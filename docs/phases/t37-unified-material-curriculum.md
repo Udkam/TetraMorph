@@ -22,7 +22,7 @@ and no Puzzle content is published without strict deterministic proof.
   Puzzle level/certificate schema, and persistence migration surface without changing
   product source.
 
-### B. Core audio audition gate
+### B. Core audio audition gate — COMPLETE
 
 - Rebuild representative production recipes for move, rotate, lock, hard drop,
   1/2/3/4-line clear, countdown, and one Mutation activation.
@@ -55,13 +55,28 @@ and no Puzzle content is published without strict deterministic proof.
   compressor on a separate bus. Automated signal/browser gates pass; stage C remains
   closed until explicit listening acceptance. Accepted 3·2·1 is status-only in R4;
   the move visual reaches its contracted settle at 56 ms before a 32 ms soft tail.
+- R5 source `2eb56af`, centred-route repair `f241488`, and evidence `05b28ff` recover
+  two exact historical action directions and three short real-Ice choices. Human
+  listening accepts **Action A** (exact T28 `35509a7`) and **Ice 2** (Freesound
+  `819779 / sbml / Ice cubes`) and rejects no part of the already frozen Studio subset.
+  Stage B is complete; this verdict opens only Stage C.
 
-### C. Complete accepted audio language
+### C. Complete accepted audio language — IN PROGRESS
 
 - Extend the accepted material grammar to every current gameplay, reward, Mutation,
   Survival, Puzzle, and UI cue.
 - Preserve mixer buses, master volume/mute, event priority, same-frame suppression,
   sixteen-voice ceiling, and exact disable/destroy silence.
+- Reproduce Action A, Studio clear/countdown, and Ice 2 exactly. Hard-drop contact waits
+  for the 50 ms descent trail; countdown uses `0 / 500 / 1000 ms` progress plus the
+  `1500 ms` start and matching visible cadence; serialized Mutation cues begin with the
+  matching renderer effect rather than a generic fixed stagger.
+- Vendor accepted runtime Ogg bytes locally with a manifest and CC0 notice. The Ice 2
+  uploader-original WAV and SHA-256 remain a blocking provenance gate for completion;
+  do not substitute a network runtime request or silently transcode the accepted Ogg.
+- Extend the grammar to the remaining gameplay, reward, Survival, Mutation, Puzzle,
+  and UI events as a bounded candidate. New cues require focused listening before Stage
+  C can close and Stage D can open.
 
 ### D. Route transition system
 

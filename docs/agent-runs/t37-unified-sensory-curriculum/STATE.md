@@ -32,6 +32,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   motifs; do not copy its labels/layout or rename Supergravity to Collapse.
 - Puzzle publication count is 46: 5 Intro, 25 Easy, 16 Hard. Easy is open; Hard uses
   related technique prerequisites at certified optimum plus five operations.
+- Human listening accepts R5 **Action A** (exact T28 `35509a7` recipe/mixer) and
+  **Ice 2** (Freesound `819779 / sbml / Ice cubes`). The R3 Studio clear/countdown
+  subset and no-tail four-pulse clear 4 remain frozen.
 
 ## Checkpoints
 
@@ -51,11 +54,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    and accepted status checkpoint `4722927` restore the 0.1-second gravity floor and
    replace inherited whole-board compaction with covered-piece-only independent-column
    settlement.
-7. `AWAITING HUMAN LISTENING` — R5 source `2eb56af`, centred-gain repair `f241488`,
+7. `ACCEPTED BY HUMAN LISTENING` — R5 source `2eb56af`, centred-gain repair `f241488`,
    and evidence `05b28ff` compare two exact historical soft action directions and three
-   short primary-source real ice contact/crack recordings. Technical and independent
-   read-only gates pass; taste remains undecided.
-8. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after R5 acceptance.
+   short primary-source real ice contact/crack recordings. The player selects Action A
+   and Ice 2; technical and independent read-only gates also pass.
+8. `IN PROGRESS` — full production audio language from the accepted Action A, Studio,
+   and Ice 2 contracts. Ice 2 original-WAV provenance remains open.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
@@ -112,8 +116,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   decodes, embedded/direct-file equality, responsive/reduced-motion checks, and zero
   console/page errors. Final typecheck, the complete suite (`381 passed / 8 skipped`),
   the 761-module build, the prescribed action client, and final independent read-only
-  QA pass. The Ice files are HQ Ogg audition previews; an accepted source still needs
-  its uploader's original WAV pinned before production use.
+  QA pass. The Ice files are HQ Ogg audition previews; the selected source still needs
+  its uploader's original WAV pinned before the production asset gate can close.
+- The player's verdict is Action A and Ice 2. Action A freezes the T28 `35509a7` mixer,
+  direct centred action route, directional movement pan, and 50 ms hard-drop
+  trail-to-contact alignment. Ice 2 freezes HQ Ogg SHA-256
+  `5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450`, original-rate
+  window `0.19375–0.63375 s`, 3 ms attack, 12 ms release, and direct accepted output.
+- A live normal-download check found no authenticated accessible Freesound surface in
+  the currently controlled browsers, and no matching original WAV exists in the local
+  Downloads folder. Do not bypass the login gate. Candidate integration may use the
+  exact accepted HQ Ogg, while `819779__sbml__ice-cubes.wav` plus its SHA-256 remains
+  the next provenance requirement.
 - Accepted Studio clear/countdown uses its own exact R3 compressor
   (`-10 dB / knee 10 / 4:1 / 3 ms / 120 ms`) after follow-up `8d8cb67`; candidates use
   a separate safety compressor. The verifier exposes and asserts this output contract.
@@ -159,15 +173,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Present the direct-file R5 page for human listening. Ask the player to accept T28,
-T29, a per-action mixture, or neither, and to select Ice 1/2/3 or reject all. Do not
-expand the remaining palette or start transition/material/Puzzle work before that
-explicit verdict.
+Commit this acceptance checkpoint, then implement Stage C in reviewable audio-only
+slices: local accepted assets/provenance boundary; exact Action A and Studio playback;
+Ice 2 window/envelope; renderer-aligned hard-drop/countdown/Mutation timing; remaining
+candidate palette and focused listening evidence. Keep transition/material/Puzzle work
+closed until the production audio candidate is green.
 
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
   evidence.
-- Do not expand the complete audio palette before the compact audition passes.
+- Do not reopen Action A, Ice 2, or the frozen Studio subset without new explicit player
+  feedback; do not treat newly extended cues as accepted merely because they share the
+  selected grammar.
 - Do not redesign all Puzzle UI before strict level data and proof contracts are green.
 - Do not reread broad logs after compaction; continue from this file one stage at a time.

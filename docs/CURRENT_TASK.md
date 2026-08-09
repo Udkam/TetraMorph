@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **AWAITING R5 HUMAN LISTENING — exact soft-history recovery and real-Ice audition**
+Status: **STAGE C IN PROGRESS — Action A and Ice 2 accepted; production audio integration**
 
 ## Active objective
 
@@ -15,8 +15,10 @@ Mutation now restores its 0.1-second-per-cell fastest tier. A Supergravity-cover
 tetromino settles by its own occupied columns against the existing board; it does not
 compact, push, or move already-settled cells. The ghost, final lock, carrier coordinates,
 and resulting line-clear rows agree in the reported floating-cell scenario. Product
-logic, evidence, corrected status records, and final independent review all pass. This
-exception does not accept R4 audio or open transition, material, or Puzzle expansion.
+logic, evidence, corrected status records, and final independent review all pass. The
+player has since accepted R5 **Action A** and **Ice 2**, opening only the complete-audio
+checkpoint. R4 remains rejected, and transition, material, and Puzzle expansion remain
+ordered after Stage C.
 
 ## Frozen product direction
 
@@ -58,10 +60,10 @@ exception does not accept R4 audio or open transition, material, or Puzzle expan
 ## Ordered checkpoints
 
 1. **Contract** — this file, `docs/DESIGN.md`, T37 phase contract, and bounded run state.
-2. **Audio audition gate** — implement and export a compact representative set covering
+2. **Audio audition gate — COMPLETE** — implement and export a compact representative set covering
    movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
    activation. Stop expansion until human listening accepts the language.
-3. **Complete audio palette** — extend only the accepted grammar to remaining gameplay,
+3. **Complete audio palette — IN PROGRESS** — extend only the accepted grammar to remaining gameplay,
    Survival, Mutation, Puzzle, and UI events; prove hierarchy, voice bounds, controls,
    determinism, and cleanup.
 4. **Transition system** — route shell and page transitions with explicit
@@ -171,10 +173,26 @@ exception does not accept R4 audio or open transition, material, or Puzzle expan
   action routing, desktop/mobile layout, reduced motion, and zero console/page errors.
   Final typecheck, the complete suite (`381 passed / 8 skipped`), and the 761-module
   build pass. Independent read-only QA passes with no blocker. These technical results
-  do not accept the sound; R5 remains blocked on the player's listening verdict.
+  established the listening candidate but did not itself accept the sound.
+- The player's verdict is **Action A + Ice 2**. Action A means exact T28 source
+  `35509a7` / blob `c43a687...`, including its mixer, direct centred routing, disclosed
+  left/right pan, and hard-drop contact after the 50 ms descent trail. Ice 2 means
+  Freesound `819779 / sbml / Ice cubes`, exact accepted HQ Ogg SHA-256
+  `5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450`, original-rate
+  `0.19375–0.63375 s` window, and accepted envelope/output route. Stage C is now open.
 - The accepted Studio clear 1/2/3 and countdown stay byte/mix frozen. Clear 4 remains
-  the same four `progress-step` pulses with no tail. None are reopened for selection.
-  Do not implement the complete palette or start transitions before R5 human listening.
+  the same four `progress-step` pulses with no tail. Countdown is the exact R3
+  `0 / 500 / 1000 / 1500 ms` cadence, including the start sample, and the visible entry
+  countdown must align to it. None are reopened for selection.
+- Production adoption remains partially gated on provenance: Freesound requires a
+  signed-in download for uploader-original `819779__sbml__ice-cubes.wav`; that original
+  WAV is not yet present locally and must be archived and hashed. The exact accepted HQ
+  Ogg may be integrated as a candidate runtime byte now, but Stage C cannot be called
+  complete until the original-source archive and manifest are green.
+- Stage C must preserve existing bounded voices, priority, mute/volume, determinism,
+  and teardown. It must align hard drop and serialized multi-Mutation audio with their
+  actual renderer start times. New non-accepted cues remain candidates requiring a
+  focused listening pass; Stage D stays closed until the Stage C candidate is verified.
 - Independent read-only QA passes candidate range `f122a4e..4a61bf5` with
   `P0 0 / P1 0 / P2 0 / P3 0`. A Temp copy reran the verifier, rebuilt the layered Ice
   asset to the committed SHA-256, confirmed the three Ice release peaks near
@@ -204,8 +222,9 @@ Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 
 ## T37 acceptance boundary
 
-- Passing tests or measurements cannot accept sound; explicit listening acceptance is
-  required before checkpoint 3.
+- Action A, Ice 2, and the frozen Studio subset are human accepted. Passing tests or
+  measurements still cannot accept newly extended Stage C cues; those require a
+  focused listening verdict before the complete-audio checkpoint closes.
 - A visual state is not accepted unless a current-source browser frame demonstrates the
   active piece, Next, ghost/landing guide, relevant status, all three themes, and both
   motion preferences without clipping or console errors.

@@ -124,6 +124,37 @@ adding unrelated badges or ornamental effects.
   responsive, reduced-motion, full project, and independent read-only gates. This only
   establishes an auditable R5 listening candidate; the player's listening verdict is
   still the sole authority for expansion.
+- Human listening now accepts **Action A** and **Ice 2**. Action A is the exact T28
+  `35509a7` recipe/mixer recovered by R5: `1.85` action master, `1.45` voice boost,
+  `0.50` ceiling, and compressor `-4 dB / knee 6 / 3:1 / 3 ms / 120 ms`, followed by
+  the audition's `0.78` output reference. Left/right alone use `-0.28 / +0.28` pan;
+  rotate, natural lock, and hard drop stay on the direct centred route. Move is the
+  short `220 Hz` settle; rotate is the `293.66 + 440 Hz` pivot/detent; lock is the
+  `246.94 Hz` contact; hard drop is the `174.61 + 349.23 Hz` mass/contact pair and its
+  audible contact begins after the renderer's 50 ms descent trail when distance is
+  non-zero. These accepted cues must be reproduced exactly before any additional cue
+  is presented as part of the same language.
+- Ice 2 is Freesound sound `819779`, uploader `sbml`, title `Ice cubes`, licensed CC0.
+  Runtime must use the exact accepted HQ Ogg byte
+  `5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450` at original
+  rate, window `0.19375–0.63375 s`, with a 3 ms rise to `0.78` and 12 ms release,
+  routed directly to the `0.78` output reference without the Action A compressor. The
+  uploader-original `819779__sbml__ice-cubes.wav` remains a mandatory provenance
+  archive with a pinned SHA-256 before the production asset gate can close; the
+  accepted Ogg remains the runtime byte so no unreviewed transcode changes the sound.
+- The already accepted Studio files are also byte-frozen: `progress-step.ogg`
+  `f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c` and
+  `start.ogg` `b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388`.
+  Clear 1–4 uses one through four progress pulses and never the rejected completion
+  tail. Countdown uses progress at `0 / 500 / 1000 ms` and start at `1500 ms`; the
+  visible entry digits adopt the same 500 ms cadence so accepted audio and animation
+  do not drift. Studio samples retain their exact stereo-panner and
+  `-10 dB / knee 10 / 4:1 / 3 ms / 120 ms` compressor route.
+- Stage C may extend this accepted grammar to the remaining events, but every new
+  soft-drop, Survival, UI, Bomb, Multiplier, and Supergravity cue remains a production
+  candidate until focused listening and automated gates pass. Mutation audio must use
+  the renderer's serialized effect order and visual start time; a fixed 35 ms audio
+  stagger is not sufficient when an earlier Bomb delays a later Ice animation.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into
