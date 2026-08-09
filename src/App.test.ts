@@ -53,6 +53,7 @@ import { PUZZLE_HARD_MASTERY_GROUPS, PUZZLE_OPTIMAL_CERTIFICATES } from './puzzl
 import { LEADERBOARD_KEY, emptyLeaderboard, type ScoreRecord } from './leaderboard';
 import { itemLabel, modeIntroRules, modeRules, modeRulesTitle } from './ui/localization';
 import type { VisualThemeId } from './design/visualThemes';
+import { appHistoryStateFor, appNavigationFromHistory } from './navigation/appRoute';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 const sourceStyles = readFileSync('src/styles.css', 'utf8');
@@ -98,7 +99,11 @@ interface RuntimeTestInstance {
   setState: (state: GameState) => void;
 }
 
-const runtimeHarness = vi.hoisted(() => ({ instances: [] as RuntimeTestInstance[] }));
+const runtimeHarness = vi.hoisted(() => ({
+  instances: [] as RuntimeTestInstance[],
+  mountGate: null as Promise<void> | null,
+  mountError: null as Error | null,
+}));
 
 vi.mock('./game/runtime/GameRuntime', async () => {
   const core = await vi.importActual<typeof import('./game/core')>('./game/core');
@@ -109,6 +114,7 @@ vi.mock('./game/runtime/GameRuntime', async () => {
     private nextClassicStartingGravityTicks: number;
     private nextClassicGravityFloorTicks: number;
     private canvas: HTMLCanvasElement | null = null;
+    private destroyed = false;
     readonly setInputEnabled = vi.fn();
     readonly setSurvivalEntryBedrockRows = vi.fn();
     readonly setReducedMotion = vi.fn();
@@ -142,6 +148,9 @@ vi.mock('./game/runtime/GameRuntime', async () => {
     }
 
     async mount(host: HTMLElement): Promise<void> {
+      if (runtimeHarness.mountGate) await runtimeHarness.mountGate;
+      if (this.destroyed) return;
+      if (runtimeHarness.mountError) throw runtimeHarness.mountError;
       this.canvas = document.createElement('canvas');
       this.canvas.tabIndex = 0;
       host.append(this.canvas);
@@ -178,7 +187,10 @@ vi.mock('./game/runtime/GameRuntime', async () => {
       this.options.onState?.(this.state, []);
     }
     getRendererSnapshot(): Record<string, never> { return {}; }
-    destroy(): void { this.canvas?.remove(); }
+    destroy(): void {
+      this.destroyed = true;
+      this.canvas?.remove();
+    }
     },
   };
 });
@@ -187,84 +199,269 @@ afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
   Reflect.deleteProperty(document as unknown as Record<string, unknown>, 'startViewTransition');
+  delete document.documentElement.dataset.routeDirection;
   localStorage.clear();
   window.history.replaceState({}, '', '/');
   runtimeHarness.instances.length = 0;
+  runtimeHarness.mountGate = null;
+  runtimeHarness.mountError = null;
 });
 
-describe('T30 route transition boundary', () => {
-  function installViewTransition() {
-    const startViewTransition = vi.fn((update: () => void) => {
-      update();
-      return { finished: Promise.resolve() };
+describe('T37 Settled Handoff route boundary', () => {
+  interface ControlledTransition {
+    readonly updateCallbackDone: Promise<void>;
+    readonly skipTransition: ReturnType<typeof vi.fn>;
+    runUpdate(): Promise<void>;
+    finish(): void;
+    rejectFinished(error?: unknown): void;
+  }
+
+  function installControlledViewTransition() {
+    const transitions: ControlledTransition[] = [];
+    const startViewTransition = vi.fn((update: () => void | Promise<void>) => {
+      let updatePromise: Promise<void> | null = null;
+      let resolveUpdate!: () => void;
+      let rejectUpdate!: (error: unknown) => void;
+      let resolveFinished!: () => void;
+      let rejectFinished!: (error: unknown) => void;
+      const updateCallbackDone = new Promise<void>((resolve, reject) => {
+        resolveUpdate = resolve;
+        rejectUpdate = reject;
+      });
+      const finished = new Promise<void>((resolve, reject) => {
+        resolveFinished = resolve;
+        rejectFinished = reject;
+      });
+      const controlled: ControlledTransition = {
+        updateCallbackDone,
+        skipTransition: vi.fn(() => resolveFinished()),
+        runUpdate: () => {
+          if (updatePromise) return updatePromise;
+          try {
+            updatePromise = Promise.resolve(update());
+          } catch (error) {
+            updatePromise = Promise.reject(error);
+          }
+          void updatePromise.then(resolveUpdate, rejectUpdate);
+          return updatePromise;
+        },
+        finish: resolveFinished,
+        rejectFinished: (error = new Error('transition failed')) => rejectFinished(error),
+      };
+      transitions.push(controlled);
+      return { finished, updateCallbackDone, skipTransition: controlled.skipTransition };
     });
     Object.defineProperty(document, 'startViewTransition', {
       configurable: true,
       value: startViewTransition,
     });
-    return startViewTransition;
+    return { startViewTransition, transitions };
   }
 
-  it('uses the native transition for push and pop routes without retaining a canvas', async () => {
-    localStorage.setItem('tetris:mode-rule-intros:v1', JSON.stringify(['marathon']));
-    const startViewTransition = installViewTransition();
+  function allowModes(...modes: GameMode[]) {
+    localStorage.setItem('tetramorph:mode-rule-intros:v1', JSON.stringify(modes));
+  }
+
+  it('waits for the real game Canvas before completing the native update snapshot', async () => {
+    allowModes('marathon');
+    let releaseMount!: () => void;
+    runtimeHarness.mountGate = new Promise<void>((resolve) => { releaseMount = resolve; });
+    const control = installControlledViewTransition();
     const view = render(createElement(App));
 
-    expect(view.container.querySelectorAll('.app-route-surface')).toHaveLength(1);
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
+    expect(control.transitions).toHaveLength(1);
+    let updateSettled = false;
+    const update = control.transitions[0]!.runUpdate().then(() => { updateSettled = true; });
     await act(async () => Promise.resolve());
 
     expect(window.location.pathname).toBe('/play/classic');
-    expect(startViewTransition).toHaveBeenCalledTimes(1);
+    expect(view.container.querySelector('[data-testid="game-screen"]')).not.toBeNull();
+    expect(view.container.querySelectorAll('canvas')).toHaveLength(0);
+    expect(updateSettled).toBe(false);
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('native');
-    expect(view.container.querySelectorAll('.app-route-surface')).toHaveLength(1);
+
+    releaseMount();
+    await act(async () => update);
+    expect(updateSettled).toBe(true);
     expect(view.container.querySelectorAll('canvas')).toHaveLength(1);
-
-    act(() => {
-      window.history.replaceState({}, '', '/');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
+    control.transitions[0]!.finish();
     await act(async () => Promise.resolve());
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
+    view.unmount();
+  });
 
-    expect(startViewTransition).toHaveBeenCalledTimes(2);
-    expect(view.container.querySelector('[data-testid="mode-home"]')).not.toBeNull();
+  it('fails closed instead of treating the Canvas readiness timeout as success', async () => {
+    vi.useFakeTimers();
+    allowModes('marathon');
+    let releaseMount!: () => void;
+    runtimeHarness.mountGate = new Promise<void>((resolve) => { releaseMount = resolve; });
+    const control = installControlledViewTransition();
+    const view = render(createElement(App));
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
+    const update = control.transitions[0]!.runUpdate();
+    await act(async () => Promise.resolve());
+    expect(view.container.querySelectorAll('canvas')).toHaveLength(0);
+
+    await act(async () => vi.advanceTimersByTimeAsync(800));
+    await act(async () => update);
+    expect(control.transitions[0]!.skipTransition).toHaveBeenCalledTimes(1);
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
+    expect(view.container.querySelectorAll('canvas')).toHaveLength(0);
+
+    view.unmount();
+    releaseMount();
+    await act(async () => Promise.resolve());
+  });
+
+  it('consumes a rejected runtime mount and skips the empty native destination', async () => {
+    allowModes('marathon');
+    runtimeHarness.mountError = new Error('WebGL unavailable');
+    const control = installControlledViewTransition();
+    const view = render(createElement(App));
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
+    await act(async () => control.transitions[0]!.runUpdate());
+
+    expect(control.transitions[0]!.skipTransition).toHaveBeenCalledTimes(1);
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
     expect(view.container.querySelectorAll('canvas')).toHaveLength(0);
     view.unmount();
   });
 
-  it('falls back immediately when the native API is absent', () => {
-    localStorage.setItem('tetris:mode-rule-intros:v1', JSON.stringify(['marathon']));
+  it('lets only the latest deferred navigation mutate History and React state', async () => {
+    allowModes('marathon', 'puzzle');
+    const control = installControlledViewTransition();
     const view = render(createElement(App));
 
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
+    expect(control.transitions).toHaveLength(2);
+    expect(control.transitions[0]!.skipTransition).toHaveBeenCalledTimes(1);
+    expect(window.location.pathname).toBe('/');
 
+    await act(async () => control.transitions[1]!.runUpdate());
+    await act(async () => control.transitions[0]!.runUpdate());
     expect(window.location.pathname).toBe('/play/classic');
     expect(view.container.querySelector('[data-testid="game-screen"]')).not.toBeNull();
-    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('fallback');
+    expect(view.container.querySelectorAll('.app-route-surface')).toHaveLength(1);
+    expect(view.container.querySelectorAll('canvas')).toHaveLength(1);
+
+    control.transitions[1]!.finish();
+    await act(async () => Promise.resolve());
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
     view.unmount();
   });
 
-  it('uses an opacity-only reduced path and leaves in-page puzzle selection unanimated', () => {
+  it('uses a bounded continuously-visible fallback and restores library focus', async () => {
+    vi.useFakeTimers();
+    allowModes('puzzle');
+    const view = render(createElement(App));
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
+    expect(window.location.pathname).toBe('/puzzles');
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('fallback');
+    await act(async () => vi.advanceTimersByTimeAsync(16));
+    expect(document.activeElement).toBe(view.container.querySelector('[data-testid="level-row"][aria-pressed="true"]'));
+    expect(view.container.querySelectorAll('[data-testid="route-viewport"]')).toHaveLength(1);
+
+    const libraryViewport = view.container.querySelector('[data-testid="route-viewport"]');
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]')?.click());
+    await act(async () => Promise.resolve());
+    expect(window.location.pathname).toMatch(/^\/play\/puzzle\//);
+    expect(view.container.querySelector('[data-testid="route-viewport"]')).not.toBe(libraryViewport);
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('fallback');
+    expect(view.container.querySelectorAll('canvas')).toHaveLength(1);
+
+    await act(async () => vi.advanceTimersByTimeAsync(160));
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
+    view.unmount();
+  });
+
+  it('uses resolved reduced motion without a native transition or spatial route change', async () => {
+    vi.useFakeTimers();
     vi.stubGlobal('matchMedia', vi.fn(() => ({
       matches: true,
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     })));
-    localStorage.setItem('tetris:mode-rule-intros:v1', JSON.stringify(['puzzle']));
-    const startViewTransition = installViewTransition();
+    allowModes('puzzle');
+    const control = installControlledViewTransition();
     const view = render(createElement(App));
 
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
-    expect(startViewTransition).not.toHaveBeenCalled();
-    expect(window.location.pathname).toBe('/puzzles');
+    expect(control.startViewTransition).not.toHaveBeenCalled();
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('reduced');
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-direction')).toBe('forward');
+
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-direction')).toBe('neutral');
 
     const routeRoot = view.container.querySelector('[data-testid="puzzle-library"]');
     const nextLevel = view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')[1]!;
     act(() => nextLevel.click());
     expect(window.location.pathname).toBe('/puzzles');
-    expect(startViewTransition).not.toHaveBeenCalled();
+    expect(appNavigationFromHistory('/puzzles', window.history.state)?.selectedPuzzleId)
+      .toBe(nextLevel.dataset.levelId);
     expect(view.container.querySelector('[data-testid="puzzle-library"]')).toBe(routeRoot);
+    expect(control.startViewTransition).not.toHaveBeenCalled();
+    view.unmount();
+  });
+
+  it('routes in-page selection through the same owner and skips an active native snapshot', async () => {
+    allowModes('puzzle');
+    const control = installControlledViewTransition();
+    const view = render(createElement(App));
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
+    await act(async () => control.transitions[0]!.runUpdate());
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('native');
+
+    const nextLevel = view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')[1]!;
+    act(() => nextLevel.click());
+    expect(control.transitions[0]!.skipTransition).toHaveBeenCalledTimes(1);
+    expect(control.transitions).toHaveLength(1);
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-direction')).toBe('neutral');
+    expect(appNavigationFromHistory('/puzzles', window.history.state)?.selectedPuzzleId)
+      .toBe(nextLevel.dataset.levelId);
+    view.unmount();
+  });
+
+  it('restores validated Puzzle context and avoids double animation for UA history gestures', () => {
+    const secondPuzzleId = CAMPAIGN_LEVELS[1]!.id;
+    const library = { screen: 'puzzle-library', mode: 'puzzle', selectedPuzzleId: secondPuzzleId } as const;
+    const control = installControlledViewTransition();
+    const view = render(createElement(App));
+
+    act(() => {
+      window.history.pushState(appHistoryStateFor(library), '', '/puzzles');
+      const event = new PopStateEvent('popstate', { state: appHistoryStateFor(library) });
+      Object.defineProperty(event, 'hasUAVisualTransition', { value: true });
+      window.dispatchEvent(event);
+    });
+
+    expect(control.startViewTransition).not.toHaveBeenCalled();
+    expect(view.container.querySelector('[data-testid="puzzle-library"]')).not.toBeNull();
+    expect(view.container.querySelector(`[data-level-id="${secondPuzzleId}"]`)?.getAttribute('aria-pressed')).toBe('true');
+    expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
+    view.unmount();
+  });
+
+  it('cleans a rejected native completion back to idle without changing the committed route', async () => {
+    allowModes('puzzle');
+    const control = installControlledViewTransition();
+    const view = render(createElement(App));
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
+    await act(async () => control.transitions[0]!.runUpdate());
+    control.transitions[0]!.rejectFinished();
+    await act(async () => Promise.resolve());
+
+    expect(window.location.pathname).toBe('/puzzles');
+    expect(view.container.querySelector('[data-testid="puzzle-library"]')).not.toBeNull();
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
     view.unmount();
   });

@@ -38,13 +38,16 @@ import {
   survivalIntervalTicks,
 } from './game/core';
 import { GameRuntime, randomRunSeed } from './game/runtime/GameRuntime';
-import { browserPlatform } from './platform/browserPlatform';
+import { browserPlatform, type PlatformFrame, type PlatformTimeout } from './platform/browserPlatform';
 import {
   DEFAULT_APP_NAVIGATION,
+  appHistoryStateFor,
+  appNavigationFromHistory,
   appPathFor,
   navigationForMode,
-  parseAppPath,
+  routeTransitionDirection,
   type AppNavigationState,
+  type RouteTransitionDirection,
 } from './navigation/appRoute';
 import {
   CAMPAIGN_LEVELS,
@@ -131,10 +134,15 @@ const APP_SEED = 0x51a1f00d;
 const PRODUCT_NAME = 'TetraMorph';
 const ENTRY_COUNTDOWN_STEP_MS = 500;
 const ENTRY_COVER_EXIT_MS = 120;
+const ROUTE_FALLBACK_MS = 160;
+const ROUTE_REDUCED_MS = 32;
+const ROUTE_READY_TIMEOUT_MS = 800;
+const NOOP = () => undefined;
 
 function readAppNavigation(): AppNavigationState {
-  const pathname = browserPlatform.windowTarget()?.location.pathname ?? '/';
-  return parseAppPath(pathname) ?? DEFAULT_APP_NAVIGATION;
+  const target = browserPlatform.windowTarget();
+  return appNavigationFromHistory(target?.location.pathname ?? '/', target?.history.state)
+    ?? DEFAULT_APP_NAVIGATION;
 }
 const MODE_RULE_INTROS_KEY = 'tetramorph:mode-rule-intros:v1';
 const LEGACY_MODE_RULE_INTROS_KEY = 'tetris:mode-rule-intros:v1';
@@ -686,7 +694,7 @@ export function ModeHome({
     modeButtonRefs.current[nextIndex]?.focus();
   };
   return (
-    <main id="game" lang={language} className="landing-shell landing-shell--workbench landing-shell--wordmark app-route-surface" data-testid="mode-home">
+    <main id="game" lang={language} className="landing-shell landing-shell--workbench landing-shell--wordmark app-route-surface" data-testid="mode-home" tabIndex={-1}>
       <section className="landing-stage landing-stage--workbench" aria-labelledby="home-title">
         <section className="mode-chooser mode-chooser--workbench">
           <div className="landing-intro">
@@ -951,7 +959,7 @@ export function PuzzleLibrary({
     selectLevelAtIndex(pageLevels[nextLocalIndex]!.index - 1, true);
   };
   return (
-    <main id="game" lang={language} className="library-shell library-shell--gallery app-route-surface" data-testid="puzzle-library">
+    <main id="game" lang={language} className="library-shell library-shell--gallery app-route-surface" data-testid="puzzle-library" tabIndex={-1}>
       <header className="library-header puzzle-gallery__header">
         <button className="library-back" type="button" aria-label={copy.labels.leaveRun} onClick={onBack}>
           <b aria-hidden="true">←</b><span>{copy.labels.modeHome}</span>
@@ -1800,6 +1808,8 @@ export function GameSession({
   onClassicGravityRangeChange = () => undefined,
   reducedMotion = browserPlatform.mediaQuery('(prefers-reduced-motion: reduce)').matches,
   onReducedMotionChange = () => undefined,
+  routeEpoch = 0,
+  onRouteReady = NOOP,
 }: {
   mode: GameMode;
   puzzleId: PuzzleId;
@@ -1816,6 +1826,8 @@ export function GameSession({
   onClassicGravityRangeChange?: (range: ClassicGravityRange) => void;
   reducedMotion?: boolean;
   onReducedMotionChange?: (reducedMotion: boolean) => void;
+  routeEpoch?: number;
+  onRouteReady?: (epoch: number, ready?: boolean) => void;
 }) {
   const copy = appCopy(language);
   const skipsEntryCountdown = mode === 'puzzle';
@@ -1987,6 +1999,7 @@ export function GameSession({
       const canvas = host.querySelector('canvas');
       canvas?.setAttribute('aria-label', appCopy(languageRef.current).phrasing.boardLabel);
       canvas?.setAttribute('aria-description', appCopy(languageRef.current).labels.touchGestureHint);
+      onRouteReady(routeEpoch, true);
       if (skipsEntryCountdown) {
         nextRuntime.start();
         setLiveMessage(appCopy(languageRef.current).labels.runStarted);
@@ -1994,6 +2007,11 @@ export function GameSession({
       } else if (countdownCompleteRef.current) {
         focusBoard();
       }
+    }).catch(() => {
+      if (disposed) return;
+      nextRuntime.destroy();
+      if (runtimeRef.current === nextRuntime) runtimeRef.current = null;
+      onRouteReady(routeEpoch, false);
     });
 
     return () => {
@@ -2001,7 +2019,7 @@ export function GameSession({
       nextRuntime.destroy();
       if (runtimeRef.current === nextRuntime) runtimeRef.current = null;
     };
-  }, [focusBoard, mode, onCanonicalCompletion, onRunFinished, puzzleId, runSeed, skipsEntryCountdown]);
+  }, [focusBoard, mode, onCanonicalCompletion, onRouteReady, onRunFinished, puzzleId, routeEpoch, runSeed, skipsEntryCountdown]);
 
   useEffect(() => {
     runtime?.setReducedMotion(reducedMotion);
@@ -2419,6 +2437,7 @@ export function GameSession({
       lang={language}
       className={`play-shell app-route-surface${pauseOpen || restartConfirmOpen ? ' play-shell--interrupted' : ''}`}
       data-testid="game-screen"
+      tabIndex={-1}
     >
       <header className="play-topbar" data-testid="cluster-header">
         <button
@@ -2717,16 +2736,52 @@ type RouteTransitionMode = 'idle' | 'native' | 'fallback' | 'reduced';
 
 interface AppViewTransition {
   finished: Promise<unknown>;
+  updateCallbackDone?: Promise<unknown>;
+  skipTransition?: () => void;
 }
 
 type AppViewTransitionDocument = Document & {
-  startViewTransition?: (update: () => void) => AppViewTransition;
+  startViewTransition?: (update: () => void | Promise<void>) => AppViewTransition;
 };
+
+interface ActiveRouteTransition {
+  readonly epoch: number;
+  readonly transition: AppViewTransition;
+}
+
+interface RouteReadyGate {
+  readonly epoch: number;
+  readonly promise: Promise<boolean>;
+  readonly resolve: (ready: boolean) => void;
+  timeout: PlatformTimeout;
+}
+
+function writeDocumentRouteDirection(direction: RouteTransitionDirection | null): void {
+  const root = browserPlatform.documentTarget()?.documentElement;
+  if (!root) return;
+  if (direction === null) delete root.dataset.routeDirection;
+  else root.dataset.routeDirection = direction;
+}
+
+function skipAppViewTransition(transition: AppViewTransition | null | undefined): void {
+  try {
+    transition?.skipTransition?.();
+  } catch {
+    // A browser may already have released an interrupted compositor transition.
+  }
+}
 
 export default function App() {
   const [navigation, setNavigation] = useState<AppNavigationState>(readAppNavigation);
   const navigationRef = useRef(navigation);
   const [routeTransitionMode, setRouteTransitionMode] = useState<RouteTransitionMode>('idle');
+  const [routeDirection, setRouteDirection] = useState<RouteTransitionDirection>('neutral');
+  const [routeCommitEpoch, setRouteCommitEpoch] = useState(0);
+  const routeEpochRef = useRef(0);
+  const activeRouteTransitionRef = useRef<ActiveRouteTransition | null>(null);
+  const routeReadyGateRef = useRef<RouteReadyGate | null>(null);
+  const routeResetTimerRef = useRef<PlatformTimeout>(null);
+  const routeFocusFrameRef = useRef<PlatformFrame>(null);
   const [language, setLanguage] = useState<AppLanguage>(readLanguage);
   const [visualTheme, setVisualTheme] = useState<VisualThemeId>(readVisualTheme);
   const [classicGravityRange, setClassicGravityRange] = useState(readClassicGravityRange);
@@ -2760,61 +2815,190 @@ export default function App() {
     if (bootScreen) bootScreen.setAttribute('aria-label', copy.labels.loading);
   }, [language]);
 
+  const settleRouteReadyGate = useCallback((epoch?: number, ready = false) => {
+    const gate = routeReadyGateRef.current;
+    if (!gate || (epoch !== undefined && gate.epoch !== epoch)) return;
+    routeReadyGateRef.current = null;
+    browserPlatform.cancelTimeout(gate.timeout);
+    gate.resolve(ready);
+  }, []);
+
+  const waitForGameRouteReady = useCallback((epoch: number): Promise<boolean> => {
+    settleRouteReadyGate();
+    let resolve: (ready: boolean) => void = NOOP;
+    const promise = new Promise<boolean>((complete) => { resolve = complete; });
+    const gate: RouteReadyGate = { epoch, promise, resolve, timeout: null };
+    routeReadyGateRef.current = gate;
+    gate.timeout = browserPlatform.scheduleTimeout(() => {
+      const active = activeRouteTransitionRef.current;
+      if (active?.epoch === epoch) skipAppViewTransition(active.transition);
+      settleRouteReadyGate(epoch, false);
+    }, ROUTE_READY_TIMEOUT_MS);
+    if (gate.timeout === null) settleRouteReadyGate(epoch, false);
+    return promise;
+  }, [settleRouteReadyGate]);
+
+  const finishRouteTransition = useCallback((epoch: number) => {
+    if (routeEpochRef.current !== epoch) return;
+    if (activeRouteTransitionRef.current?.epoch === epoch) activeRouteTransitionRef.current = null;
+    settleRouteReadyGate(epoch);
+    browserPlatform.cancelTimeout(routeResetTimerRef.current);
+    routeResetTimerRef.current = null;
+    writeDocumentRouteDirection(null);
+    setRouteTransitionMode('idle');
+    setRouteDirection('neutral');
+  }, [settleRouteReadyGate]);
+
+  const focusRouteDestination = useCallback((nextNavigation: AppNavigationState, epoch: number) => {
+    browserPlatform.cancelFrame(routeFocusFrameRef.current);
+    routeFocusFrameRef.current = null;
+    if (nextNavigation.screen === 'game') return;
+    routeFocusFrameRef.current = browserPlatform.defer(() => {
+      if (routeEpochRef.current !== epoch) return;
+      const documentTarget = browserPlatform.documentTarget();
+      const preferred = nextNavigation.screen === 'puzzle-library'
+        ? documentTarget?.querySelector<HTMLElement>('[data-testid="level-row"][aria-pressed="true"]')
+        : documentTarget?.querySelector<HTMLElement>(`[data-testid="enter-${nextNavigation.mode}"]`);
+      const landmark = documentTarget?.querySelector<HTMLElement>(
+        nextNavigation.screen === 'puzzle-library' ? '[data-testid="puzzle-library"]' : '[data-testid="mode-home"]',
+      );
+      try {
+        (preferred ?? landmark)?.focus({ preventScroll: true });
+      } catch {
+        (preferred ?? landmark)?.focus();
+      }
+    });
+  }, []);
+
   const navigate = useCallback((
     nextNavigation: AppNavigationState,
     action: 'push' | 'replace' | 'pop' = 'push',
+    hasUaVisualTransition = false,
   ) => {
     const windowTarget = browserPlatform.windowTarget();
-    const previousPath = appPathFor(navigationRef.current);
+    const previousNavigation = navigationRef.current;
+    const previousPath = appPathFor(previousNavigation);
     const nextPath = appPathFor(nextNavigation);
-    if (windowTarget && action !== 'pop' && windowTarget.location.pathname !== nextPath) {
-      if (action === 'replace') windowTarget.history.replaceState({}, '', nextPath);
-      else windowTarget.history.pushState({}, '', nextPath);
-    }
+    const direction = routeTransitionDirection(previousNavigation, nextNavigation);
+    const epoch = routeEpochRef.current + 1;
+    routeEpochRef.current = epoch;
 
-    const commit = (mode: RouteTransitionMode) => {
+    skipAppViewTransition(activeRouteTransitionRef.current?.transition);
+    activeRouteTransitionRef.current = null;
+    settleRouteReadyGate();
+    browserPlatform.cancelTimeout(routeResetTimerRef.current);
+    routeResetTimerRef.current = null;
+    browserPlatform.cancelFrame(routeFocusFrameRef.current);
+    routeFocusFrameRef.current = null;
+
+    const commit = (transitionMode: RouteTransitionMode): boolean => {
+      if (routeEpochRef.current !== epoch) return false;
+      if (windowTarget && action !== 'pop') {
+        const historyState = appHistoryStateFor(nextNavigation);
+        if (action === 'replace') windowTarget.history.replaceState(historyState, '', nextPath);
+        else if (windowTarget.location.pathname !== nextPath) windowTarget.history.pushState(historyState, '', nextPath);
+      }
       navigationRef.current = nextNavigation;
-      setRouteTransitionMode(mode);
+      setRouteCommitEpoch(epoch);
+      setRouteDirection(transitionMode === 'idle' ? 'neutral' : direction);
+      setRouteTransitionMode(transitionMode);
       setNavigation(nextNavigation);
+      return true;
     };
-    if (previousPath === nextPath) {
-      commit('idle');
+
+    const commitNow = (transitionMode: RouteTransitionMode): boolean => {
+      let committed = false;
+      flushSync(() => { committed = commit(transitionMode); });
+      if (committed) focusRouteDestination(nextNavigation, epoch);
+      return committed;
+    };
+
+    const queueFinish = (delayMs: number) => {
+      routeResetTimerRef.current = browserPlatform.scheduleTimeout(
+        () => finishRouteTransition(epoch),
+        delayMs,
+      );
+      if (routeResetTimerRef.current === null) finishRouteTransition(epoch);
+    };
+
+    if (previousPath === nextPath || hasUaVisualTransition) {
+      writeDocumentRouteDirection(null);
+      commitNow('idle');
       return;
     }
+
+    writeDocumentRouteDirection(direction);
     if (reducedMotion) {
-      commit('reduced');
+      if (commitNow('reduced')) queueFinish(ROUTE_REDUCED_MS);
       return;
     }
 
     const transitionDocument = browserPlatform.documentTarget() as AppViewTransitionDocument | null;
-    let committed = false;
-    const commitOnce = (mode: RouteTransitionMode) => {
-      if (committed) return;
-      committed = true;
-      flushSync(() => commit(mode));
-    };
     if (transitionDocument?.startViewTransition) {
       try {
-        transitionDocument.startViewTransition(() => commitOnce('native'));
+        const transition = transitionDocument.startViewTransition(async () => {
+          if (routeEpochRef.current !== epoch) return;
+          const ready = nextNavigation.screen === 'game'
+            ? waitForGameRouteReady(epoch)
+            : null;
+          if (!commitNow('native')) {
+            settleRouteReadyGate(epoch);
+            return;
+          }
+          if (ready && !(await ready)) {
+            const active = activeRouteTransitionRef.current;
+            if (active?.epoch === epoch) skipAppViewTransition(active.transition);
+          }
+        });
+        if (routeEpochRef.current !== epoch) {
+          skipAppViewTransition(transition);
+          return;
+        }
+        activeRouteTransitionRef.current = { epoch, transition };
+        void transition.updateCallbackDone?.catch(() => undefined);
+        void transition.finished.then(
+          () => finishRouteTransition(epoch),
+          () => finishRouteTransition(epoch),
+        );
         return;
       } catch {
-        commitOnce('fallback');
+        if (commitNow('fallback')) queueFinish(ROUTE_FALLBACK_MS);
         return;
       }
     }
-    commitOnce('fallback');
-  }, [reducedMotion]);
+    if (commitNow('fallback')) queueFinish(ROUTE_FALLBACK_MS);
+  }, [finishRouteTransition, focusRouteDestination, reducedMotion, settleRouteReadyGate, waitForGameRouteReady]);
+
+  const notifyRouteReady = useCallback((epoch: number, ready = true) => {
+    const active = activeRouteTransitionRef.current;
+    if (!ready && active?.epoch === epoch) skipAppViewTransition(active.transition);
+    settleRouteReadyGate(epoch, ready);
+  }, [settleRouteReadyGate]);
+
+  useEffect(() => () => {
+    routeEpochRef.current += 1;
+    skipAppViewTransition(activeRouteTransitionRef.current?.transition);
+    activeRouteTransitionRef.current = null;
+    settleRouteReadyGate();
+    browserPlatform.cancelTimeout(routeResetTimerRef.current);
+    browserPlatform.cancelFrame(routeFocusFrameRef.current);
+    routeResetTimerRef.current = null;
+    routeFocusFrameRef.current = null;
+    writeDocumentRouteDirection(null);
+  }, [settleRouteReadyGate]);
 
   useEffect(() => {
     const windowTarget = browserPlatform.windowTarget();
     if (!windowTarget) return undefined;
-    const initialRoute = parseAppPath(windowTarget.location.pathname);
+    const initialRoute = appNavigationFromHistory(windowTarget.location.pathname, windowTarget.history.state);
     if (!initialRoute) navigate(DEFAULT_APP_NAVIGATION, 'replace');
+    else windowTarget.history.replaceState(appHistoryStateFor(initialRoute), '', appPathFor(initialRoute));
 
-    return browserPlatform.listenWindow('popstate', () => {
-      const nextRoute = parseAppPath(windowTarget.location.pathname);
+    return browserPlatform.listenWindow('popstate', (event) => {
+      const popEvent = event as PopStateEvent & { hasUAVisualTransition?: boolean };
+      const nextRoute = appNavigationFromHistory(windowTarget.location.pathname, popEvent.state);
       setRuleIntroMode(null);
-      if (nextRoute) navigate(nextRoute, 'pop');
+      if (nextRoute) navigate(nextRoute, 'pop', popEvent.hasUAVisualTransition === true);
       else navigate(DEFAULT_APP_NAVIGATION, 'replace');
     });
   }, [navigate]);
@@ -2897,13 +3081,8 @@ export default function App() {
   }, [navigate, selectedPuzzleId]);
 
   const selectPuzzle = useCallback((puzzleId: PuzzleId) => {
-    setRouteTransitionMode('idle');
-    setNavigation((current) => {
-      const nextNavigation = { ...current, mode: 'puzzle' as const, selectedPuzzleId: puzzleId };
-      navigationRef.current = nextNavigation;
-      return nextNavigation;
-    });
-  }, []);
+    navigate({ ...navigationRef.current, mode: 'puzzle', selectedPuzzleId: puzzleId }, 'replace');
+  }, [navigate]);
 
   return (
     <div
@@ -2912,38 +3091,43 @@ export default function App() {
       data-theme={visualTheme}
       data-reduced-motion={reducedMotion ? 'true' : 'false'}
       data-route-transition={routeTransitionMode}
+      data-route-direction={routeDirection}
     >
-      {screen === 'home' && <ModeHome onEnter={enterMode} language={language} />}
-      {screen === 'puzzle-library' && (
-        <PuzzleLibrary
-          progress={progress}
-          selectedId={selectedPuzzleId}
-          onSelect={selectPuzzle}
-          onStart={startPuzzle}
-          onBack={() => navigate(DEFAULT_APP_NAVIGATION)}
-          language={language}
-        />
-      )}
-      {screen === 'game' && (
-        <GameSession
-          key={`${mode}:${selectedPuzzleId}`}
-          mode={mode}
-          puzzleId={selectedPuzzleId}
-          onExit={exitGame}
-          onCanonicalCompletion={recordCompletion}
-          leaderboard={leaderboard}
-          puzzleProgress={progress}
-          onRunFinished={recordRun}
-          language={language}
-          onLanguageChange={changeLanguage}
-          visualTheme={visualTheme}
-          onVisualThemeChange={changeVisualTheme}
-          classicGravityRange={classicGravityRange}
-          onClassicGravityRangeChange={changeClassicGravityRange}
-          reducedMotion={reducedMotion}
-          onReducedMotionChange={changeReducedMotion}
-        />
-      )}
+      <div className="app-route-viewport" data-testid="route-viewport" key={appPathFor(navigation)}>
+        {screen === 'home' && <ModeHome onEnter={enterMode} language={language} />}
+        {screen === 'puzzle-library' && (
+          <PuzzleLibrary
+            progress={progress}
+            selectedId={selectedPuzzleId}
+            onSelect={selectPuzzle}
+            onStart={startPuzzle}
+            onBack={() => navigate(DEFAULT_APP_NAVIGATION)}
+            language={language}
+          />
+        )}
+        {screen === 'game' && (
+          <GameSession
+            key={`${mode}:${selectedPuzzleId}`}
+            mode={mode}
+            puzzleId={selectedPuzzleId}
+            onExit={exitGame}
+            onCanonicalCompletion={recordCompletion}
+            leaderboard={leaderboard}
+            puzzleProgress={progress}
+            onRunFinished={recordRun}
+            language={language}
+            onLanguageChange={changeLanguage}
+            visualTheme={visualTheme}
+            onVisualThemeChange={changeVisualTheme}
+            classicGravityRange={classicGravityRange}
+            onClassicGravityRangeChange={changeClassicGravityRange}
+            reducedMotion={reducedMotion}
+            onReducedMotionChange={changeReducedMotion}
+            routeEpoch={routeCommitEpoch}
+            onRouteReady={notifyRouteReady}
+          />
+        )}
+      </div>
       <ActionSheet
         open={ruleIntroMode !== null}
         title={ruleIntroMode === null ? appCopy(language).labels.rules : modeRulesTitle(language, ruleIntroMode)}
