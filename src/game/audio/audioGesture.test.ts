@@ -126,8 +126,11 @@ describe('material audio gesture scheduler', () => {
     expect(gestureDuration(gesture)).toBeCloseTo(0.08, 6);
   });
 
-  it('renders every T36 instrument deterministically with finite zero endpoints', () => {
-    const instruments: ProceduralInstrument[] = ['felt', 'impact', 'ribbon', 'glass', 'shimmer', 'pulse'];
+  it('renders legacy and T37 material instruments deterministically with finite zero endpoints', () => {
+    const instruments: ProceduralInstrument[] = [
+      'felt', 'impact', 'ribbon', 'glass', 'shimmer', 'pulse',
+      'soft-contact', 'wood', 'ceramic', 'stone', 'crystal-grain', 'air-brush',
+    ];
     const signatures = new Set<string>();
     for (const instrument of instruments) {
       const layer = {

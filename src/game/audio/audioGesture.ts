@@ -7,7 +7,9 @@ interface GestureLayerBase {
   attack?: number;
 }
 
-export type ProceduralInstrument = 'felt' | 'impact' | 'ribbon' | 'glass' | 'shimmer' | 'pulse';
+export type ProceduralInstrument =
+  | 'felt' | 'impact' | 'ribbon' | 'glass' | 'shimmer' | 'pulse'
+  | 'soft-contact' | 'wood' | 'ceramic' | 'stone' | 'crystal-grain' | 'air-brush';
 
 export interface ProceduralLayer extends GestureLayerBase {
   kind: 'procedural';
@@ -119,7 +121,11 @@ export function renderProceduralSamples(layer: ProceduralLayer, sampleRate: numb
   const brightness = clamp(layer.brightness ?? 0.5, 0, 1);
   const spread = clamp(layer.spread ?? 0.35, 0, 1);
   const release = clamp(layer.release ?? 0.24, 0.04, 0.8);
-  const defaultAttack = layer.instrument === 'ribbon' || layer.instrument === 'shimmer' ? 0.012 : 0.003;
+  const defaultAttack = layer.instrument === 'ribbon'
+    || layer.instrument === 'shimmer'
+    || layer.instrument === 'air-brush'
+    ? 0.012
+    : 0.003;
   const attack = clamp(layer.attack ?? defaultAttack, 0.001, Math.max(0.001, layer.duration * 0.45));
   let phase = 0;
   let filteredNoise = 0;
@@ -187,6 +193,62 @@ export function renderProceduralSamples(layer: ProceduralLayer, sampleRate: numb
         const body = Math.sin(phase) * 0.65 + Math.sin(phase * (1.91 + spread * 0.12) + 0.5) * 0.17;
         const breath = filteredNoise * 0.08 * brightness * Math.max(0, 1 - progress * 3);
         sample = (body + breath) * envelope;
+        break;
+      }
+      case 'soft-contact': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 4.2);
+        const touch = filteredNoise * (0.55 + brightness * 0.18)
+          + highNoise * 0.08 * brightness;
+        const mutedBody = Math.sin(phase * 0.71) * 0.085 * Math.max(0, 1 - progress * 7);
+        sample = (touch + mutedBody) * envelope;
+        break;
+      }
+      case 'wood': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 3.3);
+        const contact = filteredNoise * (0.32 + brightness * 0.16)
+          * Math.max(0, 1 - progress * 10);
+        const body = Math.sin(phase) * 0.43
+          + Math.sin(phase * (1.47 + spread * 0.09) + 0.37) * 0.19
+          + Math.sin(phase * (2.13 + spread * 0.14) + 1.12) * 0.075;
+        sample = (body + contact) * envelope;
+        break;
+      }
+      case 'ceramic': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 2.15);
+        const body = Math.sin(phase) * 0.38
+          + Math.sin(phase * (2.31 + spread * 0.11) + 0.61)
+            * 0.2 * Math.max(0, 1 - progress) ** 0.55
+          + Math.sin(phase * (4.07 + spread * 0.19) + 1.73)
+            * 0.075 * Math.max(0, 1 - progress) ** 1.4;
+        const touch = filteredNoise * 0.12 * Math.max(0, 1 - progress * 12);
+        sample = (body + touch) * envelope;
+        break;
+      }
+      case 'stone': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 2.45);
+        const body = Math.sin(phase) * 0.42
+          + Math.sin(phase * (1.29 + spread * 0.07) + 0.28) * 0.21;
+        const grit = (filteredNoise * 0.42 + highNoise * 0.055)
+          * Math.max(0, 1 - progress * (4.5 + brightness * 3));
+        sample = Math.tanh((body + grit) * (1.08 + spread * 0.34)) * envelope;
+        break;
+      }
+      case 'crystal-grain': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 1.8);
+        const decay = Math.max(0, 1 - progress);
+        const body = Math.sin(phase) * 0.32
+          + Math.sin(phase * (2.68 + spread * 0.16) + 0.82) * 0.18 * decay ** 0.7
+          + Math.sin(phase * (5.19 + spread * 0.24) + 2.04) * 0.07 * decay ** 1.6;
+        const grain = Math.sign(highNoise) * Math.max(0, Math.abs(highNoise) - 0.72)
+          * 0.14 * brightness * decay ** 2;
+        sample = (body + grain) * envelope;
+        break;
+      }
+      case 'air-brush': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 0.75);
+        const body = filteredNoise * (0.66 + brightness * 0.12)
+          + highNoise * 0.055 * brightness;
+        sample = body * envelope;
         break;
       }
     }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { AUDIO_CUE_IDS, audioCue, cueEnergy, type AudioCueId } from './audioPalette';
 import { gestureDuration } from './audioGesture';
 
-describe('T36 kinetic harmonic palette', () => {
+describe('T37 material audition palette', () => {
   it('defines a bounded buffered recipe for every public cue', () => {
     expect(AUDIO_CUE_IDS).toHaveLength(27);
     for (const id of AUDIO_CUE_IDS) {
@@ -39,7 +39,7 @@ describe('T36 kinetic harmonic palette', () => {
     expect(energies[2]).toBeLessThan(energies[3] ?? 0);
     expect(durations).toEqual([...durations].sort((left, right) => left - right));
     expect(audioCue('clear-4').layers.some((layer) => (
-      layer.kind === 'procedural' && layer.instrument === 'impact'
+      layer.kind === 'procedural' && layer.instrument === 'stone'
     ))).toBe(true);
   });
 
@@ -58,14 +58,30 @@ describe('T36 kinetic harmonic palette', () => {
     }
   });
 
-  it('uses an exact three-beat cadence with a longer resolving final pulse', () => {
+  it('uses a physical core audition vocabulary without legacy electronic gestures', () => {
+    const auditionIds = [
+      'move', 'rotate', 'lock', 'hard-drop',
+      'clear-1', 'clear-2', 'clear-3', 'clear-4',
+      'countdown-tick', 'countdown-resolve', 'freeze',
+    ] satisfies AudioCueId[];
+    const physical = new Set([
+      'soft-contact', 'wood', 'ceramic', 'stone', 'crystal-grain', 'air-brush',
+    ]);
+    for (const id of auditionIds) {
+      expect(audioCue(id).layers.every((layer) => (
+        layer.kind === 'procedural' && physical.has(layer.instrument)
+      )), id).toBe(true);
+    }
+  });
+
+  it('uses an exact three-beat cadence with a longer resolving final wood strike', () => {
     expect(gestureDuration(audioCue('countdown-resolve'))).toBeGreaterThan(gestureDuration(audioCue('countdown-tick')));
     expect(cueEnergy('countdown-resolve')).toBeGreaterThan(cueEnergy('countdown-tick'));
     expect(audioCue('countdown-tick').layers[0]).toMatchObject({
-      kind: 'procedural', instrument: 'pulse', frequency: 176,
+      kind: 'procedural', instrument: 'wood', frequency: 224,
     });
     expect(audioCue('countdown-resolve').layers[0]).toMatchObject({
-      kind: 'procedural', instrument: 'pulse', frequency: 188,
+      kind: 'procedural', instrument: 'wood', frequency: 196,
     });
   });
 });
