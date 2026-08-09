@@ -74,7 +74,6 @@
   place-items: center;
   overflow: hidden;
   isolation: isolate;
-  animation: puzzle-gallery-reveal 180ms ease-out both;
 }
 
 .puzzle-gallery__stage::before {
@@ -360,7 +359,6 @@
   padding: 0;
   overflow: hidden;
   list-style: none;
-  animation: puzzle-gallery-page-in 180ms ease-out both;
 }
 
 .puzzle-gallery__grid[data-puzzle-category="intro"] {
@@ -468,16 +466,6 @@
   stroke-width: 2.45;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-@keyframes puzzle-gallery-reveal {
-  from { opacity: .55; transform: scale(.992); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes puzzle-gallery-page-in {
-  from { opacity: .45; transform: translateX(6px); }
-  to { opacity: 1; transform: translateX(0); }
 }
 
 @media (max-width: 719px), (orientation: portrait) {
@@ -684,11 +672,6 @@
   .puzzle-gallery__mastery p {
     display: none;
   }
-}
-
-.app[data-reduced-motion="true"] .puzzle-gallery__stage,
-.app[data-reduced-motion="true"] .puzzle-gallery__grid {
-  animation: none !important;
 }
 
 .app[data-reduced-motion="true"] .puzzle-gallery__node > button {
