@@ -356,6 +356,15 @@ stages despite that separate archive item, so Stage D1 is now open.
   silhouette similarity. A later independent identity slice will replace it with an
   original vector-first TetraMorph mark, prove `16/32/64 px` legibility, and keep PWA
   installation explicitly out of scope.
+- **D1 bounded checkpoint exception:** coordinator `/root` may land the inseparable
+  route transaction owner and its deferred browser-lifecycle tests together in exactly
+  `src/App.tsx` and `src/App.test.ts` at no more than `650` hand-authored changed lines.
+  The epoch owner, Canvas success/timeout/rejection gate, same-path selection, History,
+  focus, and cleanup share one state machine; splitting the two files would leave an
+  unsafe intermediate callback contract. This exception does not cover CSS, route
+  helpers, Runtime/Renderer, Core, audio, or Puzzle data. The whole checkpoint requires
+  typecheck, focused App tests, the later full suite/build/browser pass, and independent
+  exact-range read-only QA.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
