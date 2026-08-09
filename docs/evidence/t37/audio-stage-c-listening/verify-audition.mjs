@@ -8,6 +8,14 @@ import { createServer as createViteServer } from 'vite'
 const ROOT = dirname(fileURLToPath(import.meta.url))
 const PROJECT = resolve(ROOT, '..', '..', '..', '..')
 const HOST = '127.0.0.1'
+const PRODUCTION_AUDIO_PATHS = [
+  'src/game/audio/AudioEngine.ts',
+  'src/game/audio/acceptedPlayback.ts',
+  'src/game/audio/candidatePlayback.ts',
+  'src/game/audio/audioPalette.ts',
+  'src/game/audio/audioAssetCatalog.ts',
+  'src/assets/audio/t37',
+]
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -28,7 +36,7 @@ async function main() {
     cwd: PROJECT,
     stdio: 'ignore',
   })
-  execFileSync('git', ['diff', '--quiet', provenance.candidateSourceCommit, '--', 'src/game/audio'], {
+  execFileSync('git', ['diff', '--quiet', provenance.candidateSourceCommit, '--', ...PRODUCTION_AUDIO_PATHS], {
     cwd: PROJECT,
     stdio: 'ignore',
   })
@@ -66,18 +74,24 @@ async function main() {
     const initial = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
     assert(initial.sourceCommit === provenance.candidateSourceCommit, 'Page source binding changed.')
     assert(initial.productionEngine === true && initial.playCount === 0, 'Page did not start idle on production.')
-    assert(await page.locator('[data-cue]').count() === 28, 'Listening control count changed.')
+    const cueIds = await page.locator('[data-cue]').evaluateAll((buttons) => (
+      buttons.map((button) => button.dataset.cue)
+    ))
+    assert(cueIds.length === 28, 'Listening control count changed.')
+    assert(new Set(cueIds).size === cueIds.length, 'Listening cue IDs are not unique.')
     assert(await page.locator('[data-cue="freeze"]').count() === 1, 'Ice 2 is not a single frozen reference.')
 
-    await page.click('[data-cue="move-left"]')
-    await page.waitForFunction(() => JSON.parse(window.render_game_to_text()).primed === true)
-    await page.click('[data-cue="clear-4"]')
-    await page.click('[data-cue="freeze"]')
-    await page.click('[data-cue="bomb"]')
-    await page.click('[data-cue="mutation-sequence"]')
+    for (let index = 0; index < cueIds.length; index += 1) {
+      const cueId = cueIds[index]
+      assert(typeof cueId === 'string' && cueId.length > 0, `Listening cue ${index} has no ID.`)
+      await page.click(`[data-cue="${cueId}"]`)
+      await page.waitForFunction((expected) => (
+        JSON.parse(window.render_game_to_text()).playCount === expected
+      ), index + 1)
+    }
     await page.waitForTimeout(120)
     const played = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
-    assert(played.playCount === 5, 'Production listening controls did not dispatch exactly five actions.')
+    assert(played.playCount === cueIds.length, 'Not every production listening control dispatched.')
     assert(played.currentCue.includes('同帧完整序列'), 'Serialized Mutation control did not become current.')
 
     const desktop = await page.evaluate(() => ({
@@ -111,8 +125,8 @@ async function main() {
       schemaVersion: 1,
       candidateSourceCommit: provenance.candidateSourceCommit,
       productionEngineImported: true,
-      controlCount: 28,
-      dispatchedControls: 6,
+      controlCount: cueIds.length,
+      dispatchedControls: cueIds.length + 1,
       desktop,
       mobile,
       reducedTransitionDuration: reduced,

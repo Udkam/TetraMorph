@@ -80,6 +80,9 @@ async function trigger(button: HTMLButtonElement): Promise<void> {
   const handler = id ? handlers[id] : undefined;
   if (!id || !handler) return;
   clearTimers();
+  for (const active of document.querySelectorAll<HTMLButtonElement>('[data-playing]')) {
+    delete active.dataset.playing;
+  }
   button.dataset.playing = 'true';
   status && (status.textContent = primed ? '正式运行链已连接' : '正在载入本地音频…');
   await audio.prime();
