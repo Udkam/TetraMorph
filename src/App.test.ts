@@ -2242,7 +2242,7 @@ describe('T6 frontend mode binding', () => {
     expect(bomb.container.textContent).not.toContain('炸弹已清除底部 3 行');
     const mutationRule = modeRules('zh-CN', 'sprint').find((fact) => fact.id === 'items')?.value ?? '';
     expect(mutationRule).toContain('冰冻令方块以 1.0 秒/格下落');
-    expect(mutationRule).toContain('超重令后续 5 个方块落地时各列独立下沉');
+    expect(mutationRule).toContain('超重令后续 5 个方块的自身各列独立下沉，已落定方块不移动');
     expect(mutationRule).not.toContain('冻结');
     supergravity.unmount();
     latchedSupergravity.unmount();
@@ -2398,6 +2398,7 @@ describe('T6 frontend mode binding', () => {
     const customClassic = { ...createInitialState(0x51a1f00d, 'marathon', undefined, 60), lines: 10 };
     const survival = { ...createInitialState(0x51a1f00d, 'race'), lines: 3 };
     const sprint = createInitialState(0x51a1f00d, 'sprint');
+    const fastestSprint = { ...sprint, lines: 60 };
     const pending = {
       ...createInitialState(0x51a1f00d, 'race'),
       lines: 5,
@@ -2408,6 +2409,8 @@ describe('T6 frontend mode binding', () => {
     expect(fallCadenceParts(classic, 'en')).toEqual({ value: '0.7', unit: 's/cell' });
     expect(fallCadenceLabel(survival)).toBe('0.6 秒/格');
     expect(fallCadenceLabel(sprint)).toBe('0.8 秒/格');
+    expect(fallCadenceLabel(fastestSprint)).toBe('0.1 秒/格');
+    expect(fallCadenceParts(fastestSprint, 'en')).toEqual({ value: '0.1', unit: 's/cell' });
     expect(survivalCountdownLabel(pending)).toBe('待上升');
 
     const english = render(createElement(RunStats, { state: classic, language: 'en' }));
@@ -2418,6 +2421,12 @@ describe('T6 frontend mode binding', () => {
     expect(cadence?.getAttribute('aria-label')).toBe('0.7 s/cell');
     expect(cadenceUnit?.textContent).toBe('s/cell');
     english.unmount();
+
+    const mutationHud = render(createElement(RunStats, { state: fastestSprint, language: 'en' }));
+    const mutationCadence = mutationHud.container.querySelector('[data-stat-role="fall-cadence"] strong');
+    expect(mutationCadence?.textContent).toBe('0.1');
+    expect(mutationCadence?.getAttribute('aria-label')).toBe('0.1 s/cell');
+    mutationHud.unmount();
 
     expect(sourceHudStyles).toMatch(/\[data-stat-role="fall-cadence"\] \.run-stats__value-row\s*\{[^}]*display:\s*flex[^}]*align-items:\s*baseline[^}]*white-space:\s*nowrap/s);
     expect(sourceHudStyles).toMatch(/\[data-stat-role="fall-cadence"\] \.run-stats__unit\s*\{[^}]*font-family:\s*var\(--font-ui\)[^}]*font-size:\s*14px[^}]*font-weight:\s*700/s);
