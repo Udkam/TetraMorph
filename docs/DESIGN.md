@@ -200,13 +200,21 @@ adding unrelated badges or ornamental effects.
   This is a human-listening candidate, not an accepted replacement.
 - A normal one-line clear keeps its current profile and timing. Counts two through four
   use Core's existing twelve-tick / `200 ms` line-clear phase as the requested brief
-  gameplay hold; no simulation duration changes. Rows release by ascending board `y`
+  gameplay hold; no simulation duration changes. Rows start by ascending board `y`
   (top to bottom), independent of event ordering, on the accepted Studio relative
   beats: `0 / 180 ms`, `0 / 90 / 180 ms`, and `0 / 60 / 120 / 180 ms`. Presentation
-  quantizes those beats to the nearest 60 Hz tick (at most `6.67 ms` error), hides each
-  complete row on its own beat, and lets Core collapse the stack once at `200 ms`.
-  Reduced motion and Puzzle retain the same discrete row order and audio agreement but
-  remove travel, chips, and post-commit motion.
+  quantizes those beats to the nearest 60 Hz tick (at most `6.67 ms` error).
+- The prior correction that hid a complete row as soon as its beat started is rejected
+  by live play. A started row now remains materially readable for a short confirmation
+  flash, then uses the classic console centre-out order `[4,5] → [3,6] → [2,7] →
+  [1,8] → [0,9]`. The sequence is an original TetraMorph treatment: restrained inset
+  whitening and cell-pair erasure, not copied sprites, palette, exact legacy timing,
+  broad screen flash, contraction, debris, or fracture chips. Core still collapses all
+  resolved rows once at `200 ms`; only the final row may finish through a bounded,
+  translucent renderer-owned tail after that commit, and that tail must not cover the
+  settled board as an opaque old row. Reduced motion and Puzzle keep the same discrete
+  top-to-bottom audio beats but replace column travel with one stationary row flash and
+  no post-commit motion.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

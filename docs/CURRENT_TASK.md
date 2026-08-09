@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE C LISTENING GATE — Bomb and multi-line correction ready for live retest**
+Status: **STAGE C VISUAL CORRECTION — classic centre-out multi-line clear in progress**
 
 ## Active objective
 
@@ -254,6 +254,15 @@ ordered after Stage C.
   checkpoint `a096fc5` reports `P0 0 / P1 0 / P2 0 / P3 0` after `98/98` independent
   targeted tests and original-detail image review. This is ready for the player's
   focused retest, not accepted sensory work.
+- The focused retest rejects the renderer's beat-triggered direct row disappearance.
+  Counts 2–4 now require a classic-console presentation: each accepted Studio beat
+  gives its matching row a short confirmation flash, then erases symmetric cell pairs
+  from the centre outward in `[4,5] / [3,6] / [2,7] / [1,8] / [0,9]` order. Keep the
+  top-to-bottom row beats, frozen audio, one-line path, and twelve-tick Core commit.
+  Normal motion may use only a short translucent renderer tail to finish the last row
+  after Core's commit; reduced motion and Puzzle use stationary row flashes with no
+  column travel or tail. The rejected whole-row hide, broad flash, shrink/dissolve,
+  fragments, and opaque post-commit old cells must not return.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current

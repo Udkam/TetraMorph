@@ -67,7 +67,8 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    impact and the renderer's simultaneous 2–4-line removal. Correction contract
    `c52a686`, renderer `605ae2d`, Bomb `c875415`, shared timing `8e32b13`, clock-origin
    repair `41afc78`, evidence `dc70f10`, and QA `a096fc5` are green while all previously
-   accepted anchors remain frozen. Human live-play/listening remains authoritative.
+   accepted anchors remain frozen. Human live-play accepts neither the direct row-hide
+   presentation nor its prior visual evidence; a classic centre-out correction is open.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
@@ -237,13 +238,21 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   PNGs, passes seven targeted files `98/98`, finds no inherited dirty path in range,
   and reports `P0 0 / P1 0 / P2 0 / P3 0`. This permits player retesting only; it does
   not accept Bomb feel or the perceived multi-line cadence.
+- The next live-play verdict rejects direct row disappearance even though the row/audio
+  ordering is correct. The reopened renderer-only slice preserves Studio audio, Bomb,
+  one-line clear, and Core's tick-12 commit. Counts 2–4 must flash each row on its
+  accepted top-to-bottom beat, then erase symmetric pairs from centre to edges. Only a
+  short translucent normal-motion tail may outlive Core so the 180 ms final beat can
+  complete; Puzzle/reduced motion stay stationary and tail-free. Fresh real frames and
+  independent read-only QA are required before another player retest.
 
 ## Next exact action
 
-Obtain the player's focused live-play/listening verdict on Bomb and 2–4-line clears at
-normal device volume. Make no further sound or clear-timing change until that verdict;
-keep accepted anchors frozen and Stage D closed. The Ice 2 uploader-original WAV
-provenance remains independently open until acquired and hashed.
+Implement and visually verify the bounded classic centre-out 2–4-line correction. Keep
+Studio audio, Bomb, one-line clear, Core timing, and accepted anchors unchanged; capture
+normal, reduced-motion, and Puzzle frames from final source, then obtain independent
+read-only QA before returning the build for focused play. The Ice 2 uploader-original
+WAV provenance remains independently open until acquired and hashed.
 
 ## Do not repeat
 

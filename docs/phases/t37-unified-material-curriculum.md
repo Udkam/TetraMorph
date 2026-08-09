@@ -106,6 +106,14 @@ and no Puzzle content is published without strict deterministic proof.
   top-to-bottom Pixi frames, unchanged Core atomicity, lifecycle cleanup, and zero
   browser errors. Independent QA `a096fc5` reports P0–P3 all zero. Stage C still waits
   for the player's focused live-play/listening verdict; Stage D remains closed.
+- The focused retest rejects direct whole-row disappearance. Without reopening Studio
+  audio, one-line clear, or Core timing, 2–4 lines must now confirm each row on its
+  existing top-to-bottom beat and perform an original classic-console centre-out erase:
+  `[4,5] → [3,6] → [2,7] → [1,8] → [0,9]`. Normal motion may finish only the final
+  row through a short translucent renderer-owned tail after the atomic commit. Reduced
+  motion and Puzzle retain stationary row flashes and omit column travel, fragments,
+  and post-commit motion. This visual correction needs fresh browser evidence and human
+  play acceptance; the prior evidence remains historical evidence of the rejected pass.
 
 ### D. Route transition system
 
