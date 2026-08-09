@@ -1,0 +1,1775 @@
+{
+  "result": "PASS",
+  "sourceSha": "b3f21447f36e3a9e9995bb19a6c23f4aa1cc7fe2",
+  "sourceBase": "98d92be7a42149191f7c38060d21783a66515628",
+  "sourceCommitPaths": [
+    "src/animation/lineClearTimeline.test.ts",
+    "src/animation/lineClearTimeline.ts",
+    "src/game/render/TetrisRenderer.test.ts",
+    "src/game/render/TetrisRenderer.ts",
+    "src/game/render/presentation.test.ts",
+    "src/game/render/presentation.ts"
+  ],
+  "origin": "http://127.0.0.1:4190",
+  "live": {
+    "before": {
+      "canvasCount": 1,
+      "domCellCount": 0,
+      "qa": true,
+      "status": "playing",
+      "renderText": "function",
+      "viewportOverflow": 0
+    },
+    "restart": {
+      "sameCanvas": true,
+      "canvasCount": 1,
+      "cueCount": 0,
+      "status": "ready"
+    },
+    "exit": {
+      "canvasCount": 0,
+      "qa": false,
+      "renderText": "undefined"
+    }
+  },
+  "renderer": {
+    "captures": [
+      {
+        "file": "two-normal-00-0ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 0,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 71
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 0,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-01-32ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 32,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 71
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 32,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-02-64ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 64,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 79
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 64,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-03-96ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 96,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 77
+        },
+        "visibleLockedCells": 21,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 96,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 18
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-04-128ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 128,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 71
+        },
+        "visibleLockedCells": 19,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 128,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 16
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-05-160ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 160,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 65
+        },
+        "visibleLockedCells": 17,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 160,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 14
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-06-176ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 176,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 57
+        },
+        "visibleLockedCells": 17,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 176,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 14
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-07-180ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 180,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 62
+        },
+        "visibleLockedCells": 17,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 180,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 12
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-normal-08-192ms.png",
+        "scenario": "two-normal",
+        "elapsedMs": 192,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 61
+        },
+        "visibleLockedCells": 15,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 192,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 12
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-00-0ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 0,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 111
+        },
+        "visibleLockedCells": 43,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 0,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 40
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-01-16p7ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 16.7,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 115
+        },
+        "visibleLockedCells": 43,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 16.7,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 40
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-02-33p3ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 33.3,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 123
+        },
+        "visibleLockedCells": 43,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 33.3,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 40
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-03-50ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 50,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 119
+        },
+        "visibleLockedCells": 43,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 50,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 40
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-04-66p7ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 66.7,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 132
+        },
+        "visibleLockedCells": 41,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 66.7,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 38
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-05-83p3ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 83.3,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 131
+        },
+        "visibleLockedCells": 39,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 83.3,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 36
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-06-100ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 100,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 122
+        },
+        "visibleLockedCells": 37,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 100,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 34
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-07-116p7ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 116.7,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 107
+        },
+        "visibleLockedCells": 33,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 116.7,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 30
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-08-133p3ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 133.3,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 110
+        },
+        "visibleLockedCells": 29,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 133.3,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 26
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-09-150ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 150,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 101
+        },
+        "visibleLockedCells": 27,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 150,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 24
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-10-166p7ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 166.7,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 88
+        },
+        "visibleLockedCells": 25,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 166.7,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 22
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-11-180ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 180,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 89
+        },
+        "visibleLockedCells": 21,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 180,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 18
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-12-199p9ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 199.9,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 81
+        },
+        "visibleLockedCells": 19,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 199.9,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": false,
+          "visibleCellCount": 16
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-normal-13-200ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 200,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 98
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 200,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": false,
+          "visibleCellCount": 16
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-normal-14-216p7ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 216.7,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 86
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 216.7,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": false,
+          "visibleCellCount": 14
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-normal-15-233p3ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 233.3,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 77
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 233.3,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": false,
+          "visibleCellCount": 10
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-normal-16-250ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 250,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 68
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 250,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": false,
+          "visibleCellCount": 6
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-normal-17-266p7ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 266.7,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 65
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 266.7,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": false,
+          "visibleCellCount": 4
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-normal-18-283p3ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 283.3,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 51
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 283.3,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": false,
+          "visibleCellCount": 2
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-normal-19-299p9ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 299.9,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 41
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 299.9,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": false,
+          "visibleCellCount": 0
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-normal-20-300ms.png",
+        "scenario": "four-normal",
+        "elapsedMs": 300,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 41
+        },
+        "visibleLockedCells": 3,
+        "cue": null,
+        "phase": "active"
+      },
+      {
+        "file": "four-reduced-00-0ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 0,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 111
+        },
+        "visibleLockedCells": 43,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 0,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 40
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-reduced-01-40ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 40,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 106
+        },
+        "visibleLockedCells": 43,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 40,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 40
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-reduced-02-80ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 80,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 105
+        },
+        "visibleLockedCells": 43,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 80,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 40
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-reduced-03-120ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 120,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 92
+        },
+        "visibleLockedCells": 33,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 120,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 30
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-reduced-04-160ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 160,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 71
+        },
+        "visibleLockedCells": 33,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 160,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 30
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-reduced-05-180ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 180,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 68
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 180,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-reduced-06-199p9ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 199.9,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 56
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 199.9,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "four-reduced-07-200ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 200,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 74
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 200,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-reduced-08-250ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 250,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 57
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 250,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": true,
+          "visibleCellCount": 10
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-reduced-09-299p9ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 299.9,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 41
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "elapsedMs": 299.9,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": true,
+          "visibleCellCount": 0
+        },
+        "phase": "active"
+      },
+      {
+        "file": "four-reduced-10-300ms.png",
+        "scenario": "four-reduced",
+        "elapsedMs": 300,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 41
+        },
+        "visibleLockedCells": 3,
+        "cue": null,
+        "phase": "active"
+      },
+      {
+        "file": "two-puzzle-00-0ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 0,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 73
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 0,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-01-40ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 40,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 65
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 40,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-02-80ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 80,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 64
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 80,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-03-120ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 120,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 61
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 120,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-04-160ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 160,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 53
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 160,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-05-180ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 180,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 59
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 180,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-06-192ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 192,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 51
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 192,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-07-199p9ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 199.9,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 49
+        },
+        "visibleLockedCells": 23,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 199.9,
+          "durationMs": 300,
+          "committed": false,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "line-clear"
+      },
+      {
+        "file": "two-puzzle-08-200ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 200,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 48
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 200,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": true,
+          "visibleCellCount": 20
+        },
+        "phase": "active"
+      },
+      {
+        "file": "two-puzzle-09-250ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 250,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 45
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 250,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": true,
+          "visibleCellCount": 10
+        },
+        "phase": "active"
+      },
+      {
+        "file": "two-puzzle-10-299p9ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 299.9,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 23
+        },
+        "visibleLockedCells": 3,
+        "cue": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "elapsedMs": 299.9,
+          "durationMs": 300,
+          "committed": true,
+          "restrained": true,
+          "visibleCellCount": 0
+        },
+        "phase": "active"
+      },
+      {
+        "file": "two-puzzle-11-300ms.png",
+        "scenario": "two-puzzle",
+        "elapsedMs": 300,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 23
+        },
+        "visibleLockedCells": 3,
+        "cue": null,
+        "phase": "active"
+      }
+    ],
+    "core": [
+      {
+        "scenario": "two-normal",
+        "count": 2,
+        "unchangedBeforeCommit": true,
+        "boardChangedAtCommit": true,
+        "lineEvent": {
+          "type": "lines-cleared",
+          "rows": [
+            39,
+            38
+          ],
+          "count": 2,
+          "score": 100
+        }
+      },
+      {
+        "scenario": "four-normal",
+        "count": 4,
+        "unchangedBeforeCommit": true,
+        "boardChangedAtCommit": true,
+        "lineEvent": {
+          "type": "lines-cleared",
+          "rows": [
+            39,
+            38,
+            37,
+            36
+          ],
+          "count": 4,
+          "score": 1200
+        }
+      },
+      {
+        "scenario": "four-reduced",
+        "count": 4,
+        "unchangedBeforeCommit": true,
+        "boardChangedAtCommit": true,
+        "lineEvent": {
+          "type": "lines-cleared",
+          "rows": [
+            39,
+            38,
+            37,
+            36
+          ],
+          "count": 4,
+          "score": 1200
+        }
+      },
+      {
+        "scenario": "two-puzzle",
+        "count": 2,
+        "unchangedBeforeCommit": true,
+        "boardChangedAtCommit": true,
+        "lineEvent": {
+          "type": "lines-cleared",
+          "rows": [
+            39,
+            38
+          ],
+          "count": 2,
+          "score": 100
+        }
+      }
+    ],
+    "constants": {
+      "studioOffsetsMs": {
+        "1": [
+          0
+        ],
+        "2": [
+          0,
+          180
+        ],
+        "3": [
+          0,
+          90,
+          180
+        ],
+        "4": [
+          0,
+          60,
+          120,
+          180
+        ]
+      },
+      "sequenceMs": 300,
+      "tailMs": 100,
+      "fixedStepMs": 16.666666666666668,
+      "coreCommitMs": 200
+    },
+    "handoff": {
+      "first": {
+        "active": true,
+        "complete": false,
+        "pairIndex": 4,
+        "pairProgress": 0.6753246753246753,
+        "alpha": 0.4992507495000007,
+        "scale": 0.8898351648900001,
+        "highlight": 0.4254149453815441
+      },
+      "second": {
+        "active": true,
+        "complete": false,
+        "pairIndex": 0,
+        "pairProgress": 0,
+        "alpha": 1,
+        "scale": 1,
+        "highlight": 0.8
+      }
+    },
+    "cleanup": {
+      "cueBeforeModeSwitch": 1,
+      "cueAfterModeSwitch": 0
+    },
+    "canvasCountAfterDestroy": 0
+  },
+  "browserErrors": [],
+  "failures": []
+}
