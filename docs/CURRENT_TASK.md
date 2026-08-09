@@ -351,7 +351,9 @@ stages despite that separate archive item, so Stage D1 is now open.
   direction, a stable named viewport, Canvas-ready game capture, one live route/Canvas,
   focus restoration, and complete native/fallback/reduced cleanup. The destination
   starts at opacity `0.985` or higher, travels at most `6 px`, settles in `200 ms`, and
-  never blocks ready gameplay input. Mode intro/results remain a later transition slice.
+  never blocks ready gameplay input. Its named viewport owns an opaque theme-page
+  backing so transparent Game gaps never reveal an old route snapshot. Mode intro/results
+  remain a later transition slice.
 - The current four-equal-quadrant data-URI favicon is rejected for Microsoft-like
   silhouette similarity. A later independent identity slice will replace it with an
   original vector-first TetraMorph mark, prove `16/32/64 px` legibility, and keep PWA

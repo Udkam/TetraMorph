@@ -268,7 +268,9 @@ adding unrelated badges or ornamental effects.
 - One stable named route viewport owns the browser snapshot; differently sized Home,
   Library, and Game `<main>` elements do not each claim the same transition name. At
   most one React route and one live Canvas exist. Old visuals may persist only as a UA
-  compositor snapshot, never as a second mounted page/runtime.
+  compositor snapshot, never as a second mounted page/runtime. The named viewport
+  carries the active theme's opaque `--page` background so transparent gaps in Game
+  panels cannot reveal Home or Library content beneath the destination snapshot.
 - `App` owns one monotonic navigation epoch. A new intent invalidates and skips older
   native work; only the latest callback may update History and React state. Completion,
   rejection, synchronous failure, interruption, and unmount clean only their own epoch
