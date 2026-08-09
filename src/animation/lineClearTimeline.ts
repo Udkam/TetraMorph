@@ -12,6 +12,15 @@ export const STUDIO_LINE_CLEAR_OFFSETS_MS = Object.freeze({
 
 export const LINE_CLEAR_FIXED_STEP_MS = 1_000 / TICKS_PER_SECOND;
 
+/**
+ * TetraMorph's classic-console erase compresses five symmetric column pairs into
+ * three readable renderer steps: centre pair, centre six, then the outer four.
+ * Core still owns the unchanged twelve-tick commit.
+ */
+export const CLASSIC_LINE_CLEAR_ERASE_TICKS = 3;
+export const CLASSIC_LINE_CLEAR_TAIL_TICKS = 2;
+export const CLASSIC_LINE_CLEAR_TAIL_MS = CLASSIC_LINE_CLEAR_TAIL_TICKS * LINE_CLEAR_FIXED_STEP_MS;
+
 /** Nearest canonical 60 Hz presentation tick for every accepted Studio pulse. */
 export const LINE_CLEAR_RELEASE_TICKS = Object.freeze({
   1: Object.freeze([0]),
@@ -38,6 +47,18 @@ export function orderedLineClearRows(rows: readonly number[]): readonly number[]
 export function lineClearReleaseTicks(count: number): readonly number[] {
   if (!isLineClearCount(count)) return Object.freeze([]);
   return LINE_CLEAR_RELEASE_TICKS[count];
+}
+
+/** Integer/fractional ticks elapsed since one row's accepted Studio beat. */
+export function lineClearRowElapsedTicks(
+  phaseTicks: number,
+  count: number,
+  rowOrder: number,
+): number | null {
+  if (!isLineClearCount(count) || count === 1 || !Number.isInteger(rowOrder)) return null;
+  const releaseTick = LINE_CLEAR_RELEASE_TICKS[count][rowOrder];
+  if (releaseTick === undefined || !Number.isFinite(phaseTicks) || phaseTicks < releaseTick) return null;
+  return Math.max(0, phaseTicks - releaseTick);
 }
 
 /**
@@ -70,11 +91,9 @@ export function lineClearRowReleaseProgress(
   count: number,
   rowOrder: number,
 ): number {
-  if (!isLineClearCount(count) || count === 1 || !Number.isInteger(rowOrder)) return 0;
-  const releaseTick = LINE_CLEAR_RELEASE_TICKS[count][rowOrder];
-  if (releaseTick === undefined || phaseTicks < releaseTick) return 0;
-  const availableTicks = Math.max(1, Math.min(3, LINE_CLEAR_DELAY_TICKS - releaseTick));
-  return Math.max(0, Math.min(1, (phaseTicks - releaseTick + 0.5) / availableTicks));
+  const elapsedTicks = lineClearRowElapsedTicks(phaseTicks, count, rowOrder);
+  if (elapsedTicks === null) return 0;
+  return Math.max(0, Math.min(1, (elapsedTicks + 0.5) / CLASSIC_LINE_CLEAR_ERASE_TICKS));
 }
 
 /** Age already accrued when Core commits, so earlier rows never respawn as fresh tails. */

@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CLASSIC_LINE_CLEAR_ERASE_TICKS,
+  CLASSIC_LINE_CLEAR_TAIL_MS,
+  CLASSIC_LINE_CLEAR_TAIL_TICKS,
   LINE_CLEAR_FIXED_STEP_MS,
   LINE_CLEAR_RELEASE_TICKS,
   STUDIO_LINE_CLEAR_OFFSETS_MS,
   lineClearReleaseAgeMs,
   lineClearReleaseSnapshot,
+  lineClearRowElapsedTicks,
   lineClearRowReleaseProgress,
   orderedLineClearRows,
 } from './lineClearTimeline';
@@ -47,11 +51,17 @@ describe('line-clear timeline', () => {
     expect(lineClearReleaseSnapshot([1, 2, 3, 4, 5], 0)).toBeNull();
   });
 
-  it('bounds each multi-line row pulse and carries its pre-commit release age', () => {
+  it('keeps a three-tick classic erase and carries the final row across commit', () => {
+    expect(CLASSIC_LINE_CLEAR_ERASE_TICKS).toBe(3);
+    expect(CLASSIC_LINE_CLEAR_TAIL_TICKS).toBe(2);
+    expect(CLASSIC_LINE_CLEAR_TAIL_MS).toBe(2 * LINE_CLEAR_FIXED_STEP_MS);
+    expect(lineClearRowElapsedTicks(3, 4, 1)).toBeNull();
+    expect(lineClearRowElapsedTicks(4, 4, 1)).toBe(0);
+    expect(lineClearRowElapsedTicks(6.5, 4, 1)).toBe(2.5);
     expect(lineClearRowReleaseProgress(3, 4, 1)).toBe(0);
     expect(lineClearRowReleaseProgress(4, 4, 1)).toBeGreaterThan(0);
     expect(lineClearRowReleaseProgress(7, 4, 1)).toBe(1);
-    expect(lineClearRowReleaseProgress(11, 4, 3)).toBe(0.5);
+    expect(lineClearRowReleaseProgress(11, 4, 3)).toBeCloseTo(1 / 6);
     expect(lineClearRowReleaseProgress(11, 1, 0)).toBe(0);
 
     const ages = [0, 1, 2, 3].map((rowOrder) => lineClearReleaseAgeMs(4, rowOrder));

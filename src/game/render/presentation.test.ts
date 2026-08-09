@@ -5,6 +5,9 @@ import {
   approachPresentationPoint,
   boardShiftPresentationOffset,
   clampActivePresentationOffsetY,
+  classicLineClearCellErased,
+  classicLineClearErasedPairCount,
+  classicLineClearPairIndex,
   exposedCellEdges,
   internalCellSeams,
   lineClearCellProgress,
@@ -14,6 +17,7 @@ import {
   ordinaryLineClearCellProgress,
   ordinaryLineClearFragment,
   ordinaryMultiLineClearCellProgress,
+  ordinaryMultiLineClearCellErased,
   ordinaryLineClearPresentationProgress,
   ordinaryLineClearProfile,
   orthogonalCellComponents,
@@ -21,6 +25,7 @@ import {
   survivalDebrisCells,
 } from './presentation';
 import { createBoard, createInitialState, dispatch, PIECE_SHAPES, PIECE_TYPES, type Cell, type GameState } from '../core';
+import { CLASSIC_LINE_CLEAR_TAIL_MS } from '../../animation/lineClearTimeline';
 
 describe('presentation interpolation', () => {
   it('projects the real independent-column Supergravity landing without mutating Core', () => {
@@ -95,9 +100,9 @@ describe('presentation interpolation', () => {
   it('maps only the four ordinary clear profiles to their fixed normal and reduced timing', () => {
     expect([1, 2, 3, 4].map((count) => ordinaryLineClearProfile(count))).toMatchObject([
       { id: 'precision-cut', normalTicks: 9, reducedTicks: 6, postCommitTailMs: 0 },
-      { id: 'dual-resonance', normalTicks: 11, reducedTicks: 7, postCommitTailMs: 20 },
-      { id: 'cascade-fracture', normalTicks: 12, reducedTicks: 8, postCommitTailMs: 80 },
-      { id: 'tetramorph', normalTicks: 12, reducedTicks: 8, postCommitTailMs: 220 },
+      { id: 'dual-resonance', normalTicks: 11, reducedTicks: 7, postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS },
+      { id: 'cascade-fracture', normalTicks: 12, reducedTicks: 8, postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS },
+      { id: 'tetramorph', normalTicks: 12, reducedTicks: 8, postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS },
     ]);
     for (const count of [-1, 0, 1.5, 5, Number.NaN]) {
       expect(ordinaryLineClearProfile(count)).toBeNull();
@@ -127,13 +132,35 @@ describe('presentation interpolation', () => {
     expect(lineClearCellProgress(1, 9, 10)).toBe(1);
   });
 
-  it('stages multi-line feedback top-to-bottom while reduced motion keeps the same beats stationary', () => {
-    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 0, 4, false)).toBeGreaterThan(0);
+  it('flashes, then erases symmetric pairs centre-out while restrained geometry stays stationary', () => {
+    expect(Array.from({ length: 10 }, (_, column) => classicLineClearPairIndex(column, 10)))
+      .toEqual([4, 3, 2, 1, 0, 0, 1, 2, 3, 4]);
+    expect(classicLineClearErasedPairCount(0, 10, false)).toBe(0);
+    expect(classicLineClearErasedPairCount(1, 10, false)).toBe(1);
+    expect(classicLineClearErasedPairCount(2, 10, false)).toBe(3);
+    expect(classicLineClearErasedPairCount(3, 10, false)).toBe(5);
+    expect(classicLineClearCellErased(1, 4, 10, false)).toBe(true);
+    expect(classicLineClearCellErased(1, 3, 10, false)).toBe(false);
+    expect(classicLineClearCellErased(2, 2, 10, false)).toBe(true);
+    expect(classicLineClearCellErased(2, 1, 10, false)).toBe(false);
+    expect(classicLineClearCellErased(3, 0, 10, false)).toBe(true);
+
+    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 0, 4, false)).toBe(1);
     expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 1, 4, false)).toBe(0);
-    expect(ordinaryMultiLineClearCellProgress(4, 4, 10, 1, 4, false)).toBeGreaterThan(0);
+    expect(ordinaryMultiLineClearCellProgress(4, 4, 10, 1, 4, false)).toBe(1);
     expect(ordinaryMultiLineClearCellProgress(4, 4, 10, 2, 4, false)).toBe(0);
+    expect(ordinaryMultiLineClearCellErased(0, 4, 10, 0, 4, false)).toBe(false);
+    expect(ordinaryMultiLineClearCellErased(1, 4, 10, 0, 4, false)).toBe(true);
+    expect(ordinaryMultiLineClearCellErased(1, 0, 10, 0, 4, false)).toBe(false);
+    expect(ordinaryMultiLineClearCellErased(2, 2, 10, 0, 4, false)).toBe(true);
+    expect(ordinaryMultiLineClearCellErased(3, 0, 10, 0, 4, false)).toBe(true);
+
+    expect(ordinaryMultiLineClearCellProgress(0, 0, 10, 0, 4, true)).toBe(1);
     expect(ordinaryMultiLineClearCellProgress(0, 0, 10, 0, 4, true))
       .toBe(ordinaryMultiLineClearCellProgress(0, 9, 10, 0, 4, true));
+    expect(ordinaryMultiLineClearCellErased(0, 0, 10, 0, 4, true)).toBe(false);
+    expect(ordinaryMultiLineClearCellErased(1, 0, 10, 0, 4, true)).toBe(true);
+    expect(ordinaryMultiLineClearCellErased(1, 9, 10, 0, 4, true)).toBe(true);
     expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 1, 4, true)).toBe(0);
     expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 0, 1, false)).toBe(0);
 

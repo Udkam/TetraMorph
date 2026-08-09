@@ -20,7 +20,11 @@ import {
   VISIBLE_START_ROW,
 } from '../core';
 import { ordinaryLineClearProfile } from './presentation';
-import { LINE_CLEAR_FIXED_STEP_MS, LINE_CLEAR_RELEASE_TICKS } from '../../animation/lineClearTimeline';
+import {
+  CLASSIC_LINE_CLEAR_TAIL_MS,
+  LINE_CLEAR_FIXED_STEP_MS,
+  LINE_CLEAR_RELEASE_TICKS,
+} from '../../animation/lineClearTimeline';
 import { BEDROCK_MATERIAL, COLORS, MUTATION_MATERIALS, SURVIVAL_STONE_MATERIAL, type PieceMaterial } from './theme';
 
 let TetrisRendererClass: (typeof import('./TetrisRenderer'))['TetrisRenderer'];
@@ -181,10 +185,12 @@ type RendererInternals = {
   }>;
   ordinaryLineClearTails: Array<{
     count: 2 | 3 | 4;
-    cells: readonly { cell: Cell; material: BoardMaterial; releaseAgeMs: number }[];
+    cells: readonly { cell: Cell; material: BoardMaterial }[];
+    elapsedAtCommitTicks: number;
     elapsed: number;
     duration: number;
     intensity: number;
+    fresh: boolean;
   }>;
   survivalBedrockCue: {
     direction: 'up' | 'down';
@@ -2029,7 +2035,7 @@ describe('Puzzle undo presentation reset', () => {
     expect(new Set(signatures).size).toBe(4);
   });
 
-  it('hides multi-line rows top-to-bottom without moving Core cells or hiding fixed materials', () => {
+  it('flashes then erases multi-line cells centre-out without moving Core or hiding fixed materials', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
@@ -2056,10 +2062,13 @@ describe('Puzzle undo presentation reset', () => {
     const app = { screen: { width: 280, height: 480 }, renderer: { resolution: 1 } };
 
     for (const expected of [
-      { tick: 0, visible: 33, releasedRows: orderedRows.slice(0, 1) },
-      { tick: 4, visible: 23, releasedRows: orderedRows.slice(0, 2) },
-      { tick: 7, visible: 13, releasedRows: orderedRows.slice(0, 3) },
-      { tick: 11, visible: 3, releasedRows: orderedRows },
+      { tick: 0, visible: 41, releasedRows: orderedRows.slice(0, 1) },
+      { tick: 1, visible: 39, releasedRows: orderedRows.slice(0, 1) },
+      { tick: 2, visible: 35, releasedRows: orderedRows.slice(0, 1) },
+      { tick: 3, visible: 33, releasedRows: orderedRows.slice(0, 1) },
+      { tick: 4, visible: 33, releasedRows: orderedRows.slice(0, 2) },
+      { tick: 7, visible: 23, releasedRows: orderedRows.slice(0, 3) },
+      { tick: 11, visible: 13, releasedRows: orderedRows },
     ]) {
       const frame = { ...state, phaseTicks: expected.tick } as GameState;
       internals.drawPieces(frame, layout);
@@ -2091,14 +2100,14 @@ describe('Puzzle undo presentation reset', () => {
     });
   });
 
-  it('removes released Puzzle markers and Mutation material overlays with their row', () => {
+  it('keeps Puzzle markers and Mutation materials until their matching cells erase', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
     const top = BOARD_HEIGHT - 2;
     const bottom = BOARD_HEIGHT - 1;
     const board = createBoard();
-    board[top]![1] = 'T';
+    board[top]![4] = 'T';
     board[bottom]![2] = 'T';
     const puzzle = {
       ...createInitialState(0x1a16_401, 'puzzle'),
@@ -2107,13 +2116,16 @@ describe('Puzzle undo presentation reset', () => {
       phase: 'line-clear',
       phaseTicks: 0,
       pendingClearRows: [bottom, top],
-      puzzleTargetCells: [{ x: 1, y: top }, { x: 2, y: bottom }],
+      puzzleTargetCells: [{ x: 4, y: top }, { x: 2, y: bottom }],
     } as GameState;
     const markers = createGraphicsRecorder();
 
     internals.drawPuzzleTargetMarkers(markers.graphics, puzzle, layout, 0);
 
-    expect(markers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(2);
+    expect(markers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(4);
+    const laterMarkers = createGraphicsRecorder();
+    internals.drawPuzzleTargetMarkers(laterMarkers.graphics, { ...puzzle, phaseTicks: 1 }, layout, 0);
+    expect(laterMarkers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(2);
 
     const mutation = {
       ...createInitialState(0x1a16_402, 'sprint'),
@@ -2125,13 +2137,25 @@ describe('Puzzle undo presentation reset', () => {
       mutationCarriers: [{
         id: 1,
         item: 'freeze',
-        cells: [{ x: 1, y: top }, { x: 2, y: bottom }],
+        cells: [{ x: 4, y: top }, { x: 2, y: bottom }],
       }],
     } as GameState;
     const drawSurface = vi.spyOn(internals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
     const drawCore = vi.spyOn(internals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
 
     internals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
+
+    expect(drawSurface.mock.calls[0]?.[1]).toEqual([
+      { x: 4, y: top - VISIBLE_START_ROW },
+      { x: 2, y: bottom - VISIBLE_START_ROW },
+    ]);
+    expect(drawCore.mock.calls[0]?.[1]).toEqual([
+      { x: 4, y: top - VISIBLE_START_ROW },
+      { x: 2, y: bottom - VISIBLE_START_ROW },
+    ]);
+    drawSurface.mockClear();
+    drawCore.mockClear();
+    internals.drawMutationCarrierMaterials(markers.graphics, { ...mutation, phaseTicks: 1 }, layout, 0);
 
     expect(drawSurface.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
     expect(drawCore.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
@@ -2251,7 +2275,7 @@ describe('Puzzle undo presentation reset', () => {
     expect(singleProfile.reducedTicks).toBe(6);
   });
 
-  it('bounds post-commit clear tails and clears them on conflicts and lifecycle boundaries', () => {
+  it('bridges only the unfinished final row for two ticks and clears tails on lifecycle boundaries', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const board = createBoard();
@@ -2265,21 +2289,36 @@ describe('Puzzle undo presentation reset', () => {
     };
     const classic = { ...createInitialState(0x1a16_6ff, 'marathon'), status: 'playing' } as GameState;
 
+    internals.consumeEvents([event], classic, board);
+    expect(internals.ordinaryLineClearTails).toHaveLength(1);
+    expect(internals.ordinaryLineClearTails[0]).toMatchObject({
+      duration: CLASSIC_LINE_CLEAR_TAIL_MS,
+      elapsedAtCommitTicks: 1,
+      fresh: true,
+    });
+    expect(internals.ordinaryLineClearTails[0]!.cells).toHaveLength(8);
+    expect(internals.ordinaryLineClearTails[0]!.cells.every(({ cell }) => cell.y === BOARD_HEIGHT - 1)).toBe(true);
+    expect(internals.ordinaryLineClearTails[0]!.cells.map(({ cell }) => cell.x)).toEqual([0, 1, 2, 3, 6, 7, 8, 9]);
+
+    const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
+    const commitFrame = createGraphicsRecorder();
+    (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = commitFrame.graphics;
+    internals.drawEffects(classic, layout);
+    expect(commitFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(8);
+    internals.advanceEffects(0);
+    internals.advanceEffects(LINE_CLEAR_FIXED_STEP_MS);
+    const secondFrame = createGraphicsRecorder();
+    (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = secondFrame.graphics;
+    internals.drawEffects(classic, layout);
+    expect(secondFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(4);
+    internals.advanceEffects(LINE_CLEAR_FIXED_STEP_MS);
+    expect(internals.ordinaryLineClearTails).toHaveLength(0);
+
     for (let index = 0; index < 6; index += 1) internals.consumeEvents([event], classic, board);
     expect(internals.ordinaryLineClearTails).toHaveLength(4);
-    expect(internals.ordinaryLineClearTails.every((tail) => tail.duration === 220)).toBe(true);
-    expect(internals.ordinaryLineClearTails.every((tail) => tail.cells.length === 40)).toBe(true);
-    const releaseAgeByRow = new Map<number, number>();
-    for (const cell of internals.ordinaryLineClearTails[0]!.cells) {
-      releaseAgeByRow.set(cell.cell.y, cell.releaseAgeMs);
-    }
-    expect([...releaseAgeByRow.entries()].sort(([left], [right]) => left - right)).toEqual([
-      [BOARD_HEIGHT - 4, 12 * LINE_CLEAR_FIXED_STEP_MS],
-      [BOARD_HEIGHT - 3, 8 * LINE_CLEAR_FIXED_STEP_MS],
-      [BOARD_HEIGHT - 2, 5 * LINE_CLEAR_FIXED_STEP_MS],
-      [BOARD_HEIGHT - 1, LINE_CLEAR_FIXED_STEP_MS],
-    ]);
-    internals.advanceEffects(220);
+    expect(internals.ordinaryLineClearTails.every((tail) => tail.cells.length === 8)).toBe(true);
+    internals.advanceEffects(0);
+    internals.advanceEffects(CLASSIC_LINE_CLEAR_TAIL_MS);
     expect(internals.ordinaryLineClearTails).toHaveLength(0);
 
     internals.consumeEvents([event], { ...classic, mode: 'puzzle' }, board);
@@ -2288,7 +2327,8 @@ describe('Puzzle undo presentation reset', () => {
       event,
       { type: 'mutation-activated', item: 'bomb', durationTicks: 0, score: 300, rowsRemoved: 3 },
     ], { ...classic, mode: 'sprint' }, board);
-    expect(internals.ordinaryLineClearTails).toHaveLength(0);
+    expect(internals.ordinaryLineClearTails).toHaveLength(1);
+    internals.ordinaryLineClearTails.length = 0;
 
     internals.consumeEvents([event], classic, board);
     expect(internals.ordinaryLineClearTails).toHaveLength(1);

@@ -10,7 +10,10 @@ import {
   type PieceType,
   type SurvivalDebris,
 } from '../core';
-import { lineClearRowReleaseProgress } from '../../animation/lineClearTimeline';
+import {
+  CLASSIC_LINE_CLEAR_TAIL_MS,
+  lineClearRowElapsedTicks,
+} from '../../animation/lineClearTimeline';
 
 export interface PresentationPoint {
   x: number;
@@ -80,7 +83,7 @@ const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
     id: 'dual-resonance',
     normalTicks: 11,
     reducedTicks: 7,
-    postCommitTailMs: 20,
+    postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS,
     faceAlpha: 0.18,
     fragmentCeiling: 16,
     rowStagger: 0,
@@ -90,7 +93,7 @@ const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
     id: 'cascade-fracture',
     normalTicks: 12,
     reducedTicks: 8,
-    postCommitTailMs: 80,
+    postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS,
     faceAlpha: 0.21,
     fragmentCeiling: 32,
     rowStagger: 0.1,
@@ -100,7 +103,7 @@ const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
     id: 'tetramorph',
     normalTicks: 12,
     reducedTicks: 8,
-    postCommitTailMs: 220,
+    postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS,
     faceAlpha: 0.24,
     fragmentCeiling: 48,
     rowStagger: 0.07,
@@ -142,9 +145,47 @@ export function ordinaryLineClearCellProgress(
   return lineClearCellProgress(rowProgress, column, width);
 }
 
+/** Symmetric NES-like pair ordinal: `[4,5]` is zero and `[0,9]` is four. */
+export function classicLineClearPairIndex(column: number, width: number): number | null {
+  if (!Number.isInteger(column) || !Number.isInteger(width) || width <= 0 || column < 0 || column >= width) {
+    return null;
+  }
+  return Math.floor(Math.abs(column - (width - 1) / 2));
+}
+
 /**
- * Binds one whole multi-line row to its matching Studio pulse. Every cell shares
- * one release beat; reduced motion and Puzzle remove the renderer's chips/travel.
+ * Number of symmetric centre-out pairs already erased at a row-local time.
+ * The fixed ten-column board reads as `0 → 1 → 3 → 5` pairs across three ticks.
+ */
+export function classicLineClearErasedPairCount(
+  elapsedTicks: number,
+  width: number,
+  restrainedGeometry: boolean,
+): number {
+  if (!Number.isFinite(elapsedTicks) || !Number.isInteger(width) || width <= 0 || elapsedTicks <= 0) return 0;
+  const pairCount = Math.ceil(width / 2);
+  if (restrainedGeometry) return pairCount;
+  const step = Math.floor(elapsedTicks);
+  if (step <= 0) return 0;
+  if (step === 1) return Math.min(1, pairCount);
+  if (step === 2) return Math.min(pairCount, Math.max(1, Math.ceil(pairCount * 0.6)));
+  return pairCount;
+}
+
+export function classicLineClearCellErased(
+  elapsedTicks: number,
+  column: number,
+  width: number,
+  restrainedGeometry: boolean,
+): boolean {
+  const pairIndex = classicLineClearPairIndex(column, width);
+  if (pairIndex === null) return false;
+  return pairIndex < classicLineClearErasedPairCount(elapsedTicks, width, restrainedGeometry);
+}
+
+/**
+ * Binds each multi-line row to its Studio beat. A complete confirmation flash is
+ * followed by a clean centre-out boundary; no chip/fracture language is returned.
  */
 export function ordinaryMultiLineClearCellProgress(
   phaseTicks: number,
@@ -152,10 +193,29 @@ export function ordinaryMultiLineClearCellProgress(
   width: number,
   rowOrder: number,
   count: number,
-  _restrainedGeometry: boolean,
+  restrainedGeometry: boolean,
 ): number {
-  if (!Number.isInteger(column) || width <= 0 || column < 0 || column >= width) return 0;
-  return lineClearRowReleaseProgress(phaseTicks, count, rowOrder);
+  const pairIndex = classicLineClearPairIndex(column, width);
+  const elapsedTicks = lineClearRowElapsedTicks(phaseTicks, count, rowOrder);
+  if (pairIndex === null || elapsedTicks === null) return 0;
+  if (classicLineClearCellErased(elapsedTicks, column, width, restrainedGeometry)) return 0;
+  if (elapsedTicks <= 0 || restrainedGeometry) return 1;
+  const erasedPairs = classicLineClearErasedPairCount(elapsedTicks, width, false);
+  const boundaryDistance = Math.max(0, pairIndex - erasedPairs);
+  return Math.max(0.24, 1 - boundaryDistance * 0.24);
+}
+
+export function ordinaryMultiLineClearCellErased(
+  phaseTicks: number,
+  column: number,
+  width: number,
+  rowOrder: number,
+  count: number,
+  restrainedGeometry: boolean,
+): boolean {
+  const elapsedTicks = lineClearRowElapsedTicks(phaseTicks, count, rowOrder);
+  if (elapsedTicks === null) return false;
+  return classicLineClearCellErased(elapsedTicks, column, width, restrainedGeometry);
 }
 
 /**
