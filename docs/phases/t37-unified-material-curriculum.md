@@ -91,6 +91,16 @@ and no Puzzle content is published without strict deterministic proof.
 - Independent QA found no P0/P1/P2 and only two P3 coverage gaps. Test `2766a55` closes
   the complete Bomb-route assertion; evidence repair `94fffb9` dispatches all 28 controls
   and fixes the stale multi-button playing state found by that exhaustive pass.
+- Live play on 2026-08-10 reopens Bomb and the 2–4-line presentation/audio join. The
+  existing Bomb sound finishes before the renderer's 220 ms impact; correct it with one
+  quiet warning pressure followed by a bounded low body, deterministic low-passed crack,
+  and low tail beginning exactly at impact. Keep the 620 ms visual sequence unchanged.
+- Preserve Core's twelve-tick / 200 ms clear pause and the accepted Studio relative
+  cadence. One line stays unchanged. For 2/3/4 lines, release rows top-to-bottom at
+  `0/180`, `0/90/180`, and `0/60/120/180 ms` respectively, then let Core perform its
+  existing single atomic stack collapse. Reduced motion and Puzzle keep the same
+  discrete order without chips or travel. These corrections require focused human
+  play/listening before Stage C can close.
 
 ### D. Route transition system
 

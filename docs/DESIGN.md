@@ -185,6 +185,28 @@ adding unrelated badges or ornamental effects.
   Survival, outcome, Bomb, Multiplier, and Supergravity remain unaccepted until the
   player listens. The R5 provenance record now uses the real
   full T28 commit `35509a70c35cebf16b942387229ca880756a61cd`.
+- The 2026-08-10 live-play verdict reopens two bounded Stage-C details. Bomb pressure
+  is audible but does not read as an explosion because its complete `0–160 ms` cue
+  ends before the renderer's `220 ms` impact. Two-, three-, and four-line clears are
+  also rejected as an audio/visual pair: Studio already emits distinct row pulses,
+  while the locked board still removes every pending row together at Core commit.
+  Action A, Ice 2, countdown, the Studio sample bytes/mixer, and the one-line clear
+  remain frozen.
+- The Bomb correction keeps the existing `620 ms` visual sequence and sixteen-voice
+  ceiling. A restrained `74 Hz` warning pressure begins at activation; the actual
+  explosion begins at the renderer's exact `220 ms` impact with a `111 → 48 Hz` body,
+  a short `880 Hz / Q 0.55` low-passed deterministic crack, and one quiet low tail.
+  The cue ends by `490 ms`, before the next serialized Mutation may start at `620 ms`.
+  This is a human-listening candidate, not an accepted replacement.
+- A normal one-line clear keeps its current profile and timing. Counts two through four
+  use Core's existing twelve-tick / `200 ms` line-clear phase as the requested brief
+  gameplay hold; no simulation duration changes. Rows release by ascending board `y`
+  (top to bottom), independent of event ordering, on the accepted Studio relative
+  beats: `0 / 180 ms`, `0 / 90 / 180 ms`, and `0 / 60 / 120 / 180 ms`. Presentation
+  quantizes those beats to the nearest 60 Hz tick (at most `6.67 ms` error), hides each
+  complete row on its own beat, and lets Core collapse the stack once at `200 ms`.
+  Reduced motion and Puzzle retain the same discrete row order and audio agreement but
+  remove travel, chips, and post-commit motion.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

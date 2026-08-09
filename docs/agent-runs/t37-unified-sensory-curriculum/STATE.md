@@ -58,12 +58,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    and evidence `05b28ff` compare two exact historical soft action directions and three
    short primary-source real ice contact/crack recordings. The player selects Action A
    and Ice 2; technical and independent read-only gates also pass.
-8. `HUMAN LISTENING GATE` — full production audio language from the accepted Action A,
+8. `LIVE-PLAY CORRECTION IN PROGRESS` — full production audio language from the accepted Action A,
    Studio, and Ice 2 contracts. Contract `03ce9fd`, playback foundation `a1febc0`, local
    assets/countdown `47629e7`, production mapping `108aee8`, remaining candidate
    `95978eb`, direct-production evidence `006a936`, coverage test `2766a55`, and
    all-control evidence repair `94fffb9` are committed. Ice 2 original-WAV provenance
-   and remaining-cue listening remain open.
+   and remaining-cue listening remain open. The player now rejects Bomb's missing
+   impact and the renderer's simultaneous 2–4-line removal; their bounded correction
+   is open while all previously accepted anchors remain frozen.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
@@ -212,14 +214,21 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   delta, a clean range diff, and no inherited T27 or `progress.md` path in the candidate.
 - Two initial read-only audit agents failed before producing findings because the
   selected model was at capacity. No retry loop or extra resource was started.
+- The 2026-08-10 live-play audit identifies two structural mismatches. Bomb audio ends
+  at 160 ms although its Pixi impact begins at 220 ms. Multi-line Studio pulses already
+  span 0–180 ms, but locked rows remain visible until Core removes the entire set at
+  200 ms. The correction keeps Core at twelve ticks, binds Bomb's main body/crack to
+  220 ms, and uses the existing clear hold to release rows top-to-bottom at the accepted
+  pulse beats. One-line clear, Action A, Ice 2, and Studio sample/mixer bytes are outside
+  the reopened surface.
 
 ## Next exact action
 
-Obtain the player's focused verdict on utility/UI, Survival, outcomes, Bomb,
-Multiplier, and Supergravity from the direct-production listening surface. Keep the
-accepted anchors frozen and Stage D product edits closed. If the candidate passes,
-run the post-source full gates and close only the listening half of Stage C; the Ice 2
-uploader-original WAV provenance must still be reported open until acquired and hashed.
+Implement the bounded Bomb impact and 2–4-line top-to-bottom correction, then run the
+focused source tests followed by exactly one final typecheck, complete suite, build, and
+source-bound browser pass. Obtain the player's focused live-play/listening verdict while
+keeping accepted anchors frozen and Stage D closed. The Ice 2 uploader-original WAV
+provenance remains independently open until acquired and hashed.
 
 ## Do not repeat
 

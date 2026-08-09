@@ -63,7 +63,7 @@ ordered after Stage C.
 2. **Audio audition gate — COMPLETE** — implement and export a compact representative set covering
    movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
    activation. Stop expansion until human listening accepts the language.
-3. **Complete audio palette — IN PROGRESS** — extend only the accepted grammar to remaining gameplay,
+3. **Complete audio palette — IN PROGRESS / LIVE-PLAY CORRECTION** — extend only the accepted grammar to remaining gameplay,
    Survival, Mutation, Puzzle, and UI events; prove hierarchy, voice bounds, controls,
    determinism, and cleanup.
 4. **Transition system** — route shell and page transitions with explicit
@@ -230,6 +230,18 @@ ordered after Stage C.
   asset to the committed SHA-256, confirmed the three Ice release peaks near
   `324 / 327 / 327 ms`, and found no inherited T27 or `progress.md` path in range.
   This technical verdict does not replace the remaining human listening decision.
+- The 2026-08-10 live-play pass rejects the production Bomb cue and the current visual
+  handling of multi-line clears. Bomb ends before its visual impact and therefore lacks
+  an explosion beat. Studio 2/3/4-line audio is still accepted, but the renderer leaves
+  all pending rows visible until the atomic Core commit, so the visual result reads as
+  one simultaneous deletion instead of the audible row sequence.
+- The bounded correction freezes one-line clear, Action A, Ice 2, Studio bytes/mixer,
+  and the twelve-tick Core rule. Bomb gains a restrained warning-to-impact contour whose
+  main body/crack begins at the existing `220 ms` Pixi impact and ends before `620 ms`.
+  Counts 2–4 use the existing `200 ms` hold to release complete rows top-to-bottom at
+  the accepted relative beats (`0/180`, `0/90/180`, `0/60/120/180 ms`) before the one
+  atomic stack collapse. Reduced motion/Puzzle keep that discrete order without travel
+  or fragments. Both changes remain unaccepted until focused live listening/play.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
