@@ -235,6 +235,13 @@ adding unrelated badges or ornamental effects.
   beneath the current board/piece with only low-alpha highlights above. Reduced motion
   and Puzzle keep geometry fixed and use opacity only. No fragments, broad flash,
   copied legacy palette/timing, audio reschedule, or input delay is introduced.
+- The player accepts that R3 treatment for two through four rows and explicitly reopens
+  one-line presentation. A one-line clear now uses the same `0–300 ms` centre-out
+  material track from its existing `0 ms` Studio start: the same symmetric pair order,
+  highlight/scale/alpha sample, `200 ms` Core commit, at-most-`100 ms` captured-material
+  continuation, stationary Puzzle/reduced-motion form, Mutation/target alpha agreement,
+  exclusions, cue cap, and lifecycle cleanup. Its accepted audio byte/mix is unchanged;
+  the old one-line precision-cut/chip overlay is retired rather than layered underneath.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

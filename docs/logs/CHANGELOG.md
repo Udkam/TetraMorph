@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-10 — T37 continuous multi-line clear accepted; single-line extension opened
+
+- Replaced the rejected `50 ms` / three-step 2–4-line clear with a continuous
+  renderer-owned `300 ms` centre-out track. Two rows use `210/120 ms` windows and
+  three/four rows use `120 ms` windows, producing at least `30 ms` overlap between
+  adjacent rows while preserving the accepted Studio starts and one-line path.
+- Normal cells now pass through sampled highlight, scale, and alpha states. Unfinished
+  original material continues through Core's unchanged `200 ms` atomic commit for at
+  most `100 ms`, beneath the collapsed board/current piece; Puzzle and reduced motion
+  use stationary opacity, with Puzzle targets and all four Mutation materials retained.
+- Product `40b3e76`, continuity repair `b3f2144`, and evidence `914a937` pass final
+  typecheck, the full suite (`401 passed / 8 skipped`), the 767-module build, a
+  53-frame zero-error real Pixi/browser audit, and independent `109/109` review with
+  `P0 0 / P1 0 / P2 0 / P3 0`. The first QA pass's three continuity/cleanup findings
+  are closed. The player now accepts this 2–4-line effect.
+- The same verdict explicitly reopens one line. Its next bounded implementation must
+  reuse the accepted `0–300 ms` centre-out material track and stationary restrained
+  form while preserving the `0 ms` Studio cue, tick-12 Core commit, accepted multi-line
+  behavior, Mutation/Puzzle material agreement, cue cap, and cleanup. Nothing is pushed
+  until that extension has fresh evidence and review.
+
 ## 2026-08-10 — T37 classic centre-out multi-line clear awaiting play acceptance
 
 - Replaced the rejected beat-triggered whole-row disappearance for 2–4-line clears with

@@ -268,16 +268,34 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   only. All incomplete rows retain captured material through the maximum `100 ms`
   post-commit continuation, beneath the collapsed board/current piece. Anchor/Bedrock
   are excluded, marker/material alpha is synchronized, and lifecycle cleanup is exact.
+- Product `40b3e76` implements the continuous track; repair `b3f2144` closes the first
+  read-only QA findings by preserving the same material/alpha across the `200 ms`
+  commit, continuing Puzzle targets and all four Mutation surfaces, and clearing cues
+  when reduced motion is toggled in either direction. Core, audio, one-line clear, and
+  inherited dirty paths remain outside the source range.
+- Evidence `914a937` binds 53 real renderer frames plus the full Chinese Classic page
+  and prescribed two-iteration client to source `b3f2144`. Its audit passes overlapping
+  row handoff, `199.9/200/250/300 ms` continuity, stationary restrained handling,
+  tick-12 atomicity, lifecycle cleanup, one Canvas, zero DOM cells, and zero browser
+  errors. The owned Vite PID `29628` exited and port `4190` is released.
+- Final typecheck, the complete suite (`44 passed / 2 skipped` files;
+  `401 passed / 8 skipped` tests), and the 767-module production build pass. Independent
+  recheck passes `109/109` focused tests and reports `P0 0 / P1 0 / P2 0 / P3 0`.
+- The player accepts the R3 2–4-line effect and explicitly extends it to one line. The
+  single row uses the same `0–300 ms` sampled centre-out material track, current `0 ms`
+  Studio start, tick-12 commit, at-most-`100 ms` continuation, stationary restrained
+  branch, Mutation/Puzzle material agreement, exclusions, cue cap, and cleanup. The old
+  one-line precision-cut/chip overlay is removed; audio and accepted multi-line behavior
+  stay frozen.
 
 ## Next exact action
 
-Implement the bounded R3 continuous 2–4-line track in the six timeline/presentation/
-renderer source-and-test paths. Prove intermediate per-cell samples, overlapping row
-handoffs, `199.9 → 200 → 250 → 300 ms` continuity, stationary restrained handling,
-material/marker agreement, and exact lifecycle cleanup; then capture a real 60 fps
-sequence and obtain independent read-only QA before another focused play verdict. The
-Ice 2 uploader-original WAV provenance remains independently open until acquired and
-hashed.
+Implement the bounded one-line extension in the shared timeline/presentation/renderer
+paths and tests. Prove a `0–300 ms` normal centre-out sequence, stationary Puzzle and
+reduced-motion handling, `199.9 → 200 → 250 → 300 ms` material continuity, unchanged
+Studio audio/Core/multi-line contracts, and exact cleanup. Then capture real one-line
+Pixi frames and obtain independent read-only QA before another player check. Do not
+push; the Ice 2 uploader-original WAV remains independently open.
 
 ## Do not repeat
 

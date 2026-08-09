@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE C R3 CONTINUOUS-CLEAR CORRECTION — implementation in progress**
+Status: **STAGE C R3 MULTI-LINE ACCEPTED — SINGLE-LINE EXTENSION IN PROGRESS**
 
 ## Active objective
 
@@ -296,6 +296,25 @@ ordered after Stage C.
   row starts and end time but replace centre travel/scale with a stationary opacity
   fade. Target markers and Mutation surfaces follow their cell alpha; Anchor/Bedrock
   never enter the track. Restart, undo, mode/reduced-motion switch, and destroy clear it.
+- Product `40b3e76` plus continuity repair `b3f2144` implements that R3 contract in the
+  six renderer/timeline source-and-test paths. The repair closes the first independent
+  review's commit-frame opacity jump, missing post-commit Puzzle/Mutation material, and
+  incomplete reduced-motion cleanup without touching Core, audio, or one-line clear.
+  Evidence `914a937` binds 53 real Pixi frames and complete-page/client runs to full
+  source `b3f21447f36e3a9e9995bb19a6c23f4aa1cc7fe2`; it records an overlapping two-row
+  handoff, continuous `199.9 → 200 → 250 → 300 ms` material, stationary restrained
+  variants, one Canvas, zero DOM cells, exact cleanup, and zero browser errors. Final
+  typecheck, the complete suite (`401 passed / 8 skipped`), the 767-module build, and
+  independent `109/109` focused recheck pass with `P0 0 / P1 0 / P2 0 / P3 0`.
+  Normal-speed human play remained the only acceptance gate for this presentation.
+- The player now accepts the R3 2–4-line presentation and explicitly reopens the
+  previously frozen one-line path. One line must reuse the same full `0–300 ms`
+  centre-out material track from its existing `0 ms` Studio start, including continuous
+  pair sampling, the unchanged `200 ms` Core commit, at most `100 ms` of identical
+  captured material after commit, stationary Puzzle/reduced-motion handling,
+  Mutation/target alpha agreement, and exact cleanup. Remove the old one-line
+  precision-cut/chip overlay; do not change the accepted one-line audio or any 2–4-line
+  timing/material behavior.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current

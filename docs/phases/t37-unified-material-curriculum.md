@@ -127,6 +127,18 @@ and no Puzzle content is published without strict deterministic proof.
   `30 ms`. Each normal pair exposes highlight, scale, and partial-alpha states; the
   restrained branch uses stationary opacity only. All unfinished rows may continue the
   same captured-material sample for at most `100 ms` after Core's atomic commit.
+- R3 product `40b3e76` and continuity repair `b3f2144` pass final typecheck, the full
+  suite (`401 passed / 8 skipped`), the 767-module build, and independent `109/109`
+  focused review with P0–P3 all zero. Evidence `914a937` binds 53 real Pixi captures,
+  both sides of the `200 ms` Core commit, the `250/300 ms` tail endpoints, overlapping
+  row handoff, restrained Puzzle/reduced-motion material, real-page lifecycle, and zero
+  browser errors to the repaired source. This admits normal-speed player testing only;
+  it does not mark the visual cadence accepted or open Stage D.
+- The player accepts that R3 2–4-line cadence. The same verdict explicitly reopens one
+  line: it adopts the identical `0–300 ms` centre-out track at its existing `0 ms`
+  Studio beat, including the unchanged tick-12 commit, at-most-`100 ms` continuation,
+  stationary restrained form, material/marker agreement, and cleanup. The accepted
+  one-line audio remains frozen, and this bounded extension does not open Stage D.
 
 ### D. Route transition system
 
