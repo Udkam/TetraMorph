@@ -45,7 +45,7 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 4. `PARTIALLY ACCEPTED` — R3 freezes Studio clear 1/2/3 and countdown; clear 4 adopts
    the same four-pulse grammar without the rejected completion tail.
 5. `CANDIDATE / LISTENING REQUIRED` — R4 replaces rejected
-   move/rotate/lock/hard-drop and Glass Ice only at candidate tip `8d8cb67`.
+   move/rotate/lock/hard-drop and Glass Ice only at candidate tip `9232d14`.
 6. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
 7. `PENDING` — route transition system and reduced-motion verification.
@@ -78,7 +78,8 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   rotation, natural-lock, hard-drop candidates are too sharp/not soft enough; Glass Ice
   is rejected as unpleasant. These verdicts override the green R3 measurements.
 - The R4 page under `docs/evidence/t37/audio-audition-r4/` contains only the failed
-  action set, three new Ice choices, and read-only review buttons for the frozen set.
+  action set, three new Ice choices, frozen-set status labels, and one clear-4 extension
+  button. Accepted 3·2·1 is not reopened as a review control.
   Actions use five UI SFX `soft` files with per-event contour, 12–18 ms attacks,
   1.6–2.6 kHz low-pass ceilings, `0.88×–1.05×` rates, post-filter peak calibration,
   and 12 ms retrigger release. Ice uses CC0 OpenGameArt Freeze Spell and IceShatters
@@ -91,10 +92,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Accepted Studio clear/countdown uses its own exact R3 compressor
   (`-10 dB / knee 10 / 4:1 / 3 ms / 120 ms`) after follow-up `8d8cb67`; candidates use
   a separate safety compressor. The verifier exposes and asserts this output contract.
+- Follow-up `9232d14` makes the move visual reach its declared main settle at 56 ms,
+  then finish a 32 ms soft tail. The verifier asserts both the visual timing and absence
+  of an accepted-countdown review control.
 - The develop-web-game client observed `ice-layered / 冰冻激活` with no error artifact.
   A second pass observed accepted `3 · 2 · 1` with the frozen compressor contract.
-  Owned Python server PIDs `6608` and `3140` exited and port `4184` was released after
-  each pass. No audition server or browser remains owned.
+  A third pass observed `soft / 左移` with the `56 / 88 ms` timing contract. Owned
+  Python server PIDs `6608`, `3140`, and `24132` exited and port `4184` was released
+  after each pass. No audition server or browser remains owned.
 - The required develop-web-game client also observed `studio / 左移`; its owned Vite
   PID was stopped and port `4183` released. No server or browser remains owned.
 - The superseded uncommitted R2 gain-only edit was restored to committed source. Its

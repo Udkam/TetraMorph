@@ -117,7 +117,7 @@ materials, and Puzzle progression.
   new Ice candidates; it does not make the user re-approve the frozen clear/countdown
   set.
 - R4 evidence is committed at `0e2b13e` with accepted-mix preservation follow-up
-  `8d8cb67` under
+  `8d8cb67` and scope/timing follow-up `9232d14` under
   `docs/evidence/t37/audio-audition-r4/`. Ordinary actions now use UI SFX `soft`
   directional/semantic cues with 12–18 ms attack, low-pass shaping, restrained rate,
   post-filter peak calibration, and de-clicked retrigger release. This keeps move,
@@ -136,6 +136,9 @@ materials, and Puzzle progression.
   exact `-10 dB / knee 10 / 4:1 / 3 ms / 120 ms` settings. Open R4 candidates retain
   their separate safety chain, so preserving the accepted mix does not undo the new
   softer-action calibration.
+- The accepted 3·2·1 remains a status label rather than a review button. The only
+  accepted-area control is the new four-pulse clear-4 extension. Move now reaches its
+  main lateral settle at the declared 56 ms and uses a 32 ms soft visual tail.
 - The only next product decision is human listening: ordinary actions may pass as a
   set or receive per-action feedback; Ice may select 1 / 2 / 3 or reject all. Do not
   implement the complete palette or start transitions before that answer.
