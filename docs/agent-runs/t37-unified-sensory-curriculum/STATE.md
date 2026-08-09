@@ -46,9 +46,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    the same four-pulse grammar without the rejected completion tail.
 5. `CANDIDATE / LISTENING REQUIRED` — R4 replaces rejected
    move/rotate/lock/hard-drop and Glass Ice only at candidate tip `9232d14`.
-6. `IN PROGRESS` — player-directed bounded Mutation correction from base `265899d`:
-   restore the 0.1-second gravity floor and replace inherited whole-board compaction
-   with covered-piece-only independent-column settlement.
+6. `IMPLEMENTED / FINAL DOC QA PENDING` — player-directed bounded Mutation correction
+   from base `265899d`: source `646b865`, bilingual copy `ae75f1e`, and source-bound
+   browser evidence `c691d54` restore the 0.1-second gravity floor and replace inherited
+   whole-board compaction with covered-piece-only independent-column settlement.
 7. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
 8. `PENDING` — route transition system and reduced-motion verification.
@@ -115,16 +116,30 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - The superseded uncommitted R2 gain-only edit was restored to committed source. Its
   two untracked draft files were moved out of the workspace to the task-specific temp
   archive rather than staged or deleted.
-- No full suite, build, browser pass, server, or complete-palette expansion has run.
+- The Mutation correction's focused Core/presentation tests pass `50/50`; focused App
+  tests pass `56/56`. After the last product source edit,
+  `npm.cmd run typecheck`, the complete suite (`40 passed / 2 skipped` files;
+  `381 passed / 8 skipped` tests), and the 761-module production build all pass. The
+  build emits only the pre-existing bundle-size advisory.
+- Browser evidence under `docs/evidence/t37/mutation-rules-correction/` binds to product
+  source `ae75f1e`. Its live frame has one Canvas, zero DOM board cells, no overflow,
+  and no console/page errors. Its deterministic exact reproduction keeps the settled
+  `(8,34)` cell fixed, settles the covered O cells at `(8,32)`, `(8,33)`, `(9,38)`, and
+  `(9,39)`, preserves the bottom-row `(8,39)` gap, starts no clear, matches ghost to
+  lock and carrier coordinates, and verifies 60 lines as 6 ticks / 0.1 seconds per cell.
+- Initial independent read-only QA of `265899d..c691d54` passes every product, test,
+  evidence, scope, and screenshot claim and independently reruns `106/106` targeted
+  tests. It withholds final acceptance only because this state file still described the
+  completed gates as pending; the current documentation checkpoint corrects that stale
+  record and requires one final read-only recheck.
 - Two initial read-only audit agents failed before producing findings because the
   selected model was at capacity. No retry loop or extra resource was started.
 
 ## Next exact action
 
-Complete the bounded Mutation rules correction: update Core and projection together,
-add the floating-support no-push/no-tunnel regression, run focused then final gates and
-one browser pass, and obtain independent read-only QA. Afterwards return to R4 human
-listening; do not expand the remaining palette or start transition/material/Puzzle work.
+Obtain independent read-only recheck of the corrected Mutation status documents. If it
+passes, record the verdict and return to R4 human listening; do not expand the remaining
+palette or start transition/material/Puzzle work without the player's sound decision.
 
 ## Do not repeat
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **IMPLEMENTING — bounded Mutation rules correction; R4 listening remains open**
+Status: **FINAL DOC QA — Mutation correction implemented; R4 listening remains open**
 
 ## Active objective
 
@@ -10,12 +10,14 @@ audible palette and combines four user-visible concerns that must agree rather t
 polished independently: tactile sound, page transitions, ordinary/Mutation piece
 materials, and Puzzle progression.
 
-The player has temporarily interrupted the audio gate for one bounded Core correction.
-Mutation must restore its 0.1-second-per-cell fastest tier. A Supergravity-covered
-tetromino settles by its own occupied columns against the existing board; it must not
+The player temporarily interrupted the audio gate for one bounded Core correction.
+Mutation now restores its 0.1-second-per-cell fastest tier. A Supergravity-covered
+tetromino settles by its own occupied columns against the existing board; it does not
 compact, push, or move already-settled cells. The ghost, final lock, carrier coordinates,
-and resulting line-clear rows must agree in the reported floating-cell scenario. This
-exception does not accept R4 audio or open transition, material, or Puzzle expansion.
+and resulting line-clear rows agree in the reported floating-cell scenario. Product
+logic and evidence pass independent review; only the corrected final status record
+awaits recheck. This exception does not accept R4 audio or open transition, material, or
+Puzzle expansion.
 
 ## Frozen product direction
 
@@ -160,6 +162,17 @@ exception does not accept R4 audio or open transition, material, or Puzzle expan
   rule copy, which assigns independent descent to the covered tetromino. The bounded
   correction keeps settled cells fixed as collision support and restores Mutation's
   historic 0.1-second gravity floor before returning to the R4 listening gate.
+- Contract `6ffef46`, Core/presentation source `646b865`, bilingual rule copy
+  `ae75f1e`, and browser evidence `c691d54` form the bounded correction candidate.
+  Focused tests pass `50/50` plus `56/56`; final typecheck, the complete suite
+  (`381 passed / 8 skipped`), and the 761-module build pass after the last product edit.
+  The source-bound browser audit verifies the exact floating-support scene, 6-tick
+  fastest gravity, one Canvas, zero DOM board cells, ghost/lock/carrier agreement, no
+  false clear, and zero browser errors; its owned server exited and port 4185 is free.
+- Independent read-only QA passes every product/evidence claim and independently reruns
+  `106/106` targeted tests. Its sole initial blocker was the stale run-state sentence
+  that still called completed gates pending; that record is corrected here and awaits
+  the final documentation-only recheck.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.
