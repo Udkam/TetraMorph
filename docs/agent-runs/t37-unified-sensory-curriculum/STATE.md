@@ -95,6 +95,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Follow-up `9232d14` makes the move visual reach its declared main settle at 56 ms,
   then finish a 32 ms soft tail. The verifier asserts both the visual timing and absence
   of an accepted-countdown review control.
+- Independent read-only QA passes `f122a4e..4a61bf5` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. Its task-specific Temp copy reports
+  `PASS assets=10 recipes=8 consoleErrors=0 pageErrors=0`; it independently rebuilds
+  the layered Ice buffer to SHA-256 `fea3b7e185441bd68707602ad0efa284c279d32d7511c7600a47ab7e6e240082`,
+  measures the three Ice main responses near `324 / 327 / 327 ms`, confirms primary
+  CC0 source records, and finds no inherited T27 or `progress.md` path in the range.
+  Human listening remains the only open audio gate.
 - The develop-web-game client observed `ice-layered / 冰冻激活` with no error artifact.
   A second pass observed accepted `3 · 2 · 1` with the frozen compressor contract.
   A third pass observed `soft / 左移` with the `56 / 88 ms` timing contract. Owned

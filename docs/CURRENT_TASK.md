@@ -142,6 +142,11 @@ materials, and Puzzle progression.
 - The only next product decision is human listening: ordinary actions may pass as a
   set or receive per-action feedback; Ice may select 1 / 2 / 3 or reject all. Do not
   implement the complete palette or start transitions before that answer.
+- Independent read-only QA passes candidate range `f122a4e..4a61bf5` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. A Temp copy reran the verifier, rebuilt the layered Ice
+  asset to the committed SHA-256, confirmed the three Ice release peaks near
+  `324 / 327 / 327 ms`, and found no inherited T27 or `progress.md` path in range.
+  This technical verdict does not replace the remaining human listening decision.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.
