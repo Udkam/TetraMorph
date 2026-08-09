@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { CAMPAIGN_LEVELS } from '../puzzleProgress';
 import {
   DEFAULT_APP_NAVIGATION,
+  appHistoryStateFor,
+  appNavigationFromHistory,
   appPathFor,
   navigationForMode,
   parseAppPath,
+  routeTransitionDirection,
 } from './appRoute';
 
 describe('appRoute', () => {
@@ -37,5 +40,29 @@ describe('appRoute', () => {
     expect(appPathFor(navigationForMode('puzzle', firstPuzzleId))).toBe('/puzzles');
     expect(appPathFor({ screen: 'game', mode: 'puzzle', selectedPuzzleId: firstPuzzleId }))
       .toBe(`/play/puzzle/${firstPuzzleId}`);
+  });
+
+  it('restores validated route context without allowing history to override the URL', () => {
+    const secondPuzzleId = CAMPAIGN_LEVELS[1]!.id;
+    const library = { screen: 'puzzle-library', mode: 'puzzle', selectedPuzzleId: secondPuzzleId } as const;
+    const saved = appHistoryStateFor(library);
+
+    expect(appNavigationFromHistory('/puzzles', saved)).toEqual(library);
+    expect(appNavigationFromHistory('/', saved)).toEqual(DEFAULT_APP_NAVIGATION);
+    expect(appNavigationFromHistory('/puzzles', {
+      tetramorphRoute: { version: 1, navigation: { ...library, selectedPuzzleId: 'unknown' } },
+    })).toEqual(parseAppPath('/puzzles'));
+  });
+
+  it('derives calm transition direction from route hierarchy', () => {
+    const classic = navigationForMode('marathon', firstPuzzleId);
+    const library = navigationForMode('puzzle', firstPuzzleId);
+    const puzzleGame = { screen: 'game', mode: 'puzzle', selectedPuzzleId: firstPuzzleId } as const;
+
+    expect(routeTransitionDirection(DEFAULT_APP_NAVIGATION, classic)).toBe('forward');
+    expect(routeTransitionDirection(DEFAULT_APP_NAVIGATION, library)).toBe('forward');
+    expect(routeTransitionDirection(library, puzzleGame)).toBe('forward');
+    expect(routeTransitionDirection(puzzleGame, library)).toBe('back');
+    expect(routeTransitionDirection(classic, library)).toBe('neutral');
   });
 });
