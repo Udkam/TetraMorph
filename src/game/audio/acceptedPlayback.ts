@@ -8,6 +8,7 @@ export type AcceptedActionCueId = 'move' | 'rotate' | 'lock' | 'hard-drop';
 
 export interface AcceptedActionTone {
   readonly frequency: number;
+  readonly endFrequency?: number;
   readonly duration: number;
   readonly gain: number;
   readonly attack: number;
@@ -118,11 +119,37 @@ export function scheduleAcceptedAction(
     readonly maxVoices?: number;
   } = {},
 ): GestureVoice[] {
+  return scheduleToneRecipe(context, destination, ACTION_A_CONTRACT.recipes[cue], {
+    ...options,
+    gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
+    gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
+  });
+}
+
+/**
+ * Schedules the short T28 tone grammar without assigning human-acceptance status.
+ * Action A calls this with its frozen recipe; the recovered support palette calls it
+ * on a separate graph with the same bounded envelope and gain rules.
+ */
+export function scheduleToneRecipe(
+  context: AudioContext,
+  destination: AudioNode,
+  tones: readonly AcceptedActionTone[],
+  options: AcceptedVoiceHooks & {
+    readonly startAt?: number;
+    readonly pan?: number;
+    readonly maxVoices?: number;
+    readonly gainBoost?: number;
+    readonly gainCeiling?: number;
+  } = {},
+): GestureVoice[] {
   const startAt = options.startAt ?? context.currentTime;
   const pan = options.pan ?? 0;
-  const maxVoices = Math.max(0, options.maxVoices ?? ACTION_A_CONTRACT.recipes[cue].length);
+  const maxVoices = Math.max(0, options.maxVoices ?? tones.length);
+  const gainBoost = Math.max(0, options.gainBoost ?? 1);
+  const gainCeiling = Math.max(ACCEPTED_SILENCE, options.gainCeiling ?? 1);
   const voices: GestureVoice[] = [];
-  for (const tone of ACTION_A_CONTRACT.recipes[cue].slice(0, maxVoices)) {
+  for (const tone of tones.slice(0, maxVoices)) {
     const start = startAt + (tone.delay ?? 0);
     const end = start + tone.duration;
     const oscillator = context.createOscillator();
@@ -132,10 +159,13 @@ export function scheduleAcceptedAction(
       : null;
     const peak = Math.max(
       ACCEPTED_SILENCE,
-      Math.min(ACTION_A_CONTRACT.voiceGainCeiling, tone.gain * ACTION_A_CONTRACT.voiceGainBoost),
+      Math.min(gainCeiling, tone.gain * gainBoost),
     );
     oscillator.type = tone.waveform;
     oscillator.frequency.setValueAtTime(tone.frequency, start);
+    if (tone.endFrequency) {
+      oscillator.frequency.exponentialRampToValueAtTime(Math.max(1, tone.endFrequency), end);
+    }
     gain.gain.setValueAtTime(ACCEPTED_SILENCE, start);
     gain.gain.exponentialRampToValueAtTime(peak, start + Math.min(tone.attack, tone.duration * 0.25));
     gain.gain.exponentialRampToValueAtTime(ACCEPTED_SILENCE, end);

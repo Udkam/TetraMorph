@@ -196,7 +196,7 @@ beforeEach(() => {
 });
 
 describe('AudioEngine accepted production contract', () => {
-  it('builds isolated Action A, Studio, Ice, and compensated extension routes', async () => {
+  it('builds isolated Action A, Studio, Ice, and recovered-candidate routes', async () => {
     const audio = audioFor();
     await audio.prime();
 
@@ -210,12 +210,13 @@ describe('AudioEngine accepted production contract', () => {
       attack: node.attack.value,
       release: node.release.value,
     }))).toEqual([
-      { threshold: -3, knee: 5, ratio: 2.2, attack: 0.007, release: 0.19 },
+      { threshold: -4, knee: 6, ratio: 3, attack: 0.003, release: 0.12 },
       { threshold: -4, knee: 6, ratio: 3, attack: 0.003, release: 0.12 },
       { threshold: -10, knee: 10, ratio: 4, attack: 0.003, release: 0.12 },
     ]);
     expect(gains[0]?.gain.value).toBeCloseTo(0.78);
-    expect(gains[3]?.gain.value).toBeCloseTo(1.42 / 0.78);
+    expect(gains[2]?.gain.value).toBe(1);
+    expect(gains[3]?.gain.value).toBe(1.85);
     expect(gains[4]?.gain.value).toBe(1.85);
     expect(gains.slice(5, 10).map((node) => node.gain.value)).toEqual([0.9, 1, 0.96, 0.14, 0.7]);
   });
@@ -260,6 +261,26 @@ describe('AudioEngine accepted production contract', () => {
     const before = oscillators.length;
     audio.play([{ type: 'hard-dropped', piece: 'I', distance: 0 }]);
     expect(oscillators.slice(before).map((node) => node.starts[0])).toEqual([0, 0.004]);
+  });
+
+  it('restores the soft T28 drop contour with its greater-than-52 ms throttle', async () => {
+    let now = 1_000;
+    const audio = audioFor(new FakeAudioContext(), () => now);
+    await audio.prime();
+    const softDrop: GameEvent = {
+      type: 'piece-moved', piece: 'I', dx: 0, dy: 1, cause: 'soft-drop',
+    };
+
+    audio.play([softDrop]);
+    expect(oscillators).toHaveLength(1);
+    expect(oscillators[0]?.frequency.setValues[0]?.value).toBe(196);
+    expect(oscillators[0]?.frequency.exponential[0]).toEqual({ value: 185, time: 0.036 });
+    now += 52;
+    audio.play([softDrop]);
+    expect(oscillators).toHaveLength(1);
+    now += 1;
+    audio.play([softDrop]);
+    expect(oscillators).toHaveLength(2);
   });
 
   it('plays three Studio progress steps and one separate start resolve', async () => {
@@ -317,7 +338,10 @@ describe('AudioEngine accepted production contract', () => {
     expect(sourceCount()).toBeLessThanOrEqual(16);
     const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
     expect(ice?.starts[0]).toEqual({ time: 0.62, offset: 0.19375, duration: 0.44 });
-    const starts = bufferSources.flatMap((source) => source.starts.map((entry) => entry.time));
+    const starts = [
+      ...oscillators.flatMap((source) => source.starts),
+      ...bufferSources.flatMap((source) => source.starts.map((entry) => entry.time)),
+    ];
     expect(starts.some((start) => Math.abs(start - 0) < 0.000001)).toBe(true);
     expect(starts.some((start) => Math.abs(start - 0.94) < 0.000001)).toBe(true);
     expect(starts.some((start) => Math.abs(start - 1.16) < 0.000001)).toBe(true);
@@ -418,9 +442,9 @@ describe('AudioEngine accepted production contract', () => {
     expect(() => audio.destroy()).not.toThrow();
   });
 
-  it('keeps extension palette voice accounting consistent with the engine', () => {
-    expect(audioCue('bomb').layers).toHaveLength(3);
-    expect(audioCue('supergravity').layers).toHaveLength(2);
-    expect(audioCue('multiplier-4').layers).toHaveLength(4);
+  it('keeps recovered-candidate voice accounting consistent with the engine', () => {
+    expect(audioCue('bomb').tones.length + (audioCue('bomb').air?.length ?? 0)).toBe(2);
+    expect(audioCue('supergravity').tones).toHaveLength(2);
+    expect(audioCue('multiplier-4').tones).toHaveLength(6);
   });
 });

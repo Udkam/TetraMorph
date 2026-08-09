@@ -3,11 +3,11 @@ import { browserPlatform, type BrowserPlatform } from '../../platform/browserPla
 import type { VisualThemeId } from '../../design/visualThemes';
 import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 import {
-  scheduleGesture,
   type AudioBus,
   type GestureVoice,
 } from './audioGesture';
-import { audioCue, type LegacyAudioCueId } from './audioPalette';
+import { audioCue, type CandidateAudioCueId } from './audioPalette';
+import { scheduleRecoveredNoisePuff } from './candidatePlayback';
 import { T37_AUDIO_ASSETS, type T37AudioAssetId } from './audioAssetCatalog';
 import {
   ACCEPTED_OUTPUT_GAIN,
@@ -19,6 +19,7 @@ import {
   scheduleAcceptedAction,
   scheduleIceSample,
   scheduleStudioSample,
+  scheduleToneRecipe,
   type AcceptedActionCueId,
   type AcceptedVoiceHooks,
 } from './acceptedPlayback';
@@ -26,9 +27,8 @@ import {
 type MutationActivation = Extract<GameEvent, { type: 'mutation-activated' }>;
 export type AcceptedAudioAssetLoader = (url: string) => Promise<ArrayBuffer>;
 
-const LEGACY_FULL_VOLUME_GAIN = 1.42;
 const MOVE_CUE_MIN_INTERVAL_MS = 60;
-const SOFT_DROP_CUE_MIN_INTERVAL_MS = 48;
+const SOFT_DROP_CUE_MIN_INTERVAL_MS = 52;
 const MAX_EFFECT_VOICES = 16;
 const HARD_DROP_TRAIL_SECONDS = 0.05;
 const AUDIO_BUSES: readonly AudioBus[] = Object.freeze([
@@ -67,9 +67,9 @@ export class AudioEngine {
   private context: AudioContext | null = null;
   private output: GainNode | null = null;
   private enabledGate: GainNode | null = null;
-  private legacyEffects: GainNode | null = null;
-  private legacyMaster: GainNode | null = null;
-  private legacyCompressor: DynamicsCompressorNode | null = null;
+  private candidateEffects: GainNode | null = null;
+  private candidateMaster: GainNode | null = null;
+  private candidateCompressor: DynamicsCompressorNode | null = null;
   private actionMaster: GainNode | null = null;
   private actionCompressor: DynamicsCompressorNode | null = null;
   private studioCompressor: DynamicsCompressorNode | null = null;
@@ -143,8 +143,8 @@ export class AudioEngine {
         }
       } else if (event.type === 'piece-moved' && event.cause === 'soft-drop') {
         const now = this.platform.now();
-        if (now - this.lastSoftDropAt >= SOFT_DROP_CUE_MIN_INTERVAL_MS) {
-          this.playLegacyCue('soft-drop');
+        if (now - this.lastSoftDropAt > SOFT_DROP_CUE_MIN_INTERVAL_MS) {
+          this.playCandidateCue('soft-drop');
           this.lastSoftDropAt = now;
         }
       } else if (event.type === 'piece-rotated') {
@@ -157,7 +157,7 @@ export class AudioEngine {
         this.playAcceptedAction('lock');
       } else if (event.type === 'puzzle-undone') {
         this.pendingClearCount = null;
-        this.playLegacyCue('puzzle-undo');
+        this.playCandidateCue('puzzle-undo');
       } else if (event.type === 'clear-started') {
         const count = event.rows.length;
         this.pendingClearCount = Number.isInteger(count) && count >= 1 && count <= 4
@@ -172,25 +172,25 @@ export class AudioEngine {
         this.pendingClearCount = null;
         if (!hasHigherResolution && !alreadyStarted) this.playClear(event.count);
       } else if (event.type === 'bedrock-raised') {
-        this.playLegacyCue('bedrock-rise');
+        this.playCandidateCue('bedrock-rise');
       } else if (event.type === 'bedrock-lowered') {
-        this.playLegacyCue('bedrock-lower');
+        this.playCandidateCue('bedrock-lower');
       } else if (event.type === 'survival-stones-warned') {
-        this.playLegacyCue('stone-warning');
+        this.playCandidateCue('stone-warning');
       } else if (event.type === 'survival-stones-spawned') {
-        this.playLegacyCue('stone-spawn');
+        this.playCandidateCue('stone-spawn');
       } else if (event.type === 'survival-stones-landed') {
-        this.playLegacyCue('stone-land');
+        this.playCandidateCue('stone-land');
       } else if (event.type === 'level-up' && !hasMutationActivation) {
-        this.playLegacyCue('level-up');
+        this.playCandidateCue('level-up');
       } else if (event.type === 'finished' && !hasMutationActivation) {
-        this.playLegacyCue('finished');
+        this.playCandidateCue('finished');
       } else if (event.type === 'game-over' && !hasMutationActivation) {
-        this.playLegacyCue('game-over');
+        this.playCandidateCue('game-over');
       } else if (event.type === 'paused') {
-        this.playLegacyCue('pause');
+        this.playCandidateCue('pause');
       } else if (event.type === 'resumed') {
-        this.playLegacyCue('resume');
+        this.playCandidateCue('resume');
       } else if (event.type === 'restarted') {
         this.pendingClearCount = null;
       }
@@ -233,17 +233,17 @@ export class AudioEngine {
     this.activeVoices.clear();
     for (const name of AUDIO_BUSES) this.buses[name]?.disconnect();
     this.buses = {};
-    this.legacyEffects?.disconnect();
-    this.legacyMaster?.disconnect();
-    this.legacyCompressor?.disconnect();
+    this.candidateEffects?.disconnect();
+    this.candidateMaster?.disconnect();
+    this.candidateCompressor?.disconnect();
     this.actionMaster?.disconnect();
     this.actionCompressor?.disconnect();
     this.studioCompressor?.disconnect();
     this.enabledGate?.disconnect();
     this.output?.disconnect();
-    this.legacyEffects = null;
-    this.legacyMaster = null;
-    this.legacyCompressor = null;
+    this.candidateEffects = null;
+    this.candidateMaster = null;
+    this.candidateCompressor = null;
     this.actionMaster = null;
     this.actionCompressor = null;
     this.studioCompressor = null;
@@ -262,9 +262,9 @@ export class AudioEngine {
     this.context = context;
     this.output = context.createGain();
     this.enabledGate = context.createGain();
-    this.legacyEffects = context.createGain();
-    this.legacyMaster = context.createGain();
-    this.legacyCompressor = context.createDynamicsCompressor();
+    this.candidateEffects = context.createGain();
+    this.candidateMaster = context.createGain();
+    this.candidateCompressor = context.createDynamicsCompressor();
     this.actionMaster = context.createGain();
     this.actionCompressor = context.createDynamicsCompressor();
     this.studioCompressor = context.createDynamicsCompressor();
@@ -272,23 +272,22 @@ export class AudioEngine {
     for (const name of AUDIO_BUSES) {
       const bus = context.createGain();
       bus.gain.value = AUDIO_BUS_GAINS[name];
-      bus.connect(this.legacyEffects);
+      bus.connect(this.candidateEffects);
       this.buses[name] = bus;
     }
 
-    this.legacyMaster.gain.value = LEGACY_FULL_VOLUME_GAIN / ACCEPTED_OUTPUT_GAIN;
-    configureCompressor(this.legacyCompressor, {
-      threshold: -3, knee: 5, ratio: 2.2, attack: 0.007, release: 0.19,
-    });
+    this.candidateEffects.gain.value = 1;
+    this.candidateMaster.gain.value = ACTION_A_CONTRACT.masterGain;
+    configureCompressor(this.candidateCompressor, ACTION_A_CONTRACT.compressor);
     this.actionMaster.gain.value = ACTION_A_CONTRACT.masterGain;
     configureCompressor(this.actionCompressor, ACTION_A_CONTRACT.compressor);
     configureCompressor(this.studioCompressor, STUDIO_COMPRESSOR_CONTRACT);
     this.applyOutputGain();
     this.applyEnabledGain();
 
-    this.legacyEffects.connect(this.legacyMaster);
-    this.legacyMaster.connect(this.legacyCompressor);
-    this.legacyCompressor.connect(this.enabledGate);
+    this.candidateEffects.connect(this.candidateMaster);
+    this.candidateMaster.connect(this.candidateCompressor);
+    this.candidateCompressor.connect(this.enabledGate);
     this.actionMaster.connect(this.actionCompressor);
     this.actionCompressor.connect(this.enabledGate);
     this.studioCompressor.connect(this.enabledGate);
@@ -405,24 +404,35 @@ export class AudioEngine {
     }
   }
 
-  private playLegacyCue(id: LegacyAudioCueId, delay = 0): void {
+  private playCandidateCue(id: CandidateAudioCueId, delay = 0): void {
     const context = this.context;
     const cue = audioCue(id);
     const destination = this.buses[cue.bus];
     const available = MAX_EFFECT_VOICES - this.activeVoices.size;
     if (!context || !destination || available <= 0 || !this.enabled || this.destroyed) return;
-    scheduleGesture(context, destination, cue, {
+    const hooks = this.voiceHooks(Boolean(cue.mutationOwned));
+    scheduleToneRecipe(context, destination, cue.tones, {
       startAt: context.currentTime + delay,
       maxVoices: available,
-      onVoiceStart: (voice) => {
-        this.activeVoices.add(voice);
-        if (cue.mutationOwned) this.mutationVoices.add(voice);
-      },
-      onVoiceEnd: (voice) => {
-        this.activeVoices.delete(voice);
-        this.mutationVoices.delete(voice);
-      },
+      gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
+      gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
+      ...hooks,
     });
+    const remaining = MAX_EFFECT_VOICES - this.activeVoices.size;
+    if (remaining <= 0 || !cue.air?.length) return;
+    for (const layer of cue.air.slice(0, remaining)) {
+      scheduleRecoveredNoisePuff(context, destination, {
+        startAt: context.currentTime + delay + (layer.delay ?? 0),
+        duration: layer.duration,
+        gain: layer.gain,
+        cutoff: layer.cutoff,
+        q: layer.q ?? 0.7,
+        attack: layer.attack ?? 0.009,
+        gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
+        gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
+        ...hooks,
+      });
+    }
   }
 
   private uniqueMutationActivations(events: readonly GameEvent[]): MutationActivation[] {
@@ -442,12 +452,12 @@ export class AudioEngine {
       if (event.item === 'freeze') {
         this.playIce(delay);
       } else {
-        const id: LegacyAudioCueId = event.item === 'collapse'
+        const id: CandidateAudioCueId = event.item === 'collapse'
           ? 'supergravity'
           : event.item === 'bomb'
             ? 'bomb'
             : event.multiplierFactor === 4 ? 'multiplier-4' : 'multiplier-2';
-        this.playLegacyCue(id, delay);
+        this.playCandidateCue(id, delay);
       }
       delay += MUTATION_VFX_TOKENS[event.item].animation.activationMs / 1_000;
     }

@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import {
   AUDIO_CUE_IDS,
   audioCue,
+  cueDuration,
   cueEnergy,
-  type LegacyAudioCueId,
+  type CandidateAudioCueId,
 } from './audioPalette';
-import { gestureDuration } from './audioGesture';
 
-describe('T37 not-yet-frozen extension palette', () => {
-  it('keeps every remaining cue bounded and explicitly separate from accepted playback', () => {
+describe('T37 recovered soft support palette', () => {
+  it('keeps all sixteen candidate cues bounded and separate from accepted playback', () => {
     expect(AUDIO_CUE_IDS).toHaveLength(16);
     expect(AUDIO_CUE_IDS).not.toEqual(expect.arrayContaining([
       'move', 'rotate', 'lock', 'hard-drop',
@@ -17,50 +17,91 @@ describe('T37 not-yet-frozen extension palette', () => {
     ]));
     for (const id of AUDIO_CUE_IDS) {
       const cue = audioCue(id);
-      expect(cue.layers.length, id).toBeGreaterThan(0);
-      expect(cue.layers.length, id).toBeLessThanOrEqual(4);
-      expect(gestureDuration(cue), id).toBeGreaterThan(0);
-      expect(gestureDuration(cue), id).toBeLessThanOrEqual(0.8);
-      for (const layer of cue.layers) {
-        expect(layer.kind, id).toBe('procedural');
+      const voiceCount = cue.tones.length + (cue.air?.length ?? 0);
+      expect(voiceCount, id).toBeGreaterThan(0);
+      expect(voiceCount, id).toBeLessThanOrEqual(6);
+      expect(cueDuration(cue), id).toBeGreaterThan(0);
+      expect(cueDuration(cue), id).toBeLessThanOrEqual(0.5);
+      for (const layer of cue.tones) {
+        expect(Number.isFinite(layer.frequency), id).toBe(true);
         expect(Number.isFinite(layer.duration), id).toBe(true);
         expect(Number.isFinite(layer.gain), id).toBe(true);
         expect(layer.duration, id).toBeGreaterThan(0);
         expect(layer.gain, id).toBeGreaterThan(0);
+        expect(layer.waveform === 'sine' || layer.waveform === 'triangle', id).toBe(true);
       }
     }
   });
 
-  it('keeps repeated soft drop concise while Survival warnings remain two bounded pulses', () => {
-    expect(gestureDuration(audioCue('soft-drop'))).toBeLessThan(0.1);
+  it('restores the intact T28 soft-drop, undo, and Survival contours exactly', () => {
+    expect(audioCue('soft-drop').tones).toEqual([
+      expect.objectContaining({
+        frequency: 196, endFrequency: 185, duration: 0.036, gain: 0.078,
+        attack: 0.007, waveform: 'sine',
+      }),
+    ]);
+    expect(audioCue('puzzle-undo').tones).toEqual([
+      expect.objectContaining({
+        frequency: 392, endFrequency: 293.66, duration: 0.09, gain: 0.095,
+        attack: 0.006,
+      }),
+    ]);
+    expect(audioCue('stone-warning').tones.map((layer) => ({
+      frequency: layer.frequency,
+      endFrequency: layer.endFrequency,
+      delay: layer.delay ?? 0,
+    }))).toEqual([
+      { frequency: 392, endFrequency: 523.25, delay: 0 },
+      { frequency: 523.25, endFrequency: 659.25, delay: 0.085 },
+    ]);
+    expect(cueDuration(audioCue('stone-warning'))).toBeCloseTo(0.155);
     expect(cueEnergy('soft-drop')).toBeLessThan(cueEnergy('stone-land'));
-    expect(audioCue('stone-warning').layers).toHaveLength(2);
-    expect(gestureDuration(audioCue('stone-warning'))).toBeLessThan(0.3);
   });
 
-  it('gives each remaining Mutation a unique one-shot fingerprint', () => {
-    const mutationIds = [
+  it('restores concise T28 UI contours while collapsing rewards into non-melodic gestures', () => {
+    expect(audioCue('pause').tones.map((layer) => layer.frequency)).toEqual([293.66, 220]);
+    expect(audioCue('resume').tones.map((layer) => layer.frequency)).toEqual([349.23, 523.25]);
+    expect(audioCue('level-up').tones.map((layer) => layer.delay ?? 0)).toEqual([0, 0.018]);
+    expect(audioCue('finished').tones.map((layer) => layer.delay ?? 0)).toEqual([0, 0.012, 0.024]);
+    expect(audioCue('game-over').tones.map((layer) => ({
+      frequency: layer.frequency,
+      endFrequency: layer.endFrequency,
+      delay: layer.delay ?? 0,
+    }))).toEqual([
+      { frequency: 196, endFrequency: 130.81, delay: 0 },
+      { frequency: 98, endFrequency: 65.41, delay: 0.018 },
+    ]);
+    expect(cueDuration(audioCue('level-up'))).toBeLessThan(0.2);
+    expect(cueDuration(audioCue('finished'))).toBeLessThan(0.25);
+    expect(cueDuration(audioCue('game-over'))).toBeLessThan(0.3);
+  });
+
+  it('gives every remaining Mutation a distinct material-bound one-shot', () => {
+    expect(audioCue('supergravity').tones.map((layer) => layer.frequency)).toEqual([148, 93]);
+    expect(audioCue('bomb').tones.map((layer) => layer.frequency)).toEqual([74]);
+    expect(audioCue('bomb').air).toEqual([
+      expect.objectContaining({ cutoff: 640, duration: 0.075, gain: 0.12, delay: 0.006 }),
+    ]);
+    expect(audioCue('multiplier-2').tones).toHaveLength(4);
+    expect(audioCue('multiplier-4').tones).toHaveLength(6);
+    expect(audioCue('multiplier-2').tones.map((layer) => layer.waveform)).toEqual([
+      'triangle', 'sine', 'triangle', 'sine',
+    ]);
+    for (const id of [
       'supergravity', 'bomb', 'multiplier-2', 'multiplier-4',
-    ] satisfies LegacyAudioCueId[];
-    const signatures = mutationIds.map((id) => audioCue(id).layers.map((layer) => (
-      layer.kind === 'procedural'
-        ? `${layer.instrument}:${layer.frequency}:${layer.endFrequency}:${layer.seed}`
-        : layer.kind
-    )).join('|'));
-    expect(new Set(signatures).size).toBe(mutationIds.length);
-    for (const id of mutationIds) {
+    ] satisfies CandidateAudioCueId[]) {
       expect(audioCue(id).mutationOwned).toBe(true);
-      expect(gestureDuration(audioCue(id)), id).toBeLessThan(0.8);
+      expect(cueDuration(audioCue(id)), id).toBeLessThan(0.3);
     }
   });
 
-  it('keeps all reward, Puzzle, Survival, and UI extension events represented', () => {
+  it('keeps all gameplay, reward, Puzzle, Survival, and UI candidates represented', () => {
     const expected = [
       'soft-drop', 'puzzle-undo',
       'bedrock-rise', 'bedrock-lower', 'stone-warning', 'stone-spawn', 'stone-land',
       'level-up', 'finished', 'game-over', 'pause', 'resume',
       'supergravity', 'bomb', 'multiplier-2', 'multiplier-4',
-    ] satisfies LegacyAudioCueId[];
+    ] satisfies CandidateAudioCueId[];
     expect(AUDIO_CUE_IDS).toEqual(expected);
   });
 });

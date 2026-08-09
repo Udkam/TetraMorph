@@ -1,225 +1,154 @@
-import type {
-  AudioBus,
-  AudioGesture,
-  ProceduralInstrument,
-  ProceduralLayer,
-} from './audioGesture';
+import type { AudioBus } from './audioGesture';
+import type { AcceptedActionTone } from './acceptedPlayback';
 
 /**
- * Stage-C cues that have not yet received a player-frozen sample/tone contract.
- * Accepted Action A, Studio clear/countdown, and Ice 2 are intentionally absent and
- * are scheduled only by acceptedPlayback.ts.
+ * Stage-C production candidates recovered from the intact pre-T29 T28 snapshot.
+ * Accepted Action A, Studio clear/countdown, and Ice 2 remain intentionally absent.
  */
-export type LegacyAudioCueId =
+export type CandidateAudioCueId =
   | 'soft-drop' | 'puzzle-undo'
   | 'bedrock-rise' | 'bedrock-lower' | 'stone-warning' | 'stone-spawn' | 'stone-land'
   | 'level-up' | 'finished' | 'game-over' | 'pause' | 'resume'
   | 'supergravity' | 'bomb' | 'multiplier-2' | 'multiplier-4';
 
-type LayerOptions = Partial<Pick<
-  ProceduralLayer,
-  'delay' | 'endFrequency' | 'brightness' | 'spread' | 'seed' | 'attack' | 'release'
->>;
+export interface CandidateAirLayer {
+  readonly duration: number;
+  readonly gain: number;
+  readonly delay?: number;
+  readonly cutoff: number;
+  readonly q?: number;
+  readonly attack?: number;
+}
 
-const voice = (
-  instrument: ProceduralInstrument,
+export interface CandidateAudioCue {
+  readonly bus: AudioBus;
+  readonly tones: readonly AcceptedActionTone[];
+  readonly air?: readonly CandidateAirLayer[];
+  readonly mutationOwned?: boolean;
+}
+
+type ToneOptions = Partial<Pick<AcceptedActionTone, 'endFrequency' | 'delay' | 'attack' | 'waveform'>>;
+
+const tone = (
   frequency: number,
   duration: number,
   gain: number,
-  options: LayerOptions = {},
-): ProceduralLayer => ({
-  kind: 'procedural',
-  instrument,
+  options: ToneOptions = {},
+): AcceptedActionTone => ({
   frequency,
   duration,
   gain,
-  ...options,
+  attack: options.attack ?? 0.012,
+  waveform: options.waveform ?? 'sine',
+  ...(options.endFrequency === undefined ? {} : { endFrequency: options.endFrequency }),
+  ...(options.delay === undefined ? {} : { delay: options.delay }),
 });
 
 const gesture = (
   bus: AudioBus,
-  layers: readonly ProceduralLayer[],
-  mutationOwned = false,
-): AudioGesture => ({ bus, layers, mutationOwned });
+  tones: readonly AcceptedActionTone[],
+  options: Pick<CandidateAudioCue, 'air' | 'mutationOwned'> = {},
+): CandidateAudioCue => ({ bus, tones, ...options });
 
-const PALETTE: Readonly<Record<LegacyAudioCueId, AudioGesture>> = {
+const BRIGHT_PARTIAL_RATIO = 2.01;
+
+const marimbaStrike = (frequency: number, gain: number, delay: number): readonly AcceptedActionTone[] => [
+  tone(frequency, 0.145, gain, { delay, waveform: 'triangle' }),
+  tone(frequency * BRIGHT_PARTIAL_RATIO, 0.096, gain * 0.22, { delay }),
+];
+
+const PALETTE: Readonly<Record<CandidateAudioCueId, CandidateAudioCue>> = {
   'soft-drop': gesture('gameplay', [
-    voice('ribbon', 1_180, 0.046, 0.025, {
-      endFrequency: 410, brightness: 0.2, spread: 0.24, seed: 0x1301, release: 0.28,
-    }),
-    voice('felt', 118, 0.041, 0.034, {
-      endFrequency: 93, brightness: 0.18, spread: 0.16, seed: 0x1302, release: 0.3,
-    }),
+    tone(196, 0.036, 0.078, { endFrequency: 185, attack: 0.007 }),
   ]),
   'puzzle-undo': gesture('ui', [
-    voice('ribbon', 980, 0.13, 0.035, {
-      endFrequency: 310, brightness: 0.26, spread: 0.4, seed: 0x5101, release: 0.5,
-    }),
-    voice('felt', 226, 0.11, 0.048, {
-      delay: 0.012, endFrequency: 177, brightness: 0.24, spread: 0.3,
-      seed: 0x5102, release: 0.42,
-    }),
+    tone(392, 0.09, 0.095, { endFrequency: 293.66, attack: 0.006 }),
   ]),
   'bedrock-rise': gesture('gameplay', [
-    voice('impact', 58, 0.66, 0.105, {
-      endFrequency: 79, brightness: 0.14, spread: 0.58, seed: 0x5201,
-      attack: 0.08, release: 0.56,
-    }),
-    voice('ribbon', 128, 0.58, 0.04, {
-      endFrequency: 330, brightness: 0.16, spread: 0.54, seed: 0x5202,
-      attack: 0.12, release: 0.58,
-    }),
+    tone(98, 0.17, 0.2, { endFrequency: 123.47, attack: 0.008 }),
+    tone(196, 0.09, 0.055, { delay: 0.025, endFrequency: 246.94, attack: 0.006 }),
   ]),
   'bedrock-lower': gesture('gameplay', [
-    voice('impact', 82, 0.52, 0.092, {
-      endFrequency: 48, brightness: 0.12, spread: 0.48, seed: 0x5301,
-      attack: 0.04, release: 0.55,
-    }),
-    voice('ribbon', 290, 0.44, 0.035, {
-      endFrequency: 92, brightness: 0.15, spread: 0.42, seed: 0x5302,
-      attack: 0.06, release: 0.56,
-    }),
+    tone(164.81, 0.14, 0.18, { endFrequency: 110, attack: 0.008 }),
   ]),
   'stone-warning': gesture('ui', [
-    voice('pulse', 132, 0.1, 0.065, {
-      endFrequency: 118, brightness: 0.22, spread: 0.26, seed: 0x5401, release: 0.44,
-    }),
-    voice('pulse', 132, 0.1, 0.058, {
-      delay: 0.145, endFrequency: 118, brightness: 0.22, spread: 0.26,
-      seed: 0x5402, release: 0.44,
-    }),
+    tone(392, 0.075, 0.14, { endFrequency: 523.25, attack: 0.006 }),
+    tone(523.25, 0.07, 0.105, { delay: 0.085, endFrequency: 659.25, attack: 0.006 }),
   ]),
   'stone-spawn': gesture('gameplay', [
-    voice('ribbon', 1_180, 0.15, 0.05, {
-      endFrequency: 270, brightness: 0.24, spread: 0.36, seed: 0x5501, release: 0.52,
-    }),
-    voice('felt', 173, 0.12, 0.052, {
-      delay: 0.01, endFrequency: 112, brightness: 0.22, spread: 0.32,
-      seed: 0x5502, release: 0.45,
-    }),
+    tone(329.63, 0.12, 0.13, { endFrequency: 220, attack: 0.006 }),
   ]),
   'stone-land': gesture('gameplay', [
-    voice('impact', 61, 0.23, 0.14, {
-      endFrequency: 39, brightness: 0.2, spread: 0.46, seed: 0x5601, release: 0.4,
-    }),
-    voice('felt', 151, 0.12, 0.06, {
-      delay: 0.003, endFrequency: 101, brightness: 0.3, spread: 0.42,
-      seed: 0x5602, release: 0.42,
-    }),
+    tone(130.81, 0.085, 0.18, { attack: 0.006 }),
+    tone(196, 0.055, 0.045, { delay: 0.006, attack: 0.004 }),
   ]),
   'level-up': gesture('reward', [
-    voice('shimmer', 196, 0.44, 0.12, {
-      endFrequency: 302, brightness: 0.58, spread: 0.62, seed: 0x5701, release: 0.64,
-    }),
-    voice('glass', 402, 0.34, 0.085, {
-      delay: 0.035, endFrequency: 478, brightness: 0.52, spread: 0.56,
-      seed: 0x5702, release: 0.68,
-    }),
-    voice('ribbon', 420, 0.38, 0.052, {
-      endFrequency: 1_820, brightness: 0.4, spread: 0.6, seed: 0x5703,
-      attack: 0.04, release: 0.62,
-    }),
+    tone(392, 0.16, 0.14, { endFrequency: 440, attack: 0.008 }),
+    tone(587.33, 0.13, 0.075, { delay: 0.018, attack: 0.007 }),
   ]),
   finished: gesture('reward', [
-    voice('impact', 76, 0.68, 0.12, {
-      endFrequency: 48, brightness: 0.2, spread: 0.58, seed: 0x5801, release: 0.58,
-    }),
-    voice('shimmer', 176, 0.7, 0.135, {
-      delay: 0.035, endFrequency: 324, brightness: 0.68, spread: 0.76,
-      seed: 0x5802, release: 0.68,
-    }),
-    voice('glass', 352, 0.52, 0.09, {
-      delay: 0.08, endFrequency: 496, brightness: 0.64, spread: 0.72,
-      seed: 0x5803, release: 0.72,
-    }),
+    tone(440, 0.22, 0.18, { attack: 0.009 }),
+    tone(554.37, 0.2, 0.13, { delay: 0.012, attack: 0.009 }),
+    tone(659.25, 0.18, 0.09, { delay: 0.024, attack: 0.008 }),
   ]),
   'game-over': gesture('reward', [
-    voice('impact', 112, 0.42, 0.1, {
-      endFrequency: 54, brightness: 0.14, spread: 0.52, seed: 0x5901, release: 0.52,
-    }),
-    voice('ribbon', 620, 0.4, 0.052, {
-      endFrequency: 140, brightness: 0.18, spread: 0.48, seed: 0x5902,
-      attack: 0.04, release: 0.6,
-    }),
+    tone(196, 0.28, 0.17, { endFrequency: 130.81, attack: 0.012 }),
+    tone(98, 0.22, 0.08, { delay: 0.018, endFrequency: 65.41, attack: 0.014 }),
   ]),
   pause: gesture('ui', [
-    voice('felt', 178, 0.105, 0.052, {
-      endFrequency: 142, brightness: 0.2, spread: 0.26, seed: 0x5a01, release: 0.46,
-    }),
-    voice('ribbon', 520, 0.11, 0.024, {
-      endFrequency: 240, brightness: 0.18, spread: 0.3, seed: 0x5a02, release: 0.52,
-    }),
+    tone(293.66, 0.085, 0.09, { attack: 0.007 }),
+    tone(220, 0.07, 0.045, { delay: 0.018, attack: 0.006 }),
   ]),
   resume: gesture('ui', [
-    voice('felt', 162, 0.11, 0.054, {
-      endFrequency: 194, brightness: 0.22, spread: 0.28, seed: 0x5b01, release: 0.48,
-    }),
-    voice('ribbon', 270, 0.12, 0.026, {
-      endFrequency: 740, brightness: 0.22, spread: 0.34, seed: 0x5b02, release: 0.52,
-    }),
+    tone(349.23, 0.09, 0.1, { attack: 0.007 }),
+    tone(523.25, 0.06, 0.035, { delay: 0.018, attack: 0.005 }),
   ]),
   supergravity: gesture('mutation', [
-    voice('impact', 126, 0.48, 0.18, {
-      endFrequency: 31, brightness: 0.15, spread: 0.72, seed: 0x4201,
-      attack: 0.014, release: 0.48,
-    }),
-    voice('ribbon', 430, 0.36, 0.075, {
-      delay: 0.018, endFrequency: 68, brightness: 0.18, spread: 0.55,
-      seed: 0x4202, attack: 0.028, release: 0.55,
-    }),
-  ], true),
+    tone(148, 0.09, 0.25, { attack: 0.008 }),
+    tone(93, 0.12, 0.17, { delay: 0.018, attack: 0.009 }),
+  ], { mutationOwned: true }),
   bomb: gesture('mutation', [
-    voice('ribbon', 116, 0.38, 0.1, {
-      endFrequency: 840, brightness: 0.46, spread: 0.76, seed: 0x4301,
-      attack: 0.06, release: 0.58,
-    }),
-    voice('impact', 74, 0.34, 0.2, {
-      delay: 0.09, endFrequency: 39, brightness: 0.28, spread: 0.68,
-      seed: 0x4302, release: 0.5,
-    }),
-    voice('glass', 284, 0.28, 0.07, {
-      delay: 0.115, endFrequency: 226, brightness: 0.38, spread: 0.66,
-      seed: 0x4303, release: 0.62,
-    }),
-  ], true),
+    tone(74, 0.16, 0.32, { attack: 0.006 }),
+  ], {
+    mutationOwned: true,
+    air: [{
+      duration: 0.075,
+      gain: 0.12,
+      delay: 0.006,
+      cutoff: 640,
+      q: 0.7,
+      attack: 0.009,
+    }],
+  }),
   'multiplier-2': gesture('mutation', [
-    voice('shimmer', 242, 0.42, 0.12, {
-      endFrequency: 318, brightness: 0.58, spread: 0.54, seed: 0x4401, release: 0.62,
-    }),
-    voice('glass', 486, 0.32, 0.09, {
-      delay: 0.03, endFrequency: 544, brightness: 0.52, spread: 0.5,
-      seed: 0x4402, release: 0.66,
-    }),
-    voice('ribbon', 760, 0.32, 0.06, {
-      endFrequency: 1_520, brightness: 0.38, spread: 0.5, seed: 0x4403,
-      attack: 0.025, release: 0.58,
-    }),
-  ], true),
+    ...marimbaStrike(523.25, 0.165, 0),
+    ...marimbaStrike(659.25, 0.145, 0.052),
+  ], { mutationOwned: true }),
   'multiplier-4': gesture('mutation', [
-    voice('shimmer', 218, 0.55, 0.14, {
-      endFrequency: 362, brightness: 0.68, spread: 0.72, seed: 0x4501, release: 0.66,
-    }),
-    voice('glass', 438, 0.42, 0.105, {
-      delay: 0.035, endFrequency: 552, brightness: 0.63, spread: 0.67,
-      seed: 0x4502, release: 0.7,
-    }),
-    voice('ribbon', 620, 0.42, 0.075, {
-      endFrequency: 1_980, brightness: 0.46, spread: 0.7, seed: 0x4503,
-      attack: 0.035, release: 0.64,
-    }),
-    voice('impact', 116, 0.3, 0.05, {
-      delay: 0.11, endFrequency: 72, brightness: 0.18, spread: 0.36,
-      seed: 0x4504, release: 0.5,
-    }),
-  ], true),
+    ...marimbaStrike(523.25, 0.165, 0),
+    ...marimbaStrike(659.25, 0.145, 0.052),
+    ...marimbaStrike(1_046.5, 0.12, 0.104),
+  ], { mutationOwned: true }),
 };
 
-export const AUDIO_CUE_IDS = Object.freeze(Object.keys(PALETTE) as LegacyAudioCueId[]);
+export const AUDIO_CUE_IDS = Object.freeze(Object.keys(PALETTE) as CandidateAudioCueId[]);
 
-export function audioCue(id: LegacyAudioCueId): AudioGesture {
+export function audioCue(id: CandidateAudioCueId): CandidateAudioCue {
   return PALETTE[id];
 }
 
-export function cueEnergy(id: LegacyAudioCueId): number {
-  return audioCue(id).layers.reduce((total, layer) => total + layer.gain * layer.duration, 0);
+export function cueDuration(cue: CandidateAudioCue): number {
+  const toneDuration = cue.tones.reduce((longest, layer) => (
+    Math.max(longest, (layer.delay ?? 0) + layer.duration)
+  ), 0);
+  const airDuration = (cue.air ?? []).reduce((longest, layer) => (
+    Math.max(longest, (layer.delay ?? 0) + layer.duration)
+  ), 0);
+  return Math.max(toneDuration, airDuration);
+}
+
+export function cueEnergy(id: CandidateAudioCueId): number {
+  const cue = audioCue(id);
+  return cue.tones.reduce((total, layer) => total + layer.gain * layer.duration, 0)
+    + (cue.air ?? []).reduce((total, layer) => total + layer.gain * layer.duration, 0);
 }
