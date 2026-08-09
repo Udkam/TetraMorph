@@ -58,14 +58,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    and evidence `05b28ff` compare two exact historical soft action directions and three
    short primary-source real ice contact/crack recordings. The player selects Action A
    and Ice 2; technical and independent read-only gates also pass.
-8. `LIVE-PLAY CORRECTION IN PROGRESS` — full production audio language from the accepted Action A,
+8. `FOCUSED LISTENING CANDIDATE — HUMAN VERDICT OPEN` — full production audio language from the accepted Action A,
    Studio, and Ice 2 contracts. Contract `03ce9fd`, playback foundation `a1febc0`, local
    assets/countdown `47629e7`, production mapping `108aee8`, remaining candidate
    `95978eb`, direct-production evidence `006a936`, coverage test `2766a55`, and
    all-control evidence repair `94fffb9` are committed. Ice 2 original-WAV provenance
    and remaining-cue listening remain open. The player now rejects Bomb's missing
-   impact and the renderer's simultaneous 2–4-line removal; their bounded correction
-   is open while all previously accepted anchors remain frozen.
+   impact and the renderer's simultaneous 2–4-line removal. Correction contract
+   `c52a686`, renderer `605ae2d`, Bomb `c875415`, shared timing `8e32b13`, clock-origin
+   repair `41afc78`, evidence `dc70f10`, and QA `a096fc5` are green while all previously
+   accepted anchors remain frozen. Human live-play/listening remains authoritative.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
@@ -221,13 +223,26 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   220 ms, and uses the existing clear hold to release rows top-to-bottom at the accepted
   pulse beats. One-line clear, Action A, Ice 2, and Studio sample/mixer bytes are outside
   the reopened surface.
+- The correction finishes at product source `41afc78`. A browser-found clock drift was
+  repaired by pinning every Studio clear or Bomb layer to one captured AudioContext
+  origin. Final typecheck passes; the complete suite reports `400 passed / 8 skipped`;
+  the production build transforms 767 modules and emits only the existing bundle-size
+  advisory.
+- Evidence `dc70f10` is source-bound to `41afc78`: Studio four-row starts are exactly
+  `0/60/120/180 ms`; Bomb tone starts are `0/220/235 ms` with deterministic air at
+  `220 ms` and `880 Hz / Q 0.55`; 2/3/4-row Pixi frames release top-to-bottom; Core
+  stays unchanged for eleven ticks and resolves atomically on tick 12. Live/restart/
+  exit topology passes with one Canvas, zero DOM cells, zero residue, and zero errors.
+- Independent QA checkpoint `a096fc5` reviews `d2a0b1e..dc70f10`, inspects all twelve
+  PNGs, passes seven targeted files `98/98`, finds no inherited dirty path in range,
+  and reports `P0 0 / P1 0 / P2 0 / P3 0`. This permits player retesting only; it does
+  not accept Bomb feel or the perceived multi-line cadence.
 
 ## Next exact action
 
-Implement the bounded Bomb impact and 2–4-line top-to-bottom correction, then run the
-focused source tests followed by exactly one final typecheck, complete suite, build, and
-source-bound browser pass. Obtain the player's focused live-play/listening verdict while
-keeping accepted anchors frozen and Stage D closed. The Ice 2 uploader-original WAV
+Obtain the player's focused live-play/listening verdict on Bomb and 2–4-line clears at
+normal device volume. Make no further sound or clear-timing change until that verdict;
+keep accepted anchors frozen and Stage D closed. The Ice 2 uploader-original WAV
 provenance remains independently open until acquired and hashed.
 
 ## Do not repeat

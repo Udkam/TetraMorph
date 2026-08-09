@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-10 — T37 Bomb and multi-line feedback candidate awaiting listening
+
+- Strengthened Bomb as a contained pressure-to-impact gesture: quiet 74 Hz pressure
+  leads into the main low body and deterministic low-passed air at the renderer's
+  existing 220 ms impact, followed by a 235 ms low tail. The visual 620 ms sequence,
+  sixteen-voice ceiling, Action A, Ice 2, and other accepted anchors are unchanged.
+- Replaced simultaneous 2–4-line visual removal with complete-row releases from top to
+  bottom during Core's existing 200 ms hold. Audio and visuals share one timing source:
+  two rows use `0/180 ms`, three use `0/90/180 ms`, and four use
+  `0/60/120/180 ms`; Core still collapses the stack atomically on tick 12.
+- Browser inspection found that repeated AudioContext clock reads could skew later
+  layers under load. Source `41afc78` pins every clear or Bomb event to one clock origin.
+  Final typecheck, the complete suite (`400 passed / 8 skipped`), and the 767-module
+  production build pass.
+- Evidence `dc70f10` binds exact audio starts, ten staged-clear frames, live and
+  prescribed-client pages, reduced motion, Core atomicity, one Canvas, zero DOM cells,
+  cleanup, and zero browser errors to `41afc78`. QA `a096fc5` reports
+  `P0 0 / P1 0 / P2 0 / P3 0` and `98/98` targeted tests. The result remains a focused
+  human listening/play candidate rather than an accepted sound decision.
+
 ## 2026-08-09 — T37 Mutation speed and Supergravity settlement corrected
 
 - Restored Mutation's complete six-line gravity ladder through 48/54/60-line tiers of

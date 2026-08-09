@@ -101,6 +101,11 @@ and no Puzzle content is published without strict deterministic proof.
   existing single atomic stack collapse. Reduced motion and Puzzle keep the same
   discrete order without chips or travel. These corrections require focused human
   play/listening before Stage C can close.
+- Product source `41afc78` implements that correction and pins every layer of one event
+  to one AudioContext clock origin. Evidence `dc70f10` verifies exact Studio/Bomb starts,
+  top-to-bottom Pixi frames, unchanged Core atomicity, lifecycle cleanup, and zero
+  browser errors. Independent QA `a096fc5` reports P0–P3 all zero. Stage C still waits
+  for the player's focused live-play/listening verdict; Stage D remains closed.
 
 ### D. Route transition system
 

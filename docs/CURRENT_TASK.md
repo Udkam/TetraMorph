@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE C IN PROGRESS — Action A and Ice 2 accepted; production audio integration**
+Status: **STAGE C LISTENING GATE — Bomb and multi-line correction ready for live retest**
 
 ## Active objective
 
@@ -63,7 +63,7 @@ ordered after Stage C.
 2. **Audio audition gate — COMPLETE** — implement and export a compact representative set covering
    movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
    activation. Stop expansion until human listening accepts the language.
-3. **Complete audio palette — IN PROGRESS / LIVE-PLAY CORRECTION** — extend only the accepted grammar to remaining gameplay,
+3. **Complete audio palette — FOCUSED LISTENING CANDIDATE** — extend only the accepted grammar to remaining gameplay,
    Survival, Mutation, Puzzle, and UI events; prove hierarchy, voice bounds, controls,
    determinism, and cleanup.
 4. **Transition system** — route shell and page transitions with explicit
@@ -242,6 +242,18 @@ ordered after Stage C.
   the accepted relative beats (`0/180`, `0/90/180`, `0/60/120/180 ms`) before the one
   atomic stack collapse. Reduced motion/Puzzle keep that discrete order without travel
   or fragments. Both changes remain unaccepted until focused live listening/play.
+- Correction source `605ae2d` / `c875415` / `8e32b13` stages the renderer sequence,
+  aligns Bomb to impact, and shares the Studio row timing between audio and visuals.
+  Browser inspection then exposed per-layer `AudioContext.currentTime` drift; repair
+  `41afc78` captures one clock origin for every clear or Bomb event. Final typecheck,
+  the complete suite (`400 passed / 8 skipped`), and the 767-module build pass.
+- Evidence `dc70f10` binds to `41afc78` and records Studio starts at
+  `0/60/120/180 ms`, Bomb oscillators at `0/220/235 ms`, Bomb air at `220 ms`, ten
+  actual renderer clear frames plus live/prescribed-client pages, Core tick-12 atomicity,
+  one Canvas, zero DOM board cells, lifecycle cleanup, and zero browser errors. QA
+  checkpoint `a096fc5` reports `P0 0 / P1 0 / P2 0 / P3 0` after `98/98` independent
+  targeted tests and original-detail image review. This is ready for the player's
+  focused retest, not accepted sensory work.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
