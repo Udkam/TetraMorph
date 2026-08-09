@@ -52,6 +52,18 @@ adding unrelated badges or ornamental effects.
   restraint, `mechanical` for firm detents, and `scifi` for controlled electronic
   articulation. Ice adds one separately labelled `glass` candidate. It does not mix
   families invisibly or claim that signal measurements prove taste.
+- Human listening accepts only the R3 `studio` one-, two-, and three-line releases and
+  `3 / 2 / 1` countdown. Freeze those exact assets, cadence, and mix. Four-line clear
+  uses the same row-release grammar with four pulses; it must not append R3's rejected
+  `complete` tail or introduce a separate sharp celebration.
+- R3 movement, rotation, natural lock, and hard drop are all rejected across the
+  presented families because their attacks are too pointed and the actions do not feel
+  soft enough. R4 may change their source cues and use attack shaping, low-pass
+  filtering, rate, pan, and bounded low body, but it must not solve sharpness by making
+  them inaudible. Each action remains distinguishable by motion contour and weight.
+- The R3 `glass` Ice pair is rejected as unpleasant. R4 replaces it completely with a
+  separately sourced or original crystal-freeze candidate synchronized to the same
+  320 ms bind/release visual contract; no R3 Glass layer is retained by default.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

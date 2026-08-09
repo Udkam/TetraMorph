@@ -41,6 +41,11 @@ and no Puzzle content is published without strict deterministic proof.
   pulse, 50 ms hard-drop trail, 200 ms clear interval from `clear-started`, and 320 ms
   Ice activation. Keep files local, record hashes/license/source commit, and stop for
   listening before any runtime/package adoption.
+- R3 human listening freezes only `studio` clear 1/2/3 and countdown. Clear 4 repeats
+  the accepted row-release pulse four times and drops the rejected completion tail.
+  Move, rotate, natural lock, hard drop, and Glass Ice remain rejected. R4 is limited to
+  softer replacements for those failed cues and must not reopen or subtly remix the
+  accepted set.
 
 ### C. Complete accepted audio language
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **AWAITING HUMAN LISTENING — semantic family audition R3**
+Status: **IN PROGRESS — partial R3 acceptance; soft-action and Ice audition R4**
 
 ## Active objective
 
@@ -106,6 +106,17 @@ materials, and Puzzle progression.
 - The user must now listen to the page at ordinary device volume and either select a
   family, request a deliberate hybrid by action, or reject all three. Measurements and
   the passing browser audit cannot open checkpoint 3 by themselves.
+- Human verdict on R3 is partial: accept only `studio` clear 1/2/3 and `studio`
+  countdown. Clear 4 becomes four matching `progress-step` row releases with no
+  `complete` tail. Preserve these accepted cues exactly in R4.
+- Reject every presented left/right move, rotate, natural lock, and hard-drop treatment:
+  they are too sharp and insufficiently soft. R4 must soften their transient and upper
+  spectrum while keeping ordinary device-volume audibility and action identity. Do not
+  merely lower the gain or replay the same R3 mapping under a new label.
+- Reject the complete Glass Ice treatment as unpleasant. R4 replaces it rather than
+  layering on top of it. The next audition page contains only the failed action set and
+  new Ice candidates; it does not make the user re-approve the frozen clear/countdown
+  set.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.

@@ -42,14 +42,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 3. `SUPERSEDED BEFORE LISTENING` — R2 source `06bd7ea` repaired event/timing mapping,
    but the player then removed the blanket non-electronic constraint and requested a
    network-resource review.
-4. `CANDIDATE / AWAITING HUMAN LISTENING` — network-verified semantic audio audition
-   R3 at evidence commits `5f7bc05` and `4770642`.
-5. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
+4. `PARTIALLY ACCEPTED` — R3 freezes Studio clear 1/2/3 and countdown; clear 4 adopts
+   the same four-pulse grammar without the rejected completion tail.
+5. `IN PROGRESS` — R4 replaces rejected move/rotate/lock/hard-drop and Glass Ice only.
+6. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
-6. `PENDING` — route transition system and reduced-motion verification.
-7. `PENDING` — ordinary/Mutation whole-piece material system.
-8. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
-9. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+7. `PENDING` — route transition system and reduced-motion verification.
+8. `PENDING` — ordinary/Mutation whole-piece material system.
+9. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
+10. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ## Verification state
 
@@ -72,6 +73,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `node docs/evidence/t37/audio-audition-r3/verify-audition.mjs` passes decoded
   finite/peak/RMS/duration checks, action-state checks, desktop/mobile screenshots,
   reduced motion, direct-file playback, and zero console/page errors.
+- Human listening accepts only Studio clear 1/2/3 and countdown. All movement,
+  rotation, natural-lock, hard-drop candidates are too sharp/not soft enough; Glass Ice
+  is rejected as unpleasant. These verdicts override the green R3 measurements.
 - The required develop-web-game client also observed `studio / 左移`; its owned Vite
   PID was stopped and port `4183` released. No server or browser remains owned.
 - The superseded uncommitted R2 gain-only edit was restored to committed source. Its
@@ -83,11 +87,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-The user opens `docs/evidence/t37/audio-audition-r3/index.html`, first compares each
-family's complete action chain and twelve-move repetition, then checks 1–4-line clears
-and Glass Ice. Record explicit acceptance of A/Studio, B/Mechanical, C/Sci-fi, a named
-per-action hybrid, or rejection. Do not adopt production assets, expand the remaining
-palette, or start visual work before that decision.
+Research and build a bounded R4 page containing only softer move, rotate, natural-lock,
+hard-drop replacements and new Ice candidates. Freeze Studio clear 1/2/3/countdown and
+make clear 4 four matching row pulses without a completion tail. Verify provenance,
+direct-file playback, signal bounds, repetition, synchronized visuals, and browser
+errors, then stop for human listening. Do not expand the remaining palette or start
+visual work.
 
 ## Do not repeat
 
