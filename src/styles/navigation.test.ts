@@ -65,18 +65,32 @@ describe('Phase 9 navigation authority', () => {
     );
   });
 
-  it('owns one restrained T30 transition surface for each URL route', () => {
+  it('owns one stable T37 Settled Handoff viewport with near-opaque and reduced paths', () => {
     expect(app.match(/app-route-surface/g)).toHaveLength(3);
-    expect(navigation).toContain('T30 route-motion authority');
+    expect(app.match(/className="app-route-viewport"/g)).toHaveLength(1);
+    expect(navigation).toContain('T37 Settled Handoff');
     expect(navigation).toMatch(/:root\s*\{[^}]*view-transition-name:\s*none;/s);
-    expect(navigation).toMatch(/\.app-route-surface\s*\{[^}]*view-transition-name:\s*app-route;/s);
-    expect(navigation).toMatch(/::view-transition-old\(app-route\)\s*\{[^}]*180ms/s);
-    expect(navigation).toMatch(/::view-transition-new\(app-route\)\s*\{[^}]*220ms/s);
-    expect(navigation).toContain('.app[data-route-transition="fallback"] > .app-route-surface');
-    expect(navigation).toContain('.app[data-route-transition="reduced"] > .app-route-surface');
-    const reducedKeyframes = navigation.match(/@keyframes t30-route-reduced\s*\{[\s\S]*?\n\}/)?.[0] ?? '';
+    expect(navigation).toMatch(/\.app-route-viewport\s*\{[^}]*height:\s*100dvh;[^}]*view-transition-name:\s*app-route;/s);
+    expect(navigation).toMatch(/::view-transition-old\(app-route\)\s*\{[^}]*120ms/s);
+    expect(navigation).toMatch(/::view-transition-new\(app-route\)\s*\{[^}]*200ms/s);
+    expect(navigation).toMatch(/data-route-direction="forward"[\s\S]*--t37-route-enter-x:\s*6px;[\s\S]*--t37-route-leave-x:\s*-2px;/);
+    expect(navigation).toMatch(/data-route-direction="back"[\s\S]*--t37-route-enter-x:\s*-6px;[\s\S]*--t37-route-leave-x:\s*2px;/);
+    expect(navigation).toContain('mix-blend-mode: normal');
+    expect(navigation).toMatch(/::view-transition\s*\{[^}]*pointer-events:\s*none;/s);
+    expect(navigation).toMatch(/::view-transition-old\(app-route\)\s*\{[^}]*z-index:\s*1;/s);
+    expect(navigation).toMatch(/::view-transition-new\(app-route\)\s*\{[^}]*z-index:\s*2;/s);
+    expect(navigation).toContain('.app[data-route-transition="fallback"] > .app-route-viewport');
+    expect(navigation).toContain('.app[data-route-transition="reduced"] > .app-route-viewport');
+    expect(navigation).toMatch(/data-route-transition="fallback"[^}]*\{[^}]*160ms/s);
+    expect(navigation).toMatch(/data-route-transition="reduced"[^}]*\{[^}]*32ms/s);
+    const settleKeyframes = navigation.match(/@keyframes t37-route-settle\s*\{[\s\S]*?\n\}/)?.[0] ?? '';
+    expect(settleKeyframes).toContain('opacity: .985');
+    expect(settleKeyframes).not.toContain('opacity: 0;');
+    expect(settleKeyframes).not.toContain('scale');
+    const reducedKeyframes = navigation.match(/@keyframes t37-route-reduced\s*\{[\s\S]*?\n\}/)?.[0] ?? '';
     expect(reducedKeyframes).toContain('opacity');
     expect(reducedKeyframes).not.toContain('transform');
+    expect(navigation).not.toContain('@media (prefers-reduced-motion: reduce)');
   });
 
 });

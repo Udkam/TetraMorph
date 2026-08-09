@@ -964,59 +964,86 @@
   transition: none !important;
 }
 
-/* T30 route-motion authority: one restrained transition surface per URL route. */
+/* T37 Settled Handoff: one stable viewport owns every URL-route snapshot. */
 :root {
+  --t37-route-enter-x: 0px;
+  --t37-route-leave-x: 0px;
   view-transition-name: none;
 }
 
-.app-route-surface {
+:root[data-route-direction="forward"],
+.app[data-route-direction="forward"] {
+  --t37-route-enter-x: 6px;
+  --t37-route-leave-x: -2px;
+}
+
+:root[data-route-direction="back"],
+.app[data-route-direction="back"] {
+  --t37-route-enter-x: -6px;
+  --t37-route-leave-x: 2px;
+}
+
+.app-route-viewport {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
   view-transition-name: app-route;
 }
 
+.app-route-surface {
+  min-height: 100%;
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
 ::view-transition-group(app-route) {
-  animation-duration: 220ms;
-  animation-timing-function: cubic-bezier(.22, .76, .24, 1);
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(.16, 1, .3, 1);
+}
+
+::view-transition-image-pair(app-route) {
+  isolation: isolate;
+}
+
+::view-transition-old(app-route),
+::view-transition-new(app-route) {
+  mix-blend-mode: normal;
+  backface-visibility: hidden;
 }
 
 ::view-transition-old(app-route) {
-  animation: t30-route-leave 180ms cubic-bezier(.4, 0, .6, 1) both;
+  z-index: 1;
+  animation: t37-route-release 120ms cubic-bezier(.4, 0, 1, 1) both;
 }
 
 ::view-transition-new(app-route) {
-  animation: t30-route-enter 220ms cubic-bezier(.22, .76, .24, 1) both;
+  z-index: 2;
+  animation: t37-route-settle 200ms cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.app[data-route-transition="fallback"] > .app-route-surface {
-  animation: t30-route-enter 180ms cubic-bezier(.22, .76, .24, 1) both;
+.app[data-route-transition="fallback"] > .app-route-viewport {
+  animation: t37-route-settle 160ms cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.app[data-route-transition="reduced"] > .app-route-surface {
-  animation: t30-route-reduced 1ms linear both;
+.app[data-route-transition="reduced"] > .app-route-viewport {
+  animation: t37-route-reduced 32ms linear both;
 }
 
-@keyframes t30-route-leave {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(3px); }
+@keyframes t37-route-release {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(var(--t37-route-leave-x), 0, 0); }
 }
 
-@keyframes t30-route-enter {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes t37-route-settle {
+  from { opacity: .985; transform: translate3d(var(--t37-route-enter-x), 2px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-@keyframes t30-route-reduced {
-  from { opacity: .99; }
+@keyframes t37-route-reduced {
+  from { opacity: .995; }
   to { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(app-route),
-  ::view-transition-old(app-route),
-  ::view-transition-new(app-route) {
-    animation: t30-route-reduced 1ms linear both;
-  }
-
-  .app[data-route-transition="fallback"] > .app-route-surface {
-    animation: t30-route-reduced 1ms linear both;
-  }
 }
