@@ -1,0 +1,951 @@
+{
+  "sourceSha": "a1c9dea2baef4a022da6823e32b5a684dcabeba8",
+  "capturedAt": "2026-08-09T23:43:46.229Z",
+  "origin": "http://127.0.0.1:4192",
+  "browser": "149.0.7827.55",
+  "evidence": {
+    "native": {
+      "forwardAnimations": [
+        {
+          "name": "t37-route-settle",
+          "pseudoElement": "::view-transition-new(app-route)",
+          "duration": 200
+        },
+        {
+          "name": "t37-route-release",
+          "pseudoElement": "::view-transition-old(app-route)",
+          "duration": 120
+        }
+      ],
+      "forwardFrames": [
+        {
+          "timeMs": 0,
+          "path": "/puzzles",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "native",
+          "appDirection": "forward",
+          "rootDirection": "forward",
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 补行，3 行残局，可进入",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 900,
+            "scrollWidth": 1440,
+            "scrollHeight": 900
+          },
+          "animations": [
+            {
+              "name": "t37-route-settle",
+              "currentTime": 0,
+              "duration": 200,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-new(app-route)"
+            },
+            {
+              "name": "t37-route-release",
+              "currentTime": 0,
+              "duration": 120,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-old(app-route)"
+            }
+          ]
+        },
+        {
+          "timeMs": 60,
+          "path": "/puzzles",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "native",
+          "appDirection": "forward",
+          "rootDirection": "forward",
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 补行，3 行残局，可进入",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 900,
+            "scrollWidth": 1440,
+            "scrollHeight": 900
+          },
+          "animations": [
+            {
+              "name": "t37-route-settle",
+              "currentTime": 60,
+              "duration": 200,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-new(app-route)"
+            },
+            {
+              "name": "t37-route-release",
+              "currentTime": 60,
+              "duration": 120,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-old(app-route)"
+            }
+          ]
+        },
+        {
+          "timeMs": 120,
+          "path": "/puzzles",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "native",
+          "appDirection": "forward",
+          "rootDirection": "forward",
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 补行，3 行残局，可进入",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 900,
+            "scrollWidth": 1440,
+            "scrollHeight": 900
+          },
+          "animations": [
+            {
+              "name": "t37-route-settle",
+              "currentTime": 120,
+              "duration": 200,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-new(app-route)"
+            },
+            {
+              "name": "t37-route-release",
+              "currentTime": 120,
+              "duration": 120,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-old(app-route)"
+            }
+          ]
+        },
+        {
+          "timeMs": 200,
+          "path": "/puzzles",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "native",
+          "appDirection": "forward",
+          "rootDirection": "forward",
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 补行，3 行残局，可进入",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 900,
+            "scrollWidth": 1440,
+            "scrollHeight": 900
+          },
+          "animations": [
+            {
+              "name": "t37-route-settle",
+              "currentTime": 200,
+              "duration": 200,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-new(app-route)"
+            },
+            {
+              "name": "t37-route-release",
+              "currentTime": 200,
+              "duration": 120,
+              "playState": "paused",
+              "pseudoElement": "::view-transition-old(app-route)"
+            }
+          ]
+        }
+      ],
+      "forwardFinal": {
+        "path": "/puzzles",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "puzzle-library",
+              "mode": "puzzle",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "idle",
+        "appDirection": "neutral",
+        "rootDirection": null,
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "level-row",
+        "activeAriaLabel": "01 补行，3 行残局，可进入",
+        "surfaceTestId": "puzzle-library",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": []
+      },
+      "backAnimations": [
+        {
+          "name": "t37-route-settle",
+          "pseudoElement": "::view-transition-new(app-route)",
+          "duration": 200
+        },
+        {
+          "name": "t37-route-release",
+          "pseudoElement": "::view-transition-old(app-route)",
+          "duration": 120
+        }
+      ],
+      "backDuring": {
+        "path": "/",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "home",
+              "mode": "marathon",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "native",
+        "appDirection": "back",
+        "rootDirection": "back",
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "enter-marathon",
+        "activeAriaLabel": "开始 经典",
+        "surfaceTestId": "mode-home",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": [
+          {
+            "name": "t37-route-settle",
+            "currentTime": 80,
+            "duration": 200,
+            "playState": "paused",
+            "pseudoElement": "::view-transition-new(app-route)"
+          },
+          {
+            "name": "t37-route-release",
+            "currentTime": 80,
+            "duration": 120,
+            "playState": "paused",
+            "pseudoElement": "::view-transition-old(app-route)"
+          }
+        ]
+      },
+      "backFinal": {
+        "path": "/",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "home",
+              "mode": "marathon",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "idle",
+        "appDirection": "neutral",
+        "rootDirection": null,
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "enter-marathon",
+        "activeAriaLabel": "开始 经典",
+        "surfaceTestId": "mode-home",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": []
+      },
+      "gameDuring": {
+        "path": "/play/classic",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "game",
+              "mode": "marathon",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "native",
+        "appDirection": "forward",
+        "rootDirection": "forward",
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "activeTestId": null,
+        "activeAriaLabel": null,
+        "surfaceTestId": "game-screen",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": [
+          {
+            "name": "t37-route-settle",
+            "currentTime": 80,
+            "duration": 200,
+            "playState": "paused",
+            "pseudoElement": "::view-transition-new(app-route)"
+          },
+          {
+            "name": "t37-route-release",
+            "currentTime": 80,
+            "duration": 120,
+            "playState": "paused",
+            "pseudoElement": "::view-transition-old(app-route)"
+          }
+        ]
+      },
+      "interruptionInput": {
+        "path": "/play/classic",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "game",
+              "mode": "marathon",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "native",
+        "appDirection": "forward",
+        "rootDirection": "forward",
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "activeTestId": null,
+        "activeAriaLabel": null,
+        "surfaceTestId": "game-screen",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": [
+          {
+            "name": "t37-route-settle",
+            "currentTime": 80,
+            "duration": 200,
+            "playState": "paused",
+            "pseudoElement": "::view-transition-new(app-route)"
+          },
+          {
+            "name": "t37-route-release",
+            "currentTime": 80,
+            "duration": 120,
+            "playState": "paused",
+            "pseudoElement": "::view-transition-old(app-route)"
+          }
+        ]
+      },
+      "gameText": {
+        "coordinateSystem": "board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows",
+        "screen": "game",
+        "mode": "marathon",
+        "status": "ready",
+        "countdown": 3,
+        "phase": "active",
+        "puzzleId": null,
+        "puzzleCompletion": null,
+        "puzzleTargetsRemaining": 0,
+        "puzzleTargetsInitial": 0,
+        "puzzleUndoDepth": 0,
+        "mutation": null,
+        "score": 0,
+        "lines": 0,
+        "combo": 0,
+        "bedrockRows": 0,
+        "bedrockIntervalSeconds": null,
+        "bedrockNextSeconds": null,
+        "bedrockPending": false,
+        "stoneIntervalPieces": null,
+        "stoneNextPieces": null,
+        "fallingStones": [],
+        "fallTicks": 48,
+        "placedPieces": 0,
+        "active": {
+          "type": "L",
+          "x": 3,
+          "y": 19,
+          "rotation": 0
+        },
+        "next": "O",
+        "nextPreviews": [
+          "O"
+        ],
+        "visibleBoard": [
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          ".........."
+        ]
+      },
+      "interruptedFinal": {
+        "path": "/",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "home",
+              "mode": "marathon",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "idle",
+        "appDirection": "neutral",
+        "rootDirection": null,
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "enter-marathon",
+        "activeAriaLabel": "开始 经典",
+        "surfaceTestId": "mode-home",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": []
+      },
+      "rapidFinal": {
+        "path": "/play/classic",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "game",
+              "mode": "marathon",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "idle",
+        "appDirection": "neutral",
+        "rootDirection": null,
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "activeTestId": null,
+        "activeAriaLabel": null,
+        "surfaceTestId": "game-screen",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": []
+      },
+      "rapidText": {
+        "coordinateSystem": "board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows",
+        "screen": "game",
+        "mode": "marathon",
+        "status": "ready",
+        "countdown": 3,
+        "phase": "active",
+        "puzzleId": null,
+        "puzzleCompletion": null,
+        "puzzleTargetsRemaining": 0,
+        "puzzleTargetsInitial": 0,
+        "puzzleUndoDepth": 0,
+        "mutation": null,
+        "score": 0,
+        "lines": 0,
+        "combo": 0,
+        "bedrockRows": 0,
+        "bedrockIntervalSeconds": null,
+        "bedrockNextSeconds": null,
+        "bedrockPending": false,
+        "stoneIntervalPieces": null,
+        "stoneNextPieces": null,
+        "fallingStones": [],
+        "fallTicks": 48,
+        "placedPieces": 0,
+        "active": {
+          "type": "O",
+          "x": 4,
+          "y": 19,
+          "rotation": 0
+        },
+        "next": "L",
+        "nextPreviews": [
+          "L"
+        ],
+        "visibleBoard": [
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          "..........",
+          ".........."
+        ]
+      }
+    },
+    "fallback": {
+      "animations": [
+        {
+          "name": "t37-route-settle",
+          "pseudoElement": null,
+          "duration": 160
+        }
+      ],
+      "during": {
+        "path": "/puzzles",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "puzzle-library",
+              "mode": "puzzle",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "fallback",
+        "appDirection": "forward",
+        "rootDirection": "forward",
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "level-row",
+        "activeAriaLabel": "01 补行，3 行残局，可进入",
+        "surfaceTestId": "puzzle-library",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "0.999577",
+        "viewportTransform": "matrix(1, 0, 0, 1, 0.169325, 0.0564418)",
+        "viewportRect": {
+          "x": 0.16932536661624908,
+          "y": 0.056441787630319595,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": [
+          {
+            "name": "t37-route-settle",
+            "currentTime": 80,
+            "duration": 160,
+            "playState": "paused",
+            "pseudoElement": null
+          }
+        ]
+      },
+      "final": {
+        "path": "/puzzles",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "puzzle-library",
+              "mode": "puzzle",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "idle",
+        "appDirection": "neutral",
+        "rootDirection": null,
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "level-row",
+        "activeAriaLabel": "01 补行，3 行残局，可进入",
+        "surfaceTestId": "puzzle-library",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": []
+      }
+    },
+    "reduced": {
+      "samples": [
+        {
+          "elapsedMs": 36,
+          "mode": "reduced",
+          "direction": "forward",
+          "path": "/puzzles",
+          "opacity": "0.995",
+          "transform": "none",
+          "animations": [
+            {
+              "name": "t37-route-reduced",
+              "duration": 0.01,
+              "currentTime": 0,
+              "pseudoElement": null
+            }
+          ]
+        },
+        {
+          "elapsedMs": 88.19999998807907,
+          "mode": "reduced",
+          "direction": "forward",
+          "path": "/puzzles",
+          "opacity": "0.995",
+          "transform": "none",
+          "animations": [
+            {
+              "name": "t37-route-reduced",
+              "duration": 0.01,
+              "currentTime": 0,
+              "pseudoElement": null
+            }
+          ]
+        },
+        {
+          "elapsedMs": 93.19999998807907,
+          "mode": "reduced",
+          "direction": "forward",
+          "path": "/puzzles",
+          "opacity": "0.995",
+          "transform": "none",
+          "animations": [
+            {
+              "name": "t37-route-reduced",
+              "duration": 0.01,
+              "currentTime": 0,
+              "pseudoElement": null
+            }
+          ]
+        },
+        {
+          "elapsedMs": 113.09999999403954,
+          "mode": "idle",
+          "direction": "neutral",
+          "path": "/puzzles",
+          "opacity": "1",
+          "transform": "none",
+          "animations": []
+        }
+      ],
+      "final": {
+        "path": "/puzzles",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "puzzle-library",
+              "mode": "puzzle",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "idle",
+        "appDirection": "neutral",
+        "rootDirection": null,
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "level-row",
+        "activeAriaLabel": "01 补行，3 行残局，可进入",
+        "surfaceTestId": "puzzle-library",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "animations": []
+      }
+    },
+    "mobile": {
+      "final": {
+        "path": "/puzzles",
+        "historyState": {
+          "tetramorphRoute": {
+            "version": 1,
+            "navigation": {
+              "screen": "puzzle-library",
+              "mode": "puzzle",
+              "selectedPuzzleId": "t3r-shaft-01"
+            }
+          }
+        },
+        "transitionMode": "idle",
+        "appDirection": "neutral",
+        "rootDirection": null,
+        "viewportCount": 1,
+        "surfaceCount": 1,
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "activeTestId": "level-row",
+        "activeAriaLabel": "01 补行，3 行残局，可进入",
+        "surfaceTestId": "puzzle-library",
+        "surfaceViewTransitionName": "none",
+        "viewportViewTransitionName": "app-route",
+        "viewportOpacity": "1",
+        "viewportTransform": "none",
+        "viewportRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844,
+          "scrollWidth": 390,
+          "scrollHeight": 844
+        },
+        "animations": []
+      },
+      "geometry": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "documentScrollHeight": 844,
+        "routeControlHeights": [
+          {
+            "testId": null,
+            "className": "library-back",
+            "height": 44
+          },
+          {
+            "testId": "start-selected-puzzle",
+            "className": "primary-action puzzle-gallery__start",
+            "height": 44
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.84375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.84375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.859375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.84375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.84375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.859375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.84375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.84375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.859375
+          },
+          {
+            "testId": "level-row",
+            "className": "",
+            "height": 84.84375
+          }
+        ]
+      }
+    }
+  },
+  "browserErrors": [],
+  "failures": []
+}
