@@ -1,0 +1,1014 @@
+{
+  "result": "PASS",
+  "sourceSha": "d1063b80a699c1bc42327a9fb589cabb681a6ac0",
+  "sourceCommitPaths": [
+    "src/animation/lineClearTimeline.test.ts",
+    "src/animation/lineClearTimeline.ts",
+    "src/game/render/TetrisRenderer.test.ts",
+    "src/game/render/TetrisRenderer.ts",
+    "src/game/render/presentation.test.ts",
+    "src/game/render/presentation.ts"
+  ],
+  "origin": "http://127.0.0.1:4189",
+  "live": {
+    "before": {
+      "canvasCount": 1,
+      "domCellCount": 0,
+      "qa": true,
+      "status": "playing",
+      "viewportOverflow": 0
+    },
+    "restart": {
+      "sameCanvas": true,
+      "canvasCount": 1,
+      "domCellCount": 0,
+      "status": "ready"
+    },
+    "exit": {
+      "canvasCount": 0,
+      "qa": false,
+      "renderText": "undefined"
+    },
+    "mobile": {
+      "canvasCount": 1,
+      "domCellCount": 0,
+      "overflow": 0,
+      "boardWidth": 299
+    }
+  },
+  "renderer": {
+    "captures": [
+      {
+        "file": "clear-2-tick-0.png",
+        "count": 2,
+        "rows": [
+          38,
+          39
+        ],
+        "phaseTick": 0,
+        "visibleLockedCells": 23,
+        "ordinaryLineClear": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            11
+          ],
+          "releasedRows": [
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 70
+        }
+      },
+      {
+        "file": "clear-2-tick-1.png",
+        "count": 2,
+        "rows": [
+          38,
+          39
+        ],
+        "phaseTick": 1,
+        "visibleLockedCells": 21,
+        "ordinaryLineClear": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            11
+          ],
+          "releasedRows": [
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 72
+        }
+      },
+      {
+        "file": "clear-2-tick-2.png",
+        "count": 2,
+        "rows": [
+          38,
+          39
+        ],
+        "phaseTick": 2,
+        "visibleLockedCells": 17,
+        "ordinaryLineClear": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            11
+          ],
+          "releasedRows": [
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 61
+        }
+      },
+      {
+        "file": "clear-2-tick-3.png",
+        "count": 2,
+        "rows": [
+          38,
+          39
+        ],
+        "phaseTick": 3,
+        "visibleLockedCells": 13,
+        "ordinaryLineClear": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            11
+          ],
+          "releasedRows": [
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 42
+        }
+      },
+      {
+        "file": "clear-2-tick-11.png",
+        "count": 2,
+        "rows": [
+          38,
+          39
+        ],
+        "phaseTick": 11,
+        "visibleLockedCells": 13,
+        "ordinaryLineClear": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            11
+          ],
+          "releasedRows": [
+            38,
+            39
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 49
+        }
+      },
+      {
+        "file": "clear-3-tick-0.png",
+        "count": 3,
+        "rows": [
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 0,
+        "visibleLockedCells": 33,
+        "ordinaryLineClear": {
+          "count": 3,
+          "orderedRows": [
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            5,
+            11
+          ],
+          "releasedRows": [
+            37
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 87
+        }
+      },
+      {
+        "file": "clear-3-tick-5.png",
+        "count": 3,
+        "rows": [
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 5,
+        "visibleLockedCells": 23,
+        "ordinaryLineClear": {
+          "count": 3,
+          "orderedRows": [
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            5,
+            11
+          ],
+          "releasedRows": [
+            37,
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 69
+        }
+      },
+      {
+        "file": "clear-3-tick-11.png",
+        "count": 3,
+        "rows": [
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 11,
+        "visibleLockedCells": 13,
+        "ordinaryLineClear": {
+          "count": 3,
+          "orderedRows": [
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            5,
+            11
+          ],
+          "releasedRows": [
+            37,
+            38,
+            39
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 47
+        }
+      },
+      {
+        "file": "clear-4-tick-0.png",
+        "count": 4,
+        "rows": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 0,
+        "visibleLockedCells": 43,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 112
+        }
+      },
+      {
+        "file": "clear-4-tick-1.png",
+        "count": 4,
+        "rows": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 1,
+        "visibleLockedCells": 41,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 114
+        }
+      },
+      {
+        "file": "clear-4-tick-2.png",
+        "count": 4,
+        "rows": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 2,
+        "visibleLockedCells": 37,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 106
+        }
+      },
+      {
+        "file": "clear-4-tick-3.png",
+        "count": 4,
+        "rows": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 3,
+        "visibleLockedCells": 33,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 84
+        }
+      },
+      {
+        "file": "clear-4-tick-4.png",
+        "count": 4,
+        "rows": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 4,
+        "visibleLockedCells": 33,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36,
+            37
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 93
+        }
+      },
+      {
+        "file": "clear-4-tick-7.png",
+        "count": 4,
+        "rows": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 7,
+        "visibleLockedCells": 23,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36,
+            37,
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 71
+        }
+      },
+      {
+        "file": "clear-4-tick-11.png",
+        "count": 4,
+        "rows": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "phaseTick": 11,
+        "visibleLockedCells": 13,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36,
+            37,
+            38,
+            39
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 45
+        }
+      },
+      {
+        "file": "clear-4-tail-0.png",
+        "count": 4,
+        "tailVisibleCells": 8,
+        "visibleLockedCells": 3,
+        "ordinaryLineClear": null,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 51
+        }
+      },
+      {
+        "file": "clear-4-tail-1.png",
+        "count": 4,
+        "tailVisibleCells": 4,
+        "visibleLockedCells": 3,
+        "ordinaryLineClear": null,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 51
+        }
+      },
+      {
+        "file": "clear-4-committed.png",
+        "count": 4,
+        "tailVisibleCells": 0,
+        "visibleLockedCells": 3,
+        "ordinaryLineClear": null,
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 40
+        }
+      },
+      {
+        "file": "clear-4-centre-gap-mineral-mist.png",
+        "count": 4,
+        "theme": "mineral-mist",
+        "phaseTick": 1,
+        "visibleLockedCells": 41,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 115
+        }
+      },
+      {
+        "file": "clear-4-centre-gap-deep-tide.png",
+        "count": 4,
+        "theme": "deep-tide",
+        "phaseTick": 1,
+        "visibleLockedCells": 41,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 114
+        }
+      },
+      {
+        "file": "clear-4-centre-gap-sunstone.png",
+        "count": 4,
+        "theme": "sunstone",
+        "phaseTick": 1,
+        "visibleLockedCells": 41,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 116
+        }
+      },
+      {
+        "file": "clear-4-reduced-beat-3.png",
+        "count": 4,
+        "reducedMotion": true,
+        "phaseTick": 7,
+        "visibleLockedCells": 23,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36,
+            37,
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 71
+        }
+      },
+      {
+        "file": "clear-4-reduced-after-beat-3.png",
+        "count": 4,
+        "reducedMotion": true,
+        "phaseTick": 8,
+        "visibleLockedCells": 13,
+        "ordinaryLineClear": {
+          "count": 4,
+          "orderedRows": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            4,
+            7,
+            11
+          ],
+          "releasedRows": [
+            36,
+            37,
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 41
+        }
+      },
+      {
+        "file": "clear-2-puzzle-flash.png",
+        "count": 2,
+        "puzzle": true,
+        "phaseTick": 0,
+        "visibleLockedCells": 23,
+        "ordinaryLineClear": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            11
+          ],
+          "releasedRows": [
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 71
+        }
+      },
+      {
+        "file": "clear-2-puzzle-after-flash.png",
+        "count": 2,
+        "puzzle": true,
+        "phaseTick": 1,
+        "visibleLockedCells": 13,
+        "ordinaryLineClear": {
+          "count": 2,
+          "orderedRows": [
+            38,
+            39
+          ],
+          "releaseTicks": [
+            0,
+            11
+          ],
+          "releasedRows": [
+            38
+          ]
+        },
+        "frame": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896
+        },
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 43
+        }
+      }
+    ],
+    "core": [
+      {
+        "count": 2,
+        "unchangedDuringHold": true,
+        "beforePhaseTicks": 11,
+        "committedPhase": "active",
+        "pendingAfterCommit": [],
+        "boardChangedAtCommit": true,
+        "lineEvent": {
+          "type": "lines-cleared",
+          "rows": [
+            39,
+            38
+          ],
+          "count": 2,
+          "score": 100
+        }
+      },
+      {
+        "count": 3,
+        "unchangedDuringHold": true,
+        "beforePhaseTicks": 11,
+        "committedPhase": "active",
+        "pendingAfterCommit": [],
+        "boardChangedAtCommit": true,
+        "lineEvent": {
+          "type": "lines-cleared",
+          "rows": [
+            39,
+            38,
+            37
+          ],
+          "count": 3,
+          "score": 300
+        }
+      },
+      {
+        "count": 4,
+        "unchangedDuringHold": true,
+        "beforePhaseTicks": 11,
+        "committedPhase": "active",
+        "pendingAfterCommit": [],
+        "boardChangedAtCommit": true,
+        "lineEvent": {
+          "type": "lines-cleared",
+          "rows": [
+            39,
+            38,
+            37,
+            36
+          ],
+          "count": 4,
+          "score": 1200
+        }
+      }
+    ],
+    "constants": {
+      "releaseTicks": {
+        "1": [
+          0
+        ],
+        "2": [
+          0,
+          11
+        ],
+        "3": [
+          0,
+          5,
+          11
+        ],
+        "4": [
+          0,
+          4,
+          7,
+          11
+        ]
+      },
+      "eraseTicks": 3,
+      "tailTicks": 2
+    },
+    "canvasCountAfterDestroy": 0
+  },
+  "browserErrors": [],
+  "failures": []
+}
