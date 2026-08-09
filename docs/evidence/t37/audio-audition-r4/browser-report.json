@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-09T03:36:22.164Z",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1120,
+      "screenshot": "audition-r4-desktop.png"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "screenshot": "audition-r4-mobile.png"
+    }
+  ],
+  "checkedActions": [
+    "soft move-left",
+    "soft move-right",
+    "soft rotate",
+    "soft natural-lock",
+    "soft hard-drop",
+    "accepted clear-4",
+    "ice layered",
+    "mobile soft hard-drop",
+    "reduced-motion soft rotate",
+    "direct-file ice frost"
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "playbackModes": {
+    "http": "buffer",
+    "directFile": "embedded-buffer"
+  },
+  "result": "PASS"
+}

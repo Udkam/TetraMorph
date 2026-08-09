@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TetraMorph · T37 音效试听 R4</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">TETRAMORPH · T37 AUDIO GATE · R4</p>
+          <h1>只重听未通过项</h1>
+          <p class="lede">
+            消 1–3 行与 3·2·1 已冻结为 Studio，不再比较。下面只检查被指出“太尖锐”的
+            移动、旋转、自然落位、硬降，以及新的冰冻候选。
+          </p>
+        </div>
+        <div class="toolbar" aria-label="试听控制">
+          <label class="volume-control">
+            <span>试听音量</span>
+            <input id="volume" type="range" min="0" max="100" value="90" />
+            <output id="volume-value" for="volume">90%</output>
+          </label>
+          <button id="stop-all" class="stop-button" type="button">停止所有声音</button>
+        </div>
+        <p id="load-status" class="load-status" role="status">正在解码与校准候选…</p>
+      </header>
+
+      <section class="accepted-panel" aria-labelledby="accepted-title">
+        <div>
+          <p class="section-kicker accepted">ACCEPTED · FROZEN</p>
+          <h2 id="accepted-title">已通过的声音保持原样</h2>
+          <div class="accepted-list">
+            <span>消 1–3 行 · Studio progress-step</span>
+            <span>3·2·1 · Studio progress-step + start</span>
+            <span>消 4 行 · 同一释放音 × 4，无额外尾音</span>
+          </div>
+        </div>
+        <div class="accepted-actions" aria-label="已冻结声音复核">
+          <button type="button" data-profile="accepted" data-action="clear-4">复核消 4 行</button>
+          <button type="button" data-profile="accepted" data-action="countdown">复核 3·2·1</button>
+        </div>
+      </section>
+
+      <section class="stage-panel" aria-labelledby="stage-title">
+        <div class="stage-copy">
+          <p class="stage-kicker">动作 / 动效 / 声音同步</p>
+          <h2 id="stage-title"><span id="stage-profile">等待选择</span> · <span id="stage-event">—</span></h2>
+          <p id="stage-detail">点击下方动作。每个声音都绑定对应的移动、接触或冰冻时点。</p>
+          <div id="stage-spec" class="stage-spec" aria-live="polite"></div>
+        </div>
+        <div id="stage" class="stage" aria-label="动作示意">
+          <div class="board-grid" aria-hidden="true"></div>
+          <div id="clear-rows" class="clear-rows" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div id="piece" class="piece" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div id="impact-ring" class="impact-ring" aria-hidden="true"></div>
+          <div id="countdown" class="countdown" aria-hidden="true"></div>
+          <div id="ice-field" class="ice-field" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="actions-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">OPEN GATE · ACTIONS</p>
+            <h2 id="actions-title">Soft：一套完整的柔和动作系统</h2>
+          </div>
+          <p>保留可听音量，用慢起音、低通与无点击重触发削掉尖锐感；左右移动改用真正有方向的声音。</p>
+        </div>
+        <div class="profile-grid single">
+          <article class="profile-card soft">
+            <div class="profile-heading">
+              <span class="profile-index">S</span>
+              <div>
+                <p>UI SFX · SOFT</p>
+                <h3>圆润动作触感</h3>
+              </div>
+            </div>
+            <p class="profile-description">短、暖、实体感明确；连续输入时让前一声柔和退出，不再直接截断。</p>
+            <button class="primary-action" type="button" data-profile="soft" data-action="showcase">试听完整动作链</button>
+            <div class="cue-grid">
+              <button type="button" data-profile="soft" data-action="move-left">左移</button>
+              <button type="button" data-profile="soft" data-action="move-right">右移</button>
+              <button type="button" data-profile="soft" data-action="rotate">旋转</button>
+              <button type="button" data-profile="soft" data-action="lock">自然落位</button>
+              <button type="button" data-profile="soft" data-action="hard-drop">硬降</button>
+              <button class="wide" type="button" data-profile="soft" data-action="repeat">连续移动 × 12</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="ice-section" aria-labelledby="ice-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker ice">OPEN GATE · FREEZE</p>
+            <h2 id="ice-title">冰冻：专用 CC0 素材候选</h2>
+          </div>
+          <p>都压住刺耳高频，并对齐 320 ms 冰晶封锁动效；只比较冰冻关联感与听感。</p>
+        </div>
+        <div id="ice-candidates" class="ice-grid"></div>
+      </section>
+
+      <aside class="verdict-note">
+        <p class="section-kicker">本轮只需要给出</p>
+        <p>常规操作可以整体通过或指出具体动作；冰冻选 1 / 2 / 3，若仍不合适可全部否决。</p>
+      </aside>
+
+      <footer>
+        <p>本页只用于人工试听，不会把候选自动写入正式游戏。信号检查仅排除静音、削波和映射错误。</p>
+        <a href="./PROVENANCE.md">查看网络来源、许可、排除项与处理边界</a>
+      </footer>
+    </main>
+    <script src="./embedded-assets.js"></script>
+    <script src="./audition.js"></script>
+  </body>
+</html>

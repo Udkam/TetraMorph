@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-09T03:36:22.164Z",
+  "accepted": {
+    "clear": {
+      "asset": "./assets/accepted-studio/progress-step.ogg",
+      "onePulsePerRow": true,
+      "fourLinePulseTimesMs": [
+        0,
+        60,
+        120,
+        180
+      ],
+      "fourLineResolveCue": null,
+      "rate": 1.18,
+      "maxDurationSeconds": 0.2
+    },
+    "countdown": {
+      "stepAsset": "./assets/accepted-studio/progress-step.ogg",
+      "resolveAsset": "./assets/accepted-studio/start.ogg",
+      "stepTimesMs": [
+        0,
+        500,
+        1000
+      ],
+      "resolveAtMs": 1500
+    }
+  },
+  "sources": {
+    "uiSfx": {
+      "package": "uisfx@0.4.0",
+      "sourceCommit": "2001f3dac2d1cf86ad99cbad5cef222c3a8b9082",
+      "audioLicense": "CC0-1.0"
+    },
+    "freezeSpell": {
+      "page": "https://opengameart.org/content/freeze-spell-0",
+      "author": "artisticdude",
+      "license": "CC0-1.0",
+      "sourceSha256": "dc16da845f18f88885db4584205a4ad9b84a8da6e377b79d4511b366cc8631f1"
+    },
+    "iceShatters": {
+      "page": "https://opengameart.org/content/ice-breakingshattering",
+      "author": "IgnasD",
+      "license": "CC0-1.0",
+      "archiveSha256": "b84ea396fac1af183dd2cb205a01edaa94b493ffb36965eafe59912e41cf9eb7",
+      "selectedSourceSha256": "81558c035953d4e595640be7ba1a645c47c6f4b72f38de43a44d36fa70d52b8c"
+    }
+  },
+  "recipes": {
+    "moveLeft": {
+      "label": "左移",
+      "asset": "./assets/soft/back.ogg",
+      "rate": 1,
+      "maxDuration": 0.16,
+      "lowpassHz": 2600,
+      "filterQ": 0.65,
+      "attackMs": 12,
+      "releaseMs": 18,
+      "targetPeak": 0.5
+    },
+    "moveRight": {
+      "label": "右移",
+      "asset": "./assets/soft/forward.ogg",
+      "rate": 1,
+      "maxDuration": 0.16,
+      "lowpassHz": 2600,
+      "filterQ": 0.65,
+      "attackMs": 12,
+      "releaseMs": 18,
+      "targetPeak": 0.5
+    },
+    "rotate": {
+      "label": "旋转",
+      "asset": "./assets/soft/reorder.ogg",
+      "rate": 1.05,
+      "maxDuration": 0.3,
+      "lowpassHz": 2300,
+      "filterQ": 0.65,
+      "attackMs": 16,
+      "releaseMs": 24,
+      "targetPeak": 0.57
+    },
+    "lock": {
+      "label": "自然落位",
+      "asset": "./assets/soft/lock.ogg",
+      "rate": 0.92,
+      "maxDuration": 0.3,
+      "lowpassHz": 1900,
+      "filterQ": 0.65,
+      "attackMs": 18,
+      "releaseMs": 28,
+      "targetPeak": 0.61
+    },
+    "hardDrop": {
+      "label": "硬降",
+      "asset": "./assets/soft/drop.ogg",
+      "rate": 0.88,
+      "maxDuration": 0.34,
+      "lowpassHz": 1600,
+      "filterQ": 0.65,
+      "bodyHz": 160,
+      "bodyDb": 2.5,
+      "bodyQ": 0.8,
+      "attackMs": 14,
+      "releaseMs": 36,
+      "targetPeak": 0.7
+    },
+    "iceFrost": {
+      "label": "霜封主体",
+      "asset": "./assets/ice/freeze.wav",
+      "offset": 0.69,
+      "rate": 1,
+      "maxDuration": 0.45,
+      "highpassHz": 100,
+      "highShelfHz": 5000,
+      "highShelfDb": -2,
+      "lowpassHz": 8500,
+      "filterQ": 0.707,
+      "attackMs": 20,
+      "releaseMs": 95,
+      "targetPeak": 0.56,
+      "compressor": {
+        "threshold": -16,
+        "knee": 16,
+        "ratio": 2.5,
+        "attack": 0.003,
+        "release": 0.11
+      }
+    },
+    "iceLayered": {
+      "label": "霜封 + 碎片",
+      "asset": "./assets/ice/freeze-shard-composite.wav",
+      "offset": 0,
+      "rate": 1,
+      "maxDuration": 0.58,
+      "lowpassHz": 8500,
+      "filterQ": 0.707,
+      "attackMs": 10,
+      "releaseMs": 50,
+      "targetPeak": 0.6,
+      "bakedInternalAttackMs": 24,
+      "bakedShardAtMs": 250,
+      "bakedReleasePeakMs": 327
+    },
+    "iceBalanced": {
+      "label": "柔碎冰基线",
+      "asset": "./assets/ice/ledas-luzta-4.ogg",
+      "offset": 0.025,
+      "rate": 0.83,
+      "maxDuration": 0.596,
+      "highpassHz": 100,
+      "highShelfHz": 4200,
+      "highShelfDb": -5,
+      "lowpassHz": 7000,
+      "filterQ": 0.707,
+      "attackMs": 14,
+      "releaseMs": 110,
+      "targetPeak": 0.63,
+      "compressor": {
+        "threshold": -18,
+        "knee": 18,
+        "ratio": 3.5,
+        "attack": 0.001,
+        "release": 0.1
+      }
+    }
+  },
+  "sourceMetrics": {
+    "./assets/accepted-studio/progress-step.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.252625,
+      "peak": 0.388438,
+      "rms": 0.0577192,
+      "finite": true
+    },
+    "./assets/accepted-studio/start.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.426083,
+      "peak": 0.4313105,
+      "rms": 0.0815854,
+      "finite": true
+    },
+    "./assets/soft/back.ogg": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.412,
+      "peak": 0.4043555,
+      "rms": 0.0813088,
+      "finite": true
+    },
+    "./assets/soft/forward.ogg": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.425,
+      "peak": 0.4008458,
+      "rms": 0.0887571,
+      "finite": true
+    },
+    "./assets/soft/reorder.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.474229,
+      "peak": 0.4199682,
+      "rms": 0.1091187,
+      "finite": true
+    },
+    "./assets/soft/lock.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.455208,
+      "peak": 0.3938448,
+      "rms": 0.0929374,
+      "finite": true
+    },
+    "./assets/soft/drop.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.417,
+      "peak": 0.3967164,
+      "rms": 0.0869248,
+      "finite": true
+    },
+    "./assets/ice/freeze.wav": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 2.125,
+      "peak": 0.9885,
+      "rms": 0.1008944,
+      "finite": true
+    },
+    "./assets/ice/freeze-shard-composite.wav": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.58,
+      "peak": 0.3651733,
+      "rms": 0.0344589,
+      "finite": true
+    },
+    "./assets/ice/ledas-luzta-4.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 1.046333,
+      "peak": 1.1028904,
+      "rms": 0.0698139,
+      "finite": true
+    }
+  },
+  "recipeMetrics": {
+    "moveLeft": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.16,
+      "peak": 0.5,
+      "rms": 0.1472034,
+      "finite": true,
+      "makeup": 1.229741,
+      "targetPeak": 0.5
+    },
+    "moveRight": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.16,
+      "peak": 0.5,
+      "rms": 0.1289632,
+      "finite": true,
+      "makeup": 1.241674,
+      "targetPeak": 0.5
+    },
+    "rotate": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.3,
+      "peak": 0.57,
+      "rms": 0.1734165,
+      "finite": true,
+      "makeup": 1.357406,
+      "targetPeak": 0.57
+    },
+    "lock": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.3,
+      "peak": 0.61,
+      "rms": 0.1772905,
+      "finite": true,
+      "makeup": 1.580971,
+      "targetPeak": 0.61
+    },
+    "hardDrop": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.34,
+      "peak": 0.7,
+      "rms": 0.1807088,
+      "finite": true,
+      "makeup": 1.390848,
+      "targetPeak": 0.7
+    },
+    "iceFrost": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.45,
+      "peak": 0.56,
+      "rms": 0.0822516,
+      "finite": true,
+      "makeup": 0.608931,
+      "targetPeak": 0.56
+    },
+    "iceLayered": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.58,
+      "peak": 0.6,
+      "rms": 0.0512791,
+      "finite": true,
+      "makeup": 1.430463,
+      "targetPeak": 0.6
+    },
+    "iceBalanced": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.596,
+      "peak": 0.63,
+      "rms": 0.0624498,
+      "finite": true,
+      "makeup": 0.791933,
+      "targetPeak": 0.63
+    }
+  },
+  "sha256": {
+    "LICENSE-AUDIO": "8adf5e6fa4c955c3755fbda9dce5193d5272afbe6dea1c1c802b751533b16af3",
+    "PROVENANCE.md": "0883737322bc27523c0300721cc6a11a52c2ccd1caedb66b591037a1c31af5fa",
+    "assets/accepted-studio/progress-step.ogg": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c",
+    "assets/accepted-studio/start.ogg": "b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388",
+    "assets/ice/freeze-shard-composite.wav": "fea3b7e185441bd68707602ad0efa284c279d32d7511c7600a47ab7e6e240082",
+    "assets/ice/freeze.wav": "dc16da845f18f88885db4584205a4ad9b84a8da6e377b79d4511b366cc8631f1",
+    "assets/ice/ledas-luzta-4.ogg": "81558c035953d4e595640be7ba1a645c47c6f4b72f38de43a44d36fa70d52b8c",
+    "assets/soft/back.ogg": "dfb62e244e01dfa3549aeca70bcb4dc1f24a9e714c45afcff06e4c523ad06d43",
+    "assets/soft/drop.ogg": "8b9b2437106ec9cd7616c6e41856d31318b782e7e234f8a4c081b625f7e32722",
+    "assets/soft/forward.ogg": "7f7ee911d2574bdfcb059a8d60d9909cd2196d6dcd3a80eed147ce7a8fa58761",
+    "assets/soft/lock.ogg": "51fd3ef83754c5c48f9843a368153fd42b7e3bfeb27a4dfcf1be7855fc3f174e",
+    "assets/soft/reorder.ogg": "a1d9ca2db096d21fe2191733bbe658bec7ac42bd708f67c6d777dcd341baab6a",
+    "audition.js": "3c04edb8b6f68d1a76762535d1a4a9d39ba56b48a783fa3084df45b837c256eb",
+    "embed-assets.mjs": "b0e2b1b3f26c6f38c2c3445e26755533352cb60ad68af4d6fff9d32e7e945d1f",
+    "embedded-assets.js": "875804582231e44cdc2349fe81907adaae4067d688ee0ab7068eab805c9eed95",
+    "index.html": "3ad01e424db6da31c22f467bbe7c9bcee495f562ccda95c580eb6f2db60e6ed0",
+    "render-ice-composite.mjs": "2e98819e84fba19072d68b62da7df4722c5e5b94743fd88381279ad3322e7576",
+    "styles.css": "525e6eb9b302aa5930623b42fa112fafa922805ae3c55dd4c062cdd5e2ad268c",
+    "verify-audition.mjs": "49df992a70e6a4b71ec45fc1ccc4cd16b34c4a5b5a956f6d9381f38844306de0"
+  },
+  "assertions": {
+    "expectedAssets": 10,
+    "decodedAssets": 10,
+    "embeddedAssets": 10,
+    "expectedRecipes": 8,
+    "calibratedRecipes": 8,
+    "embeddedBytesMatchSourceSha256": true,
+    "acceptedClearFourUsesFourPulsesAndNoTail": true,
+    "actionSofteningUsesContourNotLowVolume": true,
+    "processedPeaksMatchDeclaredTargets": true,
+    "allFinite": true
+  }
+}
