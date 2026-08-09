@@ -22,7 +22,8 @@ its code is MIT and is not included here.
 The accepted R3 treatment remains unchanged, including its dedicated compressor
 (`-10 dB` threshold, `10 dB` knee, `4:1`, 3 ms attack, 120 ms release). A four-row
 clear is now exactly four `progress-step` pulses at `0 / 60 / 120 / 180 ms`; it has no
-`complete` asset or resolve tail.
+`complete` asset or resolve tail. R4 displays the accepted 3·2·1 contract as status
+only; it does not ask the player to review that accepted button again.
 
 ## Reworked ordinary actions
 

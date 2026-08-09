@@ -28,6 +28,15 @@ const OUTPUT_CONTRACTS = Object.freeze({
   candidateSafety: { threshold: -4, knee: 8, ratio: 3, attack: 0.008, release: 0.16 },
 })
 
+const VISUAL_TIMING = Object.freeze({
+  moveSettleMs: 56,
+  moveDurationMs: 88,
+  rotateDurationMs: 130,
+  lockDurationMs: 145,
+  hardDropDurationMs: 170,
+  iceReleaseMs: 320,
+})
+
 const RECIPES = Object.freeze({
   moveLeft: {
     label: '左移',
@@ -603,12 +612,12 @@ function animatePiece(kind) {
   const keyframes = {
     left: [
       { transform: `${base} translateX(0)` },
-      { transform: `${base} translateX(-17px)`, offset: 0.76 },
+      { transform: `${base} translateX(-17px)`, offset: VISUAL_TIMING.moveSettleMs / VISUAL_TIMING.moveDurationMs },
       { transform: `${base} translateX(-16px)` },
     ],
     right: [
       { transform: `${base} translateX(0)` },
-      { transform: `${base} translateX(17px)`, offset: 0.76 },
+      { transform: `${base} translateX(17px)`, offset: VISUAL_TIMING.moveSettleMs / VISUAL_TIMING.moveDurationMs },
       { transform: `${base} translateX(16px)` },
     ],
     rotate: [
@@ -627,7 +636,15 @@ function animatePiece(kind) {
       { transform: `${base} translateY(0) scaleY(1)` },
     ],
   }
-  const duration = reducedMotion() ? 1 : kind === 'drop' ? 170 : kind === 'rotate' ? 130 : kind === 'lock' ? 145 : 110
+  const duration = reducedMotion()
+    ? 1
+    : kind === 'drop'
+      ? VISUAL_TIMING.hardDropDurationMs
+      : kind === 'rotate'
+        ? VISUAL_TIMING.rotateDurationMs
+        : kind === 'lock'
+          ? VISUAL_TIMING.lockDurationMs
+          : VISUAL_TIMING.moveDurationMs
   elements.piece.animate(keyframes[kind], { duration, easing: 'cubic-bezier(0.22, 0.72, 0.24, 1)' })
   if (kind === 'drop' || kind === 'lock') {
     elements.impactRing.classList.remove('is-active')
@@ -670,7 +687,7 @@ function animateIce() {
 
 function playMove(direction) {
   const key = direction < 0 ? 'moveLeft' : 'moveRight'
-  setStage('soft', RECIPES[key].label, '方向声音与 56 ms 横向位移一致；旧声以 12 ms 退出，不硬切。', key)
+  setStage('soft', RECIPES[key].label, '56 ms 完成横向主落位，再用 32 ms 柔和收束；旧声以 12 ms 退出，不硬切。', key)
   animatePiece(direction < 0 ? 'left' : 'right')
   playRecipe(key, { group: 'move', replaceGroup: true, replacementReleaseMs: 12 })
 }
@@ -816,6 +833,7 @@ window.render_game_to_text = () => JSON.stringify({
   volumePercent: Math.round(state.volume * 100),
   accepted: ACCEPTED_CONTRACT,
   outputContracts: OUTPUT_CONTRACTS,
+  visualTiming: VISUAL_TIMING,
   actionRecipes: Object.fromEntries(['moveLeft', 'moveRight', 'rotate', 'lock', 'hardDrop'].map((key) => [key, RECIPES[key]])),
   iceCandidates: ICE_CANDIDATES,
   error: state.error,
@@ -830,6 +848,7 @@ window.__AUDITION_API__ = Object.freeze({
     recipeCount: Object.keys(RECIPES).length,
     accepted: ACCEPTED_CONTRACT,
     outputContracts: OUTPUT_CONTRACTS,
+    visualTiming: VISUAL_TIMING,
     recipes: RECIPES,
     sourceMetrics: Object.fromEntries(sourceMetrics),
     recipeMetrics: Object.fromEntries(recipeMetrics),

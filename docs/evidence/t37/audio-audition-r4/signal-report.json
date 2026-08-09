@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-09T03:41:16.993Z",
+  "generatedAt": "2026-08-09T03:45:00.863Z",
   "accepted": {
     "clear": {
       "asset": "./assets/accepted-studio/progress-step.ogg",
@@ -41,6 +41,14 @@
       "attack": 0.008,
       "release": 0.16
     }
+  },
+  "visualTiming": {
+    "moveSettleMs": 56,
+    "moveDurationMs": 88,
+    "rotateDurationMs": 130,
+    "lockDurationMs": 145,
+    "hardDropDurationMs": 170,
+    "iceReleaseMs": 320
   },
   "sources": {
     "uiSfx": {
@@ -347,7 +355,7 @@
   },
   "sha256": {
     "LICENSE-AUDIO": "8adf5e6fa4c955c3755fbda9dce5193d5272afbe6dea1c1c802b751533b16af3",
-    "PROVENANCE.md": "1af0f5523a5ade3420170c2b40bb619db0a6e3ee5493229d52cb1fbbdc327cf5",
+    "PROVENANCE.md": "aaab6e5a6e3b47110a4aa699c0fa8408e9bacae1ee49509cab3604cb038cb9ce",
     "assets/accepted-studio/progress-step.ogg": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c",
     "assets/accepted-studio/start.ogg": "b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388",
     "assets/ice/freeze-shard-composite.wav": "fea3b7e185441bd68707602ad0efa284c279d32d7511c7600a47ab7e6e240082",
@@ -358,13 +366,13 @@
     "assets/soft/forward.ogg": "7f7ee911d2574bdfcb059a8d60d9909cd2196d6dcd3a80eed147ce7a8fa58761",
     "assets/soft/lock.ogg": "51fd3ef83754c5c48f9843a368153fd42b7e3bfeb27a4dfcf1be7855fc3f174e",
     "assets/soft/reorder.ogg": "a1d9ca2db096d21fe2191733bbe658bec7ac42bd708f67c6d777dcd341baab6a",
-    "audition.js": "5103bf4368d30659537e9a1350ce42c9d2addab1413a406c4a6bbe06e9e36930",
+    "audition.js": "7fb4507eedd9eb9e71d351ad5caecf8452ca5e5eadd355627091894a691b08bc",
     "embed-assets.mjs": "b0e2b1b3f26c6f38c2c3445e26755533352cb60ad68af4d6fff9d32e7e945d1f",
     "embedded-assets.js": "875804582231e44cdc2349fe81907adaae4067d688ee0ab7068eab805c9eed95",
-    "index.html": "3ad01e424db6da31c22f467bbe7c9bcee495f562ccda95c580eb6f2db60e6ed0",
+    "index.html": "b590dc6ed64b57d35b422fbc9b0d8adb432dcc61be29c24a93280aec994c3572",
     "render-ice-composite.mjs": "2e98819e84fba19072d68b62da7df4722c5e5b94743fd88381279ad3322e7576",
     "styles.css": "525e6eb9b302aa5930623b42fa112fafa922805ae3c55dd4c062cdd5e2ad268c",
-    "verify-audition.mjs": "d889f4f528818baf2328fe9ebe94da04cd81dc3a74c594ad63467ecac3f8a6b7"
+    "verify-audition.mjs": "17db5ffcf33947ee087a522f903c54195ae87c74db7ee69647dd39f014d4d84f"
   },
   "assertions": {
     "expectedAssets": 10,
@@ -375,6 +383,8 @@
     "embeddedBytesMatchSourceSha256": true,
     "acceptedClearFourUsesFourPulsesAndNoTail": true,
     "acceptedR3UsesOriginalCompressor": true,
+    "acceptedCountdownNotReopenedForReview": true,
+    "moveVisualSettlesAt56Ms": true,
     "actionSofteningUsesContourNotLowVolume": true,
     "processedPeaksMatchDeclaredTargets": true,
     "allFinite": true
