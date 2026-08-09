@@ -5,6 +5,7 @@ import {
   CLASSIC_LINE_CLEAR_SEQUENCE_MS,
   CLASSIC_LINE_CLEAR_TAIL_MS,
   LINE_CLEAR_FIXED_STEP_MS,
+  LINE_CLEAR_CORE_COMMIT_MS,
   LINE_CLEAR_RELEASE_TICKS,
   STUDIO_LINE_CLEAR_OFFSETS_MS,
   lineClearReleaseSnapshot,
@@ -57,6 +58,7 @@ describe('line-clear timeline', () => {
     expect(CLASSIC_LINE_CLEAR_ROW_MIN_MS).toBe(120);
     expect(CLASSIC_LINE_CLEAR_HANDOFF_MS).toBe(30);
     expect(CLASSIC_LINE_CLEAR_SEQUENCE_MS).toBe(300);
+    expect(LINE_CLEAR_CORE_COMMIT_MS).toBeCloseTo(200);
     expect(CLASSIC_LINE_CLEAR_TAIL_MS).toBeCloseTo(100);
     expect(lineClearRowElapsedTicks(3, 4, 1)).toBeNull();
     expect(lineClearRowElapsedTicks(4, 4, 1)).toBe(0);

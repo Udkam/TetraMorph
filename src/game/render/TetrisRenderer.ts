@@ -56,6 +56,7 @@ import {
 } from '../../animation/mutationTimeline';
 import {
   LINE_CLEAR_FIXED_STEP_MS,
+  LINE_CLEAR_CORE_COMMIT_MS,
   lineClearReleaseSnapshot,
   lineClearVisualDurationMs,
   orderedLineClearRows,
@@ -149,6 +150,7 @@ interface OrdinaryMultiLineClearCueCell {
   material: BoardMaterial;
   rowOrder: number;
   mutationItem: MutationItem | null;
+  puzzleTarget: boolean;
 }
 
 interface OrdinaryMultiLineClearCue {
@@ -786,6 +788,9 @@ export class TetrisRenderer {
             duration: SURVIVAL_ENTRY_DURATION_MS,
           };
     }
+    if (this.options.reducedMotion !== previousReducedMotion) {
+      this.ordinaryMultiLineClearCues.length = 0;
+    }
     if (this.options.reducedMotion && !previousReducedMotion) {
       this.presentation = null;
       this.trail = null;
@@ -793,7 +798,6 @@ export class TetrisRenderer {
       this.impact = 0;
       this.rotationPulse = 0;
       this.boardShift = null;
-      this.ordinaryMultiLineClearCues.length = 0;
       this.survivalEntryBedrockRise = null;
       this.mutationArrival = null;
       // Keep the authoritative Mutation FIFO, timed fields, Collapse endpoint,
@@ -2762,7 +2766,7 @@ export class TetrisRenderer {
   ): void {
     for (const cue of this.ordinaryMultiLineClearCues) {
       if (!cue.committed) continue;
-      for (const { cell, material, rowOrder } of cue.cells) {
+      for (const { cell, material, rowOrder, mutationItem } of cue.cells) {
         if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
         const sample = classicLineClearCellSample(
           cue.elapsed,
@@ -2777,7 +2781,7 @@ export class TetrisRenderer {
           graphics,
           [{ x: cell.x, y: cell.y - VISIBLE_START_ROW }],
           material,
-          Math.min(0.34, sample.alpha * 0.34),
+          sample.alpha,
           {
             originX: layout.x,
             originY: layout.y,
@@ -2785,6 +2789,28 @@ export class TetrisRenderer {
             scale: sample.scale,
           },
         );
+        if (mutationItem) {
+          const visibleCell = { x: cell.x, y: cell.y - VISIBLE_START_ROW };
+          this.drawMutationCarrierSurface(
+            graphics,
+            [visibleCell],
+            mutationItem,
+            layout,
+            0,
+            0,
+            sample.alpha,
+          );
+          this.drawMutationCarrierCore(
+            graphics,
+            [visibleCell],
+            mutationItem,
+            layout,
+            0,
+            0,
+            1,
+            sample.alpha,
+          );
+        }
       }
     }
   }
@@ -2792,7 +2818,7 @@ export class TetrisRenderer {
   /** A low, continuous highlight follows the same sample as each material body. */
   private drawOrdinaryMultiLineClearCueFaces(graphics: Graphics, layout: BoardLayout): void {
     for (const cue of this.ordinaryMultiLineClearCues) {
-      for (const { cell, material, rowOrder, mutationItem } of cue.cells) {
+      for (const { cell, material, rowOrder, mutationItem, puzzleTarget } of cue.cells) {
         if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
         const sample = classicLineClearCellSample(
           cue.elapsed,
@@ -2809,7 +2835,10 @@ export class TetrisRenderer {
         const size = baseSize * sample.scale;
         const x = layout.x + (cell.x + 0.5) * layout.cell - size / 2;
         const y = layout.y + (cell.y - VISIBLE_START_ROW + 0.5) * layout.cell - size / 2;
-        const committedAttenuation = cue.committed ? 0.55 : 1;
+        const committedFade = cue.committed
+          ? Math.max(0, Math.min(1, (cue.elapsed - LINE_CLEAR_CORE_COMMIT_MS) / 32))
+          : 0;
+        const committedAttenuation = 1 - easeOutCubic(committedFade) * 0.45;
         const alpha = Math.min(0.55, sample.highlight * 0.5) * committedAttenuation;
         graphics
           .roundRect(x, y, size, size, Math.max(1, layout.cell * 0.08))
@@ -2833,6 +2862,22 @@ export class TetrisRenderer {
               bandHeight / 2,
             )
             .fill({ color: pieceMaterial.innerEdge, alpha: Math.min(0.5, alpha * 1.08) });
+        }
+
+        if (cue.committed && puzzleTarget) {
+          const markerInset = Math.max(2, layout.cell * 0.19);
+          const markerSize = Math.max(5, layout.cell * 0.36);
+          const markerX = layout.x + cell.x * layout.cell + markerInset;
+          const markerY = layout.y + (cell.y - VISIBLE_START_ROW) * layout.cell + markerInset;
+          graphics
+            .moveTo(markerX + markerSize, markerY)
+            .lineTo(markerX, markerY)
+            .lineTo(markerX, markerY + markerSize)
+            .stroke({
+              color: COLORS.target,
+              alpha: 0.76 * sample.alpha * committedAttenuation,
+              width: Math.max(1, layout.cell * 0.038),
+            });
         }
 
         if (mutationItem === 'freeze' || mutationItem === 'collapse') {
@@ -2873,6 +2918,9 @@ export class TetrisRenderer {
         mutationItemByCell.set(`${cell.x},${cell.y}`, carrier.item);
       }
     }
+    const puzzleTargetCells = new Set(
+      state.puzzleTargetCells.map((cell) => `${cell.x},${cell.y}`),
+    );
     const cells: OrdinaryMultiLineClearCueCell[] = [];
     for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {
       const row = orderedRows[rowOrder]!;
@@ -2884,6 +2932,7 @@ export class TetrisRenderer {
           material,
           rowOrder,
           mutationItem: mutationItemByCell.get(`${x},${row}`) ?? null,
+          puzzleTarget: puzzleTargetCells.has(`${x},${row}`),
         });
       }
     }

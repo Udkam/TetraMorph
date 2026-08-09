@@ -22,6 +22,7 @@ import {
 import { ordinaryLineClearProfile } from './presentation';
 import {
   CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+  LINE_CLEAR_CORE_COMMIT_MS,
   LINE_CLEAR_RELEASE_TICKS,
   STUDIO_LINE_CLEAR_OFFSETS_MS,
 } from '../../animation/lineClearTimeline';
@@ -191,6 +192,7 @@ type RendererInternals = {
       material: BoardMaterial;
       rowOrder: number;
       mutationItem: MutationItem | null;
+      puzzleTarget: boolean;
     }[];
     elapsed: number;
     duration: number;
@@ -2184,6 +2186,21 @@ describe('Puzzle undo presentation reset', () => {
     const laterMarkers = createGraphicsRecorder();
     internals.drawPuzzleTargetMarkers(laterMarkers.graphics, puzzle, layout, 0);
     expect(laterMarkers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(2);
+    puzzleCue.elapsed = LINE_CLEAR_CORE_COMMIT_MS;
+    internals.consumeEvents([{
+      type: 'lines-cleared',
+      rows: puzzle.pendingClearRows,
+      count: 2,
+      score: 200,
+    }], { ...puzzle, phase: 'active', pendingClearRows: [] });
+    const committedMarkers = createGraphicsRecorder();
+    (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = committedMarkers.graphics;
+    internals.drawEffects({ ...puzzle, phase: 'active', pendingClearRows: [] }, layout);
+    const committedTargetStroke = committedMarkers.operations.find((operation) => (
+      operation.kind === 'stroke'
+      && (operation.options as { color?: number } | undefined)?.color === COLORS.target
+    ));
+    expect((committedTargetStroke?.options as { alpha?: number } | undefined)?.alpha).toBeGreaterThan(0);
 
     const mutationRenderer = new TetrisRendererClass();
     const mutationInternals = mutationRenderer as unknown as RendererInternals;
@@ -2235,6 +2252,48 @@ describe('Puzzle undo presentation reset', () => {
 
     expect(drawSurface.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
     expect(drawCore.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
+  });
+
+  it('continues every captured Mutation companion through the Core commit', () => {
+    const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
+    const top = BOARD_HEIGHT - 2;
+    const bottom = BOARD_HEIGHT - 1;
+    for (const item of MUTATION_ITEMS) {
+      const renderer = new TetrisRendererClass();
+      const internals = renderer as unknown as RendererInternals;
+      const board = createBoard();
+      board[top]![4] = 'T';
+      board[bottom]![2] = 'T';
+      const state = {
+        ...createInitialState(0x1a16_410 + MUTATION_ITEMS.indexOf(item), 'sprint'),
+        board,
+        active: null,
+        status: 'playing',
+        phase: 'line-clear',
+        pendingClearRows: [bottom, top],
+        mutationCarriers: [{ id: 1, item, cells: [{ x: 4, y: top }, { x: 2, y: bottom }] }],
+      } as GameState;
+      internals.consumeEvents([{ type: 'clear-started', rows: state.pendingClearRows }], state);
+      const cue = internals.ordinaryMultiLineClearCues[0]!;
+      cue.elapsed = LINE_CLEAR_CORE_COMMIT_MS;
+      internals.consumeEvents([{
+        type: 'lines-cleared',
+        rows: state.pendingClearRows,
+        count: 2,
+        score: 200,
+      }], { ...state, phase: 'active', pendingClearRows: [], mutationCarriers: [] });
+      const body = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
+      const surface = vi.spyOn(internals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
+      const core = vi.spyOn(internals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
+
+      internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
+
+      expect(body.mock.calls.length).toBeGreaterThan(0);
+      const surfaceCall = surface.mock.calls.find((call) => call[2] === item);
+      const coreCall = core.mock.calls.find((call) => call[2] === item);
+      expect(surfaceCall?.[6]).toBeGreaterThan(0);
+      expect(coreCall?.[7]).toBe(surfaceCall?.[6]);
+    }
   });
 
   it('excludes anchors and bedrock from ordinary clear faces while retaining live materials', () => {
@@ -2398,6 +2457,7 @@ describe('Puzzle undo presentation reset', () => {
     const classic = {
       ...createInitialState(0x1a16_6ff, 'marathon'),
       board,
+      active: null,
       status: 'playing',
       phase: 'line-clear',
       pendingClearRows: rows,
@@ -2418,18 +2478,42 @@ describe('Puzzle undo presentation reset', () => {
     internals.consumeEvents([startEvent], classic);
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(1);
 
-    cue.elapsed = 200;
+    const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
+    cue.elapsed = LINE_CLEAR_CORE_COMMIT_MS - 0.1;
+    const preCommitDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
+    internals.drawPieces(classic, layout);
+    const preCommitCenter = preCommitDraw.mock.calls.find((call) => (
+      (call[1] as readonly Cell[]).some((cell) => (
+        cell.x === 4 && cell.y === BOARD_HEIGHT - 1 - VISIBLE_START_ROW
+      ))
+      && typeof call[3] === 'number'
+      && call[3] < 1
+    ));
+    expect(preCommitCenter).toBeDefined();
+    const preCommitAlpha = preCommitCenter?.[3] as number;
+    preCommitDraw.mockRestore();
+
     internals.consumeEvents([clearEvent], { ...classic, phase: 'active', pendingClearRows: [] });
     expect(internals.ordinaryMultiLineClearCues[0]).toBe(cue);
-    expect(cue).toMatchObject({ elapsed: 200, committed: true });
+    expect(cue).toMatchObject({ elapsed: LINE_CLEAR_CORE_COMMIT_MS - 0.1, committed: true });
+    cue.elapsed = LINE_CLEAR_CORE_COMMIT_MS;
+    const commitDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
+    internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
+    const committedCenter = commitDraw.mock.calls.find((call) => (
+      (call[1] as readonly Cell[]).some((cell) => (
+        cell.x === 4 && cell.y === BOARD_HEIGHT - 1 - VISIBLE_START_ROW
+      ))
+    ));
+    expect(committedCenter).toBeDefined();
+    expect(Math.abs((committedCenter?.[3] as number) - preCommitAlpha)).toBeLessThan(0.02);
+    commitDraw.mockRestore();
 
-    const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
     cue.elapsed = 250;
     const bodyDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
     internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
     expect(bodyDraw.mock.calls.length).toBeGreaterThan(0);
     expect(bodyDraw.mock.calls.every((call) => (
-      typeof call[3] === 'number' && call[3] > 0 && call[3] <= 0.34
+      typeof call[3] === 'number' && call[3] > 0 && call[3] <= 1
     ))).toBe(true);
     bodyDraw.mockRestore();
 
@@ -2450,6 +2534,10 @@ describe('Puzzle undo presentation reset', () => {
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
     internals.consumeEvents([startEvent], classic);
     expect(internals.ordinaryMultiLineClearCues[0]?.restrained).toBe(true);
+    renderer.setOptions({ reducedMotion: false });
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
+    internals.consumeEvents([startEvent], classic);
+    expect(internals.ordinaryMultiLineClearCues[0]?.restrained).toBe(false);
     renderer.setOptions({ modeSwitch: true });
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
     renderer.setOptions({ modeSwitch: false });
