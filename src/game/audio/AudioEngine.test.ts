@@ -352,17 +352,24 @@ describe('AudioEngine accepted production contract', () => {
     await audio.prime();
     audio.play([mutation('bomb')]);
 
-    expect(oscillators).toHaveLength(1);
-    expect(oscillators[0]?.frequency.setValues[0]).toEqual({ value: 74, time: 0 });
-    expect(oscillators[0]?.stops[0]).toBeCloseTo(0.17);
+    expect(oscillators).toHaveLength(3);
+    expect(oscillators.map((node) => node.frequency.setValues[0])).toEqual([
+      { value: 74, time: 0 },
+      { value: 111, time: 0.22 },
+      { value: 55, time: 0.235 },
+    ]);
+    expect(oscillators[1]?.frequency.exponential[0]).toEqual({ value: 48, time: 0.44 });
+    expect(oscillators[2]?.frequency.exponential[0]).toEqual({ value: 42, time: 0.49 });
+    expect(oscillators.map((node) => node.starts[0])).toEqual([0, 0.22, 0.235]);
+    expect(oscillators.map((node) => Number(node.stops[0]?.toFixed(3)))).toEqual([0.23, 0.45, 0.5]);
     expect(bufferSources).toHaveLength(1);
-    expect(bufferSources[0]?.starts[0]).toEqual({ time: 0.006, offset: undefined, duration: undefined });
-    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.091);
+    expect(bufferSources[0]?.starts[0]).toEqual({ time: 0.22, offset: undefined, duration: undefined });
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.35);
     expect(filters).toHaveLength(1);
     expect(filters[0]?.type).toBe('lowpass');
-    expect(filters[0]?.frequency.setValues[0]).toEqual({ value: 640, time: 0.006 });
-    expect(filters[0]?.Q.setValues[0]).toEqual({ value: 0.7, time: 0.006 });
-    expect(gains.at(-1)?.gain.exponential[0]).toEqual({ value: 0.12 * 1.45, time: 0.015 });
+    expect(filters[0]?.frequency.setValues[0]).toEqual({ value: 880, time: 0.22 });
+    expect(filters[0]?.Q.setValues[0]).toEqual({ value: 0.55, time: 0.22 });
+    expect(gains.at(-1)?.gain.exponential[0]).toEqual({ value: 0.17 * 1.45, time: 0.224 });
   });
 
   it('lets Ice own a resolution frame without stacking hard-drop, lock, or clear sounds', async () => {
@@ -461,7 +468,7 @@ describe('AudioEngine accepted production contract', () => {
   });
 
   it('keeps recovered-candidate voice accounting consistent with the engine', () => {
-    expect(audioCue('bomb').tones.length + (audioCue('bomb').air?.length ?? 0)).toBe(2);
+    expect(audioCue('bomb').tones.length + (audioCue('bomb').air?.length ?? 0)).toBe(4);
     expect(audioCue('supergravity').tones).toHaveLength(2);
     expect(audioCue('multiplier-4').tones).toHaveLength(6);
   });

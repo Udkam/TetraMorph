@@ -14,7 +14,7 @@ export interface RecoveredNoisePuffOptions extends AcceptedVoiceHooks {
   readonly gainCeiling: number;
 }
 
-/** Exact deterministic low-passed pressure texture used by the earlier soft Bomb cue. */
+/** Deterministic low-passed pressure texture for bounded material transients. */
 export function scheduleRecoveredNoisePuff(
   context: AudioContext,
   destination: AudioNode,

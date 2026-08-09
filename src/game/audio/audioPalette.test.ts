@@ -6,6 +6,7 @@ import {
   cueEnergy,
   type CandidateAudioCueId,
 } from './audioPalette';
+import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 
 describe('T37 recovered soft support palette', () => {
   it('keeps all sixteen candidate cues bounded and separate from accepted playback', () => {
@@ -78,24 +79,46 @@ describe('T37 recovered soft support palette', () => {
 
   it('gives every remaining Mutation a distinct material-bound one-shot', () => {
     expect(audioCue('supergravity').tones.map((layer) => layer.frequency)).toEqual([148, 93]);
-    expect(audioCue('bomb').tones.map((layer) => layer.frequency)).toEqual([74]);
-    expect(audioCue('bomb').air).toEqual([
+    const bombImpactSeconds = (
+      MUTATION_VFX_TOKENS.bomb.animation.enterMs
+      + MUTATION_VFX_TOKENS.bomb.animation.pulseMs
+    ) / 1_000;
+    expect(bombImpactSeconds).toBe(0.22);
+    expect(audioCue('bomb').tones).toEqual([
       expect.objectContaining({
-        cutoff: 640, q: 0.7, attack: 0.009,
-        duration: 0.075, gain: 0.12, delay: 0.006,
+        frequency: 74, duration: 0.22, gain: 0.16, attack: 0.035, waveform: 'sine',
+      }),
+      expect.objectContaining({
+        frequency: 111, endFrequency: 48, delay: bombImpactSeconds,
+        duration: 0.22, gain: 0.34, attack: 0.006, waveform: 'sine',
+      }),
+      expect.objectContaining({
+        frequency: 55, endFrequency: 42, delay: 0.235,
+        duration: 0.255, gain: 0.105, attack: 0.014, waveform: 'sine',
       }),
     ]);
+    expect(audioCue('bomb').air).toEqual([
+      expect.objectContaining({
+        cutoff: 880, q: 0.55, attack: 0.004,
+        duration: 0.12, gain: 0.17, delay: bombImpactSeconds,
+      }),
+    ]);
+    expect(cueDuration(audioCue('bomb'))).toBeCloseTo(0.49);
+    expect(cueDuration(audioCue('bomb'))).toBeLessThan(
+      MUTATION_VFX_TOKENS.bomb.animation.activationMs / 1_000,
+    );
     expect(audioCue('multiplier-2').tones).toHaveLength(4);
     expect(audioCue('multiplier-4').tones).toHaveLength(6);
     expect(audioCue('multiplier-2').tones.map((layer) => layer.waveform)).toEqual([
       'triangle', 'sine', 'triangle', 'sine',
     ]);
     for (const id of [
-      'supergravity', 'bomb', 'multiplier-2', 'multiplier-4',
+      'supergravity', 'multiplier-2', 'multiplier-4',
     ] satisfies CandidateAudioCueId[]) {
       expect(audioCue(id).mutationOwned).toBe(true);
       expect(cueDuration(audioCue(id)), id).toBeLessThan(0.3);
     }
+    expect(audioCue('bomb').mutationOwned).toBe(true);
   });
 
   it('keeps all gameplay, reward, Puzzle, Survival, and UI candidates represented', () => {

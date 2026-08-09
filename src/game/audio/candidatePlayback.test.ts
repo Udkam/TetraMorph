@@ -35,7 +35,7 @@ class FakeSource extends FakeNode {
 }
 
 describe('recovered candidate playback', () => {
-  it('reproduces the deterministic 640 Hz Bomb pressure puff and cleans it up', () => {
+  it('reproduces a deterministic low-passed pressure puff and cleans it up', () => {
     const samples = new Float32Array(480);
     const source = new FakeSource();
     const filter = new FakeFilter();
