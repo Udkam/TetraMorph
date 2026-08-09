@@ -5,17 +5,20 @@ import type {
   ProceduralLayer,
 } from './audioGesture';
 
-export type AudioCueId =
-  | 'move' | 'rotate' | 'soft-drop' | 'hard-drop' | 'lock' | 'puzzle-undo'
-  | 'clear-1' | 'clear-2' | 'clear-3' | 'clear-4'
+/**
+ * Stage-C cues that have not yet received a player-frozen sample/tone contract.
+ * Accepted Action A, Studio clear/countdown, and Ice 2 are intentionally absent and
+ * are scheduled only by acceptedPlayback.ts.
+ */
+export type LegacyAudioCueId =
+  | 'soft-drop' | 'puzzle-undo'
   | 'bedrock-rise' | 'bedrock-lower' | 'stone-warning' | 'stone-spawn' | 'stone-land'
   | 'level-up' | 'finished' | 'game-over' | 'pause' | 'resume'
-  | 'countdown-tick' | 'countdown-resolve'
-  | 'freeze' | 'supergravity' | 'bomb' | 'multiplier-2' | 'multiplier-4';
+  | 'supergravity' | 'bomb' | 'multiplier-2' | 'multiplier-4';
 
 type LayerOptions = Partial<Pick<
   ProceduralLayer,
-  'delay' | 'endFrequency' | 'brightness' | 'spread' | 'pulses' | 'seed' | 'attack' | 'release'
+  'delay' | 'endFrequency' | 'brightness' | 'spread' | 'seed' | 'attack' | 'release'
 >>;
 
 const voice = (
@@ -39,17 +42,7 @@ const gesture = (
   mutationOwned = false,
 ): AudioGesture => ({ bus, layers, mutationOwned });
 
-const CONTROL_CUES: Readonly<Record<'move' | 'rotate' | 'soft-drop', AudioGesture>> = {
-  move: gesture('gameplay', [
-    voice('surface-slide', 238, 0.056, 0.16, {
-      endFrequency: 204, brightness: 0.3, spread: 0.32, seed: 0x37101, release: 0.3,
-    }),
-  ]),
-  rotate: gesture('gameplay', [
-    voice('pivot-detent', 248, 0.074, 0.21, {
-      endFrequency: 392, brightness: 0.32, spread: 0.46, seed: 0x37111, release: 0.32,
-    }),
-  ]),
+const PALETTE: Readonly<Record<LegacyAudioCueId, AudioGesture>> = {
   'soft-drop': gesture('gameplay', [
     voice('ribbon', 1_180, 0.046, 0.025, {
       endFrequency: 410, brightness: 0.2, spread: 0.24, seed: 0x1301, release: 0.28,
@@ -58,119 +51,6 @@ const CONTROL_CUES: Readonly<Record<'move' | 'rotate' | 'soft-drop', AudioGestur
       endFrequency: 93, brightness: 0.18, spread: 0.16, seed: 0x1302, release: 0.3,
     }),
   ]),
-};
-
-const CONTACT_CUES: Readonly<Record<'hard-drop' | 'lock', AudioGesture>> = {
-  lock: gesture('gameplay', [
-    voice('landing-impact', 168, 0.09, 0.19, {
-      endFrequency: 136, brightness: 0.24, spread: 0.26, seed: 0x37201, release: 0.42,
-    }),
-  ]),
-  'hard-drop': gesture('gameplay', [
-    voice('fall-rush', 980, 0.05, 0.16, {
-      endFrequency: 180, brightness: 0.4, spread: 0.48, seed: 0x37301,
-      attack: 0.004, release: 0.2,
-    }),
-    voice('landing-impact', 92, 0.15, 0.28, {
-      delay: 0.042, endFrequency: 52, brightness: 0.3, spread: 0.5,
-      seed: 0x37302, release: 0.5,
-    }),
-  ]),
-};
-
-const CLEAR_CUES: Readonly<Record<'clear-1' | 'clear-2' | 'clear-3' | 'clear-4', AudioGesture>> = {
-  'clear-1': gesture('reward', [
-    voice('row-release', 210, 0.22, 0.24, {
-      endFrequency: 300, brightness: 0.3, spread: 0.3, pulses: 1,
-      seed: 0x37401, attack: 0.006, release: 0.46,
-    }),
-  ]),
-  'clear-2': gesture('reward', [
-    voice('row-release', 190, 0.28, 0.29, {
-      endFrequency: 330, brightness: 0.35, spread: 0.4, pulses: 2,
-      seed: 0x37501, attack: 0.007, release: 0.48,
-    }),
-  ]),
-  'clear-3': gesture('reward', [
-    voice('row-release', 170, 0.38, 0.34, {
-      endFrequency: 360, brightness: 0.42, spread: 0.55, pulses: 3,
-      seed: 0x37601, attack: 0.008, release: 0.52,
-    }),
-  ]),
-  'clear-4': gesture('reward', [
-    voice('row-release', 150, 0.56, 0.4, {
-      endFrequency: 420, brightness: 0.48, spread: 0.7, pulses: 4,
-      seed: 0x37701, attack: 0.009, release: 0.58,
-    }),
-  ]),
-};
-
-const MUTATION_CUES: Readonly<Record<'freeze' | 'supergravity' | 'bomb' | 'multiplier-2' | 'multiplier-4', AudioGesture>> = {
-  freeze: gesture('mutation', [
-    voice('ice-bind', 720, 0.32, 0.42, {
-      endFrequency: 380, brightness: 0.56, spread: 0.58, seed: 0x37801,
-      attack: 0.012, release: 0.28,
-    }),
-  ], true),
-  supergravity: gesture('mutation', [
-    voice('impact', 126, 0.48, 0.18, {
-      endFrequency: 31, brightness: 0.15, spread: 0.72, seed: 0x4201,
-      attack: 0.014, release: 0.48,
-    }),
-    voice('ribbon', 430, 0.36, 0.075, {
-      delay: 0.018, endFrequency: 68, brightness: 0.18, spread: 0.55,
-      seed: 0x4202, attack: 0.028, release: 0.55,
-    }),
-  ], true),
-  bomb: gesture('mutation', [
-    voice('ribbon', 116, 0.38, 0.1, {
-      endFrequency: 840, brightness: 0.46, spread: 0.76, seed: 0x4301,
-      attack: 0.06, release: 0.58,
-    }),
-    voice('impact', 74, 0.34, 0.2, {
-      delay: 0.09, endFrequency: 39, brightness: 0.28, spread: 0.68,
-      seed: 0x4302, release: 0.5,
-    }),
-    voice('glass', 284, 0.28, 0.07, {
-      delay: 0.115, endFrequency: 226, brightness: 0.38, spread: 0.66,
-      seed: 0x4303, release: 0.62,
-    }),
-  ], true),
-  'multiplier-2': gesture('mutation', [
-    voice('shimmer', 242, 0.42, 0.12, {
-      endFrequency: 318, brightness: 0.58, spread: 0.54, seed: 0x4401, release: 0.62,
-    }),
-    voice('glass', 486, 0.32, 0.09, {
-      delay: 0.03, endFrequency: 544, brightness: 0.52, spread: 0.5,
-      seed: 0x4402, release: 0.66,
-    }),
-    voice('ribbon', 760, 0.32, 0.06, {
-      endFrequency: 1_520, brightness: 0.38, spread: 0.5, seed: 0x4403,
-      attack: 0.025, release: 0.58,
-    }),
-  ], true),
-  'multiplier-4': gesture('mutation', [
-    voice('shimmer', 218, 0.55, 0.14, {
-      endFrequency: 362, brightness: 0.68, spread: 0.72, seed: 0x4501, release: 0.66,
-    }),
-    voice('glass', 438, 0.42, 0.105, {
-      delay: 0.035, endFrequency: 552, brightness: 0.63, spread: 0.67,
-      seed: 0x4502, release: 0.7,
-    }),
-    voice('ribbon', 620, 0.42, 0.075, {
-      endFrequency: 1_980, brightness: 0.46, spread: 0.7, seed: 0x4503,
-      attack: 0.035, release: 0.64,
-    }),
-    voice('impact', 116, 0.3, 0.05, {
-      delay: 0.11, endFrequency: 72, brightness: 0.18, spread: 0.36,
-      seed: 0x4504, release: 0.5,
-    }),
-  ], true),
-};
-
-const SECONDARY_CUES: Readonly<Record<Exclude<AudioCueId,
-  keyof typeof CONTROL_CUES | keyof typeof CONTACT_CUES | keyof typeof CLEAR_CUES | keyof typeof MUTATION_CUES
->, AudioGesture>> = {
   'puzzle-undo': gesture('ui', [
     voice('ribbon', 980, 0.13, 0.035, {
       endFrequency: 310, brightness: 0.26, spread: 0.4, seed: 0x5101, release: 0.5,
@@ -278,32 +158,68 @@ const SECONDARY_CUES: Readonly<Record<Exclude<AudioCueId,
       endFrequency: 740, brightness: 0.22, spread: 0.34, seed: 0x5b02, release: 0.52,
     }),
   ]),
-  'countdown-tick': gesture('ui', [
-    voice('countdown-knock', 196, 0.14, 0.18, {
-      endFrequency: 178, brightness: 0.24, spread: 0.28, seed: 0x37901, release: 0.46,
+  supergravity: gesture('mutation', [
+    voice('impact', 126, 0.48, 0.18, {
+      endFrequency: 31, brightness: 0.15, spread: 0.72, seed: 0x4201,
+      attack: 0.014, release: 0.48,
     }),
-  ]),
-  'countdown-resolve': gesture('ui', [
-    voice('countdown-knock', 152, 0.25, 0.28, {
-      endFrequency: 132, brightness: 0.28, spread: 0.38, seed: 0x37a01, release: 0.56,
+    voice('ribbon', 430, 0.36, 0.075, {
+      delay: 0.018, endFrequency: 68, brightness: 0.18, spread: 0.55,
+      seed: 0x4202, attack: 0.028, release: 0.55,
     }),
-  ]),
+  ], true),
+  bomb: gesture('mutation', [
+    voice('ribbon', 116, 0.38, 0.1, {
+      endFrequency: 840, brightness: 0.46, spread: 0.76, seed: 0x4301,
+      attack: 0.06, release: 0.58,
+    }),
+    voice('impact', 74, 0.34, 0.2, {
+      delay: 0.09, endFrequency: 39, brightness: 0.28, spread: 0.68,
+      seed: 0x4302, release: 0.5,
+    }),
+    voice('glass', 284, 0.28, 0.07, {
+      delay: 0.115, endFrequency: 226, brightness: 0.38, spread: 0.66,
+      seed: 0x4303, release: 0.62,
+    }),
+  ], true),
+  'multiplier-2': gesture('mutation', [
+    voice('shimmer', 242, 0.42, 0.12, {
+      endFrequency: 318, brightness: 0.58, spread: 0.54, seed: 0x4401, release: 0.62,
+    }),
+    voice('glass', 486, 0.32, 0.09, {
+      delay: 0.03, endFrequency: 544, brightness: 0.52, spread: 0.5,
+      seed: 0x4402, release: 0.66,
+    }),
+    voice('ribbon', 760, 0.32, 0.06, {
+      endFrequency: 1_520, brightness: 0.38, spread: 0.5, seed: 0x4403,
+      attack: 0.025, release: 0.58,
+    }),
+  ], true),
+  'multiplier-4': gesture('mutation', [
+    voice('shimmer', 218, 0.55, 0.14, {
+      endFrequency: 362, brightness: 0.68, spread: 0.72, seed: 0x4501, release: 0.66,
+    }),
+    voice('glass', 438, 0.42, 0.105, {
+      delay: 0.035, endFrequency: 552, brightness: 0.63, spread: 0.67,
+      seed: 0x4502, release: 0.7,
+    }),
+    voice('ribbon', 620, 0.42, 0.075, {
+      endFrequency: 1_980, brightness: 0.46, spread: 0.7, seed: 0x4503,
+      attack: 0.035, release: 0.64,
+    }),
+    voice('impact', 116, 0.3, 0.05, {
+      delay: 0.11, endFrequency: 72, brightness: 0.18, spread: 0.36,
+      seed: 0x4504, release: 0.5,
+    }),
+  ], true),
 };
 
-const PALETTE: Readonly<Record<AudioCueId, AudioGesture>> = {
-  ...CONTROL_CUES,
-  ...CONTACT_CUES,
-  ...CLEAR_CUES,
-  ...MUTATION_CUES,
-  ...SECONDARY_CUES,
-};
+export const AUDIO_CUE_IDS = Object.freeze(Object.keys(PALETTE) as LegacyAudioCueId[]);
 
-export const AUDIO_CUE_IDS = Object.freeze(Object.keys(PALETTE) as AudioCueId[]);
-
-export function audioCue(id: AudioCueId): AudioGesture {
+export function audioCue(id: LegacyAudioCueId): AudioGesture {
   return PALETTE[id];
 }
 
-export function cueEnergy(id: AudioCueId): number {
+export function cueEnergy(id: LegacyAudioCueId): number {
   return audioCue(id).layers.reduce((total, layer) => total + layer.gain * layer.duration, 0);
 }

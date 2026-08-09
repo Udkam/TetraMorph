@@ -245,4 +245,3 @@ export async function fetchAcceptedAudioAsset(url: string): Promise<ArrayBuffer>
   if (!response.ok) throw new Error(`Unable to load accepted audio asset (${response.status}).`);
   return response.arrayBuffer();
 }
-

@@ -1,104 +1,113 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createBrowserPlatform } from '../../platform/browserPlatform';
 import type { GameEvent } from '../core';
-import { AudioEngine } from './AudioEngine';
+import { AudioEngine, type AcceptedAudioAssetLoader } from './AudioEngine';
 import { audioCue } from './audioPalette';
 
 class FakeAudioParam {
   value = 0;
-  readonly setValues: number[] = [];
-  readonly ramps: number[] = [];
-  readonly rampTimes: number[] = [];
+  readonly setValues: Array<{ value: number; time: number }> = [];
+  readonly exponential: Array<{ value: number; time: number }> = [];
+  readonly linear: Array<{ value: number; time: number }> = [];
   readonly targets: Array<{ value: number; time: number; constant: number }> = [];
 
-  setValueAtTime(value: number): void {
+  setValueAtTime(value: number, time = 0): void {
     this.value = value;
-    this.setValues.push(value);
+    this.setValues.push({ value, time });
   }
-
   exponentialRampToValueAtTime(value: number, time = 0): void {
     this.value = value;
-    this.ramps.push(value);
-    this.rampTimes.push(time);
+    this.exponential.push({ value, time });
   }
-
+  linearRampToValueAtTime(value: number, time = 0): void {
+    this.value = value;
+    this.linear.push({ value, time });
+  }
   setTargetAtTime(value: number, time: number, constant: number): void {
     this.value = value;
     this.targets.push({ value, time, constant });
   }
+  cancelScheduledValues(): void {}
 }
 
-class FakeGain {
-  readonly gain = new FakeAudioParam();
+class FakeNode {
   readonly connections: unknown[] = [];
   disconnected = false;
   connect(target?: unknown): void { this.connections.push(target); }
   disconnect(): void { this.disconnected = true; }
 }
 
-class FakeOscillator {
+class FakeGain extends FakeNode { readonly gain = new FakeAudioParam(); }
+class FakeStereoPanner extends FakeNode { readonly pan = new FakeAudioParam(); }
+class FakeOscillator extends FakeNode {
   type: OscillatorType = 'sine';
   readonly frequency = new FakeAudioParam();
   readonly starts: number[] = [];
   readonly stops: number[] = [];
   onended: (() => void) | null = null;
-  disconnected = false;
-  connect(): void {}
-  disconnect(): void { this.disconnected = true; }
   start(time = 0): void { this.starts.push(time); }
   stop(time = 0): void { this.stops.push(time); }
   finish(): void { this.onended?.(); }
 }
 
 class FakeAudioBuffer {
-  readonly channel: Float32Array;
-  constructor(frames: number) { this.channel = new Float32Array(frames); }
-  getChannelData(): Float32Array { return this.channel; }
+  readonly duration: number;
+  readonly length: number;
+  readonly numberOfChannels: number;
+  readonly sampleRate: number;
+  private readonly channels: Float32Array[];
+
+  constructor(frames: number, sampleRate = 48_000, channels = 1, peak = 0) {
+    this.length = frames;
+    this.sampleRate = sampleRate;
+    this.numberOfChannels = channels;
+    this.duration = frames / sampleRate;
+    this.channels = Array.from({ length: channels }, () => new Float32Array(frames));
+    if (frames > 0 && peak > 0) this.channels[0]![Math.min(10, frames - 1)] = peak;
+  }
+
+  getChannelData(channel: number): Float32Array {
+    return this.channels[channel] ?? new Float32Array();
+  }
 }
 
-class FakeBufferSource {
+class FakeBufferSource extends FakeNode {
   buffer: AudioBuffer | null = null;
   loop = false;
-  readonly starts: number[] = [];
+  readonly playbackRate = new FakeAudioParam();
+  readonly starts: Array<{ time: number; offset?: number; duration?: number }> = [];
   readonly stops: number[] = [];
   onended: (() => void) | null = null;
-  disconnected = false;
-  connect(): void {}
-  disconnect(): void { this.disconnected = true; }
-  start(time = 0): void { this.starts.push(time); }
+  start(time = 0, offset?: number, duration?: number): void {
+    this.starts.push({ time, offset, duration });
+  }
   stop(time = 0): void { this.stops.push(time); }
   finish(): void { this.onended?.(); }
 }
 
-class FakeBiquadFilter {
+class FakeBiquadFilter extends FakeNode {
   type: BiquadFilterType = 'lowpass';
   readonly frequency = new FakeAudioParam();
   readonly Q = new FakeAudioParam();
-  readonly connections: unknown[] = [];
-  disconnected = false;
-  connect(target?: unknown): void { this.connections.push(target); }
-  disconnect(): void { this.disconnected = true; }
 }
 
-class FakeCompressor {
+class FakeCompressor extends FakeNode {
   readonly threshold = new FakeAudioParam();
   readonly knee = new FakeAudioParam();
   readonly ratio = new FakeAudioParam();
   readonly attack = new FakeAudioParam();
   readonly release = new FakeAudioParam();
-  readonly connections: unknown[] = [];
-  disconnected = false;
-  connect(target?: unknown): void { this.connections.push(target); }
-  disconnect(): void { this.disconnected = true; }
 }
 
 const oscillators: FakeOscillator[] = [];
 const gains: FakeGain[] = [];
-const buffers: FakeBufferSource[] = [];
+const bufferSources: FakeBufferSource[] = [];
 const filters: FakeBiquadFilter[] = [];
 const compressors: FakeCompressor[] = [];
+const panners: FakeStereoPanner[] = [];
 let closeCalls = 0;
 let suspendCalls = 0;
+let decodeCalls = 0;
 
 class FakeAudioContext {
   currentTime = 0;
@@ -111,35 +120,38 @@ class FakeAudioContext {
     gains.push(node);
     return node as unknown as GainNode;
   }
-
   createDynamicsCompressor(): DynamicsCompressorNode {
     const node = new FakeCompressor();
     compressors.push(node);
     return node as unknown as DynamicsCompressorNode;
   }
-
   createOscillator(): OscillatorNode {
     const node = new FakeOscillator();
     oscillators.push(node);
     return node as unknown as OscillatorNode;
   }
-
-  createBuffer(_channels: number, frames: number): AudioBuffer {
-    return new FakeAudioBuffer(frames) as unknown as AudioBuffer;
+  createStereoPanner(): StereoPannerNode {
+    const node = new FakeStereoPanner();
+    panners.push(node);
+    return node as unknown as StereoPannerNode;
   }
-
+  createBuffer(_channels: number, frames: number, sampleRate = this.sampleRate): AudioBuffer {
+    return new FakeAudioBuffer(frames, sampleRate) as unknown as AudioBuffer;
+  }
   createBufferSource(): AudioBufferSourceNode {
     const node = new FakeBufferSource();
-    buffers.push(node);
+    bufferSources.push(node);
     return node as unknown as AudioBufferSourceNode;
   }
-
   createBiquadFilter(): BiquadFilterNode {
     const node = new FakeBiquadFilter();
     filters.push(node);
     return node as unknown as BiquadFilterNode;
   }
-
+  async decodeAudioData(): Promise<AudioBuffer> {
+    decodeCalls += 1;
+    return new FakeAudioBuffer(96_000, 48_000, 2, 0.5) as unknown as AudioBuffer;
+  }
   async resume(): Promise<void> { this.state = 'running'; }
   async suspend(): Promise<void> { suspendCalls += 1; this.state = 'suspended'; }
   async close(): Promise<void> { closeCalls += 1; this.state = 'closed'; }
@@ -152,8 +164,12 @@ const platformFor = (context = new FakeAudioContext(), now = () => 0) => createB
   audioContextFactory: () => context as unknown as AudioContext,
 });
 
-const sourceCount = (): number => oscillators.length + buffers.length;
-const foregroundBufferCount = (): number => buffers.filter((source) => !source.loop).length;
+let loadAsset: ReturnType<typeof vi.fn<AcceptedAudioAssetLoader>>;
+
+const audioFor = (context = new FakeAudioContext(), now = () => 0): AudioEngine => (
+  new AudioEngine(platformFor(context, now), loadAsset)
+);
+const sourceCount = (): number => oscillators.length + bufferSources.length;
 const mutation = (
   item: 'freeze' | 'collapse' | 'bomb' | 'multiplier',
   multiplierFactor?: 2 | 4,
@@ -169,88 +185,129 @@ const mutation = (
 beforeEach(() => {
   oscillators.length = 0;
   gains.length = 0;
-  buffers.length = 0;
+  bufferSources.length = 0;
   filters.length = 0;
   compressors.length = 0;
+  panners.length = 0;
   closeCalls = 0;
   suspendCalls = 0;
+  decodeCalls = 0;
+  loadAsset = vi.fn(async () => new ArrayBuffer(16));
 });
 
-describe('AudioEngine material feedback contract', () => {
-  it('routes five named buses through one shared effects path', async () => {
-    const audio = new AudioEngine(platformFor());
+describe('AudioEngine accepted production contract', () => {
+  it('builds isolated Action A, Studio, Ice, and compensated extension routes', async () => {
+    const audio = audioFor();
     await audio.prime();
 
-    expect(gains).toHaveLength(7);
-    expect(gains.slice(2, 7).map((node) => node.gain.value)).toEqual([0.9, 1, 0.96, 0.14, 0.7]);
-    expect(gains.slice(2, 7).every((node) => node.connections[0] === gains[1])).toBe(true);
-    expect(gains[1]?.connections[0]).toBe(gains[0]);
-    expect(compressors).toHaveLength(1);
-
-    audio.play([{ type: 'piece-moved', piece: 'I', dx: 1, dy: 0, cause: 'move' }]);
-    const cueGains = gains.slice(7);
-    expect(cueGains).toHaveLength(audioCue('move').layers.length);
-    expect(cueGains.every((node) => node.connections[0] === gains[2])).toBe(true);
+    expect(loadAsset).toHaveBeenCalledTimes(3);
+    expect(decodeCalls).toBe(3);
+    expect(compressors).toHaveLength(3);
+    expect(compressors.map((node) => ({
+      threshold: node.threshold.value,
+      knee: node.knee.value,
+      ratio: node.ratio.value,
+      attack: node.attack.value,
+      release: node.release.value,
+    }))).toEqual([
+      { threshold: -3, knee: 5, ratio: 2.2, attack: 0.007, release: 0.19 },
+      { threshold: -4, knee: 6, ratio: 3, attack: 0.003, release: 0.12 },
+      { threshold: -10, knee: 10, ratio: 4, attack: 0.003, release: 0.12 },
+    ]);
+    expect(gains[0]?.gain.value).toBeCloseTo(0.78);
+    expect(gains[3]?.gain.value).toBeCloseTo(1.42 / 0.78);
+    expect(gains[4]?.gain.value).toBe(1.85);
+    expect(gains.slice(5, 10).map((node) => node.gain.value)).toEqual([0.9, 1, 0.96, 0.14, 0.7]);
   });
 
-  it('keeps theme selection compatible without starting a persistent ambient voice', async () => {
-    const audio = new AudioEngine(platformFor());
-    audio.setAmbientTheme('deep-tide');
-    await audio.prime();
-
-    expect(buffers).toHaveLength(0);
-    expect(filters).toHaveLength(0);
-    audio.setAmbientTheme('mineral-mist');
-    audio.setEnabled(false);
-    audio.setEnabled(true);
-    expect(buffers).toHaveLength(0);
-  });
-
-  it('keeps entry ownership with two short ticks and one longer resolve', async () => {
-    const audio = new AudioEngine(platformFor());
-    await audio.prime();
-
-    audio.playEntryCountdown(3);
-    const tickEnd = Math.max(...oscillators.flatMap((node) => node.stops), ...buffers.flatMap((node) => node.stops));
-    const afterTick = sourceCount();
-    audio.playEntryCountdown(2);
-    expect(sourceCount() - afterTick).toBe(afterTick);
-    audio.playEntryCountdown(1);
-    const resolveEnd = Math.max(...oscillators.flatMap((node) => node.stops), ...buffers.flatMap((node) => node.stops));
-
-    expect(resolveEnd).toBeGreaterThan(tickEnd + 0.1);
-    expect(sourceCount()).toBe(
-      audioCue('countdown-tick').layers.length * 2
-      + audioCue('countdown-resolve').layers.length,
-    );
-  });
-
-  it('rate-limits rapid movement while preserving a later tactile response', async () => {
+  it('reproduces Action A routing, frequencies, envelopes, and 60 ms move throttle', async () => {
     let now = 1_000;
-    const audio = new AudioEngine(platformFor(new FakeAudioContext(), () => now));
+    const audio = audioFor(new FakeAudioContext(), () => now);
     await audio.prime();
-    const move: GameEvent = { type: 'piece-moved', piece: 'T', dx: 1, dy: 0, cause: 'move' };
+    const move: GameEvent = { type: 'piece-moved', piece: 'T', dx: -1, dy: 0, cause: 'move' };
 
     audio.play([move]);
-    const first = sourceCount();
-    now += 20;
+    expect(oscillators).toHaveLength(1);
+    expect(oscillators[0]?.frequency.setValues[0]?.value).toBe(220);
+    expect(gains.at(-1)?.gain.exponential[0]?.value).toBeCloseTo(0.062 * 1.45);
+    expect(panners).toHaveLength(1);
+    expect(panners[0]?.pan.setValues[0]?.value).toBe(-0.28);
+    now += 59;
     audio.play([move]);
-    expect(sourceCount()).toBe(first);
-    now += 60;
-    audio.play([move]);
-    expect(sourceCount()).toBe(first * 2);
+    expect(oscillators).toHaveLength(1);
+    now += 1;
+    audio.play([{ ...move, dx: 1 }]);
+    expect(oscillators).toHaveLength(2);
+    expect(panners[1]?.pan.setValues[0]?.value).toBe(0.28);
+
+    audio.play([{ type: 'piece-rotated', piece: 'T', direction: 1 }]);
+    expect(oscillators.slice(2).map((node) => node.frequency.setValues[0]?.value)).toEqual([293.66, 440]);
+    expect(oscillators.slice(2).map((node) => node.starts[0])).toEqual([0, 0.004]);
+    expect(panners).toHaveLength(2);
   });
 
-  it('leaves started, restarted, and sustained mutation state silent', async () => {
-    const audio = new AudioEngine(platformFor());
+  it('aligns hard-drop contact to the 50 ms trail and suppresses natural-lock doubling', async () => {
+    const audio = audioFor();
     await audio.prime();
-    audio.play([{ type: 'started' }, { type: 'restarted' }]);
-    audio.syncMutationState({} as never);
-    expect(sourceCount()).toBe(0);
+    audio.play([
+      { type: 'hard-dropped', piece: 'I', distance: 14 },
+      { type: 'piece-locked', piece: 'I', cells: [] },
+    ]);
+    expect(oscillators.map((node) => node.frequency.setValues[0]?.value)).toEqual([174.61, 349.23]);
+    expect(oscillators[0]?.starts[0]).toBeCloseTo(0.05, 9);
+    expect(oscillators[1]?.starts[0]).toBeCloseTo(0.054, 9);
+
+    const before = oscillators.length;
+    audio.play([{ type: 'hard-dropped', piece: 'I', distance: 0 }]);
+    expect(oscillators.slice(before).map((node) => node.starts[0])).toEqual([0, 0.004]);
   });
 
-  it('deduplicates mutation awards, orders bomb first, and respects the voice ceiling', async () => {
-    const audio = new AudioEngine(platformFor());
+  it('plays three Studio progress steps and one separate start resolve', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    audio.playEntryCountdown(3);
+    audio.playEntryCountdown(2);
+    audio.playEntryCountdown(1);
+    audio.playEntryCountdownResolve();
+
+    expect(bufferSources).toHaveLength(4);
+    expect(panners).toHaveLength(4);
+    expect(bufferSources.map((node) => node.playbackRate.value)).toEqual([1.04, 1.08, 1.12, 1.08]);
+    expect(gains.slice(-4).map((node) => node.gain.linear[0]?.value)).toEqual([1.12, 1.19, 1.26, 1.44]);
+  });
+
+  it('starts Studio row pulses at clear-started and never replays them at commit', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    audio.play([
+      { type: 'hard-dropped', piece: 'I', distance: 14 },
+      { type: 'piece-locked', piece: 'I', cells: [] },
+      { type: 'clear-started', rows: [38, 39] },
+    ]);
+
+    expect(bufferSources).toHaveLength(2);
+    expect(bufferSources.map((node) => node.starts[0]?.time)).toEqual([0, 0.18]);
+    expect(panners.map((node) => node.pan.value)).toEqual([-0.35, 0.35]);
+    const afterStart = bufferSources.length;
+    audio.play([{ type: 'lines-cleared', rows: [38, 39], count: 2, score: 300 }]);
+    expect(bufferSources).toHaveLength(afterStart);
+    audio.play([{ type: 'lines-cleared', rows: [39], count: 1, score: 100 }]);
+    expect(bufferSources).toHaveLength(afterStart + 1);
+  });
+
+  it('uses exactly four no-tail Studio pulses for a four-line clear', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    audio.play([{ type: 'clear-started', rows: [36, 37, 38, 39] }]);
+    expect(bufferSources).toHaveLength(4);
+    expect(bufferSources.map((node) => node.starts[0]?.time)).toEqual([0, 0.06, 0.12, 0.18]);
+    expect(panners.map((node) => Number(node.pan.value.toFixed(6)))).toEqual([
+      -0.35, -0.116667, 0.116667, 0.35,
+    ]);
+  });
+
+  it('deduplicates Mutation awards and delays each cue to its serialized visual start', async () => {
+    const audio = audioFor();
     await audio.prime();
     audio.play([
       mutation('freeze'), mutation('freeze'), mutation('collapse'), mutation('bomb'),
@@ -258,20 +315,16 @@ describe('AudioEngine material feedback contract', () => {
     ]);
 
     expect(sourceCount()).toBeLessThanOrEqual(16);
-    expect(foregroundBufferCount()).toBe(
-      audioCue('bomb').layers.length
-      + audioCue('freeze').layers.length
-      + audioCue('supergravity').layers.length
-      + audioCue('multiplier-4').layers.length,
-    );
-    const starts = buffers.map((node) => node.starts[0] ?? -1);
-    for (const expected of [0, 0.035, 0.07, 0.105]) {
-      expect(starts.some((start) => Math.abs(start - expected) < 0.000001)).toBe(true);
-    }
+    const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
+    expect(ice?.starts[0]).toEqual({ time: 0.62, offset: 0.19375, duration: 0.44 });
+    const starts = bufferSources.flatMap((source) => source.starts.map((entry) => entry.time));
+    expect(starts.some((start) => Math.abs(start - 0) < 0.000001)).toBe(true);
+    expect(starts.some((start) => Math.abs(start - 0.94) < 0.000001)).toBe(true);
+    expect(starts.some((start) => Math.abs(start - 1.16) < 0.000001)).toBe(true);
   });
 
-  it('lets higher resolution cues own a frame instead of stacking contacts or clears', async () => {
-    const audio = new AudioEngine(platformFor());
+  it('lets Ice own a resolution frame without stacking hard-drop, lock, or clear sounds', async () => {
+    const audio = audioFor();
     await audio.prime();
     audio.play([
       { type: 'hard-dropped', piece: 'I', distance: 14 },
@@ -281,36 +334,15 @@ describe('AudioEngine material feedback contract', () => {
     ]);
 
     expect(oscillators).toHaveLength(0);
-    expect(buffers).toHaveLength(audioCue('freeze').layers.length);
-    expect(buffers.map((node) => node.starts[0])).toEqual([0]);
+    expect(bufferSources).toHaveLength(1);
+    expect(bufferSources[0]?.starts[0]).toEqual({ time: 0, offset: 0.19375, duration: 0.44 });
   });
 
-  it('starts a normal clear with the renderer sweep and does not replay it at commit', async () => {
-    const audio = new AudioEngine(platformFor());
-    await audio.prime();
-    audio.play([
-      { type: 'hard-dropped', piece: 'I', distance: 14 },
-      { type: 'piece-locked', piece: 'I', cells: [] },
-      { type: 'clear-started', rows: [38, 39] },
-    ]);
-
-    expect(buffers).toHaveLength(audioCue('clear-2').layers.length);
-    const afterSweepStart = foregroundBufferCount();
-    audio.play([{ type: 'lines-cleared', rows: [38, 39], count: 2, score: 300 }]);
-    expect(foregroundBufferCount()).toBe(afterSweepStart);
-
-    audio.play([{ type: 'lines-cleared', rows: [39], count: 1, score: 100 }]);
-    expect(foregroundBufferCount()).toBe(afterSweepStart + audioCue('clear-1').layers.length);
-  });
-
-  it('maps clear tiers, survival pressure, UI, and puzzle events to bounded gestures', async () => {
-    const audio = new AudioEngine(platformFor());
+  it('maps every remaining extension event to a bounded gesture', async () => {
+    const audio = audioFor();
     await audio.prime();
     const batches: readonly GameEvent[][] = [
-      [{ type: 'lines-cleared', rows: [39], count: 1, score: 100 }],
-      [{ type: 'lines-cleared', rows: [38, 39], count: 2, score: 300 }],
-      [{ type: 'lines-cleared', rows: [37, 38, 39], count: 3, score: 500 }],
-      [{ type: 'lines-cleared', rows: [36, 37, 38, 39], count: 4, score: 800 }],
+      [{ type: 'piece-moved', piece: 'I', dx: 0, dy: 1, cause: 'soft-drop' }],
       [{ type: 'bedrock-raised', count: 1, height: 3 }],
       [{ type: 'bedrock-lowered', count: 1, height: 2 }],
       [{ type: 'survival-stones-warned', columns: [3], height: 2, leadPieces: 1 }],
@@ -319,32 +351,59 @@ describe('AudioEngine material feedback contract', () => {
       [{ type: 'puzzle-undone' }],
       [{ type: 'paused' }, { type: 'resumed' }],
     ];
-
     for (const batch of batches) {
       const before = sourceCount();
       audio.play(batch);
       expect(sourceCount()).toBeGreaterThan(before);
-      for (const node of [...oscillators, ...buffers]) node.finish();
+      for (const node of [...oscillators, ...bufferSources]) node.finish();
     }
-    expect(sourceCount()).toBeGreaterThan(0);
   });
 
-  it('clamps volume, suspends safely, and tears down its context once', async () => {
+  it('deduplicates concurrent local asset loading and leaves theme selection silent', async () => {
+    const audio = audioFor();
+    audio.setAmbientTheme('deep-tide');
+    await Promise.all([audio.prime(), audio.prime(), audio.prime()]);
+    expect(loadAsset).toHaveBeenCalledTimes(3);
+    expect(decodeCalls).toBe(3);
+    expect(sourceCount()).toBe(0);
+    audio.setAmbientTheme('mineral-mist');
+    expect(sourceCount()).toBe(0);
+  });
+
+  it('clamps output volume, gates disable, suspends, and tears down once', async () => {
     const context = new FakeAudioContext();
-    const audio = new AudioEngine(platformFor(context));
+    const audio = audioFor(context);
     audio.setVolume(2);
     await audio.prime();
     expect(audio.getVolume()).toBe(1);
-    expect(gains[0]?.gain.value).toBeCloseTo(1.42);
-    audio.setVolume(Number.NaN);
-    expect(audio.getVolume()).toBe(1);
+    expect(gains[0]?.gain.value).toBeCloseTo(0.78);
+    audio.setVolume(0.5);
+    expect(gains[0]?.gain.value).toBeCloseTo(0.39);
+    audio.setEnabled(false);
+    expect(gains[1]?.gain.value).toBe(0);
     audio.suspend();
     expect(suspendCalls).toBe(1);
 
     audio.destroy();
     audio.destroy();
     expect(closeCalls).toBe(1);
-    expect(gains.slice(0, 7).every((node) => node.disconnected)).toBe(true);
+    expect(gains.slice(0, 10).every((node) => node.disconnected)).toBe(true);
+  });
+
+  it('does not resurrect decoded assets after destroy during an in-flight load', async () => {
+    const resolvers: Array<(bytes: ArrayBuffer) => void> = [];
+    const delayedLoader = vi.fn<AcceptedAudioAssetLoader>(() => new Promise<ArrayBuffer>((resolve) => {
+      resolvers.push(resolve);
+    }));
+    const audio = new AudioEngine(platformFor(), delayedLoader);
+    const priming = audio.prime();
+    await Promise.resolve();
+    audio.destroy();
+    for (const resolve of resolvers) resolve(new ArrayBuffer(8));
+    await priming;
+    audio.playEntryCountdown(3);
+    audio.playEntryCountdownResolve();
+    expect(sourceCount()).toBe(0);
   });
 
   it('stays safe when the host exposes no AudioContext', async () => {
@@ -352,9 +411,16 @@ describe('AudioEngine material feedback contract', () => {
       window: null,
       document: null,
       audioContextFactory: null,
-    }));
+    }), loadAsset);
     await expect(audio.prime()).resolves.toBeUndefined();
     expect(() => audio.play([{ type: 'paused' }])).not.toThrow();
+    expect(() => audio.playEntryCountdownResolve()).not.toThrow();
     expect(() => audio.destroy()).not.toThrow();
+  });
+
+  it('keeps extension palette voice accounting consistent with the engine', () => {
+    expect(audioCue('bomb').layers).toHaveLength(3);
+    expect(audioCue('supergravity').layers).toHaveLength(2);
+    expect(audioCue('multiplier-4').layers).toHaveLength(4);
   });
 });

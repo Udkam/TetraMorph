@@ -160,4 +160,3 @@ describe('accepted audio playback contracts', () => {
     expect(measureAudioBufferPeak(buffer)).toBeCloseTo(0.7);
   });
 });
-
