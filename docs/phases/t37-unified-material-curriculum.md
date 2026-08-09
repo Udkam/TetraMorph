@@ -77,6 +77,12 @@ and no Puzzle content is published without strict deterministic proof.
 - Extend the grammar to the remaining gameplay, reward, Survival, Mutation, Puzzle,
   and UI events as a bounded candidate. New cues require focused listening before Stage
   C can close and Stage D can open.
+- Recover that candidate from the intact pre-T29 T28 snapshot `2c4e4ae`, using its
+  concise sine contours and material-specific one-shots rather than the rejected T36
+  procedural-object palette. Route the restored cues through an isolated clone of the
+  Action A safety contract; do not alter Action A, Studio, or Ice 2. Bomb uses contained
+  low bass plus low-passed pressure, Multiplier uses short golden marimba dyads, and
+  Supergravity uses a rounded two-stage weight. No sustained loop is permitted.
 
 ### D. Route transition system
 

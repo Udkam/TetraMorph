@@ -59,7 +59,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    short primary-source real ice contact/crack recordings. The player selects Action A
    and Ice 2; technical and independent read-only gates also pass.
 8. `IN PROGRESS` — full production audio language from the accepted Action A, Studio,
-   and Ice 2 contracts. Ice 2 original-WAV provenance remains open.
+   and Ice 2 contracts. Contract `03ce9fd`, playback foundation `a1febc0`, local
+   assets/countdown `47629e7`, and production mapping `108aee8` are committed. Ice 2
+   original-WAV provenance and remaining-cue listening remain open.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
@@ -128,6 +130,20 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   Downloads folder. Do not bypass the login gate. Candidate integration may use the
   exact accepted HQ Ogg, while `819779__sbml__ice-cubes.wav` plus its SHA-256 remains
   the next provenance requirement.
+- Stage-C production now loads the three byte-frozen local assets once, preserves the
+  accepted Action A/Studio/Ice output paths, aligns non-zero hard drop to the 50 ms
+  renderer trail, uses the accepted 500 ms visible countdown, and serializes Mutation
+  audio by the renderer activation durations. Typecheck and the six-file focused gate
+  pass `100/100` at source `108aee8`.
+- Concurrent writer staging combined the authorized asset and countdown paths into
+  `47629e7`. The index is clean and no inherited path entered the commit. Do not amend,
+  reset, or rewrite shared history; record the mixed checkpoint and continue with exact
+  path staging. The earlier playback foundation's two EOF warnings were removed in
+  `108aee8`.
+- The open palette candidate will restore the intact pre-T29 T28 snapshot `2c4e4ae`
+  for soft drop, undo, Survival, UI, reward, Bomb, Multiplier, and Supergravity. It uses
+  a separate Action-A-equivalent safety route, excludes accepted Freeze, and remains
+  unaccepted until focused listening.
 - Accepted Studio clear/countdown uses its own exact R3 compressor
   (`-10 dB / knee 10 / 4:1 / 3 ms / 120 ms`) after follow-up `8d8cb67`; candidates use
   a separate safety compressor. The verifier exposes and asserts this output contract.
@@ -173,11 +189,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Commit this acceptance checkpoint, then implement Stage C in reviewable audio-only
-slices: local accepted assets/provenance boundary; exact Action A and Studio playback;
-Ice 2 window/envelope; renderer-aligned hard-drop/countdown/Mutation timing; remaining
-candidate palette and focused listening evidence. Keep transition/material/Puzzle work
-closed until the production audio candidate is green.
+Implement the restored T28 remaining-cue palette and focused tests, then publish one
+production-bound listening surface without changing the accepted Action A, Studio, or
+Ice 2 controls. Keep transition/material/Puzzle work closed until the production audio
+candidate is green and the open provenance/listening gates are explicitly reported.
 
 ## Do not repeat
 

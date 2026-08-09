@@ -155,6 +155,18 @@ adding unrelated badges or ornamental effects.
   candidate until focused listening and automated gates pass. Mutation audio must use
   the renderer's serialized effect order and visual start time; a fixed 35 ms audio
   stagger is not sufficient when an earlier Bomb delays a later Ice animation.
+- The remaining-cue candidate is recovery-first rather than another timbre experiment.
+  Its baseline is the last intact pre-T29 T28 audio snapshot `2c4e4ae`: compact sine
+  contours for soft drop, undo, Survival pressure, pause/resume, and terminal feedback;
+  a rounded `148 → 93 Hz` two-part weight for Supergravity; a contained `74 Hz` body
+  plus deterministic `640 Hz` low-pass air crack for Bomb; and the short T28
+  fundamental/bright-partial marimba dyads for Multiplier ×2/×4. Freeze is excluded
+  from this recovery because the accepted Ice 2 sample owns it.
+- These restored support cues use a separate clone of the Action A gain/ceiling/
+  compressor contract so their mix can be rolled back without changing the accepted
+  Action A route. They remain candidates: historical provenance is evidence of the
+  earlier softer direction, not a new human acceptance verdict. No sustained Mutation
+  loop returns, and every cue stays under the shared sixteen-voice ceiling.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

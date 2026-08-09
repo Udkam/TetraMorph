@@ -193,6 +193,17 @@ ordered after Stage C.
   and teardown. It must align hard drop and serialized multi-Mutation audio with their
   actual renderer start times. New non-accepted cues remain candidates requiring a
   focused listening pass; Stage D stays closed until the Stage C candidate is verified.
+- Production checkpoints `a1febc0`, `47629e7`, and `108aee8` now vendor the accepted
+  local assets, align the visible `3 / 2 / 1` cadence, and reproduce Action A, Studio,
+  and Ice 2 on isolated routes. The six focused audio/runtime/App files pass `100/100`
+  with typecheck green. `47629e7` contains two authorized Stage-C claims because two
+  writers staged concurrently; history is retained rather than rewritten, and no
+  inherited T27 or `progress.md` path entered the commit.
+- The next production candidate restores the remaining soft T28 contours from the
+  intact `2c4e4ae` snapshot. It uses an isolated Action-A-equivalent safety chain and
+  maps Bomb to contained bass/air pressure, Multiplier to restrained short marimba
+  dyads, and Supergravity to a two-part downward weight. This does not reopen the
+  accepted anchors and does not mark the restored cues accepted before listening.
 - Independent read-only QA passes candidate range `f122a4e..4a61bf5` with
   `P0 0 / P1 0 / P2 0 / P3 0`. A Temp copy reran the verifier, rebuilt the layered Ice
   asset to the committed SHA-256, confirmed the three Ice release peaks near
