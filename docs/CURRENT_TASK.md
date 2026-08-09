@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **IN PROGRESS — first audio audition rejected; motion-linked audition R2**
+Status: **IN PROGRESS — network-verified semantic audition R3**
 
 ## Active objective
 
@@ -13,11 +13,13 @@ materials, and Puzzle progression.
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
-  restrained, non-harsh, and materially tactile. Do not use exposed electronic tones,
-  arcade bleeps, melodies, music, licensed samples, or copied commercial cues. Preserve
-  only proven mixer ownership, priority, master controls, bounded voices, deterministic
-  scheduling, and teardown. A small core-cue audition set is a hard human-listening gate
-  before the palette expands.
+  restrained, non-harsh, and tied to the matching action or state. Electronic layers
+  are permitted when they strengthen that relationship; piercing oscillators,
+  interchangeable arcade bleeps, melodies, music, unverified/restrictively licensed
+  samples, and copied commercial cues are not. Preserve only proven mixer ownership,
+  priority, master controls, bounded voices, deterministic scheduling, and teardown.
+  A small core-cue audition set is a hard human-listening gate before the palette
+  expands.
 - **Transitions:** give route/page changes one calm motion grammar: short opacity and
   small spatial continuity, no flashes, no large wipes, no gameplay-input delay, and a
   reduced-motion form that is effectively instant.
@@ -66,15 +68,25 @@ materials, and Puzzle progression.
   LISTENING**. The player found the result quieter, less connected to the matching
   effect/function, and worse than the earliest design. Its passing `21/21` tests,
   typecheck, deterministic WAV hashes, and zero clipping do not mitigate that verdict.
-- Audition R2 reuses the earliest design's clear action contours, not its electronic
-  timbre. Move maps to lateral settle, rotate to pivot/detent, hard drop to descent plus
+- R2 source `06bd7ea` repaired the clear event boundary and action timing but is
+  superseded before human listening by R3 after the player removed the blanket ban on
+  electronic sound. Its uncommitted gain-only follow-up is not an accepted direction.
+- Network review selected UI SFX `0.4.0` (source commit
+  `2001f3dac2d1cf86ad99cbad5cef222c3a8b9082`) as the R3 audition source because it
+  preserves one semantic event map across coherent `studio`, `mechanical`, and `scifi`
+  families. Its generated audio is CC0-1.0 and its code is MIT. Kenney Interface Sounds
+  and omgaudio are verified CC0 reserves only; no random aggregator, commercial-game
+  recording, network playback, or whole-pack dependency may enter the product.
+- Audition R3 reuses the earliest design's readable action contours. Move maps to
+  lateral settle, rotate to pivot/detent, hard drop to descent plus
   contact, line clear to the visual sweep and one-to-four row releases, countdown to
   physical cadence, and Ice to the 320 ms frost-bind/shard-release timeline.
 - Normal clears must begin audibly on `clear-started` and resolve across Core's 200 ms
   clear interval instead of arriving only after `lines-cleared`.
-- R2 source ownership is limited to `src/game/audio/AudioEngine.ts`, its direct test,
-  and the four `audioGesture` / `audioPalette` source-test paths. Do not expand the
-  other sixteen cue recipes, start a server/browser, or begin visual implementation.
+- R3 first produces a standalone, locally playable comparison using a minimal pinned
+  CC0 subset and an exact provenance manifest. Do not expand the other sixteen cue
+  recipes, adopt a runtime package, or begin visual implementation until the user has
+  selected or rejected the sound family.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.

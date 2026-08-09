@@ -20,7 +20,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Human decisions frozen for T37
 
 - T36 audio is rejected; tests and prior QA do not override listening feedback.
-- New sound is tactile, restrained, clearly responsive, and non-electronic.
+- New sound is restrained, non-harsh, clearly responsive, and semantically tied to its
+  action. Restrained electronic layers are now allowed; generic or piercing bleeps are
+  still rejected.
 - Mutation is a whole-piece material, never a carrier badge: Ice crystal, Bomb lava,
   Multiplier gold, and Supergravity violet. Four cells can release one piece-level item
   exactly once.
@@ -33,13 +35,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 2. `REJECTED BY HUMAN LISTENING` — audition R1 source `0bebf8a` and evidence `2ff0bb6`
    were too quiet, weakly related to their effects/functions, and worse than the
    earliest design.
-3. `IN PROGRESS` — motion-linked audio audition R2.
-4. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
+3. `SUPERSEDED BEFORE LISTENING` — R2 source `06bd7ea` repaired event/timing mapping,
+   but the player then removed the blanket non-electronic constraint and requested a
+   network-resource review.
+4. `IN PROGRESS` — network-verified semantic audio audition R3.
+5. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
-5. `PENDING` — route transition system and reduced-motion verification.
-6. `PENDING` — ordinary/Mutation whole-piece material system.
-7. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
-8. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+6. `PENDING` — route transition system and reduced-motion verification.
+7. `PENDING` — ordinary/Mutation whole-piece material system.
+8. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
+9. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ## Verification state
 
@@ -51,17 +56,23 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   hashes are stable; peaks are bounded; clipped sample count is zero.
 - Human listening overrides those checks: R1 fails perceived loudness and action/effect
   identity. The generic material-object vocabulary must not be incrementally retuned.
+- Official-source review selected UI SFX `0.4.0` / source commit
+  `2001f3dac2d1cf86ad99cbad5cef222c3a8b9082` for R3. Its packaged audio license is
+  CC0-1.0 and implementation license is MIT. Kenney Interface Sounds and omgaudio are
+  verified CC0 alternatives but remain unused reserves. No external package or asset
+  has entered production source yet.
 - No full suite, build, browser pass, server, or complete-palette expansion has run.
 - Two initial read-only audit agents failed before producing findings because the
   selected model was at capacity. No retry loop or extra resource was started.
 
 ## Next exact action
 
-Replace R1 with a bounded R2 across exactly `AudioEngine.ts` and its test plus the four
-`audioGesture` / `audioPalette` paths. Restore readable motion/function contours using
-non-electronic physical models, synchronize normal clears to `clear-started`, run the
-focused tests and typecheck, then render a new source-bound audition. Do not expand the
-remaining palette or start visual work.
+Build a standalone R3 comparison from the minimal pinned UI SFX CC0 subset. Use the
+same semantic map across `studio`, `mechanical`, and `scifi`, plus a labelled `glass`
+Ice cue; record original filenames, package version/integrity, source commit, license,
+and SHA-256. Verify local playback and bounded signal metadata, then stop for user
+listening. Do not adopt the runtime package, expand the remaining palette, or start
+visual work.
 
 ## Do not repeat
 

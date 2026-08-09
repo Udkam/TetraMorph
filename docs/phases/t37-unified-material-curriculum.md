@@ -32,9 +32,15 @@ and no Puzzle content is published without strict deterministic proof.
 - Stop after delivering the audition set. Do not extrapolate rejected timbre across the
   full palette.
 - R1 (`0bebf8a` / `2ff0bb6`) is rejected for low perceived loudness and weak
-  action/effect identity. R2 must preserve non-electronic timbre while binding each
-  sound contour to the live renderer timing: 56 ms move settle, rotate pulse, 50 ms
-  hard-drop trail, 200 ms clear interval from `clear-started`, and 320 ms Ice activation.
+  action/effect identity. R2 source `06bd7ea` repaired the event/timing map but was
+  superseded before human listening when the player allowed restrained electronic
+  sound and requested network research.
+- R3 uses a minimal, pinned UI SFX `0.4.0` CC0 candidate subset to compare an identical
+  action map in `studio`, `mechanical`, and `scifi` families, plus a labelled `glass`
+  Ice candidate. Bind every contour to live renderer timing: 56 ms move settle, rotate
+  pulse, 50 ms hard-drop trail, 200 ms clear interval from `clear-started`, and 320 ms
+  Ice activation. Keep files local, record hashes/license/source commit, and stop for
+  listening before any runtime/package adoption.
 
 ### C. Complete accepted audio language
 
@@ -84,8 +90,8 @@ and no Puzzle content is published without strict deterministic proof.
 
 ## Non-goals
 
-- No music, licensed samples, copied commercial assets/cues/layouts, or external
-  runtime audio service.
+- No music, unverified or restrictively licensed samples, copied commercial
+  assets/cues/layouts, whole-pack dependency, or external runtime audio service.
 - No unrelated Classic, Survival, scoring, input, ranking, or theme redesign.
 - No heuristic-only Puzzle claims, fabricated evidence, or acceptance based only on a
   nonblank screenshot.

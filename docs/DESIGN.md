@@ -14,17 +14,22 @@ adding unrelated badges or ornamental effects.
 
 ### Feedback and sound language
 
-- The mix is tactile and material-first: muted mechanism, felt contact, soft ceramic or
-  stone body, restrained crystal grains, contained pressure, and brief natural air.
-  It must not read as a synthesizer preset, arcade bleep bank, melody, notification
-  pack, or loud cinematic trailer.
+- The mix is semantic first: a listener must be able to distinguish lateral movement,
+  rotation, landing, hard drop, row release, countdown, and Mutation activation from
+  contour and timing rather than volume alone. Physical, synthesized, and restrained
+  electronic layers are all permitted. Exposed piercing tones, interchangeable arcade
+  bleeps, melody, notification-pack language, and loud cinematic trailer treatment are
+  still rejected.
 - Perceived emphasis remains `move < rotate < lock < hard drop < 1/2/3 clear < Mutation
   < four-line clear/completion`, but the differences come from mass, duration, texture,
   and space rather than sharpness or raw loudness. Rapid movement and rotation must
   remain comfortable; line clears must provide unmistakable positive feedback.
-- Clean-room references may inform cadence, response hierarchy, and material category,
-  never copy recorded samples, pitch sequences, timing fingerprints, or commercial
-  trade dress. No music or continuous state loop is introduced.
+- Clean-room references may inform cadence, response hierarchy, semantic mapping, and
+  material category; commercial game recordings, pitch sequences, timing fingerprints,
+  and trade dress remain prohibited. A minimal external asset may enter an audition
+  only from its primary publisher with verified redistribution terms, a pinned version
+  or commit, a local provenance/license record, and no runtime network dependency.
+  Music and continuous state loops remain out of scope.
 - Before rebuilding all cues, T37 publishes a compact audition matrix generated from
   production recipes. Human acceptance of that matrix is the expansion gate. Peak,
   RMS, clipping, determinism, and repetition-density measurements remain rejection
@@ -33,8 +38,22 @@ adding unrelated badges or ornamental effects.
   It was quieter, less connected to the matching action/effect, and worse than the
   earliest gameplay sound design. Replacing electronic notes with generic wood,
   ceramic, and stone objects did not create functional feedback.
-- The replacement audition restores the earliest design's readable motion contours
-  without restoring exposed oscillator timbre: move follows the 56 ms lateral settle;
+- R2 source `06bd7ea` corrected event timing but was not presented as a listening
+  candidate before the player removed the blanket non-electronic restriction. It is
+  superseded by a resource-informed R3 audition rather than incrementally amplified.
+- The primary R3 reference is UI SFX `0.4.0` / source commit
+  `2001f3dac2d1cf86ad99cbad5cef222c3a8b9082`: it separates stable semantic cues from
+  switchable sound families, publishes generated audio under CC0-1.0, and publishes
+  its implementation under MIT. The audition may vendor only the exact CC0 candidate
+  files it exposes for listening; production adoption still requires explicit human
+  acceptance and an asset manifest. Kenney Interface Sounds and omgaudio are verified
+  CC0 reserves, not mixed into R3, so provenance and sonic identity stay unambiguous.
+- R3 compares the same event map across three coherent families: `studio` for warm
+  restraint, `mechanical` for firm detents, and `scifi` for controlled electronic
+  articulation. Ice adds one separately labelled `glass` candidate. It does not mix
+  families invisibly or claim that signal measurements prove taste.
+- The replacement audition restores the earliest design's readable motion contours:
+  move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into
   contact; a normal clear starts with `clear-started`, crosses Core's 200 ms clear
   interval, and audibly releases one through four rows; Ice follows its 320 ms
