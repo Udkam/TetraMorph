@@ -116,6 +116,7 @@ async function main() {
     assert(initial.playbackMode === 'buffer', `Unexpected HTTP playback mode: ${initial.playbackMode}`)
     assert(initial.accepted.clear.fourLineResolveCue === null, 'Four-line clear still declares a resolve cue.')
     assert(JSON.stringify(initial.accepted.clear.fourLinePulseTimesMs) === JSON.stringify([0, 60, 120, 180]), 'Four-line clear pulse times changed.')
+    assert(JSON.stringify(initial.outputContracts.acceptedR3) === JSON.stringify({ threshold: -10, knee: 10, ratio: 4, attack: 0.003, release: 0.12 }), 'Accepted R3 compressor contract changed.')
     assert(initial.actionRecipes.moveLeft.asset.endsWith('/soft/back.ogg'), 'Move-left is not mapped to soft/back.ogg.')
     assert(initial.actionRecipes.moveRight.asset.endsWith('/soft/forward.ogg'), 'Move-right is not mapped to soft/forward.ogg.')
 
@@ -233,6 +234,7 @@ async function main() {
       schemaVersion: 1,
       generatedAt: new Date().toISOString(),
       accepted: report.accepted,
+      outputContracts: report.outputContracts,
       sources: {
         uiSfx: {
           package: 'uisfx@0.4.0',
@@ -265,6 +267,7 @@ async function main() {
         calibratedRecipes: Object.keys(report.recipeMetrics).length,
         embeddedBytesMatchSourceSha256: true,
         acceptedClearFourUsesFourPulsesAndNoTail: true,
+        acceptedR3UsesOriginalCompressor: true,
         actionSofteningUsesContourNotLowVolume: true,
         processedPeaksMatchDeclaredTargets: true,
         allFinite: true,

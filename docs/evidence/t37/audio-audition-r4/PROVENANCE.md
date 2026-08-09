@@ -19,9 +19,10 @@ its code is MIT and is not included here.
 | `assets/accepted-studio/progress-step.ogg` | `f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c` | accepted row pulse and 3·2·1 step |
 | `assets/accepted-studio/start.ogg` | `b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388` | accepted GO resolve |
 
-The accepted R3 treatment remains unchanged. A four-row clear is now exactly four
-`progress-step` pulses at `0 / 60 / 120 / 180 ms`; it has no `complete` asset or
-resolve tail.
+The accepted R3 treatment remains unchanged, including its dedicated compressor
+(`-10 dB` threshold, `10 dB` knee, `4:1`, 3 ms attack, 120 ms release). A four-row
+clear is now exactly four `progress-step` pulses at `0 / 60 / 120 / 180 ms`; it has no
+`complete` asset or resolve tail.
 
 ## Reworked ordinary actions
 

@@ -23,6 +23,11 @@ const ACCEPTED_CONTRACT = Object.freeze({
   },
 })
 
+const OUTPUT_CONTRACTS = Object.freeze({
+  acceptedR3: { threshold: -10, knee: 10, ratio: 4, attack: 0.003, release: 0.12 },
+  candidateSafety: { threshold: -4, knee: 8, ratio: 3, attack: 0.008, release: 0.16 },
+})
+
 const RECIPES = Object.freeze({
   moveLeft: {
     label: '左移',
@@ -196,6 +201,7 @@ const state = {
 let audioContext = null
 let masterGain = null
 let safetyCompressor = null
+let acceptedCompressor = null
 const buffers = new Map()
 const sourceMetrics = new Map()
 const recipeMetrics = new Map()
@@ -223,14 +229,21 @@ function createAudioGraph() {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext
   if (!AudioContextClass) throw new Error('当前浏览器不支持 Web Audio API。')
   audioContext = new AudioContextClass()
-  safetyCompressor = audioContext.createDynamicsCompressor()
-  safetyCompressor.threshold.value = -4
-  safetyCompressor.knee.value = 8
-  safetyCompressor.ratio.value = 3
-  safetyCompressor.attack.value = 0.008
-  safetyCompressor.release.value = 0.16
   masterGain = audioContext.createGain()
   masterGain.gain.value = state.volume
+  acceptedCompressor = audioContext.createDynamicsCompressor()
+  acceptedCompressor.threshold.value = OUTPUT_CONTRACTS.acceptedR3.threshold
+  acceptedCompressor.knee.value = OUTPUT_CONTRACTS.acceptedR3.knee
+  acceptedCompressor.ratio.value = OUTPUT_CONTRACTS.acceptedR3.ratio
+  acceptedCompressor.attack.value = OUTPUT_CONTRACTS.acceptedR3.attack
+  acceptedCompressor.release.value = OUTPUT_CONTRACTS.acceptedR3.release
+  safetyCompressor = audioContext.createDynamicsCompressor()
+  safetyCompressor.threshold.value = OUTPUT_CONTRACTS.candidateSafety.threshold
+  safetyCompressor.knee.value = OUTPUT_CONTRACTS.candidateSafety.knee
+  safetyCompressor.ratio.value = OUTPUT_CONTRACTS.candidateSafety.ratio
+  safetyCompressor.attack.value = OUTPUT_CONTRACTS.candidateSafety.attack
+  safetyCompressor.release.value = OUTPUT_CONTRACTS.candidateSafety.release
+  acceptedCompressor.connect(masterGain)
   safetyCompressor.connect(masterGain)
   masterGain.connect(audioContext.destination)
   return audioContext
@@ -523,7 +536,7 @@ function playAcceptedAsset(path, options = {}) {
   envelope.gain.linearRampToValueAtTime(0.0001, endAt)
   source.connect(panner)
   panner.connect(envelope)
-  envelope.connect(safetyCompressor)
+  envelope.connect(acceptedCompressor)
   const voice = { source, envelope, panner, group, startAt, released: false }
   activeVoices.add(voice)
   const voices = groupedVoices.get(group) ?? new Set()
@@ -802,6 +815,7 @@ window.render_game_to_text = () => JSON.stringify({
   currentRecipe: state.currentRecipe,
   volumePercent: Math.round(state.volume * 100),
   accepted: ACCEPTED_CONTRACT,
+  outputContracts: OUTPUT_CONTRACTS,
   actionRecipes: Object.fromEntries(['moveLeft', 'moveRight', 'rotate', 'lock', 'hardDrop'].map((key) => [key, RECIPES[key]])),
   iceCandidates: ICE_CANDIDATES,
   error: state.error,
@@ -815,6 +829,7 @@ window.__AUDITION_API__ = Object.freeze({
     assetCount: ASSET_PATHS.length,
     recipeCount: Object.keys(RECIPES).length,
     accepted: ACCEPTED_CONTRACT,
+    outputContracts: OUTPUT_CONTRACTS,
     recipes: RECIPES,
     sourceMetrics: Object.fromEntries(sourceMetrics),
     recipeMetrics: Object.fromEntries(recipeMetrics),
