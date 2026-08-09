@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TetraMorph · T37 音效试听 R5</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">T37 · LISTENING GATE R5</p>
+          <h1>找回旧柔和触点，冰冻改为真实冰块</h1>
+          <p class="lede">
+            R4 已整体否决，本页不复用它的动作素材或冰系法术。动作只恢复两套历史源码；冰冻只比较三段 CC0 真实冰块录音。
+          </p>
+        </div>
+        <div class="toolbar" aria-label="试听控制">
+          <label>
+            <span>试听音量</span>
+            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.78" />
+          </label>
+          <output id="volume-value" for="volume">78%</output>
+          <button id="stop-all" class="quiet-button" type="button">停止所有声音</button>
+        </div>
+      </header>
+
+      <section class="frozen-panel" aria-labelledby="frozen-title">
+        <div>
+          <p class="section-kicker">ACCEPTED · NOT REOPENED</p>
+          <h2 id="frozen-title">已通过部分保持原样</h2>
+        </div>
+        <ul>
+          <li>Studio 消 1 / 2 / 3 行</li>
+          <li>Studio 3 · 2 · 1</li>
+          <li>消 4 行：同一 release 共四次，不加尾音</li>
+        </ul>
+      </section>
+
+      <section class="audition-section" aria-labelledby="actions-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">A / B · EXACT HISTORY</p>
+            <h2 id="actions-title">动作：两套可追溯旧配方</h2>
+          </div>
+          <p>先选版本，再用同一组按钮比较。左/右只新增轻微声像，音色、时长、包络与各自旧混音保持不变。</p>
+        </div>
+
+        <div class="profile-switch" role="group" aria-label="历史动作版本">
+          <button type="button" data-profile-select="t28" aria-pressed="true">
+            <strong>A · T28 柔和版</strong>
+            <span>35509a7 · 44–72 ms 短正弦</span>
+          </button>
+          <button type="button" data-profile-select="t29" aria-pressed="false">
+            <strong>B · T29 历史接受版</strong>
+            <span>ca5da48 · 46–90 ms 圆润主体</span>
+          </button>
+        </div>
+
+        <div class="action-stage">
+          <div class="mini-board" aria-hidden="true">
+            <div id="piece" class="piece">
+              <i></i><i></i><i></i><i></i>
+            </div>
+            <div id="contact-line" class="contact-line"></div>
+          </div>
+          <div class="stage-copy" aria-live="polite">
+            <span id="stage-profile">A · T28 柔和版</span>
+            <strong id="stage-action">请选择一个动作</strong>
+            <p id="stage-detail">精确恢复 35509a7；没有 R4 素材、峰值归一或长尾。</p>
+          </div>
+        </div>
+
+        <div class="action-controls" aria-label="动作试听">
+          <button class="primary-action" type="button" data-action="showcase">试听完整动作链</button>
+          <button type="button" data-action="move-left">左移</button>
+          <button type="button" data-action="move-right">右移</button>
+          <button type="button" data-action="rotate">旋转</button>
+          <button type="button" data-action="lock">自然落位</button>
+          <button type="button" data-action="hard-drop">硬降</button>
+          <button class="wide" type="button" data-action="repeat">连续移动 × 12</button>
+        </div>
+      </section>
+
+      <section class="audition-section ice-section" aria-labelledby="ice-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">CC0 · REAL ICE FOLEY</p>
+            <h2 id="ice-title">冰冻：清脆、短促、像冰块</h2>
+          </div>
+          <p>每项只播放一段真实录音的最强短窗口；原速、无法术层、无风声、无降调。</p>
+        </div>
+        <div id="ice-field" class="ice-field" aria-hidden="true">
+          <div class="ice-cube"></div>
+          <div class="ice-cube"></div>
+          <div class="ice-cube"></div>
+        </div>
+        <div id="ice-candidates" class="ice-grid"></div>
+      </section>
+
+      <footer>
+        <p>本页只用于人工试听，不会自动写入正式游戏。技术检查只能排除映射、静音、削波和页面错误，不能替代你的听感。</p>
+      </footer>
+    </main>
+    <script src="./embedded-assets.js"></script>
+    <script src="./audition.js"></script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "actionProfiles": {
+    "t28": {
+      "label": "T28 soft-edged",
+      "audioCommit": "35509a7850b724c5a0a8359a209e8698ab5fdb93",
+      "acceptedProductCommit": "2c4e4ae",
+      "audioEngineBlob": "c43a68701fc1a7d39e31094422617214b359a001"
+    },
+    "t29": {
+      "label": "T29 previously accepted",
+      "audioCommit": "ca5da48",
+      "audioEngineBlob": "f470e8942fed47da0c10c3d0debbb41580b49bf1"
+    }
+  },
+  "iceSources": [
+    {
+      "id": 666478,
+      "title": "Ice Breaking 1",
+      "author": "giwake",
+      "page": "https://freesound.org/people/giwake/sounds/666478/",
+      "license": "CC0-1.0",
+      "original": "WAV, 0.374 seconds, 44.1 kHz, 24-bit, mono",
+      "auditionFile": "assets/ice/giwake-ice-breaking-1-hq.ogg",
+      "auditionFileKind": "Freesound-generated HQ OGG preview",
+      "auditionSha256": "e392c9ba8724513c2e7b5c3ccaec4ce241c32eeabb5d4f060a074911cb53f81b"
+    },
+    {
+      "id": 819779,
+      "title": "Ice cubes",
+      "author": "sbml",
+      "page": "https://freesound.org/people/sbml/sounds/819779/",
+      "license": "CC0-1.0",
+      "original": "WAV, 1.723 seconds, 96 kHz, 32-bit, stereo",
+      "auditionFile": "assets/ice/sbml-ice-cubes-hq.ogg",
+      "auditionFileKind": "Freesound-generated HQ OGG preview",
+      "auditionSha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450"
+    },
+    {
+      "id": 177223,
+      "title": "Ice Crack 9.wav",
+      "author": "ecfike",
+      "page": "https://freesound.org/people/ecfike/sounds/177223/",
+      "license": "CC0-1.0",
+      "original": "WAV, 2.004 seconds, 44.1 kHz, 16-bit, stereo",
+      "auditionFile": "assets/ice/ecfike-ice-crack-9-hq.ogg",
+      "auditionFileKind": "Freesound-generated HQ OGG preview",
+      "auditionSha256": "bdce4701e8fbfb36ce39931b56a7f4226265225b7529631c232aae15abc1fd4c"
+    }
+  ],
+  "licenseNote": "Each linked sound page identifies the upload as Creative Commons 0 and permits copying, modification, distribution, performance, and commercial use without permission. R5 vendors only Freesound's generated HQ OGG previews for audition. If a candidate enters production, download and hash the uploader's original WAV before integration."
+}
