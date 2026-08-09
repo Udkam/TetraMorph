@@ -139,6 +139,12 @@ and no Puzzle content is published without strict deterministic proof.
   Studio beat, including the unchanged tick-12 commit, at-most-`100 ms` continuation,
   stationary restrained form, material/marker agreement, and cleanup. The accepted
   one-line audio remains frozen, and this bounded extension does not open Stage D.
+- Contract `71f74af`, product/tests `aab8ed8`, and evidence `0d443ed` complete the
+  technical one-line extension. Final typecheck, `402 passed / 8 skipped`, the
+  767-module build, 47 source-bound real Pixi frames, the complete-page/client browser
+  pass, and independent source/evidence review all pass with P0–P3 zero. The only open
+  one-line gate is normal-speed player acceptance; the accepted 2–4-line behavior stays
+  closed, and Stage D remains unopened.
 
 ### D. Route transition system
 

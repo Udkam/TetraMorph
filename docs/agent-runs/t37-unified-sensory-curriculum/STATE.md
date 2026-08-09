@@ -58,7 +58,7 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    and evidence `05b28ff` compare two exact historical soft action directions and three
    short primary-source real ice contact/crack recordings. The player selects Action A
    and Ice 2; technical and independent read-only gates also pass.
-8. `FOCUSED LISTENING CANDIDATE — HUMAN VERDICT OPEN` — full production audio language from the accepted Action A,
+8. `FOCUSED PLAY/LISTENING CANDIDATE — HUMAN VERDICT OPEN` — full production audio language from the accepted Action A,
    Studio, and Ice 2 contracts. Contract `03ce9fd`, playback foundation `a1febc0`, local
    assets/countdown `47629e7`, production mapping `108aee8`, remaining candidate
    `95978eb`, direct-production evidence `006a936`, coverage test `2766a55`, and
@@ -67,8 +67,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    impact and the renderer's simultaneous 2–4-line removal. Correction contract
    `c52a686`, renderer `605ae2d`, Bomb `c875415`, shared timing `8e32b13`, clock-origin
    repair `41afc78`, evidence `dc70f10`, and QA `a096fc5` are green while all previously
-   accepted anchors remain frozen. Human live-play accepts neither the direct row-hide
-   presentation nor its prior visual evidence; a classic centre-out correction is open.
+   accepted anchors remain frozen. The player accepts the continuous R3 2–4-line
+   centre-out correction. Its bounded single-line reuse is now technically green at
+   source `aab8ed8` and evidence `0d443ed`; normal-speed single-line play, remaining
+   cue listening, and Ice 2 original-WAV provenance remain open.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
@@ -287,15 +289,27 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   branch, Mutation/Puzzle material agreement, exclusions, cue cap, and cleanup. The old
   one-line precision-cut/chip overlay is removed; audio and accepted multi-line behavior
   stay frozen.
+- Contract `71f74af` and product/tests `aab8ed8` implement the single-line reuse in the
+  five declared timeline/renderer test and source paths. Final typecheck passes; the
+  complete suite reports `44 passed / 2 skipped` files and `402 passed / 8 skipped`
+  tests; the production build transforms 767 modules with only the existing advisory.
+- Independent source QA reruns the three focused files (`72/72`) and reports
+  `P0 0 / P1 0 / P2 0 / P3 0`. It confirms no Core/audio/accepted multi-line or
+  inherited dirty path entered the source range.
+- Evidence `0d443ed` binds 47 renderer frames (`21/10/8/8` normal/reduced/Puzzle/Freeze),
+  four contact sheets, one complete Chinese gameplay page, and the prescribed two-pass
+  client to full source `aab8ed8a3e6b9f608b4c1fa990bf9c93b4f28e56`. Its audit has
+  zero failures/browser errors and proves one Canvas, zero DOM cells, tick-12 atomicity,
+  `199.9/200/250/300 ms` continuity, and lifecycle cleanup. Independent original-detail
+  evidence QA reports `P0 0 / P1 0 / P2 0 / P3 0`; normal-speed player acceptance stays
+  explicitly open. Owned Vite PID `15496` exited and port `4190` is released.
 
 ## Next exact action
 
-Implement the bounded one-line extension in the shared timeline/presentation/renderer
-paths and tests. Prove a `0–300 ms` normal centre-out sequence, stationary Puzzle and
-reduced-motion handling, `199.9 → 200 → 250 → 300 ms` material continuity, unchanged
-Studio audio/Core/multi-line contracts, and exact cleanup. Then capture real one-line
-Pixi frames and obtain independent read-only QA before another player check. Do not
-push; the Ice 2 uploader-original WAV remains independently open.
+Hand the current local single-line candidate to the player for normal-speed play. If it
+passes, record visual acceptance and return to the remaining Stage C listening and Ice 2
+original-WAV provenance gates; if it fails, reopen only the single-line renderer path.
+Do not push, and do not reopen the accepted 2–4-line effect.
 
 ## Do not repeat
 

@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-10 — T37 accepted clear language extended to one line
+
+- Reused the human-accepted R3 continuous clear for one line: the captured material now
+  resolves centre-out over `0–300 ms`, remains continuous across Core's unchanged
+  `200 ms` atomic commit, and uses stationary opacity for Puzzle/reduced motion. The
+  old one-line precision-cut/chip production overlay is removed. One-line Studio audio
+  remains at `0 ms`; accepted 2–4-line timing/materials are unchanged.
+- Contract `71f74af` and product/tests `aab8ed8` pass final typecheck, the complete suite
+  (`402 passed / 8 skipped`), the 767-module build, and independent focused source QA
+  (`72/72`, P0–P3 all zero). No Core, audio, T27, or `progress.md` path entered the
+  source range.
+- Evidence `0d443ed` adds 47 source-bound real Pixi frames, four contact sheets, a full
+  Chinese gameplay page, and prescribed-client states with zero failures/browser errors.
+  Independent original-detail evidence QA reports P0–P3 all zero after confirming the
+  `199.9/200/250/300 ms` sequence, restrained variants, Freeze companion, and lifecycle
+  cleanup. The candidate now waits only for normal-speed single-line player acceptance;
+  nothing has been pushed and the accepted 2–4-line effect remains closed.
+
 ## 2026-08-10 — T37 continuous multi-line clear accepted; single-line extension opened
 
 - Replaced the rejected `50 ms` / three-step 2–4-line clear with a continuous

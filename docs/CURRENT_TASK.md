@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE C R3 MULTI-LINE ACCEPTED — SINGLE-LINE EXTENSION IN PROGRESS**
+Status: **STAGE C R3 MULTI-LINE ACCEPTED — SINGLE-LINE TECHNICAL CANDIDATE AWAITING PLAY**
 
 ## Active objective
 
@@ -315,6 +315,20 @@ ordered after Stage C.
   Mutation/target alpha agreement, and exact cleanup. Remove the old one-line
   precision-cut/chip overlay; do not change the accepted one-line audio or any 2–4-line
   timing/material behavior.
+- Contract `71f74af` and product/tests `aab8ed8` complete that bounded extension. One
+  line now shares the continuous renderer cue, preserves its single Studio start at
+  `0 ms`, crosses Core's unchanged `200 ms` commit without changing material, keeps a
+  restrained stationary Puzzle/reduced-motion branch, and releases the cue at `300 ms`.
+  Final typecheck, the complete suite (`402 passed / 8 skipped`), the 767-module build,
+  and independent `72/72` focused source review pass with `P0 0 / P1 0 / P2 0 / P3 0`.
+- Evidence `0d443ed` binds 47 real Pixi frames, four contact sheets, one complete Chinese
+  gameplay page, and the prescribed two-iteration client to full source
+  `aab8ed8a3e6b9f608b4c1fa990bf9c93b4f28e56`. The audit records continuous
+  `199.9 → 200 → 250 → 300 ms` handling, stationary restrained variants, Freeze
+  companion continuity, tick-12 atomicity, one Canvas, zero DOM cells, exact cleanup,
+  and zero failures/browser errors. Independent original-detail evidence QA reports
+  `P0 0 / P1 0 / P2 0 / P3 0`. Normal-speed human play is the only remaining gate for
+  this single-line extension; the accepted 2–4-line effect is not reopened.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
@@ -342,6 +356,8 @@ Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 - Action A, Ice 2, and the frozen Studio subset are human accepted. Passing tests or
   measurements still cannot accept newly extended Stage C cues; those require a
   focused listening verdict before the complete-audio checkpoint closes.
+- The R3 2–4-line visual is human accepted. The technically green one-line reuse still
+  requires a normal-speed player verdict before it can be recorded as visually accepted.
 - A visual state is not accepted unless a current-source browser frame demonstrates the
   active piece, Next, ghost/landing guide, relevant status, all three themes, and both
   motion preferences without clipping or console errors.
