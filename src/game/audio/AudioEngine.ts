@@ -45,6 +45,7 @@ export class AudioEngine {
   private volume = 1;
   private lastMoveAt = Number.NEGATIVE_INFINITY;
   private lastSoftDropAt = Number.NEGATIVE_INFINITY;
+  private pendingClearCount: 1 | 2 | 3 | 4 | null = null;
   private readonly activeVoices = new Set<GestureVoice>();
   private readonly mutationVoices = new Set<GestureVoice>();
 
@@ -52,7 +53,10 @@ export class AudioEngine {
 
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
-    if (!enabled) this.stopMutationCue();
+    if (!enabled) {
+      this.stopMutationCue();
+      this.pendingClearCount = null;
+    }
     this.applyEffectsGain();
   }
 
@@ -101,6 +105,7 @@ export class AudioEngine {
   play(events: readonly GameEvent[]): void {
     if (!this.context || !this.master || !this.enabled) return;
     const includesHardDrop = events.some((event) => event.type === 'hard-dropped');
+    const includesClearStart = events.some((event) => event.type === 'clear-started');
     const includesLineClear = events.some((event) => event.type === 'lines-cleared');
     const includesCompletion = events.some((event) => event.type === 'finished');
     const includesGameOver = events.some((event) => event.type === 'game-over');
@@ -108,7 +113,7 @@ export class AudioEngine {
     const mutationActivations = this.uniqueMutationActivations(events);
     const hasMutationActivation = mutationActivations.length > 0;
     const hasHigherResolution = hasMutationActivation || includesCompletion || includesGameOver || includesLevelUp;
-    const hasResolution = includesLineClear || hasHigherResolution;
+    const hasResolution = includesClearStart || includesLineClear || hasHigherResolution;
 
     for (const event of events) {
       if (event.type === 'piece-moved' && event.cause === 'move') {
@@ -130,9 +135,21 @@ export class AudioEngine {
       } else if (event.type === 'piece-locked' && !includesHardDrop && !hasResolution) {
         this.playCue('lock');
       } else if (event.type === 'puzzle-undone') {
+        this.pendingClearCount = null;
         this.playCue('puzzle-undo');
+      } else if (event.type === 'clear-started') {
+        const count = event.rows.length;
+        this.pendingClearCount = Number.isInteger(count) && count >= 1 && count <= 4
+          ? count as 1 | 2 | 3 | 4
+          : null;
+        if (!hasHigherResolution) this.playClear(count);
       } else if (event.type === 'lines-cleared') {
-        if (!hasHigherResolution) this.playClear(event.count);
+        const tier = Number.isInteger(event.count) && event.count >= 1
+          ? Math.min(4, event.count) as 1 | 2 | 3 | 4
+          : null;
+        const alreadyStarted = tier !== null && this.pendingClearCount === tier;
+        this.pendingClearCount = null;
+        if (!hasHigherResolution && !alreadyStarted) this.playClear(event.count);
       } else if (event.type === 'bedrock-raised') {
         this.playCue('bedrock-rise');
       } else if (event.type === 'bedrock-lowered') {
@@ -153,6 +170,8 @@ export class AudioEngine {
         this.playCue('pause');
       } else if (event.type === 'resumed') {
         this.playCue('resume');
+      } else if (event.type === 'restarted') {
+        this.pendingClearCount = null;
       }
       // started and restarted stay silent: the entry countdown owns those frames.
     }
@@ -168,6 +187,7 @@ export class AudioEngine {
 
   destroy(): void {
     this.stopMutationCue();
+    this.pendingClearCount = null;
     for (const voice of [...this.activeVoices]) {
       voice.stop(this.context?.currentTime);
       voice.disconnect();

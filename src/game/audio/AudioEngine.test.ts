@@ -258,11 +258,16 @@ describe('AudioEngine material feedback contract', () => {
     ]);
 
     expect(sourceCount()).toBeLessThanOrEqual(16);
-    expect(foregroundBufferCount()).toBe(12);
-    expect(buffers[0]?.starts[0]).toBe(0);
-    expect(buffers[3]?.starts[0]).toBeCloseTo(0.035);
-    expect(buffers[6]?.starts[0]).toBeCloseTo(0.07);
-    expect(buffers[8]?.starts[0]).toBeCloseTo(0.105);
+    expect(foregroundBufferCount()).toBe(
+      audioCue('bomb').layers.length
+      + audioCue('freeze').layers.length
+      + audioCue('supergravity').layers.length
+      + audioCue('multiplier-4').layers.length,
+    );
+    const starts = buffers.map((node) => node.starts[0] ?? -1);
+    for (const expected of [0, 0.035, 0.07, 0.105]) {
+      expect(starts.some((start) => Math.abs(start - expected) < 0.000001)).toBe(true);
+    }
   });
 
   it('lets higher resolution cues own a frame instead of stacking contacts or clears', async () => {
@@ -277,7 +282,25 @@ describe('AudioEngine material feedback contract', () => {
 
     expect(oscillators).toHaveLength(0);
     expect(buffers).toHaveLength(audioCue('freeze').layers.length);
-    expect(buffers.map((node) => node.starts[0])).toEqual([0, 0.025, 0.08]);
+    expect(buffers.map((node) => node.starts[0])).toEqual([0]);
+  });
+
+  it('starts a normal clear with the renderer sweep and does not replay it at commit', async () => {
+    const audio = new AudioEngine(platformFor());
+    await audio.prime();
+    audio.play([
+      { type: 'hard-dropped', piece: 'I', distance: 14 },
+      { type: 'piece-locked', piece: 'I', cells: [] },
+      { type: 'clear-started', rows: [38, 39] },
+    ]);
+
+    expect(buffers).toHaveLength(audioCue('clear-2').layers.length);
+    const afterSweepStart = foregroundBufferCount();
+    audio.play([{ type: 'lines-cleared', rows: [38, 39], count: 2, score: 300 }]);
+    expect(foregroundBufferCount()).toBe(afterSweepStart);
+
+    audio.play([{ type: 'lines-cleared', rows: [39], count: 1, score: 100 }]);
+    expect(foregroundBufferCount()).toBe(afterSweepStart + audioCue('clear-1').layers.length);
   });
 
   it('maps clear tiers, survival pressure, UI, and puzzle events to bounded gestures', async () => {

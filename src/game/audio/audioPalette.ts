@@ -15,7 +15,7 @@ export type AudioCueId =
 
 type LayerOptions = Partial<Pick<
   ProceduralLayer,
-  'delay' | 'endFrequency' | 'brightness' | 'spread' | 'seed' | 'attack' | 'release'
+  'delay' | 'endFrequency' | 'brightness' | 'spread' | 'pulses' | 'seed' | 'attack' | 'release'
 >>;
 
 const voice = (
@@ -41,20 +41,13 @@ const gesture = (
 
 const CONTROL_CUES: Readonly<Record<'move' | 'rotate' | 'soft-drop', AudioGesture>> = {
   move: gesture('gameplay', [
-    voice('soft-contact', 248, 0.038, 0.068, {
-      endFrequency: 214, brightness: 0.2, spread: 0.18, seed: 0x3701, release: 0.24,
-    }),
-    voice('wood', 318, 0.034, 0.02, {
-      endFrequency: 276, brightness: 0.14, spread: 0.16, seed: 0x3702, release: 0.2,
+    voice('surface-slide', 238, 0.056, 0.16, {
+      endFrequency: 204, brightness: 0.3, spread: 0.32, seed: 0x37101, release: 0.3,
     }),
   ]),
   rotate: gesture('gameplay', [
-    voice('wood', 286, 0.056, 0.065, {
-      endFrequency: 232, brightness: 0.2, spread: 0.28, seed: 0x3711, release: 0.3,
-    }),
-    voice('air-brush', 720, 0.064, 0.018, {
-      delay: 0.002, endFrequency: 1_080, brightness: 0.18, spread: 0.32,
-      seed: 0x3712, attack: 0.009, release: 0.38,
+    voice('pivot-detent', 248, 0.074, 0.21, {
+      endFrequency: 392, brightness: 0.32, spread: 0.46, seed: 0x37111, release: 0.32,
     }),
   ]),
   'soft-drop': gesture('gameplay', [
@@ -69,93 +62,54 @@ const CONTROL_CUES: Readonly<Record<'move' | 'rotate' | 'soft-drop', AudioGestur
 
 const CONTACT_CUES: Readonly<Record<'hard-drop' | 'lock', AudioGesture>> = {
   lock: gesture('gameplay', [
-    voice('ceramic', 174, 0.092, 0.085, {
-      endFrequency: 142, brightness: 0.2, spread: 0.26, seed: 0x3721, release: 0.38,
-    }),
-    voice('soft-contact', 206, 0.052, 0.042, {
-      delay: 0.002, endFrequency: 164, brightness: 0.2, spread: 0.22,
-      seed: 0x3722, release: 0.28,
+    voice('landing-impact', 168, 0.09, 0.19, {
+      endFrequency: 136, brightness: 0.24, spread: 0.26, seed: 0x37201, release: 0.42,
     }),
   ]),
   'hard-drop': gesture('gameplay', [
-    voice('stone', 76, 0.17, 0.096, {
-      endFrequency: 48, brightness: 0.2, spread: 0.36, seed: 0x3731, release: 0.38,
+    voice('fall-rush', 980, 0.05, 0.16, {
+      endFrequency: 180, brightness: 0.4, spread: 0.48, seed: 0x37301,
+      attack: 0.004, release: 0.2,
     }),
-    voice('wood', 188, 0.082, 0.043, {
-      delay: 0.003, endFrequency: 138, brightness: 0.2, spread: 0.3,
-      seed: 0x3732, release: 0.34,
+    voice('landing-impact', 92, 0.15, 0.28, {
+      delay: 0.042, endFrequency: 52, brightness: 0.3, spread: 0.5,
+      seed: 0x37302, release: 0.5,
     }),
   ]),
 };
 
 const CLEAR_CUES: Readonly<Record<'clear-1' | 'clear-2' | 'clear-3' | 'clear-4', AudioGesture>> = {
   'clear-1': gesture('reward', [
-    voice('ceramic', 246, 0.18, 0.09, {
-      endFrequency: 282, brightness: 0.28, spread: 0.28, seed: 0x3741, release: 0.54,
-    }),
-    voice('air-brush', 620, 0.14, 0.034, {
-      endFrequency: 1_080, brightness: 0.22, spread: 0.3, seed: 0x3742,
-      attack: 0.014, release: 0.48,
+    voice('row-release', 210, 0.22, 0.24, {
+      endFrequency: 300, brightness: 0.3, spread: 0.3, pulses: 1,
+      seed: 0x37401, attack: 0.006, release: 0.46,
     }),
   ]),
   'clear-2': gesture('reward', [
-    voice('ceramic', 226, 0.23, 0.1, {
-      endFrequency: 284, brightness: 0.32, spread: 0.34, seed: 0x3751, release: 0.56,
-    }),
-    voice('wood', 156, 0.17, 0.05, {
-      delay: 0.014, endFrequency: 128, brightness: 0.16, spread: 0.28,
-      seed: 0x3752, release: 0.44,
-    }),
-    voice('air-brush', 570, 0.19, 0.04, {
-      endFrequency: 1_260, brightness: 0.24, spread: 0.4, seed: 0x3753,
-      attack: 0.018, release: 0.52,
+    voice('row-release', 190, 0.28, 0.29, {
+      endFrequency: 330, brightness: 0.35, spread: 0.4, pulses: 2,
+      seed: 0x37501, attack: 0.007, release: 0.48,
     }),
   ]),
   'clear-3': gesture('reward', [
-    voice('ceramic', 206, 0.3, 0.115, {
-      endFrequency: 292, brightness: 0.38, spread: 0.46, seed: 0x3761, release: 0.6,
-    }),
-    voice('stone', 112, 0.24, 0.065, {
-      endFrequency: 76, brightness: 0.16, spread: 0.36, seed: 0x3762, release: 0.48,
-    }),
-    voice('air-brush', 500, 0.27, 0.052, {
-      endFrequency: 1_480, brightness: 0.28, spread: 0.52, seed: 0x3763,
-      attack: 0.024, release: 0.58,
+    voice('row-release', 170, 0.38, 0.34, {
+      endFrequency: 360, brightness: 0.42, spread: 0.55, pulses: 3,
+      seed: 0x37601, attack: 0.008, release: 0.52,
     }),
   ]),
   'clear-4': gesture('reward', [
-    voice('stone', 68, 0.52, 0.145, {
-      endFrequency: 42, brightness: 0.18, spread: 0.56, seed: 0x3771,
-      attack: 0.008, release: 0.54,
-    }),
-    voice('ceramic', 188, 0.46, 0.13, {
-      delay: 0.026, endFrequency: 306, brightness: 0.44, spread: 0.62,
-      seed: 0x3772, attack: 0.02, release: 0.66,
-    }),
-    voice('crystal-grain', 392, 0.36, 0.075, {
-      delay: 0.075, endFrequency: 468, brightness: 0.48, spread: 0.58,
-      seed: 0x3773, release: 0.68,
-    }),
-    voice('air-brush', 360, 0.43, 0.06, {
-      delay: 0.018, endFrequency: 1_760, brightness: 0.32, spread: 0.66,
-      seed: 0x3774, attack: 0.05, release: 0.64,
+    voice('row-release', 150, 0.56, 0.4, {
+      endFrequency: 420, brightness: 0.48, spread: 0.7, pulses: 4,
+      seed: 0x37701, attack: 0.009, release: 0.58,
     }),
   ]),
 };
 
 const MUTATION_CUES: Readonly<Record<'freeze' | 'supergravity' | 'bomb' | 'multiplier-2' | 'multiplier-4', AudioGesture>> = {
   freeze: gesture('mutation', [
-    voice('air-brush', 1_420, 0.34, 0.06, {
-      endFrequency: 520, brightness: 0.34, spread: 0.54, seed: 0x3781,
-      attack: 0.028, release: 0.64,
-    }),
-    voice('crystal-grain', 618, 0.4, 0.115, {
-      delay: 0.025, endFrequency: 552, brightness: 0.62, spread: 0.58,
-      seed: 0x3782, release: 0.72,
-    }),
-    voice('crystal-grain', 814, 0.24, 0.052, {
-      delay: 0.08, endFrequency: 742, brightness: 0.56, spread: 0.46,
-      seed: 0x3783, release: 0.68,
+    voice('ice-bind', 720, 0.32, 0.42, {
+      endFrequency: 380, brightness: 0.56, spread: 0.58, seed: 0x37801,
+      attack: 0.012, release: 0.28,
     }),
   ], true),
   supergravity: gesture('mutation', [
@@ -325,20 +279,13 @@ const SECONDARY_CUES: Readonly<Record<Exclude<AudioCueId,
     }),
   ]),
   'countdown-tick': gesture('ui', [
-    voice('wood', 224, 0.14, 0.092, {
-      endFrequency: 192, brightness: 0.2, spread: 0.24, seed: 0x3791, release: 0.48,
-    }),
-    voice('soft-contact', 318, 0.07, 0.034, {
-      endFrequency: 264, brightness: 0.16, spread: 0.18, seed: 0x3792, release: 0.32,
+    voice('countdown-knock', 196, 0.14, 0.18, {
+      endFrequency: 178, brightness: 0.24, spread: 0.28, seed: 0x37901, release: 0.46,
     }),
   ]),
   'countdown-resolve': gesture('ui', [
-    voice('wood', 196, 0.25, 0.118, {
-      endFrequency: 158, brightness: 0.22, spread: 0.32, seed: 0x37a1, release: 0.62,
-    }),
-    voice('ceramic', 342, 0.22, 0.05, {
-      delay: 0.018, endFrequency: 296, brightness: 0.26, spread: 0.34,
-      seed: 0x37a2, release: 0.64,
+    voice('countdown-knock', 152, 0.25, 0.28, {
+      endFrequency: 132, brightness: 0.28, spread: 0.38, seed: 0x37a01, release: 0.56,
     }),
   ]),
 };

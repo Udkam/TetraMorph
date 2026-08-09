@@ -9,7 +9,8 @@ interface GestureLayerBase {
 
 export type ProceduralInstrument =
   | 'felt' | 'impact' | 'ribbon' | 'glass' | 'shimmer' | 'pulse'
-  | 'soft-contact' | 'wood' | 'ceramic' | 'stone' | 'crystal-grain' | 'air-brush';
+  | 'surface-slide' | 'pivot-detent' | 'fall-rush' | 'landing-impact'
+  | 'row-release' | 'countdown-knock' | 'ice-bind';
 
 export interface ProceduralLayer extends GestureLayerBase {
   kind: 'procedural';
@@ -18,6 +19,8 @@ export interface ProceduralLayer extends GestureLayerBase {
   endFrequency?: number;
   brightness?: number;
   spread?: number;
+  /** Discrete physical releases, used to make one through four cleared rows audible. */
+  pulses?: number;
   seed?: number;
   /** Fraction of the layer reserved for a smooth zero-ending release. */
   release?: number;
@@ -123,9 +126,9 @@ export function renderProceduralSamples(layer: ProceduralLayer, sampleRate: numb
   const release = clamp(layer.release ?? 0.24, 0.04, 0.8);
   const defaultAttack = layer.instrument === 'ribbon'
     || layer.instrument === 'shimmer'
-    || layer.instrument === 'air-brush'
+    || layer.instrument === 'ice-bind'
     ? 0.012
-    : 0.003;
+    : layer.instrument === 'fall-rush' ? 0.005 : 0.003;
   const attack = clamp(layer.attack ?? defaultAttack, 0.001, Math.max(0.001, layer.duration * 0.45));
   let phase = 0;
   let filteredNoise = 0;
@@ -195,60 +198,97 @@ export function renderProceduralSamples(layer: ProceduralLayer, sampleRate: numb
         sample = (body + breath) * envelope;
         break;
       }
-      case 'soft-contact': {
-        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 4.2);
-        const touch = filteredNoise * (0.55 + brightness * 0.18)
-          + highNoise * 0.08 * brightness;
-        const mutedBody = Math.sin(phase * 0.71) * 0.085 * Math.max(0, 1 - progress * 7);
-        sample = (touch + mutedBody) * envelope;
+      case 'surface-slide': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 1.45);
+        const travel = Math.sin(progress * Math.PI) ** 0.7;
+        const surface = filteredNoise * (0.68 + brightness * 0.2)
+          + highNoise * (0.08 + brightness * 0.07);
+        const railBump = Math.exp(-Math.abs(progress - (0.58 + spread * 0.08)) * 42);
+        const mutedBody = Math.sin(phase * (0.48 + spread * 0.08) + 0.46) * 0.16 * railBump;
+        sample = (surface * (0.42 + travel * 0.7) + mutedBody) * envelope;
         break;
       }
-      case 'wood': {
-        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 3.3);
-        const contact = filteredNoise * (0.32 + brightness * 0.16)
-          * Math.max(0, 1 - progress * 10);
-        const body = Math.sin(phase) * 0.43
-          + Math.sin(phase * (1.47 + spread * 0.09) + 0.37) * 0.19
-          + Math.sin(phase * (2.13 + spread * 0.14) + 1.12) * 0.075;
+      case 'pivot-detent': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 0.62);
+        const arc = Math.sin(progress * Math.PI) ** 1.2;
+        const scrub = (filteredNoise * 0.66 + highNoise * 0.11 * brightness) * arc;
+        const detentAge = progress - 0.58;
+        const detent = detentAge < 0 ? 0 : Math.exp(-detentAge * 24);
+        const body = Math.sin(phase * (0.57 + spread * 0.07) + 0.72) * 0.38
+          + filteredNoise * 0.2;
+        sample = (scrub * 0.8 + body * detent) * envelope;
+        break;
+      }
+      case 'fall-rush': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 0.2);
+        const travel = Math.sin(Math.min(1, progress / 0.82) * Math.PI * 0.5) ** 2;
+        const air = filteredNoise * (0.74 + brightness * 0.16)
+          + highNoise * (0.12 + brightness * 0.08);
+        const lowWake = Math.sin(phase * 0.34) * 0.09 * travel;
+        sample = (air * (0.24 + travel * 0.9) + lowWake) * envelope;
+        break;
+      }
+      case 'landing-impact': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 2.15);
+        const body = Math.sin(phase) * 0.55
+          + Math.sin(phase * (1.31 + spread * 0.08) + 0.38) * 0.22;
+        const contact = (filteredNoise * 0.42 + highNoise * 0.14)
+          * Math.exp(-progress * (10 + brightness * 8));
+        sample = Math.tanh((body + contact) * (1.05 + spread * 0.28)) * envelope;
+        break;
+      }
+      case 'row-release': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 0.22);
+        const pulses = Math.round(clamp(layer.pulses ?? 1, 1, 4));
+        const sweepEnd = 0.46 + pulses * 0.055;
+        const sweepProgress = Math.min(1, progress / sweepEnd);
+        const sweep = (filteredNoise * (0.58 + brightness * 0.18) + highNoise * 0.1)
+          * Math.sin(sweepProgress * Math.PI) ** 0.8;
+        let releases = 0;
+        for (let pulse = 0; pulse < pulses; pulse += 1) {
+          const onset = 0.46 + pulse * (0.3 / Math.max(1, pulses - 1));
+          const age = progress - onset;
+          if (age < 0) continue;
+          const decay = Math.exp(-age * (26 - pulses * 1.4));
+          const body = Math.sin(phase * (0.7 + pulse * 0.09) + pulse * 1.17) * 0.36;
+          const fracture = filteredNoise * 0.26 + highNoise * (0.12 + brightness * 0.08);
+          releases += (body + fracture) * decay;
+        }
+        const openTail = progress > sweepEnd
+          ? filteredNoise * 0.22 * Math.max(0, 1 - (progress - sweepEnd) / Math.max(0.01, 1 - sweepEnd))
+          : 0;
+        sample = (sweep * 0.76 + releases + openTail) * envelope;
+        break;
+      }
+      case 'countdown-knock': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 2.75);
+        const contact = (filteredNoise * 0.38 + highNoise * 0.08)
+          * Math.max(0, 1 - progress * 12);
+        const body = Math.sin(phase) * 0.54
+          + Math.sin(phase * (1.53 + spread * 0.08) + 0.41) * 0.2
+          + Math.sin(phase * (2.27 + spread * 0.12) + 1.16) * 0.065;
         sample = (body + contact) * envelope;
         break;
       }
-      case 'ceramic': {
-        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 2.15);
-        const body = Math.sin(phase) * 0.38
-          + Math.sin(phase * (2.31 + spread * 0.11) + 0.61)
-            * 0.2 * Math.max(0, 1 - progress) ** 0.55
-          + Math.sin(phase * (4.07 + spread * 0.19) + 1.73)
-            * 0.075 * Math.max(0, 1 - progress) ** 1.4;
-        const touch = filteredNoise * 0.12 * Math.max(0, 1 - progress * 12);
-        sample = (body + touch) * envelope;
-        break;
-      }
-      case 'stone': {
-        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 2.45);
-        const body = Math.sin(phase) * 0.42
-          + Math.sin(phase * (1.29 + spread * 0.07) + 0.28) * 0.21;
-        const grit = (filteredNoise * 0.42 + highNoise * 0.055)
-          * Math.max(0, 1 - progress * (4.5 + brightness * 3));
-        sample = Math.tanh((body + grit) * (1.08 + spread * 0.34)) * envelope;
-        break;
-      }
-      case 'crystal-grain': {
-        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 1.8);
-        const decay = Math.max(0, 1 - progress);
-        const body = Math.sin(phase) * 0.32
-          + Math.sin(phase * (2.68 + spread * 0.16) + 0.82) * 0.18 * decay ** 0.7
-          + Math.sin(phase * (5.19 + spread * 0.24) + 2.04) * 0.07 * decay ** 1.6;
-        const grain = Math.sign(highNoise) * Math.max(0, Math.abs(highNoise) - 0.72)
-          * 0.14 * brightness * decay ** 2;
-        sample = (body + grain) * envelope;
-        break;
-      }
-      case 'air-brush': {
-        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 0.75);
-        const body = filteredNoise * (0.66 + brightness * 0.12)
-          + highNoise * 0.055 * brightness;
-        sample = body * envelope;
+      case 'ice-bind': {
+        envelope = proceduralEnvelope(index, frameCount, safeRate, attack, release, 0.28);
+        const bindEnd = 0.34;
+        const bindProgress = Math.min(1, progress / bindEnd);
+        const frost = (filteredNoise * (0.62 + brightness * 0.18) + highNoise * 0.07)
+          * Math.sin(bindProgress * Math.PI * 0.5)
+          * (progress < bindEnd ? 1 : Math.max(0, 1 - (progress - bindEnd) * 1.25));
+        const releaseProgress = Math.max(0, (progress - bindEnd) / (1 - bindEnd));
+        let shards = 0;
+        for (let shard = 0; shard < 4; shard += 1) {
+          const onset = shard * 0.22;
+          const age = releaseProgress - onset;
+          if (age < 0) continue;
+          const shardDecay = Math.exp(-age * 18);
+          const crystal = Math.sin(phase * (1.64 + shard * 0.41) + shard * 0.83) * 0.24;
+          const grain = (filteredNoise * 0.16 + highNoise * 0.11) * (0.7 + brightness * 0.3);
+          shards += (crystal + grain) * shardDecay;
+        }
+        sample = (frost * 0.58 + shards) * envelope;
         break;
       }
     }
@@ -263,7 +303,7 @@ export function renderProceduralSamples(layer: ProceduralLayer, sampleRate: numb
 function proceduralBufferKey(layer: ProceduralLayer, sampleRate: number): string {
   return [
     sampleRate, layer.instrument, layer.duration, layer.frequency, layer.endFrequency,
-    layer.brightness, layer.spread, layer.seed, layer.attack, layer.release,
+    layer.brightness, layer.spread, layer.pulses, layer.seed, layer.attack, layer.release,
   ].join(':');
 }
 

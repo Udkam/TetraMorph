@@ -126,10 +126,11 @@ describe('material audio gesture scheduler', () => {
     expect(gestureDuration(gesture)).toBeCloseTo(0.08, 6);
   });
 
-  it('renders legacy and T37 material instruments deterministically with finite zero endpoints', () => {
+  it('renders legacy and motion-linked T37 instruments deterministically with finite zero endpoints', () => {
     const instruments: ProceduralInstrument[] = [
       'felt', 'impact', 'ribbon', 'glass', 'shimmer', 'pulse',
-      'soft-contact', 'wood', 'ceramic', 'stone', 'crystal-grain', 'air-brush',
+      'surface-slide', 'pivot-detent', 'fall-rush', 'landing-impact',
+      'row-release', 'countdown-knock', 'ice-bind',
     ];
     const signatures = new Set<string>();
     for (const instrument of instruments) {
@@ -142,6 +143,7 @@ describe('material audio gesture scheduler', () => {
         gain: 0.08,
         brightness: 0.57,
         spread: 0.44,
+        pulses: 3,
         seed: 42,
       };
       const first = renderProceduralSamples(layer, 8_000);
