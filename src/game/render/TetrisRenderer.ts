@@ -55,6 +55,11 @@ import {
   type TimelineSample,
 } from '../../animation/mutationTimeline';
 import {
+  lineClearReleaseAgeMs,
+  lineClearReleaseSnapshot,
+  orderedLineClearRows,
+} from '../../animation/lineClearTimeline';
+import {
   activeCellsInsideVisibleRows,
   activePresentationScaleFitsVisibleWell,
   approachPresentationPoint,
@@ -66,6 +71,7 @@ import {
   ORDINARY_LINE_CLEAR_TAIL_LIMIT,
   ordinaryLineClearCellProgress,
   ordinaryLineClearFragment,
+  ordinaryMultiLineClearCellProgress,
   ordinaryLineClearPresentationProgress,
   ordinaryLineClearProfile,
   orthogonalCellComponents,
@@ -138,7 +144,7 @@ interface BoardShift {
 
 interface OrdinaryLineClearTail {
   count: 2 | 3 | 4;
-  cells: readonly { cell: Cell; material: BoardMaterial }[];
+  cells: readonly { cell: Cell; material: BoardMaterial; releaseAgeMs: number }[];
   elapsed: number;
   duration: number;
   intensity: number;
@@ -273,6 +279,12 @@ export interface RendererSnapshot {
     hiddenCellCount: number;
   } | null;
   visibleLockedCells: number;
+  ordinaryLineClear: {
+    readonly count: 1 | 2 | 3 | 4;
+    readonly orderedRows: readonly number[];
+    readonly releaseTicks: readonly number[];
+    readonly releasedRows: readonly number[];
+  } | null;
   presentation: { x: number; y: number; offsetX: number; offsetY: number } | null;
   boardShiftOffsetY: number;
   mutationFilters: { freeze: boolean; collapse: boolean; activeCount: number };
@@ -345,6 +357,12 @@ const CLASSIC_FEEDBACK_LIMIT = 6;
 const SURVIVAL_ENTRY_RISE_MS = 680;
 const SURVIVAL_ENTRY_SETTLE_MS = 140;
 const SURVIVAL_ENTRY_DURATION_MS = SURVIVAL_ENTRY_RISE_MS + SURVIVAL_ENTRY_SETTLE_MS;
+
+function releasedOrdinaryLineClearRows(state: GameState): ReadonlySet<number> {
+  if (state.phase !== 'line-clear') return new Set();
+  const release = lineClearReleaseSnapshot(state.pendingClearRows, state.phaseTicks);
+  return new Set(release?.releasedRows ?? []);
+}
 
 type ReliefPoint = readonly [x: number, y: number];
 
@@ -653,6 +671,7 @@ export class TetrisRenderer {
     ghostCells: [],
     activeSpawnEntry: null,
     visibleLockedCells: 0,
+    ordinaryLineClear: null,
     presentation: null,
     boardShiftOffsetY: 0,
     mutationFilters: { freeze: false, collapse: false, activeCount: 0 },
@@ -993,6 +1012,7 @@ export class TetrisRenderer {
     graphics.clear();
     const entryGraphics = this.survivalEntryGraphics;
     entryGraphics.clear();
+    const releasedClearRows = releasedOrdinaryLineClearRows(state);
     this.survivalEntryMaskGraphics
       .clear()
       .rect(layout.x, layout.y, layout.width, layout.height)
@@ -1034,6 +1054,11 @@ export class TetrisRenderer {
       if (boardY < VISIBLE_START_ROW) return;
       row.forEach((cell, x) => {
         if (!cell) return;
+        if (
+          releasedClearRows.has(boardY)
+          && cell !== ANCHOR_CELL
+          && cell !== BEDROCK_CELL
+        ) return;
         const visibleY = boardY - VISIBLE_START_ROW;
         if (
           cell === BEDROCK_CELL
@@ -1090,8 +1115,8 @@ export class TetrisRenderer {
         );
       }
     }
-    this.drawPuzzleTargetMarkers(graphics, state, layout, boardShiftOffsetY);
-    this.drawMutationCarrierMaterials(graphics, state, layout, boardShiftOffsetY);
+    this.drawPuzzleTargetMarkers(graphics, state, layout, boardShiftOffsetY, releasedClearRows);
+    this.drawMutationCarrierMaterials(graphics, state, layout, boardShiftOffsetY, releasedClearRows);
 
     if (this.trail && !this.options.reducedMotion) {
       const progress = Math.min(1, this.trail.elapsed / this.trail.duration);
@@ -1202,13 +1227,20 @@ export class TetrisRenderer {
     this.mutationGraphics.alpha = this.options.modeSwitch ? 0.2 : 1;
   }
 
-  private drawPuzzleTargetMarkers(graphics: Graphics, state: GameState, layout: BoardLayout, offsetY: number): void {
+  private drawPuzzleTargetMarkers(
+    graphics: Graphics,
+    state: GameState,
+    layout: BoardLayout,
+    offsetY: number,
+    releasedClearRows: ReadonlySet<number> = releasedOrdinaryLineClearRows(state),
+  ): void {
     if (state.mode !== 'puzzle' || state.puzzleTargetCells.length === 0) return;
     const inset = Math.max(2, layout.cell * 0.19);
     const bracket = Math.max(5, layout.cell * 0.36);
     const stroke = Math.max(1, layout.cell * 0.038);
     for (const cell of state.puzzleTargetCells) {
       if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
+      if (releasedClearRows.has(cell.y)) continue;
       const material = state.board[cell.y]?.[cell.x];
       if (!material || material === ANCHOR_CELL || material === BEDROCK_CELL) continue;
       const x = layout.x + cell.x * layout.cell + inset;
@@ -1235,11 +1267,21 @@ export class TetrisRenderer {
       : { carrierId, elapsed: 0, duration: 150 };
   }
 
-  private drawMutationCarrierMaterials(graphics: Graphics, state: GameState, layout: BoardLayout, offsetY: number): void {
+  private drawMutationCarrierMaterials(
+    graphics: Graphics,
+    state: GameState,
+    layout: BoardLayout,
+    offsetY: number,
+    releasedClearRows: ReadonlySet<number> = releasedOrdinaryLineClearRows(state),
+  ): void {
     if (state.mode !== 'sprint') return;
     for (const carrier of state.mutationCarriers) {
       const cells = carrier.cells
-        .filter((cell) => cell.y >= VISIBLE_START_ROW && cell.y < VISIBLE_START_ROW + VISIBLE_HEIGHT)
+        .filter((cell) => (
+          cell.y >= VISIBLE_START_ROW
+          && cell.y < VISIBLE_START_ROW + VISIBLE_HEIGHT
+          && !releasedClearRows.has(cell.y)
+        ))
         .map((cell) => ({ x: cell.x, y: cell.y - VISIBLE_START_ROW }));
       if (cells.length === 0) continue;
       this.drawMutationCarrierSurface(graphics, cells, carrier.item, layout, 0, offsetY);
@@ -2405,7 +2447,7 @@ export class TetrisRenderer {
       count,
       restrainedGeometry,
     );
-    if (restrainedGeometry && phaseProgress >= 1) return;
+    if (count === 1 && restrainedGeometry && phaseProgress >= 1) return;
     const activationOwnsClear = state.mode === 'sprint' && (state.mutationCarriers ?? []).some(
       (carrier) => carrier.cells.some((cell) => state.pendingClearRows.includes(cell.y)),
     );
@@ -2424,7 +2466,7 @@ export class TetrisRenderer {
         for (const cell of carrier.cells) mutationItemByCell.set(`${cell.x},${cell.y}`, carrier.item);
       }
     }
-    const orderedRows = [...state.pendingClearRows].sort((left, right) => right - left);
+    const orderedRows = orderedLineClearRows(state.pendingClearRows);
     for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {
       const row = orderedRows[rowOrder]!;
       if (row < VISIBLE_START_ROW || row >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
@@ -2432,18 +2474,28 @@ export class TetrisRenderer {
       for (let column = 0; column < BOARD_WIDTH; column += 1) {
         const type = boardRow?.[column];
         if (!type || type === ANCHOR_CELL || type === BEDROCK_CELL) continue;
-        const cellProgress = ordinaryLineClearCellProgress(
-          phaseProgress,
-          column,
-          BOARD_WIDTH,
-          restrainedGeometry ? 0 : rowOrder,
-          count,
-          restrainedGeometry,
-        );
+        const cellProgress = count === 1
+          ? ordinaryLineClearCellProgress(
+              phaseProgress,
+              column,
+              BOARD_WIDTH,
+              0,
+              count,
+              restrainedGeometry,
+            )
+          : ordinaryMultiLineClearCellProgress(
+              state.phaseTicks,
+              column,
+              BOARD_WIDTH,
+              rowOrder,
+              count,
+              restrainedGeometry,
+            );
         if (cellProgress <= 0) continue;
+        if (count > 1 && restrainedGeometry && cellProgress >= 1) continue;
         const eased = easeOutCubic(cellProgress);
         const pulse = restrainedGeometry
-          ? Math.max(0.5, 1 - phaseProgress * 0.5)
+          ? Math.max(0.5, 1 - cellProgress * 0.5)
           : Math.sin(cellProgress * Math.PI);
         if (pulse <= 0) continue;
         const material = this.materialFor(type);
@@ -2558,9 +2610,10 @@ export class TetrisRenderer {
   /** Low-alpha post-commit residue; never more than four renderer-owned cues. */
   private drawOrdinaryLineClearTails(graphics: Graphics, layout: BoardLayout): void {
     for (const tail of this.ordinaryLineClearTails) {
-      const progress = Math.max(0, Math.min(1, tail.elapsed / tail.duration));
-      const fade = Math.pow(1 - progress, 2);
-      for (const { cell, material } of tail.cells) {
+      for (const { cell, material, releaseAgeMs } of tail.cells) {
+        const progress = Math.max(0, Math.min(1, (tail.elapsed + releaseAgeMs) / tail.duration));
+        if (progress >= 1) continue;
+        const fade = Math.pow(1 - progress, 2);
         if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
         const fragmentIndexes = tail.count === 4 ? 2 : 1;
         for (let index = 0; index < fragmentIndexes; index += 1) {
@@ -2602,12 +2655,15 @@ export class TetrisRenderer {
       || state?.mode === 'puzzle'
       || activationOwnsBatch
     ) return;
-    const cells: Array<{ cell: Cell; material: BoardMaterial }> = [];
-    for (const row of event.rows) {
+    const cells: Array<{ cell: Cell; material: BoardMaterial; releaseAgeMs: number }> = [];
+    const orderedRows = orderedLineClearRows(event.rows);
+    for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {
+      const row = orderedRows[rowOrder]!;
+      const releaseAgeMs = lineClearReleaseAgeMs(profile.count, rowOrder);
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
         const material = previousBoard[row]?.[x];
         if (!material || material === ANCHOR_CELL || material === BEDROCK_CELL) continue;
-        cells.push({ cell: { x, y: row }, material });
+        cells.push({ cell: { x, y: row }, material, releaseAgeMs });
       }
     }
     if (cells.length === 0) return;
@@ -4233,6 +4289,9 @@ export class TetrisRenderer {
           hiddenCellCount: Math.max(0, activeCells.length - visibleActiveCells.length),
         }
       : null;
+    const ordinaryLineClear = state.phase === 'line-clear'
+      ? lineClearReleaseSnapshot(state.pendingClearRows, state.phaseTicks)
+      : null;
     this.snapshot = {
       canvas: { width: app.screen.width, height: app.screen.height, resolution: app.renderer.resolution },
       board: { x: layout.x, y: layout.y, width: layout.width, height: layout.height, cell: layout.cell },
@@ -4248,6 +4307,14 @@ export class TetrisRenderer {
       ghostCells,
       activeSpawnEntry,
       visibleLockedCells: this.snapshot.visibleLockedCells,
+      ordinaryLineClear: ordinaryLineClear
+        ? {
+            count: ordinaryLineClear.count,
+            orderedRows: [...ordinaryLineClear.orderedRows],
+            releaseTicks: [...ordinaryLineClear.releaseTicks],
+            releasedRows: [...ordinaryLineClear.releasedRows],
+          }
+        : null,
       presentation: drawableActive && this.presentation
         ? {
             x: this.presentation.x,

@@ -13,6 +13,7 @@ import {
   nextPreviewPiece,
   ordinaryLineClearCellProgress,
   ordinaryLineClearFragment,
+  ordinaryMultiLineClearCellProgress,
   ordinaryLineClearPresentationProgress,
   ordinaryLineClearProfile,
   orthogonalCellComponents,
@@ -126,12 +127,18 @@ describe('presentation interpolation', () => {
     expect(lineClearCellProgress(1, 9, 10)).toBe(1);
   });
 
-  it('stages three and four rows bottom-to-top but keeps reduced feedback simultaneous', () => {
-    const bottom = ordinaryLineClearCellProgress(0.34, 4, 10, 0, 4, false);
-    const upper = ordinaryLineClearCellProgress(0.34, 4, 10, 3, 4, false);
-    expect(bottom).toBeGreaterThan(upper);
-    expect(ordinaryLineClearCellProgress(0.34, 4, 10, 0, 4, true)).toBe(0.34);
-    expect(ordinaryLineClearCellProgress(0.34, 4, 10, 3, 4, true)).toBe(0.34);
+  it('stages multi-line feedback top-to-bottom while reduced motion keeps the same beats stationary', () => {
+    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 0, 4, false)).toBeGreaterThan(0);
+    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 1, 4, false)).toBe(0);
+    expect(ordinaryMultiLineClearCellProgress(4, 4, 10, 1, 4, false)).toBeGreaterThan(0);
+    expect(ordinaryMultiLineClearCellProgress(4, 4, 10, 2, 4, false)).toBe(0);
+    expect(ordinaryMultiLineClearCellProgress(0, 0, 10, 0, 4, true))
+      .toBe(ordinaryMultiLineClearCellProgress(0, 9, 10, 0, 4, true));
+    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 1, 4, true)).toBe(0);
+    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 0, 1, false)).toBe(0);
+
+    // The accepted one-line compatibility sweep remains unchanged.
+    expect(ordinaryLineClearCellProgress(0.34, 4, 10, 0, 1, true)).toBe(0.34);
     expect(ordinaryLineClearCellProgress(0.5, 4, 10, 0, 7, false)).toBe(0);
   });
 

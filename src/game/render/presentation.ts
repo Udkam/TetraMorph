@@ -10,6 +10,7 @@ import {
   type PieceType,
   type SurvivalDebris,
 } from '../core';
+import { lineClearRowReleaseProgress } from '../../animation/lineClearTimeline';
 
 export interface PresentationPoint {
   x: number;
@@ -123,10 +124,7 @@ export function ordinaryLineClearPresentationProgress(
   return Math.max(0, Math.min(1, phaseTicks / duration));
 }
 
-/**
- * Three and four-line profiles resolve bottom-to-top. Reduced motion and Puzzle
- * pass rowOrder=0 so every row remains simultaneous and stationary.
- */
+/** Compatibility cell sweep. Sequential multi-row clears use the tick-bound helper below. */
 export function ordinaryLineClearCellProgress(
   phaseProgress: number,
   column: number,
@@ -142,6 +140,22 @@ export function ordinaryLineClearCellProgress(
   if (phaseProgress <= delay) return 0;
   const rowProgress = Math.min(1, (phaseProgress - delay) / Math.max(0.001, 1 - delay));
   return lineClearCellProgress(rowProgress, column, width);
+}
+
+/**
+ * Binds one whole multi-line row to its matching Studio pulse. Every cell shares
+ * one release beat; reduced motion and Puzzle remove the renderer's chips/travel.
+ */
+export function ordinaryMultiLineClearCellProgress(
+  phaseTicks: number,
+  column: number,
+  width: number,
+  rowOrder: number,
+  count: number,
+  _restrainedGeometry: boolean,
+): number {
+  if (!Number.isInteger(column) || width <= 0 || column < 0 || column >= width) return 0;
+  return lineClearRowReleaseProgress(phaseTicks, count, rowOrder);
 }
 
 /**
