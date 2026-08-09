@@ -158,7 +158,7 @@ adding unrelated badges or ornamental effects.
 - The remaining-cue candidate is recovery-first rather than another timbre experiment.
   Its baseline is the last intact pre-T29 T28 audio snapshot `2c4e4ae`: compact sine
   contours for soft drop, undo, Survival pressure, pause/resume, and terminal feedback;
-  a rounded `148 → 93 Hz` two-part weight for Supergravity; a contained `74 Hz` body
+  a rounded `148 + 93 Hz` two-part weight for Supergravity; a contained `74 Hz` body
   plus deterministic `640 Hz` low-pass air crack for Bomb; and the short T28
   fundamental/bright-partial marimba dyads for Multiplier ×2/×4. Freeze is excluded
   from this recovery because the accepted Ice 2 sample owns it.
@@ -167,6 +167,24 @@ adding unrelated badges or ornamental effects.
   Action A route. They remain candidates: historical provenance is evidence of the
   earlier softer direction, not a new human acceptance verdict. No sustained Mutation
   loop returns, and every cue stays under the shared sixteen-voice ceiling.
+- Production candidate `95978eb` implements that boundary. It preserves the established
+  five bus gains, then routes candidates through a separate Action-A-equivalent
+  master/compressor so candidate pressure cannot alter the accepted action chain.
+  Soft drop restores the historical `> 52 ms` throttle. The deterministic Bomb pressure
+  voice reproduces the earlier sine formula, `640 Hz` low-pass, `Q 0.7`, and 9 ms attack.
+  T28's sequential level/finish/failure arpeggios are deliberately not restored; compact
+  overlapping lift, chord, and descending-mass gestures keep terminal feedback readable
+  without becoming melody.
+- Listening evidence `006a936` plus coverage repair `94fffb9` imports the production
+  `AudioEngine` rather than copying
+  recipes. Its browser verifier passes 28 controls, source binding, desktop/mobile
+  overflow and 44 px targets, reduced motion, and zero console/page errors. These are
+  technical gates only. Follow-up test `2766a55` jointly freezes the complete production
+  Bomb body/pressure route, while the repaired browser pass actually dispatches all 28
+  listening controls and removes stale multi-button playback highlights. Utility,
+  Survival, outcome, Bomb, Multiplier, and Supergravity remain unaccepted until the
+  player listens. The R5 provenance record now uses the real
+  full T28 commit `35509a70c35cebf16b942387229ca880756a61cd`.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

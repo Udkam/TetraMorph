@@ -204,6 +204,27 @@ ordered after Stage C.
   maps Bomb to contained bass/air pressure, Multiplier to restrained short marimba
   dyads, and Supergravity to a two-part downward weight. This does not reopen the
   accepted anchors and does not mark the restored cues accepted before listening.
+- Candidate source `95978eb` and production-bound listening evidence `006a936` are now
+  committed. The candidate retains five-bus ownership on an isolated clone of the
+  Action A safety chain, restores soft-drop at `>52 ms`, reproduces the deterministic
+  Bomb pressure texture, removes old terminal arpeggios, and keeps all Mutation voices
+  bounded and renderer-serialized. Typecheck plus eight focused files pass `108/108`.
+  The evidence verifier passes 28 direct-production controls, desktop/mobile layout,
+  reduced motion, source binding, and zero console/page errors; the prescribed game
+  client also dispatches the same-frame Mutation sequence and reads
+  `productionEngine: true`. This opens the player listening gate only.
+- Stage C still cannot close for two independent reasons: the restored candidate cues
+  need the player's listening verdict, and the selected Ice 2 uploader-original WAV plus
+  SHA-256 remains unavailable behind the authenticated Freesound download. Do not claim
+  either gate complete or begin Stage D product edits while they remain open.
+- Independent read-only QA of `03ce9fd^..006a936` reports `P0 0 / P1 0 / P2 0` and two
+  P3 coverage gaps only. Follow-ups `2766a55` and `94fffb9` close both: one production
+  test jointly asserts Bomb's 74 Hz body, deterministic pressure source, 640 Hz/Q 0.7/
+  9 ms filter-envelope route; the browser verifier dispatches every one of the 28
+  controls. That full pass also exposed and repaired stale playback highlighting in the
+  listening UI. Post-repair typecheck, `21/21` focused tests, browser verifier, and fresh
+  desktop/mobile visual inspection pass. Independent bounded recheck reports both P3
+  items closed and `P3 0`; this still does not substitute for human listening.
 - Independent read-only QA passes candidate range `f122a4e..4a61bf5` with
   `P0 0 / P1 0 / P2 0 / P3 0`. A Temp copy reran the verifier, rebuilt the layered Ice
   asset to the committed SHA-256, confirmed the three Ice release peaks near

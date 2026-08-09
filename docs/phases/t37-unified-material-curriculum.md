@@ -83,6 +83,14 @@ and no Puzzle content is published without strict deterministic proof.
   Action A safety contract; do not alter Action A, Studio, or Ice 2. Bomb uses contained
   low bass plus low-passed pressure, Multiplier uses short golden marimba dyads, and
   Supergravity uses a rounded two-stage weight. No sustained loop is permitted.
+- Candidate `95978eb` implements this palette while replacing the historical terminal
+  arpeggios with compact non-melodic gestures. Listening surface `006a936` imports the
+  production engine directly and passes source-bound desktop/mobile/reduced-motion
+  browser checks with zero errors. Newly restored cues remain fail-closed for human
+  listening; the selected Ice uploader-original WAV remains a separate provenance gate.
+- Independent QA found no P0/P1/P2 and only two P3 coverage gaps. Test `2766a55` closes
+  the complete Bomb-route assertion; evidence repair `94fffb9` dispatches all 28 controls
+  and fixes the stale multi-button playing state found by that exhaustive pass.
 
 ### D. Route transition system
 

@@ -58,10 +58,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    and evidence `05b28ff` compare two exact historical soft action directions and three
    short primary-source real ice contact/crack recordings. The player selects Action A
    and Ice 2; technical and independent read-only gates also pass.
-8. `IN PROGRESS` — full production audio language from the accepted Action A, Studio,
-   and Ice 2 contracts. Contract `03ce9fd`, playback foundation `a1febc0`, local
-   assets/countdown `47629e7`, and production mapping `108aee8` are committed. Ice 2
-   original-WAV provenance and remaining-cue listening remain open.
+8. `HUMAN LISTENING GATE` — full production audio language from the accepted Action A,
+   Studio, and Ice 2 contracts. Contract `03ce9fd`, playback foundation `a1febc0`, local
+   assets/countdown `47629e7`, production mapping `108aee8`, remaining candidate
+   `95978eb`, direct-production evidence `006a936`, coverage test `2766a55`, and
+   all-control evidence repair `94fffb9` are committed. Ice 2 original-WAV provenance
+   and remaining-cue listening remain open.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
@@ -144,6 +146,30 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   for soft drop, undo, Survival, UI, reward, Bomb, Multiplier, and Supergravity. It uses
   a separate Action-A-equivalent safety route, excludes accepted Freeze, and remains
   unaccepted until focused listening.
+- Source `95978eb` restores short T28 utility, Survival, UI, and Mutation contours on a
+  candidate-only clone of the Action A safety chain while preserving the five bus gains.
+  Soft drop uses the historical `>52 ms` throttle; Bomb uses the deterministic T28
+  sample formula plus `640 Hz / Q 0.7 / 9 ms`; ×2/×4 use bounded short marimba strikes;
+  Supergravity uses the `148 + 93 Hz` two-part weight. T28 terminal arpeggios are replaced
+  by overlapping non-melodic lift/chord/descending-mass gestures.
+- Typecheck and eight focused audio/runtime/App test files pass `108/108`. Evidence
+  `006a936` imports production `AudioEngine`, binds to `95978eb`, and passes 28 controls,
+  desktop/mobile layout, reduced motion, 44 px controls, and zero console/page errors.
+  The prescribed game client dispatches the same-frame Mutation sequence, reports
+  `productionEngine: true`, and produces a visually inspected candidate-section frame.
+  Owned Vite PID `11132` exited and port `4187` is released; no server/browser remains.
+- R5 provenance incorrectly expanded `35509a7` to a nonexistent full SHA. Evidence
+  `006a936` corrects it to `35509a70c35cebf16b942387229ca880756a61cd` and adds commit/
+  blob existence checks. This metadata correction does not change the accepted sound.
+- Independent read-only QA of `03ce9fd^..006a936` reports `P0 0 / P1 0 / P2 0 / P3 2`
+  and says the candidate is safe to present for listening but cannot be accepted without
+  the player. Its two P3 items were coverage-only. `2766a55` adds one joint production
+  assertion for Bomb's 74 Hz body, deterministic buffer, `640 Hz / Q 0.7 / 9 ms` route;
+  typecheck and the two focused files pass `21/21`. `94fffb9` dispatches all 28 browser
+  controls. That exhaustive run exposed and fixed stale multi-button playback highlights,
+  then regenerated visually inspected desktop/mobile frames with zero errors. Independent
+  bounded recheck confirms both items closed and the final technical disposition is
+  `P0 0 / P1 0 / P2 0 / P3 0`; human listening remains authoritative.
 - Accepted Studio clear/countdown uses its own exact R3 compressor
   (`-10 dB / knee 10 / 4:1 / 3 ms / 120 ms`) after follow-up `8d8cb67`; candidates use
   a separate safety compressor. The verifier exposes and asserts this output contract.
@@ -189,10 +215,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement the restored T28 remaining-cue palette and focused tests, then publish one
-production-bound listening surface without changing the accepted Action A, Studio, or
-Ice 2 controls. Keep transition/material/Puzzle work closed until the production audio
-candidate is green and the open provenance/listening gates are explicitly reported.
+Obtain the player's focused verdict on utility/UI, Survival, outcomes, Bomb,
+Multiplier, and Supergravity from the direct-production listening surface. Keep the
+accepted anchors frozen and Stage D product edits closed. If the candidate passes,
+run the post-source full gates and close only the listening half of Stage C; the Ice 2
+uploader-original WAV provenance must still be reported open until acquired and hashed.
 
 ## Do not repeat
 
