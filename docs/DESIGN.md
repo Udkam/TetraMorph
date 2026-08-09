@@ -29,6 +29,17 @@ adding unrelated badges or ornamental effects.
   production recipes. Human acceptance of that matrix is the expansion gate. Peak,
   RMS, clipping, determinism, and repetition-density measurements remain rejection
   tools, not taste approval.
+- The first T37 audition (`0bebf8a` / `2ff0bb6`) is **REJECTED BY HUMAN LISTENING**.
+  It was quieter, less connected to the matching action/effect, and worse than the
+  earliest gameplay sound design. Replacing electronic notes with generic wood,
+  ceramic, and stone objects did not create functional feedback.
+- The replacement audition restores the earliest design's readable motion contours
+  without restoring exposed oscillator timbre: move follows the 56 ms lateral settle;
+  rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into
+  contact; a normal clear starts with `clear-started`, crosses Core's 200 ms clear
+  interval, and audibly releases one through four rows; Ice follows its 320 ms
+  `frost-bind` / `shard-release` visual timeline. At normal listening volume each cue
+  must be unmistakable before measurements or hierarchy tests matter.
 
 ### Transition language
 

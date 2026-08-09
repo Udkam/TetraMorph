@@ -30,14 +30,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Checkpoints
 
 1. `COMPLETE` — contract, phase document, and this bounded state at `429ffe2`.
-2. `CANDIDATE / LISTENING REQUIRED` — compact audio-audition source is `0bebf8a`;
-   source-bound offline WAV evidence is `2ff0bb6`.
-3. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
+2. `REJECTED BY HUMAN LISTENING` — audition R1 source `0bebf8a` and evidence `2ff0bb6`
+   were too quiet, weakly related to their effects/functions, and worse than the
+   earliest design.
+3. `IN PROGRESS` — motion-linked audio audition R2.
+4. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
-4. `PENDING` — route transition system and reduced-motion verification.
-5. `PENDING` — ordinary/Mutation whole-piece material system.
-6. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
-7. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+5. `PENDING` — route transition system and reduced-motion verification.
+6. `PENDING` — ordinary/Mutation whole-piece material system.
+7. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
+8. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ## Verification state
 
@@ -47,16 +49,19 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `docs/evidence/t37/audio-audition/` bind directly to source `0bebf8a`. All samples
   are finite; layer endpoints are zero; independent in-process and cross-process WAV
   hashes are stable; peaks are bounded; clipped sample count is zero.
+- Human listening overrides those checks: R1 fails perceived loudness and action/effect
+  identity. The generic material-object vocabulary must not be incrementally retuned.
 - No full suite, build, browser pass, server, or complete-palette expansion has run.
 - Two initial read-only audit agents failed before producing findings because the
   selected model was at capacity. No retry loop or extra resource was started.
 
 ## Next exact action
 
-Have the user listen to the five files linked from
-`docs/evidence/t37/audio-audition/README.md`. Record explicit acceptance or rejection.
-Do not expand the audio palette, start visual work, or reinterpret measurements as
-taste approval before that response.
+Replace R1 with a bounded R2 across exactly `AudioEngine.ts` and its test plus the four
+`audioGesture` / `audioPalette` paths. Restore readable motion/function contours using
+non-electronic physical models, synchronize normal clears to `clear-started`, run the
+focused tests and typecheck, then render a new source-bound audition. Do not expand the
+remaining palette or start visual work.
 
 ## Do not repeat
 

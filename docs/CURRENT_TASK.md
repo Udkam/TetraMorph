@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **IN PROGRESS — core audio audition candidate; HUMAN LISTENING REQUIRED**
+Status: **IN PROGRESS — first audio audition rejected; motion-linked audition R2**
 
 ## Active objective
 
@@ -62,16 +62,19 @@ materials, and Puzzle progression.
 
 ## Current checkpoint state
 
-- Core audition source candidate: `0bebf8a`.
-- Source-bound offline WAV evidence: `2ff0bb6`, under
-  `docs/evidence/t37/audio-audition/`.
-- Focused audio tests pass `21/21`; `npm.cmd run typecheck` passes.
-- Five mono 48 kHz / 16-bit audition files have finite samples, zero-valued layer
-  endpoints, byte-identical independent renders, bounded peaks, and zero clipped
-  samples. Cross-process WAV hashes are stable.
-- No full suite, build, browser pass, or complete-palette expansion has run for T37.
-  The next action is explicit user listening acceptance or rejection of the compact
-  audition; automation does not clear this gate.
+- Audition R1 source `0bebf8a` and evidence `2ff0bb6` are **REJECTED BY HUMAN
+  LISTENING**. The player found the result quieter, less connected to the matching
+  effect/function, and worse than the earliest design. Its passing `21/21` tests,
+  typecheck, deterministic WAV hashes, and zero clipping do not mitigate that verdict.
+- Audition R2 reuses the earliest design's clear action contours, not its electronic
+  timbre. Move maps to lateral settle, rotate to pivot/detent, hard drop to descent plus
+  contact, line clear to the visual sweep and one-to-four row releases, countdown to
+  physical cadence, and Ice to the 320 ms frost-bind/shard-release timeline.
+- Normal clears must begin audibly on `clear-started` and resolve across Core's 200 ms
+  clear interval instead of arriving only after `lines-cleared`.
+- R2 source ownership is limited to `src/game/audio/AudioEngine.ts`, its direct test,
+  and the four `audioGesture` / `audioPalette` source-test paths. Do not expand the
+  other sixteen cue recipes, start a server/browser, or begin visual implementation.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.

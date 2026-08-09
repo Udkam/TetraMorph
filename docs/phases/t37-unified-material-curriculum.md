@@ -31,6 +31,10 @@ and no Puzzle content is published without strict deterministic proof.
   comfortable rapid repetition, and lifecycle safety.
 - Stop after delivering the audition set. Do not extrapolate rejected timbre across the
   full palette.
+- R1 (`0bebf8a` / `2ff0bb6`) is rejected for low perceived loudness and weak
+  action/effect identity. R2 must preserve non-electronic timbre while binding each
+  sound contour to the live renderer timing: 56 ms move settle, rotate pulse, 50 ms
+  hard-drop trail, 200 ms clear interval from `clear-started`, and 320 ms Ice activation.
 
 ### C. Complete accepted audio language
 
