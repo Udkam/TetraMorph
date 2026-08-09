@@ -120,6 +120,13 @@ and no Puzzle content is published without strict deterministic proof.
   tick 12. Typecheck, `400 passed / 8 skipped`, the 767-module build, 25-frame browser
   audit, and independent `70/70` focused QA pass with P0–P3 all zero. Stage C still
   requires the player's normal-speed play verdict; Stage D remains closed.
+- That verdict rejects R2 as too fast and discontinuous. R3 replaces the `50 ms`
+  boolean cell steps with a continuous `300 ms` renderer track while leaving Core,
+  one-line clear, and frozen Studio audio untouched. Two-row windows are `210/120 ms`;
+  three/four-row windows are `120 ms`, so every row handoff overlaps by at least
+  `30 ms`. Each normal pair exposes highlight, scale, and partial-alpha states; the
+  restrained branch uses stationary opacity only. All unfinished rows may continue the
+  same captured-material sample for at most `100 ms` after Core's atomic commit.
 
 ### D. Route transition system
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE C CLASSIC-CLEAR CANDIDATE — human play acceptance open**
+Status: **STAGE C R3 CONTINUOUS-CLEAR CORRECTION — implementation in progress**
 
 ## Active objective
 
@@ -277,6 +277,25 @@ ordered after Stage C.
   inspects all frames, reruns the three focused files (`70/70`), and reports
   `P0 0 / P1 0 / P2 0 / P3 0`. This admits focused human play only; classic feel and
   final-row continuity are not accepted until the player confirms them at game speed.
+- The next normal-speed play verdict rejects that R2 candidate. Its three integer
+  visibility jumps complete one row in only `50 ms`; two- and three-line clears leave
+  visible gaps before later Studio beats, while four lines hard-switch between rows.
+  The low-alpha `33 ms` final bridge also drops the original material, so the result
+  still reads as direct disappearance despite technically ordered screenshots.
+- R3 keeps the Studio sample bytes and exact `0/180`, `0/90/180`, and
+  `0/60/120/180 ms` starts, one-line clear, and Core's tick-12 atomic commit. The
+  renderer now owns a continuous millisecond track ending at `300 ms`: two rows use
+  `210/120 ms` row windows, three and four use `120 ms` windows, and every adjacent
+  pair of rows overlaps for at least `30 ms`. Each symmetric cell pair must expose an
+  intermediate alpha/scale/highlight sample before completion; boolean cell culling is
+  forbidden until that sample reaches its endpoint.
+- At Core commit, every already-started unfinished row continues the same captured
+  original-material track for at most `100 ms`; no new tail grammar or opaque old row
+  may appear. The captured bodies sit beneath the collapsed board/current piece while
+  only a restrained highlight remains above it. Reduced motion and Puzzle use the same
+  row starts and end time but replace centre travel/scale with a stationary opacity
+  fade. Target markers and Mutation surfaces follow their cell alpha; Anchor/Bedrock
+  never enter the track. Restart, undo, mode/reduced-motion switch, and destroy clear it.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current

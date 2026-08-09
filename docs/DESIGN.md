@@ -221,6 +221,20 @@ adding unrelated badges or ornamental effects.
   two-tick bridge. Evidence `354c465`, final gates, and independent QA are technically
   green with P0–P3 all zero; this remains a player-facing motion candidate until normal-
   speed play accepts its cadence and continuity.
+- Normal-speed play rejects that candidate: `50 ms` per row and a `33 ms` grey tail are
+  too fast to read, integer visibility steps still look like direct deletion, and the
+  accepted row beats are separated by empty or hard-cut intervals. R3 therefore samples
+  a renderer-owned millisecond track rather than deriving existence from integer Core
+  ticks. The complete visual sequence ends at `300 ms`; starts remain the frozen Studio
+  offsets, with row windows `210/120 ms` for a double and `120 ms` for every triple or
+  quadruple row. Adjacent rows overlap by at least `30 ms`.
+- A normal cell pair keeps its full material, receives a restrained local highlight,
+  briefly reaches at most `1.035×`, then eases toward `0.78×` while alpha reaches zero.
+  It may be culled only after the continuous sample completes. Core still commits once
+  at `200 ms`; captured original-material samples continue unchanged to `300 ms`, drawn
+  beneath the current board/piece with only low-alpha highlights above. Reduced motion
+  and Puzzle keep geometry fixed and use opacity only. No fragments, broad flash,
+  copied legacy palette/timing, audio reschedule, or input delay is introduced.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

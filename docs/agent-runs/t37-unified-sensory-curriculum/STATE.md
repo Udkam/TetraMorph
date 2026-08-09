@@ -257,14 +257,27 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   767-module build pass. Independent read-only QA views all evidence, passes the three
   focused files `70/70`, confirms no inherited dirty path entered the range, and reports
   `P0 0 / P1 0 / P2 0 / P3 0`.
+- Player playtesting rejects R2 despite those green technical gates: a whole row lasts
+  only three integer ticks / `50 ms`, later rows have empty gaps or hard handoffs, and
+  the `33 ms` action-ink bridge still reads as direct disappearance. R3 is a new
+  renderer-only correction; R2 evidence remains historical, not acceptance evidence.
+- R3 freezes Core tick 12, all Studio bytes/starts, Bomb, Action A, Ice 2, and one-line
+  clear. A continuous track ends at `300 ms`: double rows use `210/120 ms`, triple and
+  quadruple rows use `120 ms`, with at least `30 ms` overlap. Normal cells must pass
+  through nontrivial highlight/scale/alpha samples; reduced motion/Puzzle use opacity
+  only. All incomplete rows retain captured material through the maximum `100 ms`
+  post-commit continuation, beneath the collapsed board/current piece. Anchor/Bedrock
+  are excluded, marker/material alpha is synchronized, and lifecycle cleanup is exact.
 
 ## Next exact action
 
-Return the source-bound classic centre-out candidate for focused normal-speed play of
-2–4-line clears. The player must decide whether the row cadence feels classic and the
-final `8 → 4 → 0` bridge reads continuously; do not mark the visual accepted or begin
-Stage D before that verdict. The Ice 2 uploader-original WAV provenance remains
-independently open until acquired and hashed.
+Implement the bounded R3 continuous 2–4-line track in the six timeline/presentation/
+renderer source-and-test paths. Prove intermediate per-cell samples, overlapping row
+handoffs, `199.9 → 200 → 250 → 300 ms` continuity, stationary restrained handling,
+material/marker agreement, and exact lifecycle cleanup; then capture a real 60 fps
+sequence and obtain independent read-only QA before another focused play verdict. The
+Ice 2 uploader-original WAV provenance remains independently open until acquired and
+hashed.
 
 ## Do not repeat
 
