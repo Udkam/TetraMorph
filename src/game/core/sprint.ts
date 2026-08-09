@@ -1,32 +1,57 @@
-import { createBoard } from './board';
+import { cloneBoard } from './board';
 import { BOARD_HEIGHT, BOARD_WIDTH } from './constants';
-import type { Board } from './types';
+import type { Board, Cell, PieceType } from './types';
 
-export interface SprintColumnCollapse {
+export interface SupergravityPieceSettlement {
   board: Board;
-  /** Source board index → settled row, or -1 when the source cell was empty. */
-  settledRowBySource: Int16Array;
+  cells: Cell[];
 }
 
 /**
- * The temporary 异变超重 item keeps material identities while letting each occupied
- * column settle on its own. One bottom-up pass produces both the immutable next board
- * and the source-row mapping consumed by carrier metadata, so Core never rescans the
- * same 40 × 10 board for one lock.
+ * Settles only the covered tetromino's occupied columns against the immutable board.
+ * Existing cells are support: they never move and the covered cells never tunnel
+ * through them. Cells from one piece column share a drop so their vertical spacing is
+ * preserved while other piece columns may continue farther.
  */
-export function collapseSprintColumns(board: Board): SprintColumnCollapse {
-  const collapsed = createBoard();
-  const settledRowBySource = new Int16Array(BOARD_WIDTH * BOARD_HEIGHT);
-  settledRowBySource.fill(-1);
-  for (let x = 0; x < BOARD_WIDTH; x += 1) {
-    let destinationY = BOARD_HEIGHT - 1;
-    for (let y = BOARD_HEIGHT - 1; y >= 0; y -= 1) {
-      const cell = board[y]![x];
-      if (cell === null) continue;
-      collapsed[destinationY]![x] = cell;
-      settledRowBySource[y * BOARD_WIDTH + x] = destinationY;
-      destinationY -= 1;
+export function settleSupergravityPiece(
+  board: Board,
+  sourceCells: readonly Cell[],
+  material: PieceType,
+): SupergravityPieceSettlement {
+  const columns = new Map<number, Cell[]>();
+  for (const cell of sourceCells) {
+    if (cell.x < 0 || cell.x >= BOARD_WIDTH || cell.y < 0 || cell.y >= BOARD_HEIGHT) {
+      throw new Error('Cannot settle a Supergravity piece outside the canonical board.');
     }
+    if (board[cell.y]![cell.x] !== null) {
+      throw new Error('Cannot settle a Supergravity piece through an occupied board cell.');
+    }
+    const column = columns.get(cell.x) ?? [];
+    column.push(cell);
+    columns.set(cell.x, column);
   }
-  return { board: collapsed, settledRowBySource };
+
+  const dropByColumn = new Map<number, number>();
+  for (const [x, cells] of columns) {
+    let columnDrop = BOARD_HEIGHT;
+    for (const cell of cells) {
+      let supportY = BOARD_HEIGHT;
+      for (let y = cell.y + 1; y < BOARD_HEIGHT; y += 1) {
+        if (board[y]![x] !== null) {
+          supportY = y;
+          break;
+        }
+      }
+      columnDrop = Math.min(columnDrop, supportY - cell.y - 1);
+    }
+    dropByColumn.set(x, columnDrop);
+  }
+
+  const cells = sourceCells.map((cell) => ({
+    x: cell.x,
+    y: cell.y + (dropByColumn.get(cell.x) ?? 0),
+  }));
+  const settled = cloneBoard(board);
+  for (const cell of cells) settled[cell.y]![cell.x] = material;
+  return { board: settled, cells };
 }

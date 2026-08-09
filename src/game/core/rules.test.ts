@@ -25,8 +25,11 @@ describe('Modern Classic timing and score contract', () => {
     MUTATION_GRAVITY_TICKS.forEach((expected, tier) => {
       expect(gravityForMode('sprint', 0, 0, tier * MUTATION_LINES_PER_SPEED)).toBe(expected);
     });
-    expect(MUTATION_GRAVITY_TICKS.at(-1)).toBe(12);
-    expect(gravityForMode('sprint', 0, 0, 10_000)).toBe(12);
+    expect(MUTATION_GRAVITY_TICKS).toEqual([48, 43, 38, 33, 28, 23, 18, 13, 10, 8, 6]);
+    expect(gravityForMode('sprint', 0, 0, 48)).toBe(10);
+    expect(gravityForMode('sprint', 0, 0, 54)).toBe(8);
+    expect(gravityForMode('sprint', 0, 0, 60)).toBe(6);
+    expect(gravityForMode('sprint', 0, 0, 10_000)).toBe(6);
     expect(gravityForMode('marathon', 29, 10_000, 10_000)).toBe(CLASSIC_STARTING_GRAVITY_MIN_TICKS);
     expect(gravityForMode('puzzle', 29, 10_000, 10_000)).toBe(STANDARD_GRAVITY_TICKS);
   });

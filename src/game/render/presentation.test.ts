@@ -24,24 +24,23 @@ import { createBoard, createInitialState, dispatch, PIECE_SHAPES, PIECE_TYPES, t
 describe('presentation interpolation', () => {
   it('projects the real independent-column Supergravity landing without mutating Core', () => {
     const board = createBoard();
-    board[39]![3] = 'I';
-    board[38]![3] = 'T';
-    board[39]![4] = 'L';
+    for (let x = 0; x < 8; x += 1) board[39]![x] = 'T';
+    board[34]![8] = 'J';
     const base = dispatch(createInitialState(0x11a, 'sprint'), { type: 'start' }).state;
     const state = {
       ...base,
       board,
-      active: { type: 'O', rotation: 0, x: 3, y: 20 },
+      active: { type: 'O', rotation: 0, x: 8, y: 20 },
       mutationCollapsePiecesRemaining: 0,
       mutationCollapseLandingLatched: true,
     } as GameState;
     const before = board.map((row) => [...row]);
 
     const rigidLanding = [
-      { x: 3, y: 36 }, { x: 4, y: 36 }, { x: 3, y: 37 }, { x: 4, y: 37 },
+      { x: 8, y: 32 }, { x: 9, y: 32 }, { x: 8, y: 33 }, { x: 9, y: 33 },
     ];
     const independentLanding = [
-      { x: 3, y: 36 }, { x: 4, y: 37 }, { x: 3, y: 37 }, { x: 4, y: 38 },
+      { x: 8, y: 32 }, { x: 9, y: 38 }, { x: 8, y: 33 }, { x: 9, y: 39 },
     ];
 
     expect(projectedLandingCells({
@@ -49,11 +48,15 @@ describe('presentation interpolation', () => {
       mutationCollapseLandingLatched: false,
     })).toEqual(rigidLanding);
     expect(projectedLandingCells(state)).toEqual(independentLanding);
-    const locked = dispatch(state, { type: 'hard-drop' }).events.find(
+    const transition = dispatch(state, { type: 'hard-drop' });
+    const locked = transition.events.find(
       (event) => event.type === 'piece-locked',
     );
     expect(locked?.cells).toEqual(independentLanding);
     expect(locked?.cells).toEqual(projectedLandingCells(state));
+    expect(transition.events.some((event) => event.type === 'clear-started')).toBe(false);
+    expect(transition.state.board[34]?.[8]).toBe('J');
+    expect(transition.state.board[39]?.[8]).toBeNull();
     expect(projectedLandingCells(state)).toEqual(projectedLandingCells(state));
     expect(board).toEqual(before);
   });

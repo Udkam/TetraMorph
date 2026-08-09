@@ -12,10 +12,9 @@ import {
 } from './constants';
 import { createBoard, setCell } from './board';
 import { createInitialState, dispatch, nextMutationPreviewItem, stateHash } from './engine';
-import { collapseMutationCarriers } from './mutation';
 import { cellsForPiece } from './pieces';
 import { createRandomizer } from './random';
-import { collapseSprintColumns } from './sprint';
+import { settleSupergravityPiece } from './sprint';
 import type { GameEvent, GameState, MutationItem } from './types';
 
 type MutationActivationEvent = Extract<GameEvent, { type: 'mutation-activated' }>;
@@ -67,25 +66,47 @@ function fullyClearedCarrierState(item: MutationItem): GameState {
 }
 
 describe('异变 mode', () => {
-  it('keeps ordinary columns intact until a temporary collapse effect is active', () => {
+  it('keeps floating settled cells fixed and prevents a Supergravity-assisted false clear', () => {
     let board = createBoard();
-    board = setCell(board, 0, 34, 'T');
-    const ordinary = dispatch({
+    for (let x = 0; x < 8; x += 1) board = setCell(board, x, 39, 'T');
+    board = setCell(board, 8, 34, 'J');
+    const transition = dispatch({
       ...playingMutation(),
       board,
-      active: { type: 'O', rotation: 0, x: 8, y: 38 },
-    }, { type: 'hard-drop' }).state;
-    expect(ordinary.board[34]?.[0]).toBe('T');
-
-    const collapsed = dispatch({
-      ...playingMutation(),
-      board,
-      active: { type: 'O', rotation: 0, x: 8, y: 38 },
+      active: { type: 'O', rotation: 0, x: 8, y: 0 },
       mutationCollapseLandingLatched: true,
-      mutationCarriers: [{ id: 4, item: 'freeze', cells: [{ x: 0, y: 34 }] }],
-    }, { type: 'hard-drop' }).state;
-    expect(collapsed.board[39]?.[0]).toBe('T');
-    expect(collapsed.mutationCarriers).toEqual([{ id: 4, item: 'freeze', cells: [{ x: 0, y: 39 }] }]);
+      mutationCarriers: [{ id: 4, item: 'freeze', cells: [{ x: 8, y: 34 }] }],
+      mutationActiveCarrier: { id: 5, item: 'bomb' },
+    }, { type: 'hard-drop' });
+
+    expect(transition.events).toContainEqual({ type: 'hard-dropped', piece: 'O', distance: 32 });
+    expect(transition.events.some((event) => event.type === 'clear-started')).toBe(false);
+    expect(transition.events.find((event) => event.type === 'piece-locked')).toEqual({
+      type: 'piece-locked',
+      piece: 'O',
+      cells: [
+        { x: 8, y: 32 },
+        { x: 9, y: 38 },
+        { x: 8, y: 33 },
+        { x: 9, y: 39 },
+      ],
+    });
+    expect(transition.state.board[34]?.[8]).toBe('J');
+    expect(transition.state.board[39]?.[8]).toBeNull();
+    expect(transition.state.board[39]?.[9]).toBe('O');
+    expect(transition.state.mutationCarriers).toEqual([
+      { id: 4, item: 'freeze', cells: [{ x: 8, y: 34 }] },
+      {
+        id: 5,
+        item: 'bomb',
+        cells: [
+          { x: 8, y: 32 },
+          { x: 9, y: 38 },
+          { x: 8, y: 33 },
+          { x: 9, y: 39 },
+        ],
+      },
+    ]);
   });
 
   it('covers exactly the next five spawned pieces and keeps the fifth latched at quota zero', () => {
@@ -156,7 +177,7 @@ describe('异变 mode', () => {
     expect(transition.state.mutationCollapseLandingLatched).toBe(false);
   });
 
-  it('evaluates lock-out after independent columns settle into visible rows', () => {
+  it('treats floating settled cells as collision support during lock-out evaluation', () => {
     let board = createBoard();
     board = setCell(board, 4, 20, 'J');
     board = setCell(board, 5, 20, 'L');
@@ -168,10 +189,17 @@ describe('异变 mode', () => {
       mutationCollapseLandingLatched: true,
     }, { type: 'hard-drop' });
 
-    expect(transition.state.status).toBe('playing');
-    expect(transition.events.some((event) => event.type === 'game-over')).toBe(false);
+    expect(transition.state.status).toBe('game-over');
+    expect(transition.events).toContainEqual({ type: 'game-over', reason: 'lock-out' });
     const locked = transition.events.find((event) => event.type === 'piece-locked');
-    expect(locked?.cells.every((cell) => cell.y >= 37)).toBe(true);
+    expect(locked?.cells).toEqual([
+      { x: 4, y: 18 },
+      { x: 5, y: 18 },
+      { x: 4, y: 19 },
+      { x: 5, y: 19 },
+    ]);
+    expect(transition.state.board[20]?.[4]).toBe('J');
+    expect(transition.state.board[20]?.[5]).toBe('L');
   });
 
   it('starts with no carrier, schedules one only after two locks, and remains seeded', () => {
@@ -328,8 +356,9 @@ describe('异变 mode', () => {
     expect(observed).toEqual(expected);
   });
 
-  it('caps Mutation gravity at 0.2 seconds per cell without slowing Classic', () => {
+  it('caps Mutation gravity at 0.1 seconds per cell without slowing Classic', () => {
     expect(gravityForMode('sprint', 0, 0, Number.MAX_SAFE_INTEGER)).toBe(MUTATION_GRAVITY_TICKS.at(-1));
+    expect(MUTATION_GRAVITY_TICKS.at(-1)).toBe(TICKS_PER_SECOND / 10);
     expect(gravityForMode('marathon', 0, 0, Number.MAX_SAFE_INTEGER)).toBe(6);
   });
 
@@ -648,158 +677,41 @@ describe('异变 mode', () => {
     expect(bomb.state.score).toBe((40 + MUTATION_BOMB_SCORE) * 4);
   });
 
-  it('keeps the reusable independent-column resolver deterministic for the timed effect', () => {
+  it('settles only the supplied Supergravity piece columns against fixed support', () => {
     let board = createBoard();
     board = setCell(board, 0, 34, 'T');
-    board = setCell(board, 0, 38, 'I');
-    board = setCell(board, 1, 36, 'L');
-    board = setCell(board, 1, 39, 'O');
+    board = setCell(board, 8, 34, 'J');
+    const before = board.map((row) => [...row]);
+    const sourceCells = [
+      { x: 8, y: 32 },
+      { x: 9, y: 32 },
+      { x: 8, y: 33 },
+      { x: 9, y: 33 },
+    ];
 
-    const collapsed = collapseSprintColumns(board).board;
-    expect(collapsed[39]?.[0]).toBe('I');
-    expect(collapsed[38]?.[0]).toBe('T');
-    expect(collapsed[39]?.[1]).toBe('O');
-    expect(collapsed[38]?.[1]).toBe('L');
-  });
-
-  it('shares one board scan with carrier settlement metadata', () => {
-    let board = createBoard();
-    board = setCell(board, 0, 34, 'T');
-    board = setCell(board, 0, 38, 'I');
-    board = setCell(board, 1, 36, 'L');
-    board = setCell(board, 1, 39, 'O');
-
-    let cellReads = 0;
-    const countedBoard = board.map((row) => new Proxy(row, {
-      get(target, property, receiver) {
-        if (typeof property === 'string' && /^\d+$/.test(property)) cellReads += 1;
-        return Reflect.get(target, property, receiver);
-      },
-    }));
-    const collapsed = collapseSprintColumns(countedBoard);
-    expect(cellReads).toBe(400);
-
-    const carriers = collapseMutationCarriers(collapsed.settledRowBySource, [{
-      id: 1,
-      item: 'freeze',
-      cells: [{ x: 0, y: 34 }, { x: 0, y: 38 }],
-    }]);
-    expect(cellReads).toBe(400);
-    expect(carriers).toEqual([{
-      id: 1,
-      item: 'freeze',
-      cells: [{ x: 0, y: 38 }, { x: 0, y: 39 }],
-    }]);
-  });
-
-  it('preserves multiple carrier identities and leaves empty sources unmapped', () => {
-    let board = createBoard();
-    board = setCell(board, 0, 30, 'T');
-    board = setCell(board, 0, 39, 'I');
-    board = setCell(board, 1, 35, 'L');
-    board = setCell(board, 1, 36, 'O');
-    board = setCell(board, 1, 38, 'S');
-    board = setCell(board, 3, 20, 'Z');
-
-    const collapsed = collapseSprintColumns(board);
-    for (let y = 0; y < board.length; y += 1) {
-      for (let x = 0; x < board[y]!.length; x += 1) {
-        if (board[y]![x] === null) {
-          expect(collapsed.settledRowBySource[y * 10 + x]).toBe(-1);
-        }
-      }
-    }
-
-    expect(collapseMutationCarriers(collapsed.settledRowBySource, [
-      {
-        id: 11,
-        item: 'freeze',
-        cells: [{ x: 0, y: 30 }, { x: 1, y: 35 }],
-      },
-      {
-        id: 22,
-        item: 'bomb',
-        cells: [{ x: 1, y: 36 }, { x: 1, y: 38 }, { x: 3, y: 20 }],
-      },
-      {
-        id: 33,
-        item: 'multiplier',
-        cells: [{ x: 2, y: 12 }, { x: 9, y: 39 }],
-      },
-      {
-        id: 44,
-        item: 'collapse',
-        cells: [{ x: 2, y: 5 }, { x: 0, y: 39 }],
-      },
-    ])).toEqual([
-      {
-        id: 11,
-        item: 'freeze',
-        cells: [{ x: 0, y: 38 }, { x: 1, y: 37 }],
-      },
-      {
-        id: 22,
-        item: 'bomb',
-        cells: [{ x: 1, y: 38 }, { x: 1, y: 39 }, { x: 3, y: 39 }],
-      },
-      {
-        id: 44,
-        item: 'collapse',
-        cells: [{ x: 0, y: 39 }],
-      },
+    const first = settleSupergravityPiece(board, sourceCells, 'O');
+    const second = settleSupergravityPiece(board, sourceCells, 'O');
+    expect(first).toEqual(second);
+    expect(board).toEqual(before);
+    expect(first.cells).toEqual([
+      { x: 8, y: 32 },
+      { x: 9, y: 38 },
+      { x: 8, y: 33 },
+      { x: 9, y: 39 },
     ]);
+    expect(first.board[34]?.[0]).toBe('T');
+    expect(first.board[34]?.[8]).toBe('J');
+    expect(first.board[39]?.[8]).toBeNull();
+    expect(first.board[39]?.[9]).toBe('O');
   });
 
-  it('matches a simple reference across sparse and dense deterministic boards', () => {
-    let random = 0x8bad_f00d;
-    const nextRandom = () => {
-      random = (Math.imul(random, 1_664_525) + 1_013_904_223) >>> 0;
-      return random;
-    };
-    const materials = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] as const;
-
-    for (let sample = 0; sample < 96; sample += 1) {
-      let board = createBoard();
-      const occupied: Array<{ x: number; y: number }> = [];
-      const density = sample % 3 === 0 ? 2 : sample % 3 === 1 ? 4 : 7;
-      for (let y = 0; y < board.length; y += 1) {
-        for (let x = 0; x < board[y]!.length; x += 1) {
-          const roll = nextRandom();
-          if (roll % 10 >= density) continue;
-          board = setCell(board, x, y, materials[roll % materials.length]!);
-          occupied.push({ x, y });
-        }
-      }
-
-      const actual = collapseSprintColumns(board);
-      const expected = createBoard();
-      for (let x = 0; x < 10; x += 1) {
-        const column = board
-          .map((row, y) => ({ material: row[x], y }))
-          .filter((cell) => cell.material !== null);
-        column.forEach((cell, index) => {
-          expected[expected.length - column.length + index]![x] = cell.material;
-          expect(actual.settledRowBySource[cell.y * 10 + x])
-            .toBe(expected.length - column.length + index);
-        });
-      }
-      expect(actual.board).toEqual(expected);
-
-      const carrierCells = occupied.filter((_, index) => index % 13 === sample % 13);
-      const mapped = collapseMutationCarriers(actual.settledRowBySource, [{
-        id: sample + 1,
-        item: 'collapse',
-        cells: carrierCells,
-      }]);
-      const expectedCells = carrierCells.map((cell) => ({
-        x: cell.x,
-        y: board.slice(cell.y + 1).filter((row) => row[cell.x] !== null).length,
-      })).map((cell) => ({ ...cell, y: board.length - 1 - cell.y }));
-      expect(mapped).toEqual(carrierCells.length === 0 ? [] : [{
-        id: sample + 1,
-        item: 'collapse',
-        cells: expectedCells,
-      }]);
-    }
+  it('rejects Supergravity overlap or out-of-bounds input without changing the board', () => {
+    const board = setCell(createBoard(), 4, 20, 'T');
+    const before = board.map((row) => [...row]);
+    expect(() => settleSupergravityPiece(board, [{ x: 4, y: 20 }], 'O'))
+      .toThrow('through an occupied board cell');
+    expect(() => settleSupergravityPiece(board, [{ x: -1, y: 20 }], 'O'))
+      .toThrow('outside the canonical board');
+    expect(board).toEqual(before);
   });
 });

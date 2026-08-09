@@ -1,5 +1,4 @@
 import { mapCellsAfterClear } from './board';
-import { BOARD_WIDTH } from './constants';
 import type { Board, Cell, GameState, MutationCarrier } from './types';
 
 /**
@@ -65,25 +64,6 @@ export function mapMutationCarriersAfterClear(
     ...carrier,
     cells: Object.freeze(mapCellsAfterClear(board, rows, carrier.cells)),
   })).filter((carrier) => carrier.cells.length > 0));
-}
-
-/**
- * Applies the source-to-settled-row mapping produced by the board's single collapse
- * pass. It never receives or scans the board itself.
- */
-export function collapseMutationCarriers(
-  settledRowBySource: ArrayLike<number>,
-  carriers: readonly MutationCarrier[],
-): readonly MutationCarrier[] {
-  if (carriers.length === 0) return carriers;
-  return Object.freeze(carriers.map((carrier) => {
-    const cells: Cell[] = [];
-    for (const cell of carrier.cells) {
-      const destinationY = settledRowBySource[cell.y * BOARD_WIDTH + cell.x] ?? -1;
-      if (destinationY >= 0) cells.push({ x: cell.x, y: destinationY });
-    }
-    return { ...carrier, cells: Object.freeze(cells) };
-  }).filter((carrier) => carrier.cells.length > 0));
 }
 
 /** Assertion helper kept local to protect against accidental duplicated core marks. */

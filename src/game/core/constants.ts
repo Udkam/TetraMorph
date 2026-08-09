@@ -58,8 +58,8 @@ export const MUTATION_FREEZE_GRAVITY_TICKS = TICKS_PER_SECOND;
 
 /** Default 0.8-second Classic opening pace, accelerating by 0.1 seconds every ten lines. */
 export const PROGRESSIVE_GRAVITY_TICKS = [48, 42, 36, 30, 24, 18, 12, 6] as const;
-/** Mutation caps at 0.2 seconds per cell so late-game item play stays readable. */
-export const MUTATION_GRAVITY_TICKS = [48, 43, 38, 33, 28, 23, 18, 13, 12] as const;
+/** Mutation alone caps at 0.1 seconds per cell so late-game item play stays responsive. */
+export const MUTATION_GRAVITY_TICKS = [48, 43, 38, 33, 28, 23, 18, 13, 10, 8, 6] as const;
 
 export function speedTierForLines(lines: number): number {
   return Math.min(PROGRESSIVE_GRAVITY_TICKS.length - 1, Math.max(0, Math.floor(lines / 10)));

@@ -39,10 +39,9 @@ import { cellsForPiece, createSpawnPiece, nextRotation } from './pieces';
 import { createPuzzleBoard, defaultPuzzleId, getPuzzleDefinition, nextPuzzleId, originalTargetCells, type PuzzleDefinition } from './puzzles';
 import { createRandomizer, drawPiece, drawRandom } from './random';
 import { kickTests } from './rotation';
-import { collapseSprintColumns } from './sprint';
+import { settleSupergravityPiece } from './sprint';
 import {
   activeUsesSupergravityLanding,
-  collapseMutationCarriers,
   mapMutationCarriersAfterClear,
   mutationCarriersClearedByRows,
   withoutMutationCarriers,
@@ -1117,30 +1116,26 @@ function lockActive(
   const sourceCells = cellsForPiece(state.active);
   if (sourceCells.some((cell) => cell.y < 0 || cell.y >= BOARD_HEIGHT)) return invalidState(state);
   const puzzleAnchorSupportedCells = puzzleAnchorSupportAfterLock(state, sourceCells);
-  let board = mergePiece(state.board, state.active);
+  let board: GameState['board'];
   const pieceCount = state.pieceCount + 1;
   let settledCells = sourceCells;
+  if (activeUsesSupergravityLanding(state)) {
+    const settlement = settleSupergravityPiece(state.board, sourceCells, state.active.type);
+    board = settlement.board;
+    settledCells = settlement.cells;
+  } else {
+    board = mergePiece(state.board, state.active);
+  }
   let mutationCarriers = state.mutationCarriers;
-  if (state.mode === 'sprint') {
-    if (state.mutationActiveCarrier !== null) {
-      mutationCarriers = Object.freeze([
-        ...mutationCarriers,
-        {
-          id: state.mutationActiveCarrier.id,
-          item: state.mutationActiveCarrier.item,
-          cells: Object.freeze(sourceCells.map((cell) => ({ ...cell }))),
-        },
-      ]);
-    }
-    if (activeUsesSupergravityLanding(state)) {
-      const collapsed = collapseSprintColumns(board);
-      settledCells = sourceCells.map((cell) => {
-        const settledY = collapsed.settledRowBySource[cell.y * BOARD_WIDTH + cell.x];
-        return { x: cell.x, y: settledY !== undefined && settledY >= 0 ? settledY : cell.y };
-      });
-      mutationCarriers = collapseMutationCarriers(collapsed.settledRowBySource, mutationCarriers);
-      board = collapsed.board;
-    }
+  if (state.mode === 'sprint' && state.mutationActiveCarrier !== null) {
+    mutationCarriers = Object.freeze([
+      ...mutationCarriers,
+      {
+        id: state.mutationActiveCarrier.id,
+        item: state.mutationActiveCarrier.item,
+        cells: Object.freeze(settledCells.map((cell) => ({ ...cell }))),
+      },
+    ]);
   }
   const lockedEvent: GameEvent = {
     type: 'piece-locked',
