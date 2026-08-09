@@ -16,7 +16,12 @@
   Independent original-detail evidence QA reports P0–P3 all zero after confirming the
   `199.9/200/250/300 ms` sequence, restrained variants, Freeze companion, and lifecycle
   cleanup. The candidate now waits only for normal-speed single-line player acceptance;
-  nothing has been pushed and the accepted 2–4-line effect remains closed.
+  the accepted 2–4-line effect remains closed.
+- Pre-push validation from a fresh Git checkout found that one HUD CSS test assumed LF
+  bytes and failed after Windows converted the same committed CSS to CRLF. Test-only
+  checkpoint `27e998e` accepts either newline form. A second fresh checkout passes
+  committed-lockfile `npm ci`, typecheck, the full suite (`402 passed / 8 skipped`), and
+  the 767-module build; Gitleaks reports no findings across the complete outgoing range.
 
 ## 2026-08-10 — T37 continuous multi-line clear accepted; single-line extension opened
 

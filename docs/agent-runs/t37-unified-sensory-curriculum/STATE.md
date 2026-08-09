@@ -303,13 +303,24 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `199.9/200/250/300 ms` continuity, and lifecycle cleanup. Independent original-detail
   evidence QA reports `P0 0 / P1 0 / P2 0 / P3 0`; normal-speed player acceptance stays
   explicitly open. Owned Vite PID `15496` exited and port `4190` is released.
+- Push authorization exposed one clean-checkout-only test defect from base `77a61c3`:
+  with `core.autocrlf=true`, `src/styles/hud.test.ts` compared two CSS fragments using
+  hard-coded LF bytes. Test checkpoint `27e998e` makes only those assertions accept LF
+  or CRLF; it does not change product CSS or behavior. Focused HUD tests pass `11/11`.
+- A fresh detached worktree at `27e998e` ran committed-lockfile
+  `npm.cmd ci --ignore-scripts --no-audit --no-fund`, typecheck, the complete suite
+  (`44 passed / 2 skipped` files; `402 passed / 8 skipped` tests), and the 767-module
+  production build successfully. The temporary worktree was removed. Gitleaks 8.30.1
+  scanned `origin/main..HEAD` with 62 commits and found no leaks. The original worktree's
+  inherited T27/`progress.md` paths and existing user-owned Vite processes were untouched.
 
 ## Next exact action
 
-Hand the current local single-line candidate to the player for normal-speed play. If it
-passes, record visual acceptance and return to the remaining Stage C listening and Ice 2
-original-WAV provenance gates; if it fails, reopen only the single-line renderer path.
-Do not push, and do not reopen the accepted 2–4-line effect.
+The player authorizes publication of the current green `main` chain. After the
+coordinator pushes and verifies exact `HEAD == origin/main`, wait for normal-speed
+single-line play. If it passes, record visual acceptance and return to the remaining
+Stage C listening and Ice 2 original-WAV provenance gates; if it fails, reopen only the
+single-line renderer path. Do not reopen the accepted 2–4-line effect or Stage D.
 
 ## Do not repeat
 
