@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **IN PROGRESS — network-verified semantic audition R3**
+Status: **AWAITING HUMAN LISTENING — semantic family audition R3**
 
 ## Active objective
 
@@ -97,6 +97,15 @@ materials, and Puzzle progression.
   CC0 subset and an exact provenance manifest. Do not expand the other sixteen cue
   recipes, adopt a runtime package, or begin visual implementation until the user has
   selected or rejected the sound family.
+- R3 evidence is committed at `5f7bc05` plus direct-file follow-up `4770642` under
+  `docs/evidence/t37/audio-audition-r3/`. Its single page compares `studio`,
+  `mechanical`, and `scifi` with the same move/rotate/lock/hard-drop/clear/countdown
+  map, and isolates `glass` Ice. All 23 Ogg files and embedded copies match the pinned
+  source bytes; browser decoding, signal floors/ceilings, desktop/mobile layout,
+  reduced motion, direct-file playback, and console/page-error gates pass.
+- The user must now listen to the page at ordinary device volume and either select a
+  family, request a deliberate hybrid by action, or reject all three. Measurements and
+  the passing browser audit cannot open checkpoint 3 by themselves.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.
