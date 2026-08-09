@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage C accepted; staged transition and icon work opened
+
+- The player reports that all preceding modifications pass. This closes the human
+  listening/play gates for the strengthened Bomb join, remaining Stage-C cues, and the
+  shared one-through-four-line continuous clear while preserving their accepted bytes,
+  timing, Core atomicity, and earlier evidence. The still-unavailable Ice 2
+  uploader-original WAV/hash remains an explicit provenance follow-up.
+- The player authorizes later T37 goals to proceed in bounded stages. Stage D1 is frozen
+  as a URL-route-only **Settled Handoff** rewrite: latest-request ownership, atomic
+  History/React commit, directional `200 ms` near-opaque settle, Canvas-ready native
+  capture, continuous fallback, no-translation reduced motion, focus/context recovery,
+  and one live route/Canvas. Results/mode-intro motion remains a later slice.
+- The current four-equal-quadrant data-URI favicon is rejected because its dominant
+  silhouette resembles a Microsoft window mark. A separate later identity slice will
+  introduce an original vector-first TetraMorph transformation mark, verify
+  `16/32/64 px`, avoid commercial trade dress, and keep PWA installation out of scope.
+
 ## 2026-08-10 — T37 accepted clear language extended to one line
 
 - Reused the human-accepted R3 continuous clear for one line: the captured material now

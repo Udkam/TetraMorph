@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE C R3 MULTI-LINE ACCEPTED — SINGLE-LINE TECHNICAL CANDIDATE AWAITING PLAY**
+Status: **STAGE D1 CONTRACT — ROUTE HANDOFF IMPLEMENTATION OPEN**
 
 ## Active objective
 
@@ -16,9 +16,11 @@ tetromino settles by its own occupied columns against the existing board; it doe
 compact, push, or move already-settled cells. The ghost, final lock, carrier coordinates,
 and resulting line-clear rows agree in the reported floating-cell scenario. Product
 logic, evidence, corrected status records, and final independent review all pass. The
-player has since accepted R5 **Action A** and **Ice 2**, opening only the complete-audio
-checkpoint. R4 remains rejected, and transition, material, and Puzzle expansion remain
-ordered after Stage C.
+player has since accepted R5 **Action A**, **Ice 2**, the strengthened Bomb impact,
+continuous one-through-four-line clearing, and every other preceding Stage-C candidate.
+The uploader-original Ice WAV remains an explicit provenance follow-up, not a claim that
+has been satisfied. On 2026-08-10 the player authorized later work to proceed in bounded
+stages despite that separate archive item, so Stage D1 is now open.
 
 ## Frozen product direction
 
@@ -33,6 +35,11 @@ ordered after Stage C.
 - **Transitions:** give route/page changes one calm motion grammar: short opacity and
   small spatial continuity, no flashes, no large wipes, no gameplay-input delay, and a
   reduced-motion form that is effectively instant.
+- **Site identity:** replace the current equal 2×2 multicolour favicon, whose dominant
+  four-pane silhouette resembles Microsoft's window mark, with an original
+  TetraMorph/tetromino transformation symbol. It must be vector-first, legible at
+  `16 px`, avoid four equal quadrants and commercial logo/trade-dress cues, and be
+  verified in browser tabs across the three themes without adding a PWA install surface.
 - **Pieces:** ordinary tetrominoes remain the familiar multicolour family. Mutation no
   longer appears as an attached carrier badge or overlay: the complete tetromino is a
   dedicated material object. Ice uses cold crystalline cyan, Bomb uses contained lava,
@@ -63,11 +70,14 @@ ordered after Stage C.
 2. **Audio audition gate — COMPLETE** — implement and export a compact representative set covering
    movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
    activation. Stop expansion until human listening accepts the language.
-3. **Complete audio palette — FOCUSED LISTENING CANDIDATE** — extend only the accepted grammar to remaining gameplay,
-   Survival, Mutation, Puzzle, and UI events; prove hierarchy, voice bounds, controls,
-   determinism, and cleanup.
-4. **Transition system** — route shell and page transitions with explicit
-   reduced-motion behavior and no duplicate mounts/listeners/canvases.
+3. **Complete audio palette — HUMAN ACCEPTED; ORIGINAL-WAV PROVENANCE FOLLOW-UP OPEN** —
+   the preceding production candidate and its joined clear/Bomb behavior are accepted;
+   retain the Ice uploader-original archive/hash as an honest parallel evidence item.
+4. **Transition and identity system — D1 OPEN** — first replace URL-route handoff with
+   latest-request ownership, Canvas-ready native capture, continuous fallback,
+   direction, focus/history continuity, explicit reduced motion, and no duplicate
+   mounts/listeners/canvases. Later bounded slices cover in-page sheets/results and the
+   new vector-first site icon.
 5. **Material system** — ordinary-piece polish and the four whole-piece Mutation
    materials, including Next/ghost/clear/audio agreement and once-per-piece triggering.
 6. **Puzzle curriculum** — 5/25/16 content, deduplication, solver certificates,
@@ -327,8 +337,25 @@ ordered after Stage C.
   `199.9 → 200 → 250 → 300 ms` handling, stationary restrained variants, Freeze
   companion continuity, tick-12 atomicity, one Canvas, zero DOM cells, exact cleanup,
   and zero failures/browser errors. Independent original-detail evidence QA reports
-  `P0 0 / P1 0 / P2 0 / P3 0`. Normal-speed human play is the only remaining gate for
-  this single-line extension; the accepted 2–4-line effect is not reopened.
+  `P0 0 / P1 0 / P2 0 / P3 0`. Normal-speed human play was the only remaining gate for
+  this single-line extension; the accepted 2–4-line effect was not reopened.
+- The player has now explicitly reported that all preceding modifications pass. This
+  human verdict accepts the strengthened Bomb join, the complete Stage-C cue candidate,
+  and the shared one-through-four-line presentation/audio behavior. It supersedes the
+  earlier listening/play holds without changing any accepted bytes or timings. The Ice
+  2 uploader-original WAV/hash remains unavailable and must stay labelled as an open
+  provenance follow-up.
+- The player separately authorizes later goals to proceed in bounded phases. Stage D1
+  is therefore a URL-route-only **Settled Handoff** slice: one latest-request owner,
+  history and React commit in the same valid transaction, `forward/back/neutral`
+  direction, a stable named viewport, Canvas-ready game capture, one live route/Canvas,
+  focus restoration, and complete native/fallback/reduced cleanup. The destination
+  starts at opacity `0.985` or higher, travels at most `6 px`, settles in `200 ms`, and
+  never blocks ready gameplay input. Mode intro/results remain a later transition slice.
+- The current four-equal-quadrant data-URI favicon is rejected for Microsoft-like
+  silhouette similarity. A later independent identity slice will replace it with an
+  original vector-first TetraMorph mark, prove `16/32/64 px` legibility, and keep PWA
+  installation explicitly out of scope.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
@@ -353,11 +380,10 @@ Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 
 ## T37 acceptance boundary
 
-- Action A, Ice 2, and the frozen Studio subset are human accepted. Passing tests or
-  measurements still cannot accept newly extended Stage C cues; those require a
-  focused listening verdict before the complete-audio checkpoint closes.
-- The R3 2–4-line visual is human accepted. The technically green one-line reuse still
-  requires a normal-speed player verdict before it can be recorded as visually accepted.
+- Action A, Ice 2, the frozen Studio subset, the strengthened Bomb join, remaining
+  Stage-C cues, and the one-through-four-line clear presentation are human accepted.
+  The selected Ice uploader-original WAV and SHA-256 remain a separate provenance item;
+  do not describe that archive as complete.
 - A visual state is not accepted unless a current-source browser frame demonstrates the
   active piece, Next, ghost/landing guide, relevant status, all three themes, and both
   motion preferences without clipping or console errors.

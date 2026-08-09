@@ -58,7 +58,7 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    and evidence `05b28ff` compare two exact historical soft action directions and three
    short primary-source real ice contact/crack recordings. The player selects Action A
    and Ice 2; technical and independent read-only gates also pass.
-8. `FOCUSED PLAY/LISTENING CANDIDATE — HUMAN VERDICT OPEN` — full production audio language from the accepted Action A,
+8. `HUMAN ACCEPTED — PROVENANCE FOLLOW-UP OPEN` — full production audio language from the accepted Action A,
    Studio, and Ice 2 contracts. Contract `03ce9fd`, playback foundation `a1febc0`, local
    assets/countdown `47629e7`, production mapping `108aee8`, remaining candidate
    `95978eb`, direct-production evidence `006a936`, coverage test `2766a55`, and
@@ -68,10 +68,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    `c52a686`, renderer `605ae2d`, Bomb `c875415`, shared timing `8e32b13`, clock-origin
    repair `41afc78`, evidence `dc70f10`, and QA `a096fc5` are green while all previously
    accepted anchors remain frozen. The player accepts the continuous R3 2–4-line
-   centre-out correction. Its bounded single-line reuse is now technically green at
-   source `aab8ed8` and evidence `0d443ed`; normal-speed single-line play, remaining
-   cue listening, and Ice 2 original-WAV provenance remain open.
-9. `PENDING` — route transition system and reduced-motion verification.
+   centre-out correction and later reports all preceding modifications pass, accepting
+   the bounded one-line reuse, strengthened Bomb join, and remaining cue candidate.
+   Ice 2 original-WAV provenance remains open as a separate evidence follow-up.
+9. `IN PROGRESS` — Stage D1 URL-route Settled Handoff; later bounded transition/icon
+   slices remain pending.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
 12. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
@@ -316,11 +317,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-The player authorizes publication of the current green `main` chain. After the
-coordinator pushes and verifies exact `HEAD == origin/main`, wait for normal-speed
-single-line play. If it passes, record visual acceptance and return to the remaining
-Stage C listening and Ice 2 original-WAV provenance gates; if it fails, reopen only the
-single-line renderer path. Do not reopen the accepted 2–4-line effect or Stage D.
+Record the player's explicit full acceptance and staged-work authorization, then
+implement only Stage D1 URL-route Settled Handoff. Preserve the inherited T27 and
+`progress.md` paths. D1 must establish latest-request ownership, atomic valid history/
+React commits, forward/back/neutral direction, one stable named viewport, Canvas-ready
+native capture, continuously visible fallback, resolved reduced-motion authority,
+focus/history context, terminal idle cleanup, one live route, and at most one Canvas.
+Run focused tests, then one final typecheck/full suite/build and current-source browser
+evidence before independent read-only QA and push. Keep mode intro/results and the new
+favicon as later independent slices. Continue to label the missing Ice uploader-original
+WAV/hash honestly; do not reopen any accepted Stage-C sound or clear behavior.
 
 ## Do not repeat
 

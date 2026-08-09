@@ -61,7 +61,7 @@ and no Puzzle content is published without strict deterministic proof.
   `819779 / sbml / Ice cubes`) and rejects no part of the already frozen Studio subset.
   Stage B is complete; this verdict opens only Stage C.
 
-### C. Complete accepted audio language — IN PROGRESS
+### C. Complete accepted audio language — HUMAN ACCEPTED; PROVENANCE FOLLOW-UP OPEN
 
 - Extend the accepted material grammar to every current gameplay, reward, Mutation,
   Survival, Puzzle, and UI cue.
@@ -72,11 +72,13 @@ and no Puzzle content is published without strict deterministic proof.
   `1500 ms` start and matching visible cadence; serialized Mutation cues begin with the
   matching renderer effect rather than a generic fixed stagger.
 - Vendor accepted runtime Ogg bytes locally with a manifest and CC0 notice. The Ice 2
-  uploader-original WAV and SHA-256 remain a blocking provenance gate for completion;
-  do not substitute a network runtime request or silently transcode the accepted Ogg.
+  uploader-original WAV and SHA-256 remain a mandatory provenance follow-up; do not
+  claim it is archived, substitute a network runtime request, or silently transcode the
+  accepted Ogg. The player's later staged-work authorization allows Stage D to proceed
+  while this evidence item stays explicitly open.
 - Extend the grammar to the remaining gameplay, reward, Survival, Mutation, Puzzle,
-  and UI events as a bounded candidate. New cues require focused listening before Stage
-  C can close and Stage D can open.
+  and UI events as a bounded candidate. New cues require focused listening; the player
+  has now supplied that verdict by accepting all preceding modifications.
 - Recover that candidate from the intact pre-T29 T28 snapshot `2c4e4ae`, using its
   concise sine contours and material-specific one-shots rather than the rejected T36
   procedural-object palette. Route the restored cues through an isolated clone of the
@@ -144,15 +146,33 @@ and no Puzzle content is published without strict deterministic proof.
   767-module build, 47 source-bound real Pixi frames, the complete-page/client browser
   pass, and independent source/evidence review all pass with P0–P3 zero. The only open
   one-line gate is normal-speed player acceptance; the accepted 2–4-line behavior stays
-  closed, and Stage D remains unopened.
+  closed, and Stage D remained unopened at that checkpoint.
+- The player's later explicit verdict, “前面的修改全通过”, accepts the strengthened
+  Bomb join, all remaining Stage-C candidate cues, and the one-line reuse alongside the
+  already accepted two-through-four-line treatment. The separate instruction to begin
+  later work in phases opens Stage D without misrepresenting the still-missing Ice 2
+  uploader-original WAV/hash.
 
 ### D. Route transition system
 
-- Introduce one route-shell transition owner with bounded opacity/translation stages.
-- Cover home, mode intro, Puzzle selection, gameplay, and results routes in Chinese and
-  English under all three themes.
-- Verify reduced motion, rapid navigation, history/back behavior, focus continuity,
-  one Canvas, and zero leaked listeners/tickers.
+- **D1 — Settled Handoff URL routes:** one monotonic latest-request owner invalidates
+  stale callbacks and joins History with the valid React commit. Use one stable named
+  viewport, `forward/back/neutral` direction, `120 ms` release plus `200 ms` settle,
+  destination opacity never below `.985`, and at most `6 px` horizontal plus `2 px`
+  vertical travel. Native game capture waits for the real Pixi Canvas readiness signal;
+  fallback remains continuously visible rather than entering from transparent.
+- D1 must consume native completion/rejection, skip interrupted work, return to idle,
+  preserve selected-Puzzle history context, and restore destination focus without
+  waiting for visual completion. Reduced motion is one runtime-owned, no-translation,
+  near-instant path. At every sample there is exactly one live route and at most one
+  Canvas, with no stale listener/ticker/runtime.
+- **D2/D3 — bounded follow-ups:** apply the same grammar to mode intro/results without
+  moving the board, then replace the rejected equal 2×2 favicon with an original
+  vector-first TetraMorph transformation mark. The icon must remain distinct at
+  `16/32/64 px`, avoid four equal quadrants/commercial trade dress, and does not add PWA.
+- Cover Chinese and English under all three themes, native/fallback/reduced paths,
+  rapid navigation, history/back/forward, focus continuity, and actual intermediate
+  frames rather than endpoint screenshots alone.
 
 ### E. Whole-piece material system
 

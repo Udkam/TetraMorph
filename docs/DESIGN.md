@@ -182,8 +182,9 @@ adding unrelated badges or ornamental effects.
   technical gates only. Follow-up test `2766a55` jointly freezes the complete production
   Bomb body/pressure route, while the repaired browser pass actually dispatches all 28
   listening controls and removes stale multi-button playback highlights. Utility,
-  Survival, outcome, Bomb, Multiplier, and Supergravity remain unaccepted until the
-  player listens. The R5 provenance record now uses the real
+  Survival, outcome, Bomb, Multiplier, and Supergravity remained candidates at that
+  checkpoint. The player later accepted all preceding modifications, including the
+  strengthened Bomb join and this remaining cue set. The R5 provenance record uses the real
   full T28 commit `35509a70c35cebf16b942387229ca880756a61cd`.
 - The 2026-08-10 live-play verdict reopens two bounded Stage-C details. Bomb pressure
   is audible but does not read as an explosion because its complete `0–160 ms` cue
@@ -242,6 +243,11 @@ adding unrelated badges or ornamental effects.
   continuation, stationary Puzzle/reduced-motion form, Mutation/target alpha agreement,
   exclusions, cue cap, and lifecycle cleanup. Its accepted audio byte/mix is unchanged;
   the old one-line precision-cut/chip overlay is retired rather than layered underneath.
+- The player's subsequent “前面的修改全通过” verdict accepts this bounded one-line
+  reuse and the preceding Stage-C corrections. All one-through-four-line presentation
+  and joined audio behavior are therefore human accepted. The missing Ice 2
+  uploader-original WAV/hash remains an evidence-provenance follow-up only; it is not
+  silently treated as present.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into
@@ -252,15 +258,35 @@ adding unrelated badges or ornamental effects.
 
 ### Transition language
 
-- Route changes use a shared-shell transition: departing content fades and moves no
-  more than 12 px while the destination resolves over roughly 180–260 ms. Direction may
-  reflect navigation hierarchy, but the header and global controls never flash or
-  remount unnecessarily.
-- Game start/restart/countdown remains owned by the board cover, not the route
-  transition. Transition state cannot consume gameplay input after the destination is
-  ready, create a second Canvas, or leave stale listeners/tickers.
-- `prefers-reduced-motion` removes spatial travel and decorative staging; it keeps only
-  a near-instant opacity handoff needed to avoid a one-frame flash.
+- The T37 route grammar is **Settled Handoff**. The old page releases for `120 ms`; the
+  destination begins at opacity `.985`, moves no more than `6 px` horizontally and
+  `2 px` downward, and settles over `200 ms` with
+  `cubic-bezier(.16, 1, .3, 1)`. Forward/back reverse only the horizontal sign; a
+  neutral same-depth change uses no invented hierarchy. Scale, blur, flashes, wipes,
+  springs, child cascades, theme-specific timing, and entry from full transparency are
+  forbidden.
+- One stable named route viewport owns the browser snapshot; differently sized Home,
+  Library, and Game `<main>` elements do not each claim the same transition name. At
+  most one React route and one live Canvas exist. Old visuals may persist only as a UA
+  compositor snapshot, never as a second mounted page/runtime.
+- `App` owns one monotonic navigation epoch. A new intent invalidates and skips older
+  native work; only the latest callback may update History and React state. Completion,
+  rejection, synchronous failure, interruption, and unmount clean only their own epoch
+  and return the current owner to idle. Browser-provided back/forward gestures must not
+  receive a second application animation.
+- Entering Game cannot declare the native destination snapshot ready until Pixi has
+  appended and rendered its single Canvas. A bounded failure path must still settle
+  without hanging. Fallback keeps the destination continuously visible and applies only
+  its small settle motion; it does not hard-cut to a page starting at opacity zero.
+- History stores enough validated route context to restore the selected Puzzle. Route
+  commit restores the Home/Library landmark or selected row during the first frame;
+  Puzzle Game retains runtime-ready Canvas focus and ordinary Game retains its existing
+  countdown/input boundary. Visual completion never gates ready input.
+- The application's resolved `data-reduced-motion` value is the route-motion authority.
+  Reduced motion performs a no-translation opacity handoff and is stable within `32 ms`;
+  a bare media query may not contradict an explicit in-app override.
+- Game start/restart/countdown remains owned by the board cover. Mode intro/results are
+  a later in-page slice with the board fixed, not part of the first URL-route rewrite.
 
 ### Piece and Mutation material language
 
@@ -1871,9 +1897,13 @@ rim, attachment frame, or empty-cell outline after the clear removes it.
 The `TetraMorph` wordmark is centred against the complete dark brand panel, not against
 an incidental text line box. The layout uses the panel's two-axis grid centre and gives
 the script face a symmetric containing box so glyph overhang cannot pull the visible
-mark off-centre. The browser icon is a clean 2×2 square of Classic green, Survival blue,
-Mutation orange, and Puzzle purple in reading order. It is an original mode-map mark
-with no letter, copied logo, or trade-dress silhouette.
+mark off-centre. The former browser icon's four equal multicolour quadrants are rejected:
+at favicon size that geometry reads as a generic four-pane window and is too close to
+Microsoft's dominant silhouette. Its replacement is a vector-first, asymmetric
+TetraMorph/tetromino transformation mark with one unmistakable outer contour, protected
+negative space, and no letter, copied logo, four-equal-quadrant grid, or trade-dress
+silhouette. It must remain recognizable at `16/32/64 px`; favicon work does not reopen
+the explicitly excluded PWA install surface.
 
 Final responsive proof must preserve that same geometry after every legacy cascade.
 The wordmark owns a shrink-to-ink box (`max-content`) centred by the parent grid; it may
