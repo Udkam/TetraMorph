@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **IN PROGRESS — partial R3 acceptance; soft-action and Ice audition R4**
+Status: **LISTENING REQUIRED — R4 soft-action and Ice candidate published**
 
 ## Active objective
 
@@ -103,9 +103,8 @@ materials, and Puzzle progression.
   map, and isolates `glass` Ice. All 23 Ogg files and embedded copies match the pinned
   source bytes; browser decoding, signal floors/ceilings, desktop/mobile layout,
   reduced motion, direct-file playback, and console/page-error gates pass.
-- The user must now listen to the page at ordinary device volume and either select a
-  family, request a deliberate hybrid by action, or reject all three. Measurements and
-  the passing browser audit cannot open checkpoint 3 by themselves.
+- R3 was presented for ordinary-volume listening. Its partial human result is recorded
+  below; its green browser audit did not open checkpoint 3 by itself.
 - Human verdict on R3 is partial: accept only `studio` clear 1/2/3 and `studio`
   countdown. Clear 4 becomes four matching `progress-step` row releases with no
   `complete` tail. Preserve these accepted cues exactly in R4.
@@ -117,6 +116,24 @@ materials, and Puzzle progression.
   layering on top of it. The next audition page contains only the failed action set and
   new Ice candidates; it does not make the user re-approve the frozen clear/countdown
   set.
+- R4 evidence is committed at `0e2b13e` under
+  `docs/evidence/t37/audio-audition-r4/`. Ordinary actions now use UI SFX `soft`
+  directional/semantic cues with 12–18 ms attack, low-pass shaping, restrained rate,
+  post-filter peak calibration, and de-clicked retrigger release. This keeps move,
+  rotate, natural lock, and hard drop audible without recycling the rejected sharp R3
+  treatment.
+- R4 Ice compares three primary-source CC0 directions: OpenGameArt Freeze Spell solo,
+  an offline-baked Freeze Spell plus IceShatters release, and a lowered/filtered
+  IceShatters baseline. The old Glass pair, high-frequency `Ice spells` WAV pair, and
+  omgaudio's 1 ms high-pitched zap are not candidates.
+- `node docs/evidence/t37/audio-audition-r4/verify-audition.mjs` passes 10 decoded
+  sources, 8 post-filter calibrated recipes, embedded/direct-file byte equality,
+  exact four-pulse/no-tail clear 4, action mapping, desktop/mobile layout, reduced
+  motion, and zero console/page errors. The required develop-web-game client also
+  observed the layered Ice state; its exact local server PID was stopped.
+- The only next product decision is human listening: ordinary actions may pass as a
+  set or receive per-action feedback; Ice may select 1 / 2 / 3 or reject all. Do not
+  implement the complete palette or start transitions before that answer.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.

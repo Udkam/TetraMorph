@@ -64,6 +64,17 @@ adding unrelated badges or ornamental effects.
 - The R3 `glass` Ice pair is rejected as unpleasant. R4 replaces it completely with a
   separately sourced or original crystal-freeze candidate synchronized to the same
   320 ms bind/release visual contract; no R3 Glass layer is retained by default.
+- R4 uses one coherent `soft` action set from the same pinned UI SFX release instead
+  of another broad family comparison. Left/right use native directional `back` and
+  `forward`; rotate uses `reorder`; natural lock uses `lock`; hard drop uses `drop`.
+  Playback stays between `0.88×` and `1.05×`, attacks stay between 12 and 18 ms, and
+  post-filter peaks are recalibrated so low-pass softening does not become a hidden
+  volume cut. Repeated move voices release over 12 ms before stopping.
+- R4 Ice candidates come only from primary-page CC0 OpenGameArt sources: Freeze Spell
+  by `artisticdude` and Ice breaking/shattering by `IgnasD`. The comparison is a
+  freeze-only slice whose main response lands at 320 ms, an offline-baked
+  freeze-plus-shard cue, and a lowered/filtered shard baseline. The old high-frequency
+  Ice spells pair and the 1 ms high-pitched omgaudio zap are explicitly excluded.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

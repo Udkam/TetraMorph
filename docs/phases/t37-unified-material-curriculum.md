@@ -46,6 +46,12 @@ and no Puzzle content is published without strict deterministic proof.
   Move, rotate, natural lock, hard drop, and Glass Ice remain rejected. R4 is limited to
   softer replacements for those failed cues and must not reopen or subtly remix the
   accepted set.
+- R4 candidate `0e2b13e` uses the pinned UI SFX `soft` pack for directional movement,
+  rotation, natural lock, and hard drop with slower attacks, low-pass shaping,
+  post-filter peak calibration, and de-clicked retriggering. Ice compares primary-page
+  CC0 OpenGameArt Freeze Spell and IceShatters sources in solo, offline-layered, and
+  lowered/filtered forms. Automated signal/browser gates pass; stage C remains closed
+  until explicit listening acceptance.
 
 ### C. Complete accepted audio language
 

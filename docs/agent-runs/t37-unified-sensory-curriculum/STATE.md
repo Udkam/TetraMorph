@@ -44,7 +44,8 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    network-resource review.
 4. `PARTIALLY ACCEPTED` — R3 freezes Studio clear 1/2/3 and countdown; clear 4 adopts
    the same four-pulse grammar without the rejected completion tail.
-5. `IN PROGRESS` — R4 replaces rejected move/rotate/lock/hard-drop and Glass Ice only.
+5. `CANDIDATE / LISTENING REQUIRED` — R4 replaces rejected
+   move/rotate/lock/hard-drop and Glass Ice only at `0e2b13e`.
 6. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
 7. `PENDING` — route transition system and reduced-motion verification.
@@ -76,6 +77,20 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Human listening accepts only Studio clear 1/2/3 and countdown. All movement,
   rotation, natural-lock, hard-drop candidates are too sharp/not soft enough; Glass Ice
   is rejected as unpleasant. These verdicts override the green R3 measurements.
+- The R4 page under `docs/evidence/t37/audio-audition-r4/` contains only the failed
+  action set, three new Ice choices, and read-only review buttons for the frozen set.
+  Actions use five UI SFX `soft` files with per-event contour, 12–18 ms attacks,
+  1.6–2.6 kHz low-pass ceilings, `0.88×–1.05×` rates, post-filter peak calibration,
+  and 12 ms retrigger release. Ice uses CC0 OpenGameArt Freeze Spell and IceShatters
+  sources; the layered cue is baked into one buffer by a committed renderer.
+- `node docs/evidence/t37/audio-audition-r4/verify-audition.mjs` passes `10/10` source
+  decodes and `8/8` calibrated recipes, embedded-byte equality, clear-4 four-pulse with
+  no extra tail, desktop/mobile frames, reduced motion, direct-file playback, and zero
+  console/page errors. `git diff --check -- docs/evidence/t37/audio-audition-r4`
+  passes.
+- The develop-web-game client observed `ice-layered / 冰冻激活` with no error artifact.
+  Its owned Python server PID `6608` exited and port `4184` was released. No audition
+  server or browser remains owned.
 - The required develop-web-game client also observed `studio / 左移`; its owned Vite
   PID was stopped and port `4183` released. No server or browser remains owned.
 - The superseded uncommitted R2 gain-only edit was restored to committed source. Its
@@ -87,12 +102,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Research and build a bounded R4 page containing only softer move, rotate, natural-lock,
-hard-drop replacements and new Ice candidates. Freeze Studio clear 1/2/3/countdown and
-make clear 4 four matching row pulses without a completion tail. Verify provenance,
-direct-file playback, signal bounds, repetition, synchronized visuals, and browser
-errors, then stop for human listening. Do not expand the remaining palette or start
-visual work.
+Ask the player to open R4 directly and listen at ordinary device volume. Accept either
+an overall or per-action verdict for move/rotate/natural-lock/hard-drop, and Ice choice
+1 / 2 / 3 or reject-all. Do not expand the remaining palette, change product audio,
+or start transition/material/Puzzle work before that decision.
 
 ## Do not repeat
 
