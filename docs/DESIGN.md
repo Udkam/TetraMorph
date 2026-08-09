@@ -3,6 +3,83 @@
 > The current page-facing identity is the plain-text `TetraMorph`. Older `Tetra` and
 > `Tetris` headings below are retained only as historical contract provenance.
 
+## 2026-08-09 T37 — Unified material feedback and Puzzle curriculum
+
+**Status: IN PROGRESS.** T36 was technically safe but failed human listening. Repeated
+isolated redesigns also left transitions, ordinary pieces, Mutation materials, and
+Puzzle progression without one shared world rule. T37 defines that rule as **gravity
+reveals material**: motion is calm and precise; contact, clearing, and transformation
+produce short physical responses; exceptional states change material rather than
+adding unrelated badges or ornamental effects.
+
+### Feedback and sound language
+
+- The mix is tactile and material-first: muted mechanism, felt contact, soft ceramic or
+  stone body, restrained crystal grains, contained pressure, and brief natural air.
+  It must not read as a synthesizer preset, arcade bleep bank, melody, notification
+  pack, or loud cinematic trailer.
+- Perceived emphasis remains `move < rotate < lock < hard drop < 1/2/3 clear < Mutation
+  < four-line clear/completion`, but the differences come from mass, duration, texture,
+  and space rather than sharpness or raw loudness. Rapid movement and rotation must
+  remain comfortable; line clears must provide unmistakable positive feedback.
+- Clean-room references may inform cadence, response hierarchy, and material category,
+  never copy recorded samples, pitch sequences, timing fingerprints, or commercial
+  trade dress. No music or continuous state loop is introduced.
+- Before rebuilding all cues, T37 publishes a compact audition matrix generated from
+  production recipes. Human acceptance of that matrix is the expansion gate. Peak,
+  RMS, clipping, determinism, and repetition-density measurements remain rejection
+  tools, not taste approval.
+
+### Transition language
+
+- Route changes use a shared-shell transition: departing content fades and moves no
+  more than 12 px while the destination resolves over roughly 180–260 ms. Direction may
+  reflect navigation hierarchy, but the header and global controls never flash or
+  remount unnecessarily.
+- Game start/restart/countdown remains owned by the board cover, not the route
+  transition. Transition state cannot consume gameplay input after the destination is
+  ready, create a second Canvas, or leave stale listeners/tickers.
+- `prefers-reduced-motion` removes spatial travel and decorative staging; it keeps only
+  a near-instant opacity handoff needed to avoid a one-frame flash.
+
+### Piece and Mutation material language
+
+- Ordinary tetrominoes remain the multicolour baseline and receive only a coherent
+  surface/edge/light polish. They must stay quieter than item materials and legible in
+  all three themes.
+- A Mutation item is the whole tetromino, not a normal piece carrying a badge. **Ice**
+  is faceted cyan crystal with a cold internal edge; **Bomb** is dark contained rock
+  with lava seams; **Multiplier** is warm gold with sparse glints; **Supergravity** is
+  dense bright violet with a controlled inward falloff. Glows are local and bounded.
+- The material identity appears consistently on spawn, board, Next, ghost/landing
+  guide, activation, and clear. Colour is reinforced by silhouette-safe surface motifs
+  so item identity does not depend on hue alone.
+- Any of the four cells may be cleared to activate the item, but the item owns one
+  piece-level activation latch. Multiple cleared cells never duplicate its effect.
+  Reshape remains removed.
+
+### Puzzle learning contract
+
+- The published curriculum is exactly **5 Intro / 25 Easy / 16 Hard**. Intro uses
+  3–4-row boards to teach one visible idea per level without trivial one-drop answers.
+  Easy is fully open, mixes ordinary residual boards with reusable techniques, and
+  names the technique relationship used for Hard unlocks. Hard contains sixteen
+  deliberately authored applications, including tall trick boards, multiple anchors,
+  suspended/two-wall cavities, downward triangles, pyramids, and bounded board-shape
+  variations when those shapes improve the puzzle rather than decoration.
+- Duplicate or near-duplicate residual states are rejected by canonical board/anchor
+  fingerprints plus a human technique review. Reordering uses stable IDs and an
+  explicit progress migration.
+- Every level ships with a fixed queue, initial-state hash, deterministic ruleset,
+  exact optimal operation count, and at least two replayable legal solutions when the
+  state permits non-unique play. A Hard level may unlock only through a declared related
+  Easy level completed within `optimum + 5` operations.
+- Guidance teaches observable technique, not solver statistics: complete a row before
+  building above it, preserve a safe landing surface, use late horizontal movement to
+  route around anchors, plan cavities from the fixed two-piece preview, and control
+  extra material introduced by a clear. The UI may reveal these ideas progressively
+  but may not expose a full solution by default.
+
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
 **Status: CANDIDATE / LISTENING REQUIRED.** T35 was technically valid but failed human listening. Its

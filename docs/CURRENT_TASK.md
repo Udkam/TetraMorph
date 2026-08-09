@@ -1,7 +1,86 @@
-# Current Task — T36 Kinetic Harmonic Audio Recomposition
+# Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **CANDIDATE / LISTENING REQUIRED — implementation, automated gates, browser
-evidence, and independent QA complete at `4433aaf`; human listening remains pending**
+Status: **IN PROGRESS — contract checkpoint; no T37 source change accepted yet**
+
+## Active objective
+
+Rebuild TetraMorph around one coherent physical-material language, then restructure
+Puzzle into a certified 5/25/16 learning curriculum. T37 supersedes the rejected T36
+audible palette and combines four user-visible concerns that must agree rather than be
+polished independently: tactile sound, page transitions, ordinary/Mutation piece
+materials, and Puzzle progression.
+
+## Frozen product direction
+
+- **Sound:** replace the entire audible palette. Feedback must be clear, positive,
+  restrained, non-harsh, and materially tactile. Do not use exposed electronic tones,
+  arcade bleeps, melodies, music, licensed samples, or copied commercial cues. Preserve
+  only proven mixer ownership, priority, master controls, bounded voices, deterministic
+  scheduling, and teardown. A small core-cue audition set is a hard human-listening gate
+  before the palette expands.
+- **Transitions:** give route/page changes one calm motion grammar: short opacity and
+  small spatial continuity, no flashes, no large wipes, no gameplay-input delay, and a
+  reduced-motion form that is effectively instant.
+- **Pieces:** ordinary tetrominoes remain the familiar multicolour family. Mutation no
+  longer appears as an attached carrier badge or overlay: the complete tetromino is a
+  dedicated material object. Ice uses cold crystalline cyan, Bomb uses contained lava,
+  Multiplier uses restrained gold glints, and Supergravity uses luminous violet mass.
+  Every cell of a Mutation piece may release its item, but the piece triggers exactly
+  once. Board, active piece, ghost, Next, clear feedback, and audio must agree.
+- **Puzzle:** ship exactly 46 levels split into 5 Intro, 25 Easy, and 16 Hard levels.
+  Intro is fully rebuilt around guided 3–4-row positions. Easy stays fully open and
+  teaches reusable techniques while retaining normal residual-board puzzles. Hard uses
+  distinctive, related applications such as tall trick boards, multiple anchors,
+  hollow/two-wall/top structures, triangles, pyramids, and bounded board-shape variants.
+  Repeated residual boards are removed. Every published level requires a deterministic
+  strict solution certificate and confirmed optimum.
+- Hard unlocks are attached to explicitly related Easy techniques. The qualifying Easy
+  result is at most `certified optimum + 5` operations. Stable level IDs and stored
+  progress must migrate without silently awarding completion.
+- Preserve deterministic renderer-independent Core, React/Pixi ownership, one Canvas,
+  touch and keyboard safety, three visual themes, bilingual copy, and all accepted
+  Classic/Survival/Supergravity behavior not explicitly superseded here.
+
+## Ordered checkpoints
+
+1. **Contract** — this file, `docs/DESIGN.md`, T37 phase contract, and bounded run state.
+2. **Audio audition gate** — implement and export a compact representative set covering
+   movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
+   activation. Stop expansion until human listening accepts the language.
+3. **Complete audio palette** — extend only the accepted grammar to remaining gameplay,
+   Survival, Mutation, Puzzle, and UI events; prove hierarchy, voice bounds, controls,
+   determinism, and cleanup.
+4. **Transition system** — route shell and page transitions with explicit
+   reduced-motion behavior and no duplicate mounts/listeners/canvases.
+5. **Material system** — ordinary-piece polish and the four whole-piece Mutation
+   materials, including Next/ghost/clear/audio agreement and once-per-piece triggering.
+6. **Puzzle curriculum** — 5/25/16 content, deduplication, solver certificates,
+   technique links, unlock migration, and UI pagination.
+7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
+   complete suite, build, browser evidence pass, independent read-only QA, changelog,
+   bounded commits, and coordinator push.
+
+Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
+`progress.md` remain outside T37 and must not be staged.
+
+## T37 acceptance boundary
+
+- Passing tests or measurements cannot accept sound; explicit listening acceptance is
+  required before checkpoint 3.
+- A visual state is not accepted unless a current-source browser frame demonstrates the
+  active piece, Next, ghost/landing guide, relevant status, all three themes, and both
+  motion preferences without clipping or console errors.
+- A Puzzle level is not accepted because a heuristic solver found one route. Its exact
+  initial hash, fixed queue, ruleset, optimum, replay, and technique/unlock metadata
+  must be reproducible from the public verification command.
+- “Complete” is reserved for the final integrated candidate after multiple acceptance
+  rounds. Until then every checkpoint remains a bounded candidate or listening gate.
+
+---
+
+# Previous Task — T36 Kinetic Harmonic Audio Recomposition
+
+Status: **REJECTED BY HUMAN LISTENING 2026-08-09 — superseded by T37**
 
 ## Active objective
 
