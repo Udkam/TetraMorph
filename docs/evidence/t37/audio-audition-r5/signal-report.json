@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-09T05:07:38.038Z",
-  "sourceSha": "2eb56af23117a0b9926a7be7580ac389c83cdcc9",
+  "generatedAt": "2026-08-09T05:19:12.907Z",
+  "sourceSha": "f241488c38b5277c336a0bdb48f66821adb4e05c",
   "actionProfiles": {
     "t28": {
       "id": "t28",
@@ -254,10 +254,10 @@
   "sha256": {
     "index.html": "3ac6b626e11acb01676c87d448ef71e492b35d9add4b0d4edb14e96ecea24b68",
     "styles.css": "02542da18765a9a25bb293b65e363b8d44a6b57d77f87891179caa6973079e2e",
-    "audition.js": "b2f1d01c766a91195bde3ee3436fd70d2c5b52d237eedaacaccb0621e336fbbd",
+    "audition.js": "0b03726ec9976789907fda60cec837fe42f208b64fa1cd17ee97e48a5ca2c6c6",
     "embedded-assets.js": "a4e9f46765c50869b20d453afa49b705983329096a5369580eca186aca1cc951",
     "build-embedded-assets.mjs": "24e86319425cb9aabe81f6eff78d06c018738eaec48734d097d8686876f3ca4d",
-    "verify-audition.mjs": "ed2adc8f2ddee7240843de909849b092848fa3ad3a5b4e3155d2d1ec3d05b2c7",
+    "verify-audition.mjs": "fc794c869947cc85fefe7396adc6aaf96a897833ddc5b7f9c53406a8a3844754",
     "provenance.json": "b9d7b70039e35782b8a228cb558019092f80654067fba79f0d605b5e26770cb1",
     "README.md": "ebdab4c88fb549e0fe2c25fcdbabb5dc558d5f4b861028fdcd4c0b7d19fb2734",
     "assets/ice/giwake-ice-breaking-1-hq.ogg": "e392c9ba8724513c2e7b5c3ccaec4ce241c32eeabb5d4f060a074911cb53f81b",
@@ -267,6 +267,7 @@
   "assertions": {
     "r4RecipesExcluded": true,
     "exactHistoricalProfiles": 2,
+    "centredHistoricalActionsBypassStereoPanner": true,
     "acceptedSoundsNotReopened": true,
     "clearFourHasFourPulsesAndNoTail": true,
     "embeddedBytesMatchDownloadedPreviews": true,
