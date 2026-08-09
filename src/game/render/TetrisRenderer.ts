@@ -72,10 +72,6 @@ import {
   nextPreviewPieces,
   ORDINARY_LINE_CLEAR_TAIL_LIMIT,
   classicLineClearCellSample,
-  ordinaryLineClearCellProgress,
-  ordinaryLineClearFragment,
-  ordinaryLineClearPresentationProgress,
-  ordinaryLineClearProfile,
   orthogonalCellComponents,
   projectedLandingCells,
   survivalDebrisCells,
@@ -154,7 +150,7 @@ interface OrdinaryMultiLineClearCueCell {
 }
 
 interface OrdinaryMultiLineClearCue {
-  count: 2 | 3 | 4;
+  count: 1 | 2 | 3 | 4;
   orderedRows: readonly number[];
   cells: readonly OrdinaryMultiLineClearCueCell[];
   elapsed: number;
@@ -300,7 +296,7 @@ export interface RendererSnapshot {
     readonly releasedRows: readonly number[];
   } | null;
   ordinaryMultiLineClearCues: Array<{
-    count: 2 | 3 | 4;
+    count: 1 | 2 | 3 | 4;
     orderedRows: number[];
     elapsedMs: number;
     durationMs: number;
@@ -390,7 +386,7 @@ function ordinaryLineClearCellSampleForState(
 ): Readonly<ClassicLineClearCellSample> | null {
   if (state.phase !== 'line-clear') return null;
   const release = lineClearReleaseSnapshot(state.pendingClearRows, state.phaseTicks);
-  if (!release || release.count === 1) return null;
+  if (!release) return null;
   const rowOrder = release.orderedRows.indexOf(row);
   if (rowOrder < 0) return null;
   return classicLineClearCellSample(
@@ -1053,7 +1049,7 @@ export class TetrisRenderer {
   }
 
   private ordinaryMultiLineClearCueForState(state: GameState): OrdinaryMultiLineClearCue | null {
-    if (state.phase !== 'line-clear' || state.pendingClearRows.length < 2 || state.pendingClearRows.length > 4) {
+    if (state.phase !== 'line-clear' || state.pendingClearRows.length < 1 || state.pendingClearRows.length > 4) {
       return null;
     }
     const orderedRows = orderedLineClearRows(state.pendingClearRows);
@@ -2262,9 +2258,6 @@ export class TetrisRenderer {
     }
     this.drawMutationParticles(mutationGraphics, layout);
     this.drawOrdinaryMultiLineClearCueFaces(graphics, layout);
-    if (state.phase === 'line-clear' && state.pendingClearRows.length === 1) {
-      this.drawOrdinaryLineClearFaces(graphics, state, layout);
-    }
     this.drawClassicFeedbackCues(graphics, state, layout);
 
     if (this.lockPulse) {
@@ -2578,142 +2571,6 @@ export class TetrisRenderer {
     }
   }
 
-  /** Ordinary 1–4 line clears share one local grammar without moving the board. */
-  private drawOrdinaryLineClearFaces(
-    graphics: Graphics,
-    state: GameState,
-    layout: BoardLayout,
-  ): void {
-    const count = state.pendingClearRows.length;
-    const profile = ordinaryLineClearProfile(count);
-    if (!profile || count !== 1) return;
-    const restrainedGeometry = this.options.reducedMotion || state.mode === 'puzzle';
-    const phaseProgress = ordinaryLineClearPresentationProgress(
-      state.phaseTicks,
-      count,
-      restrainedGeometry,
-    );
-    if (count === 1 && restrainedGeometry && phaseProgress >= 1) return;
-    const activationOwnsClear = state.mode === 'sprint' && (state.mutationCarriers ?? []).some(
-      (carrier) => carrier.cells.some((cell) => state.pendingClearRows.includes(cell.y)),
-    );
-    const modeFaceScale = state.mode === 'race'
-      ? 0.95
-      : state.mode === 'sprint'
-        ? 1.05
-        : state.mode === 'puzzle'
-          ? 0.78
-          : 1;
-    const faceScale = modeFaceScale * (activationOwnsClear ? 0.65 : 1);
-    const fragmentScale = (state.mode === 'race' ? 0.9 : 1) * (activationOwnsClear ? 0.65 : 1);
-    const mutationItemByCell = new Map<string, MutationItem>();
-    if (state.mode === 'sprint') {
-      for (const carrier of state.mutationCarriers) {
-        for (const cell of carrier.cells) mutationItemByCell.set(`${cell.x},${cell.y}`, carrier.item);
-      }
-    }
-    const orderedRows = orderedLineClearRows(state.pendingClearRows);
-    for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {
-      const row = orderedRows[rowOrder]!;
-      if (row < VISIBLE_START_ROW || row >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
-      const boardRow = state.board[row];
-      for (let column = 0; column < BOARD_WIDTH; column += 1) {
-        const type = boardRow?.[column];
-        if (!type || type === ANCHOR_CELL || type === BEDROCK_CELL) continue;
-        const cellProgress = ordinaryLineClearCellProgress(
-          phaseProgress,
-          column,
-          BOARD_WIDTH,
-          0,
-          count,
-          restrainedGeometry,
-        );
-        if (cellProgress <= 0) continue;
-        const eased = easeOutCubic(cellProgress);
-        const multiLineClassic = count > 1;
-        const pulse = multiLineClassic
-          ? cellProgress
-          : restrainedGeometry
-            ? Math.max(0.5, 1 - cellProgress * 0.5)
-            : Math.sin(cellProgress * Math.PI);
-        if (pulse <= 0) continue;
-        const material = this.materialFor(type);
-        const inset = layout.cell * (multiLineClassic ? 0.075 : 0.13);
-        const x = layout.x + column * layout.cell + inset;
-        const y = layout.y + (row - VISIBLE_START_ROW) * layout.cell + inset;
-        const size = layout.cell - inset * 2;
-        const alpha = multiLineClassic
-          ? Math.min(0.56, (0.14 + pulse * 0.42) * faceScale)
-          : Math.min(0.29, pulse * profile.faceAlpha * faceScale * (0.84 + eased * 0.16));
-        const face = graphics
-          .roundRect(x, y, size, size, Math.max(1, layout.cell * 0.08))
-          .fill({ color: multiLineClassic ? COLORS.actionInk : material.innerEdge, alpha });
-        if (multiLineClassic) {
-          face.stroke({
-            color: material.innerEdge,
-            alpha: Math.min(0.7, alpha * 1.18),
-            width: Math.max(1, layout.cell * 0.045),
-          });
-        }
-
-        const mutationItem = mutationItemByCell.get(`${column},${row}`);
-        if (mutationItem === 'freeze' || mutationItem === 'collapse') {
-          this.drawMutationLineClearAccent(graphics, mutationItem, x, y, size, cellProgress, layout.cell);
-        }
-
-        if (multiLineClassic || restrainedGeometry) continue;
-        const centerX = x + size * 0.5;
-        const centerY = y + size * 0.5;
-        if (profile.id === 'precision-cut') {
-          const cutWidth = Math.max(1, layout.cell * 0.035);
-          graphics
-            .rect(centerX - cutWidth * 0.5, y + size * 0.22, cutWidth, size * 0.56)
-            .fill({ color: material.innerEdge, alpha: alpha * 0.7 });
-        } else if (profile.id === 'dual-resonance') {
-          const echoHeight = Math.max(1, layout.cell * 0.035);
-          const echoY = centerY + (rowOrder === 0 ? -1 : 1) * size * 0.16;
-          graphics
-            .roundRect(x + size * 0.24, echoY - echoHeight * 0.5, size * 0.52, echoHeight, echoHeight * 0.5)
-            .fill({ color: material.innerEdge, alpha: alpha * 0.48 });
-        } else if (
-          profile.id === 'tetramorph'
-          && column === (rowOrder * 3 + 2) % BOARD_WIDTH
-        ) {
-          const glint = size * (0.2 + eased * 0.13);
-          graphics
-            .moveTo(centerX - glint, centerY + glint)
-            .lineTo(centerX + glint, centerY - glint)
-            .stroke({
-              color: material.innerEdge,
-              alpha: Math.min(0.42, alpha * 1.35),
-              width: Math.max(0.75, layout.cell * 0.035),
-            });
-        }
-
-        const fragmentIndexes = profile.id === 'tetramorph' ? 2 : 1;
-        for (let index = 0; index < fragmentIndexes; index += 1) {
-          const fragment = ordinaryLineClearFragment(count, row, column, index);
-          if (!fragment) continue;
-          const release = Math.max(0, Math.min(1, (cellProgress - 0.2) / 0.8));
-          if (release <= 0) continue;
-          const chipWidth = Math.max(1, layout.cell * fragment.width);
-          const chipHeight = Math.max(0.75, layout.cell * fragment.height);
-          graphics
-            .rect(
-              layout.x + column * layout.cell + layout.cell * (fragment.offsetX + fragment.driftX * release),
-              layout.y + (row - VISIBLE_START_ROW) * layout.cell + layout.cell * (fragment.offsetY + fragment.driftY * release),
-              chipWidth,
-              chipHeight,
-            )
-            .fill({
-              color: material.innerEdge,
-              alpha: Math.min(0.22, alpha * 0.86 * fragmentScale * (1 - release * 0.35)),
-            });
-        }
-      }
-    }
-  }
-
   /** Carrier-only clear accents make the triggering cell readable before activation. */
   private drawMutationLineClearAccent(
     graphics: Graphics,
@@ -2900,11 +2757,11 @@ export class TetrisRenderer {
     rows: readonly number[],
     state: GameState | undefined,
   ): void {
-    if (!state) return;
+    if (!state || !Array.isArray(state.board)) return;
     const orderedRows = orderedLineClearRows(rows);
     const count = orderedRows.length;
-    if (count < 2 || count > 4) return;
-    const typedCount = count as 2 | 3 | 4;
+    if (count < 1 || count > 4) return;
+    const typedCount = count as 1 | 2 | 3 | 4;
     const duplicate = this.ordinaryMultiLineClearCues.some((cue) => (
       !cue.committed
       && cue.count === typedCount
@@ -2913,13 +2770,13 @@ export class TetrisRenderer {
     if (duplicate) return;
 
     const mutationItemByCell = new Map<string, MutationItem>();
-    for (const carrier of state.mutationCarriers) {
+    for (const carrier of state.mutationCarriers ?? []) {
       for (const cell of carrier.cells) {
         mutationItemByCell.set(`${cell.x},${cell.y}`, carrier.item);
       }
     }
     const puzzleTargetCells = new Set(
-      state.puzzleTargetCells.map((cell) => `${cell.x},${cell.y}`),
+      (state.puzzleTargetCells ?? []).map((cell) => `${cell.x},${cell.y}`),
     );
     const cells: OrdinaryMultiLineClearCueCell[] = [];
     for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {

@@ -56,7 +56,7 @@ export function lineClearRowElapsedTicks(
   count: number,
   rowOrder: number,
 ): number | null {
-  if (!isLineClearCount(count) || count === 1 || !Number.isInteger(rowOrder)) return null;
+  if (!isLineClearCount(count) || !Number.isInteger(rowOrder)) return null;
   const releaseTick = LINE_CLEAR_RELEASE_TICKS[count][rowOrder];
   if (releaseTick === undefined || !Number.isFinite(phaseTicks) || phaseTicks < releaseTick) return null;
   return Math.max(0, phaseTicks - releaseTick);
@@ -68,7 +68,7 @@ export function lineClearRowElapsedMs(
   count: number,
   rowOrder: number,
 ): number | null {
-  if (!isLineClearCount(count) || count === 1 || !Number.isInteger(rowOrder)) return null;
+  if (!isLineClearCount(count) || !Number.isInteger(rowOrder)) return null;
   const releaseMs = STUDIO_LINE_CLEAR_OFFSETS_MS[count][rowOrder];
   if (releaseMs === undefined || !Number.isFinite(elapsedMs) || elapsedMs < releaseMs) return null;
   return Math.max(0, elapsedMs - releaseMs);
@@ -79,10 +79,11 @@ export function lineClearRowElapsedMs(
  * the accepted 180 ms audio interval without changing either Studio start.
  */
 export function lineClearRowDurationMs(count: number, rowOrder: number): number {
-  if (!isLineClearCount(count) || count === 1 || !Number.isInteger(rowOrder)) return 0;
+  if (!isLineClearCount(count) || !Number.isInteger(rowOrder)) return 0;
   const offsets = STUDIO_LINE_CLEAR_OFFSETS_MS[count];
   const current = offsets[rowOrder];
   if (current === undefined) return 0;
+  if (count === 1) return CLASSIC_LINE_CLEAR_SEQUENCE_MS;
   const next = offsets[rowOrder + 1];
   return next === undefined
     ? CLASSIC_LINE_CLEAR_ROW_MIN_MS
@@ -90,15 +91,16 @@ export function lineClearRowDurationMs(count: number, rowOrder: number): number 
 }
 
 export function lineClearVisualDurationMs(count: number): number {
-  if (!isLineClearCount(count) || count === 1) return 0;
+  if (!isLineClearCount(count)) return 0;
   const offsets = STUDIO_LINE_CLEAR_OFFSETS_MS[count];
   const lastOrder = offsets.length - 1;
   return offsets[lastOrder]! + lineClearRowDurationMs(count, lastOrder);
 }
 
 /**
- * One-line clear remains on its accepted renderer path. Only multi-line clears
- * expose released rows before Core's unchanged twelve-tick atomic commit.
+ * All accepted Studio starts are exposed to the shared renderer track before Core's
+ * unchanged twelve-tick atomic commit. `releasedRows` means presentation has started;
+ * it never authorizes Core mutation or direct row removal.
  */
 export function lineClearReleaseSnapshot(
   rows: readonly number[],
@@ -109,9 +111,7 @@ export function lineClearReleaseSnapshot(
   if (!isLineClearCount(count)) return null;
   const releaseTicks = LINE_CLEAR_RELEASE_TICKS[count];
   const canonicalTick = Math.max(0, Math.floor(Number.isFinite(phaseTicks) ? phaseTicks : 0));
-  const releasedRows = count === 1
-    ? []
-    : orderedRows.filter((_, index) => canonicalTick >= releaseTicks[index]!);
+  const releasedRows = orderedRows.filter((_, index) => canonicalTick >= releaseTicks[index]!);
   return Object.freeze({
     count,
     orderedRows,

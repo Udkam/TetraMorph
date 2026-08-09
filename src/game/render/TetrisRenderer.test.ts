@@ -19,7 +19,6 @@ import {
   type PieceType,
   VISIBLE_START_ROW,
 } from '../core';
-import { ordinaryLineClearProfile } from './presentation';
 import {
   CLASSIC_LINE_CLEAR_SEQUENCE_MS,
   LINE_CLEAR_CORE_COMMIT_MS,
@@ -185,7 +184,7 @@ type RendererInternals = {
     duration: number;
   }>;
   ordinaryMultiLineClearCues: Array<{
-    count: 2 | 3 | 4;
+    count: 1 | 2 | 3 | 4;
     orderedRows: readonly number[];
     cells: readonly {
       cell: Cell;
@@ -2000,7 +1999,7 @@ describe('Puzzle undo presentation reset', () => {
     expect(renderer.getSnapshot().mutationCollapseTrail).toBeNull();
   });
 
-  it('renders four distinct, bounded ordinary clear profiles on their row-local beats', () => {
+  it('renders the shared bounded continuous grammar for every clear count', () => {
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
     const pieces: PieceType[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L', 'I', 'O', 'T'];
     const signatures: string[] = [];
@@ -2026,15 +2025,12 @@ describe('Puzzle undo presentation reset', () => {
       const recorder = createGraphicsRecorder();
       (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = recorder.graphics;
 
-      if (count === 1) {
-        internals.drawEffects({ ...state, phaseTicks: 8 }, layout);
-      } else {
-        internals.consumeEvents([{ type: 'clear-started', rows }], state);
-        const cue = internals.ordinaryMultiLineClearCues[0]!;
-        for (const elapsedMs of STUDIO_LINE_CLEAR_OFFSETS_MS[count]) {
-          cue.elapsed = elapsedMs;
-          internals.drawEffects(state, layout);
-        }
+      internals.consumeEvents([{ type: 'clear-started', rows }], state);
+      const cue = internals.ordinaryMultiLineClearCues[0]!;
+      expect(cue).toMatchObject({ count, duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS });
+      for (const elapsedMs of STUDIO_LINE_CLEAR_OFFSETS_MS[count]) {
+        cue.elapsed = elapsedMs;
+        internals.drawEffects(state, layout);
       }
 
       const faceBlooms = recorder.operations.filter((operation) => (
@@ -2134,17 +2130,36 @@ describe('Puzzle undo presentation reset', () => {
 
     const oneLineBoard = createBoard();
     oneLineBoard[BOARD_HEIGHT - 1]!.fill('I');
+    const oneLineRenderer = new TetrisRendererClass();
+    const oneLineInternals = oneLineRenderer as unknown as RendererInternals;
+    Object.assign(oneLineInternals as unknown as Record<string, unknown>, {
+      pieceGraphics: createGraphicsRecorder().graphics,
+      survivalEntryGraphics: createGraphicsRecorder().graphics,
+      survivalEntryMaskGraphics: createGraphicsRecorder().graphics,
+      pieceMaskGraphics: createGraphicsRecorder().graphics,
+    });
     const oneLine = {
       ...state,
       board: oneLineBoard,
-      phaseTicks: 11,
+      phaseTicks: 9,
       pendingClearRows: [BOARD_HEIGHT - 1],
     } as GameState;
-    internals.drawPieces(oneLine, layout);
-    internals.updateSnapshot(oneLine, layout, app);
-    expect(renderer.getSnapshot()).toMatchObject({
-      visibleLockedCells: 10,
-      ordinaryLineClear: { count: 1, releasedRows: [] },
+    oneLineInternals.consumeEvents([{
+      type: 'clear-started',
+      rows: oneLine.pendingClearRows,
+    }], oneLine);
+    const oneLineCue = oneLineInternals.ordinaryMultiLineClearCues[0]!;
+    oneLineCue.elapsed = 150;
+    oneLineInternals.drawPieces(oneLine, layout);
+    oneLineInternals.updateSnapshot(oneLine, layout, app);
+    expect(oneLineRenderer.getSnapshot()).toMatchObject({
+      visibleLockedCells: 8,
+      ordinaryLineClear: { count: 1, releasedRows: [BOARD_HEIGHT - 1] },
+      ordinaryMultiLineClearCues: [{
+        count: 1,
+        durationMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+        visibleCellCount: 8,
+      }],
     });
   });
 
@@ -2317,12 +2332,124 @@ describe('Puzzle undo presentation reset', () => {
     const recorder = createGraphicsRecorder();
     (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = recorder.graphics;
 
+    internals.consumeEvents([{ type: 'clear-started', rows: state.pendingClearRows }], state);
     internals.drawEffects(state, layout);
 
     expect(recorder.operations.filter((operation) => (
       operation.kind === 'roundRect' && operation.values[2] === operation.values[3]
     ))).toHaveLength(8);
     expect(hasBroadHorizontalGeometry(recorder.operations, layout.width)).toBe(false);
+  });
+
+  it('continues the accepted 300 ms material track for one line across Core commit', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
+    const row = BOARD_HEIGHT - 1;
+    const board = createBoard();
+    board[row]!.fill('I');
+    const state = {
+      ...createInitialState(0x1a16_500, 'marathon'),
+      board,
+      active: null,
+      status: 'playing',
+      phase: 'line-clear',
+      pendingClearRows: [row],
+      puzzleTargetCells: [{ x: 0, y: row }],
+      mutationCarriers: [{ id: 1, item: 'freeze', cells: [{ x: 0, y: row }] }],
+    } as GameState;
+    Object.assign(internals as unknown as Record<string, unknown>, {
+      pieceGraphics: createGraphicsRecorder().graphics,
+      survivalEntryGraphics: createGraphicsRecorder().graphics,
+      survivalEntryMaskGraphics: createGraphicsRecorder().graphics,
+      pieceMaskGraphics: createGraphicsRecorder().graphics,
+    });
+
+    internals.consumeEvents([{ type: 'clear-started', rows: [row] }], state);
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(1);
+    internals.advanceEffects(0);
+    const cue = internals.ordinaryMultiLineClearCues[0]!;
+    expect(cue).toMatchObject({
+      count: 1,
+      orderedRows: [row],
+      duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+      committed: false,
+    });
+    expect(cue.cells).toHaveLength(10);
+    expect(cue.cells.find(({ cell }) => cell.x === 0)?.puzzleTarget).toBe(true);
+    expect(cue.cells.find(({ cell }) => cell.x === 0)?.mutationItem).toBe('freeze');
+
+    cue.elapsed = LINE_CLEAR_CORE_COMMIT_MS - 0.1;
+    const preCommitDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
+    internals.drawPieces(state, layout);
+    const preCommitPair = preCommitDraw.mock.calls.find((call) => (
+      (call[1] as readonly Cell[]).some((cell) => cell.x === 2 && cell.y === row - VISIBLE_START_ROW)
+      && typeof call[3] === 'number'
+      && call[3] > 0
+      && call[3] < 1
+    ));
+    expect(preCommitPair).toBeDefined();
+    const preCommitAlpha = preCommitPair?.[3] as number;
+    preCommitDraw.mockRestore();
+
+    internals.consumeEvents([{
+      type: 'lines-cleared',
+      rows: [row],
+      count: 1,
+      score: 40,
+    }], { ...state, phase: 'active', pendingClearRows: [] });
+    expect(internals.ordinaryMultiLineClearCues[0]).toBe(cue);
+    expect(cue).toMatchObject({
+      elapsed: LINE_CLEAR_CORE_COMMIT_MS - 0.1,
+      committed: true,
+    });
+
+    cue.elapsed = LINE_CLEAR_CORE_COMMIT_MS;
+    const commitDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
+    internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
+    const committedPair = commitDraw.mock.calls.find((call) => (
+      (call[1] as readonly Cell[]).some((cell) => cell.x === 2 && cell.y === row - VISIBLE_START_ROW)
+    ));
+    expect(committedPair).toBeDefined();
+    expect(Math.abs((committedPair?.[3] as number) - preCommitAlpha)).toBeLessThan(0.02);
+    commitDraw.mockRestore();
+
+    cue.elapsed = 250;
+    const tailDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
+    const tailSurface = vi.spyOn(internals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
+    const tailCore = vi.spyOn(internals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
+    internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
+    expect(tailDraw.mock.calls.some((call) => (
+      (call[1] as readonly Cell[]).some((cell) => cell.x === 0 && cell.y === row - VISIBLE_START_ROW)
+      && typeof call[3] === 'number'
+      && call[3] > 0
+      && call[3] < 1
+    ))).toBe(true);
+    const tailSurfaceCall = tailSurface.mock.calls.find((call) => call[2] === 'freeze');
+    const tailCoreCall = tailCore.mock.calls.find((call) => call[2] === 'freeze');
+    expect(tailSurfaceCall?.[6]).toBeGreaterThan(0);
+    expect(tailCoreCall?.[7]).toBe(tailSurfaceCall?.[6]);
+    tailDraw.mockRestore();
+    tailSurface.mockRestore();
+    tailCore.mockRestore();
+
+    const tailFaces = createGraphicsRecorder();
+    (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = tailFaces.graphics;
+    internals.drawEffects({
+      ...state,
+      phase: 'active',
+      pendingClearRows: [],
+      mutationCarriers: [],
+      puzzleTargetCells: [],
+    }, layout);
+    expect(tailFaces.operations.some((operation) => (
+      operation.kind === 'stroke'
+      && (operation.options as { color?: number } | undefined)?.color === COLORS.target
+    ))).toBe(true);
+
+    cue.elapsed = 299.9;
+    internals.advanceEffects(0.2);
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
   });
 
   it('keeps reduced motion and Puzzle on the same ordered beats without chips or travel', () => {
@@ -2378,7 +2505,7 @@ describe('Puzzle undo presentation reset', () => {
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
     const app = { screen: { width: 280, height: 480 }, renderer: { resolution: 1 } };
 
-    for (const count of [2, 3, 4] as const) {
+    for (const count of [1, 2, 3, 4] as const) {
       const board = createBoard();
       const rows = Array.from({ length: count }, (_, index) => BOARD_HEIGHT - 1 - index);
       for (const row of rows) board[row]!.fill('I');
@@ -2438,8 +2565,6 @@ describe('Puzzle undo presentation reset', () => {
       }
     }
 
-    const singleProfile = ordinaryLineClearProfile(1)!;
-    expect(singleProfile.reducedTicks).toBe(6);
   });
 
   it('captures one bounded 300 ms material cue and clears it on lifecycle boundaries', () => {

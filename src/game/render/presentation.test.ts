@@ -165,9 +165,23 @@ describe('presentation interpolation', () => {
     expect(restrainedLeft.alpha).toBeLessThan(1);
     expect(classicLineClearCellSample(120, 0, 10, 0, 4, true).complete).toBe(true);
 
-    expect(classicLineClearCellSample(0, 4, 10, 0, 1, false).active).toBe(false);
+    const singleCentreStart = classicLineClearCellSample(0, 4, 10, 0, 1, false);
+    const singleCentreMiddle = classicLineClearCellSample(90, 4, 10, 0, 1, false);
+    const singleEdgeBefore = classicLineClearCellSample(160, 0, 10, 0, 1, false);
+    const singleEdgeTail = classicLineClearCellSample(250, 0, 10, 0, 1, false);
+    expect(singleCentreStart).toMatchObject({ active: true, complete: false, alpha: 1 });
+    expect(singleCentreMiddle.alpha).toBeGreaterThan(0);
+    expect(singleCentreMiddle.alpha).toBeLessThan(1);
+    expect(singleEdgeBefore).toMatchObject({ active: true, complete: false, alpha: 1 });
+    expect(singleEdgeTail.alpha).toBeGreaterThan(0);
+    expect(singleEdgeTail.alpha).toBeLessThan(1);
+    expect(classicLineClearCellSample(300, 0, 10, 0, 1, false)).toMatchObject({
+      complete: true,
+      alpha: 0,
+    });
 
-    // The accepted one-line compatibility sweep remains unchanged.
+    // Legacy stateless callers remain deterministic, but production one-line rendering
+    // now uses the accepted continuous sample above.
     expect(ordinaryLineClearCellProgress(0.34, 4, 10, 0, 1, true)).toBe(0.34);
     expect(ordinaryLineClearCellProgress(0.5, 4, 10, 0, 7, false)).toBe(0);
   });

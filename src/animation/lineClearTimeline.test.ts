@@ -38,13 +38,13 @@ describe('line-clear timeline', () => {
     }
   });
 
-  it('sorts arbitrary row input top-to-bottom and releases only multi-line rows', () => {
+  it('sorts arbitrary row input top-to-bottom and exposes every accepted visual start', () => {
     expect(orderedLineClearRows([39, 36, 38, 37, 38])).toEqual([36, 37, 38, 39]);
     expect(lineClearReleaseSnapshot([39], 11)).toEqual({
       count: 1,
       orderedRows: [39],
       releaseTicks: [0],
-      releasedRows: [],
+      releasedRows: [39],
     });
     expect(lineClearReleaseSnapshot([39, 36, 38, 37], 0)?.releasedRows).toEqual([36]);
     expect(lineClearReleaseSnapshot([39, 36, 38, 37], 4)?.releasedRows).toEqual([36, 37]);
@@ -60,17 +60,23 @@ describe('line-clear timeline', () => {
     expect(CLASSIC_LINE_CLEAR_SEQUENCE_MS).toBe(300);
     expect(LINE_CLEAR_CORE_COMMIT_MS).toBeCloseTo(200);
     expect(CLASSIC_LINE_CLEAR_TAIL_MS).toBeCloseTo(100);
+    expect(lineClearRowElapsedTicks(0, 1, 0)).toBe(0);
+    expect(lineClearRowElapsedTicks(4.5, 1, 0)).toBe(4.5);
     expect(lineClearRowElapsedTicks(3, 4, 1)).toBeNull();
     expect(lineClearRowElapsedTicks(4, 4, 1)).toBe(0);
     expect(lineClearRowElapsedTicks(6.5, 4, 1)).toBe(2.5);
     expect(lineClearRowElapsedMs(59.9, 4, 1)).toBeNull();
+    expect(lineClearRowElapsedMs(0, 1, 0)).toBe(0);
+    expect(lineClearRowElapsedMs(125, 1, 0)).toBe(125);
     expect(lineClearRowElapsedMs(60, 4, 1)).toBe(0);
     expect(lineClearRowElapsedMs(92.5, 4, 1)).toBe(32.5);
 
+    expect(lineClearRowDurationMs(1, 0)).toBe(300);
+    expect(lineClearRowDurationMs(1, 1)).toBe(0);
     expect([0, 1].map((rowOrder) => lineClearRowDurationMs(2, rowOrder))).toEqual([210, 120]);
     expect([0, 1, 2].map((rowOrder) => lineClearRowDurationMs(3, rowOrder))).toEqual([120, 120, 120]);
     expect([0, 1, 2, 3].map((rowOrder) => lineClearRowDurationMs(4, rowOrder))).toEqual([120, 120, 120, 120]);
-    expect([2, 3, 4].map(lineClearVisualDurationMs)).toEqual([300, 300, 300]);
+    expect([1, 2, 3, 4].map(lineClearVisualDurationMs)).toEqual([300, 300, 300, 300]);
 
     for (const count of [2, 3, 4] as const) {
       const offsets = STUDIO_LINE_CLEAR_OFFSETS_MS[count];
