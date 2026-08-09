@@ -93,6 +93,7 @@ async function main() {
   const sourceSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim()
   const auditionSource = await readFile(join(ROOT, 'audition.js'), 'utf8')
   assert(!auditionSource.includes('/assets/soft/'), 'R5 reintroduced an R4 soft-pack asset.')
+  assert(auditionSource.includes("const panner = pan !== 0 &&"), 'R5 must bypass StereoPanner for centred historical actions.')
   assert(!auditionSource.includes('iceFrost') && !auditionSource.includes('iceLayered') && !auditionSource.includes('iceBalanced'), 'R5 reintroduced an R4 Ice recipe.')
 
   const server = createStaticServer()
@@ -146,10 +147,23 @@ async function main() {
     await page.waitForTimeout(110)
     let state = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
     assert(state.currentAction === '左移', 'T28 move-left mapping failed.')
+    assert(state.lastActionRoute === 'stereo-pan:-0.28', 'Move-left did not use the disclosed directional pan.')
     await page.click('[data-action="move-right"]')
+    await page.waitForTimeout(20)
+    state = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
+    assert(state.lastActionRoute === 'stereo-pan:0.28', 'Move-right did not use the disclosed directional pan.')
     await page.click('[data-action="rotate"]')
+    await page.waitForTimeout(20)
+    state = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
+    assert(state.currentAction === '旋转' && state.lastActionRoute === 'direct', 'Rotate did not bypass StereoPanner.')
     await page.click('[data-action="lock"]')
+    await page.waitForTimeout(20)
+    state = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
+    assert(state.currentAction === '自然落位' && state.lastActionRoute === 'direct', 'Natural lock did not bypass StereoPanner.')
     await page.click('[data-action="hard-drop"]')
+    await page.waitForTimeout(20)
+    state = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
+    assert(state.currentAction === '硬降' && state.lastActionRoute === 'direct', 'Hard drop did not bypass StereoPanner.')
     await page.waitForTimeout(220)
     await page.click('[data-action="repeat"]')
     await page.waitForTimeout(1250)
@@ -248,6 +262,7 @@ async function main() {
       assertions: {
         r4RecipesExcluded: true,
         exactHistoricalProfiles: 2,
+        centredHistoricalActionsBypassStereoPanner: true,
         acceptedSoundsNotReopened: true,
         clearFourHasFourPulsesAndNoTail: true,
         embeddedBytesMatchDownloadedPreviews: true,

@@ -129,6 +129,7 @@ let actionMaster = null
 let actionCompressor = null
 let currentProfileId = 't28'
 let currentAction = null
+let lastActionRoute = 'not-played'
 let playbackMode = 'loading'
 
 function schedule(callback, delayMs) {
@@ -221,7 +222,9 @@ function tone(options, pan = 0) {
   const end = start + options.duration
   const oscillator = audioContext.createOscillator()
   const gain = audioContext.createGain()
-  const panner = typeof audioContext.createStereoPanner === 'function' ? audioContext.createStereoPanner() : null
+  const panner = pan !== 0 && typeof audioContext.createStereoPanner === 'function'
+    ? audioContext.createStereoPanner()
+    : null
   oscillator.type = options.type ?? 'sine'
   oscillator.frequency.setValueAtTime(options.frequency, start)
   if (options.endFrequency) oscillator.frequency.exponentialRampToValueAtTime(Math.max(1, options.endFrequency), end)
@@ -247,8 +250,10 @@ function tone(options, pan = 0) {
     gain.connect(panner)
     panner.connect(actionEffects)
     nodes.push(panner)
+    lastActionRoute = `stereo-pan:${pan}`
   } else {
     gain.connect(actionEffects)
+    lastActionRoute = 'direct'
   }
   const voice = { source: oscillator, gain, nodes, released: false }
   liveVoices.add(voice)
@@ -477,6 +482,7 @@ window.render_game_to_text = () => JSON.stringify({
   surface: 'T37 audio audition R5',
   currentProfile: currentProfileId,
   currentAction,
+  lastActionRoute,
   playbackMode,
   accepted: ACCEPTED,
   profiles: PROFILES,
