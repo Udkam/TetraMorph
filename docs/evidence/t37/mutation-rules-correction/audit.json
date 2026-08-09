@@ -1,0 +1,214 @@
+{
+  "sourceSha": "ae75f1e830b2cc10d261770b9ceb62cdf9b907a8",
+  "origin": "http://127.0.0.1:4185",
+  "live": {
+    "layout": {
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900
+      },
+      "bounds": {
+        "board": {
+          "left": 524,
+          "top": 88,
+          "right": 916,
+          "bottom": 872,
+          "width": 392,
+          "height": 784
+        },
+        "stats": {
+          "left": 959.1875,
+          "top": 118,
+          "right": 1183.1875,
+          "bottom": 376.03125,
+          "width": 224,
+          "height": 258.03125
+        },
+        "next": {
+          "left": 256.8125,
+          "top": 143,
+          "right": 480.8125,
+          "bottom": 255,
+          "width": 224,
+          "height": 112
+        },
+        "touch": null
+      },
+      "assertions": {
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "minButtonWidth": 58,
+        "minButtonHeight": 44,
+        "noHorizontalOverflow": true,
+        "noVerticalOverflow": true
+      },
+      "state": {
+        "mode": "sprint",
+        "status": "playing",
+        "active": {
+          "type": "Z",
+          "rotation": 0,
+          "x": 3,
+          "y": 19
+        }
+      },
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "activeCells": [
+          {
+            "x": 3,
+            "y": 19
+          },
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 3,
+            "y": 38
+          },
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ]
+      }
+    },
+    "cadence": "0.8",
+    "cadenceAria": "0.8 秒/格",
+    "unit": "秒/格"
+  },
+  "deterministicScenario": {
+    "fastestTicks": 6,
+    "fastestZh": "0.1 秒/格",
+    "fastestEn": "0.1 s/cell",
+    "supergravityRuleEn": "Freeze sets gravity to 1.0 s/cell for 10 seconds; Supergravity settles only each of the next 5 pieces by its own occupied columns, without moving locked cells; Bomb clears the bottom 3 rows; Double makes line-clear scores ×2 for 10 seconds. Repeating Freeze or Double refreshes its duration, while Supergravity refreshes its 5-piece quota; stacked Double becomes Super Double ×4.",
+    "projected": [
+      {
+        "x": 8,
+        "y": 32
+      },
+      {
+        "x": 9,
+        "y": 38
+      },
+      {
+        "x": 8,
+        "y": 33
+      },
+      {
+        "x": 9,
+        "y": 39
+      }
+    ],
+    "lockedCells": [
+      {
+        "x": 8,
+        "y": 32
+      },
+      {
+        "x": 9,
+        "y": 38
+      },
+      {
+        "x": 8,
+        "y": 33
+      },
+      {
+        "x": 9,
+        "y": 39
+      }
+    ],
+    "hardDropDistance": 32,
+    "clearStarted": false,
+    "floatingCell": "J",
+    "floorGap": null,
+    "independentFloorCell": "O",
+    "carriers": [
+      {
+        "id": 4,
+        "item": "freeze",
+        "cells": [
+          {
+            "x": 8,
+            "y": 34
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "item": "bomb",
+        "cells": [
+          {
+            "x": 8,
+            "y": 32
+          },
+          {
+            "x": 9,
+            "y": 38
+          },
+          {
+            "x": 8,
+            "y": 33
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ]
+      }
+    ],
+    "deterministic": true
+  },
+  "rulesText": "规则 消行基础规则与经典相同；每累计消除 6 行，下落速度提升一级。 携带带有彩色核心标记的方块携带道具；该方块任意一格被消除时立即触发。 道具冰冻令方块以 1.0 秒/格下落 10 秒；超重令后续 5 个方块的自身各列独立下沉，已落定方块不移动；炸弹清除底部 3 行；加倍令消行得分 ×2，持续 10 秒。再次触发冰冻或加倍会刷新时长，超重则刷新后续 5 块额度；加倍叠加后升级为超级加倍 ×4。 结束新方块无法进入棋盘时，本局结束。",
+  "errors": [],
+  "assertions": {
+    "oneCanvas": true,
+    "zeroDomBoardCells": true,
+    "noHorizontalOverflow": true,
+    "mutationFloorIsPointOneSeconds": true,
+    "settledCellsRemainFixed": true,
+    "noTunnelOrFalseClear": true,
+    "ghostMatchesLock": true,
+    "carrierCoordinatesMatch": true,
+    "bilingualRuleIsExplicit": true,
+    "browserErrors": 0
+  }
+}
