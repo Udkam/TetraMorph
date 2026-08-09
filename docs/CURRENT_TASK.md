@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **IN PROGRESS — contract checkpoint; no T37 source change accepted yet**
+Status: **IN PROGRESS — core audio audition candidate; HUMAN LISTENING REQUIRED**
 
 ## Active objective
 
@@ -59,6 +59,19 @@ materials, and Puzzle progression.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
+
+## Current checkpoint state
+
+- Core audition source candidate: `0bebf8a`.
+- Source-bound offline WAV evidence: `2ff0bb6`, under
+  `docs/evidence/t37/audio-audition/`.
+- Focused audio tests pass `21/21`; `npm.cmd run typecheck` passes.
+- Five mono 48 kHz / 16-bit audition files have finite samples, zero-valued layer
+  endpoints, byte-identical independent renders, bounded peaks, and zero clipped
+  samples. Cross-process WAV hashes are stable.
+- No full suite, build, browser pass, or complete-palette expansion has run for T37.
+  The next action is explicit user listening acceptance or rejection of the compact
+  audition; automation does not clear this gate.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.

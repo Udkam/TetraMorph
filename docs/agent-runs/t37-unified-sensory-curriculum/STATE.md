@@ -29,8 +29,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Checkpoints
 
-1. `IN PROGRESS` — contract, phase document, and this bounded state.
-2. `PENDING` — read-only inventory and compact audio audition implementation/evidence.
+1. `COMPLETE` — contract, phase document, and this bounded state at `429ffe2`.
+2. `CANDIDATE / LISTENING REQUIRED` — compact audio-audition source is `0bebf8a`;
+   source-bound offline WAV evidence is `2ff0bb6`.
 3. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
 4. `PENDING` — route transition system and reduced-motion verification.
@@ -40,15 +41,22 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Verification state
 
-- Adoption inspection only: `HEAD` and `origin/main` both resolved to `745edb0`.
-- No T37 test, build, browser, server, or generated evidence has run.
+- Contract checkpoint is committed as `429ffe2` on `main`.
+- Focused audio tests pass `21/21`; `npm.cmd run typecheck` passes.
+- Five mono 48 kHz / 16-bit WAV suites under
+  `docs/evidence/t37/audio-audition/` bind directly to source `0bebf8a`. All samples
+  are finite; layer endpoints are zero; independent in-process and cross-process WAV
+  hashes are stable; peaks are bounded; clipped sample count is zero.
+- No full suite, build, browser pass, server, or complete-palette expansion has run.
 - Two initial read-only audit agents failed before producing findings because the
   selected model was at capacity. No retry loop or extra resource was started.
 
 ## Next exact action
 
-Commit the contract checkpoint with only the four T37 documentation paths, then perform
-a targeted read-only inventory for the bounded audio audition paths.
+Have the user listen to the five files linked from
+`docs/evidence/t37/audio-audition/README.md`. Record explicit acceptance or rejection.
+Do not expand the audio palette, start visual work, or reinterpret measurements as
+taste approval before that response.
 
 ## Do not repeat
 
