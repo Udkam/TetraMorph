@@ -27,8 +27,12 @@ materials, and Puzzle progression.
   longer appears as an attached carrier badge or overlay: the complete tetromino is a
   dedicated material object. Ice uses cold crystalline cyan, Bomb uses contained lava,
   Multiplier uses restrained gold glints, and Supergravity uses luminous violet mass.
-  Every cell of a Mutation piece may release its item, but the piece triggers exactly
-  once. Board, active piece, ghost, Next, clear feedback, and audio must agree.
+  A player-supplied reference further freezes triangular cell facets, continuous
+  whole-piece material, bounded state-aware glow, and sparse motifs: frost/mist,
+  ember/core, star glints, and a few gravity wells respectively. Do not copy its labels,
+  column composition, exact facet network, or full-strength bloom. Every cell of a
+  Mutation piece may release its item, but the piece triggers exactly once. Board,
+  active piece, ghost, Next, clear feedback, and audio must agree.
 - **Puzzle:** ship exactly 46 levels split into 5 Intro, 25 Easy, and 16 Hard levels.
   Intro is fully rebuilt around guided 3–4-row positions. Easy stays fully open and
   teaches reusable techniques while retaining normal residual-board puzzles. Hard uses
@@ -77,6 +81,12 @@ materials, and Puzzle progression.
   families. Its generated audio is CC0-1.0 and its code is MIT. Kenney Interface Sounds
   and omgaudio are verified CC0 reserves only; no random aggregator, commercial-game
   recording, network playback, or whole-pack dependency may enter the product.
+- The 2026-08-09 player material reference (conversation asset SHA-256
+  `3BED43DFC335615C6C61A1989DA7B95CCA129C74F41622A1205EF99A59A569B8`) also informs
+  the eventual item sounds: Ice must read as crystal bind/release, Bomb as contained
+  pressure and crack, Multiplier as restrained golden lift, and Supergravity as dense
+  downward mass. It does not authorize copying commercial game audio or changing the
+  current audio-first checkpoint order.
 - Audition R3 reuses the earliest design's readable action contours. Move maps to
   lateral settle, rotate to pivot/detent, hard drop to descent plus
   contact, line clear to the visual sweep and one-to-four row releases, countdown to

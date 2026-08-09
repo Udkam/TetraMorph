@@ -62,6 +62,10 @@ and no Puzzle content is published without strict deterministic proof.
 - Polish ordinary multicolour pieces as the quiet baseline.
 - Replace carrier/badge Mutation rendering with four complete materials: Ice crystal,
   Bomb lava, Multiplier gold, and Supergravity violet mass.
+- Translate the player-supplied material board into original renderer rules: triangular
+  cell facets, continuous whole-piece material, state-aware bounded bloom, and one
+  sparse motif family for each item. Preserve `Supergravity`; do not reproduce the
+  reference labels, composition, exact facet network, or heavy bloom.
 - Share one semantic material description across active piece, Next, ghost, board,
   clear/activation VFX, and matching audio. Prove all four cells can trigger and the
   piece fires once.

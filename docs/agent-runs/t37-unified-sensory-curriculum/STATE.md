@@ -26,6 +26,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Mutation is a whole-piece material, never a carrier badge: Ice crystal, Bomb lava,
   Multiplier gold, and Supergravity violet. Four cells can release one piece-level item
   exactly once.
+- The player-supplied material board is direction only (SHA-256
+  `3BED43DFC335615C6C61A1989DA7B95CCA129C74F41622A1205EF99A59A569B8`): retain its
+  triangular facets, continuous materials, bounded glow hierarchy, and sparse item
+  motifs; do not copy its labels/layout or rename Supergravity to Collapse.
 - Puzzle publication count is 46: 5 Intro, 25 Easy, 16 Hard. Easy is open; Hard uses
   related technique prerequisites at certified optimum plus five operations.
 

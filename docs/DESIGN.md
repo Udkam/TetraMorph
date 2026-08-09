@@ -81,6 +81,18 @@ adding unrelated badges or ornamental effects.
   is faceted cyan crystal with a cold internal edge; **Bomb** is dark contained rock
   with lava seams; **Multiplier** is warm gold with sparse glints; **Supergravity** is
   dense bright violet with a controlled inward falloff. Glows are local and bounded.
+- The player-supplied 2026-08-09 material board is a direction reference, not a
+  production asset or layout to copy. Its adopted principles are triangular internal
+  facets on every cell, one continuous material family across the complete tetromino,
+  and one sparse secondary motif per item. Ice may carry edge frost and a brief mist;
+  Bomb carries ember seams and a contained core; Multiplier carries occasional star
+  glints; Supergravity carries a small number of dark gravity wells rather than a badge
+  on every cell. The project keeps the `Supergravity` name and mechanic rather than the
+  reference image's `Collapse` label.
+- Glow strength is state-aware: active piece and Next may show the strongest material
+  read, ghost is silhouette-safe and translucent, and settled board cells reduce bloom
+  enough that several adjacent pieces remain individually readable. The reference's
+  column layout, labels, exact facet network, and heavy full-time bloom are not copied.
 - The material identity appears consistently on spawn, board, Next, ghost/landing
   guide, activation, and clear. Colour is reinforced by silhouette-safe surface motifs
   so item identity does not depend on hue alone.
