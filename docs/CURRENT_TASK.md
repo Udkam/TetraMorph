@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **LISTENING REQUIRED — R4 soft-action and Ice candidate published**
+Status: **IMPLEMENTING — bounded Mutation rules correction; R4 listening remains open**
 
 ## Active objective
 
@@ -9,6 +9,13 @@ Puzzle into a certified 5/25/16 learning curriculum. T37 supersedes the rejected
 audible palette and combines four user-visible concerns that must agree rather than be
 polished independently: tactile sound, page transitions, ordinary/Mutation piece
 materials, and Puzzle progression.
+
+The player has temporarily interrupted the audio gate for one bounded Core correction.
+Mutation must restore its 0.1-second-per-cell fastest tier. A Supergravity-covered
+tetromino settles by its own occupied columns against the existing board; it must not
+compact, push, or move already-settled cells. The ghost, final lock, carrier coordinates,
+and resulting line-clear rows must agree in the reported floating-cell scenario. This
+exception does not accept R4 audio or open transition, material, or Puzzle expansion.
 
 ## Frozen product direction
 
@@ -147,6 +154,12 @@ materials, and Puzzle progression.
   asset to the committed SHA-256, confirmed the three Ice release peaks near
   `324 / 327 / 327 ms`, and found no inherited T27 or `progress.md` path in range.
   This technical verdict does not replace the remaining human listening decision.
+- A player-observed Supergravity lock exposed that the retained whole-board column
+  compactor moved an isolated settled cell to the floor and completed a row. This was
+  not tunnelling—the compactor preserved vertical order—but it exceeded the current
+  rule copy, which assigns independent descent to the covered tetromino. The bounded
+  correction keeps settled cells fixed as collision support and restores Mutation's
+  historic 0.1-second gravity floor before returning to the R4 listening gate.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.

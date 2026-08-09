@@ -46,12 +46,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    the same four-pulse grammar without the rejected completion tail.
 5. `CANDIDATE / LISTENING REQUIRED` — R4 replaces rejected
    move/rotate/lock/hard-drop and Glass Ice only at candidate tip `9232d14`.
-6. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
+6. `IN PROGRESS` — player-directed bounded Mutation correction from base `265899d`:
+   restore the 0.1-second gravity floor and replace inherited whole-board compaction
+   with covered-piece-only independent-column settlement.
+7. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
-7. `PENDING` — route transition system and reduced-motion verification.
-8. `PENDING` — ordinary/Mutation whole-piece material system.
-9. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
-10. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+8. `PENDING` — route transition system and reduced-motion verification.
+9. `PENDING` — ordinary/Mutation whole-piece material system.
+10. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
+11. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ## Verification state
 
@@ -118,10 +121,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Ask the player to open R4 directly and listen at ordinary device volume. Accept either
-an overall or per-action verdict for move/rotate/natural-lock/hard-drop, and Ice choice
-1 / 2 / 3 or reject-all. Do not expand the remaining palette, change product audio,
-or start transition/material/Puzzle work before that decision.
+Complete the bounded Mutation rules correction: update Core and projection together,
+add the floating-support no-push/no-tunnel regression, run focused then final gates and
+one browser pass, and obtain independent read-only QA. Afterwards return to R4 human
+listening; do not expand the remaining palette or start transition/material/Puzzle work.
 
 ## Do not repeat
 

@@ -12,6 +12,23 @@ reveals material**: motion is calm and precise; contact, clearing, and transform
 produce short physical responses; exceptional states change material rather than
 adding unrelated badges or ornamental effects.
 
+### Player-directed Mutation rules correction
+
+- Mutation's ordinary gravity ladder again ends at **0.1 seconds per cell** (6 fixed
+  ticks at 60 Hz). It keeps the established six-cleared-line tier cadence and restores
+  the complete late-game `0.8 → … → 0.1` ladder; Ice still overrides the live cadence
+  with 1.0 second per cell while active.
+- Supergravity changes only the covered tetromino's settlement. After its ordinary
+  rigid descent, each occupied column of that tetromino may continue downward against
+  the immutable pre-lock board; cells in one piece column keep their vertical spacing.
+  Already-settled board cells are collision support and never move, get pushed, or get
+  compacted by this lock. The covered cells cannot tunnel through them.
+- The landing ghost, final `piece-locked` coordinates, stored carrier geometry, and
+  line-clear decision all use that same piece-only settlement. A floating settled cell
+  therefore remains where it was and can stop a covered column; unrelated columns can
+  still descend farther. This explicitly supersedes the older whole-board column
+  compaction inherited from the historical Collapse mode.
+
 ### Feedback and sound language
 
 - The mix is semantic first: a listener must be able to distinguish lateral movement,
