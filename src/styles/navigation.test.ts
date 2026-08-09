@@ -70,7 +70,7 @@ describe('Phase 9 navigation authority', () => {
     expect(app.match(/className="app-route-viewport"/g)).toHaveLength(1);
     expect(navigation).toContain('T37 Settled Handoff');
     expect(navigation).toMatch(/:root\s*\{[^}]*view-transition-name:\s*none;/s);
-    expect(navigation).toMatch(/\.app-route-viewport\s*\{[^}]*height:\s*100dvh;[^}]*view-transition-name:\s*app-route;/s);
+    expect(navigation).toMatch(/\.app-route-viewport\s*\{[^}]*height:\s*100dvh;[^}]*background:\s*var\(--page\);[^}]*view-transition-name:\s*app-route;/s);
     expect(navigation).toMatch(/::view-transition-old\(app-route\)\s*\{[^}]*120ms/s);
     expect(navigation).toMatch(/::view-transition-new\(app-route\)\s*\{[^}]*200ms/s);
     expect(navigation).toMatch(/data-route-direction="forward"[\s\S]*--t37-route-enter-x:\s*6px;[\s\S]*--t37-route-leave-x:\s*-2px;/);

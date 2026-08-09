@@ -988,6 +988,7 @@
   width: 100%;
   height: 100dvh;
   overflow: hidden;
+  background: var(--page);
   isolation: isolate;
   view-transition-name: app-route;
 }
