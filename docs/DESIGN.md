@@ -215,6 +215,12 @@ adding unrelated badges or ornamental effects.
   settled board as an opaque old row. Reduced motion and Puzzle keep the same discrete
   top-to-bottom audio beats but replace column travel with one stationary row flash and
   no post-commit motion.
+- The implemented candidate at `d1063b8` compresses the ordered centre-out grammar into
+  three readable 60 Hz erase stages per row: centre two, centre six, then complete.
+  Its final beat crosses the unchanged Core commit through an `8 → 4 → 0` translucent
+  two-tick bridge. Evidence `354c465`, final gates, and independent QA are technically
+  green with P0–P3 all zero; this remains a player-facing motion candidate until normal-
+  speed play accepts its cadence and continuity.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

@@ -114,6 +114,12 @@ and no Puzzle content is published without strict deterministic proof.
   motion and Puzzle retain stationary row flashes and omit column travel, fragments,
   and post-commit motion. This visual correction needs fresh browser evidence and human
   play acceptance; the prior evidence remains historical evidence of the rejected pass.
+- Contract `d9e41b4`, source `d1063b8`, and evidence `354c465` complete the bounded
+  technical correction. The real renderer shows `complete → centre 2 → centre 6 →
+  complete` on every row and an `8 → 4 → 0` final bridge while Core still resolves at
+  tick 12. Typecheck, `400 passed / 8 skipped`, the 767-module build, 25-frame browser
+  audit, and independent `70/70` focused QA pass with P0–P3 all zero. Stage C still
+  requires the player's normal-speed play verdict; Stage D remains closed.
 
 ### D. Route transition system
 

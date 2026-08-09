@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE C VISUAL CORRECTION — classic centre-out multi-line clear in progress**
+Status: **STAGE C CLASSIC-CLEAR CANDIDATE — human play acceptance open**
 
 ## Active objective
 
@@ -263,6 +263,20 @@ ordered after Stage C.
   after Core's commit; reduced motion and Puzzle use stationary row flashes with no
   column travel or tail. The rejected whole-row hide, broad flash, shrink/dissolve,
   fragments, and opaque post-commit old cells must not return.
+- Contract `d9e41b4` and product/test source `d1063b8` implement that correction without
+  touching Core, audio, Action A, Ice 2, or the one-line path. Each row now presents
+  `complete flash → centre 2 erased → centre 6 erased → complete`; Core remains atomic
+  at tick 12, with only a translucent renderer-owned `8 → 4 → 0` bridge completing the
+  final row over two ticks. Reduced motion and Puzzle use the stationary no-tail form;
+  fixed Anchor/Bedrock cells remain excluded.
+- Evidence `354c465` binds 25 Pixi frames plus live desktop/mobile and prescribed-client
+  states to full source SHA `d1063b80a699c1bc42327a9fb589cabb681a6ac0`. It reports
+  zero browser errors/failures, one Canvas, zero DOM board cells, no overflow, stable
+  restart, and complete exit cleanup. Final typecheck, the complete suite
+  (`400 passed / 8 skipped`), and the 767-module build pass. Independent read-only QA
+  inspects all frames, reruns the three focused files (`70/70`), and reports
+  `P0 0 / P1 0 / P2 0 / P3 0`. This admits focused human play only; classic feel and
+  final-row continuity are not accepted until the player confirms them at game speed.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current

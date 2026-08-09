@@ -245,14 +245,26 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   short translucent normal-motion tail may outlive Core so the 180 ms final beat can
   complete; Puzzle/reduced motion stay stationary and tail-free. Fresh real frames and
   independent read-only QA are required before another player retest.
+- Contract `d9e41b4` and source `d1063b8` replace that direct hide with a complete-row
+  confirmation flash followed by centre-out visibility counts `10 → 8 → 4 → 0` for
+  each row. The final row crosses Core's unchanged tick-12 commit only through a
+  renderer-owned `8 → 4 → 0` two-tick translucent bridge. Core, audio, one-line clear,
+  Action A, Ice 2, Anchor, and Bedrock behavior remain outside the changed surface.
+- Evidence `354c465` binds 25 renderer frames, desktop Chinese, mobile English, and the
+  prescribed game client to source `d1063b80a699c1bc42327a9fb589cabb681a6ac0`; its
+  audit passes with zero failures/browser errors and clean one-Canvas lifecycle.
+  Post-source typecheck, the complete suite (`400 passed / 8 skipped`), and the
+  767-module build pass. Independent read-only QA views all evidence, passes the three
+  focused files `70/70`, confirms no inherited dirty path entered the range, and reports
+  `P0 0 / P1 0 / P2 0 / P3 0`.
 
 ## Next exact action
 
-Implement and visually verify the bounded classic centre-out 2–4-line correction. Keep
-Studio audio, Bomb, one-line clear, Core timing, and accepted anchors unchanged; capture
-normal, reduced-motion, and Puzzle frames from final source, then obtain independent
-read-only QA before returning the build for focused play. The Ice 2 uploader-original
-WAV provenance remains independently open until acquired and hashed.
+Return the source-bound classic centre-out candidate for focused normal-speed play of
+2–4-line clears. The player must decide whether the row cadence feels classic and the
+final `8 → 4 → 0` bridge reads continuously; do not mark the visual accepted or begin
+Stage D before that verdict. The Ice 2 uploader-original WAV provenance remains
+independently open until acquired and hashed.
 
 ## Do not repeat
 

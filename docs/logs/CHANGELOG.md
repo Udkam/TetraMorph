@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-10 — T37 classic centre-out multi-line clear awaiting play acceptance
+
+- Replaced the rejected beat-triggered whole-row disappearance for 2–4-line clears with
+  a classic game-machine presentation: every existing Studio row beat first confirms
+  the complete row, then erases from the centre outward as `10 → 8 → 4 → 0` visible
+  cells. Row order and accepted `0/180`, `0/90/180`, and `0/60/120/180 ms` audio timing
+  remain unchanged.
+- Core still performs one atomic stack collapse at tick 12 / 200 ms. A translucent
+  renderer-only `8 → 4 → 0` two-tick bridge completes the final row without delaying
+  input; reduced motion and Puzzle use a stationary no-tail form, and Anchor/Bedrock
+  cells remain fixed.
+- Contract `d9e41b4`, source/tests `d1063b8`, and evidence `354c465` pass final
+  typecheck, the complete suite (`400 passed / 8 skipped`), the 767-module build, a
+  25-frame zero-error browser audit, and independent focused tests `70/70`. Read-only QA
+  reports `P0 0 / P1 0 / P2 0 / P3 0` after inspecting every frame and confirms that
+  Core/audio plus inherited T27/progress paths are outside the candidate. Human play at
+  normal speed remains the acceptance gate.
+
 ## 2026-08-10 — T37 Bomb and multi-line feedback candidate awaiting listening
 
 - Strengthened Bomb as a contained pressure-to-impact gesture: quiet 74 Hz pressure
