@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **DESIGNING R5 — R4 rejected; recover softer history and crisp ice-cube sound**
+Status: **AWAITING R5 HUMAN LISTENING — exact soft-history recovery and real-Ice audition**
 
 ## Active objective
 
@@ -156,6 +156,22 @@ exception does not accept R4 audio or open transition, material, or Puzzle expan
   sets. Ice may compare at most three short, crisp, real ice-cube contact/crack sources
   from primary pages with verified redistribution terms; spell, wind, glass-sparkle,
   large shatter, long-tail, and zap language is rejected.
+- R5 source `2eb56af` restores T28 `35509a7` / blob `c43a687...` and T29
+  `ca5da48` / blob `f470e89...` with their exact recipes and mixers. Repair
+  `f241488` removes an unintended centred `StereoPannerNode` attenuation: only left and
+  right movement add the disclosed `-0.28 / +0.28` pan; rotate, natural lock, and hard
+  drop now use the historical direct route and original level.
+- The three Ice choices are independent CC0 Freesound recordings from `giwake`, `sbml`,
+  and `ecfike`. R5 plays one peak-centred window at original rate with no filter, pitch
+  change, spell layer, or synthetic sparkle. The committed audition files are Freesound
+  HQ Ogg previews; production adoption requires downloading and hashing the uploader's
+  original WAV after the player selects a direction.
+- Evidence `05b28ff` binds to repaired source `f241488`. Its verifier passes two exact
+  historical profiles, three Ice decodes, embedded/direct-file byte equality, centred
+  action routing, desktop/mobile layout, reduced motion, and zero console/page errors.
+  Final typecheck, the complete suite (`381 passed / 8 skipped`), and the 761-module
+  build pass. Independent read-only QA passes with no blocker. These technical results
+  do not accept the sound; R5 remains blocked on the player's listening verdict.
 - The accepted Studio clear 1/2/3 and countdown stay byte/mix frozen. Clear 4 remains
   the same four `progress-step` pulses with no tail. None are reopened for selection.
   Do not implement the complete palette or start transitions before R5 human listening.
@@ -169,7 +185,7 @@ exception does not accept R4 audio or open transition, material, or Puzzle expan
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
   rule copy, which assigns independent descent to the covered tetromino. The bounded
   correction keeps settled cells fixed as collision support and restores Mutation's
-  historic 0.1-second gravity floor before returning to the R4 listening gate.
+  historic 0.1-second gravity floor before returning to the R5 listening gate.
 - Contract `6ffef46`, Core/presentation source `646b865`, bilingual rule copy
   `ae75f1e`, and browser evidence `c691d54` form the bounded correction candidate.
   Focused tests pass `50/50` plus `56/56`; final typecheck, the complete suite

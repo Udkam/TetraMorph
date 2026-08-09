@@ -32,7 +32,7 @@ adding unrelated badges or ornamental effects.
   evidence `c691d54` binds to that product source and reproduces the reported floating
   support without movement, tunnelling, or a false clear. Final typecheck, the complete
   suite (`381 passed / 8 skipped`), build, and final independent read-only QA pass. This
-  bounded acceptance returns T37 to the R4 listening gate; it does not accept R4 audio.
+  bounded acceptance returns T37 to the R5 listening gate; it does not accept audio.
 
 ### Feedback and sound language
 
@@ -112,6 +112,18 @@ adding unrelated badges or ornamental effects.
   Compare at most three primary-source candidates with verified redistribution terms.
   Preserve the accepted Studio clear 1/2/3, countdown, and four-pulse clear 4 exactly;
   they are status-only and are not reopened for voting.
+- The R5 audition restores the exact T28 `35509a7` and T29 `ca5da48` recipes and each
+  historical mixer. Only lateral movement gains the disclosed `-0.28 / +0.28` stereo
+  pan; every centred action bypasses `StereoPannerNode` so browser equal-power panning
+  cannot silently reduce its historical level. Its three Ice options are independent
+  CC0 real-Ice recordings played at original rate as one short peak-centred window,
+  without filters, pitch changes, spell layers, or synthetic sparkle. Freesound HQ Ogg
+  previews are sufficient for this human gate; production adoption still requires the
+  selected uploader's original WAV and a pinned SHA-256.
+- Repaired source `f241488` and evidence `05b28ff` pass the signal, browser, direct-file,
+  responsive, reduced-motion, full project, and independent read-only gates. This only
+  establishes an auditable R5 listening candidate; the player's listening verdict is
+  still the sole authority for expansion.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

@@ -51,8 +51,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    and accepted status checkpoint `4722927` restore the 0.1-second gravity floor and
    replace inherited whole-board compaction with covered-piece-only independent-column
    settlement.
-7. `IN PROGRESS` — R5 recovers at most two exact historical soft action directions and
-   compares at most three short primary-source real ice-cube contact/crack sounds.
+7. `AWAITING HUMAN LISTENING` — R5 source `2eb56af`, centred-gain repair `f241488`,
+   and evidence `05b28ff` compare two exact historical soft action directions and three
+   short primary-source real ice contact/crack recordings. Technical and independent
+   read-only gates pass; taste remains undecided.
 8. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after R5 acceptance.
 9. `PENDING` — route transition system and reduced-motion verification.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
@@ -99,6 +101,19 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   preferred softness, and the three Ice choices did not sound like the requested crisp
   ice-cube response. No R4 recipe is accepted for production; its green technical
   evidence remains provenance and rollback information only.
+- R5 source `2eb56af` restores the exact T28 `35509a7` / `c43a687...` and T29
+  `ca5da48` / `f470e89...` recipes and mixers. Independent QA rejected its initial
+  evidence because a centred `StereoPannerNode` reduced rotate, lock, and hard drop by
+  about 3.01 dB in Chromium. Repair `f241488` limits panning to disclosed left/right
+  movement and routes all centred actions directly; runtime checks observe
+  `stereo-pan:-0.28`, `stereo-pan:0.28`, then `direct` for the other actions.
+- Evidence `05b28ff` binds both reports to `f241488` and passes two-profile history,
+  frozen Studio hashes/mix, four-pulse/no-tail clear 4, three original-rate real-Ice
+  decodes, embedded/direct-file equality, responsive/reduced-motion checks, and zero
+  console/page errors. Final typecheck, the complete suite (`381 passed / 8 skipped`),
+  the 761-module build, the prescribed action client, and final independent read-only
+  QA pass. The Ice files are HQ Ogg audition previews; an accepted source still needs
+  its uploader's original WAV pinned before production use.
 - Accepted Studio clear/countdown uses its own exact R3 compressor
   (`-10 dB / knee 10 / 4:1 / 3 ms / 120 ms`) after follow-up `8d8cb67`; candidates use
   a separate safety compressor. The verifier exposes and asserts this output contract.
@@ -144,10 +159,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Trace the exact earlier soft action version from Git and verify primary-source,
-redistributable real ice-cube recordings. Then build one minimal R5 A/B page with no
-more than two action directions and three Ice choices. Do not expand the remaining
-palette or start transition/material/Puzzle work before R5 human listening.
+Present the direct-file R5 page for human listening. Ask the player to accept T28,
+T29, a per-action mixture, or neither, and to select Ice 1/2/3 or reject all. Do not
+expand the remaining palette or start transition/material/Puzzle work before that
+explicit verdict.
 
 ## Do not repeat
 
