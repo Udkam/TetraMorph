@@ -98,6 +98,20 @@ adding unrelated badges or ornamental effects.
   freeze-only slice whose main response lands at 320 ms, an offline-baked
   freeze-plus-shard cue, and a lowered/filtered shard baseline. The old high-frequency
   Ice spells pair and the 1 ms high-pitched omgaudio zap are explicitly excluded.
+- Human listening rejects the complete R4 candidate. Its `soft` action set is not a
+  recovery baseline, and none of its three Ice recipes may enter production or be
+  rescued by another gain/filter-only pass. Automated signal and browser checks remain
+  technical evidence only and do not weaken this rejection.
+- R5 is recovery-first. Before authoring another action family, inspect the repository's
+  audible history and expose at most two exact, commit-identified earlier directions
+  that genuinely sounded softer. Do not rely on names such as `soft`; the audition must
+  identify the original bytes/recipe and make any new processing explicit.
+- R5 Ice is a short, crisp **real ice-cube** response: a small hard frozen object makes
+  contact and/or a concise crack. Reject spell casting, wind beds, glass sparkle,
+  avalanche-sized shattering, long crystalline tails, and piercing zap transients.
+  Compare at most three primary-source candidates with verified redistribution terms.
+  Preserve the accepted Studio clear 1/2/3, countdown, and four-pulse clear 4 exactly;
+  they are status-only and are not reopened for voting.
 - The replacement audition restores the earliest design's readable motion contours:
   move follows the 56 ms lateral settle;
   rotate owns a curved pivot and detent; hard drop follows the 50 ms descent trail into

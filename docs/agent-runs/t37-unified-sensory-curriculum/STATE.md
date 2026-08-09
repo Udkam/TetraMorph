@@ -44,19 +44,20 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    network-resource review.
 4. `PARTIALLY ACCEPTED` — R3 freezes Studio clear 1/2/3 and countdown; clear 4 adopts
    the same four-pulse grammar without the rejected completion tail.
-5. `CANDIDATE / LISTENING REQUIRED` — R4 replaces rejected
-   move/rotate/lock/hard-drop and Glass Ice only at candidate tip `9232d14`.
+5. `REJECTED BY HUMAN LISTENING` — R4 action and Ice candidate tip `9232d14` is worse
+   than an earlier softer direction; technical checks and independent QA do not rescue it.
 6. `ACCEPTED` — player-directed bounded Mutation correction from base `265899d`:
    source `646b865`, bilingual copy `ae75f1e`, source-bound browser evidence `c691d54`,
    and accepted status checkpoint `4722927` restore the 0.1-second gravity floor and
    replace inherited whole-board compaction with covered-piece-only independent-column
    settlement.
-7. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
-   acceptance.
-8. `PENDING` — route transition system and reduced-motion verification.
-9. `PENDING` — ordinary/Mutation whole-piece material system.
-10. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
-11. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+7. `IN PROGRESS` — R5 recovers at most two exact historical soft action directions and
+   compares at most three short primary-source real ice-cube contact/crack sounds.
+8. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after R5 acceptance.
+9. `PENDING` — route transition system and reduced-motion verification.
+10. `PENDING` — ordinary/Mutation whole-piece material system.
+11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
+12. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ## Verification state
 
@@ -94,6 +95,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   no extra tail, desktop/mobile frames, reduced motion, direct-file playback, and zero
   console/page errors. `git diff --check -- docs/evidence/t37/audio-audition-r4`
   passes.
+- Human listening rejects all of R4. The `soft` name did not correspond to the earlier
+  preferred softness, and the three Ice choices did not sound like the requested crisp
+  ice-cube response. No R4 recipe is accepted for production; its green technical
+  evidence remains provenance and rollback information only.
 - Accepted Studio clear/countdown uses its own exact R3 compressor
   (`-10 dB / knee 10 / 4:1 / 3 ms / 120 ms`) after follow-up `8d8cb67`; candidates use
   a separate safety compressor. The verifier exposes and asserts this output contract.
@@ -139,8 +144,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Return to R4 human listening. Do not expand the remaining palette or start
-transition/material/Puzzle work without the player's sound decision.
+Trace the exact earlier soft action version from Git and verify primary-source,
+redistributable real ice-cube recordings. Then build one minimal R5 A/B page with no
+more than two action directions and three Ice choices. Do not expand the remaining
+palette or start transition/material/Puzzle work before R5 human listening.
 
 ## Do not repeat
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **LISTENING REQUIRED — Mutation correction accepted; R4 audio decision open**
+Status: **DESIGNING R5 — R4 rejected; recover softer history and crisp ice-cube sound**
 
 ## Active objective
 
@@ -147,9 +147,18 @@ exception does not accept R4 audio or open transition, material, or Puzzle expan
 - The accepted 3·2·1 remains a status label rather than a review button. The only
   accepted-area control is the new four-pulse clear-4 extension. Move now reaches its
   main lateral settle at the declared 56 ms and uses a 32 ms soft visual tail.
-- The only next product decision is human listening: ordinary actions may pass as a
-  set or receive per-action feedback; Ice may select 1 / 2 / 3 or reject all. Do not
-  implement the complete palette or start transitions before that answer.
+- Human listening rejects R4 in full: its action set is substantially worse than an
+  earlier softer version, and all three Ice candidates fail. This verdict overrides
+  every green R4 verifier/QA result. Do not incrementally retune, adopt, or present R4
+  again as the baseline.
+- R5 first recovers the exact earlier soft direction from Git history rather than
+  guessing from labels. It may compare at most two commit-identified historical action
+  sets. Ice may compare at most three short, crisp, real ice-cube contact/crack sources
+  from primary pages with verified redistribution terms; spell, wind, glass-sparkle,
+  large shatter, long-tail, and zap language is rejected.
+- The accepted Studio clear 1/2/3 and countdown stay byte/mix frozen. Clear 4 remains
+  the same four `progress-step` pulses with no tail. None are reopened for selection.
+  Do not implement the complete palette or start transitions before R5 human listening.
 - Independent read-only QA passes candidate range `f122a4e..4a61bf5` with
   `P0 0 / P1 0 / P2 0 / P3 0`. A Temp copy reran the verifier, rebuilt the layered Ice
   asset to the committed SHA-256, confirmed the three Ice release peaks near
