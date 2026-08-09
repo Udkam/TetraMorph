@@ -81,8 +81,8 @@ describe('T27-R1 centered live stage', () => {
       hudCss.indexOf('\n}', hudCss.indexOf('.entry-countdown {')) + 2,
     );
     expect(coverBlock).toContain('--entry-cover-fill:');
-    expect(coverBlock).toContain('linear-gradient(\n      90deg');
-    expect(coverBlock).toContain('linear-gradient(\n      180deg');
+    expect(coverBlock).toMatch(/linear-gradient\(\r?\n\s+90deg/);
+    expect(coverBlock).toMatch(/linear-gradient\(\r?\n\s+180deg/);
     expect(coverBlock).toContain('var(--entry-cover-fill)');
     expect(coverBlock).not.toContain('radial-gradient');
     expect(hudCss).toMatch(/\.entry-countdown::before\s*\{[^}]*animation:\s*entry-cover-breathe 2600ms ease-in-out infinite alternate;/s);
