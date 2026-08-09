@@ -145,6 +145,32 @@ const screenshot = (page, name) => page.screenshot({
   animations: 'allow',
 });
 
+const manifestPayload = (file) => {
+  const bytes = fs.readFileSync(path.join(output, file));
+  if (!/\.(?:json|md|mjs)$/u.test(file)) return bytes;
+  return Buffer.from(bytes.toString('utf8').replace(/\r\n?/gu, '\n'), 'utf8');
+};
+
+const writeManifest = ({ sourceSha: boundSourceSha, capturedAt }) => {
+  const manifestFiles = [
+    'README.md',
+    'capture-route-handoff.mjs',
+    'audit.json',
+    ...fs.readdirSync(output).filter((file) => file.endsWith('.png')).sort(),
+  ];
+  const manifest = {
+    sourceSha: boundSourceSha,
+    capturedAt,
+    algorithm: 'sha256',
+    textNormalization: 'UTF-8 with CRLF and CR normalized to LF for .json, .md, and .mjs',
+    files: Object.fromEntries(manifestFiles.map((file) => [
+      file,
+      createHash('sha256').update(manifestPayload(file)).digest('hex'),
+    ])),
+  };
+  fs.writeFileSync(path.join(output, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+};
+
 const waitForIdle = (page) => page.waitForFunction(
   () => document.querySelector('.app')?.getAttribute('data-route-transition') === 'idle',
   null,
@@ -161,6 +187,12 @@ const validateTopology = (name, snapshot, { expectedCanvas = null } = {}) => {
     requireEvidence(snapshot.canvasCount === expectedCanvas, `${name}: expected ${expectedCanvas} Canvas, got ${snapshot.canvasCount}`);
   }
 };
+
+if (process.argv.includes('--manifest-only')) {
+  const audit = JSON.parse(fs.readFileSync(path.join(output, 'audit.json'), 'utf8'));
+  writeManifest(audit);
+  process.exit(0);
+}
 
 let browser;
 try {
@@ -416,21 +448,7 @@ try {
   fs.writeFileSync(path.join(output, 'audit.json'), `${JSON.stringify(audit, null, 2)}\n`, 'utf8');
   if (failures.length > 0) throw new Error(failures.join('\n'));
 
-  const manifestFiles = [
-    'capture-route-handoff.mjs',
-    'audit.json',
-    ...fs.readdirSync(output).filter((file) => file.endsWith('.png')).sort(),
-  ];
-  const manifest = {
-    sourceSha,
-    capturedAt: audit.capturedAt,
-    algorithm: 'sha256',
-    files: Object.fromEntries(manifestFiles.map((file) => [
-      file,
-      createHash('sha256').update(fs.readFileSync(path.join(output, file))).digest('hex'),
-    ])),
-  };
-  fs.writeFileSync(path.join(output, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  writeManifest(audit);
 } finally {
   if (browser) await browser.close().catch(() => {});
 }

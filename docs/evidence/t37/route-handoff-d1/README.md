@@ -23,4 +23,8 @@ Set `T37_ROUTE_ORIGIN` to use another explicitly owned local origin. The capture
 
 `audit.json` is the machine-readable decision. A passing run has empty `failures` and
 `browserErrors` arrays. `manifest.json` pins the capture script, audit, and every PNG by
-SHA-256. The images are real Chromium frames, not fabricated route state.
+SHA-256. Text entries are hashed as UTF-8 after CRLF/CR is normalized to LF, so the
+manifest remains stable under this repository's Windows checkout policy. Run
+`node docs/evidence/t37/route-handoff-d1/capture-route-handoff.mjs --manifest-only` to
+recompute only that portable manifest. The images are real Chromium frames, not
+fabricated route state.

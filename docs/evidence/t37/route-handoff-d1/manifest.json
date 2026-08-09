@@ -2,8 +2,10 @@
   "sourceSha": "a1c9dea2baef4a022da6823e32b5a684dcabeba8",
   "capturedAt": "2026-08-09T23:43:46.229Z",
   "algorithm": "sha256",
+  "textNormalization": "UTF-8 with CRLF and CR normalized to LF for .json, .md, and .mjs",
   "files": {
-    "capture-route-handoff.mjs": "1ef26d7a7de0ef47865ce1ae413e1b3d92093f8a18791721f1bec15a72be8c7e",
+    "README.md": "f81cacdba8f658238f8d8ee411a34e923c42b803c472b8c152b25cf6d3a39cf7",
+    "capture-route-handoff.mjs": "09ce3233f9616b4cf16dd626f88d8b83b1cc5d6ba109a591ff11771488bb6d38",
     "audit.json": "38ac6afa65a123c982365eeb6d4765b234467eff9b46b67a571ec8d56a3c702b",
     "fallback-forward-080ms.png": "80d52fb24c65fa7a9647a16f419c17794094c54bef139a29055058d30c5824b6",
     "fallback-forward-final.png": "29e9f6c021a1ccd85bb7cd3088534c769b398ca6a26754795869531e5eee0575",
