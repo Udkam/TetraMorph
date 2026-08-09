@@ -12,7 +12,8 @@ import {
 } from '../core';
 import {
   CLASSIC_LINE_CLEAR_TAIL_MS,
-  lineClearRowElapsedTicks,
+  lineClearRowDurationMs,
+  lineClearRowElapsedMs,
 } from '../../animation/lineClearTimeline';
 
 export interface PresentationPoint {
@@ -65,6 +66,16 @@ export interface OrdinaryLineClearFragment {
   height: number;
   driftX: number;
   driftY: number;
+}
+
+export interface ClassicLineClearCellSample {
+  active: boolean;
+  complete: boolean;
+  pairIndex: number;
+  pairProgress: number;
+  alpha: number;
+  scale: number;
+  highlight: number;
 }
 
 const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
@@ -145,7 +156,7 @@ export function ordinaryLineClearCellProgress(
   return lineClearCellProgress(rowProgress, column, width);
 }
 
-/** Symmetric NES-like pair ordinal: `[4,5]` is zero and `[0,9]` is four. */
+/** Symmetric centre-out pair ordinal: `[4,5]` is zero and `[0,9]` is four. */
 export function classicLineClearPairIndex(column: number, width: number): number | null {
   if (!Number.isInteger(column) || !Number.isInteger(width) || width <= 0 || column < 0 || column >= width) {
     return null;
@@ -153,69 +164,73 @@ export function classicLineClearPairIndex(column: number, width: number): number
   return Math.floor(Math.abs(column - (width - 1) / 2));
 }
 
+const clampUnit = (value: number): number => Math.max(0, Math.min(1, value));
+const smoothstepUnit = (value: number): number => {
+  const clamped = clampUnit(value);
+  return clamped * clamped * (3 - 2 * clamped);
+};
+
 /**
- * Number of symmetric centre-out pairs already erased at a row-local time.
- * The fixed ten-column board reads as `0 → 1 → 3 → 5` pairs across three ticks.
+ * Continuous R3 material sample. Normal motion gives every symmetric pair a real
+ * intermediate body/highlight state; restrained geometry changes opacity only.
  */
-export function classicLineClearErasedPairCount(
-  elapsedTicks: number,
+export function classicLineClearCellSample(
+  elapsedMs: number,
+  column: number,
   width: number,
+  rowOrder: number,
+  count: number,
   restrainedGeometry: boolean,
-): number {
-  if (!Number.isFinite(elapsedTicks) || !Number.isInteger(width) || width <= 0 || elapsedTicks <= 0) return 0;
+): Readonly<ClassicLineClearCellSample> {
+  const pairIndex = classicLineClearPairIndex(column, width);
+  const rowElapsedMs = lineClearRowElapsedMs(elapsedMs, count, rowOrder);
+  const rowDurationMs = lineClearRowDurationMs(count, rowOrder);
+  if (pairIndex === null || rowElapsedMs === null || rowDurationMs <= 0) {
+    return Object.freeze({
+      active: false,
+      complete: false,
+      pairIndex: pairIndex ?? -1,
+      pairProgress: 0,
+      alpha: 1,
+      scale: 1,
+      highlight: 0,
+    });
+  }
+
+  const rowFlash = 1 - smoothstepUnit(rowElapsedMs / 32);
+  if (restrainedGeometry) {
+    const fade = smoothstepUnit((rowElapsedMs - 40) / Math.max(1, rowDurationMs - 40));
+    const alpha = Math.max(0, 1 - fade);
+    return Object.freeze({
+      active: true,
+      complete: fade >= 1,
+      pairIndex,
+      pairProgress: fade,
+      alpha,
+      scale: 1,
+      highlight: Math.max(rowFlash * 0.8, alpha * 0.12),
+    });
+  }
+
   const pairCount = Math.ceil(width / 2);
-  if (restrainedGeometry) return pairCount;
-  const step = Math.floor(elapsedTicks);
-  if (step <= 0) return 0;
-  if (step === 1) return Math.min(1, pairCount);
-  if (step === 2) return Math.min(pairCount, Math.max(1, Math.ceil(pairCount * 0.6)));
-  return pairCount;
-}
-
-export function classicLineClearCellErased(
-  elapsedTicks: number,
-  column: number,
-  width: number,
-  restrainedGeometry: boolean,
-): boolean {
-  const pairIndex = classicLineClearPairIndex(column, width);
-  if (pairIndex === null) return false;
-  return pairIndex < classicLineClearErasedPairCount(elapsedTicks, width, restrainedGeometry);
-}
-
-/**
- * Binds each multi-line row to its Studio beat. A complete confirmation flash is
- * followed by a clean centre-out boundary; no chip/fracture language is returned.
- */
-export function ordinaryMultiLineClearCellProgress(
-  phaseTicks: number,
-  column: number,
-  width: number,
-  rowOrder: number,
-  count: number,
-  restrainedGeometry: boolean,
-): number {
-  const pairIndex = classicLineClearPairIndex(column, width);
-  const elapsedTicks = lineClearRowElapsedTicks(phaseTicks, count, rowOrder);
-  if (pairIndex === null || elapsedTicks === null) return 0;
-  if (classicLineClearCellErased(elapsedTicks, column, width, restrainedGeometry)) return 0;
-  if (elapsedTicks <= 0 || restrainedGeometry) return 1;
-  const erasedPairs = classicLineClearErasedPairCount(elapsedTicks, width, false);
-  const boundaryDistance = Math.max(0, pairIndex - erasedPairs);
-  return Math.max(0.24, 1 - boundaryDistance * 0.24);
-}
-
-export function ordinaryMultiLineClearCellErased(
-  phaseTicks: number,
-  column: number,
-  width: number,
-  rowOrder: number,
-  count: number,
-  restrainedGeometry: boolean,
-): boolean {
-  const elapsedTicks = lineClearRowElapsedTicks(phaseTicks, count, rowOrder);
-  if (elapsedTicks === null) return false;
-  return classicLineClearCellErased(elapsedTicks, column, width, restrainedGeometry);
+  const pairWindowMs = rowDurationMs * 0.44;
+  const pairStaggerMs = pairCount <= 1
+    ? 0
+    : (rowDurationMs - pairWindowMs) / (pairCount - 1);
+  const pairProgress = clampUnit((rowElapsedMs - pairIndex * pairStaggerMs) / Math.max(1, pairWindowMs));
+  const fade = smoothstepUnit((pairProgress - 0.35) / 0.65);
+  const alpha = Math.max(0, 1 - fade);
+  const swell = Math.sin(Math.PI * Math.min(1, pairProgress / 0.35));
+  const scale = Math.max(0.78, 1 + 0.035 * swell - 0.22 * fade);
+  return Object.freeze({
+    active: true,
+    complete: pairProgress >= 1,
+    pairIndex,
+    pairProgress,
+    alpha,
+    scale,
+    highlight: Math.max(rowFlash * 0.8, Math.sin(Math.PI * pairProgress)) * alpha,
+  });
 }
 
 /**

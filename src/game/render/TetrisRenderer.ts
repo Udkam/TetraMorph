@@ -56,8 +56,8 @@ import {
 } from '../../animation/mutationTimeline';
 import {
   LINE_CLEAR_FIXED_STEP_MS,
-  lineClearReleaseAgeMs,
   lineClearReleaseSnapshot,
+  lineClearVisualDurationMs,
   orderedLineClearRows,
 } from '../../animation/lineClearTimeline';
 import {
@@ -70,18 +70,15 @@ import {
   internalCellSeams,
   nextPreviewPieces,
   ORDINARY_LINE_CLEAR_TAIL_LIMIT,
+  classicLineClearCellSample,
   ordinaryLineClearCellProgress,
-  classicLineClearCellErased,
-  classicLineClearErasedPairCount,
-  classicLineClearPairIndex,
   ordinaryLineClearFragment,
-  ordinaryMultiLineClearCellProgress,
-  ordinaryMultiLineClearCellErased,
   ordinaryLineClearPresentationProgress,
   ordinaryLineClearProfile,
   orthogonalCellComponents,
   projectedLandingCells,
   survivalDebrisCells,
+  type ClassicLineClearCellSample,
   type CellEdge,
   type BoardShiftDirection,
 } from './presentation';
@@ -147,13 +144,21 @@ interface BoardShift {
   duration: number;
 }
 
-interface OrdinaryLineClearTail {
+interface OrdinaryMultiLineClearCueCell {
+  cell: Cell;
+  material: BoardMaterial;
+  rowOrder: number;
+  mutationItem: MutationItem | null;
+}
+
+interface OrdinaryMultiLineClearCue {
   count: 2 | 3 | 4;
-  cells: readonly { cell: Cell; material: BoardMaterial }[];
-  elapsedAtCommitTicks: number;
+  orderedRows: readonly number[];
+  cells: readonly OrdinaryMultiLineClearCueCell[];
   elapsed: number;
   duration: number;
-  intensity: number;
+  restrained: boolean;
+  committed: boolean;
   fresh: boolean;
 }
 
@@ -292,6 +297,15 @@ export interface RendererSnapshot {
     readonly releaseTicks: readonly number[];
     readonly releasedRows: readonly number[];
   } | null;
+  ordinaryMultiLineClearCues: Array<{
+    count: 2 | 3 | 4;
+    orderedRows: number[];
+    elapsedMs: number;
+    durationMs: number;
+    committed: boolean;
+    restrained: boolean;
+    visibleCellCount: number;
+  }>;
   presentation: { x: number; y: number; offsetX: number; offsetY: number } | null;
   boardShiftOffsetY: number;
   mutationFilters: { freeze: boolean; collapse: boolean; activeCount: number };
@@ -365,19 +379,20 @@ const SURVIVAL_ENTRY_RISE_MS = 680;
 const SURVIVAL_ENTRY_SETTLE_MS = 140;
 const SURVIVAL_ENTRY_DURATION_MS = SURVIVAL_ENTRY_RISE_MS + SURVIVAL_ENTRY_SETTLE_MS;
 
-function ordinaryLineClearCellIsErased(
+function ordinaryLineClearCellSampleForState(
   state: GameState,
   column: number,
   row: number,
   restrainedGeometry: boolean,
-): boolean {
-  if (state.phase !== 'line-clear') return false;
+  elapsedMs = state.phaseTicks * LINE_CLEAR_FIXED_STEP_MS,
+): Readonly<ClassicLineClearCellSample> | null {
+  if (state.phase !== 'line-clear') return null;
   const release = lineClearReleaseSnapshot(state.pendingClearRows, state.phaseTicks);
-  if (!release || release.count === 1) return false;
+  if (!release || release.count === 1) return null;
   const rowOrder = release.orderedRows.indexOf(row);
-  if (rowOrder < 0) return false;
-  return ordinaryMultiLineClearCellErased(
-    state.phaseTicks,
+  if (rowOrder < 0) return null;
+  return classicLineClearCellSample(
+    elapsedMs,
     column,
     BOARD_WIDTH,
     rowOrder,
@@ -617,7 +632,7 @@ export class TetrisRenderer {
   private impact = 0;
   private rotationPulse = 0;
   private boardShift: BoardShift | null = null;
-  private readonly ordinaryLineClearTails: OrdinaryLineClearTail[] = [];
+  private readonly ordinaryMultiLineClearCues: OrdinaryMultiLineClearCue[] = [];
   private readonly classicFeedbackCues: ClassicFeedbackCue[] = [];
   private readonly survivalDebrisPresentation = new Map<number, SurvivalDebrisPresentation>();
   private readonly survivalStoneCues: SurvivalStoneCue[] = [];
@@ -694,6 +709,7 @@ export class TetrisRenderer {
     activeSpawnEntry: null,
     visibleLockedCells: 0,
     ordinaryLineClear: null,
+    ordinaryMultiLineClearCues: [],
     presentation: null,
     boardShiftOffsetY: 0,
     mutationFilters: { freeze: false, collapse: false, activeCount: 0 },
@@ -747,6 +763,8 @@ export class TetrisRenderer {
 
   setOptions(options: Partial<RenderOptions>): void {
     const previousEntryRows = this.options.survivalEntryBedrockRows;
+    const previousReducedMotion = this.options.reducedMotion;
+    const previousModeSwitch = this.options.modeSwitch;
     const hasEntryRows = Object.prototype.hasOwnProperty.call(options, 'survivalEntryBedrockRows');
     const requestedEntryRows = hasEntryRows
       ? options.survivalEntryBedrockRows
@@ -768,14 +786,14 @@ export class TetrisRenderer {
             duration: SURVIVAL_ENTRY_DURATION_MS,
           };
     }
-    if (this.options.reducedMotion) {
+    if (this.options.reducedMotion && !previousReducedMotion) {
       this.presentation = null;
       this.trail = null;
       this.lockPulse = null;
       this.impact = 0;
       this.rotationPulse = 0;
       this.boardShift = null;
-      this.ordinaryLineClearTails.length = 0;
+      this.ordinaryMultiLineClearCues.length = 0;
       this.survivalEntryBedrockRise = null;
       this.mutationArrival = null;
       // Keep the authoritative Mutation FIFO, timed fields, Collapse endpoint,
@@ -785,6 +803,7 @@ export class TetrisRenderer {
       this.resetMutationFilters();
       this.setWorldOffset(0, 0);
     }
+    if (this.options.modeSwitch && !previousModeSwitch) this.ordinaryMultiLineClearCues.length = 0;
   }
 
   private syncCanvasSize(app: Application): void {
@@ -950,7 +969,7 @@ export class TetrisRenderer {
     this.activeSpawnGenerationKey = null;
     this.activeSpawnEntry = null;
     this.lockPulse = null;
-    this.ordinaryLineClearTails.length = 0;
+    this.ordinaryMultiLineClearCues.length = 0;
     this.classicFeedbackCues.length = 0;
     this.mutationFlash = null;
     this.mutationArrival = null;
@@ -1029,6 +1048,37 @@ export class TetrisRenderer {
     }
   }
 
+  private ordinaryMultiLineClearCueForState(state: GameState): OrdinaryMultiLineClearCue | null {
+    if (state.phase !== 'line-clear' || state.pendingClearRows.length < 2 || state.pendingClearRows.length > 4) {
+      return null;
+    }
+    const orderedRows = orderedLineClearRows(state.pendingClearRows);
+    for (let index = this.ordinaryMultiLineClearCues.length - 1; index >= 0; index -= 1) {
+      const cue = this.ordinaryMultiLineClearCues[index]!;
+      if (
+        cue.count === orderedRows.length
+        && cue.orderedRows.every((row, rowOrder) => row === orderedRows[rowOrder])
+      ) return cue;
+    }
+    return null;
+  }
+
+  private ordinaryMultiLineClearSampleForState(
+    state: GameState,
+    column: number,
+    row: number,
+    restrainedGeometry: boolean,
+  ): Readonly<ClassicLineClearCellSample> | null {
+    const cue = this.ordinaryMultiLineClearCueForState(state);
+    return ordinaryLineClearCellSampleForState(
+      state,
+      column,
+      row,
+      cue?.restrained ?? restrainedGeometry,
+      cue?.elapsed,
+    );
+  }
+
   private drawPieces(state: GameState, layout: BoardLayout): void {
     const graphics = this.pieceGraphics;
     graphics.clear();
@@ -1047,6 +1097,12 @@ export class TetrisRenderer {
     this.syncActiveSpawnEntry(state);
     let visibleLockedCells = 0;
     const lockedByMaterial = new Map<BoardMaterial, Cell[]>();
+    const transitioningLockedCells: Array<{
+      cell: Cell;
+      material: BoardMaterial;
+      alpha: number;
+      scale: number;
+    }> = [];
     const risingBedrockCells: Cell[] = [];
     const stagedBedrockRows = state.mode === 'race' && state.status === 'ready'
       ? this.options.survivalEntryBedrockRows
@@ -1072,22 +1128,40 @@ export class TetrisRenderer {
         )
       : 0;
 
+    this.drawCommittedOrdinaryMultiLineClearBodies(graphics, layout);
+
     state.board.forEach((row, boardY) => {
       if (boardY < VISIBLE_START_ROW) return;
       row.forEach((cell, x) => {
         if (!cell) return;
-        if (
-          ordinaryLineClearCellIsErased(state, x, boardY, restrainedClearGeometry)
-          && cell !== ANCHOR_CELL
-          && cell !== BEDROCK_CELL
-        ) return;
         const visibleY = boardY - VISIBLE_START_ROW;
+        const clearSample = cell === ANCHOR_CELL || cell === BEDROCK_CELL
+          ? null
+          : this.ordinaryMultiLineClearSampleForState(
+              state,
+              x,
+              boardY,
+              restrainedClearGeometry,
+            );
+        if (clearSample?.complete) return;
         if (
           cell === BEDROCK_CELL
           && stagedBedrockRows !== null
           && visibleY < firstVisibleBedrockY
         ) return;
         visibleLockedCells += 1;
+        if (
+          clearSample?.active
+          && (clearSample.alpha < 0.999 || Math.abs(clearSample.scale - 1) > 0.001)
+        ) {
+          transitioningLockedCells.push({
+            cell: { x, y: visibleY },
+            material: cell,
+            alpha: clearSample.alpha,
+            scale: clearSample.scale,
+          });
+          return;
+        }
         if (cell === BEDROCK_CELL && entryRiseActive) {
           risingBedrockCells.push({ x, y: visibleY });
           return;
@@ -1103,6 +1177,15 @@ export class TetrisRenderer {
         originY: layout.y,
         unit: layout.cell,
         offsetY: boardShiftOffsetY,
+      });
+    }
+    for (const transition of transitioningLockedCells) {
+      this.drawCellGroups(graphics, [transition.cell], transition.material, transition.alpha, {
+        originX: layout.x,
+        originY: layout.y,
+        unit: layout.cell,
+        offsetY: boardShiftOffsetY,
+        scale: transition.scale,
       });
     }
     if (risingBedrockCells.length > 0) {
@@ -1261,7 +1344,8 @@ export class TetrisRenderer {
     const stroke = Math.max(1, layout.cell * 0.038);
     for (const cell of state.puzzleTargetCells) {
       if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
-      if (ordinaryLineClearCellIsErased(state, cell.x, cell.y, true)) continue;
+      const clearSample = this.ordinaryMultiLineClearSampleForState(state, cell.x, cell.y, true);
+      if (clearSample?.complete) continue;
       const material = state.board[cell.y]?.[cell.x];
       if (!material || material === ANCHOR_CELL || material === BEDROCK_CELL) continue;
       const x = layout.x + cell.x * layout.cell + inset;
@@ -1269,7 +1353,7 @@ export class TetrisRenderer {
       graphics.moveTo(x + bracket, y)
         .lineTo(x, y)
         .lineTo(x, y + bracket)
-        .stroke({ color: COLORS.target, alpha: 0.76, width: stroke });
+        .stroke({ color: COLORS.target, alpha: 0.76 * (clearSample?.alpha ?? 1), width: stroke });
     }
   }
 
@@ -1296,21 +1380,49 @@ export class TetrisRenderer {
   ): void {
     if (state.mode !== 'sprint') return;
     for (const carrier of state.mutationCarriers) {
-      const cells = carrier.cells
-        .filter((cell) => (
-          cell.y >= VISIBLE_START_ROW
-          && cell.y < VISIBLE_START_ROW + VISIBLE_HEIGHT
-          && !ordinaryLineClearCellIsErased(
-            state,
-            cell.x,
-            cell.y,
-            this.options.reducedMotion,
-          )
-        ))
-        .map((cell) => ({ x: cell.x, y: cell.y - VISIBLE_START_ROW }));
-      if (cells.length === 0) continue;
-      this.drawMutationCarrierSurface(graphics, cells, carrier.item, layout, 0, offsetY);
-      this.drawMutationCarrierCore(graphics, cells, carrier.item, layout, 0, offsetY);
+      const stableCells: Cell[] = [];
+      const transitioningCells: Array<{ cell: Cell; alpha: number }> = [];
+      for (const cell of carrier.cells) {
+        if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
+        const sample = this.ordinaryMultiLineClearSampleForState(
+          state,
+          cell.x,
+          cell.y,
+          this.options.reducedMotion,
+        );
+        if (sample?.complete) continue;
+        const visibleCell = { x: cell.x, y: cell.y - VISIBLE_START_ROW };
+        if (sample?.active && sample.alpha < 0.999) {
+          transitioningCells.push({ cell: visibleCell, alpha: sample.alpha });
+        } else {
+          stableCells.push(visibleCell);
+        }
+      }
+      if (stableCells.length > 0) {
+        this.drawMutationCarrierSurface(graphics, stableCells, carrier.item, layout, 0, offsetY);
+        this.drawMutationCarrierCore(graphics, stableCells, carrier.item, layout, 0, offsetY);
+      }
+      for (const transition of transitioningCells) {
+        this.drawMutationCarrierSurface(
+          graphics,
+          [transition.cell],
+          carrier.item,
+          layout,
+          0,
+          offsetY,
+          transition.alpha,
+        );
+        this.drawMutationCarrierCore(
+          graphics,
+          [transition.cell],
+          carrier.item,
+          layout,
+          0,
+          offsetY,
+          1,
+          transition.alpha,
+        );
+      }
     }
   }
 
@@ -1335,7 +1447,9 @@ export class TetrisRenderer {
     layout: BoardLayout,
     offsetX = 0,
     offsetY = 0,
+    intensity = 1,
   ): void {
+    if (intensity <= 0) return;
     const token = MUTATION_VFX_TOKENS[item];
     const pulse = this.options.reducedMotion ? 1 : .72 + Math.sin(this.mutationClockMs / token.animation.pulseMs * Math.PI * 2) * .16;
     const inset = Math.max(1, layout.cell * .22);
@@ -1352,29 +1466,29 @@ export class TetrisRenderer {
           .lineTo(x + layout.cell - inset * 1.7, y + layout.cell - inset * 1.5)
           .lineTo(x + inset * 1.5, y + layout.cell - inset * .8)
           .lineTo(x + inset, y + inset)
-          .fill({ color: token.palette.highlight, alpha: .16 * pulse });
+          .fill({ color: token.palette.highlight, alpha: .16 * pulse * intensity });
         this.strokeSegments(graphics, [
           [x + inset, y + inset, x + layout.cell - inset * 1.35, y + layout.cell - inset * 1.35],
           [x + layout.cell - inset, y + inset * 1.4, x + inset * 1.4, y + layout.cell - inset],
-        ], token.palette.highlight, .36 * pulse, Math.max(1, mark * .36));
+        ], token.palette.highlight, .36 * pulse * intensity, Math.max(1, mark * .36));
       } else if (item === 'collapse') {
         graphics
           .roundRect(centerX - mark * .36, y + inset, mark * .72, layout.cell - inset * 2, mark * .32)
-          .fill({ color: token.palette.deep, alpha: .38 })
+          .fill({ color: token.palette.deep, alpha: .38 * intensity })
           .roundRect(centerX - mark * .16, y + inset * 1.45, mark * .32, layout.cell - inset * 3, mark * .16)
-          .fill({ color: token.palette.highlight, alpha: .46 * pulse });
+          .fill({ color: token.palette.highlight, alpha: .46 * pulse * intensity });
       } else if (item === 'bomb') {
         graphics
           .circle(centerX, centerY, mark * .78)
-          .fill({ color: token.palette.deep, alpha: .5 })
+          .fill({ color: token.palette.deep, alpha: .5 * intensity })
           .circle(centerX - mark * .18, centerY - mark * .18, mark * .26)
-          .fill({ color: token.palette.highlight, alpha: .78 * pulse });
+          .fill({ color: token.palette.highlight, alpha: .78 * pulse * intensity });
       } else {
-        this.drawMutationDiamond(graphics, centerX, centerY, mark * .8, mark * .8, token.palette.highlight, .5 * pulse);
+        this.drawMutationDiamond(graphics, centerX, centerY, mark * .8, mark * .8, token.palette.highlight, .5 * pulse * intensity);
         this.strokeSegments(graphics, [
           [centerX - mark * 1.15, centerY, centerX + mark * 1.15, centerY],
           [centerX, centerY - mark * 1.15, centerX, centerY + mark * 1.15],
-        ], token.palette.primary, .46 * pulse, Math.max(1, mark * .32));
+        ], token.palette.primary, .46 * pulse * intensity, Math.max(1, mark * .32));
       }
     }
   }
@@ -1391,8 +1505,9 @@ export class TetrisRenderer {
     offsetX = 0,
     offsetY = 0,
     detailScale = 1,
+    intensity = 1,
   ): void {
-    if (cells.length === 0) return;
+    if (cells.length === 0 || intensity <= 0) return;
     const material = this.mutationMaterial(item);
     for (const component of orthogonalCellComponents(cells)) {
       const minX = Math.min(...component.map((cell) => cell.x));
@@ -1406,50 +1521,50 @@ export class TetrisRenderer {
         : 1;
       const radius = Math.max(2, layout.cell * .19 * detailScale) * freezeBreath;
       if (item === 'freeze') {
-        this.drawMutationDiamond(graphics, centerX, centerY, radius * 1.18, radius * 1.54, material.edge, .92);
-        this.drawMutationDiamond(graphics, centerX, centerY, radius * .7, radius, material.innerEdge, .94);
+        this.drawMutationDiamond(graphics, centerX, centerY, radius * 1.18, radius * 1.54, material.edge, .92 * intensity);
+        this.drawMutationDiamond(graphics, centerX, centerY, radius * .7, radius, material.innerEdge, .94 * intensity);
         this.strokeSegments(graphics, [
           [centerX - radius * 1.48, centerY, centerX + radius * 1.48, centerY],
           [centerX, centerY - radius * 1.36, centerX, centerY + radius * 1.36],
-        ], material.fillStart, .9, Math.max(1, radius * .28));
+        ], material.fillStart, .9 * intensity, Math.max(1, radius * .28));
       } else if (item === 'collapse') {
         const weightWidth = radius * 2.65;
         const weightHeight = radius * .62;
         graphics
           .roundRect(centerX - weightWidth / 2, centerY - radius * 1.2, weightWidth, weightHeight, radius * .22)
-          .fill({ color: material.edge, alpha: .94 })
+          .fill({ color: material.edge, alpha: .94 * intensity })
           .roundRect(centerX - weightWidth * .38, centerY - radius * .5, weightWidth * .76, weightHeight, radius * .22)
-          .fill({ color: material.fillStart, alpha: .92 })
+          .fill({ color: material.fillStart, alpha: .92 * intensity })
           .circle(centerX, centerY + radius * .7, radius * .54)
-          .fill({ color: material.edge, alpha: .96 })
+          .fill({ color: material.edge, alpha: .96 * intensity })
           .circle(centerX, centerY + radius * .7, radius * .26)
-          .fill({ color: material.innerEdge, alpha: .9 });
+          .fill({ color: material.innerEdge, alpha: .9 * intensity });
         this.strokeSegments(graphics, [
           [centerX - radius * 1.3, centerY + radius * 1.36, centerX - radius * .78, centerY + radius * 2.02],
           [centerX, centerY + radius * 1.36, centerX, centerY + radius * 2.25],
           [centerX + radius * 1.3, centerY + radius * 1.36, centerX + radius * .78, centerY + radius * 2.02],
-        ], material.innerEdge, .82, Math.max(1, radius * .2));
+        ], material.innerEdge, .82 * intensity, Math.max(1, radius * .2));
       } else if (item === 'bomb') {
         graphics
           .circle(centerX, centerY, radius * 1.28)
-          .fill({ color: material.edge, alpha: .96 })
+          .fill({ color: material.edge, alpha: .96 * intensity })
           .circle(centerX, centerY, radius * .89)
-          .fill({ color: material.fillEnd, alpha: .98 })
+          .fill({ color: material.fillEnd, alpha: .98 * intensity })
           .circle(centerX, centerY, radius * .48)
-          .fill({ color: material.fillStart, alpha: .96 })
+          .fill({ color: material.fillStart, alpha: .96 * intensity })
           .circle(centerX - radius * .18, centerY - radius * .24, radius * .16)
-          .fill({ color: material.innerEdge, alpha: .94 });
+          .fill({ color: material.innerEdge, alpha: .94 * intensity });
         this.strokeSegments(graphics, [
           [centerX, centerY - radius * 1.78, centerX + radius * .56, centerY - radius * 1.24],
           [centerX + radius * 1.46, centerY - radius * .4, centerX + radius * 1.92, centerY - radius * .66],
           [centerX - radius * 1.48, centerY + radius * .78, centerX - radius * 1.92, centerY + radius * 1.16],
-        ], material.innerEdge, .92, Math.max(1, radius * .22));
+        ], material.innerEdge, .92 * intensity, Math.max(1, radius * .22));
       } else {
-        graphics.circle(centerX, centerY, radius * 1.35).fill({ color: material.edge, alpha: .76 });
-        this.drawMutationStar(graphics, centerX, centerY, radius * 1.25, radius * .52, material.innerEdge, .97);
-        this.drawMutationStar(graphics, centerX, centerY, radius * .66, radius * .25, material.fillStart, .98);
+        graphics.circle(centerX, centerY, radius * 1.35).fill({ color: material.edge, alpha: .76 * intensity });
+        this.drawMutationStar(graphics, centerX, centerY, radius * 1.25, radius * .52, material.innerEdge, .97 * intensity);
+        this.drawMutationStar(graphics, centerX, centerY, radius * .66, radius * .25, material.fillStart, .98 * intensity);
       }
-      this.drawMutationCarrierRim(graphics, component, item, layout, offsetX, offsetY, .64);
+      this.drawMutationCarrierRim(graphics, component, item, layout, offsetX, offsetY, .64 * intensity);
     }
   }
 
@@ -2142,8 +2257,10 @@ export class TetrisRenderer {
       this.drawMutationActivationEffect(mutationGraphics, this.mutationFlash, layout);
     }
     this.drawMutationParticles(mutationGraphics, layout);
-    this.drawOrdinaryLineClearTails(graphics, layout);
-    if (state.phase === 'line-clear') this.drawOrdinaryLineClearFaces(graphics, state, layout);
+    this.drawOrdinaryMultiLineClearCueFaces(graphics, layout);
+    if (state.phase === 'line-clear' && state.pendingClearRows.length === 1) {
+      this.drawOrdinaryLineClearFaces(graphics, state, layout);
+    }
     this.drawClassicFeedbackCues(graphics, state, layout);
 
     if (this.lockPulse) {
@@ -2465,7 +2582,7 @@ export class TetrisRenderer {
   ): void {
     const count = state.pendingClearRows.length;
     const profile = ordinaryLineClearProfile(count);
-    if (!profile) return;
+    if (!profile || count !== 1) return;
     const restrainedGeometry = this.options.reducedMotion || state.mode === 'puzzle';
     const phaseProgress = ordinaryLineClearPresentationProgress(
       state.phaseTicks,
@@ -2499,23 +2616,14 @@ export class TetrisRenderer {
       for (let column = 0; column < BOARD_WIDTH; column += 1) {
         const type = boardRow?.[column];
         if (!type || type === ANCHOR_CELL || type === BEDROCK_CELL) continue;
-        const cellProgress = count === 1
-          ? ordinaryLineClearCellProgress(
-              phaseProgress,
-              column,
-              BOARD_WIDTH,
-              0,
-              count,
-              restrainedGeometry,
-            )
-          : ordinaryMultiLineClearCellProgress(
-              state.phaseTicks,
-              column,
-              BOARD_WIDTH,
-              rowOrder,
-              count,
-              restrainedGeometry,
-            );
+        const cellProgress = ordinaryLineClearCellProgress(
+          phaseProgress,
+          column,
+          BOARD_WIDTH,
+          0,
+          count,
+          restrainedGeometry,
+        );
         if (cellProgress <= 0) continue;
         const eased = easeOutCubic(cellProgress);
         const multiLineClassic = count > 1;
@@ -2611,10 +2719,11 @@ export class TetrisRenderer {
     size: number,
     progress: number,
     cellSize: number,
+    alphaScale = 1,
   ): void {
     const token = MUTATION_VFX_TOKENS[item];
     const pulse = Math.sin(Math.max(0, Math.min(1, progress)) * Math.PI);
-    const alpha = Math.max(.22, pulse) * (this.options.reducedMotion ? .62 : 1);
+    const alpha = Math.max(.22, pulse) * (this.options.reducedMotion ? .62 : 1) * alphaScale;
     const centerX = x + size * .5;
     const centerY = y + size * .5;
     const stroke = Math.max(1, cellSize * .045);
@@ -2643,80 +2752,172 @@ export class TetrisRenderer {
     }
   }
 
-  /** Two-tick translucent bridge that finishes only the final centre-out row. */
-  private drawOrdinaryLineClearTails(graphics: Graphics, layout: BoardLayout): void {
-    for (const tail of this.ordinaryLineClearTails) {
-      const elapsedTicks = tail.elapsedAtCommitTicks + tail.elapsed / LINE_CLEAR_FIXED_STEP_MS;
-      const progress = Math.max(0, Math.min(1, tail.elapsed / tail.duration));
-      const erasedPairs = classicLineClearErasedPairCount(elapsedTicks, BOARD_WIDTH, false);
-      for (const { cell, material } of tail.cells) {
-        if (classicLineClearCellErased(elapsedTicks, cell.x, BOARD_WIDTH, false)) continue;
+  /**
+   * After Core collapses the board at 200 ms, unfinished captured cells continue
+   * below the new board on the same 300 ms material track. No row is restarted.
+   */
+  private drawCommittedOrdinaryMultiLineClearBodies(
+    graphics: Graphics,
+    layout: BoardLayout,
+  ): void {
+    for (const cue of this.ordinaryMultiLineClearCues) {
+      if (!cue.committed) continue;
+      for (const { cell, material, rowOrder } of cue.cells) {
         if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
-        const pairIndex = classicLineClearPairIndex(cell.x, BOARD_WIDTH) ?? erasedPairs;
-        const boundary = pairIndex === erasedPairs;
+        const sample = classicLineClearCellSample(
+          cue.elapsed,
+          cell.x,
+          BOARD_WIDTH,
+          rowOrder,
+          cue.count,
+          cue.restrained,
+        );
+        if (sample.complete || sample.alpha <= 0.001) continue;
+        this.drawCellGroups(
+          graphics,
+          [{ x: cell.x, y: cell.y - VISIBLE_START_ROW }],
+          material,
+          Math.min(0.34, sample.alpha * 0.34),
+          {
+            originX: layout.x,
+            originY: layout.y,
+            unit: layout.cell,
+            scale: sample.scale,
+          },
+        );
+      }
+    }
+  }
+
+  /** A low, continuous highlight follows the same sample as each material body. */
+  private drawOrdinaryMultiLineClearCueFaces(graphics: Graphics, layout: BoardLayout): void {
+    for (const cue of this.ordinaryMultiLineClearCues) {
+      for (const { cell, material, rowOrder, mutationItem } of cue.cells) {
+        if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
+        const sample = classicLineClearCellSample(
+          cue.elapsed,
+          cell.x,
+          BOARD_WIDTH,
+          rowOrder,
+          cue.count,
+          cue.restrained,
+        );
+        if (sample.complete || !sample.active || sample.highlight <= 0.001) continue;
         const pieceMaterial = this.materialFor(material);
         const inset = layout.cell * 0.075;
-        const x = layout.x + cell.x * layout.cell + inset;
-        const y = layout.y + (cell.y - VISIBLE_START_ROW) * layout.cell + inset;
-        const size = layout.cell - inset * 2;
-        const alpha = (boundary ? 0.42 : 0.22) * (1 - progress * 0.34) * tail.intensity;
+        const baseSize = layout.cell - inset * 2;
+        const size = baseSize * sample.scale;
+        const x = layout.x + (cell.x + 0.5) * layout.cell - size / 2;
+        const y = layout.y + (cell.y - VISIBLE_START_ROW + 0.5) * layout.cell - size / 2;
+        const committedAttenuation = cue.committed ? 0.55 : 1;
+        const alpha = Math.min(0.55, sample.highlight * 0.5) * committedAttenuation;
         graphics
           .roundRect(x, y, size, size, Math.max(1, layout.cell * 0.08))
           .fill({ color: COLORS.actionInk, alpha })
           .stroke({
             color: pieceMaterial.innerEdge,
-            alpha: Math.min(0.58, alpha * 1.25),
-            width: Math.max(1, layout.cell * 0.045),
+            alpha: Math.min(0.62, alpha * 1.16),
+            width: Math.max(1, layout.cell * 0.042),
           });
+
+        if (!cue.restrained && sample.pairProgress > 0) {
+          const bandProgress = Math.sin(Math.min(1, sample.pairProgress) * Math.PI);
+          const bandWidth = size * (0.56 - Math.min(1, sample.pairProgress) * 0.22);
+          const bandHeight = Math.max(1, layout.cell * (0.035 + bandProgress * 0.018));
+          graphics
+            .roundRect(
+              x + (size - bandWidth) / 2,
+              y + (size - bandHeight) / 2,
+              bandWidth,
+              bandHeight,
+              bandHeight / 2,
+            )
+            .fill({ color: pieceMaterial.innerEdge, alpha: Math.min(0.5, alpha * 1.08) });
+        }
+
+        if (mutationItem === 'freeze' || mutationItem === 'collapse') {
+          this.drawMutationLineClearAccent(
+            graphics,
+            mutationItem,
+            x,
+            y,
+            size,
+            sample.pairProgress,
+            layout.cell,
+            sample.alpha * committedAttenuation,
+          );
+        }
       }
     }
   }
 
-  private enqueueOrdinaryLineClearTail(
-    event: Extract<GameEvent, { type: 'lines-cleared' }>,
+  private enqueueOrdinaryMultiLineClearCue(
+    rows: readonly number[],
     state: GameState | undefined,
-    previousBoard: GameState['board'] | null,
   ): void {
-    const profile = ordinaryLineClearProfile(event.count);
-    if (
-      !profile
-      || profile.count === 1
-      || profile.postCommitTailMs <= 0
-      || event.rows.length !== profile.count
-      || !previousBoard
-      || this.options.reducedMotion
-      || state?.mode === 'puzzle'
-    ) return;
-    const cells: Array<{ cell: Cell; material: BoardMaterial }> = [];
-    let elapsedAtCommitTicks: number | null = null;
-    const orderedRows = orderedLineClearRows(event.rows);
-    for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {
-      const row = orderedRows[rowOrder]!;
-      const releaseAgeMs = lineClearReleaseAgeMs(profile.count, rowOrder);
-      const rowElapsedAtCommitTicks = releaseAgeMs / LINE_CLEAR_FIXED_STEP_MS;
-      for (let x = 0; x < BOARD_WIDTH; x += 1) {
-        const material = previousBoard[row]?.[x];
-        if (!material || material === ANCHOR_CELL || material === BEDROCK_CELL) continue;
-        if (classicLineClearCellErased(rowElapsedAtCommitTicks, x, BOARD_WIDTH, false)) continue;
-        cells.push({ cell: { x, y: row }, material });
-        elapsedAtCommitTicks ??= rowElapsedAtCommitTicks;
+    if (!state) return;
+    const orderedRows = orderedLineClearRows(rows);
+    const count = orderedRows.length;
+    if (count < 2 || count > 4) return;
+    const typedCount = count as 2 | 3 | 4;
+    const duplicate = this.ordinaryMultiLineClearCues.some((cue) => (
+      !cue.committed
+      && cue.count === typedCount
+      && cue.orderedRows.every((row, rowOrder) => row === orderedRows[rowOrder])
+    ));
+    if (duplicate) return;
+
+    const mutationItemByCell = new Map<string, MutationItem>();
+    for (const carrier of state.mutationCarriers) {
+      for (const cell of carrier.cells) {
+        mutationItemByCell.set(`${cell.x},${cell.y}`, carrier.item);
       }
     }
-    if (cells.length === 0 || elapsedAtCommitTicks === null) return;
-    this.ordinaryLineClearTails.push({
-      count: profile.count,
+    const cells: OrdinaryMultiLineClearCueCell[] = [];
+    for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {
+      const row = orderedRows[rowOrder]!;
+      for (let x = 0; x < BOARD_WIDTH; x += 1) {
+        const material = state.board[row]?.[x];
+        if (!material || material === ANCHOR_CELL || material === BEDROCK_CELL) continue;
+        cells.push({
+          cell: { x, y: row },
+          material,
+          rowOrder,
+          mutationItem: mutationItemByCell.get(`${x},${row}`) ?? null,
+        });
+      }
+    }
+    if (cells.length === 0) return;
+    this.ordinaryMultiLineClearCues.push({
+      count: typedCount,
+      orderedRows,
       cells,
-      elapsedAtCommitTicks,
       elapsed: 0,
-      duration: profile.postCommitTailMs,
-      intensity: state?.mode === 'race' ? 0.9 : 1,
+      duration: lineClearVisualDurationMs(typedCount),
+      restrained: this.options.reducedMotion || state.mode === 'puzzle',
+      committed: false,
       fresh: true,
     });
-    if (this.ordinaryLineClearTails.length > ORDINARY_LINE_CLEAR_TAIL_LIMIT) {
-      this.ordinaryLineClearTails.splice(
+    if (this.ordinaryMultiLineClearCues.length > ORDINARY_LINE_CLEAR_TAIL_LIMIT) {
+      this.ordinaryMultiLineClearCues.splice(
         0,
-        this.ordinaryLineClearTails.length - ORDINARY_LINE_CLEAR_TAIL_LIMIT,
+        this.ordinaryMultiLineClearCues.length - ORDINARY_LINE_CLEAR_TAIL_LIMIT,
       );
+    }
+  }
+
+  private commitOrdinaryMultiLineClearCue(rows: readonly number[]): void {
+    const orderedRows = orderedLineClearRows(rows);
+    for (let index = this.ordinaryMultiLineClearCues.length - 1; index >= 0; index -= 1) {
+      const cue = this.ordinaryMultiLineClearCues[index]!;
+      if (
+        !cue.committed
+        && cue.count === orderedRows.length
+        && cue.orderedRows.every((row, rowOrder) => row === orderedRows[rowOrder])
+      ) {
+        cue.committed = true;
+        return;
+      }
     }
   }
 
@@ -4047,7 +4248,7 @@ export class TetrisRenderer {
         this.activeSpawnGenerationKey = null;
         this.activeSpawnEntry = null;
         this.boardShift = null;
-        this.ordinaryLineClearTails.length = 0;
+        this.ordinaryMultiLineClearCues.length = 0;
         this.classicFeedbackCues.length = 0;
         this.clearSurvivalVisualState();
         this.mutationFlash = null;
@@ -4064,7 +4265,7 @@ export class TetrisRenderer {
         this.activeSpawnEntry = null;
         this.trail = null;
         this.lockPulse = null;
-        this.ordinaryLineClearTails.length = 0;
+        this.ordinaryMultiLineClearCues.length = 0;
         this.classicFeedbackCues.length = 0;
         this.impact = 0;
         this.rotationPulse = 0;
@@ -4095,13 +4296,11 @@ export class TetrisRenderer {
             piece: event.piece,
           };
         }
+      } else if (event.type === 'clear-started') {
+        this.enqueueOrdinaryMultiLineClearCue(event.rows, state);
       } else if (event.type === 'lines-cleared') {
         this.impact = this.options.reducedMotion ? 0.3 : Math.min(1.4, 0.55 + event.count * 0.2);
-        this.enqueueOrdinaryLineClearTail(
-          event,
-          state,
-          previousBoard,
-        );
+        this.commitOrdinaryMultiLineClearCue(event.rows);
         if (classic) {
           if ((state?.combo ?? 0) > 1) {
             this.enqueueClassicFeedback('combo', {
@@ -4188,14 +4387,14 @@ export class TetrisRenderer {
       cue.elapsed += Math.max(0, deltaMs);
       if (cue.elapsed >= cue.duration) this.survivalStoneCues.splice(index, 1);
     }
-    for (let index = this.ordinaryLineClearTails.length - 1; index >= 0; index -= 1) {
-      const cue = this.ordinaryLineClearTails[index]!;
+    for (let index = this.ordinaryMultiLineClearCues.length - 1; index >= 0; index -= 1) {
+      const cue = this.ordinaryMultiLineClearCues[index]!;
       if (cue.fresh) {
         cue.fresh = false;
         continue;
       }
       cue.elapsed += Math.max(0, deltaMs);
-      if (cue.elapsed >= cue.duration) this.ordinaryLineClearTails.splice(index, 1);
+      if (cue.elapsed >= cue.duration) this.ordinaryMultiLineClearCues.splice(index, 1);
     }
     if (this.survivalBedrockCue) {
       this.survivalBedrockCue.elapsed += Math.max(0, deltaMs);
@@ -4356,6 +4555,25 @@ export class TetrisRenderer {
             releasedRows: [...ordinaryLineClear.releasedRows],
           }
         : null,
+      ordinaryMultiLineClearCues: this.ordinaryMultiLineClearCues.map((cue) => ({
+        count: cue.count,
+        orderedRows: [...cue.orderedRows],
+        elapsedMs: cue.elapsed,
+        durationMs: cue.duration,
+        committed: cue.committed,
+        restrained: cue.restrained,
+        visibleCellCount: cue.cells.reduce((visibleCount, { cell, rowOrder }) => {
+          const sample = classicLineClearCellSample(
+            cue.elapsed,
+            cell.x,
+            BOARD_WIDTH,
+            rowOrder,
+            cue.count,
+            cue.restrained,
+          );
+          return visibleCount + Number(!sample.complete && sample.alpha > 0.001);
+        }, 0),
+      })),
       presentation: drawableActive && this.presentation
         ? {
             x: this.presentation.x,

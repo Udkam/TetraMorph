@@ -5,8 +5,7 @@ import {
   approachPresentationPoint,
   boardShiftPresentationOffset,
   clampActivePresentationOffsetY,
-  classicLineClearCellErased,
-  classicLineClearErasedPairCount,
+  classicLineClearCellSample,
   classicLineClearPairIndex,
   exposedCellEdges,
   internalCellSeams,
@@ -16,8 +15,6 @@ import {
   nextPreviewPiece,
   ordinaryLineClearCellProgress,
   ordinaryLineClearFragment,
-  ordinaryMultiLineClearCellProgress,
-  ordinaryMultiLineClearCellErased,
   ordinaryLineClearPresentationProgress,
   ordinaryLineClearProfile,
   orthogonalCellComponents,
@@ -132,37 +129,43 @@ describe('presentation interpolation', () => {
     expect(lineClearCellProgress(1, 9, 10)).toBe(1);
   });
 
-  it('flashes, then erases symmetric pairs centre-out while restrained geometry stays stationary', () => {
+  it('samples continuous symmetric cell exits while restrained geometry stays stationary', () => {
     expect(Array.from({ length: 10 }, (_, column) => classicLineClearPairIndex(column, 10)))
       .toEqual([4, 3, 2, 1, 0, 0, 1, 2, 3, 4]);
-    expect(classicLineClearErasedPairCount(0, 10, false)).toBe(0);
-    expect(classicLineClearErasedPairCount(1, 10, false)).toBe(1);
-    expect(classicLineClearErasedPairCount(2, 10, false)).toBe(3);
-    expect(classicLineClearErasedPairCount(3, 10, false)).toBe(5);
-    expect(classicLineClearCellErased(1, 4, 10, false)).toBe(true);
-    expect(classicLineClearCellErased(1, 3, 10, false)).toBe(false);
-    expect(classicLineClearCellErased(2, 2, 10, false)).toBe(true);
-    expect(classicLineClearCellErased(2, 1, 10, false)).toBe(false);
-    expect(classicLineClearCellErased(3, 0, 10, false)).toBe(true);
+    const untouched = classicLineClearCellSample(39, 4, 10, 1, 4, false);
+    expect(untouched).toMatchObject({ active: false, complete: false, alpha: 1, scale: 1 });
 
-    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 0, 4, false)).toBe(1);
-    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 1, 4, false)).toBe(0);
-    expect(ordinaryMultiLineClearCellProgress(4, 4, 10, 1, 4, false)).toBe(1);
-    expect(ordinaryMultiLineClearCellProgress(4, 4, 10, 2, 4, false)).toBe(0);
-    expect(ordinaryMultiLineClearCellErased(0, 4, 10, 0, 4, false)).toBe(false);
-    expect(ordinaryMultiLineClearCellErased(1, 4, 10, 0, 4, false)).toBe(true);
-    expect(ordinaryMultiLineClearCellErased(1, 0, 10, 0, 4, false)).toBe(false);
-    expect(ordinaryMultiLineClearCellErased(2, 2, 10, 0, 4, false)).toBe(true);
-    expect(ordinaryMultiLineClearCellErased(3, 0, 10, 0, 4, false)).toBe(true);
+    const centreStart = classicLineClearCellSample(0, 4, 10, 0, 4, false);
+    const centreMiddle = classicLineClearCellSample(30, 4, 10, 0, 4, false);
+    const centreEnd = classicLineClearCellSample(53, 4, 10, 0, 4, false);
+    expect(centreStart).toMatchObject({ active: true, complete: false, alpha: 1, scale: 1 });
+    expect(centreMiddle.alpha).toBeGreaterThan(0);
+    expect(centreMiddle.alpha).toBeLessThan(1);
+    expect(centreMiddle.scale).toBeLessThan(1);
+    expect(centreMiddle.highlight).toBeGreaterThan(0);
+    expect(centreEnd).toMatchObject({ complete: true, alpha: 0, scale: 0.78 });
 
-    expect(ordinaryMultiLineClearCellProgress(0, 0, 10, 0, 4, true)).toBe(1);
-    expect(ordinaryMultiLineClearCellProgress(0, 0, 10, 0, 4, true))
-      .toBe(ordinaryMultiLineClearCellProgress(0, 9, 10, 0, 4, true));
-    expect(ordinaryMultiLineClearCellErased(0, 0, 10, 0, 4, true)).toBe(false);
-    expect(ordinaryMultiLineClearCellErased(1, 0, 10, 0, 4, true)).toBe(true);
-    expect(ordinaryMultiLineClearCellErased(1, 9, 10, 0, 4, true)).toBe(true);
-    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 1, 4, true)).toBe(0);
-    expect(ordinaryMultiLineClearCellProgress(0, 4, 10, 0, 1, false)).toBe(0);
+    const centreLeft = classicLineClearCellSample(30, 4, 10, 0, 4, false);
+    const centreRight = classicLineClearCellSample(30, 5, 10, 0, 4, false);
+    expect(centreLeft).toEqual(centreRight);
+    expect(classicLineClearCellSample(30, 4, 10, 0, 4, false).pairProgress)
+      .toBeGreaterThan(classicLineClearCellSample(30, 0, 10, 0, 4, false).pairProgress);
+
+    const firstRowAtHandoff = classicLineClearCellSample(180, 0, 10, 0, 2, false);
+    const secondRowAtHandoff = classicLineClearCellSample(180, 4, 10, 1, 2, false);
+    expect(firstRowAtHandoff.complete).toBe(false);
+    expect(firstRowAtHandoff.alpha).toBeGreaterThan(0);
+    expect(secondRowAtHandoff).toMatchObject({ active: true, complete: false, alpha: 1 });
+
+    const restrainedLeft = classicLineClearCellSample(80, 0, 10, 0, 4, true);
+    const restrainedRight = classicLineClearCellSample(80, 9, 10, 0, 4, true);
+    expect(restrainedLeft).toEqual(restrainedRight);
+    expect(restrainedLeft.scale).toBe(1);
+    expect(restrainedLeft.alpha).toBeGreaterThan(0);
+    expect(restrainedLeft.alpha).toBeLessThan(1);
+    expect(classicLineClearCellSample(120, 0, 10, 0, 4, true).complete).toBe(true);
+
+    expect(classicLineClearCellSample(0, 4, 10, 0, 1, false).active).toBe(false);
 
     // The accepted one-line compatibility sweep remains unchanged.
     expect(ordinaryLineClearCellProgress(0.34, 4, 10, 0, 1, true)).toBe(0.34);

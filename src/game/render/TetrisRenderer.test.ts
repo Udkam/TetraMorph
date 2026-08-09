@@ -21,9 +21,9 @@ import {
 } from '../core';
 import { ordinaryLineClearProfile } from './presentation';
 import {
-  CLASSIC_LINE_CLEAR_TAIL_MS,
-  LINE_CLEAR_FIXED_STEP_MS,
+  CLASSIC_LINE_CLEAR_SEQUENCE_MS,
   LINE_CLEAR_RELEASE_TICKS,
+  STUDIO_LINE_CLEAR_OFFSETS_MS,
 } from '../../animation/lineClearTimeline';
 import { BEDROCK_MATERIAL, COLORS, MUTATION_MATERIALS, SURVIVAL_STONE_MATERIAL, type PieceMaterial } from './theme';
 
@@ -183,13 +183,19 @@ type RendererInternals = {
     elapsed: number;
     duration: number;
   }>;
-  ordinaryLineClearTails: Array<{
+  ordinaryMultiLineClearCues: Array<{
     count: 2 | 3 | 4;
-    cells: readonly { cell: Cell; material: BoardMaterial }[];
-    elapsedAtCommitTicks: number;
+    orderedRows: readonly number[];
+    cells: readonly {
+      cell: Cell;
+      material: BoardMaterial;
+      rowOrder: number;
+      mutationItem: MutationItem | null;
+    }[];
     elapsed: number;
     duration: number;
-    intensity: number;
+    restrained: boolean;
+    committed: boolean;
     fresh: boolean;
   }>;
   survivalBedrockCue: {
@@ -241,6 +247,10 @@ type RendererInternals = {
   syncActiveSpawnEntry: (state: GameState) => void;
   advanceSurvivalDebrisPresentation: (state: GameState, deltaMs: number) => void;
   drawEffects: (state: GameState, layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean }) => void;
+  drawCommittedOrdinaryMultiLineClearBodies: (
+    graphics: unknown,
+    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
+  ) => void;
   drawPreviews: (state: GameState, layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean }) => void;
   drawSurvivalPressureEffects: (
     graphics: unknown,
@@ -257,6 +267,7 @@ type RendererInternals = {
     offsetX?: number,
     offsetY?: number,
     detailScale?: number,
+    intensity?: number,
   ) => void;
   drawMutationCarrierSurface: (
     graphics: unknown,
@@ -265,6 +276,7 @@ type RendererInternals = {
     layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
     offsetX?: number,
     offsetY?: number,
+    intensity?: number,
   ) => void;
   drawMutationCarrierMaterials: (
     graphics: unknown,
@@ -1987,13 +1999,13 @@ describe('Puzzle undo presentation reset', () => {
   });
 
   it('renders four distinct, bounded ordinary clear profiles on their row-local beats', () => {
-    const renderer = new TetrisRendererClass();
-    const internals = renderer as unknown as RendererInternals;
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
     const pieces: PieceType[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L', 'I', 'O', 'T'];
     const signatures: string[] = [];
 
     for (const count of [1, 2, 3, 4] as const) {
+      const renderer = new TetrisRendererClass();
+      const internals = renderer as unknown as RendererInternals;
       const board = createBoard();
       const rows = Array.from({ length: count }, (_, index) => BOARD_HEIGHT - 1 - index);
       for (const row of rows) {
@@ -2012,8 +2024,16 @@ describe('Puzzle undo presentation reset', () => {
       const recorder = createGraphicsRecorder();
       (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = recorder.graphics;
 
-      const cueTicks = count === 1 ? [8] : LINE_CLEAR_RELEASE_TICKS[count];
-      for (const phaseTicks of cueTicks) internals.drawEffects({ ...state, phaseTicks }, layout);
+      if (count === 1) {
+        internals.drawEffects({ ...state, phaseTicks: 8 }, layout);
+      } else {
+        internals.consumeEvents([{ type: 'clear-started', rows }], state);
+        const cue = internals.ordinaryMultiLineClearCues[0]!;
+        for (const elapsedMs of STUDIO_LINE_CLEAR_OFFSETS_MS[count]) {
+          cue.elapsed = elapsedMs;
+          internals.drawEffects(state, layout);
+        }
+      }
 
       const faceBlooms = recorder.operations.filter((operation) => (
         operation.kind === 'roundRect' && operation.values[2] === operation.values[3]
@@ -2060,29 +2080,55 @@ describe('Puzzle undo presentation reset', () => {
       pieceMaskGraphics: createGraphicsRecorder().graphics,
     });
     const app = { screen: { width: 280, height: 480 }, renderer: { resolution: 1 } };
+    internals.consumeEvents([{ type: 'clear-started', rows: state.pendingClearRows }], state);
+    const cue = internals.ordinaryMultiLineClearCues[0]!;
+    expect(cue).toMatchObject({
+      count: 4,
+      orderedRows,
+      duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+      committed: false,
+    });
+    expect(cue.cells).toHaveLength(38);
+    expect(cue.cells.some(({ material }) => material === ANCHOR_CELL || material === BEDROCK_CELL)).toBe(false);
 
-    for (const expected of [
-      { tick: 0, visible: 41, releasedRows: orderedRows.slice(0, 1) },
-      { tick: 1, visible: 39, releasedRows: orderedRows.slice(0, 1) },
-      { tick: 2, visible: 35, releasedRows: orderedRows.slice(0, 1) },
-      { tick: 3, visible: 33, releasedRows: orderedRows.slice(0, 1) },
-      { tick: 4, visible: 33, releasedRows: orderedRows.slice(0, 2) },
-      { tick: 7, visible: 23, releasedRows: orderedRows.slice(0, 3) },
-      { tick: 11, visible: 13, releasedRows: orderedRows },
-    ]) {
-      const frame = { ...state, phaseTicks: expected.tick } as GameState;
-      internals.drawPieces(frame, layout);
-      internals.updateSnapshot(frame, layout, app);
-      expect(renderer.getSnapshot()).toMatchObject({
-        visibleLockedCells: expected.visible,
-        ordinaryLineClear: {
-          count: 4,
-          orderedRows,
-          releaseTicks: [0, 4, 7, 11],
-          releasedRows: expected.releasedRows,
-        },
-      });
-    }
+    const drawCells = vi.spyOn(internals, 'drawCellGroups');
+    cue.elapsed = 30;
+    internals.drawPieces(state, layout);
+    internals.updateSnapshot(state, layout, app);
+    expect(renderer.getSnapshot()).toMatchObject({
+      visibleLockedCells: 41,
+      ordinaryLineClear: {
+        count: 4,
+        orderedRows,
+        releaseTicks: [0, 4, 7, 11],
+        releasedRows: orderedRows.slice(0, 1),
+      },
+      ordinaryMultiLineClearCues: [{
+        elapsedMs: 30,
+        durationMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+        visibleCellCount: 38,
+      }],
+    });
+    const centreTransition = drawCells.mock.calls.find((call) => (
+      (call[1] as readonly Cell[]).some((cell) => (
+        cell.x === 4 && cell.y === orderedRows[0]! - VISIBLE_START_ROW
+      ))
+      && typeof call[3] === 'number'
+      && call[3] > 0
+      && call[3] < 1
+    ));
+    expect(centreTransition).toBeDefined();
+    expect((centreTransition?.[4] as { scale?: number }).scale).toBeLessThan(1);
+
+    drawCells.mockClear();
+    cue.elapsed = 60;
+    internals.drawPieces(state, layout);
+    internals.updateSnapshot(state, layout, app);
+    expect(renderer.getSnapshot()).toMatchObject({
+      visibleLockedCells: 39,
+      ordinaryMultiLineClearCues: [{ visibleCellCount: 36 }],
+    });
+    expect(board[orderedRows[0]!]![4]).toBe('I');
 
     const oneLineBoard = createBoard();
     oneLineBoard[BOARD_HEIGHT - 1]!.fill('I');
@@ -2119,14 +2165,28 @@ describe('Puzzle undo presentation reset', () => {
       puzzleTargetCells: [{ x: 4, y: top }, { x: 2, y: bottom }],
     } as GameState;
     const markers = createGraphicsRecorder();
+    internals.consumeEvents([{ type: 'clear-started', rows: puzzle.pendingClearRows }], puzzle);
+    const puzzleCue = internals.ordinaryMultiLineClearCues[0]!;
 
     internals.drawPuzzleTargetMarkers(markers.graphics, puzzle, layout, 0);
 
     expect(markers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(4);
+    puzzleCue.elapsed = 80;
+    const fadingMarkers = createGraphicsRecorder();
+    internals.drawPuzzleTargetMarkers(fadingMarkers.graphics, puzzle, layout, 0);
+    expect(fadingMarkers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(4);
+    const fadingMarkerAlpha = (fadingMarkers.operations.find((operation) => (
+      operation.kind === 'stroke'
+    ))?.options as { alpha?: number } | undefined)?.alpha;
+    expect(fadingMarkerAlpha).toBeGreaterThan(0);
+    expect(fadingMarkerAlpha).toBeLessThan(0.76);
+    puzzleCue.elapsed = 210;
     const laterMarkers = createGraphicsRecorder();
-    internals.drawPuzzleTargetMarkers(laterMarkers.graphics, { ...puzzle, phaseTicks: 1 }, layout, 0);
+    internals.drawPuzzleTargetMarkers(laterMarkers.graphics, puzzle, layout, 0);
     expect(laterMarkers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(2);
 
+    const mutationRenderer = new TetrisRendererClass();
+    const mutationInternals = mutationRenderer as unknown as RendererInternals;
     const mutation = {
       ...createInitialState(0x1a16_402, 'sprint'),
       board,
@@ -2140,10 +2200,12 @@ describe('Puzzle undo presentation reset', () => {
         cells: [{ x: 4, y: top }, { x: 2, y: bottom }],
       }],
     } as GameState;
-    const drawSurface = vi.spyOn(internals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
-    const drawCore = vi.spyOn(internals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
+    mutationInternals.consumeEvents([{ type: 'clear-started', rows: mutation.pendingClearRows }], mutation);
+    const mutationCue = mutationInternals.ordinaryMultiLineClearCues[0]!;
+    const drawSurface = vi.spyOn(mutationInternals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
+    const drawCore = vi.spyOn(mutationInternals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
 
-    internals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
+    mutationInternals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
 
     expect(drawSurface.mock.calls[0]?.[1]).toEqual([
       { x: 4, y: top - VISIBLE_START_ROW },
@@ -2155,7 +2217,21 @@ describe('Puzzle undo presentation reset', () => {
     ]);
     drawSurface.mockClear();
     drawCore.mockClear();
-    internals.drawMutationCarrierMaterials(markers.graphics, { ...mutation, phaseTicks: 1 }, layout, 0);
+    mutationCue.elapsed = 60;
+    mutationInternals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
+    const fadingSurface = drawSurface.mock.calls.find((call) => (
+      (call[1] as readonly Cell[]).some((cell) => cell.x === 4)
+    ));
+    const fadingCore = drawCore.mock.calls.find((call) => (
+      (call[1] as readonly Cell[]).some((cell) => cell.x === 4)
+    ));
+    expect(fadingSurface?.[6]).toBeGreaterThan(0);
+    expect(fadingSurface?.[6]).toBeLessThan(1);
+    expect(fadingCore?.[7]).toBe(fadingSurface?.[6]);
+    drawSurface.mockClear();
+    drawCore.mockClear();
+    mutationCue.elapsed = 100;
+    mutationInternals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
 
     expect(drawSurface.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
     expect(drawCore.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
@@ -2206,31 +2282,42 @@ describe('Puzzle undo presentation reset', () => {
     const reducedRenderer = new TetrisRendererClass();
     reducedRenderer.setOptions({ reducedMotion: true });
     const reduced = reducedRenderer as unknown as RendererInternals;
+    reduced.consumeEvents([{ type: 'clear-started', rows }], base);
+    const reducedCue = reduced.ordinaryMultiLineClearCues[0]!;
+    expect(reducedCue.restrained).toBe(true);
     const reducedStart = createGraphicsRecorder();
     (reduced as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = reducedStart.graphics;
-    reduced.drawEffects({ ...base, phaseTicks: 0 }, layout);
+    reducedCue.elapsed = 0;
+    reduced.drawEffects(base, layout);
     const reducedLater = createGraphicsRecorder();
     (reduced as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = reducedLater.graphics;
-    reduced.drawEffects({ ...base, phaseTicks: 4 }, layout);
+    reducedCue.elapsed = 20;
+    reduced.drawEffects(base, layout);
     const reducedStartFaces = reducedStart.operations.filter((operation) => operation.kind === 'roundRect');
     const reducedLaterFaces = reducedLater.operations.filter((operation) => operation.kind === 'roundRect');
     expect(reducedStartFaces).toHaveLength(10);
     expect(reducedLaterFaces).toHaveLength(10);
-    expect(reducedLaterFaces[0]?.values[1]).toBeGreaterThan(reducedStartFaces[0]?.values[1] ?? 0);
+    expect(geometrySignature(reducedLater.operations)).toBe(geometrySignature(reducedStart.operations));
     expect(reducedStart.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
     expect(reducedLater.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
 
     const puzzleRenderer = new TetrisRendererClass();
     const puzzle = puzzleRenderer as unknown as RendererInternals;
+    const puzzleState = { ...base, mode: 'puzzle' } as GameState;
+    puzzle.consumeEvents([{ type: 'clear-started', rows }], puzzleState);
+    const puzzleCue = puzzle.ordinaryMultiLineClearCues[0]!;
+    puzzleCue.elapsed = 20;
+    expect(puzzleCue.restrained).toBe(true);
     const puzzleFrame = createGraphicsRecorder();
     (puzzle as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = puzzleFrame.graphics;
-    puzzle.drawEffects({ ...base, mode: 'puzzle', phaseTicks: 4 }, layout);
+    puzzle.drawEffects(puzzleState, layout);
     expect(puzzleFrame.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
     expect(puzzleFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(10);
   });
 
-  it('ends reduced-motion and Puzzle row feedback before the unchanged Core commit', () => {
+  it('keeps restrained feedback on one continuous track across the unchanged Core commit', () => {
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
+    const app = { screen: { width: 280, height: 480 }, renderer: { resolution: 1 } };
 
     for (const count of [2, 3, 4] as const) {
       const board = createBoard();
@@ -2251,23 +2338,44 @@ describe('Puzzle undo presentation reset', () => {
         const renderer = new TetrisRendererClass();
         renderer.setOptions({ reducedMotion: variant.reducedMotion });
         const internals = renderer as unknown as RendererInternals;
-        const finalBeat = createGraphicsRecorder();
-        (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = finalBeat.graphics;
-        internals.drawEffects({
+        const frame = {
           ...base,
           mode: variant.mode,
-          phaseTicks: LINE_CLEAR_RELEASE_TICKS[count].at(-1)!,
-        }, layout);
-        expect(finalBeat.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(BOARD_WIDTH);
+        } as GameState;
+        internals.consumeEvents([{ type: 'clear-started', rows }], frame);
+        internals.advanceEffects(0);
+        const cue = internals.ordinaryMultiLineClearCues[0]!;
+        cue.elapsed = 199.9;
+        const cueIdentity = cue;
+        internals.consumeEvents([{
+          type: 'lines-cleared',
+          rows,
+          count,
+          score: 100 * count,
+        }], { ...frame, phase: 'active', pendingClearRows: [] });
+        expect(internals.ordinaryMultiLineClearCues[0]).toBe(cueIdentity);
+        expect(cue).toMatchObject({
+          elapsed: 199.9,
+          duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+          restrained: true,
+          committed: true,
+        });
+        expect(cue.duration - 200).toBeCloseTo(100, 5);
 
-        const atEnd = createGraphicsRecorder();
-        (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = atEnd.graphics;
-        internals.drawEffects({
-          ...base,
-          mode: variant.mode,
-          phaseTicks: 12,
-        }, layout);
-        expect(atEnd.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(0);
+        cue.elapsed = 250;
+        const postCommit = { ...frame, phase: 'active', pendingClearRows: [], active: null } as GameState;
+        internals.updateSnapshot(postCommit, layout, app);
+        expect(renderer.getSnapshot().ordinaryMultiLineClearCues[0]!.visibleCellCount).toBeGreaterThan(0);
+        const tailFrame = createGraphicsRecorder();
+        (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = tailFrame.graphics;
+        internals.drawEffects(postCommit, layout);
+        expect(tailFrame.operations.filter((operation) => operation.kind === 'roundRect').length).toBeGreaterThan(0);
+        expect(tailFrame.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
+
+        cue.elapsed = 299.9;
+        expect(internals.ordinaryMultiLineClearCues).toContain(cue);
+        internals.advanceEffects(0.2);
+        expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
       }
     }
 
@@ -2275,71 +2383,80 @@ describe('Puzzle undo presentation reset', () => {
     expect(singleProfile.reducedTicks).toBe(6);
   });
 
-  it('bridges only the unfinished final row for two ticks and clears tails on lifecycle boundaries', () => {
+  it('captures one bounded 300 ms material cue and clears it on lifecycle boundaries', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const board = createBoard();
     const rows = Array.from({ length: 4 }, (_, index) => BOARD_HEIGHT - 1 - index);
     for (const row of rows) board[row]!.fill('I');
-    const event: Extract<GameEvent, { type: 'lines-cleared' }> = {
+    const clearEvent: Extract<GameEvent, { type: 'lines-cleared' }> = {
       type: 'lines-cleared',
       rows,
       count: 4,
       score: 1200,
     };
-    const classic = { ...createInitialState(0x1a16_6ff, 'marathon'), status: 'playing' } as GameState;
+    const classic = {
+      ...createInitialState(0x1a16_6ff, 'marathon'),
+      board,
+      status: 'playing',
+      phase: 'line-clear',
+      pendingClearRows: rows,
+    } as GameState;
+    const startEvent: Extract<GameEvent, { type: 'clear-started' }> = { type: 'clear-started', rows };
 
-    internals.consumeEvents([event], classic, board);
-    expect(internals.ordinaryLineClearTails).toHaveLength(1);
-    expect(internals.ordinaryLineClearTails[0]).toMatchObject({
-      duration: CLASSIC_LINE_CLEAR_TAIL_MS,
-      elapsedAtCommitTicks: 1,
+    internals.consumeEvents([startEvent], classic);
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(1);
+    const cue = internals.ordinaryMultiLineClearCues[0]!;
+    expect(cue).toMatchObject({
+      duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+      elapsed: 0,
+      restrained: false,
+      committed: false,
       fresh: true,
     });
-    expect(internals.ordinaryLineClearTails[0]!.cells).toHaveLength(8);
-    expect(internals.ordinaryLineClearTails[0]!.cells.every(({ cell }) => cell.y === BOARD_HEIGHT - 1)).toBe(true);
-    expect(internals.ordinaryLineClearTails[0]!.cells.map(({ cell }) => cell.x)).toEqual([0, 1, 2, 3, 6, 7, 8, 9]);
+    expect(cue.cells).toHaveLength(40);
+    internals.consumeEvents([startEvent], classic);
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(1);
+
+    cue.elapsed = 200;
+    internals.consumeEvents([clearEvent], { ...classic, phase: 'active', pendingClearRows: [] });
+    expect(internals.ordinaryMultiLineClearCues[0]).toBe(cue);
+    expect(cue).toMatchObject({ elapsed: 200, committed: true });
 
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
-    const commitFrame = createGraphicsRecorder();
-    (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = commitFrame.graphics;
-    internals.drawEffects(classic, layout);
-    expect(commitFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(8);
-    internals.advanceEffects(0);
-    internals.advanceEffects(LINE_CLEAR_FIXED_STEP_MS);
-    const secondFrame = createGraphicsRecorder();
-    (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = secondFrame.graphics;
-    internals.drawEffects(classic, layout);
-    expect(secondFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(4);
-    internals.advanceEffects(LINE_CLEAR_FIXED_STEP_MS);
-    expect(internals.ordinaryLineClearTails).toHaveLength(0);
+    cue.elapsed = 250;
+    const bodyDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
+    internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
+    expect(bodyDraw.mock.calls.length).toBeGreaterThan(0);
+    expect(bodyDraw.mock.calls.every((call) => (
+      typeof call[3] === 'number' && call[3] > 0 && call[3] <= 0.34
+    ))).toBe(true);
+    bodyDraw.mockRestore();
 
-    for (let index = 0; index < 6; index += 1) internals.consumeEvents([event], classic, board);
-    expect(internals.ordinaryLineClearTails).toHaveLength(4);
-    expect(internals.ordinaryLineClearTails.every((tail) => tail.cells.length === 8)).toBe(true);
-    internals.advanceEffects(0);
-    internals.advanceEffects(CLASSIC_LINE_CLEAR_TAIL_MS);
-    expect(internals.ordinaryLineClearTails).toHaveLength(0);
+    internals.ordinaryMultiLineClearCues.length = 0;
+    for (let index = 0; index < 6; index += 1) {
+      internals.consumeEvents([startEvent, clearEvent], classic);
+    }
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(4);
+    expect(internals.ordinaryMultiLineClearCues.every((entry) => entry.cells.length === 40)).toBe(true);
 
-    internals.consumeEvents([event], { ...classic, mode: 'puzzle' }, board);
-    expect(internals.ordinaryLineClearTails).toHaveLength(0);
-    internals.consumeEvents([
-      event,
-      { type: 'mutation-activated', item: 'bomb', durationTicks: 0, score: 300, rowsRemoved: 3 },
-    ], { ...classic, mode: 'sprint' }, board);
-    expect(internals.ordinaryLineClearTails).toHaveLength(1);
-    internals.ordinaryLineClearTails.length = 0;
-
-    internals.consumeEvents([event], classic, board);
-    expect(internals.ordinaryLineClearTails).toHaveLength(1);
     internals.consumeEvents([{ type: 'restarted' }], classic);
-    expect(internals.ordinaryLineClearTails).toHaveLength(0);
-    internals.consumeEvents([event], classic, board);
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
+    internals.consumeEvents([startEvent], classic);
     internals.consumeEvents([{ type: 'puzzle-undone' }], classic);
-    expect(internals.ordinaryLineClearTails).toHaveLength(0);
-    internals.consumeEvents([event], classic, board);
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
+    internals.consumeEvents([startEvent], classic);
+    renderer.setOptions({ reducedMotion: true });
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
+    internals.consumeEvents([startEvent], classic);
+    expect(internals.ordinaryMultiLineClearCues[0]?.restrained).toBe(true);
+    renderer.setOptions({ modeSwitch: true });
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
+    renderer.setOptions({ modeSwitch: false });
+    internals.consumeEvents([startEvent], { ...classic, mode: 'puzzle' });
+    expect(internals.ordinaryMultiLineClearCues[0]?.restrained).toBe(true);
     renderer.destroy();
-    expect(internals.ordinaryLineClearTails).toHaveLength(0);
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
   });
 
   it('queues bounded coexisting Classic combo, speed, and top-out cues only', () => {

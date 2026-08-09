@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
-  CLASSIC_LINE_CLEAR_ERASE_TICKS,
+  CLASSIC_LINE_CLEAR_HANDOFF_MS,
+  CLASSIC_LINE_CLEAR_ROW_MIN_MS,
+  CLASSIC_LINE_CLEAR_SEQUENCE_MS,
   CLASSIC_LINE_CLEAR_TAIL_MS,
-  CLASSIC_LINE_CLEAR_TAIL_TICKS,
   LINE_CLEAR_FIXED_STEP_MS,
   LINE_CLEAR_RELEASE_TICKS,
   STUDIO_LINE_CLEAR_OFFSETS_MS,
-  lineClearReleaseAgeMs,
   lineClearReleaseSnapshot,
+  lineClearRowDurationMs,
+  lineClearRowElapsedMs,
   lineClearRowElapsedTicks,
-  lineClearRowReleaseProgress,
+  lineClearVisualDurationMs,
   orderedLineClearRows,
 } from './lineClearTimeline';
 
@@ -51,26 +53,29 @@ describe('line-clear timeline', () => {
     expect(lineClearReleaseSnapshot([1, 2, 3, 4, 5], 0)).toBeNull();
   });
 
-  it('keeps a three-tick classic erase and carries the final row across commit', () => {
-    expect(CLASSIC_LINE_CLEAR_ERASE_TICKS).toBe(3);
-    expect(CLASSIC_LINE_CLEAR_TAIL_TICKS).toBe(2);
-    expect(CLASSIC_LINE_CLEAR_TAIL_MS).toBe(2 * LINE_CLEAR_FIXED_STEP_MS);
+  it('keeps frozen starts while every R3 row handoff overlaps on a 300 ms track', () => {
+    expect(CLASSIC_LINE_CLEAR_ROW_MIN_MS).toBe(120);
+    expect(CLASSIC_LINE_CLEAR_HANDOFF_MS).toBe(30);
+    expect(CLASSIC_LINE_CLEAR_SEQUENCE_MS).toBe(300);
+    expect(CLASSIC_LINE_CLEAR_TAIL_MS).toBeCloseTo(100);
     expect(lineClearRowElapsedTicks(3, 4, 1)).toBeNull();
     expect(lineClearRowElapsedTicks(4, 4, 1)).toBe(0);
     expect(lineClearRowElapsedTicks(6.5, 4, 1)).toBe(2.5);
-    expect(lineClearRowReleaseProgress(3, 4, 1)).toBe(0);
-    expect(lineClearRowReleaseProgress(4, 4, 1)).toBeGreaterThan(0);
-    expect(lineClearRowReleaseProgress(7, 4, 1)).toBe(1);
-    expect(lineClearRowReleaseProgress(11, 4, 3)).toBeCloseTo(1 / 6);
-    expect(lineClearRowReleaseProgress(11, 1, 0)).toBe(0);
+    expect(lineClearRowElapsedMs(59.9, 4, 1)).toBeNull();
+    expect(lineClearRowElapsedMs(60, 4, 1)).toBe(0);
+    expect(lineClearRowElapsedMs(92.5, 4, 1)).toBe(32.5);
 
-    const ages = [0, 1, 2, 3].map((rowOrder) => lineClearReleaseAgeMs(4, rowOrder));
-    expect(ages).toEqual([
-      12 * LINE_CLEAR_FIXED_STEP_MS,
-      8 * LINE_CLEAR_FIXED_STEP_MS,
-      5 * LINE_CLEAR_FIXED_STEP_MS,
-      LINE_CLEAR_FIXED_STEP_MS,
-    ]);
-    expect(ages.every((age, index) => index === 0 || age < ages[index - 1]!)).toBe(true);
+    expect([0, 1].map((rowOrder) => lineClearRowDurationMs(2, rowOrder))).toEqual([210, 120]);
+    expect([0, 1, 2].map((rowOrder) => lineClearRowDurationMs(3, rowOrder))).toEqual([120, 120, 120]);
+    expect([0, 1, 2, 3].map((rowOrder) => lineClearRowDurationMs(4, rowOrder))).toEqual([120, 120, 120, 120]);
+    expect([2, 3, 4].map(lineClearVisualDurationMs)).toEqual([300, 300, 300]);
+
+    for (const count of [2, 3, 4] as const) {
+      const offsets = STUDIO_LINE_CLEAR_OFFSETS_MS[count];
+      for (let rowOrder = 0; rowOrder < offsets.length - 1; rowOrder += 1) {
+        const rowEnd = offsets[rowOrder]! + lineClearRowDurationMs(count, rowOrder);
+        expect(rowEnd - offsets[rowOrder + 1]!).toBeGreaterThanOrEqual(CLASSIC_LINE_CLEAR_HANDOFF_MS);
+      }
+    }
   });
 });
