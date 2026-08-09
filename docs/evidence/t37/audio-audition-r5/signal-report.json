@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-09T05:07:38.038Z",
+  "sourceSha": "2eb56af23117a0b9926a7be7580ac389c83cdcc9",
+  "actionProfiles": {
+    "t28": {
+      "id": "t28",
+      "label": "A · T28 柔和版",
+      "sourceCommit": "35509a7",
+      "sourceBlob": "c43a68701fc1a7d39e31094422617214b359a001",
+      "description": "44–72 ms 短正弦；精确恢复旧柔和触点，不做峰值归一。",
+      "masterGain": 1.85,
+      "voiceGainBoost": 1.45,
+      "voiceGainCeiling": 0.5,
+      "compressor": {
+        "threshold": -4,
+        "knee": 6,
+        "ratio": 3,
+        "attack": 0.003,
+        "release": 0.12
+      },
+      "recipes": {
+        "move": [
+          {
+            "frequency": 220,
+            "duration": 0.044,
+            "gain": 0.062,
+            "attack": 0.006,
+            "type": "sine"
+          }
+        ],
+        "rotate": [
+          {
+            "frequency": 293.66,
+            "duration": 0.065,
+            "gain": 0.09,
+            "attack": 0.006,
+            "type": "sine"
+          },
+          {
+            "frequency": 440,
+            "duration": 0.038,
+            "gain": 0.024,
+            "delay": 0.004,
+            "attack": 0.004,
+            "type": "sine"
+          }
+        ],
+        "lock": [
+          {
+            "frequency": 246.94,
+            "duration": 0.048,
+            "gain": 0.06,
+            "attack": 0.007,
+            "type": "sine"
+          }
+        ],
+        "hardDrop": [
+          {
+            "frequency": 174.61,
+            "duration": 0.072,
+            "gain": 0.1,
+            "attack": 0.006,
+            "type": "sine"
+          },
+          {
+            "frequency": 349.23,
+            "duration": 0.038,
+            "gain": 0.03,
+            "delay": 0.004,
+            "attack": 0.004,
+            "type": "sine"
+          }
+        ]
+      }
+    },
+    "t29": {
+      "id": "t29",
+      "label": "B · T29 历史接受版",
+      "sourceCommit": "ca5da48",
+      "sourceBlob": "f470e8942fed47da0c10c3d0debbb41580b49bf1",
+      "description": "46–90 ms 圆润主体；旧人工接受版，比 T28 更有存在感。",
+      "masterGain": 1.5,
+      "voiceGainBoost": 1.6,
+      "voiceGainCeiling": 0.46,
+      "compressor": {
+        "threshold": -2,
+        "knee": 4,
+        "ratio": 2.4,
+        "attack": 0.006,
+        "release": 0.16
+      },
+      "recipes": {
+        "move": [
+          {
+            "frequency": 196,
+            "duration": 0.046,
+            "gain": 0.068,
+            "attack": 0.003,
+            "body": 0.46,
+            "bodyGain": 0.46,
+            "type": "triangle"
+          }
+        ],
+        "rotate": [
+          {
+            "frequency": 261.63,
+            "duration": 0.08,
+            "gain": 0.105,
+            "attack": 0.004,
+            "body": 0.5,
+            "bodyGain": 0.52,
+            "type": "triangle"
+          },
+          {
+            "frequency": 392,
+            "duration": 0.055,
+            "gain": 0.045,
+            "delay": 0.012,
+            "attack": 0.003,
+            "body": 0.42,
+            "bodyGain": 0.44,
+            "type": "sine"
+          }
+        ],
+        "lock": [
+          {
+            "frequency": 220,
+            "duration": 0.055,
+            "gain": 0.07,
+            "attack": 0.004,
+            "body": 0.48,
+            "bodyGain": 0.48,
+            "type": "triangle"
+          }
+        ],
+        "hardDrop": [
+          {
+            "frequency": 146.83,
+            "endFrequency": 130.81,
+            "duration": 0.09,
+            "gain": 0.13,
+            "attack": 0.004,
+            "body": 0.5,
+            "bodyGain": 0.54,
+            "type": "triangle"
+          },
+          {
+            "frequency": 293.66,
+            "duration": 0.05,
+            "gain": 0.045,
+            "delay": 0.006,
+            "attack": 0.003,
+            "body": 0.42,
+            "bodyGain": 0.42,
+            "type": "sine"
+          }
+        ]
+      }
+    }
+  },
+  "accepted": {
+    "clearOneToThreeAssetSha256": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c",
+    "countdownStartAssetSha256": "b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388",
+    "compressor": {
+      "threshold": -10,
+      "knee": 10,
+      "ratio": 4,
+      "attack": 0.003,
+      "release": 0.12
+    },
+    "clearFourPulseTimesMs": [
+      0,
+      60,
+      120,
+      180
+    ],
+    "clearFourResolveCue": null,
+    "reviewControls": false
+  },
+  "iceSources": [
+    {
+      "id": 666478,
+      "title": "Ice Breaking 1",
+      "author": "giwake",
+      "page": "https://freesound.org/people/giwake/sounds/666478/",
+      "license": "CC0-1.0",
+      "original": "WAV, 0.374 seconds, 44.1 kHz, 24-bit, mono",
+      "auditionFile": "assets/ice/giwake-ice-breaking-1-hq.ogg",
+      "auditionFileKind": "Freesound-generated HQ OGG preview",
+      "auditionSha256": "e392c9ba8724513c2e7b5c3ccaec4ce241c32eeabb5d4f060a074911cb53f81b"
+    },
+    {
+      "id": 819779,
+      "title": "Ice cubes",
+      "author": "sbml",
+      "page": "https://freesound.org/people/sbml/sounds/819779/",
+      "license": "CC0-1.0",
+      "original": "WAV, 1.723 seconds, 96 kHz, 32-bit, stereo",
+      "auditionFile": "assets/ice/sbml-ice-cubes-hq.ogg",
+      "auditionFileKind": "Freesound-generated HQ OGG preview",
+      "auditionSha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450"
+    },
+    {
+      "id": 177223,
+      "title": "Ice Crack 9.wav",
+      "author": "ecfike",
+      "page": "https://freesound.org/people/ecfike/sounds/177223/",
+      "license": "CC0-1.0",
+      "original": "WAV, 2.004 seconds, 44.1 kHz, 16-bit, stereo",
+      "auditionFile": "assets/ice/ecfike-ice-crack-9-hq.ogg",
+      "auditionFileKind": "Freesound-generated HQ OGG preview",
+      "auditionSha256": "bdce4701e8fbfb36ce39931b56a7f4226265225b7529631c232aae15abc1fd4c"
+    }
+  ],
+  "iceMetrics": {
+    "ice-break": {
+      "durationSeconds": 0.38166666666666665,
+      "channels": 1,
+      "sampleRate": 48000,
+      "peak": 0.5021997094154358,
+      "rms": 0.033865021172599485,
+      "finite": true,
+      "peakSeconds": 0.020791666666666667,
+      "windowStartSeconds": 0,
+      "windowDurationSeconds": 0.38166666666666665,
+      "peakResponseMs": 21
+    },
+    "ice-crack": {
+      "durationSeconds": 2.0099583333333335,
+      "channels": 2,
+      "sampleRate": 48000,
+      "peak": 1.042474389076233,
+      "rms": 0.045964336071791866,
+      "finite": true,
+      "peakSeconds": 0.07633333333333334,
+      "windowStartSeconds": 0.04133333333333333,
+      "windowDurationSeconds": 0.44,
+      "peakResponseMs": 35
+    },
+    "ice-cubes": {
+      "durationSeconds": 1.734,
+      "channels": 2,
+      "sampleRate": 48000,
+      "peak": 0.7197997570037842,
+      "rms": 0.015009496292877502,
+      "finite": true,
+      "peakSeconds": 0.22875,
+      "windowStartSeconds": 0.19375,
+      "windowDurationSeconds": 0.44,
+      "peakResponseMs": 35
+    }
+  },
+  "sha256": {
+    "index.html": "3ac6b626e11acb01676c87d448ef71e492b35d9add4b0d4edb14e96ecea24b68",
+    "styles.css": "02542da18765a9a25bb293b65e363b8d44a6b57d77f87891179caa6973079e2e",
+    "audition.js": "b2f1d01c766a91195bde3ee3436fd70d2c5b52d237eedaacaccb0621e336fbbd",
+    "embedded-assets.js": "a4e9f46765c50869b20d453afa49b705983329096a5369580eca186aca1cc951",
+    "build-embedded-assets.mjs": "24e86319425cb9aabe81f6eff78d06c018738eaec48734d097d8686876f3ca4d",
+    "verify-audition.mjs": "ed2adc8f2ddee7240843de909849b092848fa3ad3a5b4e3155d2d1ec3d05b2c7",
+    "provenance.json": "b9d7b70039e35782b8a228cb558019092f80654067fba79f0d605b5e26770cb1",
+    "README.md": "ebdab4c88fb549e0fe2c25fcdbabb5dc558d5f4b861028fdcd4c0b7d19fb2734",
+    "assets/ice/giwake-ice-breaking-1-hq.ogg": "e392c9ba8724513c2e7b5c3ccaec4ce241c32eeabb5d4f060a074911cb53f81b",
+    "assets/ice/sbml-ice-cubes-hq.ogg": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+    "assets/ice/ecfike-ice-crack-9-hq.ogg": "bdce4701e8fbfb36ce39931b56a7f4226265225b7529631c232aae15abc1fd4c"
+  },
+  "assertions": {
+    "r4RecipesExcluded": true,
+    "exactHistoricalProfiles": 2,
+    "acceptedSoundsNotReopened": true,
+    "clearFourHasFourPulsesAndNoTail": true,
+    "embeddedBytesMatchDownloadedPreviews": true,
+    "iceAtOriginalRate": true,
+    "peakCentredIceWindowsAtMost441Ms": true,
+    "allIceFinite": true
+  }
+}

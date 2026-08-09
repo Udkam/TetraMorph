@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-09T05:07:38.038Z",
+  "sourceSha": "2eb56af23117a0b9926a7be7580ac389c83cdcc9",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1080,
+      "screenshot": "audition-r5-desktop.png"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "screenshot": "audition-r5-mobile.png"
+    }
+  ],
+  "checkedActions": [
+    "T28 left/right/rotate/lock/hard-drop/repeat",
+    "T29 full action chain",
+    "Ice 1/2/3",
+    "mobile Ice 1",
+    "reduced-motion rotate",
+    "direct-file embedded Ice 1"
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "directFileErrors": [],
+  "desktopLayout": {
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "buttons": [
+      {
+        "width": 282,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 522,
+        "height": 78,
+        "disabled": false
+      },
+      {
+        "width": 522,
+        "height": 78,
+        "disabled": false
+      },
+      {
+        "width": 524,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 168,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 168,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 168,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 168,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 168,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 524,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 301.328125,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 301.328125,
+        "height": 44,
+        "disabled": false
+      },
+      {
+        "width": 301.34375,
+        "height": 44,
+        "disabled": false
+      }
+    ]
+  },
+  "mobileLayout": {
+    "scrollWidth": 390,
+    "clientWidth": 390
+  },
+  "result": "PASS"
+}
