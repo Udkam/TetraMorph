@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TetraMorph · T37 音效试听 R3</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">TETRAMORPH · T37 AUDIO GATE · R3</p>
+        <h1>同一动作，比较三种声纹</h1>
+        <p class="lede">
+          三套方案使用相同的功能映射与动效时序，只改变声音材质。请先用常用系统音量试听，
+          再判断哪一套最像“有反馈、克制、不刺耳”的方块游戏。
+        </p>
+        <div class="toolbar" aria-label="试听控制">
+          <label class="volume-control">
+            <span>试听音量</span>
+            <input id="volume" type="range" min="0" max="100" value="90" />
+            <output id="volume-value" for="volume">90%</output>
+          </label>
+          <button id="stop-all" class="stop-button" type="button">停止所有声音</button>
+        </div>
+        <p id="load-status" class="load-status" role="status">正在载入 23 个 CC0 候选…</p>
+      </header>
+
+      <section class="stage-panel" aria-labelledby="stage-title">
+        <div class="stage-copy">
+          <p class="stage-kicker">动作 / 动效 / 声音同步</p>
+          <h2 id="stage-title"><span id="stage-family">等待选择</span> · <span id="stage-event">—</span></h2>
+          <p id="stage-detail">点击下方任一动作。这里会显示声音所对应的实际功能，而不是抽象试听。</p>
+        </div>
+        <div id="stage" class="stage" aria-label="动作示意">
+          <div class="board-grid" aria-hidden="true"></div>
+          <div id="clear-rows" class="clear-rows" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div id="piece" class="piece" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div id="impact-ring" class="impact-ring" aria-hidden="true"></div>
+          <div id="countdown" class="countdown" aria-hidden="true"></div>
+          <div id="ice-field" class="ice-field" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="families-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">A / B / C</p>
+            <h2 id="families-title">先选常规操作的声音家族</h2>
+          </div>
+          <p>建议依次听“动作链”和“连续移动”，再单独比较 1–4 行消除。</p>
+        </div>
+        <div id="families" class="family-grid"></div>
+      </section>
+
+      <section class="ice-panel" aria-labelledby="ice-title">
+        <div>
+          <p class="section-kicker ice">MUTATION · ICE</p>
+          <h2 id="ice-title">冰冻：晶体锁定 → 碎片释放</h2>
+          <p>
+            单列的 Glass 候选，绑定 320 ms 冰冻动效：0 ms 锁定，109 ms 开始碎片释放。
+            它不代表其余道具已经定稿。
+          </p>
+        </div>
+        <button class="primary-action ice-action" type="button" data-family="glass" data-action="ice">
+          试听冰冻联动
+        </button>
+      </section>
+
+      <footer>
+        <p>
+          试听音频：UI SFX 0.4.0，CC0-1.0。当前文件仅用于选择声纹；未引入运行时依赖，
+          也尚未获得人工听感验收。
+        </p>
+        <a href="./PROVENANCE.md">查看来源、许可与文件边界</a>
+      </footer>
+    </main>
+    <script type="module" src="./audition.js"></script>
+  </body>
+</html>

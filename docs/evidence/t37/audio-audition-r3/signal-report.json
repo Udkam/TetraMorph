@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-09T02:47:22.808Z",
+  "source": {
+    "package": "uisfx@0.4.0",
+    "sourceCommit": "2001f3dac2d1cf86ad99cbad5cef222c3a8b9082",
+    "tarballIntegrity": "sha512-W891N75C09cvpaNeChP+7BiP0Yp5VSbrIcRgZvzpFUT3o/2DxZqROmUcX50oxeyMnY4Hqxu4jEfjndVUpmheEQ==",
+    "audioLicense": "CC0-1.0"
+  },
+  "actionMap": {
+    "move": {
+      "cue": "swipe",
+      "visualMs": 56
+    },
+    "rotate": {
+      "cue": "reorder",
+      "visualMs": 74
+    },
+    "lock": {
+      "cue": "lock",
+      "visualMs": 90
+    },
+    "hardDrop": {
+      "cue": "drop",
+      "visualMs": 50
+    },
+    "clear": {
+      "cue": "progress-step",
+      "visualMs": 200
+    },
+    "fourLineResolve": {
+      "cue": "complete",
+      "startsAtMs": 190
+    },
+    "countdown": {
+      "cue": "progress-step",
+      "stepMs": 500,
+      "resolveCue": "start"
+    },
+    "ice": {
+      "cues": [
+        "lock",
+        "snap"
+      ],
+      "shardReleaseAtMs": 109,
+      "visualMs": 320
+    }
+  },
+  "assets": {
+    "./assets/glass/lock.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.569604,
+      "peak": 0.4168922,
+      "rms": 0.100523,
+      "tailPeak": 0.000001,
+      "finite": true
+    },
+    "./assets/glass/snap.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.363208,
+      "peak": 0.4400273,
+      "rms": 0.0940418,
+      "tailPeak": 0.0000767,
+      "finite": true
+    },
+    "./assets/mechanical/complete.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.559729,
+      "peak": 0.4156653,
+      "rms": 0.0738607,
+      "tailPeak": 0.0000225,
+      "finite": true
+    },
+    "./assets/mechanical/drop.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.252437,
+      "peak": 0.4644619,
+      "rms": 0.064523,
+      "tailPeak": 0.0002026,
+      "finite": true
+    },
+    "./assets/mechanical/lock.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.263104,
+      "peak": 0.4448434,
+      "rms": 0.0629589,
+      "tailPeak": 0.0001563,
+      "finite": true
+    },
+    "./assets/mechanical/progress-step.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.213625,
+      "peak": 0.406152,
+      "rms": 0.0501497,
+      "tailPeak": 0.0001713,
+      "finite": true
+    },
+    "./assets/mechanical/reorder.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.288438,
+      "peak": 0.4213977,
+      "rms": 0.0706788,
+      "tailPeak": 0.000273,
+      "finite": true
+    },
+    "./assets/mechanical/start.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.361167,
+      "peak": 0.4178261,
+      "rms": 0.0721031,
+      "tailPeak": 0.0001425,
+      "finite": true
+    },
+    "./assets/mechanical/swipe.ogg": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.251875,
+      "peak": 0.3899347,
+      "rms": 0.0472244,
+      "tailPeak": 0.0000342,
+      "finite": true
+    },
+    "./assets/scifi/complete.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.689708,
+      "peak": 0.4345438,
+      "rms": 0.117306,
+      "tailPeak": 0,
+      "finite": true
+    },
+    "./assets/scifi/drop.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.319437,
+      "peak": 0.405192,
+      "rms": 0.0960931,
+      "tailPeak": 0.0000174,
+      "finite": true
+    },
+    "./assets/scifi/lock.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.335229,
+      "peak": 0.4284319,
+      "rms": 0.0968935,
+      "tailPeak": 0,
+      "finite": true
+    },
+    "./assets/scifi/progress-step.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.273208,
+      "peak": 0.4129612,
+      "rms": 0.0809936,
+      "tailPeak": 0,
+      "finite": true
+    },
+    "./assets/scifi/reorder.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.361438,
+      "peak": 0.4152519,
+      "rms": 0.1112661,
+      "tailPeak": 0.0000916,
+      "finite": true
+    },
+    "./assets/scifi/start.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.450458,
+      "peak": 0.427764,
+      "rms": 0.1169368,
+      "tailPeak": 0,
+      "finite": true
+    },
+    "./assets/scifi/swipe.ogg": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.332208,
+      "peak": 0.4092886,
+      "rms": 0.0727109,
+      "tailPeak": 0,
+      "finite": true
+    },
+    "./assets/studio/complete.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.652563,
+      "peak": 0.4148435,
+      "rms": 0.0908305,
+      "tailPeak": 0,
+      "finite": true
+    },
+    "./assets/studio/drop.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.301958,
+      "peak": 0.4486482,
+      "rms": 0.0723929,
+      "tailPeak": 0.0000932,
+      "finite": true
+    },
+    "./assets/studio/lock.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.321313,
+      "peak": 0.4176894,
+      "rms": 0.0758226,
+      "tailPeak": 0.0000412,
+      "finite": true
+    },
+    "./assets/studio/progress-step.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.252625,
+      "peak": 0.388438,
+      "rms": 0.0577192,
+      "tailPeak": 0.0000305,
+      "finite": true
+    },
+    "./assets/studio/reorder.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.339667,
+      "peak": 0.408488,
+      "rms": 0.0822256,
+      "tailPeak": 0.0000307,
+      "finite": true
+    },
+    "./assets/studio/start.ogg": {
+      "channels": 1,
+      "sampleRate": 48000,
+      "durationSeconds": 0.426083,
+      "peak": 0.4313105,
+      "rms": 0.0815854,
+      "tailPeak": 0.0000258,
+      "finite": true
+    },
+    "./assets/studio/swipe.ogg": {
+      "channels": 2,
+      "sampleRate": 48000,
+      "durationSeconds": 0.334083,
+      "peak": 0.4231498,
+      "rms": 0.0551066,
+      "tailPeak": 0,
+      "finite": true
+    }
+  },
+  "sha256": {
+    "LICENSE-AUDIO": "e0ba86134c566659a19dc73993e594c88a282b99f8f300d83de98acec1c99f1f",
+    "PROVENANCE.md": "e31d164b219f486bd4c7425ed5d502667c7ce0f79fdc4d2a496f67419d35dd21",
+    "assets/glass/lock.ogg": "491061633cba13b8bf837090d50cb593462f7a0a323b8b30f0dbe7ecfa67120b",
+    "assets/glass/snap.ogg": "656ae75c9bd8f0db281fc8cc0279bbbd013f642061838f9c265183b7f403fa92",
+    "assets/mechanical/complete.ogg": "a23161be8b9feb590163bd60c24d1d4d62a374f2769cc6380db6664a933836e5",
+    "assets/mechanical/drop.ogg": "212690aa91f8b04df4ebbf6fed0131267f96f62172de42972d408b59b55f71a6",
+    "assets/mechanical/lock.ogg": "16110b535c4a1ea4d86599d66832ea3f0135ccc6a6b15c56aa3f057fecd92fae",
+    "assets/mechanical/progress-step.ogg": "e8406d9560f24d47b7ad8cc713861d248f38be7e88a8731a84b17915019035a5",
+    "assets/mechanical/reorder.ogg": "9c240ad2ae685db88d0b83d71000f6043acdcd4c799c7a1e2859e7b98ed4a0b0",
+    "assets/mechanical/start.ogg": "9950aff265b8fdae40a6bde9ba3ed8fc186a9c98537b7157894d18467da41a99",
+    "assets/mechanical/swipe.ogg": "63eaa45b4fa8f835398f17adaf553203a1baf650b69b5af60717b04fee1f3f08",
+    "assets/scifi/complete.ogg": "f18c5c8e9d1db15dcc0d55da166a5f8387ad801e388afe682e4e990e523514bf",
+    "assets/scifi/drop.ogg": "3d94652dfa3e0bf88317a07572065a0dc0838f95a2100981246819c8834b2758",
+    "assets/scifi/lock.ogg": "7d2ff1f3d0cccfc95fdf8f44ac2b0e2527f4f70f5733ec7a7cc562f60cf673ce",
+    "assets/scifi/progress-step.ogg": "9c9774d859d982268c155f3c990cb5e95f6338d29814ee04eddb5b6b2ffc8097",
+    "assets/scifi/reorder.ogg": "691291604d1cee5d3d680e01a8e0b0257a7cd4c6b1989ac209d7fd66022b0320",
+    "assets/scifi/start.ogg": "fd7d3ef425fec70f6badec364cff6ccf8dd5a1f609f6ec6b01bafd7986730d13",
+    "assets/scifi/swipe.ogg": "a824f37450ad6bb1a4b192ad0684f5924176cc066b9d4cd237b47d7d5978b9c2",
+    "assets/studio/complete.ogg": "0563fd85c224f265b92db06dbe4194fee1bf86829b466310fe42c2ca2ce6a4a8",
+    "assets/studio/drop.ogg": "c8874f6f81deef2d5d2bb988dd0f83afe583ad8c004dbed64685c4611c2216f5",
+    "assets/studio/lock.ogg": "d2137fb39c5310780c1c56931b59268a7b70d3e35904e0d2fa5cf7b4f3ccb6f5",
+    "assets/studio/progress-step.ogg": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c",
+    "assets/studio/reorder.ogg": "a02373fad67b12313061cf14f8dd4c915928ca96652305beaab1f0cc2e342260",
+    "assets/studio/start.ogg": "b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388",
+    "assets/studio/swipe.ogg": "99a13b8e43cbef1326577dcaa3ff35e83b6f769a84d05f69e9077fe740074b26",
+    "audition.js": "87bdd677eb313131488557b0dd70c5d7eacbd58061833627a78b2ff116236af8",
+    "index.html": "905cc835a1c7699f812fd8134ca602ba82d95b314dcf3b9cacb7e53cfd076f1a",
+    "styles.css": "fcc3e55db8dd15079ad34965a056a2d22f865a2c4e8747301f5220dade0879bb",
+    "verify-audition.mjs": "0f4259517a74e136f57ea4de79fdde0d713f26c5de8d2e00a2cbb1d832c72220"
+  },
+  "assertions": {
+    "expectedAssets": 23,
+    "decodedAssets": 23,
+    "allFinite": true,
+    "allAudibleByPeakAndRmsFloor": true,
+    "noDecodedFullScaleOverflow": true
+  }
+}

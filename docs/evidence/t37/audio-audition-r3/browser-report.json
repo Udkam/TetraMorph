@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-09T02:47:22.808Z",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1100,
+      "screenshot": "audition-r3-desktop.png"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "screenshot": "audition-r3-mobile.png"
+    }
+  ],
+  "checkedActions": [
+    "studio move-left",
+    "mechanical rotate",
+    "scifi clear-4",
+    "glass ice",
+    "scifi mobile hard-drop",
+    "studio reduced-motion rotate"
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "playbackMode": "buffer",
+  "result": "PASS"
+}
