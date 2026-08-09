@@ -80,7 +80,10 @@ describe('T37 recovered soft support palette', () => {
     expect(audioCue('supergravity').tones.map((layer) => layer.frequency)).toEqual([148, 93]);
     expect(audioCue('bomb').tones.map((layer) => layer.frequency)).toEqual([74]);
     expect(audioCue('bomb').air).toEqual([
-      expect.objectContaining({ cutoff: 640, duration: 0.075, gain: 0.12, delay: 0.006 }),
+      expect.objectContaining({
+        cutoff: 640, q: 0.7, attack: 0.009,
+        duration: 0.075, gain: 0.12, delay: 0.006,
+      }),
     ]);
     expect(audioCue('multiplier-2').tones).toHaveLength(4);
     expect(audioCue('multiplier-4').tones).toHaveLength(6);

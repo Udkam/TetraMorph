@@ -347,6 +347,24 @@ describe('AudioEngine accepted production contract', () => {
     expect(starts.some((start) => Math.abs(start - 1.16) < 0.000001)).toBe(true);
   });
 
+  it('routes the complete deterministic Bomb body and pressure contract through production', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    audio.play([mutation('bomb')]);
+
+    expect(oscillators).toHaveLength(1);
+    expect(oscillators[0]?.frequency.setValues[0]).toEqual({ value: 74, time: 0 });
+    expect(oscillators[0]?.stops[0]).toBeCloseTo(0.17);
+    expect(bufferSources).toHaveLength(1);
+    expect(bufferSources[0]?.starts[0]).toEqual({ time: 0.006, offset: undefined, duration: undefined });
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.091);
+    expect(filters).toHaveLength(1);
+    expect(filters[0]?.type).toBe('lowpass');
+    expect(filters[0]?.frequency.setValues[0]).toEqual({ value: 640, time: 0.006 });
+    expect(filters[0]?.Q.setValues[0]).toEqual({ value: 0.7, time: 0.006 });
+    expect(gains.at(-1)?.gain.exponential[0]).toEqual({ value: 0.12 * 1.45, time: 0.015 });
+  });
+
   it('lets Ice own a resolution frame without stacking hard-drop, lock, or clear sounds', async () => {
     const audio = audioFor();
     await audio.prime();
