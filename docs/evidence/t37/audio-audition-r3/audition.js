@@ -31,6 +31,8 @@ const ASSET_PATHS = [
   './assets/glass/snap.ogg',
 ]
 
+const EMBEDDED_ASSETS = window.__T37_EMBEDDED_AUDIO__ ?? {}
+
 const ACTIONS = [
   ['move-left', '左移'],
   ['move-right', '右移'],
@@ -89,7 +91,6 @@ const signalMetrics = new Map()
 const activeSources = new Set()
 const groupedSources = new Map()
 const actionTimers = new Set()
-const mediaFallback = new Set()
 
 function renderFamilies() {
   elements.families.innerHTML = FAMILIES.map((family) => `
@@ -167,9 +168,20 @@ async function loadAssets() {
   let loaded = 0
   try {
     for (const path of ASSET_PATHS) {
-      const response = await fetch(path)
-      if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`)
-      const encoded = await response.arrayBuffer()
+      let encoded
+      if (window.location.protocol === 'file:') {
+        const base64 = EMBEDDED_ASSETS[path]
+        if (!base64) throw new Error(`${path}: 缺少内嵌音频`)
+        const binary = window.atob(base64)
+        const bytes = new Uint8Array(binary.length)
+        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index)
+        encoded = bytes.buffer
+        state.mode = 'embedded-buffer'
+      } else {
+        const response = await fetch(path)
+        if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`)
+        encoded = await response.arrayBuffer()
+      }
       const buffer = await context.decodeAudioData(encoded.slice(0))
       buffers.set(path, buffer)
       signalMetrics.set(path, analyzeBuffer(buffer))
@@ -178,11 +190,6 @@ async function loadAssets() {
     }
     markReady('23 个候选已在本地解码；点击任一按钮开始试听。')
   } catch (error) {
-    if (window.location.protocol === 'file:') {
-      state.mode = 'media-fallback'
-      markReady('已进入本地文件兼容模式；建议通过验证命令打开以获得精确混音。')
-      return
-    }
     state.error = error instanceof Error ? error.message : String(error)
     elements.loadStatus.textContent = `载入失败：${state.error}`
     elements.loadStatus.classList.add('error')
@@ -203,7 +210,6 @@ function markReady(message) {
 }
 
 async function unlockAudio() {
-  if (state.mode === 'media-fallback') return
   const context = createAudioGraph()
   if (context.state !== 'running') await context.resume()
 }
@@ -235,21 +241,6 @@ function stopGroup(group) {
   groupedSources.delete(group)
 }
 
-function playMediaFallback(path, { delayMs = 0, volume = 0.75, rate = 1 } = {}) {
-  const timer = window.setTimeout(() => {
-    actionTimers.delete(timer)
-    const audio = new Audio(path)
-    audio.volume = Math.min(1, volume * state.volume)
-    audio.playbackRate = rate
-    mediaFallback.add(audio)
-    audio.addEventListener('ended', () => mediaFallback.delete(audio), { once: true })
-    audio.play().catch((error) => {
-      state.error = error instanceof Error ? error.message : String(error)
-    })
-  }, delayMs)
-  actionTimers.add(timer)
-}
-
 function playAsset(pack, cue, options = {}) {
   const path = resolveAsset(pack, cue)
   const {
@@ -261,11 +252,6 @@ function playAsset(pack, cue, options = {}) {
     group = null,
     replaceGroup = false,
   } = options
-
-  if (state.mode === 'media-fallback') {
-    playMediaFallback(path, { delayMs, volume: targetPeak, rate })
-    return null
-  }
 
   if (replaceGroup && group) stopGroup(group)
   const context = createAudioGraph()
@@ -585,11 +571,6 @@ function stopAll(resetStage = true) {
   }
   activeSources.clear()
   groupedSources.clear()
-  for (const audio of mediaFallback) {
-    audio.pause()
-    audio.currentTime = 0
-  }
-  mediaFallback.clear()
   cancelVisuals()
   if (resetStage) setStage('—', '已停止', '可以从任意声族重新开始。')
 }

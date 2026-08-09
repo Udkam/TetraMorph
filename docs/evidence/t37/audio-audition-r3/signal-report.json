@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-09T02:47:22.808Z",
+  "generatedAt": "2026-08-09T02:50:57.284Z",
   "source": {
     "package": "uisfx@0.4.0",
     "sourceCommit": "2001f3dac2d1cf86ad99cbad5cef222c3a8b9082",
@@ -257,7 +257,7 @@
   },
   "sha256": {
     "LICENSE-AUDIO": "e0ba86134c566659a19dc73993e594c88a282b99f8f300d83de98acec1c99f1f",
-    "PROVENANCE.md": "e31d164b219f486bd4c7425ed5d502667c7ce0f79fdc4d2a496f67419d35dd21",
+    "PROVENANCE.md": "a08bfa52443681383701d227a34b800eb181c1fc2401cd3b29e1b81857be2714",
     "assets/glass/lock.ogg": "491061633cba13b8bf837090d50cb593462f7a0a323b8b30f0dbe7ecfa67120b",
     "assets/glass/snap.ogg": "656ae75c9bd8f0db281fc8cc0279bbbd013f642061838f9c265183b7f403fa92",
     "assets/mechanical/complete.ogg": "a23161be8b9feb590163bd60c24d1d4d62a374f2769cc6380db6664a933836e5",
@@ -281,14 +281,18 @@
     "assets/studio/reorder.ogg": "a02373fad67b12313061cf14f8dd4c915928ca96652305beaab1f0cc2e342260",
     "assets/studio/start.ogg": "b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388",
     "assets/studio/swipe.ogg": "99a13b8e43cbef1326577dcaa3ff35e83b6f769a84d05f69e9077fe740074b26",
-    "audition.js": "87bdd677eb313131488557b0dd70c5d7eacbd58061833627a78b2ff116236af8",
-    "index.html": "905cc835a1c7699f812fd8134ca602ba82d95b314dcf3b9cacb7e53cfd076f1a",
+    "audition.js": "db2ce340a04bf1893b790e7d1ab92fbba9d2bae1ef427ec220f7f4f650f6c8f3",
+    "embed-assets.mjs": "409fc30c75c2f5715e8eba104b40a387713573a007583753f049212cbe4a081e",
+    "embedded-assets.js": "635cbf73726315507102dff4b3291e6a7756d3708ac17e14da23cbaad52152d7",
+    "index.html": "760be9f0e83f10bed806cc5169ec7403a90ed6305e1354bcc9276db718e961c7",
     "styles.css": "fcc3e55db8dd15079ad34965a056a2d22f865a2c4e8747301f5220dade0879bb",
-    "verify-audition.mjs": "0f4259517a74e136f57ea4de79fdde0d713f26c5de8d2e00a2cbb1d832c72220"
+    "verify-audition.mjs": "b162c37891bfe5a9876b4138bc8429bd868dc1cd88320f56658decb20a169285"
   },
   "assertions": {
     "expectedAssets": 23,
     "decodedAssets": 23,
+    "embeddedAssets": 23,
+    "embeddedBytesMatchOggSha256": true,
     "allFinite": true,
     "allAudibleByPeakAndRmsFloor": true,
     "noDecodedFullScaleOverflow": true

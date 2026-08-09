@@ -23,6 +23,11 @@ The audition copies only 23 Ogg files:
   `progress-step`, `complete`, and `start`;
 - `glass`: `lock` and `snap` for the isolated Ice comparison.
 
+`embedded-assets.js` contains the same 23 Ogg byte streams as Base64 so the intended
+Web Audio mix also works when `index.html` is opened directly from disk. The verifier
+checks every embedded byte stream against its corresponding Ogg SHA-256; it is not a
+second audio source.
+
 The three ordinary families deliberately use the same semantic map:
 
 | TetraMorph action | Source cue | Audition treatment |

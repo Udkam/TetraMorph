@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs'
 import { readdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { dirname, extname, join, relative, resolve, sep } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { chromium } from 'playwright'
 
 const ROOT = dirname(fileURLToPath(import.meta.url))
@@ -68,6 +68,17 @@ function createStaticServer() {
 }
 
 async function main() {
+  const embeddedSource = await readFile(join(ROOT, 'embedded-assets.js'), 'utf8')
+  const embeddedMatch = embeddedSource.match(/^window\.__T37_EMBEDDED_AUDIO__ = Object\.freeze\((\{.*\})\)\s*$/s)
+  assert(embeddedMatch, 'embedded-assets.js does not match its generated contract.')
+  const embeddedAssets = JSON.parse(embeddedMatch[1])
+  assert(Object.keys(embeddedAssets).length === 23, `Expected 23 embedded assets, received ${Object.keys(embeddedAssets).length}.`)
+  for (const [path, base64] of Object.entries(embeddedAssets)) {
+    const diskPath = join(ROOT, path.replace(/^\.\//, ''))
+    const embeddedHash = createHash('sha256').update(Buffer.from(base64, 'base64')).digest('hex')
+    assert(embeddedHash === await sha256(diskPath), `${path} embedded bytes differ from the Ogg file.`)
+  }
+
   const server = createStaticServer()
   await new Promise((resolveListen, reject) => {
     server.once('error', reject)
@@ -131,6 +142,20 @@ async function main() {
     const reducedState = JSON.parse(await page.evaluate(() => window.render_game_to_text()))
     assert(reducedState.currentAction === '旋转', 'Reduced-motion action mapping failed.')
 
+    const filePage = await browser.newPage({ viewport: { width: 1000, height: 760 } })
+    filePage.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(`file: ${message.text()}`)
+    })
+    filePage.on('pageerror', (error) => pageErrors.push(`file: ${error.message}`))
+    await filePage.goto(pathToFileURL(join(ROOT, 'index.html')).href, { waitUntil: 'load' })
+    await filePage.waitForFunction(() => window.__AUDITION_READY__ === true, null, { timeout: 20_000 })
+    await filePage.click('[data-family="studio"][data-action="move-left"]')
+    await filePage.waitForTimeout(140)
+    const fileState = JSON.parse(await filePage.evaluate(() => window.render_game_to_text()))
+    assert(fileState.playbackMode === 'embedded-buffer', `Direct-file playback used ${fileState.playbackMode}.`)
+    assert(fileState.currentFamily === 'studio' && fileState.currentAction === '左移', 'Direct-file action mapping failed.')
+    await filePage.close()
+
     const report = await page.evaluate(() => window.__AUDITION_API__.getReport())
     assert(report.assetCount === 23, `Expected 23 assets, received ${report.assetCount}.`)
     assert(Object.keys(report.assets).length === 23, `Expected 23 decoded metrics, received ${Object.keys(report.assets).length}.`)
@@ -168,6 +193,8 @@ async function main() {
       assertions: {
         expectedAssets: 23,
         decodedAssets: Object.keys(report.assets).length,
+        embeddedAssets: Object.keys(embeddedAssets).length,
+        embeddedBytesMatchOggSha256: true,
         allFinite: true,
         allAudibleByPeakAndRmsFloor: true,
         noDecodedFullScaleOverflow: true,
@@ -180,10 +207,10 @@ async function main() {
         { width: 1440, height: 1100, screenshot: 'audition-r3-desktop.png' },
         { width: 390, height: 844, screenshot: 'audition-r3-mobile.png' },
       ],
-      checkedActions: ['studio move-left', 'mechanical rotate', 'scifi clear-4', 'glass ice', 'scifi mobile hard-drop', 'studio reduced-motion rotate'],
+      checkedActions: ['studio move-left', 'mechanical rotate', 'scifi clear-4', 'glass ice', 'scifi mobile hard-drop', 'studio reduced-motion rotate', 'direct-file studio move-left'],
       consoleErrors,
       pageErrors,
-      playbackMode: report.playbackMode,
+      playbackModes: { http: report.playbackMode, directFile: 'embedded-buffer' },
       result: 'PASS',
     }
     await writeFile(join(ROOT, 'signal-report.json'), `${JSON.stringify(signalReport, null, 2)}\n`, 'utf8')
