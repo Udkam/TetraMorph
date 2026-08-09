@@ -209,6 +209,7 @@ afterEach(() => {
 
 describe('T37 Settled Handoff route boundary', () => {
   interface ControlledTransition {
+    readonly readyCatch: ReturnType<typeof vi.spyOn>;
     readonly updateCallbackDone: Promise<void>;
     readonly skipTransition: ReturnType<typeof vi.fn>;
     runUpdate(): Promise<void>;
@@ -222,19 +223,30 @@ describe('T37 Settled Handoff route boundary', () => {
       let updatePromise: Promise<void> | null = null;
       let resolveUpdate!: () => void;
       let rejectUpdate!: (error: unknown) => void;
+      let resolveReady!: () => void;
+      let rejectReady!: (error: unknown) => void;
       let resolveFinished!: () => void;
       let rejectFinished!: (error: unknown) => void;
       const updateCallbackDone = new Promise<void>((resolve, reject) => {
         resolveUpdate = resolve;
         rejectUpdate = reject;
       });
+      const ready = new Promise<void>((resolve, reject) => {
+        resolveReady = resolve;
+        rejectReady = reject;
+      });
+      const readyCatch = vi.spyOn(ready, 'catch');
       const finished = new Promise<void>((resolve, reject) => {
         resolveFinished = resolve;
         rejectFinished = reject;
       });
       const controlled: ControlledTransition = {
+        readyCatch,
         updateCallbackDone,
-        skipTransition: vi.fn(() => resolveFinished()),
+        skipTransition: vi.fn(() => {
+          rejectReady(new Error('Transition was skipped'));
+          resolveFinished();
+        }),
         runUpdate: () => {
           if (updatePromise) return updatePromise;
           try {
@@ -242,14 +254,29 @@ describe('T37 Settled Handoff route boundary', () => {
           } catch (error) {
             updatePromise = Promise.reject(error);
           }
-          void updatePromise.then(resolveUpdate, rejectUpdate);
+          void updatePromise.then(
+            () => {
+              resolveUpdate();
+              resolveReady();
+            },
+            (error) => {
+              rejectUpdate(error);
+              rejectReady(error);
+            },
+          );
           return updatePromise;
         },
-        finish: resolveFinished,
-        rejectFinished: (error = new Error('transition failed')) => rejectFinished(error),
+        finish: () => {
+          resolveReady();
+          resolveFinished();
+        },
+        rejectFinished: (error = new Error('transition failed')) => {
+          resolveReady();
+          rejectFinished(error);
+        },
       };
       transitions.push(controlled);
-      return { finished, updateCallbackDone, skipTransition: controlled.skipTransition };
+      return { ready, finished, updateCallbackDone, skipTransition: controlled.skipTransition };
     });
     Object.defineProperty(document, 'startViewTransition', {
       configurable: true,
@@ -339,6 +366,8 @@ describe('T37 Settled Handoff route boundary', () => {
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
     expect(control.transitions).toHaveLength(2);
     expect(control.transitions[0]!.skipTransition).toHaveBeenCalledTimes(1);
+    expect(control.transitions[0]!.readyCatch).toHaveBeenCalledTimes(1);
+    expect(control.transitions[1]!.readyCatch).toHaveBeenCalledTimes(1);
     expect(window.location.pathname).toBe('/');
 
     await act(async () => control.transitions[1]!.runUpdate());

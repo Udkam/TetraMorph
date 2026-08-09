@@ -2736,6 +2736,7 @@ type RouteTransitionMode = 'idle' | 'native' | 'fallback' | 'reduced';
 
 interface AppViewTransition {
   finished: Promise<unknown>;
+  ready?: Promise<unknown>;
   updateCallbackDone?: Promise<unknown>;
   skipTransition?: () => void;
 }
@@ -2955,6 +2956,7 @@ export default function App() {
           return;
         }
         activeRouteTransitionRef.current = { epoch, transition };
+        void transition.ready?.catch(() => undefined);
         void transition.updateCallbackDone?.catch(() => undefined);
         void transition.finished.then(
           () => finishRouteTransition(epoch),
