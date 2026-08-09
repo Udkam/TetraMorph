@@ -345,6 +345,7 @@ export class AudioEngine {
     assetId: 'studioProgress' | 'studioStart',
     options: {
       readonly delay?: number;
+      readonly startAt?: number;
       readonly targetPeak: number;
       readonly rate: number;
       readonly pan: number;
@@ -359,7 +360,7 @@ export class AudioEngine {
       || this.activeVoices.size >= MAX_EFFECT_VOICES
     ) return;
     scheduleStudioSample(context, destination, buffer, {
-      startAt: context.currentTime + (options.delay ?? 0),
+      startAt: options.startAt ?? context.currentTime + (options.delay ?? 0),
       targetPeak: options.targetPeak,
       rate: options.rate,
       pan: options.pan,
@@ -392,10 +393,13 @@ export class AudioEngine {
     if (!Number.isInteger(count) || count < 1) return;
     const tier = Math.min(4, count) as 1 | 2 | 3 | 4;
     const delays = STUDIO_CLEAR_CONTRACT.delaysMs[tier];
+    const context = this.context;
+    if (!context) return;
+    const eventStart = context.currentTime;
     for (let index = 0; index < delays.length; index += 1) {
       const pan = tier === 1 ? 0 : -0.35 + (0.7 * index) / (tier - 1);
       this.playStudio('studioProgress', {
-        delay: (delays[index] ?? 0) / 1_000,
+        startAt: eventStart + (delays[index] ?? 0) / 1_000,
         targetPeak: STUDIO_CLEAR_CONTRACT.targetPeak[tier],
         rate: STUDIO_CLEAR_CONTRACT.rate,
         pan,
@@ -411,8 +415,9 @@ export class AudioEngine {
     const available = MAX_EFFECT_VOICES - this.activeVoices.size;
     if (!context || !destination || available <= 0 || !this.enabled || this.destroyed) return;
     const hooks = this.voiceHooks(Boolean(cue.mutationOwned));
+    const eventStart = context.currentTime + delay;
     scheduleToneRecipe(context, destination, cue.tones, {
-      startAt: context.currentTime + delay,
+      startAt: eventStart,
       maxVoices: available,
       gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
       gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
@@ -422,7 +427,7 @@ export class AudioEngine {
     if (remaining <= 0 || !cue.air?.length) return;
     for (const layer of cue.air.slice(0, remaining)) {
       scheduleRecoveredNoisePuff(context, destination, {
-        startAt: context.currentTime + delay + (layer.delay ?? 0),
+        startAt: eventStart + (layer.delay ?? 0),
         duration: layer.duration,
         gain: layer.gain,
         cutoff: layer.cutoff,

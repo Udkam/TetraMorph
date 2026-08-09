@@ -372,6 +372,35 @@ describe('AudioEngine accepted production contract', () => {
     expect(gains.at(-1)?.gain.exponential[0]).toEqual({ value: 0.17 * 1.45, time: 0.224 });
   });
 
+  it('pins every layer of one clear or Bomb event to one moving AudioContext clock read', async () => {
+    const context = new FakeAudioContext();
+    let clock = 0;
+    let readStep = 0;
+    Object.defineProperty(context, 'currentTime', {
+      configurable: true,
+      get: () => {
+        const value = clock;
+        clock += readStep;
+        return value;
+      },
+      set: (value: number) => { clock = value; },
+    });
+    const audio = audioFor(context);
+    await audio.prime();
+    clock = 4;
+    readStep = 0.011;
+
+    audio.play([{ type: 'clear-started', rows: [36, 37, 38, 39] }]);
+    expect(bufferSources.map((node) => node.starts[0]?.time)).toEqual([4, 4.06, 4.12, 4.18]);
+
+    audio.play([mutation('bomb')]);
+    const bombStarts = oscillators.slice(-3).map((node) => node.starts[0] ?? 0);
+    const bombOrigin = bombStarts[0]!;
+    expect(bombStarts.map((start) => Number((start - bombOrigin).toFixed(3)))).toEqual([0, 0.22, 0.235]);
+    expect(bufferSources.at(-1)?.starts[0]?.time).toBeCloseTo(bombOrigin + 0.22);
+    expect(filters.at(-1)?.frequency.setValues[0]?.time).toBeCloseTo(bombOrigin + 0.22);
+  });
+
   it('lets Ice own a resolution frame without stacking hard-drop, lock, or clear sounds', async () => {
     const audio = audioFor();
     await audio.prime();
