@@ -26,6 +26,7 @@ const inputDestroy = vi.hoisted(() => vi.fn());
 const inputHarness = vi.hoisted(() => ({ emit: null as ((action: string) => void) | null }));
 const audioPrime = vi.hoisted(() => vi.fn());
 const audioPlayEntryCountdown = vi.hoisted(() => vi.fn());
+const audioPlayEntryCountdownResolve = vi.hoisted(() => vi.fn());
 const audioSetVolume = vi.hoisted(() => vi.fn());
 const audioSetAmbientTheme = vi.hoisted(() => vi.fn());
 const audioDestroy = vi.hoisted(() => vi.fn());
@@ -36,8 +37,9 @@ vi.mock('../audio/AudioEngine', () => ({
     setEnabled(): void {}
     setVolume(volume: number): void { audioSetVolume(volume); }
     setAmbientTheme(theme: string): void { audioSetAmbientTheme(theme); }
-    async prime(): Promise<void> { audioPrime(); }
+    prime(): Promise<void> { return Promise.resolve(audioPrime()); }
     playEntryCountdown(digit: 3 | 2 | 1): void { audioPlayEntryCountdown(digit); }
+    playEntryCountdownResolve(): void { audioPlayEntryCountdownResolve(); }
     play(): void {}
     syncMutationState(): void {}
     suspend(): void {}
@@ -353,7 +355,33 @@ describe('GameRuntime public state boundary', () => {
     expect(audioPrime).toHaveBeenCalledTimes(1);
     expect(audioPlayEntryCountdown).toHaveBeenCalledExactlyOnceWith(3);
     expect(runtime.getState().status).toBe('ready');
+
+    audioPrime.mockClear();
+    audioPlayEntryCountdownResolve.mockClear();
+    runtime.playEntryCountdownResolve();
+    await Promise.resolve();
+
+    expect(audioPrime).toHaveBeenCalledTimes(1);
+    expect(audioPlayEntryCountdownResolve).toHaveBeenCalledTimes(1);
+    expect(runtime.getState().status).toBe('ready');
     runtime.destroy();
+  });
+
+  it('does not forward a pending countdown resolution after destroy', async () => {
+    let releasePrime!: () => void;
+    audioPrime.mockImplementationOnce(() => new Promise<void>((resolve) => {
+      releasePrime = resolve;
+    }));
+    audioPlayEntryCountdownResolve.mockClear();
+    const runtime = new GameRuntime({ seed: 123, inputEnabled: false });
+
+    runtime.playEntryCountdownResolve();
+    runtime.destroy();
+    releasePrime();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(audioPlayEntryCountdownResolve).not.toHaveBeenCalled();
   });
 
   it('restarts immediately from active play when the public R action is received', async () => {

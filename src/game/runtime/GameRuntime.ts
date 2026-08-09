@@ -305,6 +305,18 @@ export class GameRuntime {
       });
   }
 
+  /** Resolves the countdown as its cover begins the final gated exit. */
+  playEntryCountdownResolve(): void {
+    if (this.destroyed) return;
+    void this.audio.prime()
+      .then(() => {
+        if (!this.destroyed) this.audio.playEntryCountdownResolve();
+      })
+      .catch(() => {
+        // Hosts may deny autoplay until a later gesture; countdown remains visual.
+      });
+  }
+
   getState(): GameState {
     return this.state;
   }

@@ -91,6 +91,7 @@ interface RuntimeTestInstance {
   setAudioEnabled: ReturnType<typeof vi.fn>;
   setAudioVolume: ReturnType<typeof vi.fn>;
   playEntryCountdown: ReturnType<typeof vi.fn>;
+  playEntryCountdownResolve: ReturnType<typeof vi.fn>;
   press: ReturnType<typeof vi.fn>;
   release: ReturnType<typeof vi.fn>;
   getState: () => GameState;
@@ -120,6 +121,7 @@ vi.mock('./game/runtime/GameRuntime', async () => {
     readonly setAudioEnabled = vi.fn();
     readonly setAudioVolume = vi.fn();
     readonly playEntryCountdown = vi.fn();
+    readonly playEntryCountdownResolve = vi.fn();
     readonly start = vi.fn(() => {
       const transition = core.dispatch(this.state, { type: 'start' });
       this.state = transition.state;
@@ -289,7 +291,7 @@ function render(element: ReactNode): {
 
 async function advanceEntryCountdown(): Promise<void> {
   for (let step = 0; step < 3; step += 1) {
-    await act(async () => vi.advanceTimersByTimeAsync(1000));
+    await act(async () => vi.advanceTimersByTimeAsync(500));
   }
   await act(async () => vi.advanceTimersByTimeAsync(220));
 }
@@ -599,6 +601,7 @@ describe('entry countdown', () => {
     expect(runtime.start).toHaveBeenCalledTimes(1);
     expect(runtime.getState().status).toBe('playing');
     expect(runtime.playEntryCountdown).not.toHaveBeenCalled();
+    expect(runtime.playEntryCountdownResolve).not.toHaveBeenCalled();
     expect(countdown()).toBeNull();
 
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')?.click());
@@ -607,6 +610,7 @@ describe('entry countdown', () => {
     expect(runtime.start).toHaveBeenCalledTimes(2);
     expect(runtime.getState().status).toBe('playing');
     expect(runtime.playEntryCountdown).not.toHaveBeenCalled();
+    expect(runtime.playEntryCountdownResolve).not.toHaveBeenCalled();
     expect(countdown()).toBeNull();
 
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', key: 'r', bubbles: true })));
@@ -616,6 +620,7 @@ describe('entry countdown', () => {
     expect(runtime.start).toHaveBeenCalledTimes(3);
     expect(runtime.getState().status).toBe('playing');
     expect(runtime.playEntryCountdown).not.toHaveBeenCalled();
+    expect(runtime.playEntryCountdownResolve).not.toHaveBeenCalled();
     expect(countdown()).toBeNull();
 
     act(() => runtime.setState({
@@ -632,11 +637,12 @@ describe('entry countdown', () => {
     expect(runtime.start).toHaveBeenCalledTimes(4);
     expect(runtime.getState().status).toBe('playing');
     expect(runtime.playEntryCountdown).not.toHaveBeenCalled();
+    expect(runtime.playEntryCountdownResolve).not.toHaveBeenCalled();
     expect(countdown()).toBeNull();
     view.unmount();
   });
 
-  it('freezes the current digit across Settings and Exit, then starts exactly once after three open-sheet-free seconds', async () => {
+  it('preserves the accepted 500 ms cadence remainder across Settings and Exit, then resolves at 1500 ms exactly once', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('matchMedia', vi.fn(() => ({
       matches: true,
@@ -669,6 +675,7 @@ describe('entry countdown', () => {
     expect(textState).toMatchObject({ combo: 0, bedrockRows: 0, fallTicks: 48 });
     expect(countdown()?.dataset.countdown).toBe('3');
     expect(runtime.playEntryCountdown).toHaveBeenCalledExactlyOnceWith(3);
+    expect(runtime.playEntryCountdownResolve).not.toHaveBeenCalled();
     expect(settings.disabled).toBe(false);
     expect(back.disabled).toBe(false);
     expect(view.container.querySelector('[data-testid="touch-rail"]')).toBeNull();
@@ -687,12 +694,13 @@ describe('entry countdown', () => {
     expect(view.container.querySelector<HTMLElement>('[role="dialog"]')?.contains(document.activeElement)).toBe(true);
 
     act(() => view.container.querySelector<HTMLElement>('[data-testid="action-sheet-backdrop"]')?.click());
-    await act(async () => vi.advanceTimersByTimeAsync(999));
+    await act(async () => vi.advanceTimersByTimeAsync(99));
     expect(countdown()?.dataset.countdown).toBe('3');
     await act(async () => vi.advanceTimersByTimeAsync(1));
     expect(countdown()?.dataset.countdown).toBe('2');
     expect(runtime.playEntryCountdown).toHaveBeenLastCalledWith(2);
 
+    await act(async () => vi.advanceTimersByTimeAsync(200));
     act(() => back.click());
     expect(view.container.querySelector('.action-sheet')?.textContent).toContain('离开本局？');
     await act(async () => vi.advanceTimersByTimeAsync(5000));
@@ -703,12 +711,12 @@ describe('entry countdown', () => {
 
     act(() => [...view.container.querySelectorAll<HTMLButtonElement>('.action-sheet__actions > button')]
       .find((button) => button.textContent === '留在本局')?.click());
-    await act(async () => vi.advanceTimersByTimeAsync(999));
+    await act(async () => vi.advanceTimersByTimeAsync(299));
     expect(countdown()?.dataset.countdown).toBe('2');
     await act(async () => vi.advanceTimersByTimeAsync(1));
     expect(countdown()?.dataset.countdown).toBe('1');
     expect(runtime.playEntryCountdown).toHaveBeenLastCalledWith(1);
-    await act(async () => vi.advanceTimersByTimeAsync(999));
+    await act(async () => vi.advanceTimersByTimeAsync(499));
     expect(countdown()?.dataset.countdown).toBe('1');
     expect(runtime.start).not.toHaveBeenCalled();
 
@@ -716,13 +724,20 @@ describe('entry countdown', () => {
 
     expect(countdown()?.dataset.countdown).toBe('exit');
     expect(countdown()?.textContent).toBe('');
+    expect(runtime.playEntryCountdownResolve).toHaveBeenCalledTimes(1);
     expect(runtime.setInputEnabled.mock.calls.some(([enabled]) => enabled === true)).toBe(false);
     expect(runtime.setInputEnabled).toHaveBeenCalledWith(false);
     expect(runtime.start).not.toHaveBeenCalled();
     expect(runtime.playEntryCountdown.mock.calls.map(([digit]) => digit)).toEqual([3, 2, 1]);
     expect(settings.disabled).toBe(false);
     expect(back.disabled).toBe(false);
-    await act(async () => vi.advanceTimersByTimeAsync(119));
+    await act(async () => vi.advanceTimersByTimeAsync(50));
+    act(() => settings.click());
+    await act(async () => vi.advanceTimersByTimeAsync(5000));
+    expect(countdown()?.dataset.countdown).toBe('exit');
+    expect(runtime.start).not.toHaveBeenCalled();
+    act(() => view.container.querySelector<HTMLElement>('[data-testid="action-sheet-backdrop"]')?.click());
+    await act(async () => vi.advanceTimersByTimeAsync(69));
     expect(countdown()?.dataset.countdown).toBe('exit');
     expect(runtime.start).not.toHaveBeenCalled();
     await act(async () => vi.advanceTimersByTimeAsync(1));
@@ -733,6 +748,7 @@ describe('entry countdown', () => {
     expect(document.activeElement).toBe(view.container.querySelector('canvas'));
     await act(async () => vi.advanceTimersByTimeAsync(5000));
     expect(runtime.start).toHaveBeenCalledTimes(1);
+    expect(runtime.playEntryCountdownResolve).toHaveBeenCalledTimes(1);
 
     const terminalState = {
       ...createInitialState(0x51a1f00d, 'marathon'),
@@ -780,6 +796,7 @@ describe('entry countdown', () => {
     await act(async () => vi.advanceTimersByTimeAsync(5000));
 
     expect(runtime.start).not.toHaveBeenCalled();
+    expect(runtime.playEntryCountdownResolve).not.toHaveBeenCalled();
     expect(runtime.setInputEnabled.mock.calls.some(([enabled]) => enabled === true)).toBe(false);
   });
 });
@@ -1539,6 +1556,8 @@ describe('T6 frontend mode binding', () => {
     runtimeHarness.instances.at(-1)?.restart.mockClear();
     runtimeHarness.instances.at(-1)?.start.mockClear();
     runtimeHarness.instances.at(-1)?.togglePause.mockClear();
+    runtimeHarness.instances.at(-1)?.playEntryCountdown.mockClear();
+    runtimeHarness.instances.at(-1)?.playEntryCountdownResolve.mockClear();
     const settings = view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')!;
     const topbar = view.container.querySelector<HTMLElement>('[data-testid="cluster-header"]')!;
     expect(settings.disabled).toBe(false);
@@ -1556,6 +1575,11 @@ describe('T6 frontend mode binding', () => {
     expect(runtimeHarness.instances.at(-1)?.setInputEnabled).toHaveBeenLastCalledWith(false);
     await advanceEntryCountdown();
     expect(runtimeHarness.instances.at(-1)?.start).toHaveBeenCalledTimes(1);
+    expect(runtimeHarness.instances.at(-1)?.playEntryCountdown.mock.calls.map(([digit]) => digit)).toEqual([3, 2, 1]);
+    expect(runtimeHarness.instances.at(-1)?.playEntryCountdownResolve).toHaveBeenCalledTimes(1);
+
+    runtimeHarness.instances.at(-1)?.playEntryCountdown.mockClear();
+    runtimeHarness.instances.at(-1)?.playEntryCountdownResolve.mockClear();
 
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', key: 'r', bubbles: true })));
     expect(view.container.textContent).toContain('重新开始');
@@ -1570,6 +1594,8 @@ describe('T6 frontend mode binding', () => {
     expect(view.container.querySelector('[data-testid="restart-curtain"]')).toBeNull();
     await advanceEntryCountdown();
     expect(runtimeHarness.instances.at(-1)?.start).toHaveBeenCalledTimes(2);
+    expect(runtimeHarness.instances.at(-1)?.playEntryCountdown.mock.calls.map(([digit]) => digit)).toEqual([3, 2, 1]);
+    expect(runtimeHarness.instances.at(-1)?.playEntryCountdownResolve).toHaveBeenCalledTimes(1);
     expect(view.container.querySelector('[data-testid="entry-countdown"]')).toBeNull();
     view.unmount();
   });

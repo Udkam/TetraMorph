@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "runtimeNetworkDependency": false,
+  "licenseFile": "licenses/audio/CC0-1.0.txt",
+  "assets": [
+    {
+      "id": "studioProgress",
+      "runtimePath": "src/assets/audio/t37/studio-progress-step.ogg",
+      "sha256": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c",
+      "license": "CC0-1.0",
+      "uses": ["line-clear-row-pulse", "countdown-step"],
+      "source": {
+        "publisher": "UI SFX",
+        "projectUrl": "https://uisfx.com/",
+        "repositoryUrl": "https://github.com/romainsimon/uisfx",
+        "package": "uisfx@0.4.0",
+        "sourceCommit": "2001f3dac2d1cf86ad99cbad5cef222c3a8b9082",
+        "sourceFile": "sounds/studio/progress-step.ogg"
+      }
+    },
+    {
+      "id": "studioStart",
+      "runtimePath": "src/assets/audio/t37/studio-start.ogg",
+      "sha256": "b85abe167750922700a1aa7f5d2f5e5162facfdc6782c298b9c825375bdfb388",
+      "license": "CC0-1.0",
+      "uses": ["countdown-resolve"],
+      "source": {
+        "publisher": "UI SFX",
+        "projectUrl": "https://uisfx.com/",
+        "repositoryUrl": "https://github.com/romainsimon/uisfx",
+        "package": "uisfx@0.4.0",
+        "sourceCommit": "2001f3dac2d1cf86ad99cbad5cef222c3a8b9082",
+        "sourceFile": "sounds/studio/start.ogg"
+      }
+    },
+    {
+      "id": "freezeIce",
+      "runtimePath": "src/assets/audio/t37/freeze-ice-cubes-hq.ogg",
+      "runtimeFileKind": "Freesound-generated HQ Ogg preview",
+      "sha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+      "license": "CC0-1.0",
+      "uses": ["freeze-activation"],
+      "source": {
+        "publisher": "Freesound",
+        "pageUrl": "https://freesound.org/people/sbml/sounds/819779/",
+        "soundId": 819779,
+        "author": "sbml",
+        "title": "Ice cubes"
+      },
+      "treatment": {
+        "windowStartSeconds": 0.19375,
+        "windowDurationSeconds": 0.44,
+        "gain": 0.78,
+        "attackSeconds": 0.003,
+        "releaseSeconds": 0.012,
+        "playbackRate": 1
+      }
+    }
+  ],
+  "provenanceArchives": [
+    {
+      "sourceAssetId": "freezeIce",
+      "originalFilename": "819779__sbml__ice-cubes.wav",
+      "originalDescription": "WAV, 1.723 seconds, 96 kHz, 32-bit, stereo",
+      "status": "pending",
+      "sha256": null,
+      "requiredBeforeProductionAssetGateCloses": true,
+      "note": "The runtime Ogg remains the accepted byte. The uploader-original WAV must be downloaded through Freesound's normal authenticated flow and hashed as a provenance archive; the Ogg is not that WAV."
+    }
+  ]
+}

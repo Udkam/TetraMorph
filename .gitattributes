@@ -8,3 +8,5 @@ docs/qa/evidence/t15-phase6/*.json text eol=lf
 docs/qa/evidence/t15-phase6/*.txt text eol=lf
 docs/qa/evidence/t15-phase6/*.log text eol=lf
 docs/qa/evidence/t15-phase6/*.png -text
+*.ogg -text
+*.wav -text

@@ -19,7 +19,8 @@ readable pressure, and deterministic replay.
   particles, and effects.
 - **Deterministic Core** isolated from React, PixiJS, browser timing, storage, and audio.
 - **Replay system** with seeded runs and public state snapshots for reproducible QA.
-- **Procedural audio** generated locally without licensed music or runtime media calls.
+- **Local Web Audio feedback** combines procedural synthesis with three pinned CC0 Ogg
+  samples, without licensed music or runtime network media calls.
 - **TypeScript architecture** with explicit Core, runtime, input, renderer, platform,
   persistence, and React composition boundaries.
 

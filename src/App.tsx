@@ -129,6 +129,7 @@ export type ClassicGravityRange = {
 
 const APP_SEED = 0x51a1f00d;
 const PRODUCT_NAME = 'TetraMorph';
+const ENTRY_COUNTDOWN_STEP_MS = 500;
 const ENTRY_COVER_EXIT_MS = 120;
 
 function readAppNavigation(): AppNavigationState {
@@ -1822,6 +1823,11 @@ export function GameSession({
   const boardGestureRef = useRef<{ id: number; x: number; y: number; at: number } | null>(null);
   const runtimeRef = useRef<GameRuntime | null>(null);
   const countdownCompleteRef = useRef(skipsEntryCountdown);
+  const countdownTimerDigitRef = useRef<EntryCountdownDigit | null>(null);
+  const countdownTimerRemainingMsRef = useRef(ENTRY_COUNTDOWN_STEP_MS);
+  const countdownTimerDeadlineRef = useRef<number | null>(null);
+  const entryCoverRemainingMsRef = useRef(ENTRY_COVER_EXIT_MS);
+  const entryCoverDeadlineRef = useRef<number | null>(null);
   const exitWasPlayingRef = useRef(false);
   const restartWasPlayingRef = useRef(false);
   const settingsWasPlayingRef = useRef(false);
@@ -2016,9 +2022,17 @@ export function GameSession({
 
   useEffect(() => {
     if (!runtime || countdownDigit === null || settingsOpen || restartConfirmOpen || exitOpen) return;
-    let cancelled = false;
+    if (countdownTimerDigitRef.current !== countdownDigit) {
+      countdownTimerDigitRef.current = countdownDigit;
+      countdownTimerRemainingMsRef.current = ENTRY_COUNTDOWN_STEP_MS;
+    }
+    let completed = false;
+    const deadline = browserPlatform.now() + countdownTimerRemainingMsRef.current;
+    countdownTimerDeadlineRef.current = deadline;
     const timer = browserPlatform.scheduleTimeout(() => {
-      if (cancelled) return;
+      completed = true;
+      countdownTimerDeadlineRef.current = null;
+      countdownTimerRemainingMsRef.current = ENTRY_COUNTDOWN_STEP_MS;
       if (countdownDigit === 3) {
         setCountdownDigit(2);
         return;
@@ -2027,26 +2041,44 @@ export function GameSession({
         setCountdownDigit(1);
         return;
       }
+      countdownTimerDigitRef.current = null;
+      entryCoverRemainingMsRef.current = ENTRY_COVER_EXIT_MS;
+      runtime.playEntryCountdownResolve();
       setEntryCoverExiting(true);
       setCountdownDigit(null);
-    }, 1000);
+    }, countdownTimerRemainingMsRef.current);
     return () => {
-      cancelled = true;
       browserPlatform.cancelTimeout(timer);
+      if (!completed && countdownTimerDeadlineRef.current === deadline) {
+        countdownTimerRemainingMsRef.current = Math.max(0, deadline - browserPlatform.now());
+        countdownTimerDeadlineRef.current = null;
+      }
     };
-  }, [countdownDigit, exitOpen, focusBoard, restartConfirmOpen, runtime, settingsOpen]);
+  }, [countdownDigit, exitOpen, restartConfirmOpen, runtime, settingsOpen]);
 
   useEffect(() => {
     if (!runtime || !entryCoverExiting || settingsOpen || restartConfirmOpen || exitOpen) return;
+    let completed = false;
+    const deadline = browserPlatform.now() + entryCoverRemainingMsRef.current;
+    entryCoverDeadlineRef.current = deadline;
     const timer = browserPlatform.scheduleTimeout(() => {
+      completed = true;
+      entryCoverDeadlineRef.current = null;
+      entryCoverRemainingMsRef.current = ENTRY_COVER_EXIT_MS;
       countdownCompleteRef.current = true;
       runtime.setInputEnabled(true);
       runtime.start();
       setEntryCoverExiting(false);
       setLiveMessage(appCopy(languageRef.current).labels.runStarted);
       focusBoard();
-    }, ENTRY_COVER_EXIT_MS);
-    return () => browserPlatform.cancelTimeout(timer);
+    }, entryCoverRemainingMsRef.current);
+    return () => {
+      browserPlatform.cancelTimeout(timer);
+      if (!completed && entryCoverDeadlineRef.current === deadline) {
+        entryCoverRemainingMsRef.current = Math.max(0, deadline - browserPlatform.now());
+        entryCoverDeadlineRef.current = null;
+      }
+    };
   }, [entryCoverExiting, exitOpen, focusBoard, restartConfirmOpen, runtime, settingsOpen]);
 
   useEffect(() => {
@@ -2209,6 +2241,11 @@ export function GameSession({
     settingsWasPlayingRef.current = false;
     restartWasPlayingRef.current = false;
     countdownCompleteRef.current = skipsEntryCountdown;
+    countdownTimerDigitRef.current = null;
+    countdownTimerRemainingMsRef.current = ENTRY_COUNTDOWN_STEP_MS;
+    countdownTimerDeadlineRef.current = null;
+    entryCoverRemainingMsRef.current = ENTRY_COVER_EXIT_MS;
+    entryCoverDeadlineRef.current = null;
     setEntryCoverExiting(false);
     runtime?.setInputEnabled(true);
     runtime?.restart();
