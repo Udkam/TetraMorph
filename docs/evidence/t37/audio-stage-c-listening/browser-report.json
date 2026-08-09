@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "candidateSourceCommit": "95978eb8ad5fe66eb77faf05d010df9eb1a66cfa",
+  "productionEngineImported": true,
+  "controlCount": 28,
+  "dispatchedControls": 6,
+  "desktop": {
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "buttonHeights": [
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      46,
+      151.99993896484375,
+      152,
+      152,
+      152,
+      112
+    ]
+  },
+  "mobile": {
+    "scrollWidth": 390,
+    "clientWidth": 390
+  },
+  "reducedTransitionDuration": "1e-06s",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "humanListeningStatus": "required-for-candidates"
+}

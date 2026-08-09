@@ -71,6 +71,14 @@ function maxRecipeEnd(recipe) {
 
 async function main() {
   const provenance = JSON.parse(await readFile(join(ROOT, 'provenance.json'), 'utf8'))
+  execFileSync('git', ['cat-file', '-e', `${provenance.actionProfiles.t28.audioCommit}^{commit}`], {
+    cwd: ROOT,
+    stdio: 'ignore',
+  })
+  execFileSync('git', ['cat-file', '-e', provenance.actionProfiles.t28.audioEngineBlob], {
+    cwd: ROOT,
+    stdio: 'ignore',
+  })
   const embeddedSource = await readFile(join(ROOT, 'embedded-assets.js'), 'utf8')
   const embeddedMatch = embeddedSource.match(/^window\.__T37_R5_EMBEDDED_AUDIO__ = Object\.freeze\((\{.*\})\)\s*$/s)
   assert(embeddedMatch, 'embedded-assets.js does not match the R5 generated contract.')

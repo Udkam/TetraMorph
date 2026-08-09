@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>TetraMorph · Stage C 正式音效试听</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="listening-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">T37 · PRODUCTION AUDIO</p>
+          <h1>正式运行链试听</h1>
+          <p class="lede">所有按钮直接触发生产 <code>AudioEngine</code>。动作 A、Studio 与冰冻 2 是冻结参照；其余是待听感确认的柔和恢复候选。</p>
+        </div>
+        <aside class="mix-panel" aria-label="试听输出控制">
+          <div class="status-row"><span class="status-dot" aria-hidden="true"></span><strong id="audio-status">等待首次交互</strong></div>
+          <label for="volume">输出音量 <output id="volume-value">100%</output></label>
+          <input id="volume" type="range" min="0" max="100" value="100" />
+          <button class="mute-button" id="mute" type="button" aria-pressed="false">静音</button>
+        </aside>
+      </header>
+
+      <section class="listening-section frozen-section" aria-labelledby="frozen-title">
+        <div class="section-heading">
+          <div><p class="section-index">01</p><h2 id="frozen-title">已通过参照</h2></div>
+          <span class="badge frozen">FROZEN</span>
+        </div>
+        <p class="section-note">仅用于对齐响度与手感，不重新投票，不经过候选混音链。</p>
+        <div class="cue-grid">
+          <article class="cue-card cyan">
+            <p class="cue-family">ACTION A</p><h3>移动与接触</h3>
+            <div class="button-grid">
+              <button data-cue="move-left" type="button">← 左移</button>
+              <button data-cue="move-right" type="button">右移 →</button>
+              <button data-cue="rotate" type="button">旋转</button>
+              <button data-cue="lock" type="button">自然落位</button>
+              <button data-cue="hard-drop" type="button">硬降</button>
+            </div>
+          </article>
+          <article class="cue-card gold">
+            <p class="cue-family">STUDIO</p><h3>消行与倒计时</h3>
+            <div class="button-grid">
+              <button data-cue="clear-1" type="button">消 1 行</button>
+              <button data-cue="clear-2" type="button">消 2 行</button>
+              <button data-cue="clear-3" type="button">消 3 行</button>
+              <button data-cue="clear-4" type="button">消 4 行</button>
+              <button data-cue="countdown" type="button">3 · 2 · 1</button>
+            </div>
+          </article>
+          <article class="cue-card ice">
+            <p class="cue-family">ICE 2</p><h3>冰块接触</h3>
+            <p class="cue-copy">原速 440ms 峰值窗口，直接输出；没有法术层、移调或电子亮片。</p>
+            <button data-cue="freeze" type="button">试听冰冻激活</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="listening-section" aria-labelledby="candidate-title">
+        <div class="section-heading">
+          <div><p class="section-index">02</p><h2 id="candidate-title">柔和恢复候选</h2></div>
+          <span class="badge candidate">LISTENING</span>
+        </div>
+        <p class="section-note">以 T28 短轮廓为基线；升级/结算已去除逐音旋律。建议用日常音量快速重复试听。</p>
+        <div class="cue-grid candidate-grid">
+          <article class="cue-card slate">
+            <p class="cue-family">UTILITY / UI</p><h3>轻操作</h3>
+            <div class="button-grid">
+              <button data-cue="soft-drop" type="button">自然下移</button>
+              <button data-cue="undo" type="button">撤销</button>
+              <button data-cue="pause" type="button">暂停</button>
+              <button data-cue="resume" type="button">继续</button>
+            </div>
+          </article>
+          <article class="cue-card stone">
+            <p class="cue-family">SURVIVAL</p><h3>地层与落石</h3>
+            <div class="button-grid">
+              <button data-cue="bedrock-rise" type="button">地层升高</button>
+              <button data-cue="bedrock-lower" type="button">地层下降</button>
+              <button data-cue="stone-warning" type="button">落石预警</button>
+              <button data-cue="stone-spawn" type="button">落石生成</button>
+              <button data-cue="stone-land" type="button">落石着地</button>
+            </div>
+          </article>
+          <article class="cue-card warm">
+            <p class="cue-family">OUTCOME</p><h3>阶段结果</h3>
+            <div class="button-grid">
+              <button data-cue="level-up" type="button">升级</button>
+              <button data-cue="finished" type="button">完成</button>
+              <button data-cue="game-over" type="button">失败</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="listening-section mutation-section" aria-labelledby="mutation-title">
+        <div class="section-heading">
+          <div><p class="section-index">03</p><h2 id="mutation-title">材质异变候选</h2></div>
+          <span class="badge candidate">SYNCED</span>
+        </div>
+        <p class="section-note">炸弹优先；同帧多异变按 620 / 320 / 220 / 320ms 视觉占用串行起音。</p>
+        <div class="mutation-grid">
+          <button class="material-button lava" data-cue="bomb" type="button"><small>熔岩压力</small><strong>炸弹 Bomb</strong><span>低频体积 + 低通裂压</span></button>
+          <button class="material-button violet" data-cue="supergravity" type="button"><small>亮紫重量</small><strong>超重 Supergravity</strong><span>两段向下质量</span></button>
+          <button class="material-button bullion" data-cue="multiplier-2" type="button"><small>金色抬升</small><strong>加倍 ×2</strong><span>短双音敲击</span></button>
+          <button class="material-button bullion-strong" data-cue="multiplier-4" type="button"><small>金色强化</small><strong>加倍 ×4</strong><span>追加一层高八度</span></button>
+          <button class="material-button sequence" data-cue="mutation-sequence" type="button"><small>音画队列</small><strong>同帧完整序列</strong><span>Bomb → Ice → Supergravity → ×2</span></button>
+        </div>
+      </section>
+
+      <footer><span>Source <code>95978eb</code></span><span id="last-cue">尚未播放</span></footer>
+    </main>
+    <script type="module" src="./audition.ts"></script>
+  </body>
+</html>

@@ -3,7 +3,7 @@
   "actionProfiles": {
     "t28": {
       "label": "T28 soft-edged",
-      "audioCommit": "35509a7850b724c5a0a8359a209e8698ab5fdb93",
+      "audioCommit": "35509a70c35cebf16b942387229ca880756a61cd",
       "acceptedProductCommit": "2c4e4ae",
       "audioEngineBlob": "c43a68701fc1a7d39e31094422617214b359a001"
     },
