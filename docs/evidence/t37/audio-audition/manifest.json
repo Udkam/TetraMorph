@@ -1,0 +1,309 @@
+{
+  "sourceSha": "0bebf8aff1f113990bfcd48a6f1a948b1dd22526",
+  "generatedAt": "2026-08-09T02:03:42.729Z",
+  "renderer": "one-shot Node renderer using production audioPalette + renderProceduralSamples, production bus/master gains, and static production compressor transfer",
+  "sampleRate": 48000,
+  "checks": {
+    "finiteSamples": true,
+    "zeroLayerEndpoints": true,
+    "deterministicWavBytes": true,
+    "boundedPeaks": true,
+    "clippedSamples": 0
+  },
+  "files": [
+    {
+      "file": "01-controls-repeat.wav",
+      "description": "Fast move and rotate repetition. Judge tactility, separation, and fatigue at realistic input density.",
+      "sequence": [
+        "move",
+        "move",
+        "move",
+        "move",
+        "move",
+        "move",
+        "rotate",
+        "rotate",
+        "move",
+        "rotate"
+      ],
+      "cueBoundaries": [
+        {
+          "id": "move",
+          "startSeconds": 0.16,
+          "endSeconds": 0.198
+        },
+        {
+          "id": "move",
+          "startSeconds": 0.24,
+          "endSeconds": 0.27799999999999997
+        },
+        {
+          "id": "move",
+          "startSeconds": 0.32,
+          "endSeconds": 0.358
+        },
+        {
+          "id": "move",
+          "startSeconds": 0.4,
+          "endSeconds": 0.438
+        },
+        {
+          "id": "move",
+          "startSeconds": 0.48,
+          "endSeconds": 0.518
+        },
+        {
+          "id": "move",
+          "startSeconds": 0.56,
+          "endSeconds": 0.5980000000000001
+        },
+        {
+          "id": "rotate",
+          "startSeconds": 0.78,
+          "endSeconds": 0.8460000000000001
+        },
+        {
+          "id": "rotate",
+          "startSeconds": 0.9,
+          "endSeconds": 0.966
+        },
+        {
+          "id": "move",
+          "startSeconds": 1.14,
+          "endSeconds": 1.178
+        },
+        {
+          "id": "rotate",
+          "startSeconds": 1.28,
+          "endSeconds": 1.346
+        }
+      ],
+      "durationSeconds": 1.706,
+      "repetitionDensity": 5.861664712778429,
+      "zeroLayerEndpoints": true,
+      "peak": 0.03453508019447327,
+      "rms": 0.002829782179419293,
+      "dcOffset": -0.000042810362916976193,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "sha256": "7952e54e04e4eacb36278dcb037eda25b7b82cc0a1d44d175b922bd7ce67c216",
+      "deterministicWavBytes": true
+    },
+    {
+      "file": "02-contact-reward-ladder.wav",
+      "description": "Lock, hard drop, then one- through four-line clears. Judge physical weight and positive hierarchy without sharpness.",
+      "sequence": [
+        "lock",
+        "hard-drop",
+        "clear-1",
+        "clear-2",
+        "clear-3",
+        "clear-4"
+      ],
+      "cueBoundaries": [
+        {
+          "id": "lock",
+          "startSeconds": 0.16,
+          "endSeconds": 0.252
+        },
+        {
+          "id": "hard-drop",
+          "startSeconds": 0.58,
+          "endSeconds": 0.75
+        },
+        {
+          "id": "clear-1",
+          "startSeconds": 1.06,
+          "endSeconds": 1.24
+        },
+        {
+          "id": "clear-2",
+          "startSeconds": 1.72,
+          "endSeconds": 1.95
+        },
+        {
+          "id": "clear-3",
+          "startSeconds": 2.48,
+          "endSeconds": 2.78
+        },
+        {
+          "id": "clear-4",
+          "startSeconds": 3.34,
+          "endSeconds": 3.86
+        }
+      ],
+      "durationSeconds": 4.38,
+      "repetitionDensity": 1.36986301369863,
+      "zeroLayerEndpoints": true,
+      "peak": 0.21093907952308655,
+      "rms": 0.01618215892926958,
+      "dcOffset": -0.000008933018709328876,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "sha256": "6b9f553fc3adf73b7e2c3575515a195bd068c8d4f813b0564dc79fd4d60d841b",
+      "deterministicWavBytes": true
+    },
+    {
+      "file": "03-countdown.wav",
+      "description": "Two related ticks and one longer resolving strike. Judge calm readiness rather than notification or melody.",
+      "sequence": [
+        "countdown-tick",
+        "countdown-tick",
+        "countdown-resolve"
+      ],
+      "cueBoundaries": [
+        {
+          "id": "countdown-tick",
+          "startSeconds": 0.2,
+          "endSeconds": 0.34
+        },
+        {
+          "id": "countdown-tick",
+          "startSeconds": 1.2,
+          "endSeconds": 1.3399999999999999
+        },
+        {
+          "id": "countdown-resolve",
+          "startSeconds": 2.2,
+          "endSeconds": 2.45
+        }
+      ],
+      "durationSeconds": 3.17,
+      "repetitionDensity": 0.9463722397476341,
+      "zeroLayerEndpoints": true,
+      "peak": 0.07626263052225113,
+      "rms": 0.0052390196201050655,
+      "dcOffset": -0.0000071232467442810066,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "sha256": "babd9a2c83e94f84d1400865312d700bb0e36b9e0059a0e7ea30fd2902faa598",
+      "deterministicWavBytes": true
+    },
+    {
+      "file": "04-ice-material.wav",
+      "description": "Two isolated Ice activations. Judge restrained crystal identity, grain, and repeat comfort.",
+      "sequence": [
+        "freeze",
+        "freeze"
+      ],
+      "cueBoundaries": [
+        {
+          "id": "freeze",
+          "startSeconds": 0.18,
+          "endSeconds": 0.605
+        },
+        {
+          "id": "freeze",
+          "startSeconds": 1.24,
+          "endSeconds": 1.665
+        }
+      ],
+      "durationSeconds": 2.185,
+      "repetitionDensity": 0.9153318077803203,
+      "zeroLayerEndpoints": true,
+      "peak": 0.09197218716144562,
+      "rms": 0.01188284300693791,
+      "dcOffset": 0.00007611799084488004,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "sha256": "1344f5b9b7a6855aa0ca8dc14d8760f3edea59d9ee978ebb9887e7b9c0c586b8",
+      "deterministicWavBytes": true
+    },
+    {
+      "file": "05-play-cadence.wav",
+      "description": "Representative play cadence for masking, contact-to-reward hierarchy, and Ice identity in context.",
+      "sequence": [
+        "move",
+        "move",
+        "rotate",
+        "hard-drop",
+        "clear-1",
+        "move",
+        "rotate",
+        "hard-drop",
+        "clear-2",
+        "freeze",
+        "move",
+        "hard-drop",
+        "clear-4"
+      ],
+      "cueBoundaries": [
+        {
+          "id": "move",
+          "startSeconds": 0.16,
+          "endSeconds": 0.198
+        },
+        {
+          "id": "move",
+          "startSeconds": 0.25,
+          "endSeconds": 0.288
+        },
+        {
+          "id": "rotate",
+          "startSeconds": 0.39,
+          "endSeconds": 0.456
+        },
+        {
+          "id": "hard-drop",
+          "startSeconds": 0.64,
+          "endSeconds": 0.81
+        },
+        {
+          "id": "clear-1",
+          "startSeconds": 1.02,
+          "endSeconds": 1.2
+        },
+        {
+          "id": "move",
+          "startSeconds": 1.56,
+          "endSeconds": 1.598
+        },
+        {
+          "id": "rotate",
+          "startSeconds": 1.7,
+          "endSeconds": 1.766
+        },
+        {
+          "id": "hard-drop",
+          "startSeconds": 1.94,
+          "endSeconds": 2.11
+        },
+        {
+          "id": "clear-2",
+          "startSeconds": 2.32,
+          "endSeconds": 2.55
+        },
+        {
+          "id": "freeze",
+          "startSeconds": 2.94,
+          "endSeconds": 3.365
+        },
+        {
+          "id": "move",
+          "startSeconds": 3.54,
+          "endSeconds": 3.578
+        },
+        {
+          "id": "hard-drop",
+          "startSeconds": 3.8,
+          "endSeconds": 3.9699999999999998
+        },
+        {
+          "id": "clear-4",
+          "startSeconds": 4.2,
+          "endSeconds": 4.720000000000001
+        }
+      ],
+      "durationSeconds": 5.24,
+      "repetitionDensity": 2.480916030534351,
+      "zeroLayerEndpoints": true,
+      "peak": 0.21093907952308655,
+      "rms": 0.015372930975376838,
+      "dcOffset": 0.00003772015316820516,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "sha256": "d14a675919884caeda3d370ccb986f77162171417b91110b6a099a68eba9d1ae",
+      "deterministicWavBytes": true
+    }
+  ]
+}
