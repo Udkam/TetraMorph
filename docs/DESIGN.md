@@ -28,6 +28,11 @@ adding unrelated badges or ornamental effects.
   therefore remains where it was and can stop a covered column; unrelated columns can
   still descend farther. This explicitly supersedes the older whole-board column
   compaction inherited from the historical Collapse mode.
+- Accepted implementation is source `646b865` plus bilingual copy `ae75f1e`; browser
+  evidence `c691d54` binds to that product source and reproduces the reported floating
+  support without movement, tunnelling, or a false clear. Final typecheck, the complete
+  suite (`381 passed / 8 skipped`), build, and final independent read-only QA pass. This
+  bounded acceptance returns T37 to the R4 listening gate; it does not accept R4 audio.
 
 ### Feedback and sound language
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **FINAL DOC QA — Mutation correction implemented; R4 listening remains open**
+Status: **LISTENING REQUIRED — Mutation correction accepted; R4 audio decision open**
 
 ## Active objective
 
@@ -15,9 +15,8 @@ Mutation now restores its 0.1-second-per-cell fastest tier. A Supergravity-cover
 tetromino settles by its own occupied columns against the existing board; it does not
 compact, push, or move already-settled cells. The ghost, final lock, carrier coordinates,
 and resulting line-clear rows agree in the reported floating-cell scenario. Product
-logic and evidence pass independent review; only the corrected final status record
-awaits recheck. This exception does not accept R4 audio or open transition, material, or
-Puzzle expansion.
+logic, evidence, corrected status records, and final independent review all pass. This
+exception does not accept R4 audio or open transition, material, or Puzzle expansion.
 
 ## Frozen product direction
 
@@ -171,8 +170,9 @@ Puzzle expansion.
   false clear, and zero browser errors; its owned server exited and port 4185 is free.
 - Independent read-only QA passes every product/evidence claim and independently reruns
   `106/106` targeted tests. Its sole initial blocker was the stale run-state sentence
-  that still called completed gates pending; that record is corrected here and awaits
-  the final documentation-only recheck.
+  that still called completed gates pending. Status checkpoint `4722927` corrects that
+  record, and the final documentation-only recheck passes with
+  `P0 0 / P1 0 / P2 0 / P3 0`, no product delta, and no inherited dirty path in range.
 
 Inherited dirty `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, and
 `progress.md` remain outside T37 and must not be staged.

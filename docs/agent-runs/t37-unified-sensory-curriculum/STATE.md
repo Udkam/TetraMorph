@@ -46,10 +46,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    the same four-pulse grammar without the rejected completion tail.
 5. `CANDIDATE / LISTENING REQUIRED` — R4 replaces rejected
    move/rotate/lock/hard-drop and Glass Ice only at candidate tip `9232d14`.
-6. `IMPLEMENTED / FINAL DOC QA PENDING` — player-directed bounded Mutation correction
-   from base `265899d`: source `646b865`, bilingual copy `ae75f1e`, and source-bound
-   browser evidence `c691d54` restore the 0.1-second gravity floor and replace inherited
-   whole-board compaction with covered-piece-only independent-column settlement.
+6. `ACCEPTED` — player-directed bounded Mutation correction from base `265899d`:
+   source `646b865`, bilingual copy `ae75f1e`, source-bound browser evidence `c691d54`,
+   and accepted status checkpoint `4722927` restore the 0.1-second gravity floor and
+   replace inherited whole-board compaction with covered-piece-only independent-column
+   settlement.
 7. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
 8. `PENDING` — route transition system and reduced-motion verification.
@@ -129,17 +130,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   lock and carrier coordinates, and verifies 60 lines as 6 ticks / 0.1 seconds per cell.
 - Initial independent read-only QA of `265899d..c691d54` passes every product, test,
   evidence, scope, and screenshot claim and independently reruns `106/106` targeted
-  tests. It withholds final acceptance only because this state file still described the
-  completed gates as pending; the current documentation checkpoint corrects that stale
-  record and requires one final read-only recheck.
+  tests. It initially withholds acceptance only because this state file still described
+  the completed gates as pending. Status checkpoint `4722927` corrects that stale record;
+  the final read-only recheck passes with `P0 0 / P1 0 / P2 0 / P3 0`, no product-source
+  delta, a clean range diff, and no inherited T27 or `progress.md` path in the candidate.
 - Two initial read-only audit agents failed before producing findings because the
   selected model was at capacity. No retry loop or extra resource was started.
 
 ## Next exact action
 
-Obtain independent read-only recheck of the corrected Mutation status documents. If it
-passes, record the verdict and return to R4 human listening; do not expand the remaining
-palette or start transition/material/Puzzle work without the player's sound decision.
+Return to R4 human listening. Do not expand the remaining palette or start
+transition/material/Puzzle work without the player's sound decision.
 
 ## Do not repeat
 

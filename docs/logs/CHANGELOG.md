@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-09 — T37 Mutation speed and Supergravity settlement corrected
+
+- Restored Mutation's complete six-line gravity ladder through 48/54/60-line tiers of
+  10/8/6 ticks, so ordinary late-game gravity again reaches 0.1 seconds per cell while
+  preserving Ice's separate 1.0-second override and leaving Classic unchanged.
+- Replaced inherited whole-board column compaction with covered-piece-only settlement.
+  Existing locked cells now remain fixed collision support; each occupied column of the
+  Supergravity-covered tetromino may descend independently without tunnelling through or
+  pushing the settled board. Ghost, lock, carrier geometry, and clear decisions share
+  the same settlement function.
+- The exact reported floating-support reproduction keeps the old cell at `(8,34)`,
+  settles the covered O cells at `(8,32)`, `(8,33)`, `(9,38)`, and `(9,39)`, leaves the
+  bottom `(8,39)` gap empty, and starts no false clear. Chinese and English rules now
+  state that Supergravity does not move locked cells.
+- Contract `6ffef46`, product source `646b865` / `ae75f1e`, evidence `c691d54`, and
+  accepted status checkpoint `4722927` pass focused tests (`50/50 + 56/56`), typecheck,
+  the complete suite (`381 passed / 8 skipped`), the 761-module build, one-Canvas and
+  zero-browser-error evidence, and final independent QA with P0–P3 all zero. Inherited
+  T27 evidence and `progress.md` remain untouched; T37 returns to R4 human listening.
+
 ## 2026-08-07 — T32 mastery certificate fingerprints refreshed
 
 - Anchor-supported Puzzle cells became future-relevant canonical state, which changed
