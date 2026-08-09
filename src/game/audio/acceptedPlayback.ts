@@ -1,4 +1,5 @@
 import type { GestureVoice } from './audioGesture';
+import { STUDIO_LINE_CLEAR_OFFSETS_MS } from '../../animation/lineClearTimeline';
 
 const ACCEPTED_SILENCE = 0.0001;
 
@@ -58,12 +59,7 @@ export const STUDIO_COMPRESSOR_CONTRACT = Object.freeze({
 export const STUDIO_CLEAR_CONTRACT = Object.freeze({
   rate: 1.18,
   maxDuration: 0.2,
-  delaysMs: Object.freeze({
-    1: Object.freeze([0]),
-    2: Object.freeze([0, 180]),
-    3: Object.freeze([0, 90, 180]),
-    4: Object.freeze([0, 60, 120, 180]),
-  }),
+  delaysMs: STUDIO_LINE_CLEAR_OFFSETS_MS,
   targetPeak: Object.freeze({ 1: 0.5, 2: 0.5, 3: 0.54, 4: 0.54 }),
 });
 

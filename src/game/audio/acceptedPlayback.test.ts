@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { STUDIO_LINE_CLEAR_OFFSETS_MS } from '../../animation/lineClearTimeline';
 import {
   ACCEPTED_OUTPUT_GAIN,
   ACTION_A_CONTRACT,
@@ -114,6 +115,7 @@ describe('accepted audio playback contracts', () => {
 
   it('freezes Studio clear/countdown cadence and always schedules through a panner', () => {
     expect(STUDIO_COMPRESSOR_CONTRACT).toEqual({ threshold: -10, knee: 10, ratio: 4, attack: 0.003, release: 0.12 });
+    expect(STUDIO_CLEAR_CONTRACT.delaysMs).toBe(STUDIO_LINE_CLEAR_OFFSETS_MS);
     expect(STUDIO_CLEAR_CONTRACT.delaysMs).toEqual({
       1: [0], 2: [0, 180], 3: [0, 90, 180], 4: [0, 60, 120, 180],
     });
