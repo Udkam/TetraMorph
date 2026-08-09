@@ -53,9 +53,10 @@ adding unrelated badges or ornamental effects.
   articulation. Ice adds one separately labelled `glass` candidate. It does not mix
   families invisibly or claim that signal measurements prove taste.
 - Human listening accepts only the R3 `studio` one-, two-, and three-line releases and
-  `3 / 2 / 1` countdown. Freeze those exact assets, cadence, and mix. Four-line clear
-  uses the same row-release grammar with four pulses; it must not append R3's rejected
-  `complete` tail or introduce a separate sharp celebration.
+  `3 / 2 / 1` countdown. Freeze those exact assets, cadence, mix, and original R3
+  compressor. Four-line clear uses the same row-release grammar with four pulses; it
+  must not append R3's rejected `complete` tail or introduce a separate sharp
+  celebration.
 - R3 movement, rotation, natural lock, and hard drop are all rejected across the
   presented families because their attacks are too pointed and the actions do not feel
   soft enough. R4 may change their source cues and use attack shaping, low-pass

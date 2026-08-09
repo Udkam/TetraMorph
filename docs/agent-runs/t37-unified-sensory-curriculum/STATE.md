@@ -45,7 +45,7 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 4. `PARTIALLY ACCEPTED` — R3 freezes Studio clear 1/2/3 and countdown; clear 4 adopts
    the same four-pulse grammar without the rejected completion tail.
 5. `CANDIDATE / LISTENING REQUIRED` — R4 replaces rejected
-   move/rotate/lock/hard-drop and Glass Ice only at `0e2b13e`.
+   move/rotate/lock/hard-drop and Glass Ice only at candidate tip `8d8cb67`.
 6. `BLOCKED ON HUMAN LISTENING` — full audio palette may start only after audition
    acceptance.
 7. `PENDING` — route transition system and reduced-motion verification.
@@ -88,9 +88,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   no extra tail, desktop/mobile frames, reduced motion, direct-file playback, and zero
   console/page errors. `git diff --check -- docs/evidence/t37/audio-audition-r4`
   passes.
+- Accepted Studio clear/countdown uses its own exact R3 compressor
+  (`-10 dB / knee 10 / 4:1 / 3 ms / 120 ms`) after follow-up `8d8cb67`; candidates use
+  a separate safety compressor. The verifier exposes and asserts this output contract.
 - The develop-web-game client observed `ice-layered / 冰冻激活` with no error artifact.
-  Its owned Python server PID `6608` exited and port `4184` was released. No audition
-  server or browser remains owned.
+  A second pass observed accepted `3 · 2 · 1` with the frozen compressor contract.
+  Owned Python server PIDs `6608` and `3140` exited and port `4184` was released after
+  each pass. No audition server or browser remains owned.
 - The required develop-web-game client also observed `studio / 左移`; its owned Vite
   PID was stopped and port `4183` released. No server or browser remains owned.
 - The superseded uncommitted R2 gain-only edit was restored to committed source. Its
