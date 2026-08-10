@@ -297,6 +297,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `A5A6A955...C71EEC`. All exact Temp outputs are removed, matching Temp count is zero,
   owned process count is zero, and cumulative new fair coverage is 50,000,000. This is
   not a negative proof.
+- Post-checkpoint resource samples are red at CPU `92.0% / 92.2% / 98.3%`, with
+  11.28–11.39 GiB free memory and disk queue zero. No seeded-reverse reviewer or search
+  process starts; the independent read-only design review remains the sole next action.
 
 ### Stage F3B accepted status
 
