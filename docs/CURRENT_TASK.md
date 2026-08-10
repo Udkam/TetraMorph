@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FAIR-SHARD CONTRACT ACCEPTED; TOOL REVISION OPEN**
+Status: **STAGE F3C FAIR-SHARD TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
 
 ## Active objective
 
@@ -435,6 +435,15 @@ only; it is not F3 source acceptance.
   budget, and protected exclusions. Only the existing tool path may now implement this
   schema-2 contract; fair search and all product/fixture paths remain closed until the
   tool candidate passes its runtime gates and a second independent QA.
+- Tool candidate `1a9c9da` changes only the accepted 479-line tool from base `8ff907a`.
+  Syntax and diff checks pass. Four shards partition an 8-seed smoke exactly, share
+  domain hash `9D9CA7EC968687A10E7FD2AAF0E193E72FF5905C461C7004C0F6B494C7163285`,
+  and each stops at exactly one new probe. A 1,500-probe one-shot and a replay-750 plus
+  new-750 resume match domain, queue, probe, memo, status, setup, and next cursor; their
+  separate repeated files are byte-identical. Missing/invalid shard, wrap, and
+  cursor-plus-budget guards fail before output. A 128 MiB trie guard leaves new probes
+  and cursor unchanged, all 12 Temp files are removed, and no owned Node process remains.
+  Independent QA is now required before any substantive fair shard runs.
 
 ## Current checkpoint state
 

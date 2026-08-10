@@ -443,6 +443,11 @@ adding unrelated badges or ornamental effects.
 - Independent repair QA accepts `a1bcf15..1ccc04a` with P0–P3 all zero. The accepted
   design opens only the standalone tool implementation; no authoring candidate, product
   definition, or proof fixture inherits acceptance from the scheduling contract.
+- Standalone candidate `1a9c9da` implements schema 2 without changing the accepted
+  fixed-mask/Core-equivalent landing rules. Its small-domain union, exact pre-probe
+  budget, one-shot/resumed probe+memo identity, separate byte determinism, fail-closed
+  inputs, and RSS cursor preservation pass locally. It remains unaccepted until an
+  independent review reproduces those claims.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

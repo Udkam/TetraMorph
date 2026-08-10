@@ -100,10 +100,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 17. `F3C FIRST BATCH CONTAINED` — the authorized seed `1..20000`
     batch reaches 10,000,001 attempted landings with no candidate. Its global DFS budget
     does not exhaust the range.
-18. `F3C FAIR-SHARD CONTRACT ACCEPTED; TOOL OPEN` — repair QA closes P1/P2 with
-    P0–P3 all zero. Only the standalone tool path may implement schema 2; product data
-    and fair search remain closed.
-19. `PENDING` — fair-round candidate, F3C fixture/test, later content, migration, UI,
+18. `F3C FAIR-SHARD CONTRACT ACCEPTED` — repair QA closes P1/P2 with P0–P3 all zero.
+19. `F3C FAIR-SHARD TOOL CANDIDATE; QA REQUIRED` — source `1a9c9da` implements schema
+    2 in the sole tool path; product data and fair search remain closed.
+20. `PENDING` — fair-round candidate, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -199,6 +199,20 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   probe/memo equivalence, inline cursor phase, pre-probe budget, equal rounds, commit
   budget, and protected exclusions. The sole implementation path is now open; no
   substantive fair search, product source, or F3C fixture/test is open.
+- Tool task `T37/F3C-fair-tool`; base `8ff907a`; source candidate `1a9c9da`; exact path
+  `tools/search-puzzle-v3-prototype.mjs`; 479 total lines; checkpoint `144+/21-`.
+  Syntax/diff checks pass. The 8-seed/4-shard union is exact with shared domain hash
+  `9D9CA7EC968687A10E7FD2AAF0E193E72FF5905C461C7004C0F6B494C7163285` and no probe
+  overrun.
+- Cursor evidence: 750-probe first segment joins the resumed start; one-shot 1,500 and
+  resumed 750+750 share domain `AA59890E...985FD`, queue `72B12EA3...C3A07`, probe
+  `7553AD77...08273`, memo `A75C9B7A...BD4BA`, status/setup, and next cursor 1,500.
+  Repeated file hashes are `B334010D...19A2A` (one-shot) and
+  `B5BCCC97...AB454` (resumed).
+- Fail-closed missing/invalid shard, uint32 wrap, and absolute-probe overflow create no
+  output. A 128 MiB guard stops partial trie construction with zero probes and preserves
+  both cursor 0 and cursor 750. Twelve exact Temp outputs are removed; owned process
+  count is zero. Independent QA must reproduce these gates before fair search opens.
 
 ### Stage F3B accepted status
 
@@ -616,13 +630,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement only `tools/search-puzzle-v3-prototype.mjs` against the accepted schema-2
-contract. Preserve accepted Core-equivalent search behavior while adding shard/cursor
-arguments, exact domain/queue/probe/memo hashes, pre-probe limits, and STOP propagation.
-Run syntax and invalid-argument guards, a small-domain shard-union check, separate
-byte-identical one-shot/resume repeats, one-shot-versus-resumed hash/status/setup/cursor
-equivalence, and Temp/process cleanup. Commit only the tool, then record a candidate for
-second independent QA. Do not run the substantive fair round or open final JSON/test,
+Independently review `8ff907a..1a9c9da` plus this candidate-status checkpoint. Verify
+the one-path/479-line budget, accepted forward-search preservation, exact queue/domain
+bytes, contiguous shard math, STOP/memo behavior, inline cursor accounting, pre-probe
+limit, schema-2 evidence, fail-closed inputs, byte repeats, one-shot/resumed equivalence,
+128 MiB cursor preservation, cleanup, and protected exclusions. If P0–P3 are zero,
+record acceptance and only then run the 32-shard fair round. Do not open final JSON/test,
 later content, deferred identity, T27/`progress.md`, or the missing Ice archive.
 
 ## Do not repeat

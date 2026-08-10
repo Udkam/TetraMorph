@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FAIR-SHARD CONTRACT ACCEPTED; TOOL REVISION OPEN**
+Status: **F3C FAIR-SHARD TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -491,6 +491,29 @@ within budget, and product/protected paths remain excluded. Only
 `tools/search-puzzle-v3-prototype.mjs` may now implement schema 2; no fair-round search
 or final fixture/test path opens until that tool candidate passes all runtime gates and
 independent QA.
+
+Tool candidate `1a9c9da` is the exact one-path implementation from base `8ff907a`; the
+file is 479 lines and its checkpoint changes 144 insertions / 21 deletions. `node
+--check` and diff checks pass. A seed `1..8`, four-shard smoke proves adjacent absolute
+ranges `[1,3)`, `[3,5)`, `[5,7)`, `[7,9)`, total seed count eight, one shared domain
+hash, and one exact new probe per shard.
+
+For seed domain `11..13`, one-shot `cursor=0,budget=1500` and resumed
+`cursor=750,budget=750` both end at cursor 1,500 with 52 accepted placements and 40
+completed failed states. Both have domain hash
+`AA59890E709C8870AA75213FA793688BF46AA727B7559486A494205C803985FD`, queue digest
+`72B12EA371CB53F9D8390AE9AA4B6E419278DDE0355AE3B4F972BA567AFC3A07`, probe hash
+`7553AD77B6DE58BDB044625F0CD266854522B2F7F9BECE428641FE338C808273`, and memo hash
+`A75C9B7A6D58707822FCB644D79DE78D2D233CD9F4E3C1202607FCD8427BD4BA`.
+Repeated one-shot files share SHA-256
+`B334010D7CEC7E38A35EDB429FE9DA3333D5A312893B78EFB4E8659455419A2A`; repeated
+resumed files share `B5BCCC97D05CF107F988907E9E45E525D97D145CE684F140455317896A8AB454`.
+
+Missing shard inputs, uint32 wrap, invalid shard index, and cursor-plus-budget overflow
+all fail before output. At 128 MiB, trie construction stops after 16,384 selected seeds
+with zero probes; cursor 0 stays 0 and cursor 750 stays 750. All 12 generated Temp files
+are removed and owned-process count is zero. These are candidate claims only; independent
+QA must reproduce the one-path range and runtime gates before the fair round opens.
 
 ## Progress v6 and revision-3 migration
 
