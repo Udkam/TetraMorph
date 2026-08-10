@@ -1,0 +1,468 @@
+{
+  "sourceSha": "a1849525db8742701c398cd67c4eed5a9f4bc47b",
+  "capturedAt": "2026-08-10T07:57:53.205Z",
+  "browser": "149.0.7827.55",
+  "cases": {
+    "deep-normal-desktop-freeze": {
+      "name": "deep-normal-desktop-freeze",
+      "item": "freeze",
+      "seed": 49,
+      "profile": "freeze",
+      "theme": "deep-tide",
+      "reduced": false,
+      "language": "zh-CN",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "observed": {
+        "root": {
+          "language": "zh-CN",
+          "theme": "deep-tide",
+          "reducedMotion": "false"
+        },
+        "item": "freeze",
+        "piece": "T",
+        "activeCells": [
+          {
+            "x": 8,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 8,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "previewItem": null,
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "deep-reduced-mobile-collapse": {
+      "name": "deep-reduced-mobile-collapse",
+      "item": "collapse",
+      "seed": 163,
+      "profile": "freeze",
+      "theme": "deep-tide",
+      "reduced": true,
+      "language": "en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "observed": {
+        "root": {
+          "language": "en",
+          "theme": "deep-tide",
+          "reducedMotion": "true"
+        },
+        "item": "collapse",
+        "piece": "T",
+        "activeCells": [
+          {
+            "x": 8,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 8,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "previewItem": "bomb",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 49.140625,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "mineral-normal-portrait-multiplier": {
+      "name": "mineral-normal-portrait-multiplier",
+      "item": "multiplier",
+      "seed": 11,
+      "profile": "multiplier",
+      "theme": "mineral-mist",
+      "reduced": false,
+      "language": "en",
+      "viewport": {
+        "width": 1125,
+        "height": 1196
+      },
+      "observed": {
+        "root": {
+          "language": "en",
+          "theme": "mineral-mist",
+          "reducedMotion": "false"
+        },
+        "item": "multiplier",
+        "piece": "L",
+        "activeCells": [
+          {
+            "x": 9,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 9,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "previewItem": "collapse",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 74.390625,
+          "minButtonHeight": 52,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "mineral-reduced-mobile-bomb": {
+      "name": "mineral-reduced-mobile-bomb",
+      "item": "bomb",
+      "seed": 90,
+      "profile": "bomb",
+      "theme": "mineral-mist",
+      "reduced": true,
+      "language": "zh-CN",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "observed": {
+        "root": {
+          "language": "zh-CN",
+          "theme": "mineral-mist",
+          "reducedMotion": "true"
+        },
+        "item": "bomb",
+        "piece": "I",
+        "activeCells": [
+          {
+            "x": 6,
+            "y": 21
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 6,
+            "y": 39
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "previewItem": "collapse",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 44,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "sunstone-normal-desktop-collapse": {
+      "name": "sunstone-normal-desktop-collapse",
+      "item": "collapse",
+      "seed": 163,
+      "profile": "freeze",
+      "theme": "sunstone",
+      "reduced": false,
+      "language": "zh-CN",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "observed": {
+        "root": {
+          "language": "zh-CN",
+          "theme": "sunstone",
+          "reducedMotion": "false"
+        },
+        "item": "collapse",
+        "piece": "T",
+        "activeCells": [
+          {
+            "x": 8,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 8,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "previewItem": "bomb",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "sunstone-reduced-portrait-freeze": {
+      "name": "sunstone-reduced-portrait-freeze",
+      "item": "freeze",
+      "seed": 49,
+      "profile": "freeze",
+      "theme": "sunstone",
+      "reduced": true,
+      "language": "en",
+      "viewport": {
+        "width": 1125,
+        "height": 1196
+      },
+      "observed": {
+        "root": {
+          "language": "en",
+          "theme": "sunstone",
+          "reducedMotion": "true"
+        },
+        "item": "freeze",
+        "piece": "T",
+        "activeCells": [
+          {
+            "x": 8,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 8,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "previewItem": null,
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 74.390625,
+          "minButtonHeight": 52,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    }
+  },
+  "errors": [],
+  "coverage": {
+    "themes": [
+      "deep-tide",
+      "mineral-mist",
+      "sunstone"
+    ],
+    "motionPreferences": [
+      "full",
+      "reduced"
+    ],
+    "languages": [
+      "en",
+      "zh-CN"
+    ],
+    "viewports": [
+      "1125x1196",
+      "1440x900",
+      "390x844"
+    ],
+    "items": [
+      "bomb",
+      "collapse",
+      "freeze",
+      "multiplier"
+    ]
+  },
+  "screenshots": [
+    {
+      "name": "deep-normal-desktop-freeze.png",
+      "sha256": "e1b5b6d1ae16b4bb6e59ddb0bc9367652a6a62c0451149d66efdac48e8bb0f16"
+    },
+    {
+      "name": "deep-reduced-mobile-collapse.png",
+      "sha256": "523f03c3146579478a84659844222c0d08fd0f2534b4adc6a4d4557bcb342271"
+    },
+    {
+      "name": "mineral-normal-portrait-multiplier.png",
+      "sha256": "bbb4ca42be8e03d9e9fed874793bce636e4637a70f6e10fae66a472ed52a853c"
+    },
+    {
+      "name": "mineral-reduced-mobile-bomb.png",
+      "sha256": "338addf48d12f91c2c2decbcfe10d304bc45ae712794266e6b36cd1fbf74cd8e"
+    },
+    {
+      "name": "sunstone-normal-desktop-collapse.png",
+      "sha256": "5a1ae298d80a8dca96e56811ba1bdc775cc2d9683b0bfe752a0d56e8ae8f4673"
+    },
+    {
+      "name": "sunstone-reduced-portrait-freeze.png",
+      "sha256": "b0e713cfbe4dad0eb18bb2bf05dbb6399e6ed9f427c3d0ba07fc70ef14f47d81"
+    }
+  ]
+}
