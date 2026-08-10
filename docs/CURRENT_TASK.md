@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FAIR-SHARD REVISION CONTRACT CANDIDATE**
+Status: **STAGE F3C FAIR-SHARD CONTRACT REPAIR CANDIDATE**
 
 ## Active objective
 
@@ -407,17 +407,28 @@ only; it is not F3 source acceptance.
   landing probes after the cursor, while deterministic replay rebuilds prior memo state.
   A distinct stop sentinel must unwind without caching incomplete states, and the probe
   limit is checked before execution so coverage has no `+1` ambiguity.
-- Schema 2 output must bind traversal `seed-shard-replay-v1`, an uppercase SHA-256 of
-  canonical JSON covering mask, shapes/types, seed domain, sequence length, shard count,
-  and traversal order, plus domain and selected shard bounds,
-  start/next cursor, replayed/new probe counts, and completion state. A cursor that
-  reaches beyond natural exhaustion or would skip a replayed candidate fails closed.
+- Schema 2 output must bind traversal `seed-shard-replay-v1`, queue generator
+  `xorshift32-fisher-yates-seven-bag-v1`, and a materialized digest of every ascending
+  seed's 20-piece sequence. The exact ordered domain payload also contains setup-rule
+  version, board geometry, mask, shapes/types, seed domain, sequence length, shard count,
+  and traversal order; `domainHash` is uppercase SHA-256 of UTF-8
+  `JSON.stringify(payload) + "\n"`. It records domain and selected shard bounds,
+  start/next cursor, replayed/new probe counts, completion state, ordered probe hash, and
+  sorted completed-memo hash. A cursor that reaches beyond natural exhaustion or would
+  skip a replayed candidate fails closed.
   The first fair round is frozen at 32 ascending shards of 625 seeds, cursor 0, and
   312,500 new probes per shard (10,000,000 total), with 900 MiB RSS and explicit Temp
   output. Existing type/rotation/x traversal and lowest-seed leaf selection remain
   fixed; ascending shard order stops at the first candidate. Another substantive run
   remains closed until independent contract review and a separately reviewed tool
   candidate pass.
+- Contract QA rejects `a1bcf15` with `P0 0 / P1 1 / P2 1 / P3 0`: the first hash
+  omitted seed-to-sequence generation semantics, and its smoke language could not prove
+  replay rebuilt the same memo. Repair requires separate byte-identical repeats plus a
+  one-shot `A+B` versus resumed `cursor=A,budget=B` comparison at the same absolute
+  cursor. `domainHash`, ordered `probeHash`, sorted `memoHash`, status/setup, and next
+  cursor must match. Replay and new work are phases of one uninterrupted DFS invocation;
+  the implementation may not STOP at the cursor and restart from root with carried memo.
 
 ## Current checkpoint state
 

@@ -428,6 +428,18 @@ adding unrelated badges or ornamental effects.
   bounds plus replay/new cursor coverage. Only natural shard exhaustion is `not-found`;
   budget or RSS stops remain incomplete. Equal-budget rounds visit shard indices in
   ascending order before any shard receives its next increment.
+- The domain identity additionally materializes the actual queue mapping. Ascending
+  seeds contribute exact UTF-8 lines `<decimal-seed>:<20-piece-type-string>\n` to an
+  uppercase SHA-256 `queueSequenceDigest`; the ordered domain payload names the
+  xorshift32/Fisher–Yates generator and setup-rule versions and is hashed as UTF-8
+  `JSON.stringify(payload) + "\n"`. Any queue mapping change must bump its version and
+  necessarily changes the materialized digest.
+- Cursor proof is behavioral, not numeric. Each executed probe contributes its complete
+  pre-probe semantic state plus type/rotation/x to an ordered SHA-256 `probeHash`; every
+  fully exhausted memo key contributes, after ordinal sorting, to `memoHash`. A one-shot
+  run to absolute cursor `A+B` and a resumed run replaying `A` then doing `B` new probes
+  must match both hashes, status/setup, and next cursor. The replay-to-new transition is
+  inline in one DFS; it never stops/unwinds at `A` or imports serialized memo.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

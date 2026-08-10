@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FAIR-SHARD REVISION CONTRACT CANDIDATE**
+Status: **F3C FAIR-SHARD CONTRACT REPAIR CANDIDATE**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -433,18 +433,56 @@ existing 1,000,000,000-probe limit. `--node-budget` counts only new landing prob
 the cursor; deterministic replay reconstructs prior failed-state memo. Budget/RSS
 stopping uses a dedicated sentinel and may not memoize an incomplete caller.
 
-Schema 2 output must set traversal version `seed-shard-replay-v1` and compute uppercase
-SHA-256 over canonical JSON containing mask, shapes/types, seed domain, sequence length,
-shard count, and traversal order. It also includes original domain,
-selected shard seed bounds, start/next cursor, replayed and new probe counts, and
-`complete`. Probe limits are checked before execution, eliminating the old `+1` guard
-count. Cursor replay that encounters a prior candidate or ends before the cursor fails
-closed. After contract and tool QA, the first fair round runs shard indices `0..31` in
+Schema 2 output sets traversal version `seed-shard-replay-v1`, queue-generator version
+`xorshift32-fisher-yates-seven-bag-v1`, and setup-rule version
+`visible-spawn19-vertical-hard-drop-no-clear-no-hidden-no-same-type-touch-v1`.
+`queueSequenceDigest` is uppercase SHA-256 of the UTF-8 concatenation, in ascending seed
+order, of exact lines `<decimal-uint32-seed>:<20-uppercase-piece-letters>\n`. Any change
+to xorshift32, zero-seed fallback, Fisher–Yates, bag reset, type order, or draw order
+must bump the queue version and changes this materialized digest.
+
+The domain payload uses this exact insertion order: `traversalVersion`,
+`queueGeneratorVersion`, `setupRulesVersion`, `queueSequenceDigest`, `boardGeometry`,
+`targetMaskRows`, `pieceTypes`, `pieceShapes`, `seedStart`, `seedCount`,
+`sequenceLength`, `shardCount`, `traversalOrder`. `boardGeometry` is the ordered object
+`{width,height,visibleStart,targetTop}`. `pieceShapes` is the nested array
+`pieceTypes.map(type => [type, SHAPES[type].map(shape => shape.map(([x,y]) => [x,y]))])`,
+preserving rotations 0–3 and source cell order. `traversalOrder` is exactly
+`type-index/rotation-0..3/x-ascending/landing-cell-dedupe-v1`. `domainHash` is uppercase
+SHA-256 of the UTF-8 bytes of `JSON.stringify(domainPayload) + "\n"`, with no other
+whitespace.
+
+The output also includes original domain, selected absolute shard seed bounds,
+start/next cursor, replayed and new probe counts, `complete`, `probeHash`, and `memoHash`.
+Before every landing attempt, `probeHash` receives the UTF-8 line
+`<nodeIndex>|<boardKey>|<typeRowsKey>|<type>|<rotation>|<x>\n`; it therefore covers the
+complete pre-probe semantic state and fixed traversal choice. At output, `memoHash` is
+uppercase SHA-256 of every fully exhausted `failed` key in ordinal JS sort order, each
+followed by `\n` (empty set hashes empty bytes). Probe limits are checked before
+execution, eliminating the old `+1` guard count.
+
+Cursor replay and new work occur inside one uninterrupted DFS: reaching cursor changes
+only accounting phase; it does not STOP/unwind, import memo, or restart from root.
+Cursor replay that encounters a prior candidate or naturally exhausts before the cursor
+fails closed. If RSS stops before cursor, `nextCursor` remains the input cursor. The
+acceptance pair runs one-shot `cursor=0,budget=A+B` and resumed `cursor=A,budget=B`;
+at the same absolute next cursor they must match `domainHash`, ordered `probeHash`,
+sorted `memoHash`, status/setup, and next cursor. Each invocation is also repeated
+separately for byte identity; first and resumed outputs are not compared byte-for-byte
+because their coverage fields intentionally differ.
+
+After contract and tool QA, the first fair round runs shard indices `0..31` in
 order, each selecting 625 seeds with cursor 0 and 312,500 new probes; all 32 together
 own exactly 10,000,000 new probes under the unchanged 900 MiB RSS guard. No shard may
 receive a second increment until every incomplete shard has received the first. The
 existing type/rotation/x order and minimum seed at a matching trie leaf remain fixed;
 ascending shard order stops deterministically at the first candidate.
+
+Independent contract QA rejects first candidate `a1bcf15` with
+`P0 0 / P1 1 / P2 1 / P3 0`: domain identity omitted the queue generator, and cursor
+evidence did not prove memo/probe equivalence. The repaired hash and one-shot/resumed
+equivalence gates above must pass a fresh read-only disposition before the tool path
+reopens.
 
 ## Progress v6 and revision-3 migration
 
