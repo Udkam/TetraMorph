@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FAIR-SHARD TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
+Status: **STAGE F3C FAIR-SHARD TOOL ACCEPTED; FIRST FAIR ROUND NEXT**
 
 ## Active objective
 
@@ -444,6 +444,14 @@ only; it is not F3 source acceptance.
   cursor-plus-budget guards fail before output. A 128 MiB trie guard leaves new probes
   and cursor unchanged, all 12 Temp files are removed, and no owned Node process remains.
   Independent QA is now required before any substantive fair shard runs.
+- Independent read-only QA accepts `8ff907a..4ad42ba` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It independently recomputes queue/domain identity,
+  reproduces shard union and one-shot/resumed probe+memo equivalence, confirms unchanged
+  Core semantics and fail-closed guards, and removes all Temp output with zero owned
+  process. Its 128 MiB guard triggered after 14,336 rather than 16,384 seeds, an expected
+  live-RSS boundary variation; both runs stopped before probes and preserved cursor.
+  The tool is accepted. After a fresh resource/Temp check, the frozen 32-shard first
+  round may run serially; product and final fixture/test paths remain closed.
 
 ## Current checkpoint state
 

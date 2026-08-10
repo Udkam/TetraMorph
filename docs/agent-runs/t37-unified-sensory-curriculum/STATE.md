@@ -101,9 +101,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     batch reaches 10,000,001 attempted landings with no candidate. Its global DFS budget
     does not exhaust the range.
 18. `F3C FAIR-SHARD CONTRACT ACCEPTED` — repair QA closes P1/P2 with P0–P3 all zero.
-19. `F3C FAIR-SHARD TOOL CANDIDATE; QA REQUIRED` — source `1a9c9da` implements schema
-    2 in the sole tool path; product data and fair search remain closed.
-20. `PENDING` — fair-round candidate, F3C fixture/test, later content, migration, UI,
+19. `F3C FAIR-SHARD TOOL ACCEPTED; FIRST ROUND NEXT` — source `1a9c9da` and candidate
+    docs pass independent QA with P0–P3 all zero; product data remains closed.
+20. `PENDING` — first fair-round candidate, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -213,6 +213,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   output. A 128 MiB guard stops partial trie construction with zero probes and preserves
   both cursor 0 and cursor 750. Twelve exact Temp outputs are removed; owned process
   count is zero. Independent QA must reproduce these gates before fair search opens.
+- Independent QA accepts `8ff907a..4ad42ba` with `P0 0 / P1 0 / P2 0 / P3 0`.
+  It verifies the five-path range, unchanged Core semantics, exact independent queue and
+  domain digest reconstruction, 8-seed union, one-shot/resumed probe+memo hashes, byte
+  repeats, STOP/cursor/RSS behavior, invalid-output closure, and cleanup. Its live 128
+  MiB guard trips at 14,336 seeds, confirming that the earlier 16,384 count is an
+  environment-dependent observation; both preserve cursor with zero probes.
 
 ### Stage F3B accepted status
 
@@ -630,13 +636,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Independently review `8ff907a..1a9c9da` plus this candidate-status checkpoint. Verify
-the one-path/479-line budget, accepted forward-search preservation, exact queue/domain
-bytes, contiguous shard math, STOP/memo behavior, inline cursor accounting, pre-probe
-limit, schema-2 evidence, fail-closed inputs, byte repeats, one-shot/resumed equivalence,
-128 MiB cursor preservation, cleanup, and protected exclusions. If P0–P3 are zero,
-record acceptance and only then run the 32-shard fair round. Do not open final JSON/test,
-later content, deferred identity, T27/`progress.md`, or the missing Ice archive.
+After a fresh resource and exact Temp-target check, run the accepted tool serially for
+shard indices `0..31` with seed domain `1..20000`, cursor 0, 312,500 new probes per
+shard, and 900 MiB RSS. Stop at the first candidate; otherwise complete the equal first
+round and record each shard's status/domain/range/cursor plus aggregate coverage. Remove
+every exact Temp output and confirm no owned process. Only a candidate may proceed to
+Core replay and the final F3C JSON/test; keep later content, deferred identity,
+T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

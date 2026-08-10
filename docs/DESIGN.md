@@ -448,6 +448,9 @@ adding unrelated badges or ornamental effects.
   budget, one-shot/resumed probe+memo identity, separate byte determinism, fail-closed
   inputs, and RSS cursor preservation pass locally. It remains unaccepted until an
   independent review reproduces those claims.
+- Independent QA accepts `8ff907a..4ad42ba` with P0–P3 all zero after independently
+  reconstructing the domain bytes and replay evidence. The shard tool is accepted for
+  its frozen first fair round; its outputs remain authoring discovery only.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

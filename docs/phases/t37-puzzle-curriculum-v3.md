@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FAIR-SHARD TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
+Status: **F3C FAIR-SHARD TOOL ACCEPTED; FIRST FAIR ROUND NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -514,6 +514,17 @@ all fail before output. At 128 MiB, trie construction stops after 16,384 selecte
 with zero probes; cursor 0 stays 0 and cursor 750 stays 750. All 12 generated Temp files
 are removed and owned-process count is zero. These are candidate claims only; independent
 QA must reproduce the one-path range and runtime gates before the fair round opens.
+
+Independent read-only QA accepts `8ff907a..4ad42ba` with
+`P0 0 / P1 0 / P2 0 / P3 0`. It rechecks the exact five-path range and 479-line budget,
+confirms the accepted forward/Core semantics are unchanged, independently recomputes
+the queue/domain digests, and reproduces the shard union, exact probe counts,
+one-shot/resumed probe+memo identity, byte repeats, invalid-input closure, and RSS
+cursor preservation. Live 128 MiB pressure stopped its trie after 14,336 seeds rather
+than the coordinator's 16,384; both are containment observations rather than canonical
+counts and both stop with zero probes. Its Temp files and owned process are zero. The
+accepted tool may now run only the frozen serial first fair round; its output cannot
+open the final F3C fixture/test without Core replay and proof.
 
 ## Progress v6 and revision-3 migration
 

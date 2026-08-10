@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3C fair-shard tool accepted
+
+- Tool `1a9c9da` upgrades the fixed-mask authoring search to schema 2 with contiguous
+  seed shards, deterministic inline replay cursors, exact domain/queue/probe/memo
+  digests, pre-probe budgets, and fail-closed STOP propagation. The accepted forward
+  Core-equivalent search and candidate-only claim remain unchanged.
+- Small-domain union, separate byte repeats, one-shot versus resumed hash equality,
+  invalid-input no-output checks, and 128 MiB cursor preservation all pass with exact
+  Temp cleanup and no owned Node process.
+- Independent read-only QA accepts `8ff907a..4ad42ba` with
+  `P0 0 / P1 0 / P2 0 / P3 0`, independently reconstructs the queue/domain bytes, and
+  reproduces every runtime gate. Its RSS stop occurs at a different live seed count but
+  still before probes with cursor unchanged. The frozen first fair round may now run;
+  product and final fixture/test paths remain closed.
+
 ## 2026-08-10 — T37 Stage F3C fair-shard contract accepted
 
 - The contained global-budget run is replaced by a same-domain scheduling contract:
