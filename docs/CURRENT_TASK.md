@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FAIR-SHARD CONTRACT REPAIR CANDIDATE**
+Status: **STAGE F3C FAIR-SHARD CONTRACT ACCEPTED; TOOL REVISION OPEN**
 
 ## Active objective
 
@@ -429,6 +429,12 @@ only; it is not F3 source acceptance.
   cursor. `domainHash`, ordered `probeHash`, sorted `memoHash`, status/setup, and next
   cursor must match. Replay and new work are phases of one uninterrupted DFS invocation;
   the implementation may not STOP at the cursor and restart from root with carried memo.
+- Independent repair QA accepts `a1bcf15..1ccc04a` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It closes both findings, rechecks partition math, bounds,
+  exact byte/hash contracts, inline cursor phase, equal-round scheduling, four-path
+  budget, and protected exclusions. Only the existing tool path may now implement this
+  schema-2 contract; fair search and all product/fixture paths remain closed until the
+  tool candidate passes its runtime gates and a second independent QA.
 
 ## Current checkpoint state
 

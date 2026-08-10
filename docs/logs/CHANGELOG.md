@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3C fair-shard contract accepted
+
+- The contained global-budget run is replaced by a same-domain scheduling contract:
+  contiguous seed shards, deterministic replay cursors, pre-probe budget checks, and a
+  distinct STOP path keep incomplete states out of the failed memo.
+- Repair `1ccc04a` binds the actual xorshift32/Fisher–Yates queue mapping through exact
+  sequence/domain bytes and adds ordered probe plus sorted completed-memo hashes. The
+  acceptance gate compares one-shot and resumed search at the same absolute cursor,
+  while each invocation independently remains byte deterministic.
+- Independent read-only QA accepts `a1bcf15..1ccc04a` with
+  `P0 0 / P1 0 / P2 0 / P3 0`, closing the earlier queue-identity and replay-proof
+  findings and revalidating four-path scope, commit budget, partition math, and protected
+  exclusions. Only the standalone tool implementation opens; substantive search and
+  product/fixture paths remain closed.
+
 ## 2026-08-10 — T37 Stage F3C first candidate batch contained
 
 - The accepted tool runs its single authorized seeds `1..20000` batch with a

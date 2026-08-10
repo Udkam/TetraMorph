@@ -440,6 +440,9 @@ adding unrelated badges or ornamental effects.
   run to absolute cursor `A+B` and a resumed run replaying `A` then doing `B` new probes
   must match both hashes, status/setup, and next cursor. The replay-to-new transition is
   inline in one DFS; it never stops/unwinds at `A` or imports serialized memo.
+- Independent repair QA accepts `a1bcf15..1ccc04a` with P0–P3 all zero. The accepted
+  design opens only the standalone tool implementation; no authoring candidate, product
+  definition, or proof fixture inherits acceptance from the scheduling contract.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

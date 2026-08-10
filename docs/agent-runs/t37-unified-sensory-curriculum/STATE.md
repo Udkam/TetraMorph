@@ -100,9 +100,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 17. `F3C FIRST BATCH CONTAINED` — the authorized seed `1..20000`
     batch reaches 10,000,001 attempted landings with no candidate. Its global DFS budget
     does not exhaust the range.
-18. `F3C FAIR-SHARD CONTRACT REPAIR CANDIDATE` — first contract QA reports P1 queue
-    identity and P2 replay-equivalence gaps. The repair adds materialized queue,
-    ordered-probe, and sorted-memo digests; product data and search remain closed.
+18. `F3C FAIR-SHARD CONTRACT ACCEPTED; TOOL OPEN` — repair QA closes P1/P2 with
+    P0–P3 all zero. Only the standalone tool path may implement schema 2; product data
+    and fair search remain closed.
 19. `PENDING` — fair-round candidate, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
@@ -194,6 +194,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   with resumed `A` then `B` at the same absolute cursor for domain/probe/memo hashes,
   status/setup, and next cursor; separately repeat each invocation to byte identity.
   RSS before cursor cannot advance next cursor.
+- Independent repair QA accepts `a1bcf15..1ccc04a` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It revalidates partition math, queue-bound domain bytes,
+  probe/memo equivalence, inline cursor phase, pre-probe budget, equal rounds, commit
+  budget, and protected exclusions. The sole implementation path is now open; no
+  substantive fair search, product source, or F3C fixture/test is open.
 
 ### Stage F3B accepted status
 
@@ -611,16 +616,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Independently review this four-document repaired fair-shard contract. Verify exact
-contiguous partition coverage, deterministic replay-cursor semantics, STOP/memo safety,
-probe budget without `+1`, queue-bound domain identity, ordered probe/sorted memo
-equivalence, exact UTF-8/LF serialization, schema-2 coverage, equal-round scheduling,
-the sole tool path, and continued product/protected-path closure. If P0–P3 are zero,
-record acceptance and implement only the tool revision. Its candidate must then pass
-syntax, invalid-argument guards, exact small-domain shard union, byte-identical first
-and resumed smokes, cursor adjacency, RSS/output cleanup, and a second independent QA
-before any substantive fair round. Keep the final JSON/test, later content, deferred
-identity, T27/`progress.md`, and missing Ice archive closed.
+Implement only `tools/search-puzzle-v3-prototype.mjs` against the accepted schema-2
+contract. Preserve accepted Core-equivalent search behavior while adding shard/cursor
+arguments, exact domain/queue/probe/memo hashes, pre-probe limits, and STOP propagation.
+Run syntax and invalid-argument guards, a small-domain shard-union check, separate
+byte-identical one-shot/resume repeats, one-shot-versus-resumed hash/status/setup/cursor
+equivalence, and Temp/process cleanup. Commit only the tool, then record a candidate for
+second independent QA. Do not run the substantive fair round or open final JSON/test,
+later content, deferred identity, T27/`progress.md`, or the missing Ice archive.
 
 ## Do not repeat
 

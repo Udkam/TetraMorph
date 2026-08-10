@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FAIR-SHARD CONTRACT REPAIR CANDIDATE**
+Status: **F3C FAIR-SHARD CONTRACT ACCEPTED; TOOL REVISION OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -483,6 +483,14 @@ Independent contract QA rejects first candidate `a1bcf15` with
 evidence did not prove memo/probe equivalence. The repaired hash and one-shot/resumed
 equivalence gates above must pass a fresh read-only disposition before the tool path
 reopens.
+
+Independent repair QA accepts `a1bcf15..1ccc04a` with
+`P0 0 / P1 0 / P2 0 / P3 0`. It verifies that the queue-bound domain identity closes
+P1, the probe/memo one-shot-versus-resume gate closes P2, the four-path range stays
+within budget, and product/protected paths remain excluded. Only
+`tools/search-puzzle-v3-prototype.mjs` may now implement schema 2; no fair-round search
+or final fixture/test path opens until that tool candidate passes all runtime gates and
+independent QA.
 
 ## Progress v6 and revision-3 migration
 
