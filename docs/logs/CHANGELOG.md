@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3C first fair search round complete
+
+- All 32 contiguous shards over seeds `1..20000` receive exactly 312,500 new probes
+  under the accepted 900 MiB guard. Ranges are adjacent, domain hash is identical, and
+  aggregate new coverage is exactly 10,000,000 probes.
+- Every shard returns `budget-exhausted` at cursor 312,500; there are zero candidates,
+  complete shards, or RSS stops. Aggregate accepted placements, failed states, and trie
+  nodes are `291,609 / 290,910 / 337,031`. This is a fair prefix, not a negative result.
+- The ordered 32-file manifest hashes to
+  `DC0C992BBF7D72605D849209036AA1F12E3A011D093CE1F8776B6782D7243CA9`; all Temp
+  outputs are removed and no owned process remains. A second equal same-domain round may
+  now replay cursor 312,500 and add 312,500 probes per incomplete shard.
+
 ## 2026-08-10 — T37 Stage F3C fair-shard tool accepted
 
 - Tool `1a9c9da` upgrades the fixed-mask authoring search to schema 2 with contiguous

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FAIR-SHARD TOOL ACCEPTED; FIRST FAIR ROUND NEXT**
+Status: **STAGE F3C FIRST FAIR ROUND COMPLETE; SECOND EQUAL ROUND NEXT**
 
 ## Active objective
 
@@ -452,6 +452,16 @@ only; it is not F3 source acceptance.
   live-RSS boundary variation; both runs stopped before probes and preserved cursor.
   The tool is accepted. After a fresh resource/Temp check, the frozen 32-shard first
   round may run serially; product and final fixture/test paths remain closed.
+- The first fair round completes all 32 shards with one equal 312,500-probe increment.
+  Their adjacent 625-seed ranges cover exactly `1..20000`, share domain hash
+  `9F88718E9DC7793483578E7A82E5C30890CC7F9E61673644AE771777A4639B7E`, and total
+  10,000,000 new probes. Every shard is `budget-exhausted` at cursor 312,500: there are
+  zero candidates, naturally complete shards, or RSS stops. Aggregate accepted/failed/
+  trie-node counts are `291,609 / 290,910 / 337,031`; the 32-file manifest digest is
+  `DC0C992BBF7D72605D849209036AA1F12E3A011D093CE1F8776B6782D7243CA9`.
+  All outputs are removed and no owned process remains. This is equal coverage, not a
+  negative proof. After recording and a fresh resource check, a second equal round may
+  replay cursor 312,500 and add 312,500 probes per incomplete shard.
 
 ## Current checkpoint state
 

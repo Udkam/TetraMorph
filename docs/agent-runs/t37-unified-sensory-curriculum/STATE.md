@@ -101,9 +101,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     batch reaches 10,000,001 attempted landings with no candidate. Its global DFS budget
     does not exhaust the range.
 18. `F3C FAIR-SHARD CONTRACT ACCEPTED` — repair QA closes P1/P2 with P0–P3 all zero.
-19. `F3C FAIR-SHARD TOOL ACCEPTED; FIRST ROUND NEXT` — source `1a9c9da` and candidate
-    docs pass independent QA with P0–P3 all zero; product data remains closed.
-20. `PENDING` — first fair-round candidate, F3C fixture/test, later content, migration, UI,
+19. `F3C FAIR-SHARD TOOL ACCEPTED` — source `1a9c9da` passes independent QA.
+20. `F3C FIRST FAIR ROUND COMPLETE; SECOND NEXT` — 32 shards receive equal first
+    increments; all remain budget-incomplete with no candidate or memory stop.
+21. `PENDING` — second fair-round candidate, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -219,6 +220,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   repeats, STOP/cursor/RSS behavior, invalid-output closure, and cleanup. Its live 128
   MiB guard trips at 14,336 seeds, confirming that the earlier 16,384 count is an
   environment-dependent observation; both preserve cursor with zero probes.
+- First fair round: HEAD `3393e6b`; green preflight CPU 48.6%, free memory 12.04 GiB,
+  disk queue 0; zero pre-existing round outputs; no concurrent heavy agent. Shards
+  `0..31` run serially with domain `1..20000`, cursor 0, 312,500 new probes, and 900 MiB.
+  All 32 are budget-bound at cursor 312,500 with adjacent 625-seed ranges, shared domain
+  `9F88718E...39B7E`, total new probes 10,000,000, accepted 291,609, failed 290,910,
+  trie nodes 337,031, and zero candidate/complete/memory statuses.
+- The ordered 32-file manifest hashes to `DC0C992B...43CA9`; all exact files are removed,
+  matching Temp count is zero, and owned process count is zero. This is equal coverage,
+  not range exclusion. A second equal round may start only after this checkpoint and a
+  fresh resource/Temp check, using cursor 312,500 and 312,500 new probes for every
+  incomplete shard in ascending order.
 
 ### Stage F3B accepted status
 
@@ -636,13 +648,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-After a fresh resource and exact Temp-target check, run the accepted tool serially for
-shard indices `0..31` with seed domain `1..20000`, cursor 0, 312,500 new probes per
-shard, and 900 MiB RSS. Stop at the first candidate; otherwise complete the equal first
-round and record each shard's status/domain/range/cursor plus aggregate coverage. Remove
-every exact Temp output and confirm no owned process. Only a candidate may proceed to
-Core replay and the final F3C JSON/test; keep later content, deferred identity,
-T27/`progress.md`, and missing Ice archive closed.
+After a fresh resource and exact Temp-target check, run the same 32 shards serially in
+ascending order with cursor 312,500, 312,500 new probes each, and 900 MiB RSS. Stop at
+the first candidate or memory guard; otherwise finish the equal second round, verify
+absolute cursor 625,000 and aggregate new coverage, then remove every exact Temp output
+and confirm no owned process. Do not change seed domain or privilege a shard. Only a
+candidate may proceed to Core replay and the final F3C JSON/test; keep later content,
+deferred identity, T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

@@ -451,6 +451,11 @@ adding unrelated badges or ornamental effects.
 - Independent QA accepts `8ff907a..4ad42ba` with P0–P3 all zero after independently
   reconstructing the domain bytes and replay evidence. The shard tool is accepted for
   its frozen first fair round; its outputs remain authoring discovery only.
+- The first 32-shard round spends exactly 10,000,000 new probes with no candidate,
+  completion, or memory stop. All shards reach the same cursor 312,500, so fairness is
+  established but no seed range is excluded. The next round may give every incomplete
+  shard the same 312,500-probe increment after deterministic replay; it cannot privilege
+  one shard or advance the seed domain.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FAIR-SHARD TOOL ACCEPTED; FIRST FAIR ROUND NEXT**
+Status: **F3C FIRST FAIR ROUND COMPLETE; SECOND EQUAL ROUND NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -525,6 +525,25 @@ than the coordinator's 16,384; both are containment observations rather than can
 counts and both stop with zero probes. Its Temp files and owned process are zero. The
 accepted tool may now run only the frozen serial first fair round; its output cannot
 open the final F3C fixture/test without Core replay and proof.
+
+The first fair round runs all shard indices `0..31` in order. Every absolute range is
+adjacent, each owns 625 seeds, and their union is exactly seeds `1..20000`. All 32 return
+`budget-exhausted` with cursor/new probes exactly `312500/312500`; candidate, complete,
+and memory counts are zero. Shared domain and queue digests are
+`9F88718E9DC7793483578E7A82E5C30890CC7F9E61673644AE771777A4639B7E` and
+`1F6278E6C699C1D81D6EE289BD42C1A820D0B984FFD1C973E50271E94160A27C`.
+Aggregate new probes, accepted placements, failed states, and trie nodes are
+`10,000,000 / 291,609 / 290,910 / 337,031`. The ordered filename-and-file-hash manifest
+hash is `DC0C992BBF7D72605D849209036AA1F12E3A011D093CE1F8776B6782D7243CA9`.
+All 32 Temp files are removed and owned process count is zero.
+
+This round proves equal scheduling only; it does not exclude any incomplete shard. The
+next allowed operation, after a new green/amber resource check, is the second equal
+round over the same domain and shard order: input cursor 312,500 and new-probe budget
+312,500 per shard, yielding absolute cursor 625,000 when budget-bound. Deterministic
+replay makes the physical work 625,000 probes per shard, while new coverage remains
+10,000,000 total. Stop at candidate or RSS guard; no new seed domain or product path
+opens.
 
 ## Progress v6 and revision-3 migration
 
