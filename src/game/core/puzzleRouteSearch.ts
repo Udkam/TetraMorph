@@ -3,10 +3,11 @@ import { getPuzzleDefinition, type PuzzleDefinition } from './puzzles';
 import { ANCHOR_CELL, type Cell, type GameCommand, type GameState, type PieceType, type PuzzleId } from './types';
 
 /** Public controls available to the ordinary Puzzle player and recorded in route evidence. */
-export type PuzzleRouteToken = 'S' | 'T' | 'L' | 'R' | 'C' | 'D' | 'H';
+export type PuzzleRouteToken = 'S' | 'T' | 'L' | 'R' | 'C' | 'Q' | 'D' | 'H';
 
 const PLANNER_COMMANDS: readonly GameCommand[] = Object.freeze([
   { type: 'rotate', direction: 1 },
+  { type: 'rotate', direction: -1 },
   { type: 'move', dx: -1 },
   { type: 'move', dx: 1 },
 ]);
@@ -84,15 +85,17 @@ export interface PuzzleOptimalRouteCertificate {
   replay: PuzzleRouteReplay;
 }
 
-function tokenCommand(token: PuzzleRouteToken): GameCommand {
+function tokenCommand(token: string): GameCommand {
   switch (token) {
     case 'S': return { type: 'start' };
     case 'T': return { type: 'tick' };
     case 'L': return { type: 'move', dx: -1 };
     case 'R': return { type: 'move', dx: 1 };
     case 'C': return { type: 'rotate', direction: 1 };
+    case 'Q': return { type: 'rotate', direction: -1 };
     case 'D': return { type: 'soft-drop' };
     case 'H': return { type: 'hard-drop' };
+    default: throw new Error(`Unknown Puzzle route token: ${JSON.stringify(token)}.`);
   }
 }
 
@@ -101,6 +104,7 @@ function commandToken(command: GameCommand): PuzzleRouteToken {
   if (command.type === 'tick') return 'T';
   if (command.type === 'hard-drop') return 'H';
   if (command.type === 'rotate' && command.direction === 1) return 'C';
+  if (command.type === 'rotate' && command.direction === -1) return 'Q';
   if (command.type === 'soft-drop') return 'D';
   if (command.type === 'move' && command.dx === -1) return 'L';
   if (command.type === 'move' && command.dx === 1) return 'R';
@@ -142,9 +146,9 @@ function settleAfterLock(state: GameState): { state: GameState; commands: readon
 
 /**
  * Lists all meaningful normal landing choices from an active piece. The search state
- * only expands rotation and horizontal movement, then uses the same hard drop and
- * delay resolution a player sees; no timing trick, unsupported counter-rotation, or
- * state injection is part of the route domain.
+ * only expands both rotation directions and horizontal movement, then uses the same
+ * hard drop and delay resolution a player sees; no timing trick or state injection is
+ * part of the route domain.
  */
 export function puzzleLandings(state: GameState): readonly PuzzleLanding[] {
   if (!isActive(state)) return [];
@@ -212,7 +216,7 @@ export function exhaustivePuzzleLandings(state: GameState): readonly PuzzleLandi
         commands: Object.freeze([...route.commands, { type: 'hard-drop' }, ...settled.commands]),
         lock: lockPlacement(locked.piece, locked.cells),
       };
-      const key = routeStateKey(landing.state);
+      const key = puzzleRouteStateKey(landing.state);
       const existing = landed.get(key);
       if (!existing || landing.commands.length < existing.commands.length) landed.set(key, landing);
     }
@@ -243,15 +247,15 @@ function withoutUndoHistory(state: GameState): GameState {
   };
 }
 
-function targetKey(state: GameState): string {
-  return state.puzzleTargetCells
+function orderedCellsKey(cells: readonly Cell[]): string {
+  return [...cells]
+    .sort((left, right) => left.y - right.y || left.x - right.x)
     .map((cell) => `${cell.x},${cell.y}`)
-    .sort()
     .join('|');
 }
 
 /** Score, elapsed time, and undo history do not affect a Puzzle's future legal moves. */
-function routeStateKey(state: GameState): string {
+export function puzzleRouteStateKey(state: GameState): string {
   const active = state.active;
   return [
     // Piece colours are renderer data: future collisions and Puzzle completion only
@@ -260,7 +264,8 @@ function routeStateKey(state: GameState): string {
     state.board.map((row) => row.map((cell) => (
       cell === null ? '.' : cell === ANCHOR_CELL ? 'A' : '#'
     )).join('')).join('/'),
-    targetKey(state),
+    orderedCellsKey(state.puzzleTargetCells),
+    orderedCellsKey(state.puzzleAnchorSupportedCells),
     active ? `${active.type}:${active.rotation}:${active.x}:${active.y}` : '-',
     state.queue.join(''),
     state.randomizer.seed,
@@ -279,7 +284,13 @@ function routeStateKey(state: GameState): string {
  * column deficits must come from future tetrominoes, four cells at a time. This
  * conservation bound therefore cannot overestimate the remaining locks.
  */
-function targetDeficitLockLowerBound(state: GameState): number {
+export function puzzleRouteLockLowerBound(state: GameState): number {
+  if (
+    state.puzzleAnchorSupportedCells.length > 0
+    || state.board.some((row) => row.some((cell) => cell === ANCHOR_CELL))
+  ) {
+    return 0;
+  }
   const requiredClearsPerColumn = new Set(state.puzzleTargetCells.map((cell) => cell.y)).size;
   let deficit = 0;
   for (let x = 0; x < state.board[0]!.length; x += 1) {
@@ -299,16 +310,20 @@ export function certifyOptimalPuzzleRoute(
   levelId: PuzzleId,
   candidateCommandStream: string,
 ): PuzzleOptimalRouteCertificate | null {
-  const definition = getPuzzleDefinition(levelId);
-  if (definition.anchorCells.length > 0) {
-    throw new Error(`Optimal Puzzle deficit certificates require an unanchored prerequisite: ${levelId}.`);
-  }
-  const replay = replayPuzzleRoute(levelId, candidateCommandStream);
+  return certifyOptimalPuzzleRouteForDefinition(getPuzzleDefinition(levelId), candidateCommandStream);
+}
+
+export function certifyOptimalPuzzleRouteForDefinition(
+  definition: PuzzleDefinition,
+  candidateCommandStream: string,
+): PuzzleOptimalRouteCertificate | null {
+  const levelId = definition.id;
+  const replay = replayPuzzleRouteForDefinition(definition, candidateCommandStream);
   if (replay.state.status !== 'finished' || replay.state.puzzleCompletion !== 'finished' || replay.locks.length <= 0) {
     throw new Error(`Optimal Puzzle candidate must be a completed public-command replay: ${levelId}.`);
   }
   const optimalLocks = replay.locks.length;
-  const canonicalStart = dispatch(createInitialState(0x51a1f00d, 'puzzle', levelId), { type: 'start' }).state;
+  const canonicalStart = dispatch(createPuzzleInitialState(definition), { type: 'start' }).state;
   if (!isActive(canonicalStart)) return null;
   const initialStateHash = stateHash(canonicalStart);
   const started = withoutUndoHistory(canonicalStart);
@@ -323,7 +338,7 @@ export function certifyOptimalPuzzleRoute(
     exploredStateCount += frontier.length;
     const nextFrontier = new Map<string, GameState>();
     for (const parent of frontier) {
-      if (depth + targetDeficitLockLowerBound(parent) >= optimalLocks) {
+      if (depth + puzzleRouteLockLowerBound(parent) >= optimalLocks) {
         deficitBoundPrunes += 1;
         continue;
       }
@@ -334,11 +349,12 @@ export function certifyOptimalPuzzleRoute(
         }
         if (!isActive(landing.state)) continue;
         const nextDepth = depth + 1;
-        if (nextDepth + targetDeficitLockLowerBound(landing.state) >= optimalLocks) {
+        if (nextDepth >= optimalLocks - 1) continue;
+        if (nextDepth + puzzleRouteLockLowerBound(landing.state) >= optimalLocks) {
           deficitBoundPrunes += 1;
           continue;
         }
-        const key = routeStateKey(landing.state);
+        const key = puzzleRouteStateKey(landing.state);
         if (!nextFrontier.has(key)) nextFrontier.set(key, landing.state);
       }
     }
@@ -452,7 +468,7 @@ function searchRoute(
         };
         if (landing.state.status === 'finished') return reconstructReplay(node);
         if (!isActive(landing.state)) continue;
-        const key = routeStateKey(landing.state);
+        const key = puzzleRouteStateKey(landing.state);
         const existing = deduplicated.get(key);
         if (!existing || node.cost < existing.cost) deduplicated.set(key, node);
       }
@@ -474,19 +490,12 @@ export function findPuzzleRouteForDefinition(
   definition: PuzzleDefinition,
   options: PuzzleRouteSearchOptions = {},
 ): PuzzleRouteReplay | null {
-  const started = dispatch(createInitialState(
-    0x51a1f00d,
-    'puzzle',
-    definition.id,
-    undefined,
-    undefined,
-    definition,
-  ), { type: 'start' }).state;
+  const started = dispatch(createPuzzleInitialState(definition), { type: 'start' }).state;
   return searchRoute(definition.id, options.maxLocks ?? 30, options.beamWidth ?? 480, undefined, started);
 }
 
 export function decodePuzzleRoute(commandStream: string): readonly GameCommand[] {
-  return Object.freeze([...commandStream].map((token) => tokenCommand(token as PuzzleRouteToken)));
+  return Object.freeze([...commandStream].map(tokenCommand));
 }
 
 export function encodePuzzleRoute(commands: readonly GameCommand[]): string {
@@ -495,7 +504,25 @@ export function encodePuzzleRoute(commands: readonly GameCommand[]): string {
 
 /** Replays an artifact route through the current Core and records each genuine landing. */
 export function replayPuzzleRoute(levelId: PuzzleId, commandStream: string): PuzzleRouteReplay {
-  let state = createInitialState(0x51a1f00d, 'puzzle', levelId);
+  return replayPuzzleRouteForDefinition(getPuzzleDefinition(levelId), commandStream);
+}
+
+function createPuzzleInitialState(definition: PuzzleDefinition): GameState {
+  return createInitialState(
+    0x51a1f00d,
+    'puzzle',
+    definition.id,
+    undefined,
+    undefined,
+    definition,
+  );
+}
+
+export function replayPuzzleRouteForDefinition(
+  definition: PuzzleDefinition,
+  commandStream: string,
+): PuzzleRouteReplay {
+  let state = createPuzzleInitialState(definition);
   const commands = decodePuzzleRoute(commandStream);
   const locks: PuzzleLockPlacement[] = [];
   for (const command of commands) {
@@ -511,7 +538,7 @@ export function metricsForPuzzleRoute(commandStream: string): PuzzleRouteMetrics
   return Object.freeze({
     commandCount: commandStream.length,
     locks: [...commandStream].filter((token) => token === 'H').length,
-    rotationCount: [...commandStream].filter((token) => token === 'C').length,
+    rotationCount: [...commandStream].filter((token) => token === 'C' || token === 'Q').length,
     moveCount: [...commandStream].filter((token) => token === 'L' || token === 'R').length,
   });
 }
