@@ -339,6 +339,32 @@ adding unrelated badges or ornamental effects.
   route around anchors, plan cavities from the fixed two-piece preview, and control
   extra material introduced by a clear. The UI may reveal these ideas progressively
   but may not expose a full solution by default.
+- The Stage F1 candidate defines the active stable-ID roster in
+  `docs/phases/t37-puzzle-curriculum-v3.md`. Current positions 1–5 become the five
+  rebuilt Intro levels; current positions 6–30 remain definition-preserved as the 25
+  Easy levels. Hard retires `tm-puzzle-34`, `tm-puzzle-40`, `tm-puzzle-42`, and
+  `tm-puzzle-43`; it retains sixteen other IDs, including the accepted lower triangle,
+  pyramid, and suspended-roof silhouettes at old positions 36, 38, and 47.
+- Exactly eight unchanged Easy levels act as technique keys. Every Hard level has one
+  visible Easy prerequisite, while one Easy may unlock several Hard levels only when
+  replay evidence proves the same decision. The threshold is derived, never copied:
+  strict optimum plus five locked tetrominoes.
+- One operation means one real `piece-locked` tetromino. Movement, either rotation
+  direction, soft-drop steps, hard-drop input, settlement ticks, and undone placements
+  are not extra operations. Player copy uses `落子数 / Pieces placed` instead of the
+  ambiguous `步 / Moves`.
+- Strict proof covers both clockwise and counter-clockwise SRS, horizontal movement,
+  soft drop, and hard drop. State deduplication includes anchor-supported placement
+  identity. Beam search, a timeout, or a best-known route is never an optimum proof;
+  anchored proof initially disables the unproven target-deficit prune.
+- Campaign revision 3 migrates through an explicit 50-ID table into a new v6 storage
+  key. Only definition-preserved behavior carries completion and best placement count;
+  rebuilt and retired IDs cannot award a new clear. The old v5 key remains untouched
+  for rollback.
+- The first v3 pass keeps the unified 10 × 20 well. Definition capability may expand to
+  3–10 bottom target rows, 5–20 legal setup placements, and at most four mechanically
+  relevant anchors inside the visible bottom twelve rows. Real variable board
+  dimensions remain a separate unopened contract.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

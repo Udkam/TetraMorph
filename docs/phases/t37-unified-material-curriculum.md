@@ -218,16 +218,23 @@ complete suite (`412 passed / 8 skipped`), and the 767-module build pass. Indepe
 static, audio, and original-detail visual QA report P0–P3 all zero. Human visual/play
 review remains open.
 
-### F. Puzzle curriculum v3 — PROOF FOUNDATION NEXT
+### F. Puzzle curriculum v3 — F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED
 
-- Author 5 Intro, 25 Easy, and 16 Hard levels with stable IDs, technique tags, and no
-  duplicate residual states.
-- Keep Easy fully open. Bind each gated Hard level to one or more related Easy
-  prerequisites at exact optimum plus five operations.
-- Extend the solver/certificate format only as required for multi-anchor or bounded
-  board-shape variants. Generate exact optima, deterministic hashes, and public replay
-  verification for every level before UI adoption.
-- Migrate prior progress by stable identity; never infer a clear from array position.
+- The candidate exact roster, four retirements, eight rebuilds, operation metric,
+  eight-key Easy-to-Hard graph, schema-8 artifact, rev2 behavior-hash baselines, and
+  v5-to-v6 migration are specified in
+  `docs/phases/t37-puzzle-curriculum-v3.md`.
+- Author 5 Intro, preserve and recertify 25 Easy, and publish 16 Hard levels with stable
+  IDs, technique tags, and no duplicate residual states. Easy stays fully open; every
+  Hard has exactly one related Easy prerequisite at strict optimum plus five locked
+  tetrominoes.
+- F2 first adds counter-clockwise SRS to the complete public-control domain, includes
+  anchor-supported cells in proof-state identity, and proves ordinary, one-anchor, and
+  two-anchor fixtures without heuristic caps. Only then may definitions expand to ten
+  target rows or richer multi-anchor silhouettes.
+- Generate exact optima, deterministic hashes, and public replay verification for all
+  46 levels before UI adoption. Migrate by explicit stable identity and behavior hash;
+  never infer a clear from array position.
 
 ### G. Integrated acceptance
 
