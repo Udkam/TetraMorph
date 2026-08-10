@@ -8,10 +8,13 @@
  * Usage:
  *   node tools/search-puzzle-v3-prototype.mjs
  *     --seed-start <uint32> --seed-count <positive-int>
- *     --node-budget <positive-int> --max-rss-mib <positive-int>
+ *     --shard-count <positive-int> --shard-index <zero-based-int>
+ *     --cursor <completed-probes> --node-budget <new-probes>
+ *     --max-rss-mib <positive-int>
  *     --output <explicit-json-path>
  */
 
+import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
@@ -20,6 +23,13 @@ const HEIGHT = 40;
 const VISIBLE_START = 20;
 const TARGET_TOP = 30;
 const FULL_ROW = (1 << WIDTH) - 1;
+const MAX_PROBES = 1_000_000_000;
+const SEQUENCE_LENGTH = 20;
+const TRAVERSAL_VERSION = 'seed-shard-replay-v1';
+const QUEUE_GENERATOR_VERSION = 'xorshift32-fisher-yates-seven-bag-v1';
+const SETUP_RULES_VERSION = 'visible-spawn19-vertical-hard-drop-no-clear-no-hidden-no-same-type-touch-v1';
+const TRAVERSAL_ORDER = 'type-index/rotation-0..3/x-ascending/landing-cell-dedupe-v1';
+const STOP = Symbol('search-stop');
 const TYPES = Object.freeze(['I', 'O', 'T', 'S', 'Z', 'J', 'L']);
 const TYPE_INDEX = new Map(TYPES.map((type, index) => [type, index]));
 const SHAPES = Object.freeze({
@@ -103,17 +113,36 @@ function parseArguments(argv) {
   };
   const output = values.get('--output');
   if (!output) throw new Error('--output is required; this tool never chooses an implicit path.');
-  const allowed = new Set(['--seed-start', '--seed-count', '--node-budget', '--max-rss-mib', '--output']);
+  const allowed = new Set([
+    '--seed-start', '--seed-count', '--shard-count', '--shard-index', '--cursor',
+    '--node-budget', '--max-rss-mib', '--output',
+  ]);
   for (const name of values.keys()) if (!allowed.has(name)) throw new Error(`Unknown authoring option: ${name}.`);
   const seedStart = integer('--seed-start', 1, 0xffff_ffff);
   const seedCount = integer('--seed-count', 1, 1_000_000);
   if (seedStart + seedCount - 1 > 0xffff_ffff) {
     throw new Error('The explicit setup-seed range may not wrap uint32.');
   }
+  const shardCount = integer('--shard-count', 1, seedCount);
+  const shardIndex = integer('--shard-index', 0, shardCount - 1);
+  const cursor = integer('--cursor', 0, MAX_PROBES - 1);
+  const nodeBudget = integer('--node-budget', 1, MAX_PROBES);
+  if (cursor + nodeBudget > MAX_PROBES) {
+    throw new Error(`--cursor plus --node-budget may not exceed ${MAX_PROBES}.`);
+  }
+  const shardStartOffset = Math.floor((seedCount * shardIndex) / shardCount);
+  const shardEndOffset = Math.floor((seedCount * (shardIndex + 1)) / shardCount);
   return Object.freeze({
     seedStart,
     seedCount,
-    nodeBudget: integer('--node-budget', 1, 1_000_000_000),
+    shardCount,
+    shardIndex,
+    shardStartOffset,
+    shardEndOffset,
+    selectedSeedStart: seedStart + shardStartOffset,
+    selectedSeedCount: shardEndOffset - shardStartOffset,
+    cursor,
+    nodeBudget,
     maxRssBytes: integer('--max-rss-mib', 128, 4096) * 1024 * 1024,
     outputPath: resolve(output),
   });
@@ -146,6 +175,47 @@ function sequenceForSeed(seed, count) {
   return sequence;
 }
 
+function uppercaseSha256(text) {
+  return createHash('sha256').update(text, 'utf8').digest('hex').toUpperCase();
+}
+
+function domainIdentity(options) {
+  const queueHasher = createHash('sha256');
+  for (let offset = 0; offset < options.seedCount; offset += 1) {
+    if (offset % 1024 === 0 && process.memoryUsage().rss > options.maxRssBytes) {
+      throw new Error('The RSS guard stopped domain identity construction.');
+    }
+    const seed = options.seedStart + offset;
+    queueHasher.update(`${seed}:${sequenceForSeed(seed, SEQUENCE_LENGTH).join('')}\n`, 'utf8');
+  }
+  const queueSequenceDigest = queueHasher.digest('hex').toUpperCase();
+  const domainPayload = {
+    traversalVersion: TRAVERSAL_VERSION,
+    queueGeneratorVersion: QUEUE_GENERATOR_VERSION,
+    setupRulesVersion: SETUP_RULES_VERSION,
+    queueSequenceDigest,
+    boardGeometry: { width: WIDTH, height: HEIGHT, visibleStart: VISIBLE_START, targetTop: TARGET_TOP },
+    targetMaskRows: TARGET_VISIBLE_ROWS,
+    pieceTypes: TYPES,
+    pieceShapes: TYPES.map((type) => [type, SHAPES[type].map((shape) => shape.map(([x, y]) => [x, y]))]),
+    seedStart: options.seedStart,
+    seedCount: options.seedCount,
+    sequenceLength: SEQUENCE_LENGTH,
+    shardCount: options.shardCount,
+    traversalOrder: TRAVERSAL_ORDER,
+  };
+  return {
+    queueSequenceDigest,
+    domainHash: uppercaseSha256(`${JSON.stringify(domainPayload)}\n`),
+  };
+}
+
+function failedMemoHash(failed) {
+  const hasher = createHash('sha256');
+  for (const key of [...failed].sort()) hasher.update(`${key}\n`, 'utf8');
+  return hasher.digest('hex').toUpperCase();
+}
+
 function targetRows() {
   const rows = Array.from({ length: HEIGHT }, () => 0);
   for (const [visibleY, row] of TARGET_VISIBLE_ROWS.entries()) {
@@ -171,7 +241,7 @@ function buildSeedTrie(seedStart, seedCount, maxRssBytes) {
     }
     const seed = (seedStart + offset) >>> 0 || 1;
     let nodeIndex = 0;
-    for (const type of sequenceForSeed(seed, 20)) {
+    for (const type of sequenceForSeed(seed, SEQUENCE_LENGTH)) {
       const typeIndex = TYPE_INDEX.get(type);
       let childIndex = nodes[nodeIndex].children[typeIndex];
       if (childIndex < 0) {
@@ -235,12 +305,14 @@ function searchSetup(fixedRows, trie, options) {
   const typeRows = TYPES.map(() => Array.from({ length: HEIGHT }, () => 0));
   const placements = [];
   const failed = new Set();
+  const probeHasher = createHash('sha256');
+  const absoluteProbeLimit = options.cursor + options.nodeBudget;
   let attemptedLandings = 0;
   let acceptedPlacements = 0;
-  let memoryGuard = false;
+  let stopReason = null;
 
   const visit = (nodeIndex, depth) => {
-    if (depth === 20) {
+    if (depth === SEQUENCE_LENGTH) {
       if (!rows.every((row, y) => row === fixedRows[y])) return null;
       const seed = trie[nodeIndex].seeds[0];
       return seed ? { seed, placements: placements.map((placement) => ({ ...placement })), typeRows } : null;
@@ -259,12 +331,16 @@ function searchSetup(fixedRows, trie, options) {
         const minimumX = -Math.min(...shape.map(([cellX]) => cellX));
         const maximumX = WIDTH - 1 - Math.max(...shape.map(([cellX]) => cellX));
         for (let x = minimumX; x <= maximumX; x += 1) {
-          attemptedLandings += 1;
-          if (attemptedLandings > options.nodeBudget) return null;
-          if (attemptedLandings % 1024 === 0 && process.memoryUsage().rss > options.maxRssBytes) {
-            memoryGuard = true;
-            return null;
+          if (attemptedLandings >= absoluteProbeLimit) {
+            stopReason = 'budget';
+            return STOP;
           }
+          if (attemptedLandings % 1024 === 0 && process.memoryUsage().rss > options.maxRssBytes) {
+            stopReason = 'memory';
+            return STOP;
+          }
+          probeHasher.update(`${key}|${type}|${rotation}|${x}\n`, 'utf8');
+          attemptedLandings += 1;
           const placed = landing(rows, typeRows[typeIndex], fixedRows, type, rotation, x);
           if (!placed) continue;
           const landingKey = placed.cells.map(([cellX, cellY]) => `${cellX},${cellY}`).sort().join('|');
@@ -277,13 +353,13 @@ function searchSetup(fixedRows, trie, options) {
           }
           placements.push({ type, rotation, x });
           const result = visit(childIndex, depth + 1);
-          if (result) return result;
+          if (result !== STOP && result) return result;
           placements.pop();
           for (const [cellX, cellY] of placed.cells) {
             rows[cellY] &= ~(1 << cellX);
             typeRows[typeIndex][cellY] &= ~(1 << cellX);
           }
-          if (attemptedLandings > options.nodeBudget || memoryGuard) return null;
+          if (result === STOP) return STOP;
         }
       }
     }
@@ -291,39 +367,86 @@ function searchSetup(fixedRows, trie, options) {
     return null;
   };
 
-  const result = visit(0, 0);
+  const outcome = visit(0, 0);
+  const result = outcome === STOP ? null : outcome;
+  const complete = outcome === null;
+  if (result && attemptedLandings <= options.cursor) {
+    throw new Error('The replay cursor would skip a previously covered candidate.');
+  }
+  if (complete && attemptedLandings < options.cursor) {
+    throw new Error('The replay cursor extends beyond natural shard exhaustion.');
+  }
   return {
     result,
     attemptedLandings,
     acceptedPlacements,
     failedStateCount: failed.size,
-    memoryGuard,
+    stopReason,
+    complete,
+    probeHash: probeHasher.digest('hex').toUpperCase(),
+    memoHash: failedMemoHash(failed),
   };
 }
 
 const options = parseArguments(process.argv.slice(2));
 const fixedRows = targetRows();
-const trieBuild = buildSeedTrie(options.seedStart, options.seedCount, options.maxRssBytes);
+const identity = domainIdentity(options);
+const trieBuild = buildSeedTrie(options.selectedSeedStart, options.selectedSeedCount, options.maxRssBytes);
 const search = trieBuild.memoryGuard
   ? {
       result: null,
       attemptedLandings: 0,
       acceptedPlacements: 0,
       failedStateCount: 0,
-      memoryGuard: true,
+      stopReason: 'memory',
+      complete: false,
+      probeHash: uppercaseSha256(''),
+      memoHash: uppercaseSha256(''),
     }
   : searchSetup(fixedRows, trieBuild.nodes, options);
 const status = search.result
   ? 'candidate'
-  : search.memoryGuard
+  : search.stopReason === 'memory'
     ? 'memory-guard'
-    : search.attemptedLandings > options.nodeBudget
+    : search.stopReason === 'budget'
       ? 'budget-exhausted'
       : 'not-found';
+const nextCursor = Math.max(options.cursor, search.attemptedLandings);
 const output = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   claim: 'F3C fixed-mask setup candidate only; Core route replay and exact proof remain mandatory.',
   status,
+  domain: {
+    traversalVersion: TRAVERSAL_VERSION,
+    queueGeneratorVersion: QUEUE_GENERATOR_VERSION,
+    setupRulesVersion: SETUP_RULES_VERSION,
+    queueSequenceDigest: identity.queueSequenceDigest,
+    domainHash: identity.domainHash,
+    seedStart: options.seedStart,
+    seedCount: options.seedCount,
+    sequenceLength: SEQUENCE_LENGTH,
+    shardCount: options.shardCount,
+    traversalOrder: TRAVERSAL_ORDER,
+  },
+  shard: {
+    count: options.shardCount,
+    index: options.shardIndex,
+    startOffset: options.shardStartOffset,
+    endOffsetExclusive: options.shardEndOffset,
+    seedStart: options.selectedSeedStart,
+    seedCount: options.selectedSeedCount,
+  },
+  coverage: {
+    startCursor: options.cursor,
+    nextCursor,
+    replayedLandingProbes: Math.min(options.cursor, search.attemptedLandings),
+    newLandingProbes: Math.max(0, search.attemptedLandings - options.cursor),
+    complete: search.complete,
+  },
+  evidence: {
+    probeHash: search.probeHash,
+    memoHash: search.memoHash,
+  },
   targetRows: 10,
   targetMaskRows: TARGET_VISIBLE_ROWS,
   setup: search.result ? {
@@ -332,8 +455,6 @@ const output = {
   } : null,
   boardRows: search.result ? boardRowsWithTypes(search.result.typeRows) : null,
   search: {
-    seedStart: options.seedStart,
-    seedCount: options.seedCount,
     nodeBudget: options.nodeBudget,
     processedSeeds: trieBuild.processedSeeds,
     trieNodeCount: trieBuild.nodes.length,
@@ -348,6 +469,8 @@ writeFileSync(options.outputPath, `${JSON.stringify(output, null, 2)}\n`, { enco
 process.stdout.write(`${JSON.stringify({
   status,
   setupSeed: output.setup?.seed ?? null,
+  shardIndex: output.shard.index,
+  nextCursor: output.coverage.nextCursor,
   attemptedLandings: output.search.attemptedLandings,
   acceptedPlacements: output.search.acceptedPlacements,
   failedStateCount: output.search.failedStateCount,
