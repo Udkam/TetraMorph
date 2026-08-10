@@ -191,6 +191,22 @@ and no Puzzle content is published without strict deterministic proof.
 - Share one semantic material description across active piece, Next, ghost, board,
   clear/activation VFX, and matching audio. Prove all four cells can trigger and the
   piece fires once.
+- Implement E as three bounded checkpoints: renderer/theme plus direct tests; bilingual
+  player copy plus App tests; then AudioEngine timeline ownership plus direct tests.
+  The renderer checkpoint removes the ordinary-body-plus-core path atomically across
+  active, Ghost, Next, settled, and clear. The copy checkpoint removes visible
+  carrier/core language while preserving internal carrier IDs. The audio checkpoint
+  only serializes separate activation transitions and clears queued/current Mutation
+  sound on restart; it cannot alter any accepted sound design or VFX duration.
+- Use the reference only for the abstract material grammar. Ordinary pieces receive a
+  weaker shared triangular facet; Ice gets cold crystal/frost, Bomb gets dark rock and
+  contained lava seams, Multiplier gets no more than two sparse gold glints, and
+  Supergravity gets one or two distributed dark wells. Do not reproduce the reference's
+  exact facet mesh, motif placement, labels, four-column layout, or full-time bloom.
+- Capture new evidence under T37 only after a green source SHA. Required semantic frames
+  show each item in Next, active plus Ghost, settled beside ordinary pieces, and real
+  clear-to-activation continuity, with theme/reduced-motion/responsive coverage. Never
+  overwrite inherited T27 evidence.
 
 ### F. Puzzle curriculum v3
 

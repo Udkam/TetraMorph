@@ -1894,6 +1894,38 @@ Carrier material is owned only by extant cells. A consumed carrier can seed a bo
 activation burst, but the renderer must not retain or reconstruct its former square
 rim, attachment frame, or empty-cell outline after the clear removes it.
 
+### Whole-piece Mutation material
+
+`carrier` remains an internal deterministic identity only; it is no longer a visual or
+player-facing object. When an active or locked piece owns a Mutation item, that item
+material replaces the complete ordinary seven-colour body. The same material identity
+must survive through Next, the projected Ghost, the settled board, and the captured
+`300 ms` line-clear body. No state may render an ordinary body first and then attach a
+central core, emblem, fifth-cell-like plate, or repeated per-cell badge.
+
+All playable bodies share the existing connected outer contour, readable internal cell
+seams, and one quiet light direction. Ordinary pieces add only a low-contrast,
+deterministic triangular facet layer. Mutation pieces strengthen that shared layer and
+add one sparse family: Ice uses cold crystal planes and broken frost edges; Bomb uses a
+dark mineral body crossed by contained orange lava seams; Multiplier uses gold planes
+with at most one primary and one secondary glint per piece; Supergravity uses luminous
+violet planes with one or two dark wells distributed across the piece. These motifs are
+material texture, not trigger-location indicators.
+
+Active and Next carry the clearest material signal. Settled pieces reduce motif/glow
+strength so adjacent ordinary cells stay readable. Ghost uses the corresponding
+material-coloured outline and only enough internal signal to identify the item without
+obscuring the landing silhouette. Clear samples retain the captured material, alpha,
+and scale across the already accepted row sequence. Reduced motion uses the same static
+endpoints; it does not create a second geometry. Existing local activation particles
+release the material at trigger time and remain frozen in timing and composition.
+
+Audio continues to begin only when the item actually activates. Separate transitions
+must queue against the same accepted visual timeline instead of restarting an audio
+delay at zero, and restart must cancel both the current Mutation cue and future queued
+cues. Those lifecycle corrections do not authorize any change to accepted sound assets,
+recipes, gains, pan, compression, or timing.
+
 ### Home identity alignment
 
 The `TetraMorph` wordmark is centred against the complete dark brand panel, not against

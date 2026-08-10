@@ -88,6 +88,36 @@ browser-evidence, and independent-QA gates; normal-speed player review remains o
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
 
+### Stage E exact implementation boundary (2026-08-10)
+
+Stage E is split into three reviewable source checkpoints and may not reopen accepted
+Core mechanics, clear timing, or sound design:
+
+1. **E1 whole-piece renderer** owns only `src/game/render/theme.ts`,
+   `src/game/render/theme.test.ts`, `src/game/render/TetrisRenderer.ts`, and
+   `src/game/render/TetrisRenderer.test.ts`. Ordinary seven-colour pieces gain only a
+   low-contrast deterministic triangular facet. A Mutation item replaces the complete
+   ordinary body with one continuous Ice/Bomb/Multiplier/Supergravity material in
+   active, Ghost, Next, settled-board, and captured-clear states. Central cores,
+   per-cell badges, and ordinary base-colour exposure are removed. Active and Next are
+   strongest, settled material is quieter, Ghost is a silhouette-safe material outline,
+   and clear keeps the captured material through the accepted `300 ms` track.
+2. **E2 player language** owns only `src/ui/localization.ts` and `src/App.test.ts`
+   unless the existing call site proves insufficient. Chinese/English rules and Next
+   accessible names describe a complete material piece, never a carried item, coloured
+   core, carrier cell, or badge. Internal `mutationCarrier*` identity names remain
+   untouched because they enforce deterministic one-piece/one-trigger behavior.
+3. **E3 audio lifecycle** owns only `src/game/audio/AudioEngine.ts` and its direct test.
+   It may make separate Core transitions share the already accepted Mutation timeline
+   tail and must cancel queued/current Mutation sound on restart. It may not change any
+   asset, hash, oscillator recipe, gain, pan, compressor, cue timing, activation VFX
+   duration, or accepted Action A / Ice 2 / Studio-clear behavior.
+
+E1 preserves current Mutation probabilities, effects, durations, scoring, Bomb order,
+Supergravity placement, activation particle timelines, and line-clear geometry. Browser
+evidence begins only from a green source SHA in a new T37 material directory; the
+inherited T27 evidence and `progress.md` remain protected and excluded.
+
 ## Current checkpoint state
 
 - Audition R1 source `0bebf8a` and evidence `2ff0bb6` are **REJECTED BY HUMAN

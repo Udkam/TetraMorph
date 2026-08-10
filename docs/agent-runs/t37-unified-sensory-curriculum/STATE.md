@@ -340,13 +340,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Inventory the current ordinary and Mutation material pipeline, freeze the exact Stage E
-source/test boundary, then implement the complete-piece Ice/Bomb/Multiplier/Supergravity
-materials and their Next/ghost/board/clear/audio agreement in bounded checkpoints. Keep
+The read-only Stage E audit is complete. Implement E1 in exactly
+`src/game/render/theme.ts`, `src/game/render/theme.test.ts`,
+`src/game/render/TetrisRenderer.ts`, and `src/game/render/TetrisRenderer.test.ts`: replace
+the ordinary-body-plus-core path atomically across active/Ghost/Next/settled/clear, add
+the quiet ordinary facet baseline, and keep all Core rules, activation VFX, clear timing,
+and audio recipes frozen. Commit the first green renderer claim before E2 bilingual
+copy (`src/ui/localization.ts`, `src/App.test.ts`) and E3 AudioEngine cross-transition /
+restart ownership. Then capture real frames in a new T37 material evidence path. Keep
 D1's player verdict separate, leave mode intro/results for D3, and defer site identity
-until the final proposal gate. Preserve the inherited T27 and `progress.md` paths,
-continue to label the missing Ice uploader-original WAV/hash honestly, and do not reopen
-any accepted Stage-C sound or clear behavior.
+until the final proposal gate. Preserve inherited T27 and `progress.md`, continue to
+label the missing Ice uploader-original WAV/hash honestly, and do not reopen accepted
+Stage-C sound or clear behavior.
 
 ## Do not repeat
 
