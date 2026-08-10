@@ -1907,22 +1907,13 @@ negative space, and no letter, copied logo, four-equal-quadrant grid, or trade-d
 silhouette. It must remain recognizable at `16/32/64 px`; favicon work does not reopen
 the explicitly excluded PWA install surface.
 
-The D2 mark is **Morph Core / 异形材质核**. One irregular octagonal mineral shell encloses
-unequal diagonal facets and a small off-centre warm core. Its silhouette is connected,
-asymmetric on both axes, and contains no horizontal/vertical cross, four detached panes,
-tetromino letterform, or equal quadrant rhythm. Teal is the dominant material, with one
-blue upper facet, one violet side facet, and one restrained gold core; these are a single
-stable brand palette rather than theme-dependent favicon variants. The outer geometry
-stays inside a `4…60` safe area in a `64×64` viewBox, and no meaningful feature is
-smaller than five design units so the core survives a real `16 px` raster.
-
-The vector source owns all derivatives: `favicon.svg`, transparent `16×16` and `32×32`
-PNGs, and an opaque `180×180` Apple touch icon with sufficient mask-safe padding. HTML
-declares the SVG first and explicit PNG fallbacks; it contains no inline data URI,
-manifest, service worker, or install metadata. Evidence must decode every final asset,
-verify dimensions/MIME and built-resource availability, inspect actual-size and enlarged
-nearest-neighbour `16/32/64 px` samples against white, Deep Tide, and Sunstone fields,
-and prove the same favicon link set remains active after all three in-app theme changes.
+The first D2 **Morph Core / 异形材质核** draft is rejected before source publication: its
+faceted mineral silhouette remains too semantically ambiguous at Apple icon size. Site
+identity therefore moves to the final T37 proposal gate. Until then the existing icon is
+left unchanged rather than replaced by an unapproved mark. The final proposal must show
+its actual browser-tab and Apple-mask readings before implementation, communicate the
+falling-block/material theme without explanation, and still satisfy the asymmetric,
+single-contour, no-four-pane, no-letter, and no-PWA boundaries above.
 
 Final responsive proof must preserve that same geometry after every legacy cascade.
 The wordmark owns a shrink-to-ink box (`max-content`) centred by the parent grid; it may

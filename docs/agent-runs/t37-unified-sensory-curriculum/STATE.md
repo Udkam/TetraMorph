@@ -74,9 +74,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 9. `TECHNICAL ACCEPT — PLAYER REVIEW OPEN` — Stage D1 URL-route Settled Handoff at
    product `5329353` plus evidence `ab58b46`; later icon and in-page transition slices
    remain pending.
-10. `IN PROGRESS` — Stage D2 Morph Core site identity; D1 remains open only for the
-    player's normal-speed route-motion verdict.
-11. `PENDING` — ordinary/Mutation whole-piece material system.
+10. `DEFERRED TO FINAL PROPOSAL GATE` — the Morph Core draft is rejected for unclear
+    Apple-size meaning; no icon product source is retained.
+11. `IN PROGRESS` — ordinary/Mutation whole-piece material system.
 12. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
 13. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
@@ -332,21 +332,21 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `79/79`; both architecture and motion reviewers report
   `P0 0 / P1 0 / P2 0 / P3 0` and ACCEPT. The exact range contains no inherited T27 or
   `progress.md` path, and no product source changes follow `5329353`.
-- The site's Microsoft-like equal-2x2 favicon is the next independent identity slice.
-  The selected implementation direction is **Morph Core / 异形材质核**: a connected,
-  asymmetric faceted core with a small offset warm centre, stable across all themes and
-  proven at `16/32/64 px`; no PWA surface is added. This is a design direction, not yet
-  an implemented or human-accepted icon.
+- The site's Microsoft-like equal-2x2 favicon still requires replacement, but the first
+  **Morph Core / 异形材质核** draft is rejected because its Apple-size silhouette does
+  not communicate a clear meaning. Its uncommitted SVG/PNG/HTML/test work was removed.
+  Identity moves to the final T37 proposal gate; no PWA surface is added and no
+  replacement is implemented before player selection.
 
 ## Next exact action
 
-Implement only the D2 vector-first Morph Core site identity: correct the superseded 2×2
-contract, generate deterministic SVG/PNG/Apple assets, update the document head and
-direct tests, then collect browser-tab resource and `16/32/64 px` three-background
-evidence before independent QA. Keep D1's player verdict separate and leave mode
-intro/results for D3. Preserve the inherited T27 and `progress.md` paths, continue to
-label the missing Ice uploader-original WAV/hash honestly, and do not reopen any
-accepted Stage-C sound or clear behavior.
+Inventory the current ordinary and Mutation material pipeline, freeze the exact Stage E
+source/test boundary, then implement the complete-piece Ice/Bomb/Multiplier/Supergravity
+materials and their Next/ghost/board/clear/audio agreement in bounded checkpoints. Keep
+D1's player verdict separate, leave mode intro/results for D3, and defer site identity
+until the final proposal gate. Preserve the inherited T27 and `progress.md` paths,
+continue to label the missing Ice uploader-original WAV/hash honestly, and do not reopen
+any accepted Stage-C sound or clear behavior.
 
 ## Do not repeat
 

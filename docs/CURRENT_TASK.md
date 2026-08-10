@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE D2 SITE IDENTITY IMPLEMENTATION OPEN — D1 PLAYER REVIEW OPEN**
+Status: **STAGE E WHOLE-PIECE MATERIAL IMPLEMENTATION OPEN — D1 PLAYER REVIEW OPEN**
 
 ## Active objective
 
@@ -74,12 +74,13 @@ browser-evidence, and independent-QA gates; normal-speed player review remains o
 3. **Complete audio palette — HUMAN ACCEPTED; ORIGINAL-WAV PROVENANCE FOLLOW-UP OPEN** —
    the preceding production candidate and its joined clear/Bomb behavior are accepted;
    retain the Ice uploader-original archive/hash as an honest parallel evidence item.
-4. **Transition and identity system — D1 TECHNICAL ACCEPT; D2 IDENTITY OPEN** — the
+4. **Transition and identity system — D1 TECHNICAL ACCEPT; IDENTITY DEFERRED** — the
    URL-route handoff now has latest-request ownership, Canvas-ready native capture,
    continuous fallback, direction, focus/history continuity, explicit reduced motion,
-   and no duplicate mounts/listeners/canvases. D1 player review remains open while the
-   independent D2 slice replaces the favicon; in-page sheets/results follow later.
-5. **Material system** — ordinary-piece polish and the four whole-piece Mutation
+   and no duplicate mounts/listeners/canvases. D1 player review remains open; in-page
+   sheets/results remain later work, and site identity is deferred to the final proposal
+   gate after its first draft failed semantic clarity.
+5. **Material system — OPEN** — ordinary-piece polish and the four whole-piece Mutation
    materials, including Next/ghost/clear/audio agreement and once-per-piece triggering.
 6. **Puzzle curriculum** — 5/25/16 content, deduplication, solver certificates,
    technique links, unlock migration, and UI pagination.
@@ -377,18 +378,12 @@ browser-evidence, and independent-QA gates; normal-speed player review remains o
   skipped` files; `410 passed / 8 skipped` tests), and the 767-module build pass. Two
   independent read-only reviews report `P0 0 / P1 0 / P2 0 / P3 0`; this opens player
   review but does not claim human motion acceptance.
-- The next identity slice uses the original **Morph Core / 异形材质核** direction: one
-  connected asymmetric faceted core with an offset warm centre, never four equal panes,
-  a cross, a letter mark, or a corporate red/green/blue/yellow quadrant. It must ship as
-  vector-first favicon assets with verified `16/32/64 px` browser-tab readability and
-  no manifest, service worker, or PWA installation surface.
-- **D2 exact boundary:** the contract checkpoint owns this file, `docs/DESIGN.md`, the
-  T37 phase document, and the bounded state. Product work is limited to `index.html`,
-  `public/favicon.svg`, its generated `16×16` / `32×32` PNG fallbacks, the `180×180`
-  Apple touch icon, one reproducible generator, and direct icon/index tests. Evidence is
-  a separate source-bound commit. D2 may not change Home layout, page transitions,
-  themes, Runtime/Renderer/Core/audio/Puzzle behavior, or the protected T27 and
-  `progress.md` paths.
+- The first **Morph Core / 异形材质核** icon draft is rejected before product commit
+  because its Apple-size silhouette has no clear meaning. All draft assets, generator,
+  HTML, and tests are removed. Site identity now belongs to the final T37 proposal gate:
+  show actual tab and Apple-mask candidates to the player first, then implement only the
+  selected direction. The replacement still may not use four equal panes, a cross,
+  letter mark, corporate quadrants, commercial trade dress, or a PWA surface.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
@@ -2124,11 +2119,10 @@ single-Canvas ownership, and the remaining Phase-11 visual work stay unchanged.
 11. **The home wordmark is geometrically centred.** `TetraMorph` is centred on both
     axes of its dark brand panel at every supported viewport; letter overhang and font
     metrics may not be mistaken for container centring.
-12. **The site icon is one transforming material core.** The favicon uses the current
-    asymmetric Morph Core contract: one connected mineral contour, unequal diagonal
-    teal/blue/violet facets, and a small off-centre warm core. It contains no commercial
-    logo, letterform, four detached panes, equal 2×2 grid, or orthogonal cross, and
-    remains crisp at `16/32/64 px` across all three themes.
+12. **The site icon waits for a final proposal gate.** The rejected four-pane mark stays
+    temporarily unchanged while other T37 work proceeds. Any replacement must explain
+    the falling-block/material theme at actual browser-tab and Apple-mask sizes without
+    relying on prose, and must be selected by the player before product implementation.
 13. **Consumed carriers leave no empty-cell frame.** Once any carrier cell is removed
     by a line clear, its material rim, cell outline, and attachment frame disappear
     with the cell. The one-shot activation may use local light or particles, but it may

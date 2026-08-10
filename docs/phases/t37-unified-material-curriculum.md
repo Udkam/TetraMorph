@@ -166,13 +166,12 @@ and no Puzzle content is published without strict deterministic proof.
   waiting for visual completion. Reduced motion is one runtime-owned, no-translation,
   near-instant path. At every sample there is exactly one live route and at most one
   Canvas, with no stale listener/ticker/runtime.
-- **D2 — Morph Core site identity:** replace the rejected equal 2×2 data-URI favicon
-  with one connected, asymmetric faceted mineral core. Use one stable teal/blue/violet
-  palette with a restrained off-centre gold core, derive transparent `16×16` / `32×32`
-  PNG fallbacks and a mask-safe `180×180` Apple icon from the vector source, and keep
-  manifest/service-worker/PWA installation out of scope. Real-size evidence must cover
-  `16/32/64 px` against light, Deep Tide, and Sunstone fields and prove the same browser
-  icon resources remain active after all three theme changes.
+- **D2 — site identity deferred to the final proposal gate:** the first asymmetric
+  Morph Core draft is rejected because its Apple-size reading is semantically unclear.
+  Leave the existing product icon unchanged while Stages E/F proceed. At the final gate,
+  present actual-size browser-tab and Apple-mask candidates before implementation; any
+  selected mark still must avoid four equal quadrants, commercial trade dress, letters,
+  manifest/service-worker work, and a PWA install surface.
 - **D3 — bounded in-page follow-up:** apply Settled Handoff restraint to mode
   intro/results without moving the board. D3 does not reopen the accepted D1 route owner
   or the D2 identity assets.
