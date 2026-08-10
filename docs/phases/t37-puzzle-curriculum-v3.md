@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C TOOL ACCEPTED; ONE BOUNDED CANDIDATE BATCH NEXT**
+Status: **F3C FIRST BATCH CONTAINED; FAIR-RESUME DESIGN NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -413,6 +413,14 @@ reproducing syntax, double-smoke/hash, wrap rejection, mask/route, Core-equivale
 temporary cleanup, and exact-path gates. The accepted tool may now run exactly one
 serial batch over seeds `1..20000` with 10,000,000 attempted landings and a 900 MiB RSS
 guard. `budget-exhausted` does not prove the entire seed range negative.
+
+The authorized batch returns exactly that budget status after 10,000,001 attempted
+landings, 289,828 accepted placements, 289,654 failed states, and 267,472 trie nodes.
+It processes 20,000 seeds but produces no candidate and cannot claim that range is
+exhausted. Its Temp JSON hash is
+`1144E031CCA91E843F903E002FD79D37BA9507CBCC7856AE1A4DAEF7CF38223D`; the file and
+owned process are removed. Before another search, the contract must freeze a
+deterministic same-range fair-shard or resumable traversal and its coverage evidence.
 
 ## Progress v6 and revision-3 migration
 

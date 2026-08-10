@@ -409,6 +409,12 @@ adding unrelated badges or ornamental effects.
   QA accepts its five-path candidate range with P0–P3 all zero. One bounded substantive
   batch may now run; a successful tool result would still be only authoring input for
   the Core-owned replay/route/certificate gate.
+- The accepted first batch over seeds `1..20000` reached its 10,000,000-landing limit
+  without a candidate (`289,828` accepted placements; `289,654` memoized failures;
+  267,472 trie nodes). Because the depth-first trie order does not give every seed equal
+  work before a global budget stop, this is containment evidence, not a negative result.
+  Any continuation must first specify deterministic non-overlapping shards or a compact
+  resumable frontier for the same range; it may not silently skip to new seeds.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

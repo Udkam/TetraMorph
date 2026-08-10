@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TOOL ACCEPTED; ONE BOUNDED CANDIDATE BATCH NEXT**
+Status: **STAGE F3C FIRST BATCH CONTAINED; FAIR-RESUME DESIGN NEXT**
 
 ## Active objective
 
@@ -388,6 +388,15 @@ only; it is not F3 source acceptance.
   gates, independently verifies the 80-cell mask and `1 / 2 / 2 / 2 / 3` route, and
   confirms exact-path/protected-path discipline. The tool checkpoint is accepted; one
   substantive `1..20000` / 10,000,000-landing / 900 MiB batch may now run serially.
+- That single batch processed all 20,000 seed sequences into 267,472 trie nodes, then
+  stopped at the exact landing budget with status `budget-exhausted`: `10,000,001`
+  attempted landings, `289,828` accepted placements, and `289,654` failed states. It
+  produced no setup candidate and did not trigger the RSS guard. The 853-byte Temp JSON
+  had SHA-256 `1144E031CCA91E843F903E002FD79D37BA9507CBCC7856AE1A4DAEF7CF38223D`
+  before exact cleanup; no owned process remains. This result does not exclude seeds
+  `1..20000`. F3C must first freeze a deterministic fair-shard or resumable traversal
+  revision on the same range; jumping to later seeds or merely increasing the budget is
+  not authorized.
 
 ## Current checkpoint state
 

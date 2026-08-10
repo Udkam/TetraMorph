@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3C first candidate batch contained
+
+- The accepted tool runs its single authorized seeds `1..20000` batch with a
+  10,000,000 attempted-landing budget and 900 MiB RSS guard. It stops after 8 seconds
+  with `budget-exhausted`, no setup candidate, 267,472 trie nodes, 10,000,001 attempted
+  landings, 289,828 accepted placements, and 289,654 failed states; the RSS guard does
+  not fire.
+- The 853-byte explicit Temp output hashes to
+  `1144E031CCA91E843F903E002FD79D37BA9507CBCC7856AE1A4DAEF7CF38223D`, then is removed
+  exactly; no owned Node process remains and no repository path changes.
+- A global depth-first budget does not exhaust every seed in the trie. This run is not a
+  range-negative result and does not authorize later seeds or a blind budget increase.
+  F3C now requires a frozen deterministic same-range fair-shard/resume revision before
+  the standalone tool path or another substantive search reopens.
+
 ## 2026-08-10 — T37 Stage F3C prototype tool accepted
 
 - Tool checkpoint `8e86207` adds one 356-line, non-product authoring search for the

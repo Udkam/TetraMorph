@@ -94,11 +94,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     four-anchor board, remapping, preview projection, and four independent public-route
     witnesses without opening production Core source. Independent QA accepts
     `3aa6766..6c3286c` with P0–P3 all zero.
-16. `F3C TOOL ACCEPTED; BOUNDED BATCH NEXT` — standalone tool `8e86207` searches the
+16. `F3C TOOL ACCEPTED` — standalone tool `8e86207` searches the
     fixed five-lock mask deterministically. Independent QA accepts its five-path range
-    with P0–P3 all zero; product data remains closed.
-17. `PENDING` — one bounded candidate batch, F3C fixture/test, later content, migration,
-    UI, final gates, and push.
+    with P0–P3 all zero.
+17. `F3C FIRST BATCH CONTAINED; FAIR RESUME NEXT` — the authorized seed `1..20000`
+    batch reaches 10,000,001 attempted landings with no candidate. Its global DFS budget
+    does not exhaust the range; product data remains closed.
+18. `PENDING` — fair tool revision, candidate, F3C fixture/test, later content,
+    migration, UI, final gates, and push.
 
 ### Stage F3C tooling-discovery status
 
@@ -140,6 +143,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `--seed-start 1 --seed-count 20000 --node-budget 10000000 --max-rss-mib 900` and an
   explicit repository-external Temp output. Stop on candidate, budget, RSS guard, or
   complete not-found. A budget stop is not evidence that every seed was exhausted.
+- Batch result: started from an amber but non-red snapshot (CPU 87.8%, 14.74 GiB free,
+  disk queue 0) with no concurrent heavy worker. The accepted command processes all
+  20,000 seeds into 267,472 trie nodes and returns `budget-exhausted` after 8 seconds at
+  10,000,001 attempted landings, 289,828 accepted placements, and 289,654 failed states.
+  `setup` is null; the RSS guard does not fire. The 853-byte JSON hashes to
+  `1144E031CCA91E843F903E002FD79D37BA9507CBCC7856AE1A4DAEF7CF38223D`, then is
+  removed by exact path; `TempExists=false` and `OwnedNodeCount=0`.
+- Interpretation: the shared depth-first trie and global budget can starve later
+  branches, so this is neither a full negative result nor permission to advance the
+  seed range. Next action is read-only algorithm review, followed by a frozen minimal
+  same-range fair-shard/resume contract before any tool edit or further search.
 
 ### Stage F3B accepted status
 
@@ -557,14 +571,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-After a fresh resource check, run the accepted F3C tool exactly once with seed range
-`1..20000`, 10,000,000 attempted-landings budget, 900 MiB RSS guard, and an explicit
-repository-external Temp output. Record whether it returns candidate, budget, memory,
-or complete not-found. Only a candidate may open the final JSON/test pair, and it must
-then pass current Core setup replay, the fixed public route, exact hashes/signatures,
-and full no-beam shorter-depth proof. Do not open Intro boards, the 46-level module, v6
-migration, mastery groups, Puzzle UI, or App source. Keep deferred identity, protected
-T27/`progress.md`, and the missing Ice archive separate.
+Review the budget-exhausted first batch and freeze the smallest deterministic revision
+that fairly partitions or resumes the same seed `1..20000` search without overlap or
+coverage ambiguity. The contract must define CLI shard/cursor fields, traversal order,
+memo semantics, per-shard budgets, coverage output, candidate tie-breaking, RSS/output
+guards, and byte-identical smoke acceptance before reopening the sole tool path. Do not
+run another substantive search or open the final JSON/test, Intro boards, 46-level
+module, v6 migration, mastery groups, Puzzle UI, or App source. Keep deferred identity,
+protected T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
 
