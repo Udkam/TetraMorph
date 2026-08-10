@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE CONTRACT CANDIDATE; CONTRACT QA NEXT**
+Status: **STAGE F3C SEEDED-REVERSE CONTRACT REPAIR CANDIDATE; REPAIR QA NEXT**
 
 ## Active objective
 
@@ -524,6 +524,16 @@ only; it is not F3 source acceptance.
   `tools/search-puzzle-v3-prototype-reverse.test.mjs`. Forward mode must remain
   unchanged; Core, final F3C fixture/test, published content, migration, UI, T27, and
   `progress.md` remain closed.
+- Exact-range QA rejects contract candidate `155b82a` with
+  `P0 0 / P1 1 / P2 1 / P3 0 / GAP 0`. Equivalence, forbidden masks, state identity,
+  path scope, and test coverage pass; byte-level probe/Merkle/cursor hashing and the
+  candidate/budget/RSS/complete priority state machine are underspecified.
+- The repair freezes schema 3 / cursor schema 1, fixed binary encodings, reverse-trie/
+  catalog/domain/memo/cursor/result hashes, canonical JSON/LF output, exact probe-token
+  outcomes, and zero-probe unwind before budget-before-RSS admission. Candidate and
+  genuine stack completion win at their admitted boundary; no-child/out-of-mask/
+  duplicate descriptors consume no probe, while every descriptor in a frame's filtered
+  canonical list consumes exactly one. Implementation stays closed pending repair QA.
 
 ## Current checkpoint state
 

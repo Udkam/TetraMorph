@@ -497,6 +497,12 @@ adding unrelated badges or ornamental effects.
   node, remaining occupancy, and all seven forbidden masks. No interrupted frame enters
   the failed memo; only real stack exhaustion yields complete-not-found. This contract
   remains a docs candidate until an exact-range QA accepts it.
+- Exact-range QA rejects `155b82a` with one P1 and one P2: the Merkle/token/cursor bytes
+  and the boundary priority between descriptor filtering, probe counting, unwind,
+  budget, RSS, candidate, and completion were not frozen tightly enough. The repair
+  defines fixed integer/mask encodings, hash domain labels, trie/catalog records,
+  canonical JSON, a six-outcome probe token, and a deterministic advance state machine.
+  All other contract dimensions pass; implementation remains closed until repair QA.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

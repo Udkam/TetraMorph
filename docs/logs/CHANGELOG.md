@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded-reverse contract repair candidate
+
+- Exact-range QA rejects `155b82a` with `P0 0 / P1 1 / P2 1 / P3 0 / GAP 0` because
+  probe/Merkle/cursor bytes and probe/STOP priority were not fully specified. Range,
+  equivalence, same-type state, geometric dedupe, test scope, and exclusions pass.
+- The repair freezes schema 3 / cursor 1, binary primitives and mask layout, canonical
+  catalog/trie/domain/state/memo/probe/cursor/result hashes, canonical JSON/LF output,
+  six exact probe outcomes, and filtered-descriptor accounting.
+- Zero-probe unwind precedes deterministic budget-before-RSS admission; candidate and
+  true stack completion win at their admitted boundary. Implementation and search stay
+  closed pending independent repair QA.
+
 ## 2026-08-11 — T37 Stage F3C seeded-reverse contract candidate
 
 - Independent read-only design review accepts freezing seeded reversed-trie hard-drop

@@ -112,9 +112,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     fourth increment and remain budget-incomplete with no candidate or memory stop.
 24. `F3C FIFTH FAIR ROUND COMPLETE; REVERSE REVIEW NEXT` — all 32 shards receive the
     fifth increment; the forward replay/new ratio reaches 4:1 without a candidate.
-25. `F3C SEEDED-REVERSE CONTRACT CANDIDATE; QA NEXT` — independent design review
-    accepts freezing the bounded concept with P0–P3 all zero; implementation stays closed.
-26. `PENDING` — seeded reverse implementation, F3C fixture/test, later content, migration, UI,
+25. `F3C SEEDED-REVERSE CONTRACT REJECTED` — QA reports P1 hash-byte ambiguity and P2
+    probe/STOP ambiguity; all other dimensions pass.
+26. `F3C SEEDED-REVERSE CONTRACT REPAIR CANDIDATE; QA NEXT` — byte protocol and exact
+    advance state machine are frozen; implementation stays closed.
+27. `PENDING` — seeded reverse implementation, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -318,6 +320,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `docs/logs/CHANGELOG.md`. The proposed implementation paths are only the accepted
   forward tool and one new standalone Node test. No tool path is open before exact-range
   contract QA.
+- Exact-range QA rejects `89ae4ad..155b82a` with
+  `P0 0 / P1 1 / P2 1 / P3 0 / GAP 0`. The range is the exact five docs and excludes
+  every protected path. Equivalence, forbidden masks, full memo tuple, geometric dedupe,
+  cursor data, two-path boundary, and tests pass. P1 requires byte-exact probe/Merkle/
+  cursor/trie/memo serialization; P2 requires descriptor-count and STOP priority rules.
+- Repair base is `155b82a`. It freezes schema 3/cursor 1, binary mask/integer/string
+  records, catalog/trie/domain/state/memo/probe/cursor/result hashes, canonical JSON/LF,
+  six probe outcomes, filtered-list accounting, and zero-probe unwind before deterministic
+  budget-before-RSS admission. Empty memo/probe-root vectors are pinned respectively to
+  `1853F77C...FCFC97` (17 bytes) and `C07AA09A...2D0CA` (34 bytes). No implementation path
+  is open until repair QA.
 
 ### Stage F3B accepted status
 
@@ -735,15 +748,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Commit the exact five-path seeded-reverse contract candidate, then run one independent
-read-only QA over base `89ae4ad` through that candidate. QA must validate review
-disposition, forward/reverse equivalence conditions, forbidden-mask sufficiency, full
-state/memo identity, canonical dedupe/order, lossless no-replay cursor, block/Merkle
-probe digest, budget/RSS/STOP precedence, two-path implementation boundary, and all
-protected exclusions. Only an accepted contract may open the tool plus standalone Node
-test implementation. Do not run a sixth forward round or reverse search; keep final F3C
-JSON/test, later content, deferred identity, T27/`progress.md`, and missing Ice archive
-closed.
+Commit the exact five-path contract repair, then run independent read-only repair QA over
+`155b82a..repair` and the full `89ae4ad..repair` contract. QA must reproduce all fixed
+binary/hash vectors and the state-machine priority matrix, recheck cursor structural
+validation, no-replay equivalence, two-path implementation scope, and protected
+exclusions. Only repair acceptance may open the tool plus standalone Node test. Do not
+run a sixth forward round or reverse search; keep final F3C JSON/test, later content,
+deferred identity, T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

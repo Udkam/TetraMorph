@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED-REVERSE CONTRACT CANDIDATE; CONTRACT QA NEXT**
+Status: **F3C SEEDED-REVERSE CONTRACT REPAIR CANDIDATE; REPAIR QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -596,6 +596,11 @@ Independent read-only review accepts freezing this concept with
 not performance, completeness, solvability, or candidate evidence; seeded reverse has
 not been implemented or differentially verified; and lossless resume remains unproven.
 The review opens this docs contract only.
+Exact-range QA then rejects candidate `155b82a` with
+`P0 0 / P1 1 / P2 1 / P3 0 / GAP 0`: probe/Merkle/cursor bytes and the probe/STOP
+priority machine were ambiguous. Range, equivalence, forbidden masks, memo tuple,
+geometric dedupe, two-file boundary, tests, and protected exclusions pass. The
+following byte protocol and state machine are authoritative repairs.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and
@@ -612,7 +617,12 @@ spawn/rotation/x hard-drop simulation on `B'` lands on exactly `P`. Candidate de
 are precomputed inside the fixed mask and ordered by type index, rotation `0..3`, x
 ascending, then absolute y ascending. Descriptors with the same type and cell mask are
 deduplicated, retaining the first descriptor, matching the accepted forward geometric
-landing dedupe. Each evaluated canonical descriptor is one reverse candidate probe.
+landing dedupe. At each frame, only descriptors whose type has a real child at the
+current reversed-trie node form the filtered candidate list; types without a child,
+descriptors outside the fixed mask, and discarded geometric duplicates never enter the
+list and consume no probe. Every descriptor in that filtered list consumes exactly one
+probe when its turn begins, including remaining-board, forbidden, hard-drop, or memo
+rejections.
 An empty-board depth-20 leaf reverses the placements and chooses the minimum seed stored
 at that trie leaf; that result remains an authoring candidate only.
 
@@ -626,22 +636,132 @@ forbidden[L])`. Any failed memo uses the full tuple. A frame is memoized only af
 canonical candidates exhaust; budget, memory, candidate, or other STOP propagation may
 not memoize it.
 
-A reverse cursor is schema/version bound to algorithm, mask, shapes, queue generator,
-full seed domain, shard identity, reverse-trie hash, and candidate ordering. It stores
-cumulative probe count, every DFS frame and next-candidate index, board/forbidden/trie
-state, placement path, and the lossless failed memo. Resume continues from that stack
-without replaying prior probes. Probe identity uses deterministic 1,024-probe blocks:
-completed block hashes feed a binary Merkle accumulator, while at most 1,023 canonical
-partial-block tokens remain in the cursor. The accumulator peaks plus partial tokens
-produce the same probe hash for one-shot and split execution. Cursor state and sorted
-memo keys receive SHA-256 hashes; any identity/hash mismatch fails before search.
+Reverse output uses `schemaVersion: 3`, `algorithmVersion: "seeded-reverse-v1"`, and
+`cursorSchemaVersion: 1`. Reverse JSON uses a recursive canonical serializer: object
+keys sort by unsigned UTF-8 byte order, arrays retain order, all numbers are safe base-10
+integers, strings use ECMAScript `JSON.stringify` escaping, and output is the compact
+canonical JSON followed by one LF with no BOM. Hash labels below are their exact ASCII
+bytes including the shown terminal NUL. SHA-256 JSON fields are uppercase hexadecimal;
+hash composition uses raw 32-byte digests.
+
+Binary primitives are unsigned `u8`, two's-complement `i8`, big-endian `u32be` and
+`u64be`, plus `bytes(s) = u32be(UTF8(s).length) || UTF8(s)`. Board/cell/forbidden masks
+use bit `(absoluteY - TARGET_TOP) * 10 + x` and encode as 13 unsigned big-endian bytes
+with the top four padding bits zero; JSON uses exactly 25 uppercase hexadecimal digits.
+A placement descriptor encodes `(typeIndex:u8, rotation:u8, x:i8, absoluteY:u8,
+cellMask:mask13)`. The catalog hash is SHA-256 of
+`"T37-RCAT-v1\0" || u32be(count) || descriptors` in canonical order. The shape-table
+hash is SHA-256 of `"T37-RSHAPES-v1\0" || u32be(7)` followed in
+`I,O,T,S,Z,J,L` order by `u8(typeIndex) || u32be(4)` and, for rotations `0..3`,
+`u8(rotation) || u32be(cellCount)` plus each shape cell as `(dx:i8,dy:i8)` in source
+array order. The full-queue hash is SHA-256 of
+`"T37-RQUEUE-v1\0" || u32be(seedStart) || u32be(seedCount)` followed for every seed in
+ascending full-domain order by `u32be(seed)` and its 20 type indices as `u8`.
+Reverse-trie node
+IDs follow ascending-seed insertion of reversed queues; its hash input is
+`"T37-RTRIE-v1\0" || u32be(nodeCount)` followed for each ascending node ID by seven
+`u32be` child IDs (`0xFFFFFFFF` for absent), `u32be(seedCount)`, and ascending leaf
+seeds as `u32be`. Domain hash input is `"T37-RDOMAIN-v1\0"`, fixed mask, raw catalog/
+shape-table/full-queue/reverse-trie digests, `u32be` full seed start/count,
+shard count/index/start/end offsets, and length-prefixed algorithm, rule, type-order,
+queue-generator, and candidate-order version strings in that stated order.
+
+The reverse schema-3 output has exactly these top-level fields:
+`schemaVersion`, `algorithmVersion`, `cursorSchemaVersion`, `claim`, `status`, `phase`,
+`domain`, `shard`, `coverage`, `evidence`, `targetRows`, `targetMaskRows`, `setup`,
+`boardRows`, `search`, and `continuation`. Claim is exactly
+`F3C seeded-reverse setup candidate only; Core route replay and exact proof remain mandatory.`
+Domain records the versions and every hash named above; shard records index and exact
+offset/seed bounds; coverage is `(startProbeCount,newProbeCount,nextProbeCount,complete)`;
+evidence is `(probeHash,memoHash,cursorStateHash,resultHash)`; search records invocation
+budget, processed seeds, trie/catalog counts, cumulative probes, and failed-state count.
+Setup is null or the minimum seed plus forward-order `{type,rotation,x}` placements;
+board rows are null or their exact typed reconstruction. Continuation is null except for
+resumable search-phase stops. Candidate exits 0, valid noncandidate statuses exit 2,
+and invalid input/cursor exits 1 without output.
+
+A failed-state key is the fixed binary tuple
+`depth:u8 || reverseTrieNodeId:u32be || remainingBoard:mask13 || seven forbidden:mask13`
+in `I,O,T,S,Z,J,L` order; JSON stores its uppercase hexadecimal bytes. `memoHash` is
+SHA-256 of `"T37-RMEMO-v1\0" || u32be(count)` plus each fixed-length key's raw bytes
+sorted lexicographically unsigned. Cursor memo storage uses that same sorted key list.
+The required empty-memo vector is the 17-byte label/NUL/count input and hashes to
+`1853F77C68198E07DC7A6038F2D055CF0B1C9C9F2C2F9EAD59379CEF07FCFC97`.
+
+A zero-based probe token uses the exact binary fields
+`tokenVersion:u8(1), globalProbeIndex:u64be, depth:u8, trieNodeId:u32be,
+remainingBoard:mask13, seven forbidden:mask13, candidateIndex:u32be, typeIndex:u8,
+rotation:u8, x:i8, absoluteY:u8, cellMask:mask13, outcome:u8`. Outcome is 0
+`cells-not-remaining`, 1 `same-type-forbidden`, 2 `hard-drop-mismatch`, 3
+`child-memo-hit`, 4 `child-pushed`, or 5 `candidate-leaf`. The token is appended only
+after the descriptor's complete outcome is known, then the global and invocation probe
+counts increment by one.
+
+Probe blocks contain exactly 1,024 consecutive tokens. Block `k` hashes
+`"T37-RPBLOCK-v1\0" || u64be(k) || u32be(1024) || token[0] ... token[1023]`.
+Its Merkle leaf is SHA-256 of `"T37-RPLEAF-v1\0" || u64be(k) || blockHash`. Appending a
+leaf uses binary-carry peaks from level 0 upward; merging existing left and new right
+children at level `L` hashes `"T37-RPNODE-v1\0" || u32be(L) || left || right` and
+stores the parent at `L+1`. Cursor peaks are an array from level 0 through the highest
+present level, each `null` or uppercase hash. The partial block stores 0–1,023 complete
+tokens as uppercase hex. `probeHash` is SHA-256 of
+`"T37-RPROOT-v1\0" || u64be(totalProbeCount) || u32be(1024) || u32be(peaks.length)`,
+then for each peak `u8(0)` or `u8(1)||rawHash`, then `u32be(partialCount)` and the raw
+partial tokens. The empty stream therefore has count 0, peaks length 0, and partial
+count 0. Cursor validation requires the peak presence bits to encode exactly
+`floor(totalProbeCount / 1024)` leaves and partial count to equal the remainder.
+The required empty-probe-root vector is the 34-byte label/NUL/count/block-size/empty-
+peaks/empty-partial input and hashes to
+`C07AA09A429443F5FC5F930F033012D8EECE50DB060894EBA7324C211002D0CA`.
+
+A reverse cursor is schema/domain bound and stores cumulative probe count, peaks,
+partial tokens, the placement path, the sorted failed memo, and every DFS frame from
+root to top. A frame stores depth, trie node, remaining mask, seven forbidden masks,
+the next filtered-candidate index, and its entering descriptor (null at root). Resume
+recomputes each candidate list and validates index bounds, every parent/child board,
+forbidden/trie transition, path/frame agreement, memo keys, peak counts, and all domain
+hashes before search. `cursorStateHash` is SHA-256 of
+`"T37-RCURSOR-v1\0" || UTF8(canonicalJson(continuationWithoutCursorStateHash))`.
+Continuation has exactly `cursorSchemaVersion`, `domainHash`, `shardIndex`,
+`nextProbeCount`, `probeBlockSize`, `peaks`, `partialProbeTokens`, `placements`,
+`failedMemoKeys`, `frames`, and `cursorStateHash`; `probeBlockSize` is 1,024 and memo
+keys are already sorted. Only search-phase paused-budget or memory-guard output may be
+resumed, and resume/output paths must differ.
+`resultHash` similarly hashes `"T37-RRESULT-v1\0"` plus canonical JSON containing only
+domain hash, status, phase, cumulative probe count, complete flag, probe/memo/cursor
+hashes, and setup; it excludes invocation start/new counts and file paths so one-shot
+and resumed execution at the same state match. Any mismatch fails before a probe.
 
 `--node-budget` counts new reverse candidate probes only; time is never a correctness
-budget. Budget and RSS checks occur before the next candidate. A candidate discovered by
-the last admitted probe wins over a budget stop. Statuses are `candidate`,
-`complete-not-found`, `paused-budget`, and `memory-guard`; invalid arguments/cursors fail
-before output. Paused-budget and in-search memory guard carry a resumable cursor and make
-no completion claim. Only genuine stack exhaustion yields complete-not-found. The first
+budget. After cursor/domain validation and complete trie construction, each search
+advance follows this exact state machine:
+
+1. Perform zero-probe unwind first. Exhausted top frames enter the failed memo and pop;
+   repeat until a frame has a next descriptor or the root pops. Root exhaustion returns
+   `complete-not-found`, even when the invocation budget is also exhausted.
+2. If invocation new probes equal `--node-budget`, return `paused-budget`. Therefore
+   budget wins over a simultaneous RSS observation.
+3. Before the first new probe of every invocation, and thereafter before a next probe
+   whose global index is divisible by 1,024, check RSS. If it exceeds the guard, return
+   in-search `memory-guard`. No probe is consumed.
+4. Increment the frame's next index, evaluate that descriptor, append its completed
+   outcome token, increment counts, and update block/Merkle state. A legal child already
+   in the failed memo records outcome 3 and is not pushed; otherwise a nonleaf records
+   outcome 4 and pushes the exact child frame.
+5. A legal empty-board depth-20 trie leaf records outcome 5 and returns `candidate`
+   immediately after the admitted probe. It wins over budget or RSS at that boundary.
+   Otherwise loop to step 1, so zero-probe natural exhaustion after the final admitted
+   probe also wins over a budget stop.
+
+Trie construction checks RSS before each 1,024-seed group and once after completion.
+A trie-build guard returns `memory-guard` with phase `trie-build`, zero probes, and no
+continuation. In-search `paused-budget` and `memory-guard` carry the complete cursor and
+make no completion claim. Interrupted frames never enter the failed memo. Invalid args,
+resume status, schema, identity, hash, or structural transitions fail before output.
+Statuses remain `candidate`, `complete-not-found`, `paused-budget`, and `memory-guard`;
+phase is `trie-build` or `search`. Reverse files use the canonical JSON/LF serializer;
+identical invocations are byte-identical, while one-shot/split equivalence compares the
+same cumulative probe/memo/cursor/result hashes. The first
 accepted reverse search round, not yet open, is 32 serial shards with 1,000,000 new
 probes per shard and 900 MiB RSS; every incomplete shard receives one increment before
 another does.
@@ -655,7 +775,10 @@ adjacency; duplicate rotations; reversed queue equality and exact shard union; d
 keys for identical board/trie with different forbidden masks; one-shot N probes versus
 lossless N1+resume+N2 equality with zero prefix replay; STOP/memo cleanliness; cursor
 tamper/version/mask/trie/shard failures; deterministic byte repeats; injected and live
-RSS containment; and forward `replayPuzzleSetup` reconstruction of every test candidate.
+RSS containment; exact empty/partial/full-block and multi-peak digest vectors; all six
+probe outcomes; no-child/out-of-mask/duplicate non-probes; simultaneous budget/RSS,
+candidate/budget, candidate/RSS, complete/budget, and complete/RSS priority; and forward
+`replayPuzzleSetup` reconstruction of every test candidate.
 Core, the final F3C JSON/test, published content, and later stages remain closed.
 
 ## Progress v6 and revision-3 migration
