@@ -35,8 +35,11 @@ import {
   CELL_STYLE,
   COLORS,
   MUTATION_MATERIALS,
+  MUTATION_MATERIAL_STRENGTH,
   PIECE_MATERIALS,
   SURVIVAL_STONE_MATERIAL,
+  type MutationMaterial,
+  type MutationMaterialRole,
   type PieceMaterial,
 } from './theme';
 import {
@@ -1097,6 +1100,11 @@ export class TetrisRenderer {
     this.syncActiveSpawnEntry(state);
     let visibleLockedCells = 0;
     const lockedByMaterial = new Map<BoardMaterial, Cell[]>();
+    const mutationLockedCellKeys = state.mode === 'sprint'
+      ? new Set(state.mutationCarriers.flatMap((carrier) => (
+          carrier.cells.map((cell) => `${cell.x},${cell.y}`)
+        )))
+      : new Set<string>();
     const transitioningLockedCells: Array<{
       cell: Cell;
       material: BoardMaterial;
@@ -1150,6 +1158,9 @@ export class TetrisRenderer {
           && visibleY < firstVisibleBedrockY
         ) return;
         visibleLockedCells += 1;
+        // Mutation bodies are drawn once from their piece-level identity below. Keeping
+        // them out of ordinary groups prevents seven-bag colour from leaking underneath.
+        if (mutationLockedCellKeys.has(`${x},${boardY}`)) return;
         if (
           clearSample?.active
           && (clearSample.alpha < 0.999 || Math.abs(clearSample.scale - 1) > 0.001)
@@ -1238,19 +1249,35 @@ export class TetrisRenderer {
     const ghostOffsetX = this.presentation && drawableActive
       ? (this.presentation.x - drawableActive.x) * layout.cell
       : 0;
+    const activeMutationItem = state.mode === 'sprint'
+      ? state.mutationActiveCarrier?.item ?? null
+      : null;
     const spawnEntryPending = this.activeSpawnEntry?.generationKey === this.activeSpawnGenerationKey
       && this.activeSpawnEntry.pending;
     const hasVisibleSpawnSlice = activeCells.some((cell) => (
       cell.y >= VISIBLE_START_ROW && cell.y < VISIBLE_START_ROW + VISIBLE_HEIGHT
     ));
     if (drawableActive && (!spawnEntryPending || hasVisibleSpawnSlice)) {
-      this.drawCellGroups(graphics, visibleGhostCells, drawableActive.type, 0.82, {
+      const ghostOptions: GroupDrawOptions = {
         originX: layout.x,
         originY: layout.y,
         unit: layout.cell,
         offsetX: ghostOffsetX,
         ghost: true,
-      });
+      };
+      if (activeMutationItem) {
+        this.drawMutationPieceMaterial(
+          graphics,
+          visibleGhostCells,
+          drawableActive.type,
+          activeMutationItem,
+          0.82,
+          'ghost',
+          ghostOptions,
+        );
+      } else {
+        this.drawCellGroups(graphics, visibleGhostCells, drawableActive.type, 0.82, ghostOptions);
+      }
     }
 
     const offsetX = this.presentation && drawableActive && !this.options.reducedMotion
@@ -1289,26 +1316,32 @@ export class TetrisRenderer {
           offsetY,
         );
       }
-      this.drawCellGroups(
+      const activeOptions: GroupDrawOptions = {
+        originX: layout.x,
+        originY: layout.y,
+        unit: layout.cell,
+        offsetX,
+        offsetY,
+        active: true,
+        scale: rotationScale,
+      };
+      if (activeMutationItem) {
+        this.drawMutationPieceMaterial(
+          graphics,
+          visibleActiveCells,
+          drawableActive.type,
+          activeMutationItem,
+          1,
+          'active',
+          activeOptions,
+        );
+      } else {
+        this.drawCellGroups(graphics, visibleActiveCells, drawableActive.type, 1, activeOptions);
+      }
+      this.drawMutationMaterialArrivalPulse(
         graphics,
         visibleActiveCells,
-        drawableActive.type,
-        1,
-        {
-          originX: layout.x,
-          originY: layout.y,
-          unit: layout.cell,
-          offsetX,
-          offsetY,
-          active: true,
-          scale: rotationScale,
-        },
-      );
-      this.drawActiveMutationCarrierMaterial(graphics, state, visibleActiveCells, layout, offsetX, offsetY);
-      this.drawMutationCarrierEdgePulse(
-        graphics,
-        visibleActiveCells,
-        state.mutationActiveCarrier?.item ?? null,
+        activeMutationItem,
         layout,
         offsetX,
         offsetY,
@@ -1357,7 +1390,7 @@ export class TetrisRenderer {
     }
   }
 
-  private mutationMaterial(item: MutationItem): PieceMaterial {
+  private mutationMaterial(item: MutationItem): MutationMaterial {
     return MUTATION_MATERIALS[item];
   }
 
@@ -1380,10 +1413,17 @@ export class TetrisRenderer {
   ): void {
     if (state.mode !== 'sprint') return;
     for (const carrier of state.mutationCarriers) {
-      const stableCells: Cell[] = [];
-      const transitioningCells: Array<{ cell: Cell; alpha: number }> = [];
+      const stableByMaterial = new Map<BoardMaterial, Cell[]>();
+      const transitioningCells: Array<{
+        cell: Cell;
+        material: BoardMaterial;
+        alpha: number;
+        scale: number;
+      }> = [];
       for (const cell of carrier.cells) {
         if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
+        const boardMaterial = state.board[cell.y]?.[cell.x];
+        if (!boardMaterial) continue;
         const sample = this.ordinaryMultiLineClearSampleForState(
           state,
           cell.x,
@@ -1392,179 +1432,201 @@ export class TetrisRenderer {
         );
         if (sample?.complete) continue;
         const visibleCell = { x: cell.x, y: cell.y - VISIBLE_START_ROW };
-        if (sample?.active && sample.alpha < 0.999) {
-          transitioningCells.push({ cell: visibleCell, alpha: sample.alpha });
+        if (sample?.active) {
+          transitioningCells.push({
+            cell: visibleCell,
+            material: boardMaterial,
+            alpha: sample.alpha,
+            scale: sample.scale,
+          });
         } else {
+          const stableCells = stableByMaterial.get(boardMaterial) ?? [];
           stableCells.push(visibleCell);
+          stableByMaterial.set(boardMaterial, stableCells);
         }
       }
-      if (stableCells.length > 0) {
-        this.drawMutationCarrierSurface(graphics, stableCells, carrier.item, layout, 0, offsetY);
-        this.drawMutationCarrierCore(graphics, stableCells, carrier.item, layout, 0, offsetY);
+      for (const [material, stableCells] of stableByMaterial) {
+        this.drawMutationPieceMaterial(
+          graphics,
+          stableCells,
+          material,
+          carrier.item,
+          1,
+          'settled',
+          {
+            originX: layout.x,
+            originY: layout.y,
+            unit: layout.cell,
+            offsetY,
+          },
+        );
       }
       for (const transition of transitioningCells) {
-        this.drawMutationCarrierSurface(
+        this.drawMutationPieceMaterial(
           graphics,
           [transition.cell],
+          transition.material,
           carrier.item,
-          layout,
-          0,
-          offsetY,
           transition.alpha,
-        );
-        this.drawMutationCarrierCore(
-          graphics,
-          [transition.cell],
-          carrier.item,
-          layout,
-          0,
-          offsetY,
-          1,
-          transition.alpha,
+          'clear',
+          {
+            originX: layout.x,
+            originY: layout.y,
+            unit: layout.cell,
+            offsetY,
+            scale: transition.scale,
+          },
         );
       }
     }
   }
 
-  private drawActiveMutationCarrierMaterial(
-    graphics: Graphics,
-    state: GameState,
-    cells: readonly Cell[],
-    layout: BoardLayout,
-    offsetX: number,
-    offsetY: number,
-  ): void {
-    if (state.mode !== 'sprint' || !state.active || !state.mutationActiveCarrier) return;
-    this.drawMutationCarrierSurface(graphics, cells, state.mutationActiveCarrier.item, layout, offsetX, offsetY);
-    this.drawMutationCarrierCore(graphics, cells, state.mutationActiveCarrier.item, layout, offsetX, offsetY);
-  }
-
-  /** Fine item material marks every cell without replacing the tetromino body. */
-  private drawMutationCarrierSurface(
+  /** Draws one complete item material; ordinary seven-bag colour is never underneath. */
+  private drawMutationPieceMaterial(
     graphics: Graphics,
     cells: readonly Cell[],
+    type: BoardMaterial,
     item: MutationItem,
-    layout: BoardLayout,
-    offsetX = 0,
-    offsetY = 0,
-    intensity = 1,
+    alpha: number,
+    role: MutationMaterialRole,
+    options: GroupDrawOptions,
   ): void {
-    if (intensity <= 0) return;
-    const token = MUTATION_VFX_TOKENS[item];
-    const pulse = this.options.reducedMotion ? 1 : .72 + Math.sin(this.mutationClockMs / token.animation.pulseMs * Math.PI * 2) * .16;
-    const inset = Math.max(1, layout.cell * .22);
-    const mark = Math.max(1.5, layout.cell * .11);
-    for (const cell of cells) {
-      const x = layout.x + cell.x * layout.cell + offsetX;
-      const y = layout.y + cell.y * layout.cell + offsetY;
-      const centerX = x + layout.cell / 2;
-      const centerY = y + layout.cell / 2;
-      if (item === 'freeze') {
-        graphics
-          .moveTo(x + inset, y + inset)
-          .lineTo(x + layout.cell - inset, y + inset)
-          .lineTo(x + layout.cell - inset * 1.7, y + layout.cell - inset * 1.5)
-          .lineTo(x + inset * 1.5, y + layout.cell - inset * .8)
-          .lineTo(x + inset, y + inset)
-          .fill({ color: token.palette.highlight, alpha: .16 * pulse * intensity });
-        this.strokeSegments(graphics, [
-          [x + inset, y + inset, x + layout.cell - inset * 1.35, y + layout.cell - inset * 1.35],
-          [x + layout.cell - inset, y + inset * 1.4, x + inset * 1.4, y + layout.cell - inset],
-        ], token.palette.highlight, .36 * pulse * intensity, Math.max(1, mark * .36));
-      } else if (item === 'collapse') {
-        graphics
-          .roundRect(centerX - mark * .36, y + inset, mark * .72, layout.cell - inset * 2, mark * .32)
-          .fill({ color: token.palette.deep, alpha: .38 * intensity })
-          .roundRect(centerX - mark * .16, y + inset * 1.45, mark * .32, layout.cell - inset * 3, mark * .16)
-          .fill({ color: token.palette.highlight, alpha: .46 * pulse * intensity });
-      } else if (item === 'bomb') {
-        graphics
-          .circle(centerX, centerY, mark * .78)
-          .fill({ color: token.palette.deep, alpha: .5 * intensity })
-          .circle(centerX - mark * .18, centerY - mark * .18, mark * .26)
-          .fill({ color: token.palette.highlight, alpha: .78 * pulse * intensity });
-      } else {
-        this.drawMutationDiamond(graphics, centerX, centerY, mark * .8, mark * .8, token.palette.highlight, .5 * pulse * intensity);
-        this.strokeSegments(graphics, [
-          [centerX - mark * 1.15, centerY, centerX + mark * 1.15, centerY],
-          [centerX, centerY - mark * 1.15, centerX, centerY + mark * 1.15],
-        ], token.palette.primary, .46 * pulse * intensity, Math.max(1, mark * .32));
-      }
-    }
-  }
-
-  /**
-   * One connected core and an item-specific rim bind the four marked cells to one
-   * identity. The core never implies that only its nearest cell can activate.
-   */
-  private drawMutationCarrierCore(
-    graphics: Graphics,
-    cells: readonly Cell[],
-    item: MutationItem,
-    layout: BoardLayout,
-    offsetX = 0,
-    offsetY = 0,
-    detailScale = 1,
-    intensity = 1,
-  ): void {
-    if (cells.length === 0 || intensity <= 0) return;
+    if (cells.length === 0 || alpha <= 0) return;
     const material = this.mutationMaterial(item);
+    this.drawCellGroups(graphics, cells, type, alpha, { ...options, material });
+    this.drawMutationMaterialDetails(graphics, cells, item, alpha, role, options);
+  }
+
+  /** Triangular facets and sparse motifs describe material, never a trigger location. */
+  private drawMutationMaterialDetails(
+    graphics: Graphics,
+    cells: readonly Cell[],
+    item: MutationItem,
+    alpha: number,
+    role: MutationMaterialRole,
+    options: GroupDrawOptions,
+  ): void {
+    if (cells.length === 0 || alpha <= 0) return;
+    const material = this.mutationMaterial(item);
+    const strength = MUTATION_MATERIAL_STRENGTH[role];
+    const token = MUTATION_VFX_TOKENS[item];
+    const pulse = role === 'active' && !this.options.reducedMotion
+      ? .96 + Math.sin(this.mutationClockMs / token.animation.pulseMs * Math.PI * 2) * .04
+      : 1;
+    const scale = options.scale ?? 1;
+    const offsetX = options.offsetX ?? 0;
+    const offsetY = options.offsetY ?? 0;
     for (const component of orthogonalCellComponents(cells)) {
       const minX = Math.min(...component.map((cell) => cell.x));
       const maxX = Math.max(...component.map((cell) => cell.x));
       const minY = Math.min(...component.map((cell) => cell.y));
       const maxY = Math.max(...component.map((cell) => cell.y));
-      const centerX = layout.x + ((minX + maxX + 1) * layout.cell) / 2 + offsetX;
-      const centerY = layout.y + ((minY + maxY + 1) * layout.cell) / 2 + offsetY;
-      const freezeBreath = item === 'freeze' && !this.options.reducedMotion
-        ? 1 + .04 * (.5 - .5 * Math.cos(this.mutationClockMs / MUTATION_VFX_TOKENS.freeze.animation.pulseMs * Math.PI * 2))
-        : 1;
-      const radius = Math.max(2, layout.cell * .19 * detailScale) * freezeBreath;
-      if (item === 'freeze') {
-        this.drawMutationDiamond(graphics, centerX, centerY, radius * 1.18, radius * 1.54, material.edge, .92 * intensity);
-        this.drawMutationDiamond(graphics, centerX, centerY, radius * .7, radius, material.innerEdge, .94 * intensity);
-        this.strokeSegments(graphics, [
-          [centerX - radius * 1.48, centerY, centerX + radius * 1.48, centerY],
-          [centerX, centerY - radius * 1.36, centerX, centerY + radius * 1.36],
-        ], material.fillStart, .9 * intensity, Math.max(1, radius * .28));
-      } else if (item === 'collapse') {
-        const weightWidth = radius * 2.65;
-        const weightHeight = radius * .62;
-        graphics
-          .roundRect(centerX - weightWidth / 2, centerY - radius * 1.2, weightWidth, weightHeight, radius * .22)
-          .fill({ color: material.edge, alpha: .94 * intensity })
-          .roundRect(centerX - weightWidth * .38, centerY - radius * .5, weightWidth * .76, weightHeight, radius * .22)
-          .fill({ color: material.fillStart, alpha: .92 * intensity })
-          .circle(centerX, centerY + radius * .7, radius * .54)
-          .fill({ color: material.edge, alpha: .96 * intensity })
-          .circle(centerX, centerY + radius * .7, radius * .26)
-          .fill({ color: material.innerEdge, alpha: .9 * intensity });
-        this.strokeSegments(graphics, [
-          [centerX - radius * 1.3, centerY + radius * 1.36, centerX - radius * .78, centerY + radius * 2.02],
-          [centerX, centerY + radius * 1.36, centerX, centerY + radius * 2.25],
-          [centerX + radius * 1.3, centerY + radius * 1.36, centerX + radius * .78, centerY + radius * 2.02],
-        ], material.innerEdge, .82 * intensity, Math.max(1, radius * .2));
-      } else if (item === 'bomb') {
-        graphics
-          .circle(centerX, centerY, radius * 1.28)
-          .fill({ color: material.edge, alpha: .96 * intensity })
-          .circle(centerX, centerY, radius * .89)
-          .fill({ color: material.fillEnd, alpha: .98 * intensity })
-          .circle(centerX, centerY, radius * .48)
-          .fill({ color: material.fillStart, alpha: .96 * intensity })
-          .circle(centerX - radius * .18, centerY - radius * .24, radius * .16)
-          .fill({ color: material.innerEdge, alpha: .94 * intensity });
-        this.strokeSegments(graphics, [
-          [centerX, centerY - radius * 1.78, centerX + radius * .56, centerY - radius * 1.24],
-          [centerX + radius * 1.46, centerY - radius * .4, centerX + radius * 1.92, centerY - radius * .66],
-          [centerX - radius * 1.48, centerY + radius * .78, centerX - radius * 1.92, centerY + radius * 1.16],
-        ], material.innerEdge, .92 * intensity, Math.max(1, radius * .22));
-      } else {
-        graphics.circle(centerX, centerY, radius * 1.35).fill({ color: material.edge, alpha: .76 * intensity });
-        this.drawMutationStar(graphics, centerX, centerY, radius * 1.25, radius * .52, material.innerEdge, .97 * intensity);
-        this.drawMutationStar(graphics, centerX, centerY, radius * .66, radius * .25, material.fillStart, .98 * intensity);
+      const componentCenterX = options.originX + ((minX + maxX + 1) * options.unit) / 2;
+      const componentCenterY = options.originY + ((minY + maxY + 1) * options.unit) / 2;
+      const entries = component.map((cell) => {
+        const baseX = options.originX + cell.x * options.unit;
+        const baseY = options.originY + cell.y * options.unit;
+        const x = componentCenterX + (baseX - componentCenterX) * scale + offsetX;
+        const y = componentCenterY + (baseY - componentCenterY) * scale + offsetY;
+        const size = options.unit * scale;
+        return { cell, x, y, size, centerX: x + size / 2, centerY: y + size / 2 };
+      });
+
+      if (role !== 'ghost' && strength.facet > 0) {
+        for (const entry of entries) {
+          const inset = Math.max(1, entry.size * .13);
+          const left = entry.x + inset;
+          const top = entry.y + inset;
+          const right = entry.x + entry.size - inset;
+          const bottom = entry.y + entry.size - inset;
+          const nodeX = entry.x + entry.size * .54;
+          const nodeY = entry.y + entry.size * .46;
+          graphics
+            .moveTo(left, top)
+            .lineTo(right, top)
+            .lineTo(nodeX, nodeY)
+            .lineTo(left, top)
+            .fill({ color: material.innerEdge, alpha: alpha * strength.facet * .46 * pulse })
+            .moveTo(right, bottom)
+            .lineTo(left, bottom)
+            .lineTo(nodeX, nodeY)
+            .lineTo(right, bottom)
+            .fill({ color: material.edge, alpha: alpha * strength.facet * .36 });
+          this.strokeSegments(graphics, [
+            [left, top, nodeX, nodeY],
+            [nodeX, nodeY, right, bottom],
+          ], material.facet, alpha * strength.facet * .78, Math.max(.8, entry.size * .026));
+        }
       }
-      this.drawMutationCarrierRim(graphics, component, item, layout, offsetX, offsetY, .64 * intensity);
+
+      const motifEntries = entries.length <= 2
+        ? entries
+        : [entries[0]!, entries[Math.floor((entries.length - 1) / 2)]!, entries.at(-1)!]
+          .filter((entry, index, list) => list.indexOf(entry) === index);
+      const motifAlpha = alpha * strength.motif * pulse;
+      const motifStroke = Math.max(1, options.unit * scale * .042);
+      if (item === 'freeze') {
+        for (const entry of motifEntries.slice(0, role === 'ghost' ? 1 : 3)) {
+          const reach = entry.size * .27;
+          this.strokeSegments(graphics, [
+            [entry.centerX - reach, entry.centerY - reach * .72, entry.centerX + reach * .12, entry.centerY + reach * .05],
+            [entry.centerX + reach * .12, entry.centerY + reach * .05, entry.centerX + reach, entry.centerY + reach * .62],
+            [entry.centerX + reach * .08, entry.centerY, entry.centerX + reach * .54, entry.centerY - reach * .52],
+          ], material.glow, motifAlpha * .72, motifStroke);
+        }
+      } else if (item === 'bomb') {
+        for (const entry of motifEntries.slice(0, role === 'ghost' ? 1 : 3)) {
+          const reach = entry.size * .3;
+          this.strokeSegments(graphics, [
+            [entry.centerX - reach, entry.centerY - reach * .7, entry.centerX - reach * .04, entry.centerY],
+            [entry.centerX - reach * .04, entry.centerY, entry.centerX + reach, entry.centerY + reach * .64],
+            [entry.centerX - reach * .04, entry.centerY, entry.centerX + reach * .5, entry.centerY - reach * .66],
+          ], material.glow, motifAlpha * .88, motifStroke * 1.08);
+        }
+      } else if (item === 'multiplier') {
+        const [primary, secondary] = motifEntries;
+        if (primary) {
+          this.drawMutationStar(
+            graphics,
+            primary.centerX,
+            primary.centerY,
+            primary.size * .16,
+            primary.size * .055,
+            material.glow,
+            motifAlpha * .9,
+          );
+        }
+        if (secondary && secondary !== primary && role !== 'ghost') {
+          this.drawMutationStar(
+            graphics,
+            secondary.centerX + secondary.size * .08,
+            secondary.centerY - secondary.size * .1,
+            secondary.size * .09,
+            secondary.size * .028,
+            material.innerEdge,
+            motifAlpha * .72,
+          );
+        }
+      } else {
+        for (const entry of motifEntries.slice(0, 2)) {
+          const radius = Math.max(1.4, entry.size * (role === 'ghost' ? .1 : .13));
+          graphics
+            .circle(entry.centerX, entry.centerY, radius)
+            .fill({ color: material.edge, alpha: motifAlpha * .74 })
+            .circle(entry.centerX, entry.centerY, radius * .48)
+            .fill({ color: material.fillEnd, alpha: motifAlpha * .84 })
+            .circle(entry.centerX - radius * .18, entry.centerY - radius * .22, radius * .16)
+            .fill({ color: material.glow, alpha: motifAlpha * .56 });
+        }
+      }
+
+      this.drawMutationMaterialRim(
+        graphics,
+        component,
+        item,
+        options,
+        alpha * strength.rim * pulse,
+      );
     }
   }
 
@@ -1607,22 +1669,29 @@ export class TetrisRenderer {
     graphics.fill({ color, alpha });
   }
 
-  private drawMutationCarrierRim(
+  private drawMutationMaterialRim(
     graphics: Graphics,
     cells: readonly Cell[],
     item: MutationItem,
-    layout: BoardLayout,
-    offsetX = 0,
-    offsetY = 0,
+    options: GroupDrawOptions,
     alpha = 1,
-    width = Math.max(1, layout.cell * 0.056),
+    width = Math.max(1, options.unit * 0.056),
   ): void {
     if (cells.length === 0 || alpha <= 0) return;
-    const inset = Math.max(1, layout.cell * .12);
+    const scale = options.scale ?? 1;
+    const offsetX = options.offsetX ?? 0;
+    const offsetY = options.offsetY ?? 0;
+    const minX = Math.min(...cells.map((cell) => cell.x));
+    const maxX = Math.max(...cells.map((cell) => cell.x));
+    const minY = Math.min(...cells.map((cell) => cell.y));
+    const maxY = Math.max(...cells.map((cell) => cell.y));
+    const componentCenterX = options.originX + ((minX + maxX + 1) * options.unit) / 2;
+    const componentCenterY = options.originY + ((minY + maxY + 1) * options.unit) / 2;
+    const size = options.unit * scale;
+    const inset = Math.max(1, size * .12);
     const material = this.mutationMaterial(item);
     const segments: Array<readonly [number, number, number, number]> = [];
     const accents: Array<readonly [number, number, number, number]> = [];
-    const marks: Array<readonly [number, number]> = [];
     const pushBroken = (x1: number, y1: number, x2: number, y2: number): void => {
       const dx = x2 - x1;
       const dy = y2 - y1;
@@ -1632,10 +1701,12 @@ export class TetrisRenderer {
       );
     };
     for (const { cell, exposed } of exposedCellEdges(cells)) {
-      const x = layout.x + cell.x * layout.cell + offsetX;
-      const y = layout.y + cell.y * layout.cell + offsetY;
-      const right = x + layout.cell;
-      const bottom = y + layout.cell;
+      const baseX = options.originX + cell.x * options.unit;
+      const baseY = options.originY + cell.y * options.unit;
+      const x = componentCenterX + (baseX - componentCenterX) * scale + offsetX;
+      const y = componentCenterY + (baseY - componentCenterY) * scale + offsetY;
+      const right = x + size;
+      const bottom = y + size;
       const top: readonly [number, number, number, number] = [x + inset, y + inset, right - inset, y + inset];
       const rightEdge: readonly [number, number, number, number] = [right - inset, y + inset, right - inset, bottom - inset];
       const bottomEdge: readonly [number, number, number, number] = [right - inset, bottom - inset, x + inset, bottom - inset];
@@ -1657,54 +1728,29 @@ export class TetrisRenderer {
         if (exposed.bottom) segments.push(bottomEdge);
         if (exposed.left) segments.push(left);
       }
-      if (item === 'collapse' && exposed.bottom) {
-        const centerX = x + layout.cell / 2;
+      if (item === 'collapse' && exposed.bottom && accents.length < 3) {
+        const centerX = x + size / 2;
         const baseline = bottom - inset * .72;
         accents.push(
           [x + inset * 1.25, baseline, right - inset * 1.25, baseline],
-          [centerX - layout.cell * .18, baseline + inset * .22, centerX, baseline + inset * .72],
-          [centerX, baseline + inset * .72, centerX + layout.cell * .18, baseline + inset * .22],
+          [centerX - size * .18, baseline + inset * .22, centerX, baseline + inset * .72],
+          [centerX, baseline + inset * .72, centerX + size * .18, baseline + inset * .22],
         );
-      } else if (item === 'bomb') {
-        if (exposed.top) marks.push([x + layout.cell / 2, y + inset]);
-        if (exposed.right) marks.push([right - inset, y + layout.cell / 2]);
-        if (exposed.bottom) marks.push([x + layout.cell / 2, bottom - inset]);
-        if (exposed.left) marks.push([x + inset, y + layout.cell / 2]);
-      } else if (item === 'multiplier') {
-        if (exposed.top) marks.push([x + layout.cell / 2, y + inset]);
-        if (exposed.bottom) marks.push([x + layout.cell / 2, bottom - inset]);
-        if (exposed.left && exposed.top) marks.push([x + inset, y + inset]);
-        if (exposed.right && exposed.bottom) marks.push([right - inset, bottom - inset]);
       }
     }
     this.strokeSegments(
       graphics,
       segments,
-      item === 'collapse' ? material.edge : material.fillStart,
+      item === 'bomb' ? material.glow : item === 'collapse' ? material.fillStart : material.innerEdge,
       alpha,
       item === 'collapse' ? width * 1.18 : width,
     );
     if (accents.length > 0) {
       this.strokeSegments(graphics, accents, material.innerEdge, Math.min(1, alpha * 1.08), Math.max(1, width * .78));
     }
-    if (item === 'bomb') {
-      const radius = Math.max(1.1, layout.cell * .035);
-      for (const [x, y] of marks) {
-        graphics
-          .circle(x, y, radius * 1.55)
-          .fill({ color: material.edge, alpha: alpha * .82 })
-          .circle(x, y, radius)
-          .fill({ color: material.innerEdge, alpha });
-      }
-    } else if (item === 'multiplier') {
-      const radius = Math.max(1.8, layout.cell * .075);
-      for (const [x, y] of marks) {
-        this.drawMutationDiamond(graphics, x, y, radius, radius, material.innerEdge, alpha * .9);
-      }
-    }
   }
 
-  private drawMutationCarrierEdgePulse(
+  private drawMutationMaterialArrivalPulse(
     graphics: Graphics,
     cells: readonly Cell[],
     item: MutationItem | null,
@@ -1715,13 +1761,17 @@ export class TetrisRenderer {
     if (!item || !this.mutationArrival || this.options.reducedMotion || cells.length === 0) return;
     const progress = Math.min(1, this.mutationArrival.elapsed / this.mutationArrival.duration);
     const alpha = 0.86 * (1 - easeOutCubic(progress));
-    this.drawMutationCarrierRim(
+    this.drawMutationMaterialRim(
       graphics,
       cells,
       item,
-      layout,
-      offsetX,
-      offsetY,
+      {
+        originX: layout.x,
+        originY: layout.y,
+        unit: layout.cell,
+        offsetX,
+        offsetY,
+      },
       alpha,
       Math.max(1, layout.cell * 0.082),
     );
@@ -1890,6 +1940,28 @@ export class TetrisRenderer {
         Math.min(CELL_STYLE.faceDarkAlpha, alpha),
         faceBevelWidth,
       );
+      // One quiet facet language keeps ordinary and Mutation bodies related without
+      // turning the seven-colour baseline into another effects layer.
+      for (const entry of geometry) {
+        const inset = Math.max(1, size * .14);
+        const left = entry.x + inset;
+        const top = entry.y + inset;
+        const right = entry.x + size - inset;
+        const bottom = entry.y + size - inset;
+        const nodeX = entry.x + size * .54;
+        const nodeY = entry.y + size * .46;
+        graphics
+          .moveTo(left, top)
+          .lineTo(right, top)
+          .lineTo(nodeX, nodeY)
+          .lineTo(left, top)
+          .fill({ color: material.innerEdge, alpha: Math.min(CELL_STYLE.facetLightAlpha, alpha) })
+          .moveTo(right, bottom)
+          .lineTo(left, bottom)
+          .lineTo(nodeX, nodeY)
+          .lineTo(right, bottom)
+          .fill({ color: material.edge, alpha: Math.min(CELL_STYLE.facetDarkAlpha, alpha) });
+      }
     }
 
     const componentX = (x: number): number => (
@@ -2634,39 +2706,25 @@ export class TetrisRenderer {
           cue.restrained,
         );
         if (sample.complete || sample.alpha <= 0.001) continue;
-        this.drawCellGroups(
-          graphics,
-          [{ x: cell.x, y: cell.y - VISIBLE_START_ROW }],
-          material,
-          sample.alpha,
-          {
-            originX: layout.x,
-            originY: layout.y,
-            unit: layout.cell,
-            scale: sample.scale,
-          },
-        );
+        const visibleCell = { x: cell.x, y: cell.y - VISIBLE_START_ROW };
+        const drawOptions: GroupDrawOptions = {
+          originX: layout.x,
+          originY: layout.y,
+          unit: layout.cell,
+          scale: sample.scale,
+        };
         if (mutationItem) {
-          const visibleCell = { x: cell.x, y: cell.y - VISIBLE_START_ROW };
-          this.drawMutationCarrierSurface(
+          this.drawMutationPieceMaterial(
             graphics,
             [visibleCell],
+            material,
             mutationItem,
-            layout,
-            0,
-            0,
             sample.alpha,
+            'clear',
+            drawOptions,
           );
-          this.drawMutationCarrierCore(
-            graphics,
-            [visibleCell],
-            mutationItem,
-            layout,
-            0,
-            0,
-            1,
-            sample.alpha,
-          );
+        } else {
+          this.drawCellGroups(graphics, [visibleCell], material, sample.alpha, drawOptions);
         }
       }
     }
@@ -2686,7 +2744,9 @@ export class TetrisRenderer {
           cue.restrained,
         );
         if (sample.complete || !sample.active || sample.highlight <= 0.001) continue;
-        const pieceMaterial = this.materialFor(material);
+        const pieceMaterial = mutationItem
+          ? this.mutationMaterial(mutationItem)
+          : this.materialFor(material);
         const inset = layout.cell * 0.075;
         const baseSize = layout.cell - inset * 2;
         const size = baseSize * sample.scale;
@@ -3189,7 +3249,7 @@ export class TetrisRenderer {
     centerX: number,
     centerY: number,
     unit: number,
-    carrierItem: MutationItem | null,
+    mutationItem: MutationItem | null,
   ): void {
     const shape = PIECE_SHAPES[type][0];
     const minX = Math.min(...shape.map((cell) => cell.x));
@@ -3200,24 +3260,23 @@ export class TetrisRenderer {
     const height = (maxY - minY + 1) * unit;
     const originX = centerX - width / 2 - minX * unit;
     const originY = centerY - height / 2 - minY * unit;
-    this.drawCellGroups(graphics, shape, type, 0.96, {
+    const drawOptions: GroupDrawOptions = {
       originX,
       originY,
       unit,
-    });
-    if (carrierItem) {
-      const previewLayout: BoardLayout = {
-        x: originX,
-        y: originY,
-        width,
-        height,
-        cell: unit,
-        compact: true,
-      };
-      this.drawMutationCarrierSurface(graphics, shape, carrierItem, previewLayout);
-      // Preview decoration is deliberately compact: the canonical tetromino body
-      // remains complete and no item core can be mistaken for a fifth cell.
-      this.drawMutationCarrierCore(graphics, shape, carrierItem, previewLayout, 0, 0, 0.62);
+    };
+    if (mutationItem) {
+      this.drawMutationPieceMaterial(
+        graphics,
+        shape,
+        type,
+        mutationItem,
+        0.96,
+        'next',
+        drawOptions,
+      );
+    } else {
+      this.drawCellGroups(graphics, shape, type, 0.96, drawOptions);
     }
   }
 
@@ -3229,7 +3288,7 @@ export class TetrisRenderer {
     width: number,
     height: number,
     labelInset = 0,
-    carrierItem: MutationItem | null = null,
+    mutationItem: MutationItem | null = null,
   ): void {
     if (!pieces.length) return;
     const dualPreview = pieces.length > 1;
@@ -3239,7 +3298,7 @@ export class TetrisRenderer {
     for (const [index, piece] of pieces.entries()) {
       const unit = this.previewUnitFor(piece, width, slotHeight, dualPreview);
       const centerY = contentY + slotHeight * (index + 0.5);
-      this.drawPreviewPiece(graphics, piece, x + width / 2, centerY, unit, index === 0 ? carrierItem : null);
+      this.drawPreviewPiece(graphics, piece, x + width / 2, centerY, unit, index === 0 ? mutationItem : null);
     }
   }
 

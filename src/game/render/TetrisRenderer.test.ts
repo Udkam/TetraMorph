@@ -25,7 +25,15 @@ import {
   LINE_CLEAR_RELEASE_TICKS,
   STUDIO_LINE_CLEAR_OFFSETS_MS,
 } from '../../animation/lineClearTimeline';
-import { BEDROCK_MATERIAL, COLORS, MUTATION_MATERIALS, SURVIVAL_STONE_MATERIAL, type PieceMaterial } from './theme';
+import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
+import {
+  BEDROCK_MATERIAL,
+  COLORS,
+  MUTATION_MATERIALS,
+  SURVIVAL_STONE_MATERIAL,
+  type MutationMaterialRole,
+  type PieceMaterial,
+} from './theme';
 
 let TetrisRendererClass: (typeof import('./TetrisRenderer'))['TetrisRenderer'];
 let buildBedrockTexturePixels: (width: number, height: number) => Uint8ClampedArray;
@@ -260,24 +268,32 @@ type RendererInternals = {
   ) => void;
   mutationMaterial: (item: MutationItem) => PieceMaterial;
   materialFor: (material: typeof BEDROCK_CELL | typeof SURVIVAL_STONE_CELL) => PieceMaterial;
-  drawMutationCarrierCore: (
+  drawMutationPieceMaterial: (
     graphics: unknown,
     cells: readonly Cell[],
+    type: BoardMaterial,
     item: MutationItem,
-    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
-    offsetX?: number,
-    offsetY?: number,
-    detailScale?: number,
-    intensity?: number,
+    alpha: number,
+    role: MutationMaterialRole,
+    options: {
+      originX: number;
+      originY: number;
+      unit: number;
+      offsetX?: number;
+      offsetY?: number;
+      scale?: number;
+      active?: boolean;
+      ghost?: boolean;
+      material?: PieceMaterial;
+    },
   ) => void;
-  drawMutationCarrierSurface: (
+  drawMutationMaterialDetails: (
     graphics: unknown,
     cells: readonly Cell[],
     item: MutationItem,
-    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
-    offsetX?: number,
-    offsetY?: number,
-    intensity?: number,
+    alpha: number,
+    role: MutationMaterialRole,
+    options: { originX: number; originY: number; unit: number; offsetX?: number; offsetY?: number; scale?: number },
   ) => void;
   drawMutationCarrierMaterials: (
     graphics: unknown,
@@ -291,15 +307,7 @@ type RendererInternals = {
     layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
     offsetY: number,
   ) => void;
-  drawActiveMutationCarrierMaterial: (
-    graphics: unknown,
-    state: GameState,
-    cells: readonly Cell[],
-    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
-    offsetX: number,
-    offsetY: number,
-  ) => void;
-  drawMutationCarrierEdgePulse: (
+  drawMutationMaterialArrivalPulse: (
     graphics: unknown,
     cells: readonly Cell[],
     item: MutationItem | null,
@@ -307,11 +315,13 @@ type RendererInternals = {
     offsetX: number,
     offsetY: number,
   ) => void;
-  drawMutationCarrierRim: (
+  drawMutationMaterialRim: (
     graphics: unknown,
     cells: readonly Cell[],
     item: MutationItem,
-    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
+    options: { originX: number; originY: number; unit: number; offsetX?: number; offsetY?: number; scale?: number },
+    alpha?: number,
+    width?: number,
   ) => void;
   drawReducedMutationEndpoint: (
     graphics: unknown,
@@ -499,7 +509,7 @@ describe('Puzzle undo presentation reset', () => {
     expect(internals.boardShift).toBeNull();
   });
 
-  it('maps each item to an attached material treatment and queues bounded mutation effects', () => {
+  it('maps each item to a complete material and queues bounded mutation effects', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     expect(internals.mutationMaterial('freeze')).toBe(MUTATION_MATERIALS.freeze);
@@ -1268,7 +1278,7 @@ describe('Puzzle undo presentation reset', () => {
     };
     (internals as unknown as { effectGraphics: typeof graphics; mutationGraphics: typeof graphics }).effectGraphics = graphics;
     (internals as unknown as { effectGraphics: typeof graphics; mutationGraphics: typeof graphics }).mutationGraphics = graphics;
-    (internals as unknown as { drawMutationCarrierRim: () => void }).drawMutationCarrierRim = () => {
+    (internals as unknown as { drawMutationMaterialRim: () => void }).drawMutationMaterialRim = () => {
       carrierRimCalls += 1;
     };
 
@@ -1394,122 +1404,115 @@ describe('Puzzle undo presentation reset', () => {
     expect(geometrySignature(two.operations)).not.toBe(geometrySignature(four.operations));
   });
 
-  it('uses item-specific surface, core, and rim geometry instead of palette-only carrier variants', () => {
+  it('uses item-specific facets and sparse motifs without a central carrier plate', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
-    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
-    const cells = [{ x: 2, y: 4 }, { x: 3, y: 4 }, { x: 3, y: 5 }];
-    const geometryCount = (
-      drawLayer: (graphics: unknown, cells: readonly Cell[], item: MutationItem) => void,
-    ): number => {
-      const signatures = new Set<string>();
-      for (const item of MUTATION_ITEMS) {
-        const recorder = createGraphicsRecorder();
-        drawLayer(recorder.graphics, cells, item);
-        signatures.add(geometrySignature(recorder.operations));
-      }
-      return signatures.size;
-    };
-
-    expect(geometryCount((graphics, layerCells, item) => {
-      internals.drawMutationCarrierSurface(graphics, layerCells, item, layout);
-    })).toBe(4);
-    const originalRim = internals.drawMutationCarrierRim;
-    internals.drawMutationCarrierRim = () => undefined;
-    expect(geometryCount((graphics, layerCells, item) => {
-      internals.drawMutationCarrierCore(graphics, layerCells, item, layout);
-    })).toBe(4);
-    internals.drawMutationCarrierRim = originalRim;
-    expect(geometryCount((graphics, layerCells, item) => {
-      internals.drawMutationCarrierRim(graphics, layerCells, item, layout);
-    })).toBe(4);
-  });
-
-  it('marks all four carrier cells without repeating plates or implying one trigger cell', () => {
-    const renderer = new TetrisRendererClass();
-    const internals = renderer as unknown as RendererInternals;
-    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
     const cells = [{ x: 2, y: 4 }, { x: 3, y: 4 }, { x: 2, y: 5 }, { x: 3, y: 5 }];
-    for (const item of MUTATION_ITEMS) {
-      const single = createGraphicsRecorder();
-      internals.drawMutationCarrierSurface(single.graphics, cells.slice(0, 1), item, layout);
-      const complete = createGraphicsRecorder();
-      internals.drawMutationCarrierSurface(complete.graphics, cells, item, layout);
-      const singleGeometry = single.operations.filter((operation) => operation.kind !== 'fill' && operation.kind !== 'stroke');
-      const completeGeometry = complete.operations.filter((operation) => operation.kind !== 'fill' && operation.kind !== 'stroke');
-      expect(completeGeometry.length, item).toBe(singleGeometry.length * 4);
-      expect(complete.operations.some((operation) => operation.kind === 'rect'), item).toBe(false);
-    }
-  });
-
-  it('routes locked, active, and Next carriers through the same surface/core grammar', () => {
-    const renderer = new TetrisRendererClass();
-    const internals = renderer as unknown as RendererInternals;
-    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
-    const calls: Array<{ layer: 'surface' | 'core' | 'rim'; item: MutationItem }> = [];
-    const originalCore = internals.drawMutationCarrierCore.bind(internals);
-    internals.drawCellGroups = () => undefined;
-    internals.drawMutationCarrierSurface = (_graphics, _cells, item) => {
-      calls.push({ layer: 'surface', item });
-    };
-    internals.drawMutationCarrierRim = (_graphics, _cells, item) => {
-      calls.push({ layer: 'rim', item });
-    };
-    internals.drawMutationCarrierCore = (graphics, cells, item, coreLayout, offsetX, offsetY, detailScale) => {
-      calls.push({ layer: 'core', item });
-      originalCore(graphics, cells, item, coreLayout, offsetX, offsetY, detailScale);
-    };
-
+    const signatures = new Set<string>();
     for (const item of MUTATION_ITEMS) {
       const recorder = createGraphicsRecorder();
-      const locked = {
-        mode: 'sprint',
-        mutationCarriers: [{ id: 1, item, cells: [{ x: 2, y: VISIBLE_START_ROW + 3 }] }],
-      } as unknown as GameState;
-      const active = {
-        mode: 'sprint',
-        active: { type: 'T' },
-        mutationActiveCarrier: { id: 2, item, cells: [] },
-      } as unknown as GameState;
-      internals.drawMutationCarrierMaterials(recorder.graphics, locked, layout, 0);
-      internals.drawActiveMutationCarrierMaterial(recorder.graphics, active, [{ x: 2, y: 3 }], layout, 0, 0);
-      internals.drawPreviewPiece(recorder.graphics, 'T', 100, 100, 20, item);
+      internals.drawMutationMaterialDetails(
+        recorder.graphics,
+        cells,
+        item,
+        1,
+        'active',
+        { originX: 0, originY: 0, unit: 20 },
+      );
+      signatures.add(geometrySignature(recorder.operations));
+      expect(recorder.operations.some((operation) => operation.kind === 'roundRect'), item).toBe(false);
+      if (item !== 'collapse') {
+        expect(recorder.operations.some((operation) => operation.kind === 'circle'), item).toBe(false);
+      } else {
+        // At most two distributed wells, each made from three nested circles.
+        expect(recorder.operations.filter((operation) => operation.kind === 'circle')).toHaveLength(6);
+      }
     }
+    expect(signatures.size).toBe(4);
+  });
+
+  it('replaces the complete body material in every presentation role', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const bodyCalls: Array<{ item: MutationItem; role: MutationMaterialRole; material: PieceMaterial | undefined }> = [];
+    let currentItem: MutationItem = 'freeze';
+    let currentRole: MutationMaterialRole = 'active';
+    internals.drawCellGroups = (_graphics, _cells, _type, _alpha, options) => {
+      bodyCalls.push({
+        item: currentItem,
+        role: currentRole,
+        material: (options as { material?: PieceMaterial }).material,
+      });
+    };
+    internals.drawMutationMaterialDetails = () => undefined;
 
     for (const item of MUTATION_ITEMS) {
-      expect(calls.filter((call) => call.item === item && call.layer === 'surface')).toHaveLength(3);
-      expect(calls.filter((call) => call.item === item && call.layer === 'core')).toHaveLength(3);
-      expect(calls.filter((call) => call.item === item && call.layer === 'rim')).toHaveLength(3);
+      for (const role of ['active', 'next', 'ghost', 'settled', 'clear'] as const) {
+        currentItem = item;
+        currentRole = role;
+        internals.drawMutationPieceMaterial(
+          createGraphicsRecorder().graphics,
+          [{ x: 2, y: 3 }],
+          'T',
+          item,
+          1,
+          role,
+          { originX: 0, originY: 0, unit: 20, ghost: role === 'ghost' },
+        );
+      }
+    }
+
+    expect(bodyCalls).toHaveLength(MUTATION_ITEMS.length * 5);
+    for (const call of bodyCalls) {
+      expect(call.material).toBe(MUTATION_MATERIALS[call.item]);
     }
   });
 
-  it('keeps the full Next tetromino body and scales only its item attachment', () => {
+  it('routes settled, active, Ghost, and Next through the same whole-piece material path', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
-    const drawnBodies: Cell[][] = [];
-    const detailScales: number[] = [];
-    internals.drawCellGroups = (_graphics, cells) => {
-      drawnBodies.push(cells.map((cell) => ({ ...cell })));
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const calls: Array<{ item: MutationItem; role: MutationMaterialRole; cells: number }> = [];
+    internals.drawMutationPieceMaterial = (_graphics, cells, _type, item, _alpha, role) => {
+      calls.push({ item, role, cells: cells.length });
     };
-    internals.drawMutationCarrierSurface = () => undefined;
-    internals.drawMutationCarrierCore = (
-      _graphics,
-      _cells,
-      _item,
-      _layout,
-      _offsetX,
-      _offsetY,
-      detailScale,
-    ) => {
-      detailScales.push(detailScale ?? 1);
-    };
+    Object.assign(internals as unknown as Record<string, unknown>, {
+      pieceGraphics: createGraphicsRecorder().graphics,
+      survivalEntryGraphics: createGraphicsRecorder().graphics,
+      survivalEntryMaskGraphics: createGraphicsRecorder().graphics,
+      pieceMaskGraphics: createGraphicsRecorder().graphics,
+    });
 
-    internals.drawPreviewPiece(createGraphicsRecorder().graphics, 'L', 100, 100, 20, 'collapse');
+    for (const item of MUTATION_ITEMS) {
+      const board = createBoard();
+      board[VISIBLE_START_ROW + 3]![2] = 'T';
+      const locked = {
+        ...createInitialState(0x51a1f00d, 'sprint'),
+        board,
+        mode: 'sprint',
+        mutationCarriers: [{ id: 1, item, cells: [{ x: 2, y: VISIBLE_START_ROW + 3 }] }],
+      } as GameState;
+      internals.drawMutationCarrierMaterials(createGraphicsRecorder().graphics, locked, layout, 0);
+      internals.drawPreviewPiece(createGraphicsRecorder().graphics, 'T', 100, 100, 20, item);
 
-    expect(drawnBodies).toHaveLength(1);
-    expect(drawnBodies[0]).toHaveLength(4);
-    expect(new Set(drawnBodies[0]!.map((cell) => `${cell.x}:${cell.y}`)).size).toBe(4);
-    expect(detailScales).toEqual([0.62]);
+      const active = {
+        ...createInitialState(0x51a1f00d, 'sprint'),
+        status: 'playing',
+        phase: 'active',
+        active: { type: 'T', rotation: 0, x: 3, y: VISIBLE_START_ROW },
+        board: createBoard(),
+        mutationActiveCarrier: { id: 2, item, cells: [] },
+        mutationCarriers: [],
+      } as GameState;
+      internals.drawPieces(active, layout);
+    }
+
+    for (const item of MUTATION_ITEMS) {
+      expect(calls.filter((call) => call.item === item && call.role === 'settled')).toHaveLength(1);
+      expect(calls.filter((call) => call.item === item && call.role === 'next' && call.cells === 4)).toHaveLength(1);
+      expect(calls.filter((call) => call.item === item && call.role === 'active')).toHaveLength(1);
+      expect(calls.filter((call) => call.item === item && call.role === 'ghost')).toHaveLength(1);
+    }
   });
 
   it('activates Ice with exactly four local snowflakes', () => {
@@ -1712,12 +1715,12 @@ describe('Puzzle undo presentation reset', () => {
     expect(reducedLater.operations).toEqual([]);
   });
 
-  it('never redraws a consumed carrier rim during an item activation', () => {
+  it('never redraws a consumed material rim during an item activation', () => {
     for (const item of MUTATION_ITEMS) {
       const renderer = new TetrisRendererClass();
       const internals = renderer as unknown as RendererInternals;
       let carrierRimCalls = 0;
-      (internals as unknown as { drawMutationCarrierRim: () => void }).drawMutationCarrierRim = () => {
+      (internals as unknown as { drawMutationMaterialRim: () => void }).drawMutationMaterialRim = () => {
         carrierRimCalls += 1;
       };
       internals.consumeEvents([{
@@ -1914,26 +1917,24 @@ describe('Puzzle undo presentation reset', () => {
     ))).toBe(false);
   });
 
-  it('uses one crystalline material core for one connected freeze carrier without a neutral charm', () => {
+  it('uses crystalline facets across a connected Ice body without a central charm', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const recorder = createGraphicsRecorder();
 
-    internals.drawMutationCarrierCore(
+    internals.drawMutationMaterialDetails(
       recorder.graphics,
       [{ x: 3, y: 5 }, { x: 4, y: 5 }, { x: 3, y: 6 }, { x: 4, y: 6 }],
       'freeze',
-      { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false },
+      1,
+      'active',
+      { originX: 0, originY: 0, unit: 20 },
     );
 
     expect(recorder.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(0);
-    expect(recorder.operations.filter((operation) => operation.kind === 'fill').map((operation) => (
-      operation.options as { color?: number }
-    ).color)).toEqual([
-      MUTATION_MATERIALS.freeze.edge,
-      MUTATION_MATERIALS.freeze.innerEdge,
-    ]);
+    expect(recorder.operations.filter((operation) => operation.kind === 'fill')).toHaveLength(8);
     expect(recorder.operations.filter((operation) => operation.kind === 'circle')).toHaveLength(0);
+    expect(recorder.operations.filter((operation) => operation.kind === 'segment').length).toBeGreaterThan(16);
   });
 
   it('keeps Ice and Multiplier visible while reduced motion omits Supergravity trails', () => {
@@ -1965,7 +1966,7 @@ describe('Puzzle undo presentation reset', () => {
     const base = { mode: 'sprint', elapsedTicks: 0, phase: 'active', pendingClearRows: [] } as unknown as GameState;
     const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
     internals.drawEffects({ ...base, mutationFreezeTicks: 1 }, layout);
-    expect(fills.some((entry) => entry.color === MUTATION_MATERIALS.freeze.innerEdge)).toBe(true);
+    expect(fills.some((entry) => entry.color === MUTATION_VFX_TOKENS.freeze.palette.highlight)).toBe(true);
 
     fills.length = 0;
     strokes.length = 0;
@@ -1975,7 +1976,7 @@ describe('Puzzle undo presentation reset', () => {
 
     fills.length = 0;
     internals.drawEffects({ ...base, mutationMultiplierTicks: 1 }, layout);
-    expect(fills.some((entry) => entry.color === MUTATION_MATERIALS.multiplier.fillStart)).toBe(true);
+    expect(fills.some((entry) => entry.color === MUTATION_VFX_TOKENS.multiplier.palette.primary)).toBe(true);
   });
 
   it('uses the generic lock pulse and leaves no Supergravity landing residue', () => {
@@ -2234,39 +2235,32 @@ describe('Puzzle undo presentation reset', () => {
     } as GameState;
     mutationInternals.consumeEvents([{ type: 'clear-started', rows: mutation.pendingClearRows }], mutation);
     const mutationCue = mutationInternals.ordinaryMultiLineClearCues[0]!;
-    const drawSurface = vi.spyOn(mutationInternals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
-    const drawCore = vi.spyOn(mutationInternals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
+    const drawMaterial = vi.spyOn(mutationInternals, 'drawMutationPieceMaterial').mockImplementation(() => undefined);
 
     mutationInternals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
 
-    expect(drawSurface.mock.calls[0]?.[1]).toEqual([
-      { x: 4, y: top - VISIBLE_START_ROW },
-      { x: 2, y: bottom - VISIBLE_START_ROW },
+    expect(drawMaterial.mock.calls.map((call) => call[1]).sort((first, second) => (
+      (first[0]?.y ?? 0) - (second[0]?.y ?? 0)
+    ))).toEqual([
+      [{ x: 4, y: top - VISIBLE_START_ROW }],
+      [{ x: 2, y: bottom - VISIBLE_START_ROW }],
     ]);
-    expect(drawCore.mock.calls[0]?.[1]).toEqual([
-      { x: 4, y: top - VISIBLE_START_ROW },
-      { x: 2, y: bottom - VISIBLE_START_ROW },
-    ]);
-    drawSurface.mockClear();
-    drawCore.mockClear();
+    expect(drawMaterial.mock.calls.every((call) => call[3] === 'freeze')).toBe(true);
+    expect(drawMaterial.mock.calls.every((call) => call[5] === 'settled' || call[5] === 'clear')).toBe(true);
+    drawMaterial.mockClear();
     mutationCue.elapsed = 60;
     mutationInternals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
-    const fadingSurface = drawSurface.mock.calls.find((call) => (
+    const fadingMaterial = drawMaterial.mock.calls.find((call) => (
       (call[1] as readonly Cell[]).some((cell) => cell.x === 4)
     ));
-    const fadingCore = drawCore.mock.calls.find((call) => (
-      (call[1] as readonly Cell[]).some((cell) => cell.x === 4)
-    ));
-    expect(fadingSurface?.[6]).toBeGreaterThan(0);
-    expect(fadingSurface?.[6]).toBeLessThan(1);
-    expect(fadingCore?.[7]).toBe(fadingSurface?.[6]);
-    drawSurface.mockClear();
-    drawCore.mockClear();
+    expect(fadingMaterial?.[4]).toBeGreaterThan(0);
+    expect(fadingMaterial?.[4]).toBeLessThan(1);
+    expect(fadingMaterial?.[5]).toBe('clear');
+    drawMaterial.mockClear();
     mutationCue.elapsed = 100;
     mutationInternals.drawMutationCarrierMaterials(markers.graphics, mutation, layout, 0);
 
-    expect(drawSurface.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
-    expect(drawCore.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
+    expect(drawMaterial.mock.calls[0]?.[1]).toEqual([{ x: 2, y: bottom - VISIBLE_START_ROW }]);
   });
 
   it('continues every captured Mutation companion through the Core commit', () => {
@@ -2297,17 +2291,19 @@ describe('Puzzle undo presentation reset', () => {
         count: 2,
         score: 200,
       }], { ...state, phase: 'active', pendingClearRows: [], mutationCarriers: [] });
-      const body = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
-      const surface = vi.spyOn(internals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
-      const core = vi.spyOn(internals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
+      const body = vi.spyOn(internals, 'drawCellGroups');
+      const materialDraw = vi.spyOn(internals, 'drawMutationPieceMaterial');
 
       internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
 
       expect(body.mock.calls.length).toBeGreaterThan(0);
-      const surfaceCall = surface.mock.calls.find((call) => call[2] === item);
-      const coreCall = core.mock.calls.find((call) => call[2] === item);
-      expect(surfaceCall?.[6]).toBeGreaterThan(0);
-      expect(coreCall?.[7]).toBe(surfaceCall?.[6]);
+      const materialCall = materialDraw.mock.calls.find((call) => call[3] === item);
+      expect(materialCall?.[4]).toBeGreaterThan(0);
+      expect(materialCall?.[5]).toBe('clear');
+      const bodyCall = body.mock.calls.find((call) => (
+        (call[4] as { material?: PieceMaterial }).material === MUTATION_MATERIALS[item]
+      ));
+      expect(bodyCall).toBeDefined();
     }
   });
 
@@ -2416,22 +2412,20 @@ describe('Puzzle undo presentation reset', () => {
 
     cue.elapsed = 250;
     const tailDraw = vi.spyOn(internals, 'drawCellGroups').mockImplementation(() => undefined);
-    const tailSurface = vi.spyOn(internals, 'drawMutationCarrierSurface').mockImplementation(() => undefined);
-    const tailCore = vi.spyOn(internals, 'drawMutationCarrierCore').mockImplementation(() => undefined);
+    const tailMaterial = vi.spyOn(internals, 'drawMutationPieceMaterial');
     internals.drawCommittedOrdinaryMultiLineClearBodies(createGraphicsRecorder().graphics, layout);
     expect(tailDraw.mock.calls.some((call) => (
       (call[1] as readonly Cell[]).some((cell) => cell.x === 0 && cell.y === row - VISIBLE_START_ROW)
       && typeof call[3] === 'number'
       && call[3] > 0
       && call[3] < 1
+      && (call[4] as { material?: PieceMaterial }).material === MUTATION_MATERIALS.freeze
     ))).toBe(true);
-    const tailSurfaceCall = tailSurface.mock.calls.find((call) => call[2] === 'freeze');
-    const tailCoreCall = tailCore.mock.calls.find((call) => call[2] === 'freeze');
-    expect(tailSurfaceCall?.[6]).toBeGreaterThan(0);
-    expect(tailCoreCall?.[7]).toBe(tailSurfaceCall?.[6]);
+    const tailMaterialCall = tailMaterial.mock.calls.find((call) => call[3] === 'freeze');
+    expect(tailMaterialCall?.[4]).toBeGreaterThan(0);
+    expect(tailMaterialCall?.[5]).toBe('clear');
     tailDraw.mockRestore();
-    tailSurface.mockRestore();
-    tailCore.mockRestore();
+    tailMaterial.mockRestore();
 
     const tailFaces = createGraphicsRecorder();
     (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = tailFaces.graphics;
