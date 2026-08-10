@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SECOND FAIR ROUND COMPLETE; THIRD EQUAL ROUND NEXT**
+Status: **F3C THIRD FAIR ROUND COMPLETE; FOURTH EQUAL ROUND NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -551,11 +551,22 @@ Replay-inclusive accepted placements, failed states, and trie nodes are
 `14197EB55C858699317467C48AAF6B1470DE07166FCC6E34E5FEFCE93BA059CC`.
 All 32 exact Temp files are removed and owned process count is zero.
 
-This second round is still a fair prefix, not a negative proof. The next allowed
-operation, after a new green/amber resource check, is a third equal round over the same
-domain and shard order: input cursor 625,000 and new-probe budget 312,500 per shard,
-yielding absolute cursor 937,500 when budget-bound. Stop at candidate or RSS guard; no
-new seed domain or product path opens.
+The third equal round preserves the same domain and ascending order. Every shard starts
+at cursor 625,000, adds 312,500 new probes, and returns `budget-exhausted` at cursor
+937,500. Candidate, complete, and memory counts are zero; the domain/queue digests stay
+unchanged. The invocation records 20,000,000 replay probes, 10,000,000 new probes, and
+30,000,000 physical attempts. Cumulative new coverage across all three rounds is
+30,000,000. Replay-inclusive accepted placements, failed states, and trie nodes are
+`873,726 / 872,398 / 337,031`. SHA-256 over the sorted `filename:SHA256` lines joined
+with LF and no terminal LF is
+`D7CBB36B03EC4DA715208F8F94F35466FD3A5114D2C4E29CBF9F2B354BFC7DC3`.
+All 32 exact Temp files are removed and owned process count is zero.
+
+The third round is still a fair prefix, not a negative proof. The next allowed
+operation, after a new green/amber resource check, is a fourth equal round over the
+same domain and shard order: input cursor 937,500 and new-probe budget 312,500 per
+shard, yielding absolute cursor 1,250,000 when budget-bound. Stop at candidate or RSS
+guard; no new seed domain or product path opens.
 
 ## Progress v6 and revision-3 migration
 

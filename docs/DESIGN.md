@@ -464,6 +464,12 @@ adding unrelated badges or ornamental effects.
   same increment for every incomplete shard from cursor 625,000 after a fresh resource
   check; product and final fixture/test paths stay closed until a candidate passes Core
   replay and exact proof.
+- The third equal round again keeps every shard synchronized: 20,000,000 replay probes
+  plus 10,000,000 new probes place all 32 at cursor 937,500 with no candidate, natural
+  completion, or memory stop. Cumulative new fair coverage is 30,000,000. This is still
+  prefix evidence, so a fourth round may only apply the same 312,500-probe increment to
+  every incomplete shard from cursor 937,500 after the resource gate; no product path
+  opens.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
