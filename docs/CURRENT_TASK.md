@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C PROTOTYPE TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
+Status: **STAGE F3C TOOL ACCEPTED; ONE BOUNDED CANDIDATE BATCH NEXT**
 
 ## Active objective
 
@@ -383,9 +383,11 @@ only; it is not F3 source acceptance.
   identical SHA-256
   `1869CAD02860106A349064BD3D0B7265E8F40FED7C1303B39DBDFB6082B2097A` and identical
   counters (`1,501` attempted, `52` accepted, `40` failed states, `60` trie nodes).
-  A uint32-wrapping seed range fails before creating output. The tool candidate now
-  requires independent read-only QA; no substantive candidate search is authorized
-  until that disposition is recorded.
+  A uint32-wrapping seed range fails before creating output. Independent read-only QA
+  accepts `5bd76e2..85b48c2` with `P0 0 / P1 0 / P2 0 / P3 0`, reproduces all runtime
+  gates, independently verifies the 80-cell mask and `1 / 2 / 2 / 2 / 3` route, and
+  confirms exact-path/protected-path discipline. The tool checkpoint is accepted; one
+  substantive `1..20000` / 10,000,000-landing / 900 MiB batch may now run serially.
 
 ## Current checkpoint state
 

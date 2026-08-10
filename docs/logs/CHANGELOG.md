@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3C prototype tool accepted
+
+- Tool checkpoint `8e86207` adds one 356-line, non-product authoring search for the
+  fixed 80-cell ten-row prototype mask. Explicit seed range, attempted-landing budget,
+  RSS guard, and output path contain the search; Core-equivalent seven-bag, hard-drop,
+  off-mask, hidden, setup-clear, and same-type-source rules constrain candidates.
+- Two isolated small smokes stop at the intentional budget with byte-identical SHA-256
+  `1869CAD02860106A349064BD3D0B7265E8F40FED7C1303B39DBDFB6082B2097A`; syntax and
+  uint32-wrap rejection pass, and no temporary output/process/listener remains.
+- Independent read-only QA accepts `5bd76e2..85b48c2` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It independently verifies the exact five-path range,
+  Core equivalence, 80-cell mask, `1 / 2 / 2 / 2 / 3` completion route, deterministic
+  runtime evidence, and protected-path exclusions. One bounded substantive candidate
+  batch may now run; tool output alone is never F3C admission.
+
 ## 2026-08-10 — T37 Stage F3B injected mechanics accepted
 
 - Test checkpoint `308233c` adds exact four-anchor board/engine coverage and a

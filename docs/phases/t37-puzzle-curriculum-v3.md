@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C PROTOTYPE TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
+Status: **F3C TOOL ACCEPTED; ONE BOUNDED CANDIDATE BATCH NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -408,6 +408,11 @@ byte-identical JSON with SHA-256
 stop at the intentional node budget (`1,501` attempted landings), so they validate
 determinism and containment rather than discover a candidate. Independent QA must
 accept this checkpoint before the one bounded substantive candidate batch begins.
+Independent read-only QA accepts `5bd76e2..85b48c2` with P0–P3 all zero after
+reproducing syntax, double-smoke/hash, wrap rejection, mask/route, Core-equivalence,
+temporary cleanup, and exact-path gates. The accepted tool may now run exactly one
+serial batch over seeds `1..20000` with 10,000,000 attempted landings and a 900 MiB RSS
+guard. `budget-exhausted` does not prove the entire seed range negative.
 
 ## Progress v6 and revision-3 migration
 

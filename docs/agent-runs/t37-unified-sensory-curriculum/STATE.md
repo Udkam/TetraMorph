@@ -94,12 +94,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     four-anchor board, remapping, preview projection, and four independent public-route
     witnesses without opening production Core source. Independent QA accepts
     `3aa6766..6c3286c` with P0–P3 all zero.
-16. `F3C TOOL CANDIDATE; QA REQUIRED` — existing ten-row fixtures/local variants are
-    disproven or route-negative. Standalone tool candidate `8e86207` now searches the
-    fixed five-lock mask deterministically; product data remains closed until its
-    independent disposition.
-17. `PENDING` — bounded candidate batch, F3C fixture/test, later content, migration, UI,
-    final gates, and push.
+16. `F3C TOOL ACCEPTED; BOUNDED BATCH NEXT` — standalone tool `8e86207` searches the
+    fixed five-lock mask deterministically. Independent QA accepts its five-path range
+    with P0–P3 all zero; product data remains closed.
+17. `PENDING` — one bounded candidate batch, F3C fixture/test, later content, migration,
+    UI, final gates, and push.
 
 ### Stage F3C tooling-discovery status
 
@@ -131,10 +130,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `1,501` attempted landings, `52` accepted placements, `40` failed states, and `60`
   trie nodes. The explicit uint32-wrap negative test fails before output. No process,
   listener, or repository output remains.
-- Blocker: this tool checkpoint is not accepted until independent read-only QA validates
-  the one-path range, Core-equivalent shapes/randomizer, fixed-mask invariants, guards,
-  and deterministic smoke. Next action: perform that QA, record the disposition, then
-  run one bounded substantive candidate batch only if accepted.
+- Independent read-only QA accepts `5bd76e2..85b48c2` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It verifies the five-path range and 356-line budget,
+  independently compares all Core shapes/randomizer/spawn/hard-drop/source-adjacency
+  semantics, proves the 80-cell mask and `1 / 2 / 2 / 2 / 3` route, reproduces the
+  double smoke/hash and wrap rejection, removes its Temp files, and leaves no owned
+  process/listener. The tool checkpoint is accepted.
+- Next action: after a fresh resource check, run exactly one serial candidate batch with
+  `--seed-start 1 --seed-count 20000 --node-budget 10000000 --max-rss-mib 900` and an
+  explicit repository-external Temp output. Stop on candidate, budget, RSS guard, or
+  complete not-found. A budget stop is not evidence that every seed was exhausted.
 
 ### Stage F3B accepted status
 
@@ -552,13 +557,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Independently review `5bd76e2..8e86207` plus this candidate-status documentation. Verify
-the exact tool path, Core-equivalent shapes and seven-bag order, fixed 80-cell ten-row
-mask, same-type/no-clear/no-hidden/off-mask rejection, seed/node/RSS/output guards, and
-two byte-identical small smokes. If P0–P3 remain zero, record acceptance and run exactly
-one bounded substantive candidate batch. Do not open the final JSON, exact test, Intro
-boards, the 46-level module, v6 migration, mastery groups, Puzzle UI, or App source until
-the tool produces a Core-replayable candidate. Keep deferred identity, protected
+After a fresh resource check, run the accepted F3C tool exactly once with seed range
+`1..20000`, 10,000,000 attempted-landings budget, 900 MiB RSS guard, and an explicit
+repository-external Temp output. Record whether it returns candidate, budget, memory,
+or complete not-found. Only a candidate may open the final JSON/test pair, and it must
+then pass current Core setup replay, the fixed public route, exact hashes/signatures,
+and full no-beam shorter-depth proof. Do not open Intro boards, the 46-level module, v6
+migration, mastery groups, Puzzle UI, or App source. Keep deferred identity, protected
 T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
