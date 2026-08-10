@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BOARD_WIDTH } from './constants';
 import { clearRows, createBoard, fullRows, mapCellsAfterClear, setCell } from './board';
-import { ANCHOR_CELL } from './types';
+import { ANCHOR_CELL, type Cell } from './types';
 
 describe('anchor-aware row resolution', () => {
   it('keeps an anchor fixed when a lower row clears and only drops cells inside their own segment', () => {
@@ -99,5 +99,53 @@ describe('anchor-aware row resolution', () => {
     expect(cleared[anchorY]?.[3]).toBeNull();
     expect(cleared[anchorY - 1]?.[4]).toBe('S');
     expect(targets).toEqual([]);
+  });
+
+  it('keeps four anchors and maps target and support ownership through two clears', () => {
+    const anchors: readonly Cell[] = [
+      { x: 1, y: 29 },
+      { x: 3, y: 30 },
+      { x: 6, y: 29 },
+      { x: 8, y: 30 },
+    ];
+    const supported: readonly Cell[] = anchors.map(({ x, y }) => ({ x, y: y - 1 }));
+    const drifting: readonly Cell[] = [
+      { x: 0, y: 27 },
+      { x: 4, y: 28 },
+      { x: 9, y: 31 },
+    ];
+    const removedTarget = { x: 2, y: 30 };
+    let board = createBoard();
+    for (const { x, y } of anchors) board = setCell(board, x, y, ANCHOR_CELL);
+    for (const { x, y } of supported) board = setCell(board, x, y, 'J');
+    board = setCell(board, drifting[0]!.x, drifting[0]!.y, 'L');
+    board = setCell(board, drifting[1]!.x, drifting[1]!.y, 'S');
+    board = setCell(board, drifting[2]!.x, drifting[2]!.y, 'Z');
+    for (const y of [30, 36]) {
+      for (let x = 0; x < BOARD_WIDTH; x += 1) {
+        if (board[y]![x] === null) board = setCell(board, x, y, 'I');
+      }
+    }
+
+    const rows = fullRows(board);
+    const targets = [...supported, ...drifting, removedTarget];
+    const cleared = clearRows(board, rows, supported);
+    const mappedTargets = mapCellsAfterClear(board, rows, targets, supported);
+    const mappedSupported = mapCellsAfterClear(board, rows, supported, supported);
+
+    expect(rows).toEqual([30, 36]);
+    for (const { x, y } of anchors) expect(cleared[y]?.[x]).toBe(ANCHOR_CELL);
+    for (const { x, y } of supported) expect(cleared[y]?.[x]).toBe('J');
+    expect(cleared[29]?.[0]).toBe('L');
+    expect(cleared[30]?.[4]).toBe('S');
+    expect(cleared[32]?.[9]).toBe('Z');
+    expect(cleared.flat().filter((cell) => cell === 'I')).toHaveLength(0);
+    expect(mappedTargets).toEqual([
+      ...supported,
+      { x: 0, y: 29 },
+      { x: 4, y: 30 },
+      { x: 9, y: 32 },
+    ]);
+    expect(mappedSupported).toEqual(supported);
   });
 });

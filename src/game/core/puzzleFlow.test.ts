@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ENTRY_DELAY_TICKS, LINE_CLEAR_DELAY_TICKS, LOCK_DELAY_TICKS, VISIBLE_HEIGHT, VISIBLE_START_ROW } from './constants';
-import { createBoard, setCell } from './board';
+import { clearRows, createBoard, fullRows, mapCellsAfterClear, setCell } from './board';
 import { createInitialState, dispatch } from './engine';
 import { getPuzzleDefinition } from './puzzles';
-import { ANCHOR_CELL, type GameState, type PieceType } from './types';
+import { ANCHOR_CELL, type Cell, type GameState, type PieceType } from './types';
 
 function advance(state: GameState, ticks: number): GameState {
   let next = state;
@@ -136,5 +136,61 @@ describe('Puzzle anchor-supported placement identity', () => {
       { x: 3, y: 9 },
       { x: 4, y: 9 },
     ]);
+  });
+
+  it('maps one four-anchor board, its targets, and its support identities through the same clears', () => {
+    const anchors: readonly Cell[] = [
+      { x: 1, y: 29 },
+      { x: 3, y: 30 },
+      { x: 6, y: 29 },
+      { x: 8, y: 30 },
+    ];
+    const supported: readonly Cell[] = anchors.map(({ x, y }) => ({ x, y: y - 1 }));
+    const targets: readonly Cell[] = [
+      { x: 0, y: 27 },
+      { x: 4, y: 28 },
+      { x: 9, y: 31 },
+      { x: 2, y: 30 },
+    ];
+    let board = createBoard();
+    for (const { x, y } of anchors) board = setCell(board, x, y, ANCHOR_CELL);
+    for (const { x, y } of supported) board = setCell(board, x, y, 'J');
+    board = setCell(board, targets[0]!.x, targets[0]!.y, 'L');
+    board = setCell(board, targets[1]!.x, targets[1]!.y, 'S');
+    board = setCell(board, targets[2]!.x, targets[2]!.y, 'Z');
+    for (const y of [30, 36]) {
+      for (let x = 0; x < 10; x += 1) {
+        if (board[y]![x] === null) board = setCell(board, x, y, 'I');
+      }
+    }
+    const rows = fullRows(board);
+    const expectedBoard = clearRows(board, rows, supported);
+    const expectedTargets = mapCellsAfterClear(board, rows, targets, supported);
+    const expectedSupported = mapCellsAfterClear(board, rows, supported, supported);
+    const started = dispatch(createInitialState(1, 'puzzle', 't3r-shaft-02'), { type: 'start' }).state;
+    const resolving: GameState = {
+      ...started,
+      board,
+      active: null,
+      phase: 'line-clear',
+      phaseTicks: LINE_CLEAR_DELAY_TICKS - 1,
+      pendingClearRows: rows,
+      puzzleTargetCells: targets,
+      puzzleInitialTargetCount: targets.length,
+      puzzleAnchorSupportedCells: supported,
+    };
+
+    const resolved = dispatch(resolving, { type: 'tick' }).state;
+
+    expect(rows).toEqual([30, 36]);
+    expect(resolved.board).toEqual(expectedBoard);
+    expect(resolved.puzzleTargetCells).toEqual(expectedTargets);
+    expect(resolved.puzzleAnchorSupportedCells).toEqual(expectedSupported);
+    expect(resolved.puzzleTargetCells).toHaveLength(3);
+    expect(resolved.board.flat().filter((cell) => cell === ANCHOR_CELL)).toHaveLength(4);
+    for (const { x, y } of anchors) expect(resolved.board[y]?.[x]).toBe(ANCHOR_CELL);
+    expect(resolved.status).toBe('playing');
+    expect(resolved.phase).toBe('active');
+    expect(resolved.active).not.toBeNull();
   });
 });
