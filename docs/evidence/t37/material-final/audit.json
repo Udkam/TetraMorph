@@ -1,0 +1,1245 @@
+{
+  "sourceSha": "a1849525db8742701c398cd67c4eed5a9f4bc47b",
+  "capturedAt": "2026-08-10T07:47:15.186Z",
+  "browser": "149.0.7827.55",
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "deviceScaleFactor": 1
+  },
+  "items": {
+    "freeze": {
+      "seed": 49,
+      "preview": {
+        "item": "freeze",
+        "piece": "T",
+        "aria": "下一个方块: 冰晶材质的 T 方块，触发冰冻",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "active": {
+        "item": "freeze",
+        "piece": "T",
+        "cells": [
+          {
+            "x": 8,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 8,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "settled": {
+        "carriers": [
+          {
+            "id": 1,
+            "item": "freeze",
+            "cells": [
+              {
+                "x": 6,
+                "y": 36
+              },
+              {
+                "x": 5,
+                "y": 37
+              },
+              {
+                "x": 6,
+                "y": 37
+              },
+              {
+                "x": 7,
+                "y": 37
+              }
+            ]
+          }
+        ],
+        "activation": null,
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "clear": {
+        "phase": "line-clear",
+        "rows": [
+          39
+        ],
+        "carriers": [
+          {
+            "id": 1,
+            "item": "freeze",
+            "cells": [
+              {
+                "x": 8,
+                "y": 38
+              },
+              {
+                "x": 7,
+                "y": 39
+              },
+              {
+                "x": 8,
+                "y": 39
+              },
+              {
+                "x": 9,
+                "y": 39
+              }
+            ]
+          }
+        ],
+        "lineClear": {
+          "count": 1,
+          "orderedRows": [
+            39
+          ],
+          "releaseTicks": [
+            0
+          ],
+          "releasedRows": [
+            39
+          ]
+        },
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 102
+          }
+        },
+        "afterScreenshot": {
+          "lineClear": {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "releaseTicks": [
+              0
+            ],
+            "releasedRows": [
+              39
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "activation": {
+        "lastItem": "freeze",
+        "flash": {
+          "item": "freeze",
+          "elapsedMs": 100.10000000000036,
+          "durationMs": 320,
+          "phases": [
+            {
+              "id": "frost-bind",
+              "active": true,
+              "complete": false,
+              "progress": 0.31281250000000116,
+              "value": 0.6754917419738786
+            },
+            {
+              "id": "shard-release",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            7,
+            8,
+            9
+          ]
+        },
+        "cues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 100.10000000000036,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "visibleCellCount": 10
+          }
+        ],
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 141
+          }
+        },
+        "afterScreenshot": {
+          "flash": {
+            "item": "freeze",
+            "elapsedMs": 200,
+            "durationMs": 320,
+            "phases": [
+              {
+                "id": "frost-bind",
+                "active": true,
+                "complete": false,
+                "progress": 0.625,
+                "value": 0.947265625
+              },
+              {
+                "id": "shard-release",
+                "active": true,
+                "complete": false,
+                "progress": 0.4312796208530806,
+                "value": 0.8160514485362944
+              }
+            ],
+            "particlesEmitted": true,
+            "triggerColumns": [
+              7,
+              8,
+              9
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "bomb": {
+      "seed": 90,
+      "preview": {
+        "item": "bomb",
+        "piece": "I",
+        "aria": "下一个方块: 熔岩材质的 I 方块，触发炸弹",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "active": {
+        "item": "bomb",
+        "piece": "I",
+        "cells": [
+          {
+            "x": 6,
+            "y": 21
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 6,
+            "y": 39
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "settled": {
+        "carriers": [
+          {
+            "id": 1,
+            "item": "bomb",
+            "cells": [
+              {
+                "x": 4,
+                "y": 38
+              },
+              {
+                "x": 5,
+                "y": 38
+              },
+              {
+                "x": 6,
+                "y": 38
+              },
+              {
+                "x": 7,
+                "y": 38
+              }
+            ]
+          }
+        ],
+        "activation": null,
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "clear": {
+        "phase": "line-clear",
+        "rows": [
+          39
+        ],
+        "carriers": [
+          {
+            "id": 1,
+            "item": "bomb",
+            "cells": [
+              {
+                "x": 6,
+                "y": 39
+              },
+              {
+                "x": 7,
+                "y": 39
+              },
+              {
+                "x": 8,
+                "y": 39
+              },
+              {
+                "x": 9,
+                "y": 39
+              }
+            ]
+          }
+        ],
+        "lineClear": {
+          "count": 1,
+          "orderedRows": [
+            39
+          ],
+          "releaseTicks": [
+            0
+          ],
+          "releasedRows": [
+            39
+          ]
+        },
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 115
+          }
+        },
+        "afterScreenshot": {
+          "lineClear": {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "releaseTicks": [
+              0
+            ],
+            "releasedRows": [
+              39
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "activation": {
+        "lastItem": "bomb",
+        "flash": {
+          "item": "bomb",
+          "elapsedMs": 99.90000000000009,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": true,
+              "complete": false,
+              "progress": 0.8325000000000008,
+              "value": 0.9953005781250001
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 2.220446049250313e-16
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        "cues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 99.90000000000009,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "visibleCellCount": 10
+          }
+        ],
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 144
+          }
+        },
+        "afterScreenshot": {
+          "flash": {
+            "item": "bomb",
+            "elapsedMs": 200,
+            "durationMs": 620,
+            "phases": [
+              {
+                "id": "warning",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "pulse",
+                "active": true,
+                "complete": false,
+                "progress": 0.8,
+                "value": 1.04645056
+              },
+              {
+                "id": "impact",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              },
+              {
+                "id": "shockwave",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              }
+            ],
+            "particlesEmitted": false,
+            "triggerColumns": [
+              6,
+              7,
+              8,
+              9
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "multiplier": {
+      "seed": 11,
+      "preview": {
+        "item": "multiplier",
+        "piece": "L",
+        "aria": "下一个方块: 金辉材质的 L 方块，触发加倍",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "active": {
+        "item": "multiplier",
+        "piece": "L",
+        "cells": [
+          {
+            "x": 9,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 9,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "settled": {
+        "carriers": [
+          {
+            "id": 1,
+            "item": "multiplier",
+            "cells": [
+              {
+                "x": 7,
+                "y": 36
+              },
+              {
+                "x": 5,
+                "y": 37
+              },
+              {
+                "x": 6,
+                "y": 37
+              },
+              {
+                "x": 7,
+                "y": 37
+              }
+            ]
+          }
+        ],
+        "activation": null,
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "clear": {
+        "phase": "line-clear",
+        "rows": [
+          39
+        ],
+        "carriers": [
+          {
+            "id": 1,
+            "item": "multiplier",
+            "cells": [
+              {
+                "x": 9,
+                "y": 38
+              },
+              {
+                "x": 7,
+                "y": 39
+              },
+              {
+                "x": 8,
+                "y": 39
+              },
+              {
+                "x": 9,
+                "y": 39
+              }
+            ]
+          }
+        ],
+        "lineClear": {
+          "count": 1,
+          "orderedRows": [
+            39
+          ],
+          "releaseTicks": [
+            0
+          ],
+          "releasedRows": [
+            39
+          ]
+        },
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 106
+          }
+        },
+        "afterScreenshot": {
+          "lineClear": {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "releaseTicks": [
+              0
+            ],
+            "releasedRows": [
+              39
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "activation": {
+        "lastItem": "multiplier",
+        "flash": {
+          "item": "multiplier",
+          "elapsedMs": 100,
+          "durationMs": 320,
+          "phases": [
+            {
+              "id": "score-pop",
+              "active": true,
+              "complete": false,
+              "progress": 0.5555555555555556,
+              "value": 1.0989388203017834
+            },
+            {
+              "id": "spark-tail",
+              "active": true,
+              "complete": false,
+              "progress": 0.18518518518518517,
+              "value": 0.45902555504750275
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            7,
+            8,
+            9
+          ]
+        },
+        "cues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 100,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "visibleCellCount": 10
+          }
+        ],
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 171
+          }
+        },
+        "afterScreenshot": {
+          "flash": {
+            "item": "multiplier",
+            "elapsedMs": 200,
+            "durationMs": 320,
+            "phases": [
+              {
+                "id": "score-pop",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "spark-tail",
+                "active": true,
+                "complete": false,
+                "progress": 0.5555555555555556,
+                "value": 0.9122085048010974
+              }
+            ],
+            "particlesEmitted": true,
+            "triggerColumns": [
+              7,
+              8,
+              9
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    },
+    "collapse": {
+      "seed": 163,
+      "preview": {
+        "item": "collapse",
+        "piece": "T",
+        "aria": "下一个方块: 重力紫晶材质的 T 方块，触发超重",
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "active": {
+        "item": "collapse",
+        "piece": "T",
+        "cells": [
+          {
+            "x": 8,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 21
+          },
+          {
+            "x": 8,
+            "y": 21
+          },
+          {
+            "x": 9,
+            "y": 21
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 8,
+            "y": 38
+          },
+          {
+            "x": 7,
+            "y": 39
+          },
+          {
+            "x": 8,
+            "y": 39
+          },
+          {
+            "x": 9,
+            "y": 39
+          }
+        ],
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "settled": {
+        "carriers": [
+          {
+            "id": 1,
+            "item": "collapse",
+            "cells": [
+              {
+                "x": 6,
+                "y": 36
+              },
+              {
+                "x": 5,
+                "y": 37
+              },
+              {
+                "x": 6,
+                "y": 37
+              },
+              {
+                "x": 7,
+                "y": 37
+              }
+            ]
+          }
+        ],
+        "activation": null,
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "clear": {
+        "phase": "line-clear",
+        "rows": [
+          39
+        ],
+        "carriers": [
+          {
+            "id": 1,
+            "item": "collapse",
+            "cells": [
+              {
+                "x": 8,
+                "y": 38
+              },
+              {
+                "x": 7,
+                "y": 39
+              },
+              {
+                "x": 8,
+                "y": 39
+              },
+              {
+                "x": 9,
+                "y": 39
+              }
+            ]
+          }
+        ],
+        "lineClear": {
+          "count": 1,
+          "orderedRows": [
+            39
+          ],
+          "releaseTicks": [
+            0
+          ],
+          "releasedRows": [
+            39
+          ]
+        },
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 112
+          }
+        },
+        "afterScreenshot": {
+          "lineClear": {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "releaseTicks": [
+              0
+            ],
+            "releasedRows": [
+              39
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "activation": {
+        "lastItem": "collapse",
+        "flash": {
+          "item": "collapse",
+          "elapsedMs": 100,
+          "durationMs": 220,
+          "phases": [
+            {
+              "id": "pressure-bind",
+              "active": true,
+              "complete": false,
+              "progress": 0.8333333333333334,
+              "value": 0.9953703703703703
+            },
+            {
+              "id": "column-release",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            7,
+            8,
+            9
+          ]
+        },
+        "cues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 100,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "visibleCellCount": 10
+          }
+        ],
+        "boardCapture": {
+          "frame": {
+            "x": 464,
+            "y": 14,
+            "width": 392,
+            "height": 784
+          },
+          "resolution": 1,
+          "outputPixels": {
+            "width": 392,
+            "height": 784
+          },
+          "pixelProbe": {
+            "samples": 8307,
+            "nonTransparentSamples": 8307,
+            "distinctBuckets": 146
+          }
+        },
+        "afterScreenshot": {
+          "flash": {
+            "item": "collapse",
+            "elapsedMs": 183.29999999999973,
+            "durationMs": 220,
+            "phases": [
+              {
+                "id": "pressure-bind",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "column-release",
+                "active": true,
+                "complete": false,
+                "progress": 0.6329999999999972,
+                "value": 0.2536361369999967
+              }
+            ],
+            "particlesEmitted": true,
+            "triggerColumns": [
+              7,
+              8,
+              9
+            ]
+          }
+        },
+        "assertions": {
+          "canvasCount": 1,
+          "domCellCount": 0,
+          "minButtonWidth": 58,
+          "minButtonHeight": 44,
+          "noHorizontalOverflow": true,
+          "noVerticalOverflow": true
+        }
+      },
+      "errors": []
+    }
+  },
+  "errors": [],
+  "screenshots": [
+    {
+      "name": "bomb-activation.png",
+      "sha256": "a4dabd42b1b3b610cbbb225cf1d4dd30769290c935e9997a0936430d63d9868c"
+    },
+    {
+      "name": "bomb-active-ghost.png",
+      "sha256": "2f456197d3ee7129240bd041903df40a25077331d51e5287f17ba8e1d20d5772"
+    },
+    {
+      "name": "bomb-clear.png",
+      "sha256": "9690273188a0eaed61e78cc9d738c71b5d586a50a80085b5991df857da793cf6"
+    },
+    {
+      "name": "bomb-next.png",
+      "sha256": "45ae65b630121c58a2dd823e98019d6525e7b44338fdba910c083c3fa3b4fda6"
+    },
+    {
+      "name": "bomb-settled.png",
+      "sha256": "bb835b04b0ede465961f0a2389f93fb3509763fe68d300e9278984c65b5bc929"
+    },
+    {
+      "name": "collapse-activation.png",
+      "sha256": "327d9021692ecb8d64d7c78defc0e9dd64be2caa8ba0cba6639411a4604b416a"
+    },
+    {
+      "name": "collapse-active-ghost.png",
+      "sha256": "7056e1d62ce920d22eaa199acd2355afa5bf99749df50d56aa743745a004ac0c"
+    },
+    {
+      "name": "collapse-clear.png",
+      "sha256": "7da16c1563484865ff0bd000e025c1cf71ece3cfcd9f7446e78e808df4127da6"
+    },
+    {
+      "name": "collapse-next.png",
+      "sha256": "78f778197507bde373a7e159a303d15abdde48cf2841c99b3dd5e590fa4649e3"
+    },
+    {
+      "name": "collapse-settled.png",
+      "sha256": "09c4eeb8ab73d5dcd3082850fec0d1cd6b95dd4ca3b2726c12436d47195d56cb"
+    },
+    {
+      "name": "freeze-activation.png",
+      "sha256": "c73e00fdd567cb8e9dd756a04732a69f69660dc25fddd99524fba7714cb68490"
+    },
+    {
+      "name": "freeze-active-ghost.png",
+      "sha256": "e1b5b6d1ae16b4bb6e59ddb0bc9367652a6a62c0451149d66efdac48e8bb0f16"
+    },
+    {
+      "name": "freeze-clear.png",
+      "sha256": "568e8148caade634d79d8be1b7b84796adeddb342ce45ef4b3a07ec80b0efaf0"
+    },
+    {
+      "name": "freeze-next.png",
+      "sha256": "c9243b9e4a2237dc70b19569046d1bd755c15b28dd4cf336e02c638895a1366c"
+    },
+    {
+      "name": "freeze-settled.png",
+      "sha256": "285b7b51e00726c61f64d22d80cc96ab6d6fbd452e067dab9e1a1aa5dd505054"
+    },
+    {
+      "name": "multiplier-activation.png",
+      "sha256": "a5ab508fd2d30345d1546cb07fcd80f1c9ec2a2590d20a7061de467cdc9f5271"
+    },
+    {
+      "name": "multiplier-active-ghost.png",
+      "sha256": "fcb004cb730486b7a328430fa0af34554035e496ff3d3bd7533bae0f7d4fda26"
+    },
+    {
+      "name": "multiplier-clear.png",
+      "sha256": "737bda172cd69b1cb73c8a7ab50aebc69aa66c5b3555bcae7b1ffb60b93994a7"
+    },
+    {
+      "name": "multiplier-next.png",
+      "sha256": "f192544e22147bf60a4832a8aec0a7fe849bee1aee2f7e3e50c0534dfe2d55f2"
+    },
+    {
+      "name": "multiplier-settled.png",
+      "sha256": "27cbf2c43854967cea4f291fc2699825262f8185c3eac334e7fd7a382e2632ee"
+    }
+  ]
+}
