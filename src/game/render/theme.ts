@@ -1,5 +1,4 @@
 import type { MutationItem, PieceType } from '../core';
-import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 import { COLOR_NUMBERS } from '../../design/tokens/colors';
 
 export interface PieceMaterial {
@@ -7,6 +6,19 @@ export interface PieceMaterial {
   fillEnd: number;
   edge: number;
   innerEdge: number;
+}
+
+export interface MutationMaterial extends PieceMaterial {
+  facet: number;
+  glow: number;
+}
+
+export type MutationMaterialRole = 'active' | 'next' | 'ghost' | 'settled' | 'clear';
+
+export interface MutationMaterialStrength {
+  facet: number;
+  motif: number;
+  rim: number;
 }
 
 export const CELL_STYLE = {
@@ -29,6 +41,8 @@ export const CELL_STYLE = {
   faceBevelWidthRatio: 0.052,
   faceSignalAlpha: 0.24,
   faceDarkAlpha: 0.46,
+  facetLightAlpha: 0.09,
+  facetDarkAlpha: 0.07,
   seamGrooveWidthMin: 0.6,
   seamGrooveWidthMax: 1.2,
   seamGrooveWidthRatio: 0.038,
@@ -82,38 +96,49 @@ export const PIECE_MATERIALS: Record<PieceType, PieceMaterial> = {
   L: { fillStart: 0x65b3d1, fillEnd: 0x458da9, edge: 0x29576a, innerEdge: 0xb8e5f4 },
 };
 
-/**
- * Accent/core materials for a carrier attachment. The ordinary tetromino keeps its
- * own seven-bag material beneath this compact signal treatment, so item identity
- * never replaces shape identity.
- */
-export const MUTATION_MATERIALS: Record<MutationItem, PieceMaterial> = {
-  // Every attachment derives from the T14 VFX palette while retaining the
-  // raised-cell material grammar of the ordinary tetromino beneath it.
+/** Complete tetromino materials. No ordinary seven-bag body is rendered underneath. */
+export const MUTATION_MATERIALS: Record<MutationItem, MutationMaterial> = {
   freeze: {
-    fillStart: MUTATION_VFX_TOKENS.freeze.palette.primary,
-    fillEnd: MUTATION_VFX_TOKENS.freeze.palette.facet,
-    edge: MUTATION_VFX_TOKENS.freeze.palette.deep,
-    innerEdge: MUTATION_VFX_TOKENS.freeze.palette.highlight,
+    fillStart: 0x9beeff,
+    fillEnd: 0x58b8d2,
+    edge: 0x206d8a,
+    innerEdge: 0xe2fbff,
+    facet: 0x70d4e8,
+    glow: 0xbaf2ff,
   },
   collapse: {
-    fillStart: MUTATION_VFX_TOKENS.collapse.palette.primary,
-    fillEnd: MUTATION_VFX_TOKENS.collapse.palette.facet,
-    edge: MUTATION_VFX_TOKENS.collapse.palette.deep,
-    innerEdge: MUTATION_VFX_TOKENS.collapse.palette.highlight,
+    fillStart: 0xaa7aff,
+    fillEnd: 0x7043bd,
+    edge: 0x321354,
+    innerEdge: 0xe2c6ff,
+    facet: 0x8659d4,
+    glow: 0xc396ff,
   },
   bomb: {
-    fillStart: MUTATION_VFX_TOKENS.bomb.palette.primary,
-    fillEnd: MUTATION_VFX_TOKENS.bomb.palette.facet,
-    edge: MUTATION_VFX_TOKENS.bomb.palette.deep,
-    innerEdge: MUTATION_VFX_TOKENS.bomb.palette.highlight,
+    fillStart: 0xb95332,
+    fillEnd: 0x5c272d,
+    edge: 0x251116,
+    innerEdge: 0xffa24c,
+    facet: 0xd85b2d,
+    glow: 0xffb347,
   },
   multiplier: {
-    fillStart: MUTATION_VFX_TOKENS.multiplier.palette.primary,
-    fillEnd: MUTATION_VFX_TOKENS.multiplier.palette.facet,
-    edge: MUTATION_VFX_TOKENS.multiplier.palette.deep,
-    innerEdge: MUTATION_VFX_TOKENS.multiplier.palette.highlight,
+    fillStart: 0xffd46f,
+    fillEnd: 0xc89936,
+    edge: 0x76500f,
+    innerEdge: 0xfff3bd,
+    facet: 0xdfb24e,
+    glow: 0xffe29a,
   },
+};
+
+/** State-aware signal strength; all roles reuse the same body and motif grammar. */
+export const MUTATION_MATERIAL_STRENGTH: Record<MutationMaterialRole, MutationMaterialStrength> = {
+  active: { facet: 0.34, motif: 0.94, rim: 0.62 },
+  next: { facet: 0.3, motif: 0.86, rim: 0.56 },
+  ghost: { facet: 0, motif: 0.22, rim: 0.34 },
+  settled: { facet: 0.2, motif: 0.62, rim: 0.38 },
+  clear: { facet: 0.26, motif: 0.74, rim: 0.46 },
 };
 
 export const BEDROCK_MATERIAL: PieceMaterial = {

@@ -6,10 +6,10 @@ import {
   CELL_STYLE,
   COLORS,
   MUTATION_MATERIALS,
+  MUTATION_MATERIAL_STRENGTH,
   PIECE_MATERIALS,
   SURVIVAL_STONE_MATERIAL,
 } from './theme';
-import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 import { COLOR_NUMBERS, COLOR_TOKENS } from '../../design/tokens/colors';
 
 const styles = readFileSync(new URL('../../styles.css', import.meta.url), 'utf8');
@@ -66,44 +66,60 @@ describe('T5 bright mineral matte material', () => {
     expect(contrastRatio(SURVIVAL_STONE_MATERIAL.fillEnd, COLORS.well)).toBeGreaterThanOrEqual(3);
   });
 
-  it('derives four high-contrast attached-signal materials from the VFX palette', () => {
+  it('freezes four complete high-contrast Mutation materials without an ordinary underlay', () => {
     expect(MUTATION_MATERIALS).toEqual({
       freeze: {
-        fillStart: MUTATION_VFX_TOKENS.freeze.palette.primary,
-        fillEnd: MUTATION_VFX_TOKENS.freeze.palette.facet,
-        edge: MUTATION_VFX_TOKENS.freeze.palette.deep,
-        innerEdge: MUTATION_VFX_TOKENS.freeze.palette.highlight,
+        fillStart: 0x9beeff,
+        fillEnd: 0x58b8d2,
+        edge: 0x206d8a,
+        innerEdge: 0xe2fbff,
+        facet: 0x70d4e8,
+        glow: 0xbaf2ff,
       },
       collapse: {
-        fillStart: MUTATION_VFX_TOKENS.collapse.palette.primary,
-        fillEnd: MUTATION_VFX_TOKENS.collapse.palette.facet,
-        edge: MUTATION_VFX_TOKENS.collapse.palette.deep,
-        innerEdge: MUTATION_VFX_TOKENS.collapse.palette.highlight,
+        fillStart: 0xaa7aff,
+        fillEnd: 0x7043bd,
+        edge: 0x321354,
+        innerEdge: 0xe2c6ff,
+        facet: 0x8659d4,
+        glow: 0xc396ff,
       },
       bomb: {
-        fillStart: MUTATION_VFX_TOKENS.bomb.palette.primary,
-        fillEnd: MUTATION_VFX_TOKENS.bomb.palette.facet,
-        edge: MUTATION_VFX_TOKENS.bomb.palette.deep,
-        innerEdge: MUTATION_VFX_TOKENS.bomb.palette.highlight,
+        fillStart: 0xb95332,
+        fillEnd: 0x5c272d,
+        edge: 0x251116,
+        innerEdge: 0xffa24c,
+        facet: 0xd85b2d,
+        glow: 0xffb347,
       },
       multiplier: {
-        fillStart: MUTATION_VFX_TOKENS.multiplier.palette.primary,
-        fillEnd: MUTATION_VFX_TOKENS.multiplier.palette.facet,
-        edge: MUTATION_VFX_TOKENS.multiplier.palette.deep,
-        innerEdge: MUTATION_VFX_TOKENS.multiplier.palette.highlight,
+        fillStart: 0xffd46f,
+        fillEnd: 0xc89936,
+        edge: 0x76500f,
+        innerEdge: 0xfff3bd,
+        facet: 0xdfb24e,
+        glow: 0xffe29a,
       },
     });
     const starts = Object.values(MUTATION_MATERIALS).map((material) => material.fillStart);
     expect(new Set(starts).size).toBe(4);
     for (const material of Object.values(MUTATION_MATERIALS)) {
       expect(contrastRatio(material.fillStart, COLORS.well)).toBeGreaterThanOrEqual(3);
-      // The lower gradient endpoint is intentionally deep to keep the carrier
-      // dimensional; the lit face and signal rim retain the strict 3:1 floor.
+      // The lower endpoint may be dark mineral mass; the lit face and rim carry identity.
       expect(contrastRatio(material.fillEnd, COLORS.well)).toBeGreaterThanOrEqual(1.5);
       expect(contrastRatio(material.innerEdge, COLORS.well)).toBeGreaterThanOrEqual(3);
-      // Signals remain material-coloured; no carrier is a white-glyph substitute.
+      expect(contrastRatio(material.glow, COLORS.well)).toBeGreaterThanOrEqual(3);
       expect(material.innerEdge).not.toBe(0xffffff);
+      expect(material.facet).not.toBe(material.fillStart);
     }
+  });
+
+  it('uses one material grammar with quieter settled and silhouette-safe Ghost roles', () => {
+    expect(MUTATION_MATERIAL_STRENGTH.active.motif).toBeGreaterThan(MUTATION_MATERIAL_STRENGTH.settled.motif);
+    expect(MUTATION_MATERIAL_STRENGTH.next.motif).toBeGreaterThan(MUTATION_MATERIAL_STRENGTH.settled.motif);
+    expect(MUTATION_MATERIAL_STRENGTH.ghost.facet).toBe(0);
+    expect(MUTATION_MATERIAL_STRENGTH.ghost.motif).toBeLessThan(MUTATION_MATERIAL_STRENGTH.settled.motif);
+    expect(MUTATION_MATERIAL_STRENGTH.clear.motif).toBeGreaterThan(MUTATION_MATERIAL_STRENGTH.settled.motif);
   });
 
   it('bridges the complete renderer shell palette from Design System tokens', () => {
@@ -207,6 +223,8 @@ describe('T5 bright mineral matte material', () => {
       faceBevelWidthRatio: 0.052,
       faceSignalAlpha: 0.24,
       faceDarkAlpha: 0.46,
+      facetLightAlpha: 0.09,
+      facetDarkAlpha: 0.07,
       seamGrooveWidthMin: 0.6,
       seamGrooveWidthMax: 1.2,
       seamGrooveWidthRatio: 0.038,
