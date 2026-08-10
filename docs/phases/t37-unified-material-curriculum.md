@@ -153,7 +153,7 @@ and no Puzzle content is published without strict deterministic proof.
   later work in phases opens Stage D without misrepresenting the still-missing Ice 2
   uploader-original WAV/hash.
 
-### D. Route transition system
+### D. Transition and site identity system
 
 - **D1 — Settled Handoff URL routes:** one monotonic latest-request owner invalidates
   stale callbacks and joins History with the valid React commit. Use one stable named
@@ -166,10 +166,16 @@ and no Puzzle content is published without strict deterministic proof.
   waiting for visual completion. Reduced motion is one runtime-owned, no-translation,
   near-instant path. At every sample there is exactly one live route and at most one
   Canvas, with no stale listener/ticker/runtime.
-- **D2/D3 — bounded follow-ups:** apply the same grammar to mode intro/results without
-  moving the board, then replace the rejected equal 2×2 favicon with an original
-  vector-first TetraMorph transformation mark. The icon must remain distinct at
-  `16/32/64 px`, avoid four equal quadrants/commercial trade dress, and does not add PWA.
+- **D2 — Morph Core site identity:** replace the rejected equal 2×2 data-URI favicon
+  with one connected, asymmetric faceted mineral core. Use one stable teal/blue/violet
+  palette with a restrained off-centre gold core, derive transparent `16×16` / `32×32`
+  PNG fallbacks and a mask-safe `180×180` Apple icon from the vector source, and keep
+  manifest/service-worker/PWA installation out of scope. Real-size evidence must cover
+  `16/32/64 px` against light, Deep Tide, and Sunstone fields and prove the same browser
+  icon resources remain active after all three theme changes.
+- **D3 — bounded in-page follow-up:** apply Settled Handoff restraint to mode
+  intro/results without moving the board. D3 does not reopen the accepted D1 route owner
+  or the D2 identity assets.
 - Cover Chinese and English under all three themes, native/fallback/reduced paths,
   rapid navigation, history/back/forward, focus continuity, and actual intermediate
   frames rather than endpoint screenshots alone.

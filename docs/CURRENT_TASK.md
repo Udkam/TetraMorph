@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE D1 TECHNICAL CANDIDATE — PLAYER REVIEW OPEN**
+Status: **STAGE D2 SITE IDENTITY IMPLEMENTATION OPEN — D1 PLAYER REVIEW OPEN**
 
 ## Active objective
 
@@ -74,11 +74,11 @@ browser-evidence, and independent-QA gates; normal-speed player review remains o
 3. **Complete audio palette — HUMAN ACCEPTED; ORIGINAL-WAV PROVENANCE FOLLOW-UP OPEN** —
    the preceding production candidate and its joined clear/Bomb behavior are accepted;
    retain the Ice uploader-original archive/hash as an honest parallel evidence item.
-4. **Transition and identity system — D1 TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — the
+4. **Transition and identity system — D1 TECHNICAL ACCEPT; D2 IDENTITY OPEN** — the
    URL-route handoff now has latest-request ownership, Canvas-ready native capture,
    continuous fallback, direction, focus/history continuity, explicit reduced motion,
-   and no duplicate mounts/listeners/canvases. Later bounded slices cover the new
-   vector-first site icon and then in-page sheets/results.
+   and no duplicate mounts/listeners/canvases. D1 player review remains open while the
+   independent D2 slice replaces the favicon; in-page sheets/results follow later.
 5. **Material system** — ordinary-piece polish and the four whole-piece Mutation
    materials, including Next/ghost/clear/audio agreement and once-per-piece triggering.
 6. **Puzzle curriculum** — 5/25/16 content, deduplication, solver certificates,
@@ -382,6 +382,13 @@ browser-evidence, and independent-QA gates; normal-speed player review remains o
   a cross, a letter mark, or a corporate red/green/blue/yellow quadrant. It must ship as
   vector-first favicon assets with verified `16/32/64 px` browser-tab readability and
   no manifest, service worker, or PWA installation surface.
+- **D2 exact boundary:** the contract checkpoint owns this file, `docs/DESIGN.md`, the
+  T37 phase document, and the bounded state. Product work is limited to `index.html`,
+  `public/favicon.svg`, its generated `16×16` / `32×32` PNG fallbacks, the `180×180`
+  Apple touch icon, one reproducible generator, and direct icon/index tests. Evidence is
+  a separate source-bound commit. D2 may not change Home layout, page transitions,
+  themes, Runtime/Renderer/Core/audio/Puzzle behavior, or the protected T27 and
+  `progress.md` paths.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current
@@ -2117,10 +2124,11 @@ single-Canvas ownership, and the remaining Phase-11 visual work stay unchanged.
 11. **The home wordmark is geometrically centred.** `TetraMorph` is centred on both
     axes of its dark brand panel at every supported viewport; letter overhang and font
     metrics may not be mistaken for container centring.
-12. **The site icon belongs to the four modes.** The favicon is an original 2×2 mark
-    made from the home palette in reading order: Classic green, Survival blue,
-    Mutation orange, Puzzle purple. It contains no commercial logo or letterform and
-    remains crisp at browser-tab size.
+12. **The site icon is one transforming material core.** The favicon uses the current
+    asymmetric Morph Core contract: one connected mineral contour, unequal diagonal
+    teal/blue/violet facets, and a small off-centre warm core. It contains no commercial
+    logo, letterform, four detached panes, equal 2×2 grid, or orthogonal cross, and
+    remains crisp at `16/32/64 px` across all three themes.
 13. **Consumed carriers leave no empty-cell frame.** Once any carrier cell is removed
     by a line clear, its material rim, cell outline, and attachment frame disappear
     with the cell. The one-shot activation may use local light or particles, but it may

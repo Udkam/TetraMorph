@@ -74,9 +74,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 9. `TECHNICAL ACCEPT — PLAYER REVIEW OPEN` — Stage D1 URL-route Settled Handoff at
    product `5329353` plus evidence `ab58b46`; later icon and in-page transition slices
    remain pending.
-10. `PENDING` — ordinary/Mutation whole-piece material system.
-11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
-12. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+10. `IN PROGRESS` — Stage D2 Morph Core site identity; D1 remains open only for the
+    player's normal-speed route-motion verdict.
+11. `PENDING` — ordinary/Mutation whole-piece material system.
+12. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
+13. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ## Verification state
 
@@ -338,13 +340,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Publish the frozen D1 technical candidate and request normal-speed player review of
-Home, Puzzle Library, and Game route changes. Keep that human verdict distinct from the
-green technical gate. The next implementation slice is only the vector-first Morph Core
-site identity with browser-tab size/theme evidence; mode intro/results remain a later
-transition slice. Preserve the inherited T27 and `progress.md` paths, continue to label
-the missing Ice uploader-original WAV/hash honestly, and do not reopen any accepted
-Stage-C sound or clear behavior.
+Implement only the D2 vector-first Morph Core site identity: correct the superseded 2×2
+contract, generate deterministic SVG/PNG/Apple assets, update the document head and
+direct tests, then collect browser-tab resource and `16/32/64 px` three-background
+evidence before independent QA. Keep D1's player verdict separate and leave mode
+intro/results for D3. Preserve the inherited T27 and `progress.md` paths, continue to
+label the missing Ice uploader-original WAV/hash honestly, and do not reopen any
+accepted Stage-C sound or clear behavior.
 
 ## Do not repeat
 
