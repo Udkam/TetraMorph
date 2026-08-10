@@ -1,7 +1,7 @@
 # T37 D1 Settled Handoff browser evidence
 
 This evidence is bound to product source
-`a1c9dea2baef4a022da6823e32b5a684dcabeba8`.
+`532935362392d00eafb80b8f198a929586437eda`.
 
 Run an owned Vite server on the default evidence origin, then execute:
 
@@ -18,6 +18,8 @@ Set `T37_ROUTE_ORIGIN` to use another explicitly owned local origin. The capture
 - the continuously visible 160 ms fallback path;
 - the resolved reduced-motion opacity-only path, sampled in-page without extending its
   product timer;
+- all six Chinese/English × Mineral Mist/Deep Tide/Sunstone route combinations, with
+  any competing child animation treated as a failure;
 - a 390 × 844 Puzzle Library endpoint with no viewport overflow and route controls at
   least 44 px high.
 

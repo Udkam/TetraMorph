@@ -1,11 +1,16 @@
 {
-  "sourceSha": "a1c9dea2baef4a022da6823e32b5a684dcabeba8",
-  "capturedAt": "2026-08-09T23:43:46.229Z",
+  "sourceSha": "532935362392d00eafb80b8f198a929586437eda",
+  "capturedAt": "2026-08-10T00:02:46.604Z",
   "origin": "http://127.0.0.1:4192",
   "browser": "149.0.7827.55",
   "evidence": {
     "native": {
       "forwardAnimations": [
+        {
+          "name": "-ua-view-transition-group-anim-app-route",
+          "pseudoElement": "::view-transition-group(app-route)",
+          "duration": 200
+        },
         {
           "name": "t37-route-settle",
           "pseudoElement": "::view-transition-new(app-route)",
@@ -21,6 +26,8 @@
         {
           "timeMs": 0,
           "path": "/puzzles",
+          "language": "zh-CN",
+          "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
               "version": 1,
@@ -68,11 +75,14 @@
               "playState": "paused",
               "pseudoElement": "::view-transition-old(app-route)"
             }
-          ]
+          ],
+          "otherAnimations": []
         },
         {
           "timeMs": 60,
           "path": "/puzzles",
+          "language": "zh-CN",
+          "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
               "version": 1,
@@ -120,11 +130,14 @@
               "playState": "paused",
               "pseudoElement": "::view-transition-old(app-route)"
             }
-          ]
+          ],
+          "otherAnimations": []
         },
         {
           "timeMs": 120,
           "path": "/puzzles",
+          "language": "zh-CN",
+          "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
               "version": 1,
@@ -172,11 +185,14 @@
               "playState": "paused",
               "pseudoElement": "::view-transition-old(app-route)"
             }
-          ]
+          ],
+          "otherAnimations": []
         },
         {
           "timeMs": 200,
           "path": "/puzzles",
+          "language": "zh-CN",
+          "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
               "version": 1,
@@ -224,11 +240,14 @@
               "playState": "paused",
               "pseudoElement": "::view-transition-old(app-route)"
             }
-          ]
+          ],
+          "otherAnimations": []
         }
       ],
       "forwardFinal": {
         "path": "/puzzles",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -261,9 +280,15 @@
           "scrollWidth": 1440,
           "scrollHeight": 900
         },
-        "animations": []
+        "animations": [],
+        "otherAnimations": []
       },
       "backAnimations": [
+        {
+          "name": "-ua-view-transition-group-anim-app-route",
+          "pseudoElement": "::view-transition-group(app-route)",
+          "duration": 200
+        },
         {
           "name": "t37-route-settle",
           "pseudoElement": "::view-transition-new(app-route)",
@@ -277,6 +302,8 @@
       ],
       "backDuring": {
         "path": "/",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -324,10 +351,13 @@
             "playState": "paused",
             "pseudoElement": "::view-transition-old(app-route)"
           }
-        ]
+        ],
+        "otherAnimations": []
       },
       "backFinal": {
         "path": "/",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -360,10 +390,13 @@
           "scrollWidth": 1440,
           "scrollHeight": 900
         },
-        "animations": []
+        "animations": [],
+        "otherAnimations": []
       },
       "gameDuring": {
         "path": "/play/classic",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -410,11 +443,43 @@
             "duration": 120,
             "playState": "paused",
             "pseudoElement": "::view-transition-old(app-route)"
+          }
+        ],
+        "otherAnimations": [
+          {
+            "name": "entry-cover-in",
+            "pseudoElement": null
+          },
+          {
+            "name": "entry-cover-breathe",
+            "pseudoElement": "::before"
+          },
+          {
+            "name": "entry-countdown-in",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
           }
         ]
       },
       "interruptionInput": {
         "path": "/play/classic",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -461,6 +526,44 @@
             "duration": 120,
             "playState": "paused",
             "pseudoElement": "::view-transition-old(app-route)"
+          }
+        ],
+        "otherAnimations": [
+          {
+            "name": "entry-cover-in",
+            "pseudoElement": null
+          },
+          {
+            "name": "entry-cover-breathe",
+            "pseudoElement": "::before"
+          },
+          {
+            "name": "entry-countdown-in",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "sheet-backdrop-in",
+            "pseudoElement": null
+          },
+          {
+            "name": "sheet-in",
+            "pseudoElement": null
           }
         ]
       },
@@ -490,14 +593,14 @@
         "fallTicks": 48,
         "placedPieces": 0,
         "active": {
-          "type": "L",
+          "type": "Z",
           "x": 3,
           "y": 19,
           "rotation": 0
         },
-        "next": "O",
+        "next": "L",
         "nextPreviews": [
-          "O"
+          "L"
         ],
         "visibleBoard": [
           "..........",
@@ -524,6 +627,8 @@
       },
       "interruptedFinal": {
         "path": "/",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -556,10 +661,13 @@
           "scrollWidth": 1440,
           "scrollHeight": 900
         },
-        "animations": []
+        "animations": [],
+        "otherAnimations": []
       },
       "rapidFinal": {
         "path": "/play/classic",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -592,7 +700,37 @@
           "scrollWidth": 1440,
           "scrollHeight": 900
         },
-        "animations": []
+        "animations": [],
+        "otherAnimations": [
+          {
+            "name": "entry-cover-in",
+            "pseudoElement": null
+          },
+          {
+            "name": "entry-cover-breathe",
+            "pseudoElement": "::before"
+          },
+          {
+            "name": "entry-countdown-in",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          },
+          {
+            "name": "run-stat-value-enter",
+            "pseudoElement": null
+          }
+        ]
       },
       "rapidText": {
         "coordinateSystem": "board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows",
@@ -625,9 +763,9 @@
           "y": 19,
           "rotation": 0
         },
-        "next": "L",
+        "next": "I",
         "nextPreviews": [
-          "L"
+          "I"
         ],
         "visibleBoard": [
           "..........",
@@ -663,6 +801,8 @@
       ],
       "during": {
         "path": "/puzzles",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -703,10 +843,13 @@
             "playState": "paused",
             "pseudoElement": null
           }
-        ]
+        ],
+        "otherAnimations": []
       },
       "final": {
         "path": "/puzzles",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -739,13 +882,14 @@
           "scrollWidth": 1440,
           "scrollHeight": 900
         },
-        "animations": []
+        "animations": [],
+        "otherAnimations": []
       }
     },
     "reduced": {
       "samples": [
         {
-          "elapsedMs": 36,
+          "elapsedMs": 36.19999998807907,
           "mode": "reduced",
           "direction": "forward",
           "path": "/puzzles",
@@ -761,7 +905,7 @@
           ]
         },
         {
-          "elapsedMs": 88.19999998807907,
+          "elapsedMs": 90.5,
           "mode": "reduced",
           "direction": "forward",
           "path": "/puzzles",
@@ -777,7 +921,7 @@
           ]
         },
         {
-          "elapsedMs": 93.19999998807907,
+          "elapsedMs": 92.69999998807907,
           "mode": "reduced",
           "direction": "forward",
           "path": "/puzzles",
@@ -793,7 +937,7 @@
           ]
         },
         {
-          "elapsedMs": 113.09999999403954,
+          "elapsedMs": 111.59999999403954,
           "mode": "idle",
           "direction": "neutral",
           "path": "/puzzles",
@@ -804,6 +948,8 @@
       ],
       "final": {
         "path": "/puzzles",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -836,12 +982,15 @@
           "scrollWidth": 1440,
           "scrollHeight": 900
         },
-        "animations": []
+        "animations": [],
+        "otherAnimations": []
       }
     },
     "mobile": {
       "final": {
         "path": "/puzzles",
+        "language": "zh-CN",
+        "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
             "version": 1,
@@ -874,7 +1023,8 @@
           "scrollWidth": 390,
           "scrollHeight": 844
         },
-        "animations": []
+        "animations": [],
+        "otherAnimations": []
       },
       "geometry": {
         "innerWidth": 390,
@@ -944,7 +1094,267 @@
           }
         ]
       }
-    }
+    },
+    "languageThemeMatrix": [
+      {
+        "language": "zh-CN",
+        "theme": "mineral-mist",
+        "final": {
+          "path": "/puzzles",
+          "language": "zh-CN",
+          "theme": "mineral-mist",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "idle",
+          "appDirection": "neutral",
+          "rootDirection": null,
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 补行，3 行残局，可进入",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1180,
+            "height": 760,
+            "scrollWidth": 1180,
+            "scrollHeight": 760
+          },
+          "animations": [],
+          "otherAnimations": []
+        }
+      },
+      {
+        "language": "zh-CN",
+        "theme": "deep-tide",
+        "final": {
+          "path": "/puzzles",
+          "language": "zh-CN",
+          "theme": "deep-tide",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "idle",
+          "appDirection": "neutral",
+          "rootDirection": null,
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 补行，3 行残局，可进入",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1180,
+            "height": 760,
+            "scrollWidth": 1180,
+            "scrollHeight": 760
+          },
+          "animations": [],
+          "otherAnimations": []
+        }
+      },
+      {
+        "language": "zh-CN",
+        "theme": "sunstone",
+        "final": {
+          "path": "/puzzles",
+          "language": "zh-CN",
+          "theme": "sunstone",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "idle",
+          "appDirection": "neutral",
+          "rootDirection": null,
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 补行，3 行残局，可进入",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1180,
+            "height": 760,
+            "scrollWidth": 1180,
+            "scrollHeight": 760
+          },
+          "animations": [],
+          "otherAnimations": []
+        }
+      },
+      {
+        "language": "en",
+        "theme": "mineral-mist",
+        "final": {
+          "path": "/puzzles",
+          "language": "en",
+          "theme": "mineral-mist",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "idle",
+          "appDirection": "neutral",
+          "rootDirection": null,
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 Gap, 3-row puzzle, ready",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1180,
+            "height": 760,
+            "scrollWidth": 1180,
+            "scrollHeight": 760
+          },
+          "animations": [],
+          "otherAnimations": []
+        }
+      },
+      {
+        "language": "en",
+        "theme": "deep-tide",
+        "final": {
+          "path": "/puzzles",
+          "language": "en",
+          "theme": "deep-tide",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "idle",
+          "appDirection": "neutral",
+          "rootDirection": null,
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 Gap, 3-row puzzle, ready",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1180,
+            "height": 760,
+            "scrollWidth": 1180,
+            "scrollHeight": 760
+          },
+          "animations": [],
+          "otherAnimations": []
+        }
+      },
+      {
+        "language": "en",
+        "theme": "sunstone",
+        "final": {
+          "path": "/puzzles",
+          "language": "en",
+          "theme": "sunstone",
+          "historyState": {
+            "tetramorphRoute": {
+              "version": 1,
+              "navigation": {
+                "screen": "puzzle-library",
+                "mode": "puzzle",
+                "selectedPuzzleId": "t3r-shaft-01"
+              }
+            }
+          },
+          "transitionMode": "idle",
+          "appDirection": "neutral",
+          "rootDirection": null,
+          "viewportCount": 1,
+          "surfaceCount": 1,
+          "canvasCount": 0,
+          "domCellCount": 0,
+          "activeTestId": "level-row",
+          "activeAriaLabel": "01 Gap, 3-row puzzle, ready",
+          "surfaceTestId": "puzzle-library",
+          "surfaceViewTransitionName": "none",
+          "viewportViewTransitionName": "app-route",
+          "viewportOpacity": "1",
+          "viewportTransform": "none",
+          "viewportRect": {
+            "x": 0,
+            "y": 0,
+            "width": 1180,
+            "height": 760,
+            "scrollWidth": 1180,
+            "scrollHeight": 760
+          },
+          "animations": [],
+          "otherAnimations": []
+        }
+      }
+    ]
   },
   "browserErrors": [],
   "failures": []

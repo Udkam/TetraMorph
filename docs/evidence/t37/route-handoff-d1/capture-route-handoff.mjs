@@ -22,17 +22,21 @@ const requireEvidence = (condition, message) => {
   if (!condition) failures.push(message);
 };
 
-const addKnownPreferences = async (context, { reducedMotion = false } = {}) => {
-  await context.addInitScript(({ reduced }) => {
+const addKnownPreferences = async (context, {
+  reducedMotion = false,
+  language = 'zh-CN',
+  theme = 'mineral-mist',
+} = {}) => {
+  await context.addInitScript(({ reduced, selectedLanguage, selectedTheme }) => {
     localStorage.clear();
-    localStorage.setItem('tetramorph:language:v1', 'zh-CN');
-    localStorage.setItem('tetramorph:visual-theme:v1', 'mineral-mist');
+    localStorage.setItem('tetramorph:language:v1', selectedLanguage);
+    localStorage.setItem('tetramorph:visual-theme:v1', selectedTheme);
     localStorage.setItem('tetramorph:reduced-motion:v1', reduced ? 'on' : 'off');
     localStorage.setItem(
       'tetramorph:mode-rule-intros:v1',
       JSON.stringify(['marathon', 'race', 'sprint', 'puzzle']),
     );
-  }, { reduced: reducedMotion });
+  }, { reduced: reducedMotion, selectedLanguage: language, selectedTheme: theme });
 };
 
 const observePage = (page, label) => {
@@ -52,6 +56,8 @@ const routeSnapshot = (page) => page.evaluate((collectAnimations) => {
   const rect = viewport?.getBoundingClientRect();
   return {
     path: location.pathname,
+    language: app?.getAttribute('lang') ?? null,
+    theme: app?.getAttribute('data-theme') ?? null,
     historyState: history.state,
     transitionMode: app?.getAttribute('data-route-transition') ?? null,
     appDirection: app?.getAttribute('data-route-direction') ?? null,
@@ -88,33 +94,67 @@ const routeSnapshot = (page) => page.evaluate((collectAnimations) => {
         };
       }).filter((animation) => animation.name.startsWith('t37-route-'))
       : [],
+    otherAnimations: collectAnimations
+      ? document.getAnimations().map((animation) => ({
+        name: animation.animationName ?? '',
+        pseudoElement: animation.effect?.pseudoElement ?? null,
+      })).filter((animation) => (
+        animation.name
+          && !animation.name.startsWith('t37-route-')
+          && !animation.pseudoElement?.includes('view-transition')
+      ))
+      : [],
   };
 }, true);
 
-const pauseRouteAnimations = async (page, expectedName) => {
-  await page.waitForFunction((name) => document.getAnimations().some(
-    (animation) => animation.animationName === name,
-  ), expectedName, { timeout: 2_000, polling: 8 });
-  return page.evaluate((name) => {
+const armRouteAnimationPause = (page, expectedName) => page.evaluate((name) => {
+  globalThis.__T37_ROUTE_EVIDENCE_PAUSE__ = { expectedName: name, details: null };
+  const poll = () => {
+    const slot = globalThis.__T37_ROUTE_EVIDENCE_PAUSE__;
+    if (!slot || slot.expectedName !== name || slot.details) return;
     const animations = document.getAnimations().filter(
-      (animation) => animation.animationName?.startsWith('t37-route-'),
+      (animation) => (
+        animation.animationName?.startsWith('t37-route-')
+          || animation.effect?.pseudoElement?.includes('view-transition')
+      ),
     );
-    for (const animation of animations) animation.pause();
-    if (!animations.some((animation) => animation.animationName === name)) {
+    if (animations.some((animation) => animation.animationName === name)) {
+      for (const animation of animations) animation.pause();
+      slot.details = animations.map((animation) => ({
+        name: animation.animationName,
+        pseudoElement: animation.effect?.pseudoElement ?? null,
+        duration: animation.effect?.getComputedTiming?.().duration ?? null,
+      }));
+      return;
+    }
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+}, expectedName);
+
+const pauseRouteAnimations = async (page, expectedName) => {
+  await page.waitForFunction((name) => {
+    const slot = globalThis.__T37_ROUTE_EVIDENCE_PAUSE__;
+    return slot?.expectedName === name && Array.isArray(slot.details);
+  }, expectedName, { timeout: 2_000, polling: 8 });
+  return page.evaluate((name) => {
+    const slot = globalThis.__T37_ROUTE_EVIDENCE_PAUSE__;
+    if (slot?.expectedName !== name || !Array.isArray(slot.details)) {
       throw new Error(`Missing route animation ${name}`);
     }
-    return animations.map((animation) => ({
-      name: animation.animationName,
-      pseudoElement: animation.effect?.pseudoElement ?? null,
-      duration: animation.effect?.getComputedTiming?.().duration ?? null,
-    }));
+    const details = slot.details;
+    delete globalThis.__T37_ROUTE_EVIDENCE_PAUSE__;
+    return details;
   }, expectedName);
 };
 
 const seekRouteAnimations = async (page, timeMs) => {
   await page.evaluate((time) => {
     for (const animation of document.getAnimations()) {
-      if (!animation.animationName?.startsWith('t37-route-')) continue;
+      if (
+        !animation.animationName?.startsWith('t37-route-')
+          && !animation.effect?.pseudoElement?.includes('view-transition')
+      ) continue;
       animation.pause();
       animation.currentTime = time;
     }
@@ -124,7 +164,10 @@ const seekRouteAnimations = async (page, timeMs) => {
 const finishRouteAnimations = async (page) => {
   await page.evaluate(() => {
     for (const animation of document.getAnimations()) {
-      if (!animation.animationName?.startsWith('t37-route-')) continue;
+      if (
+        !animation.animationName?.startsWith('t37-route-')
+          && !animation.effect?.pseudoElement?.includes('view-transition')
+      ) continue;
       try {
         animation.finish();
       } catch {
@@ -211,6 +254,7 @@ try {
   requireEvidence(await nativePage.evaluate(() => typeof document.startViewTransition === 'function'), 'native: View Transition API unavailable');
   await screenshot(nativePage, 'native-home-final.png');
 
+  await armRouteAnimationPause(nativePage, 't37-route-settle');
   await nativePage.evaluate(() => document.querySelector('[data-testid="enter-puzzle"]')?.click());
   await nativePage.getByTestId('puzzle-library').waitFor();
   const forwardAnimations = await pauseRouteAnimations(nativePage, 't37-route-settle');
@@ -230,6 +274,7 @@ try {
   requireEvidence(forwardAnimations.some((animation) => animation.name === 't37-route-settle' && animation.duration === 200), 'native-forward: missing 200 ms settle animation');
   requireEvidence(forwardAnimations.some((animation) => animation.pseudoElement?.includes('view-transition-old')), 'native-forward: missing old-route pseudo snapshot');
   requireEvidence(forwardAnimations.some((animation) => animation.pseudoElement?.includes('view-transition-new')), 'native-forward: missing new-route pseudo snapshot');
+  requireEvidence(forwardFrames.every((frame) => frame.otherAnimations.length === 0), `native-forward: competing child animation appeared ${JSON.stringify(forwardFrames.map((frame) => frame.otherAnimations))}`);
   await finishRouteAnimations(nativePage);
   await nativePage.waitForFunction(() => document.activeElement?.matches('[data-testid="level-row"][aria-pressed="true"]'));
   const forwardFinal = await routeSnapshot(nativePage);
@@ -238,6 +283,7 @@ try {
   requireEvidence(forwardFinal.activeTestId === 'level-row', `native-forward-final: selected level did not receive focus (${forwardFinal.activeTestId})`);
   await screenshot(nativePage, 'native-forward-final.png');
 
+  await armRouteAnimationPause(nativePage, 't37-route-settle');
   await nativePage.evaluate(() => history.back());
   await nativePage.getByTestId('mode-home').waitFor();
   const backAnimations = await pauseRouteAnimations(nativePage, 't37-route-settle');
@@ -257,6 +303,7 @@ try {
 
   // Enter a game while native capture is active. The pseudo animation cannot exist
   // until Pixi has mounted its one Canvas and rendered the destination snapshot.
+  await armRouteAnimationPause(nativePage, 't37-route-settle');
   await nativePage.evaluate(() => document.querySelector('[data-testid="enter-marathon"]')?.click());
   await nativePage.getByTestId('game-screen').waitFor();
   await nativePage.waitForSelector('[data-testid="canvas-host"] canvas');
@@ -267,6 +314,7 @@ try {
   validateTopology('native-game-ready', gameDuring, { expectedCanvas: 1 });
   requireEvidence(gameDuring.path === '/play/classic', `native-game-ready: wrong path ${gameDuring.path}`);
   requireEvidence(typeof gameText === 'string' && gameText.length > 0, 'native-game-ready: render_game_to_text is unavailable');
+  requireEvidence(!gameDuring.otherAnimations.some((animation) => animation.name === 'surface-in'), `native-game-ready: legacy route-mount animation appeared ${JSON.stringify(gameDuring.otherAnimations)}`);
   await screenshot(nativePage, 'native-game-canvas-ready-080ms.png');
 
   // Keyboard input reaches the committed route even while the compositor animation
@@ -329,6 +377,7 @@ try {
   const fallbackPage = await fallbackContext.newPage();
   observePage(fallbackPage, 'fallback');
   await fallbackPage.goto(origin, { waitUntil: 'networkidle' });
+  await armRouteAnimationPause(fallbackPage, 't37-route-settle');
   await fallbackPage.evaluate(() => document.querySelector('[data-testid="enter-puzzle"]')?.click());
   await fallbackPage.getByTestId('puzzle-library').waitFor();
   const fallbackAnimations = await pauseRouteAnimations(fallbackPage, 't37-route-settle');
@@ -434,6 +483,33 @@ try {
   await screenshot(mobilePage, 'mobile-puzzle-final.png');
   evidence.mobile = { final: mobileFinal, geometry: mobileGeometry };
   await mobileContext.close();
+
+  // Contract matrix: every language/theme combination performs a real Home ->
+  // Library handoff and reaches the same one-route topology without browser errors.
+  const matrix = [];
+  for (const language of ['zh-CN', 'en']) {
+    for (const theme of ['mineral-mist', 'deep-tide', 'sunstone']) {
+      const label = `${language.toLowerCase()}-${theme}`;
+      const matrixContext = await browser.newContext({ viewport: { width: 1180, height: 760 }, deviceScaleFactor: 1 });
+      await addKnownPreferences(matrixContext, { language, theme });
+      const matrixPage = await matrixContext.newPage();
+      observePage(matrixPage, `matrix-${label}`);
+      await matrixPage.goto(origin, { waitUntil: 'networkidle' });
+      await matrixPage.getByTestId('enter-puzzle').click();
+      await matrixPage.getByTestId('puzzle-library').waitFor();
+      await waitForIdle(matrixPage);
+      const final = await routeSnapshot(matrixPage);
+      validateTopology(`matrix-${label}`, final, { expectedCanvas: 0 });
+      requireEvidence(final.path === '/puzzles', `matrix-${label}: wrong path ${final.path}`);
+      requireEvidence(final.language === language, `matrix-${label}: wrong language ${final.language}`);
+      requireEvidence(final.theme === theme, `matrix-${label}: wrong theme ${final.theme}`);
+      requireEvidence(final.otherAnimations.length === 0, `matrix-${label}: residual child animation ${JSON.stringify(final.otherAnimations)}`);
+      await screenshot(matrixPage, `matrix-${label}.png`);
+      matrix.push({ language, theme, final });
+      await matrixContext.close();
+    }
+  }
+  evidence.languageThemeMatrix = matrix;
 
   failures.push(...browserErrors);
   const audit = {
