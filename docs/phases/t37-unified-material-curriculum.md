@@ -218,11 +218,11 @@ complete suite (`412 passed / 8 skipped`), and the 767-module build pass. Indepe
 static, audio, and original-detail visual QA report P0–P3 all zero. Human visual/play
 review remains open.
 
-### F. Puzzle curriculum v3 — F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED
+### F. Puzzle curriculum v3 — F1 CONTRACT FROZEN; F2 STRICT SEARCH NEXT
 
-- The candidate exact roster, four retirements, eight rebuilds, operation metric,
+- The exact roster, four retirements, eight rebuilds, operation metric,
   eight-key Easy-to-Hard graph, schema-8 artifact, rev2 behavior-hash baselines, and
-  v5-to-v6 migration are specified in
+  v5-to-v6 migration are frozen in
   `docs/phases/t37-puzzle-curriculum-v3.md`.
 - Author 5 Intro, preserve and recertify 25 Easy, and publish 16 Hard levels with stable
   IDs, technique tags, and no duplicate residual states. Easy stays fully open; every

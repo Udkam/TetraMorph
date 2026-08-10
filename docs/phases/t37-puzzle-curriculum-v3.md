@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED**
+Status: **F1 CONTRACT FROZEN; F2 STRICT SEARCH NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -28,7 +28,7 @@ No published definition changes in F1. The order is:
 The old T15/T32 route JSON and evidence are historical artifacts. They are not edited
 to impersonate v3 proof.
 
-## Candidate published roster
+## Frozen published roster
 
 `preserve` means the playable definition and behavior hash must remain byte-equivalent;
 category, ordinal, lesson copy, and a newly exhaustive certificate may change without

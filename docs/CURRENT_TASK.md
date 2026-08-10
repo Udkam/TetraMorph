@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED**
+Status: **STAGE F1 CONTRACT FROZEN; STAGE F2 STRICT SEARCH NEXT**
 
 ## Active objective
 
@@ -22,10 +22,9 @@ The uploader-original Ice WAV remains an explicit provenance follow-up, not a cl
 has been satisfied. On 2026-08-10 the player authorized later work to proceed in bounded
 stages despite that separate archive item. Stage D1 and Stage E now pass their bounded
 implementation, browser-evidence, and independent-QA gates; normal-speed player review
-remains open for both. The Stage F1 candidate now specifies the exact stable-ID roster,
-migration, operation metric, proof schema, admission fixtures, and frozen rev2 behavior-
-hash baselines. Stage F2 remains closed until independent QA accepts that contract; it
-then repairs the strict public-control search before any published Puzzle definition
+remains open for both. Stage F1 now freezes the exact stable-ID roster, migration,
+operation metric, proof schema, admission fixtures, and rev2 behavior-hash baselines.
+Stage F2 repairs the strict public-control search before any published Puzzle definition
 changes.
 
 ## Frozen product direction
@@ -88,11 +87,11 @@ changes.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED** — the exact
+6. **Puzzle curriculum — F1 CONTRACT FROZEN; F2 STRICT SEARCH NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
-   are proposed. Strict search stays closed until the corrected contract passes
-   independent QA.
+   are frozen. Strict search must now cover counter-clockwise SRS and anchor-supported
+   state before content authoring.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -160,7 +159,7 @@ strict search on representative hard cases before any bulk curriculum replacemen
 
 ### Stage F1 exact contract (2026-08-10)
 
-`docs/phases/t37-puzzle-curriculum-v3.md` is the candidate Stage-F roster and migration
+`docs/phases/t37-puzzle-curriculum-v3.md` is the authoritative Stage-F roster and migration
 contract. It makes no product-data change:
 
 - Intro is the rebuilt stable-ID set at current positions 1–5. Easy preserves current

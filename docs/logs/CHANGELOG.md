@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F1 Puzzle v3 contract frozen
+
+- Froze the active campaign identity at exactly 5 Intro / 25 Easy / 16 Hard levels:
+  38 definitions preserve behavior, eight rebuild under the same stable IDs, and four
+  redundant Hard IDs retire without ordinal remapping. Eight unchanged Easy technique
+  keys each gate a declared subset of the sixteen Hard levels at strict optimum plus
+  five locked tetrominoes.
+- Defined one operation as one real `piece-locked` tetromino and froze route-token v2,
+  schema-8 proof fields, ordinary/one-anchor/two-anchor admission fixtures, and the
+  10 × 20 first-pass capability boundary. F2 must add public counter-clockwise SRS,
+  anchor-support state identity, definition-aware exact replay/proof, and a zero anchor
+  lower bound before any level definition changes.
+- Pinned a canonical JSON/LF/SHA-256 serializer and all 38 preserve hashes from baseline
+  `e675389`. Revision-3 migration uses a literal historic 50-ID decoder, leaves v5
+  storage untouched, and maps v5 `bestPieceCounts` to v6 `bestLockedPieceCounts` only
+  for a matching stable ID and frozen behavior hash.
+- Candidate commits `740e3c9` and `b8b6874` stay within checkpoint budgets and touch
+  only five declared contract paths. Independent QA reproduces all hashes and roster
+  counts and confirms no protected T27 or `progress.md` path entered the range; its
+  only stale-status P2 is resolved by this coordinator disposition.
+
 ## 2026-08-10 — T37 Stage E whole-piece materials technically accepted
 
 - Replaced the former ordinary-body-plus-core presentation with four complete Mutation

@@ -339,7 +339,7 @@ adding unrelated badges or ornamental effects.
   route around anchors, plan cavities from the fixed two-piece preview, and control
   extra material introduced by a clear. The UI may reveal these ideas progressively
   but may not expose a full solution by default.
-- The Stage F1 candidate defines the active stable-ID roster in
+- Stage F1 freezes the active stable-ID roster in
   `docs/phases/t37-puzzle-curriculum-v3.md`. Current positions 1–5 become the five
   rebuilt Intro levels; current positions 6–30 remain definition-preserved as the 25
   Easy levels. Hard retires `tm-puzzle-34`, `tm-puzzle-40`, `tm-puzzle-42`, and
