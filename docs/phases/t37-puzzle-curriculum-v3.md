@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C BOUNDED PROTOTYPE TOOLING OPEN; PRODUCT DATA CLOSED**
+Status: **F3C PROTOTYPE TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -399,6 +399,15 @@ search only a fixed reversibly constructed ten-row mask with explicit seed/node/
 bounds and an explicit output path. Its result remains a candidate until the two-path
 fixture/test checkpoint independently replays setup and route and obtains the complete
 strict certificate.
+
+Tool candidate `8e86207` is the exact one-path implementation from base `5bd76e2`.
+`node --check` passes, its uint32 wrap guard rejects before output, and two identical
+`--seed-start 11 --seed-count 3 --node-budget 1500 --max-rss-mib 512` smokes produce
+byte-identical JSON with SHA-256
+`1869CAD02860106A349064BD3D0B7265E8F40FED7C1303B39DBDFB6082B2097A`. Both smokes
+stop at the intentional node budget (`1,501` attempted landings), so they validate
+determinism and containment rather than discover a candidate. Independent QA must
+accept this checkpoint before the one bounded substantive candidate batch begins.
 
 ## Progress v6 and revision-3 migration
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C BOUNDED PROTOTYPE TOOLING OPEN; PRODUCT DATA CLOSED**
+Status: **STAGE F3C PROTOTYPE TOOL CANDIDATE; INDEPENDENT QA REQUIRED**
 
 ## Active objective
 
@@ -377,6 +377,15 @@ only; it is not F3 source acceptance.
   byte-identical normalized output and exit without residual process/listener. A
   candidate can enter the final F3C JSON/test pair only after current Core setup replay,
   the fixed public route, state/lock hashes, and the no-beam exact certificate all pass.
+- Tool candidate `8e86207` changes only
+  `tools/search-puzzle-v3-prototype.mjs` from base `5bd76e2`. `node --check` passes;
+  two isolated `11..13` / 1,500-landing smokes both stop at the explicit budget with
+  identical SHA-256
+  `1869CAD02860106A349064BD3D0B7265E8F40FED7C1303B39DBDFB6082B2097A` and identical
+  counters (`1,501` attempted, `52` accepted, `40` failed states, `60` trie nodes).
+  A uint32-wrapping seed range fails before creating output. The tool candidate now
+  requires independent read-only QA; no substantive candidate search is authorized
+  until that disposition is recorded.
 
 ## Current checkpoint state
 

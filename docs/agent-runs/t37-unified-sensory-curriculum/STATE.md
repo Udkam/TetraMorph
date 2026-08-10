@@ -94,11 +94,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     four-anchor board, remapping, preview projection, and four independent public-route
     witnesses without opening production Core source. Independent QA accepts
     `3aa6766..6c3286c` with P0–P3 all zero.
-16. `F3C TOOLING DISCOVERY OPEN` — existing ten-row fixtures/local variants are
-    disproven or route-negative. The contract-authorized standalone search tool may
-    now recover one seeded legal setup for a fixed five-lock mask; product data remains
-    closed.
-17. `PENDING` — F3C fixture/test, later content, migration, UI, final gates, and push.
+16. `F3C TOOL CANDIDATE; QA REQUIRED` — existing ten-row fixtures/local variants are
+    disproven or route-negative. Standalone tool candidate `8e86207` now searches the
+    fixed five-lock mask deterministically; product data remains closed until its
+    independent disposition.
+17. `PENDING` — bounded candidate batch, F3C fixture/test, later content, migration, UI,
+    final gates, and push.
 
 ### Stage F3C tooling-discovery status
 
@@ -122,6 +123,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   It owns deterministic fixed-mask setup discovery with explicit seed range, node
   budget, RSS guard, and output path. Two identical smoke runs must match byte-for-byte.
   No tool result is F3C admission evidence.
+- Task `T37/F3C-tool`; base `5bd76e2`; candidate `8e86207`; exact changed path
+  `tools/search-puzzle-v3-prototype.mjs`. `node --check` and `git diff --cached --check`
+  pass. Two isolated seed `11..13`, 1,500-landing smokes intentionally exit at the budget
+  with identical normalized SHA-256
+  `1869CAD02860106A349064BD3D0B7265E8F40FED7C1303B39DBDFB6082B2097A`; each records
+  `1,501` attempted landings, `52` accepted placements, `40` failed states, and `60`
+  trie nodes. The explicit uint32-wrap negative test fails before output. No process,
+  listener, or repository output remains.
+- Blocker: this tool checkpoint is not accepted until independent read-only QA validates
+  the one-path range, Core-equivalent shapes/randomizer, fixed-mask invariants, guards,
+  and deterministic smoke. Next action: perform that QA, record the disposition, then
+  run one bounded substantive candidate batch only if accepted.
 
 ### Stage F3B accepted status
 
@@ -539,14 +552,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement only `tools/search-puzzle-v3-prototype.mjs` as the standalone F3C discovery
-checkpoint. Search the fixed reversible mask for a seeded legal twenty-drop setup;
-require explicit seed range, node budget, RSS guard, and output path, plus deterministic
-same-type adjacency and no-clear/no-hidden/off-mask rejection. Run two identical small
-smokes to byte equality before one bounded candidate batch. Do not open the final JSON,
-exact test, Intro boards, the 46-level module, v6 migration, mastery groups, Puzzle UI,
-or App source until this tool produces a Core-replayable candidate. Keep deferred
-identity, protected T27/`progress.md`, and the missing Ice archive separate.
+Independently review `5bd76e2..8e86207` plus this candidate-status documentation. Verify
+the exact tool path, Core-equivalent shapes and seven-bag order, fixed 80-cell ten-row
+mask, same-type/no-clear/no-hidden/off-mask rejection, seed/node/RSS/output guards, and
+two byte-identical small smokes. If P0–P3 remain zero, record acceptance and run exactly
+one bounded substantive candidate batch. Do not open the final JSON, exact test, Intro
+boards, the 46-level module, v6 migration, mastery groups, Puzzle UI, or App source until
+the tool produces a Core-replayable candidate. Keep deferred identity, protected
+T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
 

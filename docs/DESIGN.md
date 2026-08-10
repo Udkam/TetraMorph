@@ -402,6 +402,12 @@ adding unrelated badges or ornamental effects.
   open to recover a seeded legal setup for one fixed, reversibly constructed ten-row
   mask. Tool output remains authoring input only; Core replay and exact proof still own
   admission.
+- Standalone tool candidate `8e86207` implements that fixed-mask search without opening
+  product data. Its explicit seed, node, RSS, and output guards, seven-bag prefix trie,
+  and source-piece adjacency state reproduce byte-identical small-smoke output
+  (`1869CAD02860106A349064BD3D0B7265E8F40FED7C1303B39DBDFB6082B2097A`). It remains
+  unaccepted pending independent QA, and a successful tool result would still be only
+  authoring input for the Core-owned replay/route/certificate gate.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
