@@ -71,8 +71,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    centre-out correction and later reports all preceding modifications pass, accepting
    the bounded one-line reuse, strengthened Bomb join, and remaining cue candidate.
    Ice 2 original-WAV provenance remains open as a separate evidence follow-up.
-9. `IN PROGRESS` — Stage D1 URL-route Settled Handoff; later bounded transition/icon
-   slices remain pending.
+9. `TECHNICAL ACCEPT — PLAYER REVIEW OPEN` — Stage D1 URL-route Settled Handoff at
+   product `5329353` plus evidence `ab58b46`; later icon and in-page transition slices
+   remain pending.
 10. `PENDING` — ordinary/Mutation whole-piece material system.
 11. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
 12. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
@@ -314,19 +315,36 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   production build successfully. The temporary worktree was removed. Gitleaks 8.30.1
   scanned `origin/main..HEAD` with 62 commits and found no leaks. The original worktree's
   inherited T27/`progress.md` paths and existing user-owned Vite processes were untouched.
+- D1 implements one latest-request route owner, atomic History/React state, directional
+  native View Transitions, Canvas-ready Game capture, a continuous fallback, resolved
+  reduced-motion ownership, focus restoration, and terminal idle cleanup. The first
+  evidence review rejected competing Puzzle stage/grid and Game `surface-in` reveals;
+  product repairs `97e043f` and `5329353` remove them.
+- Evidence `ab58b46` binds 20 real Chromium PNGs and 23 independently reproducible
+  hashes to product `532935362392d00eafb80b8f198a929586437eda`. Its native,
+  fallback, reduced, mobile, interruption, latest-owner, Canvas, and six-language/theme
+  matrix audit reports zero failures/browser errors. The prescribed game client reaches
+  countdown 2 and then `playing` without an error artifact.
+- Post-source typecheck, the complete suite (`44 passed / 2 skipped` files; `410 passed /
+  8 skipped` tests), and the 767-module build pass. Architecture QA also passes 4 files /
+  `79/79`; both architecture and motion reviewers report
+  `P0 0 / P1 0 / P2 0 / P3 0` and ACCEPT. The exact range contains no inherited T27 or
+  `progress.md` path, and no product source changes follow `5329353`.
+- The site's Microsoft-like equal-2x2 favicon is the next independent identity slice.
+  The selected implementation direction is **Morph Core / 异形材质核**: a connected,
+  asymmetric faceted core with a small offset warm centre, stable across all themes and
+  proven at `16/32/64 px`; no PWA surface is added. This is a design direction, not yet
+  an implemented or human-accepted icon.
 
 ## Next exact action
 
-Record the player's explicit full acceptance and staged-work authorization, then
-implement only Stage D1 URL-route Settled Handoff. Preserve the inherited T27 and
-`progress.md` paths. D1 must establish latest-request ownership, atomic valid history/
-React commits, forward/back/neutral direction, one stable named viewport, Canvas-ready
-native capture, continuously visible fallback, resolved reduced-motion authority,
-focus/history context, terminal idle cleanup, one live route, and at most one Canvas.
-Run focused tests, then one final typecheck/full suite/build and current-source browser
-evidence before independent read-only QA and push. Keep mode intro/results and the new
-favicon as later independent slices. Continue to label the missing Ice uploader-original
-WAV/hash honestly; do not reopen any accepted Stage-C sound or clear behavior.
+Publish the frozen D1 technical candidate and request normal-speed player review of
+Home, Puzzle Library, and Game route changes. Keep that human verdict distinct from the
+green technical gate. The next implementation slice is only the vector-first Morph Core
+site identity with browser-tab size/theme evidence; mode intro/results remain a later
+transition slice. Preserve the inherited T27 and `progress.md` paths, continue to label
+the missing Ice uploader-original WAV/hash honestly, and do not reopen any accepted
+Stage-C sound or clear behavior.
 
 ## Do not repeat
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE D1 CONTRACT — ROUTE HANDOFF IMPLEMENTATION OPEN**
+Status: **STAGE D1 TECHNICAL CANDIDATE — PLAYER REVIEW OPEN**
 
 ## Active objective
 
@@ -20,7 +20,8 @@ player has since accepted R5 **Action A**, **Ice 2**, the strengthened Bomb impa
 continuous one-through-four-line clearing, and every other preceding Stage-C candidate.
 The uploader-original Ice WAV remains an explicit provenance follow-up, not a claim that
 has been satisfied. On 2026-08-10 the player authorized later work to proceed in bounded
-stages despite that separate archive item, so Stage D1 is now open.
+stages despite that separate archive item. Stage D1 now passes its implementation,
+browser-evidence, and independent-QA gates; normal-speed player review remains open.
 
 ## Frozen product direction
 
@@ -73,11 +74,11 @@ stages despite that separate archive item, so Stage D1 is now open.
 3. **Complete audio palette — HUMAN ACCEPTED; ORIGINAL-WAV PROVENANCE FOLLOW-UP OPEN** —
    the preceding production candidate and its joined clear/Bomb behavior are accepted;
    retain the Ice uploader-original archive/hash as an honest parallel evidence item.
-4. **Transition and identity system — D1 OPEN** — first replace URL-route handoff with
-   latest-request ownership, Canvas-ready native capture, continuous fallback,
-   direction, focus/history continuity, explicit reduced motion, and no duplicate
-   mounts/listeners/canvases. Later bounded slices cover in-page sheets/results and the
-   new vector-first site icon.
+4. **Transition and identity system — D1 TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — the
+   URL-route handoff now has latest-request ownership, Canvas-ready native capture,
+   continuous fallback, direction, focus/history continuity, explicit reduced motion,
+   and no duplicate mounts/listeners/canvases. Later bounded slices cover the new
+   vector-first site icon and then in-page sheets/results.
 5. **Material system** — ordinary-piece polish and the four whole-piece Mutation
    materials, including Next/ghost/clear/audio agreement and once-per-piece triggering.
 6. **Puzzle curriculum** — 5/25/16 content, deduplication, solver certificates,
@@ -367,6 +368,20 @@ stages despite that separate archive item, so Stage D1 is now open.
   helpers, Runtime/Renderer, Core, audio, or Puzzle data. The whole checkpoint requires
   typecheck, focused App tests, the later full suite/build/browser pass, and independent
   exact-range read-only QA.
+- D1 product source `5329353` and evidence `ab58b46` form the technical candidate. The
+  first evidence pass exposed competing Puzzle stage/grid reveals and Game
+  `surface-in`; repairs `97e043f` and `5329353` remove them without reopening accepted
+  gameplay motion. The final audit binds 20 real PNGs and 23 portable hashes, covers
+  native/fallback/reduced/mobile plus all six language/theme combinations, and records
+  zero failures or browser errors. Final typecheck, the complete suite (`44 passed / 2
+  skipped` files; `410 passed / 8 skipped` tests), and the 767-module build pass. Two
+  independent read-only reviews report `P0 0 / P1 0 / P2 0 / P3 0`; this opens player
+  review but does not claim human motion acceptance.
+- The next identity slice uses the original **Morph Core / 异形材质核** direction: one
+  connected asymmetric faceted core with an offset warm centre, never four equal panes,
+  a cross, a letter mark, or a corporate red/green/blue/yellow quadrant. It must ship as
+  vector-first favicon assets with verified `16/32/64 px` browser-tab readability and
+  no manifest, service worker, or PWA installation surface.
 - A player-observed Supergravity lock exposed that the retained whole-board column
   compactor moved an isolated settled cell to the floor and completed a row. This was
   not tunnelling—the compactor preserved vertical order—but it exceeded the current

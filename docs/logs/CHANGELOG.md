@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage D1 route handoff technical candidate awaiting player review
+
+- Replaced URL-route changes with the bounded **Settled Handoff** owner: one latest
+  request controls atomic History/React state, forward/back/neutral direction, a stable
+  named viewport, Canvas-ready Game capture, continuous fallback, resolved reduced
+  motion, focus restoration, and terminal idle cleanup. Product source is `5329353`.
+- The first evidence review correctly rejected competing destination reveals. Repairs
+  `97e043f` and `5329353` remove the Puzzle stage/grid animations and Game
+  `surface-in`; Game countdown/HUD motion remains board-owned and route handoff uses no
+  scale, blur, wipe, spring, or child cascade.
+- Evidence `ab58b46` binds 20 real Chromium PNGs and 23 portable SHA-256 entries to the
+  final product source. Native `0/60/120/200 ms`, Game Canvas-ready, fallback, reduced,
+  interruption/latest-owner, mobile, and all six Chinese/English × theme combinations
+  pass with zero audit failures or browser errors. The prescribed two-pass client
+  reaches countdown 2 and then `playing` without an error artifact.
+- Final typecheck, the complete suite (`44 passed / 2 skipped` files; `410 passed / 8
+  skipped` tests), and the 767-module build pass. Independent architecture QA also runs
+  `79/79` focused tests; architecture and motion reviews both ACCEPT with
+  `P0 0 / P1 0 / P2 0 / P3 0`. The candidate excludes inherited T27 evidence and
+  `progress.md`. Human play at normal speed remains the acceptance gate.
+- The next independent slice replaces the Microsoft-like four-pane favicon with the
+  vector-first **Morph Core / 异形材质核** direction: one connected asymmetric faceted
+  core, a small offset warm centre, stable three-theme identity, and verified
+  `16/32/64 px` tab readability. No manifest, service worker, or PWA surface is added.
+
 ## 2026-08-10 — T37 Stage C accepted; staged transition and icon work opened
 
 - The player reports that all preceding modifications pass. This closes the human
