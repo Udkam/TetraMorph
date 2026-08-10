@@ -470,6 +470,12 @@ adding unrelated badges or ornamental effects.
   prefix evidence, so a fourth round may only apply the same 312,500-probe increment to
   every incomplete shard from cursor 937,500 after the resource gate; no product path
   opens.
+- The fourth equal round reaches cursor 1,250,000 on every shard with no candidate,
+  completion, or memory stop. It adds the same 10,000,000 new probes but now requires
+  30,000,000 replay probes, making the deterministic replay cost explicit while keeping
+  memory bounded. Cumulative new fair coverage is 40,000,000. Until a separately frozen
+  algorithm revision is reviewed, only the same fifth-round increment may continue;
+  no product path opens.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

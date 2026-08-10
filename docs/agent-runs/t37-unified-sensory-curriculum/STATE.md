@@ -108,7 +108,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     second increment and remain budget-incomplete with no candidate or memory stop.
 22. `F3C THIRD FAIR ROUND COMPLETE; FOURTH NEXT` — all 32 shards receive the same
     third increment and remain budget-incomplete with no candidate or memory stop.
-23. `PENDING` — fourth fair-round candidate, F3C fixture/test, later content, migration, UI,
+23. `F3C FOURTH FAIR ROUND COMPLETE; FIFTH NEXT` — all 32 shards receive the same
+    fourth increment and remain budget-incomplete with no candidate or memory stop.
+24. `PENDING` — fifth fair-round candidate, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -268,6 +270,20 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Fourth-round preflight at HEAD `cf9ff86` is red: CPU 97.2%, free memory 11.45 GiB,
   disk queue zero; after 30 seconds CPU remains 94.0% with 12.33 GiB free. No fourth-
   round output or owned search process exists, so the fourth round does not start.
+- On continuation at HEAD `2442ee7`, preflight remains red at 97.2% and then 99.0%.
+  After a bounded read-only reverse-geometry probe and another wait, CPU returns to
+  amber at 88.7% with 12.33 GiB free and disk queue zero. The reverse probe is not a
+  candidate or contract change: it exhausts 200,000 nodes at depth 16 with no solution.
+- The frozen fourth round then runs all 32 shards serially at cursor 937,500 and adds
+  312,500 new probes each. Every shard is `budget-exhausted` at cursor 1,250,000 with
+  zero candidate/complete/memory statuses, adjacent seed ranges, and unchanged
+  domain/queue digests. Elapsed time is 81.7 seconds.
+- The fourth invocation totals are 30,000,000 replay probes, 10,000,000 new probes, and
+  40,000,000 attempted probes. Replay-inclusive accepted/failed/trie-node counts are
+  `1,164,487 / 1,162,739 / 337,031`; the ordered manifest hash is
+  `14D1B742...1D616`. All exact Temp outputs are removed, matching Temp count is zero,
+  owned process count is zero, and cumulative new fair coverage is 40,000,000. This is
+  not a negative proof.
 
 ### Stage F3B accepted status
 
@@ -686,10 +702,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Next exact action
 
 After a fresh resource and exact Temp-target check, run the same 32 shards serially in
-ascending order with cursor 937,500, 312,500 new probes each, and 900 MiB RSS. The
+ascending order with cursor 1,250,000, 312,500 new probes each, and 900 MiB RSS. The
 wrapper must accept tool exit code 2 and decide from the JSON status. Stop at the first
-candidate or memory guard; otherwise finish the equal fourth round, verify absolute
-cursor 1,250,000 and aggregate all 32 outputs, then remove every exact Temp output and
+candidate or memory guard; otherwise finish the equal fifth round, verify absolute
+cursor 1,562,500 and aggregate all 32 outputs, then remove every exact Temp output and
 confirm no owned process. Do not change seed domain or privilege a shard. Only a
 candidate may proceed to Core replay and the final F3C JSON/test; keep later content,
 deferred identity, T27/`progress.md`, and missing Ice archive closed.

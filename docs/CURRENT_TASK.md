@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C THIRD FAIR ROUND COMPLETE; FOURTH EQUAL ROUND NEXT**
+Status: **STAGE F3C FOURTH FAIR ROUND COMPLETE; FIFTH EQUAL ROUND NEXT**
 
 ## Active objective
 
@@ -484,6 +484,16 @@ only; it is not F3 source acceptance.
   `D7CBB36B03EC4DA715208F8F94F35466FD3A5114D2C4E29CBF9F2B354BFC7DC3`.
   All exact outputs are removed and no owned process remains. This remains a fair
   prefix, not a negative proof. A fourth equal round may replay cursor 937,500 and add
+  312,500 probes per incomplete shard only after a fresh resource check.
+- The fourth equal round gives every shard a fourth identical increment. All 32 remain
+  `budget-exhausted` at cursor 1,250,000 with zero candidates, complete shards, or RSS
+  stops. It replays 30,000,000 probes and adds 10,000,000 new probes for 40,000,000
+  physical attempts; cumulative new coverage is 40,000,000. Replay-inclusive
+  accepted/failed/trie-node counts are `1,164,487 / 1,162,739 / 337,031`; the ordered
+  `filename:SHA256` LF-joined manifest digest is
+  `14D1B742D64C36CC6EC247A92B7467149217C67E5AFD7137DAABE697CF21D616`.
+  All exact outputs are removed and no owned process remains. This is still a fair
+  prefix, not a negative proof. A fifth equal round may replay cursor 1,250,000 and add
   312,500 probes per incomplete shard only after a fresh resource check.
 
 ## Current checkpoint state
