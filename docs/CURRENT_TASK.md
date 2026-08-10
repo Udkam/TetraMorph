@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FIRST BATCH CONTAINED; FAIR-RESUME DESIGN NEXT**
+Status: **STAGE F3C FAIR-SHARD REVISION CONTRACT CANDIDATE**
 
 ## Active objective
 
@@ -397,6 +397,27 @@ only; it is not F3 source acceptance.
   `1..20000`. F3C must first freeze a deterministic fair-shard or resumable traversal
   revision on the same range; jumping to later seeds or merely increasing the budget is
   not authorized.
+- The minimal revision keeps the accepted forward Core-equivalent search and reopens
+  only `tools/search-puzzle-v3-prototype.mjs`. New required `--shard-count`,
+  `--shard-index`, and `--cursor` inputs partition the original domain into contiguous
+  seed-offset intervals using floor boundaries; their union is exactly the domain and
+  no seed belongs to two shards. Shard count is `1..seedCount`, index is
+  `0..shardCount-1`, cursor is nonnegative, and cursor plus budget may not exceed the
+  existing 1,000,000,000-probe ceiling. `--node-budget` becomes the explicit count of new
+  landing probes after the cursor, while deterministic replay rebuilds prior memo state.
+  A distinct stop sentinel must unwind without caching incomplete states, and the probe
+  limit is checked before execution so coverage has no `+1` ambiguity.
+- Schema 2 output must bind traversal `seed-shard-replay-v1`, an uppercase SHA-256 of
+  canonical JSON covering mask, shapes/types, seed domain, sequence length, shard count,
+  and traversal order, plus domain and selected shard bounds,
+  start/next cursor, replayed/new probe counts, and completion state. A cursor that
+  reaches beyond natural exhaustion or would skip a replayed candidate fails closed.
+  The first fair round is frozen at 32 ascending shards of 625 seeds, cursor 0, and
+  312,500 new probes per shard (10,000,000 total), with 900 MiB RSS and explicit Temp
+  output. Existing type/rotation/x traversal and lowest-seed leaf selection remain
+  fixed; ascending shard order stops at the first candidate. Another substantive run
+  remains closed until independent contract review and a separately reviewed tool
+  candidate pass.
 
 ## Current checkpoint state
 

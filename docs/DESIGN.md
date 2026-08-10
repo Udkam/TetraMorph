@@ -415,6 +415,19 @@ adding unrelated badges or ornamental effects.
   work before a global budget stop, this is containment evidence, not a negative result.
   Any continuation must first specify deterministic non-overlapping shards or a compact
   resumable frontier for the same range; it may not silently skip to new seeds.
+- F3C keeps forward replay rather than replacing it with exact-cover, MITM, or reverse
+  peeling: the accepted implementation already matches Core, while the three-bag type
+  space is about `5040^3` and a JS middle-state table would add unmeasured 900 MiB risk.
+  The revision partitions the frozen seed range by contiguous offset floor boundaries.
+  Each shard owns an independent deterministic DFS and an absolute completed-probe
+  cursor; continuation replays the prefix to reconstruct memo state, then spends an
+  equal incremental landing budget. This trades repeated CPU for small, auditable
+  output and no serialized DFS stack.
+- Shard output schema 2 binds a stable domain hash over the mask, shapes/types, seed
+  domain, sequence length, shard count, and traversal order. It records selected seed
+  bounds plus replay/new cursor coverage. Only natural shard exhaustion is `not-found`;
+  budget or RSS stops remain incomplete. Equal-budget rounds visit shard indices in
+  ascending order before any shard receives its next increment.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

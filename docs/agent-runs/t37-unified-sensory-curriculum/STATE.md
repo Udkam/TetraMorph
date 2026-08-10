@@ -97,11 +97,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 16. `F3C TOOL ACCEPTED` — standalone tool `8e86207` searches the
     fixed five-lock mask deterministically. Independent QA accepts its five-path range
     with P0–P3 all zero.
-17. `F3C FIRST BATCH CONTAINED; FAIR RESUME NEXT` — the authorized seed `1..20000`
+17. `F3C FIRST BATCH CONTAINED` — the authorized seed `1..20000`
     batch reaches 10,000,001 attempted landings with no candidate. Its global DFS budget
-    does not exhaust the range; product data remains closed.
-18. `PENDING` — fair tool revision, candidate, F3C fixture/test, later content,
-    migration, UI, final gates, and push.
+    does not exhaust the range.
+18. `F3C FAIR-SHARD CONTRACT CANDIDATE` — retain forward search; add contiguous seed
+    shards, replay cursor, exact probe coverage, and fail-closed stop semantics. Product
+    data and further search remain closed pending contract and tool QA.
+19. `PENDING` — fair-round candidate, F3C fixture/test, later content, migration, UI,
+    final gates, and push.
 
 ### Stage F3C tooling-discovery status
 
@@ -154,6 +157,27 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   branches, so this is neither a full negative result nor permission to advance the
   seed range. Next action is read-only algorithm review, followed by a frozen minimal
   same-range fair-shard/resume contract before any tool edit or further search.
+- Two independent read-only designs reject an immediate exact-cover/MITM replacement:
+  forward Core equivalence is already accepted, 10,000,000 probes take only eight
+  seconds, the three-bag type space is about `5040^3`, and unmeasured JS middle tables
+  add memory risk. Reverse hard-drop peeling is reserved only if fair forward shards
+  later prove a single-seed geometry bottleneck.
+- Contract candidate: only `tools/search-puzzle-v3-prototype.mjs` may reopen. Require
+  `--shard-count`, `--shard-index`, and `--cursor`; shard the original seed offsets with
+  exact floor boundaries; interpret `--node-budget` as new landing probes after cursor;
+  deterministically replay the cursor to rebuild memo; use an explicit stop sentinel so
+  no incomplete state enters `failed`; check the absolute cursor-plus-budget limit
+  before a probe; keep the 1,000,000,000 absolute ceiling; require shard count within the
+  seed count and index within the shard count; and keep the seed/RSS/output guards.
+- Output schema 2 binds traversal `seed-shard-replay-v1`, uppercase canonical-JSON
+  SHA-256 over mask/shapes/types/domain/sequence/shard-count/order, original domain, shard
+  count/index/selected seed bounds, start/next cursor, replayed/new probes, and complete
+  state. Cursor past natural exhaustion or a replayed candidate fails closed. First fair
+  round, only after two QA gates: 32 shards in ascending order, 625 seeds each,
+  cursor 0, 312,500 new probes each, 900 MiB RSS, explicit repository-external output.
+  All incomplete shards receive one equal increment before any second round. Preserve
+  type/rotation/x traversal and minimum-seed leaf choice; stop at the first candidate in
+  ascending shard order.
 
 ### Stage F3B accepted status
 
@@ -571,14 +595,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Review the budget-exhausted first batch and freeze the smallest deterministic revision
-that fairly partitions or resumes the same seed `1..20000` search without overlap or
-coverage ambiguity. The contract must define CLI shard/cursor fields, traversal order,
-memo semantics, per-shard budgets, coverage output, candidate tie-breaking, RSS/output
-guards, and byte-identical smoke acceptance before reopening the sole tool path. Do not
-run another substantive search or open the final JSON/test, Intro boards, 46-level
-module, v6 migration, mastery groups, Puzzle UI, or App source. Keep deferred identity,
-protected T27/`progress.md`, and the missing Ice archive separate.
+Independently review this four-document fair-shard contract candidate. Verify exact
+contiguous partition coverage, deterministic replay-cursor semantics, STOP/memo safety,
+probe budget without `+1`, schema-2 domain/coverage evidence, equal-round scheduling,
+the sole tool path, and continued product/protected-path closure. If P0–P3 are zero,
+record acceptance and implement only the tool revision. Its candidate must then pass
+syntax, invalid-argument guards, exact small-domain shard union, byte-identical first
+and resumed smokes, cursor adjacency, RSS/output cleanup, and a second independent QA
+before any substantive fair round. Keep the final JSON/test, later content, deferred
+identity, T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

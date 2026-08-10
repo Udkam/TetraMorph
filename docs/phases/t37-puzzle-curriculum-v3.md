@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FIRST BATCH CONTAINED; FAIR-RESUME DESIGN NEXT**
+Status: **F3C FAIR-SHARD REVISION CONTRACT CANDIDATE**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -421,6 +421,30 @@ exhausted. Its Temp JSON hash is
 `1144E031CCA91E843F903E002FD79D37BA9507CBCC7856AE1A4DAEF7CF38223D`; the file and
 owned process are removed. Before another search, the contract must freeze a
 deterministic same-range fair-shard or resumable traversal and its coverage evidence.
+
+The revision contract retains the independently accepted forward search and opens only
+its existing tool path. The frozen `1..20000` domain is divided with
+`start=floor(seedCount*shardIndex/shardCount)` and
+`end=floor(seedCount*(shardIndex+1)/shardCount)` offsets. New required
+`--shard-count`, `--shard-index`, and `--cursor` arguments therefore produce complete,
+non-overlapping seed coverage. Shard count must be `1..seedCount`, shard index must be
+`0..shardCount-1`, cursor is nonnegative, and cursor plus budget cannot exceed the
+existing 1,000,000,000-probe limit. `--node-budget` counts only new landing probes after
+the cursor; deterministic replay reconstructs prior failed-state memo. Budget/RSS
+stopping uses a dedicated sentinel and may not memoize an incomplete caller.
+
+Schema 2 output must set traversal version `seed-shard-replay-v1` and compute uppercase
+SHA-256 over canonical JSON containing mask, shapes/types, seed domain, sequence length,
+shard count, and traversal order. It also includes original domain,
+selected shard seed bounds, start/next cursor, replayed and new probe counts, and
+`complete`. Probe limits are checked before execution, eliminating the old `+1` guard
+count. Cursor replay that encounters a prior candidate or ends before the cursor fails
+closed. After contract and tool QA, the first fair round runs shard indices `0..31` in
+order, each selecting 625 seeds with cursor 0 and 312,500 new probes; all 32 together
+own exactly 10,000,000 new probes under the unchanged 900 MiB RSS guard. No shard may
+receive a second increment until every incomplete shard has received the first. The
+existing type/rotation/x order and minimum seed at a matching trie leaf remain fixed;
+ascending shard order stops deterministically at the first candidate.
 
 ## Progress v6 and revision-3 migration
 
