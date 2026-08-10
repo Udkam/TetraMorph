@@ -51,7 +51,7 @@ import {
 } from './puzzleProgress';
 import { PUZZLE_HARD_MASTERY_GROUPS, PUZZLE_OPTIMAL_CERTIFICATES } from './puzzleMastery';
 import { LEADERBOARD_KEY, emptyLeaderboard, type ScoreRecord } from './leaderboard';
-import { itemLabel, modeIntroRules, modeRules, modeRulesTitle } from './ui/localization';
+import { appCopy, itemLabel, modeIntroRules, modeRules, modeRulesTitle } from './ui/localization';
 import type { VisualThemeId } from './design/visualThemes';
 import { appHistoryStateFor, appNavigationFromHistory } from './navigation/appRoute';
 
@@ -1128,7 +1128,8 @@ describe('T6 frontend mode binding', () => {
       'mechanic',
       'challenge',
     ]);
-    expect(rules.textContent).toContain('消除带核心标记的任意一格即可触发道具');
+    expect(rules.textContent).toContain('消除异变材质方块的任意一格，即可触发整件方块对应的道具');
+    expect(rules.textContent).not.toMatch(/核心|携带/);
     expect(rules.textContent).not.toContain('计时效果再次触发会刷新为 10 秒');
     expect(view.container.querySelector('[data-testid="mode-home"]')).not.toBeNull();
 
@@ -1307,7 +1308,7 @@ describe('T6 frontend mode binding', () => {
     const expected: Readonly<Record<GameMode, readonly string[]>> = {
       marathon: ['goal', 'pace', 'end'],
       race: ['start', 'pressure', 'stonefall', 'end'],
-      sprint: ['goal', 'carriers', 'items', 'end'],
+      sprint: ['goal', 'materials', 'items', 'end'],
       puzzle: ['goal', 'queue', 'undo', 'record'],
     };
 
@@ -1681,9 +1682,11 @@ describe('T6 frontend mode binding', () => {
     act(() => mutationRuntime.setState(mutationState));
     const mutationItem = nextMutationPreviewItem(mutationState);
     expect(mutationItem).not.toBeNull();
+    const mutationCopy = appCopy('zh-CN');
     expect(mutationSlot.getAttribute('aria-label')).toBe(
-      `下一个方块: ${mutationState.queue[0]} 方块，携带${itemLabel('zh-CN', mutationItem!)}道具`,
+      `下一个方块: ${mutationCopy.materials[mutationItem!]}材质的 ${mutationState.queue[0]} 方块，触发${itemLabel('zh-CN', mutationItem!)}`,
     );
+    expect(mutationSlot.getAttribute('aria-label')).not.toMatch(/核心|携带/);
     mutation.unmount();
   });
 

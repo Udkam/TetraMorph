@@ -2422,7 +2422,11 @@ export function GameSession({
     ? nextMutationPreviewItem(state)
     : null;
   const firstPreviewDescription = previewPieces[0] && previewMutationItem
-    ? copy.phrasing.mutationPreview(previewPieces[0], itemLabel(language, previewMutationItem))
+    ? copy.phrasing.mutationPreview(
+        previewPieces[0],
+        copy.materials[previewMutationItem],
+        itemLabel(language, previewMutationItem),
+      )
     : previewPieces[0];
   const firstPreviewLabel = firstPreviewDescription
     ? `${copy.labels.nextPiece}: ${firstPreviewDescription}`
