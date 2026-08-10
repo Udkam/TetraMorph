@@ -18,7 +18,7 @@ import {
   replayPuzzleRoute,
   replayPuzzleRouteForDefinition,
 } from './puzzleRouteSearch';
-import type { GameState, PuzzleId } from './types';
+import type { GameCommand, GameState, PuzzleId } from './types';
 
 type RecordedRoute = {
   id: 'primary' | 'alternate';
@@ -50,6 +50,47 @@ function startedPuzzleDefinition(definition: PuzzleDefinition): GameState {
     undefined,
     definition,
   ), { type: 'start' }).state;
+}
+
+function publicLandingSignatures(
+  state: GameState,
+  plannerCommands: readonly GameCommand[],
+): ReadonlySet<string> {
+  const queue: GameState[] = [state];
+  const activeKey = (candidate: GameState) => {
+    const active = candidate.active;
+    return active ? `${active.type}:${active.rotation}:${active.x}:${active.y}` : 'none';
+  };
+  const seen = new Set([activeKey(state)]);
+  const signatures = new Set<string>();
+
+  for (let index = 0; index < queue.length; index += 1) {
+    const parent = queue[index]!;
+    const dropped = dispatch(parent, { type: 'hard-drop' });
+    for (const event of dropped.events) {
+      if (event.type !== 'piece-locked') continue;
+      signatures.add(`${event.piece}:${[...event.cells]
+        .sort((left, right) => left.y - right.y || left.x - right.x)
+        .map((cell) => `${cell.x},${cell.y}`)
+        .join('|')}`);
+      break;
+    }
+
+    for (const command of plannerCommands) {
+      const transition = dispatch(parent, command);
+      if (
+        transition.state === parent
+        || transition.state.status !== 'playing'
+        || transition.state.phase !== 'active'
+        || transition.state.active === null
+      ) continue;
+      const key = activeKey(transition.state);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      queue.push(transition.state);
+    }
+  }
+  return signatures;
 }
 
 describe('Phase-7 Puzzle route search', () => {
@@ -96,7 +137,7 @@ describe('Phase-7 Puzzle route search', () => {
     expect(() => decodePuzzleRoute('X')).toThrow('Unknown Puzzle route token');
   });
 
-  it('covers counter-clockwise SRS in both planners and retains its distinct exhaustive landing', () => {
+  it('covers a counter-clockwise SRS landing that the clockwise-only public domain cannot reach', () => {
     let lowered = startedPuzzle('t5r-drift-08');
     for (let index = 0; index < 16; index += 1) {
       lowered = dispatch(lowered, { type: 'soft-drop' }).state;
@@ -107,16 +148,29 @@ describe('Phase-7 Puzzle route search', () => {
     ))).toBe(true);
 
     const exhaustive = exhaustivePuzzleLandings(lowered);
-    const signature = 'S:4,34|4,35|5,35|5,36';
+    const signature = 'S:0,32|0,33|1,33|1,34';
     const matches = exhaustive.filter((landing) => landing.lock.signature === signature);
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.every((landing) => (
       landing.commands.some((command) => command.type === 'rotate' && command.direction === -1)
     ))).toBe(true);
-    expect(exhaustive.some((landing) => (
-      landing.lock.signature === signature
-      && landing.commands.every((command) => command.type !== 'rotate' || command.direction !== -1)
-    ))).toBe(false);
+
+    const completeDomain = publicLandingSignatures(lowered, [
+      { type: 'rotate', direction: 1 },
+      { type: 'rotate', direction: -1 },
+      { type: 'move', dx: -1 },
+      { type: 'move', dx: 1 },
+      { type: 'soft-drop' },
+    ]);
+    const clockwiseOnlyDomain = publicLandingSignatures(lowered, [
+      { type: 'rotate', direction: 1 },
+      { type: 'move', dx: -1 },
+      { type: 'move', dx: 1 },
+      { type: 'soft-drop' },
+    ]);
+    expect(completeDomain).toContain(signature);
+    expect(clockwiseOnlyDomain).not.toContain(signature);
+    expect(completeDomain.size).toBe(clockwiseOnlyDomain.size + 1);
   });
 
   it('canonicalizes anchor support in proof identity without merging distinct masks', () => {
