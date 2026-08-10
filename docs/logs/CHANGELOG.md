@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3 capability contract frozen
+
+- Independent read-only review accepts `628f66d..dc035a3` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. The repaired contract explicitly rejects an initial row
+  completed by ordinary cells plus anchors in canonical and authoring-override modes,
+  freezes an independent 38-entry literal behavior-hash gate, and names the exact F3C
+  fixture/test/tool checkpoint split.
+- The reviewed range contains only the four declared contract paths and excludes T27,
+  `t27-r1-followup`, and `progress.md`. F3A may now open only
+  `puzzles.ts`, its direct test, and `puzzleV3BehaviorBaseline.test.ts`; published
+  curriculum content, migration, progression, and UI remain closed.
+
 ## 2026-08-10 — T37 Stage F2 strict Puzzle search accepted
 
 - Expanded the complete public-control landing domain with counter-clockwise token `Q`

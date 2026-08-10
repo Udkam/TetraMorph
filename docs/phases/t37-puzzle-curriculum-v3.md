@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F2 STRICT SEARCH ACCEPTED; F3 CAPABILITY CONTRACT CANDIDATE**
+Status: **F3 CAPABILITY CONTRACT FROZEN; F3A STRUCTURAL VALIDATOR NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -360,6 +360,12 @@ requires a failing direct mechanics test first. Historical T15/T32 route JSON an
 scripts remain untouched. After F3A/F3B/F3C are green, run final typecheck, complete
 suite, build, and independent read-only QA. Since no published/rendered state changes,
 F3 has no browser-evidence requirement.
+
+Independent read-only review accepts the frozen contract range `628f66d..dc035a3`
+with `P0 0 / P1 0 / P2 0 / P3 0`. It closes the initial full-row, literal-baseline,
+and F3C path/split findings and confirms that the four-path range excludes inherited
+T27 evidence, `t27-r1-followup`, and `progress.md`. This disposition opens F3A only;
+it does not accept any F3 product source or published level.
 
 ## Progress v6 and revision-3 migration
 

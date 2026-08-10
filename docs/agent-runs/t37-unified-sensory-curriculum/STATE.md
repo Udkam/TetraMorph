@@ -83,8 +83,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     content, unlocks, migration, and UI. Behavior source `74148ec` plus corrections
     through `1507dab` close strict-search mechanics and representative ordinary/
     one-anchor/two-anchor certificates with two independent P0–P3-zero reviews.
-13. `F3 CONTRACT CANDIDATE; SOURCE CLOSED` — validator capability, injected mechanics,
-    and one non-published ten-row certificate are split into bounded checkpoints.
+13. `F3 CONTRACT ACCEPTED; F3A NEXT` — independent read-only review accepts
+    `628f66d..dc035a3` with P0–P3 all zero. Validator capability, injected mechanics,
+    and one non-published ten-row certificate remain split into bounded checkpoints;
+    only F3A source is open.
 14. `PENDING` — later content, migration, UI, final gates, and push.
 
 ### Stage F1 frozen status
@@ -441,16 +443,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Independently review the Stage F3 contract in `docs/CURRENT_TASK.md`, `docs/DESIGN.md`,
-and `docs/phases/t37-puzzle-curriculum-v3.md`. Confirm it preserves all current
-definitions through literal verification of all 38 frozen hashes, rejects ordinary+
-anchor full rows in canonical and override modes, separates structural validation from
-per-anchor replay evidence, keeps App/UI closed, and freezes the exact F3C artifact/
-test/tooling split. Only then open F3A in `src/game/core/puzzles.ts`, its direct test,
-and `src/game/core/puzzleV3BehaviorBaseline.test.ts`. Do not begin Intro boards, the
-46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20 physics,
-D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and the
-missing Ice archive separate.
+Implement F3A only in `src/game/core/puzzles.ts`, its direct test, and
+`src/game/core/puzzleV3BehaviorBaseline.test.ts`: admit 3–10 contiguous bottom target
+rows, 5–20 legal zero-clear setup drops, and 0–4 unique anchors in visible rows 8–19;
+reject every combined ordinary-plus-anchor initial full row in canonical and override
+mode; and match all 38 literal F1 behavior hashes. Do not begin F3B/F3C, Intro boards,
+the 46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20
+physics, D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and
+the missing Ice archive separate.
 
 ## Do not repeat
 

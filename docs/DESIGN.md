@@ -381,6 +381,10 @@ adding unrelated badges or ornamental effects.
   tests alone are insufficient preservation evidence. Every validator checkpoint also
   reruns the F1 canonical serializer against the 38 literal revision-2 behavior hashes;
   expected values are never regenerated from the edited definitions.
+- Independent read-only review accepts the bounded F3 contract range
+  `628f66d..dc035a3` with P0–P3 all zero. F3A may therefore open only the structural
+  validator and its literal preservation test; content, migration, progression, and UI
+  remain closed until their later checkpoints.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
