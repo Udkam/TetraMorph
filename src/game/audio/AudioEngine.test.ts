@@ -347,6 +347,49 @@ describe('AudioEngine accepted production contract', () => {
     expect(starts.some((start) => Math.abs(start - 1.16) < 0.000001)).toBe(true);
   });
 
+  it('continues the Mutation serial tail across separate Core transitions', async () => {
+    const context = new FakeAudioContext();
+    const audio = audioFor(context);
+    await audio.prime();
+
+    context.currentTime = 4;
+    audio.play([mutation('bomb')]);
+    context.currentTime = 4.1;
+    audio.play([mutation('freeze')]);
+
+    const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
+    expect(ice?.starts[0]).toEqual({ time: 4.62, offset: 0.19375, duration: 0.44 });
+  });
+
+  it('restart cancels current and queued Mutation voices and resets the serial tail', async () => {
+    const context = new FakeAudioContext();
+    const audio = audioFor(context);
+    await audio.prime();
+
+    context.currentTime = 8;
+    audio.play([mutation('bomb')]);
+    context.currentTime = 8.1;
+    audio.play([mutation('freeze')]);
+    const scheduledOscillators = [...oscillators];
+    const scheduledBuffers = [...bufferSources];
+
+    context.currentTime = 8.2;
+    audio.play([{ type: 'restarted' }]);
+
+    expect(scheduledOscillators.every((source) => source.stops.at(-1) === 8.2)).toBe(true);
+    expect(scheduledBuffers.every((source) => source.stops.at(-1) === 8.2)).toBe(true);
+    expect(scheduledOscillators.every((source) => source.disconnected)).toBe(true);
+    expect(scheduledBuffers.every((source) => source.disconnected)).toBe(true);
+
+    context.currentTime = 9;
+    audio.play([mutation('freeze')]);
+    expect(bufferSources.at(-1)?.starts[0]).toEqual({
+      time: 9,
+      offset: 0.19375,
+      duration: 0.44,
+    });
+  });
+
   it('routes the complete deterministic Bomb body and pressure contract through production', async () => {
     const audio = audioFor();
     await audio.prime();

@@ -80,6 +80,7 @@ export class AudioEngine {
   private lastMoveAt = Number.NEGATIVE_INFINITY;
   private lastSoftDropAt = Number.NEGATIVE_INFINITY;
   private pendingClearCount: 1 | 2 | 3 | 4 | null = null;
+  private mutationTimelineTailAt = 0;
   private readonly activeVoices = new Set<GestureVoice>();
   private readonly mutationVoices = new Set<GestureVoice>();
   private readonly acceptedBuffers = new Map<T37AudioAssetId, AudioBuffer>();
@@ -122,6 +123,10 @@ export class AudioEngine {
   suspend(): void { void this.context?.suspend(); }
 
   play(events: readonly GameEvent[]): void {
+    if (events.some((event) => event.type === 'restarted')) {
+      this.pendingClearCount = null;
+      this.stopMutationCue();
+    }
     if (!this.context || !this.enabledGate || !this.enabled || this.destroyed) return;
     const includesHardDrop = events.some((event) => event.type === 'hard-dropped');
     const includesClearStart = events.some((event) => event.type === 'clear-started');
@@ -191,8 +196,6 @@ export class AudioEngine {
         this.playCandidateCue('pause');
       } else if (event.type === 'resumed') {
         this.playCandidateCue('resume');
-      } else if (event.type === 'restarted') {
-        this.pendingClearCount = null;
       }
       // started and restarted stay silent: the entry countdown owns those frames.
     }
@@ -369,7 +372,7 @@ export class AudioEngine {
     });
   }
 
-  private playIce(delay = 0): void {
+  private playIce(delay = 0, absoluteStartAt?: number): void {
     const context = this.context;
     const destination = this.enabledGate;
     const buffer = this.acceptedBuffers.get('freezeIce');
@@ -379,7 +382,7 @@ export class AudioEngine {
       || this.activeVoices.size >= MAX_EFFECT_VOICES
     ) return;
     scheduleIceSample(context, destination, buffer, {
-      startAt: context.currentTime + delay,
+      startAt: absoluteStartAt ?? context.currentTime + delay,
       offset: contract.windowStartSeconds,
       duration: contract.windowDurationSeconds,
       gain: contract.gain,
@@ -408,14 +411,14 @@ export class AudioEngine {
     }
   }
 
-  private playCandidateCue(id: CandidateAudioCueId, delay = 0): void {
+  private playCandidateCue(id: CandidateAudioCueId, delay = 0, absoluteStartAt?: number): void {
     const context = this.context;
     const cue = audioCue(id);
     const destination = this.buses[cue.bus];
     const available = MAX_EFFECT_VOICES - this.activeVoices.size;
     if (!context || !destination || available <= 0 || !this.enabled || this.destroyed) return;
     const hooks = this.voiceHooks(Boolean(cue.mutationOwned));
-    const eventStart = context.currentTime + delay;
+    const eventStart = absoluteStartAt ?? context.currentTime + delay;
     scheduleToneRecipe(context, destination, cue.tones, {
       startAt: eventStart,
       maxVoices: available,
@@ -452,20 +455,23 @@ export class AudioEngine {
   }
 
   private playMutationActivations(activations: readonly MutationActivation[]): void {
-    let delay = 0;
+    const context = this.context;
+    if (!context || activations.length === 0) return;
+    let startAt = Math.max(context.currentTime, this.mutationTimelineTailAt);
     for (const event of activations) {
       if (event.item === 'freeze') {
-        this.playIce(delay);
+        this.playIce(0, startAt);
       } else {
         const id: CandidateAudioCueId = event.item === 'collapse'
           ? 'supergravity'
           : event.item === 'bomb'
             ? 'bomb'
             : event.multiplierFactor === 4 ? 'multiplier-4' : 'multiplier-2';
-        this.playCandidateCue(id, delay);
+        this.playCandidateCue(id, 0, startAt);
       }
-      delay += MUTATION_VFX_TOKENS[event.item].animation.activationMs / 1_000;
+      startAt += MUTATION_VFX_TOKENS[event.item].animation.activationMs / 1_000;
     }
+    this.mutationTimelineTailAt = startAt;
   }
 
   private stopMutationCue(): void {
@@ -475,6 +481,7 @@ export class AudioEngine {
       this.activeVoices.delete(voice);
     }
     this.mutationVoices.clear();
+    this.mutationTimelineTailAt = 0;
   }
 
   private applyOutputGain(): void {
