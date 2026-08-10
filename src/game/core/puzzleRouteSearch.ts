@@ -72,11 +72,11 @@ export interface PuzzleOptimalRouteCertificate {
   levelId: PuzzleId;
   /** Exact minimum number of locked pieces in the complete public-control domain. */
   optimalLocks: number;
-  /** Width of every fully exhausted decision frontier at depths 0..optimalLocks - 1. */
+  /** Width of every fully exhausted decision frontier at depths 0..optimalLocks - 2. */
   exhaustedFrontierWidths: readonly number[];
   /** Number of unique decision states whose complete landing domains were expanded. */
   exploredStateCount: number;
-  /** Number of legal landing transitions considered before the first optimal win. */
+  /** Number of legal landing transitions considered while excluding every shorter win. */
   transitionCount: number;
   /** Branches proven unable to finish below the candidate by the target-deficit bound. */
   deficitBoundPrunes: number;
