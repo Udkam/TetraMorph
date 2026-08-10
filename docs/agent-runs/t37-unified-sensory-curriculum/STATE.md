@@ -106,7 +106,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     increments; all remain budget-incomplete with no candidate or memory stop.
 21. `F3C SECOND FAIR ROUND COMPLETE; THIRD NEXT` — all 32 shards receive the same
     second increment and remain budget-incomplete with no candidate or memory stop.
-22. `PENDING` — third fair-round candidate, F3C fixture/test, later content, migration, UI,
+22. `F3C THIRD FAIR ROUND PARTIAL; RESUME SHARD 1` — shard 0 receives its third equal
+    increment; subsequent resource checks are red, so shards 1..31 remain untouched.
+23. `PENDING` — third fair-round candidate, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -243,6 +245,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `14197EB5...59CC`. All exact Temp outputs are removed, matching Temp count is zero,
   and owned process count is zero. Cumulative new coverage is 20,000,000, but no shard
   is excluded.
+- Third-round preflight at HEAD `146de90` is amber: CPU 89.3%, free memory 11.48 GiB,
+  disk queue zero, with no round-three output or owned search process. Shard 0 then
+  completes normally as `budget-exhausted`, replaying 625,000 probes and adding 312,500
+  new probes to cursor 937,500. It records accepted/failed/trie-node counts
+  `27,085 / 27,069 / 10,571`, the unchanged domain/queue digests, and file SHA-256
+  `DC41D609A2E9F0BE6492EE9F6D99BF13F4B675F9F36BB898E2EA6049625BCD22`.
+- The outer PowerShell wrapper incorrectly treated the tool's expected non-candidate
+  exit code 2 as failure after that valid output. No search process remains. Follow-up
+  CPU samples `91.0% / 90.6% / 91.6%` are red, so shards 1..31 do not start. Preserve
+  exact Temp output `t37-f3c-fair-round3-00.json`; do not rerun or delete shard 0 before
+  the remaining round resumes and aggregates.
 
 ### Stage F3B accepted status
 
@@ -660,13 +673,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-After a fresh resource and exact Temp-target check, run the same 32 shards serially in
-ascending order with cursor 625,000, 312,500 new probes each, and 900 MiB RSS. Stop at
-the first candidate or memory guard; otherwise finish the equal third round, verify
-absolute cursor 937,500 and aggregate new coverage, then remove every exact Temp output
-and confirm no owned process. Do not change seed domain or privilege a shard. Only a
-candidate may proceed to Core replay and the final F3C JSON/test; keep later content,
-deferred identity, T27/`progress.md`, and missing Ice archive closed.
+After a fresh resource and exact Temp-target check, continue only when green/amber.
+First verify retained shard-0 output SHA-256 `DC41D609...BCD22`, then run shards 1..31
+serially in ascending order with cursor 625,000, 312,500 new probes each, and 900 MiB
+RSS; do not rerun shard 0. The wrapper must accept tool exit code 2 and decide from the
+JSON status. Stop at the first candidate or memory guard; otherwise finish the equal
+third round, verify absolute cursor 937,500 and aggregate all 32 outputs, then remove
+every exact Temp output and confirm no owned process. Do not change seed domain or
+privilege a shard. Only a candidate may proceed to Core replay and the final F3C
+JSON/test; keep later content, deferred identity, T27/`progress.md`, and missing Ice
+archive closed.
 
 ## Do not repeat
 
