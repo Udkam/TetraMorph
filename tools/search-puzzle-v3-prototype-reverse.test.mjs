@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { registerHooks, stripTypeScriptTypes } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { __reverseTest as reverse } from './search-puzzle-v3-prototype.mjs';
-
 const toolPath = fileURLToPath(new URL('./search-puzzle-v3-prototype.mjs', import.meta.url));
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex').toUpperCase();
 
@@ -25,6 +25,12 @@ function runForward(outputPath, cursor, budget) {
   ], { encoding: null });
 }
 
+function runReverse(outputPath, budget, extra = []) {
+  return spawnSync(process.execPath, [toolPath, '--algorithm', 'seeded-reverse-v1',
+    '--seed-start', '11', '--seed-count', '1', '--shard-count', '1', '--shard-index', '0',
+    '--node-budget', String(budget), '--max-rss-mib', '128', ...extra, '--output', outputPath],
+  { encoding: null });
+}
 assert.equal(reverse.REVERSE_ALGORITHM_VERSION, 'seeded-reverse-v1');
 assert.equal(reverse.REVERSE_CURSOR_SCHEMA_VERSION, 1);
 assert.equal(reverse.SETUP_RULES_VERSION,
@@ -61,6 +67,8 @@ assert.equal(reverse.hashHex(reverse.fullQueueHash(11, 3)),
   '6E5D7B1CC712588F84CABB4FE4874596F3CE17D742447E78C6026ABAEE5CE455');
 assert.equal(reverse.hashHex(reverse.fullQueueHash(11, 8)),
   '0C4F375D24189A46982F088520B6FB9D81969CE2917528903BCF1CA7BA02C86B');
+const shardSeeds = [0, 1, 2, 3].flatMap((index) => reverse.buildReverseTrie(11 + index * 2, 2, Number.MAX_SAFE_INTEGER, () => 0).nodes.flatMap((node) => node.seeds));
+assert.deepEqual(shardSeeds.sort((left, right) => left - right), [11, 12, 13, 14, 15, 16, 17, 18]);
 
 const trie = reverse.buildReverseTrie(11, 3, Number.MAX_SAFE_INTEGER, () => 0);
 assert.equal(trie.memoryGuard, false);
@@ -81,7 +89,6 @@ assert.equal(reverse.hashHex(reverse.memoHash([])),
   '1853F77C68198E07DC7A6038F2D055CF0B1C9C9F2C2F9EAD59379CEF07FCFC97');
 assert.equal(reverse.hashHex(reverse.probeRootHash(0, [], [])),
   'C07AA09A429443F5FC5F930F033012D8EECE50DB060894EBA7324C211002D0CA');
-
 const context = {
   fixedMask,
   catalog: catalog.descriptors,
@@ -127,7 +134,20 @@ const badRootState = reverse.restoreContinuation(splitCursor, context, domainHas
 badRootState.frames[0].remainingBoard ^= 1n;
 const badRoot = reverse.makeContinuation(badRootState, domainHash, 0);
 assert.throws(() => reverse.restoreContinuation(badRoot, context, domainHash, 0), /root/);
-
+const activeMemoState = reverse.restoreContinuation(splitCursor, context, domainHash, 0);
+const activeMemoKey = reverse.failedKey(activeMemoState.frames.at(-1));
+activeMemoState.failed.set(activeMemoKey.toString('hex').toUpperCase(), activeMemoKey);
+assert.throws(() => reverse.restoreContinuation(reverse.makeContinuation(activeMemoState, domainHash, 0),
+  context, domainHash, 0), /frame bounds/);
+const badDepthContext = { ...context, trie: context.trie.map((node) => ({ ...node })) };
+badDepthContext.trie[activeMemoState.frames.at(-1).trieNodeId].depth += 1;
+assert.throws(() => reverse.restoreContinuation(splitCursor, badDepthContext, domainHash, 0), /domain drift|frame bounds/);
+const badMemoState = reverse.restoreContinuation(splitCursor, context, domainHash, 0);
+const hole = [...Array(100).keys()].find((bit) => (fixedMask & (1n << BigInt(bit))) === 0n);
+const badMemoKey = reverse.failedKey({ ...badMemoState.frames.at(-1), remainingBoard: 1n << BigInt(hole) });
+badMemoState.failed.set(badMemoKey.toString('hex').toUpperCase(), badMemoKey);
+assert.throws(() => reverse.restoreContinuation(reverse.makeContinuation(badMemoState, domainHash, 0),
+  context, domainHash, 0), /failed memo/i);
 function digestProbeVector(count) {
   const probe = { nextProbeCount: 0, peaks: [], partialTokens: [] };
   for (let index = 0; index < count; index += 1) {
@@ -160,7 +180,111 @@ assert.deepEqual(digestProbeVector(3079), {
   partial: 7,
   root: 'CB4FB8340EB17BDD3E42E7A7439EECEA73BE40FF82BDD59BB2ACD828194F1A7E',
 });
-
+const reverseOptions = reverse.parseReverseArguments([
+  '--algorithm', 'seeded-reverse-v1', '--seed-start', '11', '--seed-count', '1',
+  '--shard-count', '1', '--shard-index', '0', '--node-budget', '1',
+  '--max-rss-mib', '128', '--output', join(tmpdir(), 'unused-t37-reverse.json'),
+]);
+const pausedOutput = reverse.executeReverse(reverseOptions, { rssBytes: () => 0 });
+let rssChecks = 0;
+const postBuildMemory = reverse.executeReverse(reverseOptions, { rssBytes: () => ++rssChecks === 1 ? 0 : Infinity });
+rssChecks = 0;
+const searchMemory = reverse.executeReverse(reverseOptions, { rssBytes: () => ++rssChecks <= 2 ? 0 : Infinity });
+const liveMemory = reverse.executeReverse({
+  ...reverseOptions, maxRssMiB: Math.max(0, Math.floor(process.memoryUsage().rss / 1024 / 1024) - 1),
+});
+assert.equal(liveMemory.phase, 'trie-build');
+assert.equal(postBuildMemory.search.processedSeeds, 1);
+assert.equal(postBuildMemory.domain.reverseTrieHash, null);
+assert.equal(postBuildMemory.domain.domainHash, null);
+const [floorDescriptor, highDescriptor] = [true, false].map((isFloor) => catalog.descriptors.find((item) =>
+  (reverse.hardDropMask(0n, item) === item.cellMask) === isFloor));
+assert(floorDescriptor && highDescriptor);
+const floorO = catalog.descriptors.find((item) => item.typeIndex === 1 && reverse.hardDropMask(0n, item) === item.cellMask);
+const touchingO = catalog.descriptors.find((item) => item.typeIndex === 1 && !(item.cellMask & floorO.cellMask) && (reverse.neighborMask(floorO.cellMask, fixedMask) & item.cellMask));
+const separatedO = catalog.descriptors.find((item) => item.typeIndex === 1 && !(item.cellMask & floorO.cellMask) && !(reverse.neighborMask(floorO.cellMask, fixedMask) & item.cellMask));
+assert(touchingO && (reverse.neighborMask(touchingO.cellMask, fixedMask) & floorO.cellMask) && (reverse.neighborMask(floorO.cellMask, fixedMask) & floorO.cellMask));
+assert(separatedO && !(reverse.neighborMask(separatedO.cellMask, fixedMask) & floorO.cellMask));
+assert.equal(reverse.buildReverseCatalog(floorO.cellMask).descriptors.filter((item) => item.typeIndex === 1).length, 1);
+const obstacleRows = Array(40).fill(0), ownerRows = reverse.TYPES.map(() => Array(40).fill(0)), permissiveRows = Array(40).fill(1023);
+obstacleRows[39] = 1; assert.equal(reverse.landing(obstacleRows, ownerRows[0], permissiveRows, 'I', 0, 0).y, 37);
+obstacleRows[20] = 1; assert.equal(reverse.landing(obstacleRows, ownerRows[0], permissiveRows, 'I', 0, 0), null);
+function syntheticContext(descriptor, leaf, depth = 1) {
+  const nodes = [{ depth: 0, children: Array(7).fill(-1), seeds: [] }];
+  let parent = 0;
+  for (let index = 1; index <= depth; index += 1) {
+    const child = nodes.length;
+    nodes[parent].children[descriptor.typeIndex] = child;
+    nodes.push({ depth: index, children: Array(7).fill(-1), seeds: index === depth && leaf ? [77] : [] });
+    parent = child;
+  }
+  return { fixedMask: descriptor.cellMask, catalog: [descriptor], trie: nodes, sequenceLength: depth };
+}
+function firstOutcome(contextValue, mutate = () => {}, budget = 1, rss = () => 0) {
+  const state = reverse.createReverseState(contextValue);
+  mutate(state, contextValue);
+  const result = reverse.advanceReverse(contextValue, state, budget, Number.MAX_SAFE_INTEGER, rss);
+  return { state, result, outcome: state.probe.partialTokens[0]?.[139] };
+}
+const outcome0 = firstOutcome(syntheticContext(floorDescriptor, true), (state) => { state.frames[0].remainingBoard = 0n; });
+const outcome1 = firstOutcome(syntheticContext(floorDescriptor, true), (state) => {
+  state.frames[0].forbiddenMasks[floorDescriptor.typeIndex] = floorDescriptor.cellMask;
+});
+const outcome2 = firstOutcome(syntheticContext(highDescriptor, true));
+const branchContext = syntheticContext(floorDescriptor, false, 2);
+const outcome4 = firstOutcome(branchContext);
+const outcome3 = firstOutcome(branchContext, (state, value) => {
+  const forbiddenMasks = Array(7).fill(0n);
+  forbiddenMasks[floorDescriptor.typeIndex] = reverse.neighborMask(floorDescriptor.cellMask, value.fixedMask);
+  const child = { depth: 1, trieNodeId: 1, remainingBoard: 0n, forbiddenMasks,
+    nextCandidateIndex: 0, enteringDescriptor: floorDescriptor };
+  const key = reverse.failedKey(child);
+  state.failed.set(key.toString('hex').toUpperCase(), key);
+});
+const outcome5 = firstOutcome(syntheticContext(floorDescriptor, true));
+assert.deepEqual([outcome0.outcome, outcome1.outcome, outcome2.outcome, outcome3.outcome, outcome4.outcome, outcome5.outcome],
+  [0, 1, 2, 3, 4, 5]);
+assert.equal(firstOutcome(branchContext, () => {}, 0, () => Infinity).result.status, 'paused-budget');
+assert.equal(firstOutcome({ ...branchContext, catalog: [] }, () => {}, 0, () => Infinity).result.status,
+  'complete-not-found');
+let candidateRssChecks = 0;
+assert.equal(firstOutcome(syntheticContext(floorDescriptor, true), () => {}, 1,
+  () => candidateRssChecks++ === 0 ? 0 : Infinity).result.status, 'candidate');
+assert.equal(firstOutcome(branchContext, () => {}, 1).result.status, 'paused-budget');
+const fakeIdentity = {
+  options: reverseOptions, fixedMask: floorDescriptor.cellMask, catalog: { descriptors: [floorDescriptor] },
+  catalogHash: catalog.catalogHash, shapeHash: reverse.shapeTableHash(), queueHash: reverse.fullQueueHash(11, 1),
+};
+const fakeTrieBuild = { memoryGuard: false, processedSeeds: 1, nodes: outcome5.state.frames.length
+  ? syntheticContext(floorDescriptor, true).trie : [], trieHash: Buffer.alloc(32, 3) };
+const candidateOutput = reverse.makeReverseOutput(fakeIdentity, fakeTrieBuild, outcome5.state,
+  outcome5.result, Buffer.alloc(32, 4));
+const completeState = reverse.createReverseState({ ...branchContext, catalog: [] });
+const completeAdvance = reverse.advanceReverse({ ...branchContext, catalog: [] }, completeState, 0, 0, () => Infinity);
+const completeOutput = reverse.makeReverseOutput({ ...fakeIdentity, catalog: { descriptors: [] } },
+  { ...fakeTrieBuild, nodes: branchContext.trie }, completeState, completeAdvance, Buffer.alloc(32, 4));
+const topKeys = ['schemaVersion', 'algorithmVersion', 'cursorSchemaVersion', 'claim', 'status', 'phase', 'domain',
+  'shard', 'coverage', 'evidence', 'targetRows', 'targetMaskRows', 'setup', 'boardRows', 'search', 'continuation'];
+for (const output of [postBuildMemory, pausedOutput, searchMemory, candidateOutput, completeOutput]) {
+  assert.deepEqual(Object.keys(output).sort(), [...topKeys].sort());
+  assert.deepEqual(Object.keys(output.coverage).sort(), ['complete', 'newProbeCount', 'nextProbeCount', 'startProbeCount']);
+  assert.deepEqual(Object.keys(output.evidence).sort(), ['cursorStateHash', 'memoHash', 'probeHash', 'resultHash']);
+  assert.deepEqual(Object.keys(output.domain).sort(), ['algorithmVersion', 'candidateOrderVersion', 'catalogHash', 'domainHash', 'fullQueueHash', 'fullSeedCount', 'fullSeedStart', 'queueGeneratorVersion', 'reverseTrieHash', 'sequenceLength', 'setupRulesVersion', 'shapeTableHash', 'shardCount', 'typeOrderVersion']);
+  assert.deepEqual(Object.keys(output.shard).sort(), ['count', 'endOffsetExclusive', 'index', 'seedCount', 'seedStart', 'startOffset']);
+  assert.deepEqual(Object.keys(output.search).sort(), ['catalogDescriptorCount', 'failedStateCount', 'maxRssMiB', 'newProbeCount', 'nextProbeCount', 'nodeBudget', 'processedSeeds', 'reverseTrieNodeCount', 'startProbeCount']);
+  assert.equal(output.evidence.resultHash, reverse.reverseResultHash({
+    complete: output.coverage.complete, cursorStateHash: output.evidence.cursorStateHash,
+    domainHash: output.domain.domainHash, memoHash: output.evidence.memoHash,
+    nextProbeCount: output.coverage.nextProbeCount, phase: output.phase,
+    probeHash: output.evidence.probeHash, setup: output.setup, status: output.status,
+  }));
+}
+assert.deepEqual([postBuildMemory.status, pausedOutput.status, searchMemory.status,
+  candidateOutput.status, completeOutput.status],
+['memory-guard', 'paused-budget', 'memory-guard', 'candidate', 'complete-not-found']);
+assert.deepEqual([postBuildMemory.continuation, pausedOutput.continuation !== null,
+  searchMemory.continuation !== null, candidateOutput.continuation, completeOutput.continuation],
+  [null, true, true, null, null]);
 const tempRoot = mkdtempSync(join(tmpdir(), 't37-reverse-contract-'));
 try {
   const firstPath = join(tempRoot, 'forward-1500.json');
@@ -181,8 +305,101 @@ try {
   assert.equal(resumed.status, 2, resumed.stderr.toString());
   assert.equal(sha256(readFileSync(resumedPath)),
     'B5BCCC97D05CF107F988907E9E45E525D97D145CE684F140455317896A8AB454');
+  const [reverseA, reverseB] = ['reverse-a.json', 'reverse-b.json'].map((name) => join(tempRoot, name));
+  assert.equal(runReverse(reverseA, 1).status, 2);
+  assert.equal(runReverse(reverseB, 1).status, 2);
+  assert.equal(sha256(readFileSync(reverseA)), 'AB6EC5CDBB08E9227A4F75F8C8F06D42729DC9E44F8F87CE629F82BC8BA240DE');
+  assert.equal(sha256(readFileSync(reverseA)), sha256(readFileSync(reverseB)));
+  const [oneShotPath, splitAPath, splitBPath] = ['reverse-12.json', 'reverse-7.json', 'reverse-7-5.json']
+    .map((name) => join(tempRoot, name));
+  assert.equal(runReverse(oneShotPath, 12).status, 2);
+  assert.equal(runReverse(splitAPath, 7).status, 2);
+  assert.equal(runReverse(splitBPath, 5, ['--resume', splitAPath]).status, 2);
+  const oneShotReverse = JSON.parse(readFileSync(oneShotPath));
+  const splitReverse = JSON.parse(readFileSync(splitBPath));
+  assert.deepEqual(splitReverse.coverage, { startProbeCount: 7, newProbeCount: 5, nextProbeCount: 12, complete: false });
+  for (const key of ['probeHash', 'memoHash', 'cursorStateHash', 'resultHash']) {
+    assert.equal(splitReverse.evidence[key], oneShotReverse.evidence[key]);
+  }
+  const invalidCursor = join(tempRoot, 'invalid-cursor.json');
+  assert.equal(runReverse(invalidCursor, 1, ['--cursor', '0']).status, 1);
+  assert.equal(existsSync(invalidCursor), false);
+  const unknownOutput = join(tempRoot, 'unknown.json');
+  const unknown = spawnSync(process.execPath, [toolPath, '--algorithm', 'other', '--output', unknownOutput], { encoding: null });
+  assert.equal(unknown.status, 1);
+  assert.equal(existsSync(unknownOutput), false);
+  const beforeSamePath = sha256(readFileSync(splitAPath));
+  assert.equal(runReverse(splitAPath, 1, ['--resume', join(tempRoot, '.', 'reverse-7.json')]).status, 1);
+  assert.equal(sha256(readFileSync(splitAPath)), beforeSamePath);
 } finally {
   rmSync(tempRoot, { recursive: true });
 }
+const typeHook = registerHooks({
+  resolve(specifier, contextValue, nextResolve) {
+    const url = specifier.startsWith('.') && !/\.[a-z]+$/i.test(specifier)
+      ? new URL(`${specifier}.ts`, contextValue.parentURL) : null;
+    if (url && existsSync(fileURLToPath(url))) return { url: url.href, shortCircuit: true };
+    return nextResolve(specifier, contextValue);
+  },
+  load(url, contextValue, nextLoad) {
+    return url.endsWith('.ts') ? { format: 'module', shortCircuit: true, source: stripTypeScriptTypes(
+      readFileSync(fileURLToPath(url), 'utf8'), { mode: 'strip', sourceUrl: url }) } : nextLoad(url, contextValue);
+  },
+});
+try {
+  const puzzles = await import(pathToFileURL(fileURLToPath(new URL('../src/game/core/puzzles.ts', import.meta.url))));
+  const definition = puzzles.getPuzzleDefinition('t3r-shaft-01');
+  const coreBoard = puzzles.replayPuzzleSetup(definition.setup);
+  const coreRows = coreBoard.slice(20).map((row) => row.map((cell) => cell ?? '.').join(''));
+  assert(coreRows.slice(0, 10).every((row) => row === '..........'));
+  let coreMask = 0n;
+  for (let y = 10; y < 20; y += 1) for (let x = 0; x < 10; x += 1) {
+    if (coreRows[y][x] !== '.') coreMask |= 1n << BigInt((y - 10) * 10 + x);
+  }
+  const coreCatalog = reverse.buildReverseCatalog(coreMask).descriptors;
+  const coreTrie = [{ depth: 0, children: Array(7).fill(-1), seeds: [] }];
+  let trieNode = 0;
+  for (const type of definition.setup.placements.map((item) => item.type).toReversed()) {
+    const child = coreTrie.length;
+    coreTrie[trieNode].children[reverse.TYPES.indexOf(type)] = child;
+    coreTrie.push({ depth: coreTrie[trieNode].depth + 1, children: Array(7).fill(-1), seeds: [] });
+    trieNode = child;
+  }
+  coreTrie[trieNode].seeds.push(definition.setup.seed);
+  assert.deepEqual(reverse.sequenceForSeed(definition.setup.seed, definition.setup.placements.length),
+    definition.setup.placements.map((item) => item.type));
+  const coreContext = { fixedMask: coreMask, catalog: coreCatalog, trie: coreTrie, sequenceLength: definition.setup.placements.length };
+  const coreState = reverse.createReverseState(coreContext);
+  const coreCandidate = reverse.advanceReverse(coreContext, coreState, 1_000_000, Number.MAX_SAFE_INTEGER, () => 0);
+  assert.equal(coreCandidate.status, 'candidate');
+  assert.deepEqual(puzzles.replayPuzzleSetup({ seed: coreCandidate.result.seed,
+    placements: coreCandidate.result.placements }), coreBoard);
+  assert.deepEqual(coreCandidate.result.boardRows, coreRows);
+  let settled = 0n, usedSupport = false;
+  for (const descriptor of coreCandidate.result.descriptors) {
+    usedSupport ||= reverse.hardDropMask(0n, descriptor) !== descriptor.cellMask;
+    assert.equal(reverse.hardDropMask(settled, descriptor), descriptor.cellMask);
+    settled |= descriptor.cellMask;
+  }
+  assert(usedSupport, 'Core candidate must exercise piece support');
+  const pair = coreCandidate.result.descriptors.slice(0, 2);
+  const pairMask = pair[0].cellMask | pair[1].cellMask;
+  const pairCatalog = reverse.buildReverseCatalog(pairMask).descriptors;
+  const forward = new Set();
+  const backward = new Set();
+  for (const first of pairCatalog.filter((item) => item.typeIndex === pair[0].typeIndex))
+    for (const last of pairCatalog.filter((item) => item.typeIndex === pair[1].typeIndex)) {
+      if ((first.cellMask | last.cellMask) !== pairMask || (first.cellMask & last.cellMask)) continue;
+      const signature = `${reverse.maskHex(first.cellMask)}/${reverse.maskHex(last.cellMask)}`;
+      if (reverse.hardDropMask(0n, first) === first.cellMask
+        && reverse.hardDropMask(first.cellMask, last) === last.cellMask) forward.add(signature);
+      if (reverse.hardDropMask(pairMask & ~last.cellMask, last) === last.cellMask
+        && reverse.hardDropMask(0n, first) === first.cellMask) backward.add(signature);
+    }
+  assert(forward.size > 0);
+  assert.deepEqual([...backward].sort(), [...forward].sort());
+} finally {
+  typeHook.deregister();
+}
 
-process.stdout.write('seeded-reverse checkpoint 1: codecs, identities, trie, and forward regression pass\n');
+process.stdout.write('seeded-reverse contract: all standalone checks pass\n');

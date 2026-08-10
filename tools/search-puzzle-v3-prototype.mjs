@@ -15,8 +15,8 @@
  */
 
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { basename, dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const WIDTH = 10;
@@ -99,8 +99,7 @@ const TARGET_VISIBLE_ROWS = Object.freeze([
 const REVERSE_ALGORITHM_VERSION = 'seeded-reverse-v1';
 const REVERSE_CURSOR_SCHEMA_VERSION = 1;
 const REVERSE_TYPE_ORDER_VERSION = 'I,O,T,S,Z,J,L-v1';
-const REVERSE_CANDIDATE_ORDER_VERSION =
-  'type-index/rotation-0..3/x-ascending/absolute-y-ascending/landing-cell-dedupe/real-trie-child-v1';
+const REVERSE_CANDIDATE_ORDER_VERSION = 'type-index/rotation-0..3/x-ascending/absolute-y-ascending/landing-cell-dedupe/real-trie-child-v1';
 const MASK_BYTES = 13;
 const MASK_HEX_DIGITS = 25;
 const PROBE_BLOCK_SIZE = 1024;
@@ -272,12 +271,16 @@ function shapeTableHash() {
 }
 
 function fullQueueHash(seedStart, seedCount) {
-  const parts = [u32be(seedStart), u32be(seedCount)];
+  const hasher = createHash('sha256');
+  hasher.update(Buffer.from('T37-RQUEUE-v1\0', 'ascii'));
+  hasher.update(u32be(seedStart));
+  hasher.update(u32be(seedCount));
   for (let offset = 0; offset < seedCount; offset += 1) {
     const seed = seedStart + offset;
-    parts.push(u32be(seed), ...sequenceForSeed(seed, SEQUENCE_LENGTH).map((type) => u8(TYPE_INDEX.get(type))));
+    hasher.update(u32be(seed));
+    for (const type of sequenceForSeed(seed, SEQUENCE_LENGTH)) hasher.update(u8(TYPE_INDEX.get(type)));
   }
-  return labeledHash('T37-RQUEUE-v1', parts);
+  return hasher.digest();
 }
 
 function reverseTrieHash(nodes) {
@@ -590,6 +593,7 @@ function restoreContinuation(value, context, domainHash, shardIndex) {
     const bytes = Buffer.from(token, 'hex');
     const expectedIndex = body.nextProbeCount - body.partialProbeTokens.length + index;
     if (bytes[0] !== 1 || bytes.readBigUInt64BE(1) !== BigInt(expectedIndex)) throw new Error('Partial token index drift.');
+    const tokenNode = bytes.readUInt32BE(10), tokenMasks = [14, 27, 40, 53, 66, 79, 92, 105, 126].map((offset) => bytesMask(bytes.subarray(offset, offset + 13))); if (context.trie[tokenNode]?.depth !== bytes[9] || tokenMasks.some((mask) => (mask & ~context.fixedMask) !== 0n) || bytes[122] >= 7 || bytes[123] >= 4 || bytes[139] >= 6) throw new Error('Partial token domain drift.');
     return bytes;
   });
   if (partialTokens.length !== body.nextProbeCount % PROBE_BLOCK_SIZE) throw new Error('Partial token count drift.');
@@ -601,8 +605,10 @@ function restoreContinuation(value, context, domainHash, shardIndex) {
       throw new Error('Invalid or unsorted failed memo key.');
     }
     const bytes = Buffer.from(key, 'hex');
-    if (bytes[0] > context.sequenceLength || bytes.readUInt32BE(1) >= context.trie.length
-      || [5, 18, 31, 44, 57, 70, 83, 96].some((offset) => (bytes[offset] & 0xf0) !== 0)) {
+    const keyNode = bytes.readUInt32BE(1);
+    const masks = [5, 18, 31, 44, 57, 70, 83, 96].map((offset) => bytesMask(bytes.subarray(offset, offset + 13)));
+    if (bytes[0] > context.sequenceLength || keyNode >= context.trie.length
+      || context.trie[keyNode].depth !== bytes[0] || masks.some((mask) => (mask & ~context.fixedMask) !== 0n)) {
       throw new Error('Failed memo key escapes the reverse domain.');
     }
     failed.set(key, bytes);
@@ -629,13 +635,19 @@ function restoreContinuation(value, context, domainHash, shardIndex) {
     const frame = frames[index];
     const candidates = frameCandidates(context, frame);
     if (frame.depth !== index || frame.trieNodeId < 0 || frame.trieNodeId >= context.trie.length
-      || frame.nextCandidateIndex < 0 || frame.nextCandidateIndex > candidates.length) throw new Error('Cursor frame bounds are invalid.');
+      || context.trie[frame.trieNodeId].depth !== frame.depth
+      || frame.nextCandidateIndex < 0 || frame.nextCandidateIndex > candidates.length
+      || (frame.remainingBoard & ~context.fixedMask) !== 0n
+      || frame.forbiddenMasks.some((mask) => (mask & ~context.fixedMask) !== 0n)
+      || failed.has(failedKey(frame).toString('hex').toUpperCase())) throw new Error('Cursor frame bounds are invalid.');
     if (index === 0) continue;
     const parent = frames[index - 1];
     const entering = frame.enteringDescriptor;
     if (parent.nextCandidateIndex < 1 || !sameDescriptor(entering, placements[index - 1])
       || !sameDescriptor(entering, frameCandidates(context, parent)[parent.nextCandidateIndex - 1])
       || context.trie[parent.trieNodeId].children[entering.typeIndex] !== frame.trieNodeId
+      || (entering.cellMask & parent.remainingBoard) !== entering.cellMask
+      || (entering.cellMask & parent.forbiddenMasks[entering.typeIndex]) !== 0n
       || frame.remainingBoard !== (parent.remainingBoard & ~entering.cellMask)
       || hardDropMask(frame.remainingBoard, entering) !== entering.cellMask) throw new Error('Cursor frame transition is invalid.');
     const expectedForbidden = [...parent.forbiddenMasks];
@@ -644,9 +656,243 @@ function restoreContinuation(value, context, domainHash, shardIndex) {
       throw new Error('Cursor forbidden transition is invalid.');
     }
   }
+  if (frames.at(-1).nextCandidateIndex >= frameCandidates(context, frames.at(-1)).length) {
+    throw new Error('Cursor top frame must be ready for a probe.');
+  }
   return { frames, placements, failed, probe: { nextProbeCount: body.nextProbeCount, peaks, partialTokens } };
 }
 
+const REVERSE_CLAIM = 'F3C seeded-reverse setup candidate only; Core route replay and exact proof remain mandatory.';
+function pathIdentity(path) {
+  const absolute = resolve(path); let existing = absolute, tail = [];
+  while (!existsSync(existing)) { tail.unshift(basename(existing)); existing = dirname(existing); }
+  const identity = resolve(realpathSync.native(existing), ...tail);
+  return process.platform === 'win32' ? identity.toLowerCase() : identity;
+}
+function parseReverseArguments(argv) {
+  const values = new Map();
+  for (let index = 0; index < argv.length; index += 2) {
+    const name = argv[index];
+    const value = argv[index + 1];
+    if (!name?.startsWith('--') || value === undefined) throw new Error('Expected explicit --name value pairs.');
+    if (values.has(name)) throw new Error(`Duplicate authoring option: ${name}.`);
+    values.set(name, value);
+  }
+  const allowed = new Set([
+    '--algorithm', '--seed-start', '--seed-count', '--shard-count', '--shard-index',
+    '--node-budget', '--max-rss-mib', '--output', '--resume',
+  ]);
+  for (const name of values.keys()) if (!allowed.has(name)) throw new Error(`Unknown reverse option: ${name}.`);
+  if (values.get('--algorithm') !== REVERSE_ALGORITHM_VERSION) throw new Error('Unsupported reverse algorithm.');
+  const integer = (name, minimum, maximum) => {
+    const value = Number(values.get(name));
+    if (!Number.isSafeInteger(value) || value < minimum || value > maximum) {
+      throw new Error(`${name} must be an integer from ${minimum} through ${maximum}.`);
+    }
+    return value;
+  };
+  const fullSeedStart = integer('--seed-start', 1, 0xffff_ffff);
+  const fullSeedCount = integer('--seed-count', 1, 1_000_000);
+  if (fullSeedStart + fullSeedCount - 1 > 0xffff_ffff) throw new Error('The seed range may not wrap uint32.');
+  const shardCount = integer('--shard-count', 1, fullSeedCount);
+  const shardIndex = integer('--shard-index', 0, shardCount - 1);
+  const startOffset = Math.floor((fullSeedCount * shardIndex) / shardCount);
+  const endOffset = Math.floor((fullSeedCount * (shardIndex + 1)) / shardCount);
+  const outputValue = values.get('--output');
+  if (!outputValue) throw new Error('--output is required.');
+  const outputPath = resolve(outputValue);
+  const resumePath = values.has('--resume') ? resolve(values.get('--resume')) : null;
+  if (resumePath && pathIdentity(resumePath) === pathIdentity(outputPath)) {
+    throw new Error('Reverse resume input and output paths must be distinct.');
+  }
+  return {
+    fullSeedStart, fullSeedCount, shardCount, shardIndex, startOffset, endOffset,
+    shardSeedStart: fullSeedStart + startOffset, shardSeedCount: endOffset - startOffset,
+    nodeBudget: integer('--node-budget', 1, MAX_PROBES),
+    maxRssMiB: integer('--max-rss-mib', 128, 4096), outputPath, resumePath,
+  };
+}
+function reverseDomainObject(identity, trieHash, domainHash) {
+  return {
+    algorithmVersion: REVERSE_ALGORITHM_VERSION,
+    setupRulesVersion: SETUP_RULES_VERSION,
+    typeOrderVersion: REVERSE_TYPE_ORDER_VERSION,
+    queueGeneratorVersion: QUEUE_GENERATOR_VERSION,
+    candidateOrderVersion: REVERSE_CANDIDATE_ORDER_VERSION,
+    catalogHash: hashHex(identity.catalogHash),
+    shapeTableHash: hashHex(identity.shapeHash),
+    fullQueueHash: hashHex(identity.queueHash),
+    reverseTrieHash: trieHash && hashHex(trieHash),
+    domainHash: domainHash && hashHex(domainHash),
+    fullSeedStart: identity.options.fullSeedStart,
+    fullSeedCount: identity.options.fullSeedCount,
+    sequenceLength: SEQUENCE_LENGTH,
+    shardCount: identity.options.shardCount,
+  };
+}
+function reverseShardObject(options) {
+  return {
+    count: options.shardCount, index: options.shardIndex,
+    startOffset: options.startOffset, endOffsetExclusive: options.endOffset,
+    seedStart: options.shardSeedStart, seedCount: options.shardSeedCount,
+  };
+}
+function reverseResultHash(values) {
+  const payload = {
+    complete: values.complete,
+    cursorStateHash: values.cursorStateHash,
+    domainHash: values.domainHash,
+    memoHash: values.memoHash,
+    nextProbeCount: values.nextProbeCount,
+    phase: values.phase,
+    probeHash: values.probeHash,
+    setup: values.setup,
+    status: values.status,
+  };
+  return hashHex(labeledHash('T37-RRESULT-v1', [Buffer.from(canonicalJson(payload))]));
+}
+function makeReverseOutput(identity, trieBuild, state, advance, domainHash) {
+  const options = identity.options;
+  const phase = trieBuild.memoryGuard ? 'trie-build' : 'search';
+  const status = trieBuild.memoryGuard ? 'memory-guard' : advance.status;
+  const complete = trieBuild.memoryGuard ? false : advance.complete;
+  const startProbeCount = trieBuild.memoryGuard ? 0 : advance.startProbeCount;
+  const newProbeCount = trieBuild.memoryGuard ? 0 : advance.newProbeCount;
+  const nextProbeCount = trieBuild.memoryGuard ? 0 : state.probe.nextProbeCount;
+  const setup = advance?.result ? { seed: advance.result.seed, placements: advance.result.placements } : null;
+  const boardRows = advance?.result?.boardRows ?? null;
+  const resumable = phase === 'search' && (status === 'paused-budget' || status === 'memory-guard');
+  const continuation = resumable ? makeContinuation(state, domainHash, options.shardIndex) : null;
+  const probeHash = trieBuild.memoryGuard
+    ? hashHex(probeRootHash(0, [], []))
+    : hashHex(probeRootHash(nextProbeCount, state.probe.peaks, state.probe.partialTokens));
+  const memoDigest = trieBuild.memoryGuard ? hashHex(memoHash([])) : hashHex(memoHash(state.failed.values()));
+  const domain = reverseDomainObject(identity, trieBuild.memoryGuard ? null : trieBuild.trieHash,
+    trieBuild.memoryGuard ? null : domainHash);
+  const resultHash = reverseResultHash({
+    complete, cursorStateHash: continuation?.cursorStateHash ?? null, domainHash: domain.domainHash,
+    memoHash: memoDigest, nextProbeCount, phase, probeHash, setup, status,
+  });
+  return {
+    schemaVersion: 3,
+    algorithmVersion: REVERSE_ALGORITHM_VERSION,
+    cursorSchemaVersion: REVERSE_CURSOR_SCHEMA_VERSION,
+    claim: REVERSE_CLAIM,
+    status,
+    phase,
+    domain,
+    shard: reverseShardObject(options),
+    coverage: { startProbeCount, newProbeCount, nextProbeCount, complete },
+    evidence: {
+      probeHash, memoHash: memoDigest, cursorStateHash: continuation?.cursorStateHash ?? null, resultHash,
+    },
+    targetRows: 10,
+    targetMaskRows: TARGET_VISIBLE_ROWS,
+    setup,
+    boardRows,
+    search: {
+      nodeBudget: options.nodeBudget,
+      maxRssMiB: options.maxRssMiB,
+      processedSeeds: trieBuild.processedSeeds,
+      catalogDescriptorCount: identity.catalog.descriptors.length,
+      reverseTrieNodeCount: trieBuild.nodes.length,
+      startProbeCount,
+      newProbeCount,
+      nextProbeCount,
+      failedStateCount: trieBuild.memoryGuard ? 0 : state.failed.size,
+    },
+    continuation,
+  };
+}
+function validateResumeOutput(output, identity, context, domainHash, trieBuild) {
+  exactKeys(output, ['schemaVersion', 'algorithmVersion', 'cursorSchemaVersion', 'claim', 'status', 'phase',
+    'domain', 'shard', 'coverage', 'evidence', 'targetRows', 'targetMaskRows', 'setup', 'boardRows', 'search',
+    'continuation'], 'resume output');
+  exactKeys(output.domain, ['algorithmVersion', 'setupRulesVersion', 'typeOrderVersion', 'queueGeneratorVersion',
+    'candidateOrderVersion', 'catalogHash', 'shapeTableHash', 'fullQueueHash', 'reverseTrieHash', 'domainHash',
+    'fullSeedStart', 'fullSeedCount', 'sequenceLength', 'shardCount'], 'resume domain');
+  exactKeys(output.shard, ['count', 'index', 'startOffset', 'endOffsetExclusive', 'seedStart', 'seedCount'], 'resume shard');
+  exactKeys(output.coverage, ['startProbeCount', 'newProbeCount', 'nextProbeCount', 'complete'], 'resume coverage');
+  exactKeys(output.evidence, ['probeHash', 'memoHash', 'cursorStateHash', 'resultHash'], 'resume evidence');
+  exactKeys(output.search, ['nodeBudget', 'maxRssMiB', 'processedSeeds', 'catalogDescriptorCount',
+    'reverseTrieNodeCount', 'startProbeCount', 'newProbeCount', 'nextProbeCount', 'failedStateCount'], 'resume search');
+  const expectedDomain = reverseDomainObject(identity, trieBuild.trieHash, domainHash);
+  if (output.schemaVersion !== 3 || output.algorithmVersion !== REVERSE_ALGORITHM_VERSION
+    || output.cursorSchemaVersion !== REVERSE_CURSOR_SCHEMA_VERSION || output.claim !== REVERSE_CLAIM
+    || output.phase !== 'search' || !['paused-budget', 'memory-guard'].includes(output.status)
+    || canonicalJson(output.domain) !== canonicalJson(expectedDomain)
+    || canonicalJson(output.shard) !== canonicalJson(reverseShardObject(identity.options))
+    || output.targetRows !== 10 || canonicalJson(output.targetMaskRows) !== canonicalJson(TARGET_VISIBLE_ROWS)
+    || output.setup !== null || output.boardRows !== null || output.coverage.complete !== false) {
+    throw new Error('Resume envelope identity is invalid.');
+  }
+  const state = restoreContinuation(output.continuation, context, domainHash, identity.options.shardIndex);
+  const next = state.probe.nextProbeCount;
+  const integerFields = [output.coverage.startProbeCount, output.coverage.newProbeCount, next,
+    output.search.nodeBudget, output.search.maxRssMiB, output.search.failedStateCount];
+  if (integerFields.some((value) => !Number.isSafeInteger(value) || value < 0)
+    || output.coverage.startProbeCount + output.coverage.newProbeCount !== next
+    || output.coverage.nextProbeCount !== next || output.search.startProbeCount !== output.coverage.startProbeCount
+    || output.search.newProbeCount !== output.coverage.newProbeCount || output.search.nextProbeCount !== next
+    || output.search.processedSeeds !== identity.options.shardSeedCount
+    || output.search.catalogDescriptorCount !== identity.catalog.descriptors.length
+    || output.search.reverseTrieNodeCount !== trieBuild.nodes.length
+    || output.search.failedStateCount !== state.failed.size) throw new Error('Resume counters are invalid.');
+  const expectedProbe = hashHex(probeRootHash(next, state.probe.peaks, state.probe.partialTokens));
+  const expectedMemo = hashHex(memoHash(state.failed.values()));
+  const expectedResult = reverseResultHash({
+    complete: false, cursorStateHash: output.continuation.cursorStateHash, domainHash: expectedDomain.domainHash,
+    memoHash: expectedMemo, nextProbeCount: next, phase: 'search', probeHash: expectedProbe,
+    setup: null, status: output.status,
+  });
+  if (output.evidence.probeHash !== expectedProbe || output.evidence.memoHash !== expectedMemo
+    || output.evidence.cursorStateHash !== output.continuation.cursorStateHash
+    || output.evidence.resultHash !== expectedResult) throw new Error('Resume evidence is invalid.');
+  return state;
+}
+function executeReverse(options, hooks = {}) {
+  const fixedMask = rowsMask();
+  const catalog = buildReverseCatalog(fixedMask);
+  const identity = {
+    options, fixedMask, catalog, catalogHash: catalog.catalogHash,
+    shapeHash: shapeTableHash(), queueHash: fullQueueHash(options.fullSeedStart, options.fullSeedCount),
+  };
+  const rssBytes = hooks.rssBytes ?? (() => process.memoryUsage().rss);
+  const trieBuild = buildReverseTrie(options.shardSeedStart, options.shardSeedCount,
+    options.maxRssMiB * 1024 * 1024, rssBytes);
+  if (trieBuild.memoryGuard) return makeReverseOutput(identity, trieBuild, null, null, null);
+  identity.trieHash = trieBuild.trieHash;
+  const domainHash = reverseDomainHash({
+    fixedMask, catalogHash: identity.catalogHash, shapeHash: identity.shapeHash, queueHash: identity.queueHash,
+    trieHash: identity.trieHash, fullSeedStart: options.fullSeedStart, fullSeedCount: options.fullSeedCount,
+    shardCount: options.shardCount, shardIndex: options.shardIndex,
+    startOffset: options.startOffset, endOffset: options.endOffset,
+  });
+  const context = { fixedMask, catalog: catalog.descriptors, trie: trieBuild.nodes, sequenceLength: SEQUENCE_LENGTH };
+  const state = hooks.resumeOutput
+    ? validateResumeOutput(hooks.resumeOutput, identity, context, domainHash, trieBuild)
+    : createReverseState(context);
+  const advance = advanceReverse(context, state, options.nodeBudget, options.maxRssMiB * 1024 * 1024, rssBytes);
+  return makeReverseOutput(identity, trieBuild, state, advance, domainHash);
+}
+function runReverseCli(argv) {
+  const options = parseReverseArguments(argv);
+  let resumeOutput = null;
+  if (options.resumePath) {
+    const bytes = readFileSync(options.resumePath);
+    resumeOutput = JSON.parse(bytes.toString('utf8'));
+    if (!bytes.equals(Buffer.from(`${canonicalJson(resumeOutput)}\n`))) throw new Error('Resume JSON is not canonical.');
+  }
+  const output = executeReverse(options, { resumeOutput });
+  mkdirSync(dirname(options.outputPath), { recursive: true });
+  writeFileSync(options.outputPath, `${canonicalJson(output)}\n`, { encoding: 'utf8' });
+  process.stdout.write(`${canonicalJson({
+    status: output.status, phase: output.phase, shardIndex: output.shard.index,
+    nextProbeCount: output.coverage.nextProbeCount, newProbeCount: output.coverage.newProbeCount,
+    setupSeed: output.setup?.seed ?? null,
+  })}\n`);
+  return output.status === 'candidate' ? 0 : 2;
+}
 function parseArguments(argv) {
   const values = new Map();
   for (let index = 0; index < argv.length; index += 2) {
@@ -1033,7 +1279,17 @@ if (!search.result) process.exitCode = 2;
 }
 
 const isMain = process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
-if (isMain) runForward(process.argv.slice(2));
+if (isMain) {
+  const argv = process.argv.slice(2);
+  if (argv.includes('--algorithm')) {
+    try {
+      process.exitCode = runReverseCli(argv);
+    } catch (error) {
+      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+      process.exitCode = 1;
+    }
+  } else runForward(argv);
+}
 
 export const __reverseTest = Object.freeze({
   TYPES,
@@ -1072,6 +1328,15 @@ export const __reverseTest = Object.freeze({
   makeContinuation,
   restoreContinuation,
   candidateBoardRows,
+  parseReverseArguments,
+  reverseDomainObject,
+  reverseShardObject,
+  reverseResultHash,
+  makeReverseOutput,
+  validateResumeOutput,
+  executeReverse,
   sequenceForSeed,
   hashHex,
+  landing,
+  canPlace,
 });
