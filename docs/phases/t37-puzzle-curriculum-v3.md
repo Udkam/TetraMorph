@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED-REVERSE IMPLEMENTATION CANDIDATE `da2c67d`; QA NEXT**
+Status: **F3C SEEDED-REVERSE IMPLEMENTATION REJECTED; BOUNDED REPAIR OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -612,6 +612,14 @@ Implementation candidate `1f85a0a..da2c67d` now occupies only those two paths an
 its post-last-edit standalone contract test, typecheck, full suite, build, exact forward
 byte regression, scope, and cleanup checks. Independent implementation QA remains
 mandatory before the first accepted reverse search round can open.
+Formal QA rejects the candidate with `P1 2`; adversarial QA rejects it with
+`P1 1 / P2 2`. Restore must bind each partial probe token to the exact reconstructed
+candidate index/descriptor and enforce the 1,000,000,000 cumulative probe ceiling before
+the first new probe. Existing resume/output paths must be compared by file identity so
+hard links cannot overwrite the checkpoint. The standalone suite must replace its
+tautological mask equality with an independent forward oracle run against actual reverse
+traversal, including both same-type peel orders. Only the two implementation paths may
+reopen for this repair; no reverse shard or product path is authorized before repair QA.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

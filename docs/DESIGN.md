@@ -516,6 +516,13 @@ adding unrelated badges or ornamental effects.
   lossless no-replay cursor state, fail-closed tamper checks, STOP/null priorities, small
   reverse candidates, and actual Core replay. The offline tool changes no page/canvas,
   so browser evidence from the web-game loop does not apply to this candidate.
+- Formal QA rejects that range with `P1 2`, and adversarial QA rejects it with
+  `P1 1 / P2 2`. The four distinct blockers are cumulative probe-ceiling overflow after
+  resume, an unbound partial-token candidate index/descriptor, resume/output NTFS
+  hard-link aliasing, and a tautological forward/reverse set test that never executes
+  reverse traversal. A bounded repair may reopen only the same tool and standalone test;
+  production search, the final fixture/Core test, published content, migration, and UI
+  remain closed until independent repair QA accepts the complete implementation range.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

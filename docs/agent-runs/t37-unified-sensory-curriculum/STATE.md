@@ -120,9 +120,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     only the authoring tool and standalone reverse test are open.
 28. `F3C SEEDED-REVERSE IMPLEMENTATION CANDIDATE; QA NEXT` — three bounded commits end
     at `da2c67d`; final local gates pass.
-29. `PENDING` — independent implementation QA precedes any reverse search run, fixture,
-    content, migration, UI,
-    final gates, and push.
+29. `F3C SEEDED-REVERSE IMPLEMENTATION REJECTED` — formal QA reports P1 2 and
+    adversarial QA reports P1 1 / P2 2. Four distinct restore, ceiling, file-identity,
+    and differential-test blockers keep production reverse search closed.
+30. `PENDING` — one bounded repair on the same two tool/test paths, final local gates,
+    and independent repair QA precede any reverse search run, fixture, content,
+    migration, UI, final integrated gates, or push.
 
 ### Stage F3C tooling-discovery status
 
@@ -365,8 +368,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `B334010D7CEC7E38A35EDB429FE9DA3333D5A312893B78EFB4E8659455419A2A`; stdout is
   `90075FF8B9F72A2295A1946BB18BFDE685F60F8944801C11317D48BC6B3E8C42` before and after.
   Exact Temp artifacts are removed, owned search Node count is zero, and no browser pass
-  applies because this is a nonvisual offline tool. Blocker: none. One next action:
-  independent read-only QA of `1f85a0a..da2c67d` before any production reverse search.
+  applies because this is a nonvisual offline tool.
+- Formal QA rejects `1f85a0a..da2c67d` with
+  `P0 0 / P1 2 / P2 0 / P3 0 / GAP 0`: resume lacks an absolute cumulative-probe
+  ceiling check and hard-linked resume/output files alias. Adversarial QA rejects with
+  `P0 0 / P1 1 / P2 2 / P3 0 / GAP 0`: partial probe tokens do not bind their candidate
+  index/descriptor, the hard-link overwrite is reproducible, and the forward/reverse
+  set test is tautological and never calls the reverse traversal. Both QA Temp areas are
+  removed, no search Node remains, and neither reviewer ran production search.
+- Blocker: the four defects above. One next action: repair only
+  `tools/search-puzzle-v3-prototype.mjs` and
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs`, run the post-last-edit gates once,
+  and obtain fresh independent QA before opening any reverse shard.
 
 ### Stage F3B accepted status
 
@@ -784,12 +797,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Run independent read-only implementation QA over exact range `1f85a0a..da2c67d`.
-Reproduce the standalone contract suite and targeted contract vectors, audit all three
-commits against the accepted byte/schema/DFS/cursor/STOP/null contract, verify exact path
-scope and legacy forward bytes, and report P0–P3/GAP. Do not run production 32-shard
-reverse search. Keep final F3C JSON/Core test, later content, deferred identity,
-T27/`progress.md`, and missing Ice archive closed.
+Repair the rejected seeded-reverse implementation only in its two authorized tool/test
+paths. Validate the restored partial token's candidate index and exact descriptor against
+the reconstructed frame list; reject `start + nodeBudget` above 1,000,000,000 before the
+first probe; reject existing resume/output hard links by file identity without modifying
+the input; and replace the false-positive mask comparison with an independent small-board
+forward oracle exercised against actual reverse traversal, including both same-type peel
+orders. Run the standalone test while editing, then one final typecheck, full suite, and
+build after the last source change. Commit a bounded repair candidate and request fresh
+independent QA. Do not run production 32-shard reverse search. Keep final F3C JSON/Core
+test, later content, deferred identity, T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE IMPLEMENTATION CANDIDATE `da2c67d`; QA NEXT**
+Status: **STAGE F3C SEEDED-REVERSE IMPLEMENTATION REJECTED; BOUNDED REPAIR OPEN**
 
 ## Active objective
 
@@ -95,13 +95,14 @@ ten-row fixture/test pair, while published Puzzle content stays closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C CONTRACT REPAIR QA** — the exact
+6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C IMPLEMENTATION REPAIR OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
    anchor-supported state identity, definition-aware replay/proof, and exact anchor
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
-   authoring-tool contract repair remains under QA and content authoring stays closed.
+   reverse implementation QA rejects `da2c67d`; a two-path repair is open while content
+   authoring stays closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -556,6 +557,21 @@ only; it is not F3 source acceptance.
   typecheck, full `46 passed / 2 skipped` file and `430 passed / 10 skipped` test run,
   and 767-module build pass. This is an implementation candidate only; independent QA
   must accept it before any production reverse shard runs.
+- Formal implementation QA rejects `1f85a0a..da2c67d` with
+  `P0 0 / P1 2 / P2 0 / P3 0 / GAP 0`: resumed work can exceed the absolute
+  1,000,000,000-probe ceiling, and NTFS hard links can alias resume/output and overwrite
+  the input checkpoint. Adversarial QA separately rejects it with
+  `P0 0 / P1 1 / P2 2 / P3 0 / GAP 0`: a recomputed cursor can carry an out-of-range
+  partial-token candidate index without descriptor validation, the hard-link alias is
+  reproducible, and the required forward/reverse set test never invokes the reverse
+  traversal and is therefore a false positive.
+- Repair remains limited to `tools/search-puzzle-v3-prototype.mjs` and
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs`. It must fail closed before the
+  first probe on cumulative-ceiling overflow, bind partial tokens to the reconstructed
+  canonical frame candidate, compare existing resume/output file identity, and replace
+  algebraic mask assertions with an independent forward oracle exercised against the
+  actual reverse traversal, including both same-type peel orders. No production reverse
+  search may start until the repaired full range passes independent QA.
 
 ## Current checkpoint state
 

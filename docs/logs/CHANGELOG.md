@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded-reverse implementation rejected
+
+- Formal QA rejects `1f85a0a..da2c67d` with `P1 2`; adversarial QA independently
+  rejects it with `P1 1 / P2 2`. The four distinct blockers are an unbound partial-token
+  candidate index/descriptor, cumulative probe-ceiling overflow after resume, NTFS
+  hard-link resume/output aliasing, and a forward/reverse set test that never executes
+  reverse traversal.
+- Production reverse search remains closed. One bounded repair may touch only the
+  existing authoring tool and standalone reverse test, must add direct regressions for
+  all four defects, and must pass fresh independent QA before any shard, fixture, Core,
+  content, migration, or UI checkpoint opens.
+
 ## 2026-08-11 — T37 Stage F3C seeded-reverse implementation candidate
 
 - Three bounded commits `95e23bb`, `2aac9f2`, and `da2c67d` implement the accepted
