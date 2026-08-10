@@ -79,10 +79,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 11. `TECHNICAL ACCEPT — PLAYER REVIEW OPEN` — ordinary/Mutation whole-piece material
     source `a184952`, restart-proof test `1058dbd`, evidence `731bf6f`, and complete
     theme/motion/responsive matrix `8e336fe`; independent P0–P3 all zero.
-12. `F2 SOURCE CANDIDATE; QA NEXT` — F1 freezes the 5/25/16 proof foundation,
-    content, unlocks, migration, and UI. Source `74148ec` closes strict-search mechanics
-    and representative ordinary/one-anchor/two-anchor certificates; independent QA is
-    pending before any level definition changes.
+12. `F2 ACCEPTED; F3 CAPABILITY NEXT` — F1 freezes the 5/25/16 proof foundation,
+    content, unlocks, migration, and UI. Behavior source `74148ec` plus corrections
+    through `1507dab` close strict-search mechanics and representative ordinary/
+    one-anchor/two-anchor certificates with two independent P0–P3-zero reviews.
 13. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ### Stage F1 frozen status
@@ -114,7 +114,7 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   v6 `bestLockedPieceCounts`; historic hashes may not be derived after those definitions
   are edited.
 
-### Stage F2 source candidate status
+### Stage F2 accepted status
 
 - Task: T37/F2 strict public-control proof repair. Base SHA: `1d7e573`; source candidate:
   `74148ec`. Exact paths are `src/game/core/puzzleRouteSearch.ts`,
@@ -142,11 +142,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   (`5/5`); `npm.cmd run test` (`417 passed / 10 skipped`); and `npm.cmd run build`
   (767 modules, only the existing chunk-size advisory). F2 changes no renderer/UI, so
   browser evidence is not applicable.
-- Blocker: none in source. Next exact action is independent read-only QA from
-  `1d7e573` through this status checkpoint, with product source ending at `74148ec`,
-  including direct reproduction of the exact suite and protected-path exclusion. Do not
-  open `puzzles.ts`, curriculum content, migration, unlock, or UI until that verdict is
-  dispositioned.
+- Initial QA correctly rejected the retained-route CCW test as a false positive: its
+  old signature was also reachable by clockwise `CRH`. Test checkpoint `8220b43`
+  compares the complete C/Q domain directly with a Q-removed domain and freezes the
+  genuine unique witness `S:0,32|0,33|1,33|1,34` at 20 versus 19 landing signatures.
+  Phase-status repair `88ed3aa` and comment-only metric repair `1507dab` close the other
+  P2/P3 findings.
+- Both independent read-only reviews accept `1d7e573..1507dab` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. Independent execution passes typecheck, route `8/8`,
+  Mastery `4/4`, and exact `5/5`; it reproduces the Q-only difference and confirms the
+  seven-path range excludes T27, `t27-r1-followup`, and `progress.md`. F2 has no open
+  blocker. Stage F3 may open only the definition capability/validation checkpoint;
+  curriculum content, migration, unlock, and UI remain closed.
 
 ## Verification state
 
@@ -432,14 +439,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Run independent read-only QA from `1d7e573` through this status checkpoint, with product
-source ending at `74148ec`: inspect the four exact source/test paths, reproduce the
-focused and opt-in exact gates, verify ordinary/one-anchor/two-anchor proof equality,
-and confirm no protected T27 or `progress.md` path entered the range. Only after QA
-disposition may Stage F3 open definition/content authoring.
-Do not begin Intro boards, the 46-level module, v6 migration, mastery groups, or Puzzle
-UI. Keep unified 10×20 physics, D1/Stage-E player verdicts, deferred identity, protected
-T27/`progress.md`, and the missing Ice archive separate.
+Freeze the bounded Stage F3 capability contract before code: extend canonical Puzzle
+validation from the current headroom subset to 3–10 contiguous bottom target rows,
+5–20 legal zero-clear setup placements, and 0–4 immutable anchors in the visible bottom
+twelve rows, with direct board/clear/support/target-mapping/preview/proof tests. Every
+anchor must own a replay-verified landing/support effect. Then obtain one complete
+strict certificate for an unanchored ten-target-row prototype before reauthoring
+`tm-puzzle-46`. Do not begin Intro boards, the 46-level module, v6 migration, mastery
+groups, or Puzzle UI. Keep unified 10×20 physics, D1/Stage-E player verdicts, deferred
+identity, protected T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
 

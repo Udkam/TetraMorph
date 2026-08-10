@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F2 STRICT SEARCH SOURCE CANDIDATE; INDEPENDENT QA NEXT**
+Status: **STAGE F2 STRICT SEARCH ACCEPTED; STAGE F3 DEFINITION CAPABILITY NEXT**
 
 ## Active objective
 
@@ -24,9 +24,11 @@ stages despite that separate archive item. Stage D1 and Stage E now pass their b
 implementation, browser-evidence, and independent-QA gates; normal-speed player review
 remains open for both. Stage F1 freezes the exact stable-ID roster, migration,
 operation metric, proof schema, admission fixtures, and rev2 behavior-hash baselines.
-Stage F2 source candidate `74148ec` repairs the strict public-control search before any
-published Puzzle definition changes; independent read-only QA is now the only open F2
-gate.
+Stage F2 behavior source `74148ec` repairs the strict public-control search before any
+published Puzzle definition changes. Its false-positive fixture and status/comment
+follow-ups close at `1507dab`; two independent read-only reviews accept the full range
+with P0–P3 all zero. Stage F3 must now extend definition validation before any board is
+reauthored.
 
 ## Frozen product direction
 
@@ -88,12 +90,12 @@ gate.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F2 STRICT SEARCH SOURCE CANDIDATE; QA NEXT** — the exact
+6. **Puzzle curriculum — F2 STRICT SEARCH ACCEPTED; F3 CAPABILITY NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
-   are frozen. Candidate `74148ec` now covers counter-clockwise SRS, anchor-supported
-   state identity, definition-aware replay/proof, and exact anchor admission; content
-   authoring remains closed until independent QA passes.
+   are frozen. Accepted source `74148ec` covers counter-clockwise SRS, anchor-supported
+   state identity, definition-aware replay/proof, and exact anchor admission. Stage F3
+   opens only validator/capability work; content authoring remains closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -205,7 +207,7 @@ The active source still publishes 50 levels at F1. No level count, board, route,
 certificate, progress value, unlock, or UI surface is considered implemented until its
 later bounded checkpoint is green.
 
-### Stage F2 strict-search candidate (2026-08-10)
+### Stage F2 strict-search acceptance (2026-08-10)
 
 - Source checkpoint `74148ec` adds route token `Q`, both public SRS directions, numeric
   `y,x` target/support canonicalization, support-mask proof identity, explicit invalid
@@ -223,9 +225,19 @@ later bounded checkpoint is green.
 - Final post-source gates pass: typecheck; route tests `8/8`; Mastery tests `4/4`; the
   opt-in strict suite `5/5`; the complete suite `417 passed / 10 skipped`; and the
   767-module production build. This is renderer-independent Core/proof work, so no
-  browser-evidence pass is required for F2. Independent read-only QA from `1d7e573`
-  through the Stage-F2 status checkpoint is next, with product source ending at
-  `74148ec`; `puzzles.ts`, content, migration, unlocks, and UI remain closed.
+  browser-evidence pass is required for F2.
+- Initial QA rejected the direction-dependent test because its retained Q route shared
+  a landing with pure clockwise route `CRH`. Test checkpoint `8220b43` replaces that
+  false positive with a direct complete-domain comparison: C/Q has 20 signatures,
+  clockwise-only has 19, and the unique Q-only witness is
+  `S:0,32|0,33|1,33|1,34`. Status repair `88ed3aa` and comment-only proof-metric repair
+  `1507dab` close the remaining documentation findings.
+- Both independent read-only reviews accept `1d7e573..1507dab` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. One review independently reruns typecheck, route `8/8`,
+  Mastery `4/4`, and exact certificates `5/5` and reproduces the 20-versus-19 Q-only
+  difference. The seven-path range excludes T27, `t27-r1-followup`, and `progress.md`.
+  F2 is accepted; Stage F3 may open only definition capability/validation, while
+  curriculum content, migration, unlocks, and UI remain closed.
 
 ## Current checkpoint state
 

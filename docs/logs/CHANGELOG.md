@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F2 strict Puzzle search accepted
+
+- Expanded the complete public-control landing domain with counter-clockwise token `Q`
+  and both SRS directions. Proof state identity now includes numerically canonical
+  target and anchor-support masks; definition-aware replay/certification share one
+  injected definition, and anchor/support states use a conservative zero lower bound.
+  Behavior source is `74148ec`.
+- Reproved all three ordinary certificates without changing their routes, optima,
+  mastery thresholds, or technique signatures; only exact frontier/transition/prune
+  statistics changed. Complete shorter-depth searches admit the current one-anchor and
+  test-only two-anchor `t5r-drift-08` fixtures at four locked tetrominoes with hashes
+  `e9b71c20` and `696f86a0`.
+- Initial QA rejected a misleading CCW fixture whose landing was also reachable by
+  clockwise `CRH`. Checkpoint `8220b43` now compares complete C/Q and clockwise-only
+  domains directly: 20 versus 19 signatures, with unique Q-only witness
+  `S:0,32|0,33|1,33|1,34`. Status correction `88ed3aa` and proof-metric comment repair
+  `1507dab` close the remaining findings.
+- Final typecheck, route `8/8`, Mastery `4/4`, exact `5/5`, complete suite
+  (`417 passed / 10 skipped`), and the 767-module build pass. Two independent read-only
+  reviews accept `1d7e573..1507dab` with `P0 0 / P1 0 / P2 0 / P3 0`; no T27,
+  `t27-r1-followup`, or `progress.md` path enters the seven-path range. Stage F3 may now
+  open definition capability/validation, not curriculum content.
+
 ## 2026-08-10 — T37 Stage F1 Puzzle v3 contract frozen
 
 - Froze the active campaign identity at exactly 5 Intro / 25 Easy / 16 Hard levels:
