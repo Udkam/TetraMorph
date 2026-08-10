@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE E TECHNICAL ACCEPT — PLAYER REVIEW OPEN; STAGE F PROOF FOUNDATION NEXT**
+Status: **STAGE F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED**
 
 ## Active objective
 
@@ -22,8 +22,11 @@ The uploader-original Ice WAV remains an explicit provenance follow-up, not a cl
 has been satisfied. On 2026-08-10 the player authorized later work to proceed in bounded
 stages despite that separate archive item. Stage D1 and Stage E now pass their bounded
 implementation, browser-evidence, and independent-QA gates; normal-speed player review
-remains open for both. Stage F begins with proof/migration infrastructure rather than
-bulk-editing the published Puzzle list.
+remains open for both. The Stage F1 candidate now specifies the exact stable-ID roster,
+migration, operation metric, proof schema, admission fixtures, and frozen rev2 behavior-
+hash baselines. Stage F2 remains closed until independent QA accepts that contract; it
+then repairs the strict public-control search before any published Puzzle definition
+changes.
 
 ## Frozen product direction
 
@@ -85,8 +88,11 @@ bulk-editing the published Puzzle list.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — PROOF FOUNDATION NEXT** — 5/25/16 content, deduplication, solver certificates,
-   technique links, unlock migration, and UI pagination.
+6. **Puzzle curriculum — F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED** — the exact
+   5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
+   migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
+   are proposed. Strict search stays closed until the corrected contract passes
+   independent QA.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -151,6 +157,52 @@ inherited T27 evidence and `progress.md` remain protected and excluded.
 Stage E is a bounded technical candidate, not a claim of player visual acceptance.
 Stage F must first freeze the 46-level identity/migration table and prove anchor-aware
 strict search on representative hard cases before any bulk curriculum replacement.
+
+### Stage F1 exact contract (2026-08-10)
+
+`docs/phases/t37-puzzle-curriculum-v3.md` is the candidate Stage-F roster and migration
+contract. It makes no product-data change:
+
+- Intro is the rebuilt stable-ID set at current positions 1–5. Easy preserves current
+  positions 6–30 exactly, moves them into one all-open 25-level band, and selects eight
+  visible technique keys. Hard retains sixteen IDs and retires `tm-puzzle-34`,
+  `tm-puzzle-40`, `tm-puzzle-42`, and `tm-puzzle-43` because their decision families
+  repeat stronger retained boards.
+- The eight behavior rebuilds are the five Intro boards plus Hard `tm-puzzle-32`,
+  `tm-puzzle-39`, and `tm-puzzle-46`. The first two become multi-anchor applications;
+  the last becomes a ten-target-row deep-well trick. The other 38 active definitions
+  remain behavior-preserved and may retain real revision-2 records.
+- One operation is one real locked tetromino. Every Hard has exactly one related Easy
+  prerequisite, with a derived threshold of strict optimum plus five. The browser will
+  eventually show `落子数 / Pieces placed` rather than ambiguous move counts.
+- The current proof graph is incomplete: it omits public counter-clockwise rotation and
+  its state key omits `puzzleAnchorSupportedCells`. F2 adds route token `Q`, includes
+  both SRS directions, adds the support mask, uses no target-deficit pruning on anchor
+  states, and exposes definition-aware replay/certification. Existing three optimum
+  certificates must be honestly rerun over that expanded graph.
+- F2 normally owns `puzzleRouteSearch.ts` and its two direct proof tests. If and only if
+  that exact rerun changes frozen proof results, `src/puzzleMastery.ts` becomes a
+  result-triggered refresh path; exact equality may not be weakened. Statistics-only
+  drift changes only statistics, while a changed optimum/route also refreshes the
+  optimum-plus-five threshold and technique signature. The current mastery groups stay
+  closed.
+- Admission cases are the current ordinary `t5r-arc-13`, current one-anchor
+  `t5r-drift-08`, and a test-only two-anchor copy that adds `{x:4,y:16}`. The existing
+  six-lock public route finishes both anchor cases and exercises a four-cell support
+  chain, but this is only a candidate replay until exhaustive shorter-depth proof
+  closes.
+- Persistence moves to key `tetramorph:puzzle-completion:v6`, schema 6, campaign
+  revision 3. A literal historical 50-ID roster decodes v5 before the explicit
+  preserve/rebuild/retire projection; the v5 key is never overwritten or deleted.
+- The 38 preserved rev2 definitions are pinned to lowercase SHA-256 behavior hashes
+  generated from baseline `e675389` with one exact canonical JSON/LF serializer. The
+  manifest is historic input, never recomputed from edited v3 data. V5
+  `bestPieceCounts` maps explicitly to v6 `bestLockedPieceCounts` only on a matching
+  stable ID and behavior hash.
+
+The active source still publishes 50 levels at F1. No level count, board, route,
+certificate, progress value, unlock, or UI surface is considered implemented until its
+later bounded checkpoint is green.
 
 ## Current checkpoint state
 

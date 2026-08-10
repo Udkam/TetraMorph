@@ -79,12 +79,43 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 11. `TECHNICAL ACCEPT — PLAYER REVIEW OPEN` — ordinary/Mutation whole-piece material
     source `a184952`, restart-proof test `1058dbd`, evidence `731bf6f`, and complete
     theme/motion/responsive matrix `8e336fe`; independent P0–P3 all zero.
-12. `NEXT` — 5/25/16 Puzzle proof foundation, content, unlocks, migration, and UI.
+12. `F1 CONTRACT CANDIDATE; QA RECHECK REQUIRED` — 5/25/16 Puzzle proof foundation,
+    content, unlocks, migration, and UI.
 13. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+
+### Stage F1 candidate status
+
+- The candidate roster/migration/proof contract is
+  `docs/phases/t37-puzzle-curriculum-v3.md`. It proposes current positions 1–5 as five
+  rebuilt Intro IDs, positions 6–30 as 25 definition-preserved Easy IDs, and sixteen
+  retained Hard IDs. Hard retires `tm-puzzle-34`, `tm-puzzle-40`, `tm-puzzle-42`, and
+  `tm-puzzle-43`; the accepted special silhouettes at old 36/38/47 stay published.
+- Only Hard `tm-puzzle-32`, `tm-puzzle-39`, and `tm-puzzle-46` join Intro in the rebuild
+  set. The first two are multi-anchor applications and the last is the ten-row trick;
+  38 active definitions remain behavior-preserved for revision-3 migration.
+- Operation count is locked tetrominoes. Eight unchanged Easy technique keys each own
+  one or more of the sixteen Hard relations, while each Hard has exactly one visible
+  prerequisite and derives its threshold as optimum plus five.
+- F2 correctness blockers are explicit: the current strict graph omits public
+  counter-clockwise SRS, proof-state identity omits anchor-supported cells, and the
+  target-deficit prune is unproved for anchors. Existing strict certificates cannot be
+  assumed stable after these repairs.
+- The current `t5r-drift-08` six-lock route finishes both its canonical one-anchor
+  definition and a test-only two-anchor copy with `{x:4,y:16}`, exercising four
+  supported cells. Their current hashes are `e9b71c20` and `696f86a0`; they are
+  admission candidates, not optimum claims.
+- Persistence is proposed as a new v6 key and campaign revision 3 with a literal historic
+  50-ID decoder plus explicit preserve/rebuild/retire projection. No published source
+  level or progress behavior changed in F1.
+- The candidate now pins one canonical UTF-8 JSON/LF SHA-256 serializer and all 38
+  baseline `e675389` preserve hashes. It also maps v5 `bestPieceCounts` explicitly to
+  v6 `bestLockedPieceCounts`; historic hashes may not be derived after those definitions
+  are edited.
 
 ## Verification state
 
-- Contract checkpoint is committed as `429ffe2` on `main`.
+- The umbrella T37 contract checkpoint is committed as `429ffe2` on `main`; this is not
+  the still-uncommitted Stage F1 curriculum contract.
 - Focused audio tests pass `21/21`; `npm.cmd run typecheck` passes.
 - Five mono 48 kHz / 16-bit WAV suites under
   `docs/evidence/t37/audio-audition/` bind directly to source `0bebf8a`. All samples
@@ -361,16 +392,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Freeze Stage F1 before editing published level data: define the exact 5 Intro / 25 Easy /
-16 Hard stable-ID roster, retained/redesigned/retired migration table, operation-count
-meaning, strict certificate schema, and representative ordinary plus multi-anchor proof
-cases. Then extend strict search to model anchor-supported state and validate that
-prototype before authoring the five guided Intro levels or bulk-changing the 50-level
-module. Preserve unified 10×20 physics for the first curriculum pass; express board
-variation through authored target silhouettes and anchors unless a separately proven
-variable-board contract is opened. Keep D1 and Stage E player verdicts separate, defer
-site identity to the final proposal gate, preserve inherited T27/`progress.md`, and do
-not claim the missing Ice uploader-original WAV/hash is archived.
+Regenerate the 38 revision-2 behavior hashes from baseline `e675389`, complete the F1
+independent recheck, and exact-stage only the five curriculum-contract paths. After the
+committed candidate passes exact-range QA, promote F1 to frozen. Only then implement
+Stage F2 in `src/game/core/puzzleRouteSearch.ts` and its direct tests: add `Q`, both SRS
+directions, canonical anchor-support identity, definition-aware replay/certification,
+and a zero lower bound whenever anchors/support exist. Rerun the three current ordinary
+certificates; only a resulting exact-proof delta may open `src/puzzleMastery.ts`, and
+the equality gate may not be weakened. Then close ordinary, one-anchor, and test-only
+two-anchor admission before changing `puzzles.ts`. Do not begin Intro boards, the
+46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20 physics,
+D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and the
+missing Ice archive separate.
 
 ## Do not repeat
 
