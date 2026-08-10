@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded-reverse implementation candidate
+
+- Three bounded commits `95e23bb`, `2aac9f2`, and `da2c67d` implement the accepted
+  seeded-reverse contract only in the authoring tool and its standalone Node test.
+- Post-last-edit standalone contract test, typecheck, full suite
+  (`46 passed / 2 skipped` files; `430 passed / 10 skipped` tests), 767-module build,
+  forward byte hashes, diff/scope, Temp cleanup, and zero-owned-process checks pass.
+- The candidate is nonvisual and changes no game/browser runtime, so Playwright evidence
+  does not apply. Production reverse search and every fixture/Core/content/UI path remain
+  closed pending independent implementation QA.
+
 ## 2026-08-11 — T37 Stage F3C seeded-reverse contract accepted
 
 - One-line closure `09e90c5` corrects the F3A source to `a1e37f1`; F2 remains

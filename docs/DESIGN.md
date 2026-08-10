@@ -511,6 +511,11 @@ adding unrelated badges or ornamental effects.
 - Closure QA accepts `89ae4ad..09e90c5` with P0–P3 and GAP all zero. This opens only
   the existing authoring tool plus its new standalone reverse-contract test; it does not
   accept a generated setup, final F3C fixture, published level, Core change, or UI work.
+- Candidate `1f85a0a..da2c67d` implements that contract in three budgeted checkpoints.
+  Its standalone suite covers forward byte preservation, reverse identity/hash bytes,
+  lossless no-replay cursor state, fail-closed tamper checks, STOP/null priorities, small
+  reverse candidates, and actual Core replay. The offline tool changes no page/canvas,
+  so browser evidence from the web-game loop does not apply to this candidate.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

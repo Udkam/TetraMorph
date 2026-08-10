@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE CONTRACT ACCEPTED; TOOL AND TEST IMPLEMENTATION NEXT**
+Status: **STAGE F3C SEEDED-REVERSE IMPLEMENTATION CANDIDATE `da2c67d`; QA NEXT**
 
 ## Active objective
 
@@ -548,6 +548,14 @@ only; it is not F3 source acceptance.
   `tools/search-puzzle-v3-prototype.mjs` and
   `tools/search-puzzle-v3-prototype-reverse.test.mjs`; reverse search and all product
   content remain closed until the implementation candidate passes independent QA.
+- Implementation range `1f85a0a..da2c67d` contains three bounded source commits
+  (`95e23bb`, `2aac9f2`, `da2c67d`) and only the two authorized tool/test paths. It adds
+  byte-exact identity codecs, lossless DFS/Merkle/cursor state, canonical reverse CLI
+  output, fail-closed resume, STOP/null handling, and a standalone contract suite while
+  preserving legacy forward JSON/stdout bytes. Post-last-edit standalone test,
+  typecheck, full `46 passed / 2 skipped` file and `430 passed / 10 skipped` test run,
+  and 767-module build pass. This is an implementation candidate only; independent QA
+  must accept it before any production reverse shard runs.
 
 ## Current checkpoint state
 

@@ -118,8 +118,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     schema/domain ambiguities and one stale-status P3 remain.
 27. `F3C SEEDED-REVERSE CONTRACT ACCEPTED` — closure QA reports P0–P3/GAP all zero;
     only the authoring tool and standalone reverse test are open.
-28. `F3C SEEDED-REVERSE TOOL/TEST IMPLEMENTATION; NEXT` — implementation candidate and
-    independent QA precede any search run, fixture, content, migration, UI,
+28. `F3C SEEDED-REVERSE IMPLEMENTATION CANDIDATE; QA NEXT` — three bounded commits end
+    at `da2c67d`; final local gates pass.
+29. `PENDING` — independent implementation QA precedes any reverse search run, fixture,
+    content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -347,6 +349,24 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   F3B remains `308233c`. Independent QA accepts full range `89ae4ad..09e90c5` with
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The two implementation paths are now open;
   search execution, final JSON/Core test, published content, and later work remain closed.
+- Task: T37/F3C seeded-reverse implementation. Base `1f85a0a`; ordered commits
+  `95e23bb`, `2aac9f2`, and candidate `da2c67d`. Exact paths are
+  `tools/search-puzzle-v3-prototype.mjs` and
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs`; checkpoint sizes are 389, 398,
+  and 500 added/modified lines.
+- The source supplies reverse identity codecs and digest vectors, shard-local reversed
+  trie/full-domain queue identity, seven-mask lossless DFS/memo/cursor/Merkle state,
+  canonical schema-3 CLI output, deterministic STOP/null and RSS handling, fail-closed
+  structural resume, small exact candidates, and real Core `replayPuzzleSetup` tests.
+- Post-last-edit commands pass: standalone Node reverse contract test; typecheck; full
+  suite `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; and build with
+  767 modules. Only the expected Node type-strip experimental warning and existing
+  >500 kB build chunk warning remain. Legacy forward JSON SHA-256 is
+  `B334010D7CEC7E38A35EDB429FE9DA3333D5A312893B78EFB4E8659455419A2A`; stdout is
+  `90075FF8B9F72A2295A1946BB18BFDE685F60F8944801C11317D48BC6B3E8C42` before and after.
+  Exact Temp artifacts are removed, owned search Node count is zero, and no browser pass
+  applies because this is a nonvisual offline tool. Blocker: none. One next action:
+  independent read-only QA of `1f85a0a..da2c67d` before any production reverse search.
 
 ### Stage F3B accepted status
 
@@ -764,11 +784,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement the accepted seeded-reverse contract only in
-`tools/search-puzzle-v3-prototype.mjs` and
-`tools/search-puzzle-v3-prototype-reverse.test.mjs`. Preserve byte-identical forward
-behavior, run the standalone contract test plus final typecheck/full suite/build, commit
-the bounded source candidate, and request independent implementation QA before any
+Run independent read-only implementation QA over exact range `1f85a0a..da2c67d`.
+Reproduce the standalone contract suite and targeted contract vectors, audit all three
+commits against the accepted byte/schema/DFS/cursor/STOP/null contract, verify exact path
+scope and legacy forward bytes, and report P0–P3/GAP. Do not run production 32-shard
 reverse search. Keep final F3C JSON/Core test, later content, deferred identity,
 T27/`progress.md`, and missing Ice archive closed.
 

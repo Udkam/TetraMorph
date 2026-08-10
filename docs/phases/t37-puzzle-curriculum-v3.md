@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED-REVERSE CONTRACT ACCEPTED; TOOL AND TEST IMPLEMENTATION NEXT**
+Status: **F3C SEEDED-REVERSE IMPLEMENTATION CANDIDATE `da2c67d`; QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -608,6 +608,10 @@ and status matrix are the authoritative second repair.
 Independent closure QA accepts `89ae4ad..09e90c5` with
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; implementation may now open only on the two paths
 named below. This is not tool, search-result, fixture, or content acceptance.
+Implementation candidate `1f85a0a..da2c67d` now occupies only those two paths and passes
+its post-last-edit standalone contract test, typecheck, full suite, build, exact forward
+byte regression, scope, and cleanup checks. Independent implementation QA remains
+mandatory before the first accepted reverse search round can open.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and
