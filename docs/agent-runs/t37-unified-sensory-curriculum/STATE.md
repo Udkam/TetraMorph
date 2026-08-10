@@ -87,12 +87,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     `628f66d..dc035a3` with P0–P3 all zero. Validator capability, injected mechanics,
     and one non-published ten-row certificate remain split into bounded checkpoints;
     only F3A source is open.
-14. `F3A CANDIDATE; QA PENDING` — source `a1e37f1` expands only the frozen structural
-    validator boundary and adds the 38-entry literal preservation gate. F3B remains
-    closed until independent review accepts the exact candidate range.
+14. `F3A ACCEPTED; F3B NEXT` — source `a1e37f1` expands only the frozen structural
+    validator boundary and adds the 38-entry literal preservation gate. Independent QA
+    accepts `da264f4..b30ee1f` with P0–P3 all zero.
 15. `PENDING` — F3B/F3C, later content, migration, UI, final gates, and push.
 
-### Stage F3A candidate status
+### Stage F3A accepted status
 
 - Task: T37/F3A Puzzle v3 structural validator. Base SHA: `da264f4`; source candidate:
   `a1e37f1`. Exact source paths are `src/game/core/puzzles.ts`,
@@ -112,10 +112,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   src/game/core/puzzleCampaign.test.ts --reporter=verbose --maxWorkers=1`
   (`3 files / 16 tests`) and `npm.cmd run typecheck` (pass). No browser pass applies
   because no published/rendered state changed.
-- Blocker: independent read-only QA has not yet reviewed the candidate. Next action:
-  review the exact range from `da264f4` through the candidate-state tip, rerun the two
-  F3A direct test files and typecheck, verify the 38 literal hashes and protected-path
-  exclusions, then either report findings or accept F3A. Do not open F3B during review.
+- Independent read-only QA accepts `da264f4..b30ee1f` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It reruns typecheck and the specified three-file suite
+  (`16/16`), independently matches both 38-entry hash tables and their computed values,
+  confirms the canonical library/order/seed/route surface is byte-stable, and verifies
+  the six-path range excludes App/UI, F3B/F3C, T27, `t27-r1-followup`, and `progress.md`.
+  The QA made no edit, stage, commit, or push. F3A has no open blocker.
 
 ### Stage F1 frozen status
 
@@ -471,11 +473,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Obtain independent read-only QA for the F3A candidate range. Require direct source and
-test inspection, typecheck, the two F3A test files, independent 38-literal comparison,
-and exact protected-path exclusion. Do not begin F3B/F3C, Intro boards, the 46-level
-module, v6 migration, mastery groups, or Puzzle UI until the coordinator disposes that
-verdict. Keep unified 10×20 physics, D1/Stage-E player verdicts, deferred identity,
+Implement F3B only in `src/game/core/board.test.ts`,
+`src/game/core/puzzleFlow.test.ts`, and new
+`src/game/core/puzzleV3AnchorEvidence.test.ts`. Prove one test-only four-anchor
+definition's exact initial board/targets, clear/support/target remapping, bottom-twelve
+preview projection, and one independent successful public-command witness per anchor
+against a copy removing only that anchor. Open the smallest owning Core source path only
+after a direct mechanics test fails. Do not begin F3C, Intro boards, the 46-level module,
+v6 migration, mastery groups, Puzzle UI, or App source. Keep deferred identity,
 protected T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat

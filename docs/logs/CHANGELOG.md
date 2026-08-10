@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3A Puzzle definition capability accepted
+
+- Source `a1e37f1` expands clean-room authoring validation to 5–20 legal zero-clear
+  setup drops, 3–10 contiguous bottom target rows, and 0–4 unique anchors in visible
+  rows 8–19. Malformed, duplicate, out-of-range, target-covered, fifth-anchor, and
+  combined ordinary-plus-anchor full-row definitions fail closed in both validation
+  modes; no live definition changes.
+- The dedicated baseline test embeds and recomputes all 38 frozen revision-2 behavior
+  hashes with the exact canonical JSON/LF serializer. Focused tests pass `16/16` and
+  typecheck passes.
+- Independent read-only QA accepts `da264f4..b30ee1f` with
+  `P0 0 / P1 0 / P2 0 / P3 0`, reproduces the gates, confirms the canonical
+  library/order/seed/route surface is unchanged, and verifies protected paths are not in
+  the six-path range. Browser evidence is not applicable because no published/rendered
+  state changed. F3B injected-definition mechanics may now open.
+
 ## 2026-08-10 — T37 Stage F3 capability contract frozen
 
 - Independent read-only review accepts `628f66d..dc035a3` with

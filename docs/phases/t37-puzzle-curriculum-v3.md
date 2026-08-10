@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3A STRUCTURAL VALIDATOR CANDIDATE; INDEPENDENT QA PENDING**
+Status: **F3A STRUCTURAL VALIDATOR ACCEPTED; F3B INJECTED MECHANICS NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -367,10 +367,12 @@ and F3C path/split findings and confirms that the four-path range excludes inher
 T27 evidence, `t27-r1-followup`, and `progress.md`. This disposition opens F3A only;
 it does not accept any F3 product source or published level.
 
-F3A source checkpoint `a1e37f1` now implements the frozen structural bounds in exactly
-the three declared Core/test paths. The literal serializer matches all 38 revision-2
-behavior hashes, and focused tests pass `16/16` with typecheck green. This is a source
-candidate awaiting independent read-only QA; F3B/F3C and curriculum content remain
+F3A source checkpoint `a1e37f1` implements the frozen structural bounds in exactly the
+three declared Core/test paths. The literal serializer matches all 38 revision-2
+behavior hashes, and focused tests pass `16/16` with typecheck green. Independent
+read-only QA repeats those gates, verifies the unchanged canonical library and range,
+and accepts `da264f4..b30ee1f` with P0–P3 all zero. F3A is accepted; F3B may open only
+the injected-definition mechanics tests, while F3C and curriculum content remain
 closed.
 
 ## Progress v6 and revision-3 migration

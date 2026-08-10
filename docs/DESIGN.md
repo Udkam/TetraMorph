@@ -385,6 +385,10 @@ adding unrelated badges or ornamental effects.
   `628f66d..dc035a3` with P0–P3 all zero. F3A may therefore open only the structural
   validator and its literal preservation test; content, migration, progression, and UI
   remain closed until their later checkpoints.
+- F3A source `a1e37f1` admits the frozen structural bounds without changing any live
+  definition. Independent read-only QA accepts `da264f4..b30ee1f` with P0–P3 all zero
+  after reproducing typecheck, 16/16 focused tests, and all 38 literal hashes. F3B may
+  now prove injected four-anchor mechanics; published content remains closed.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
