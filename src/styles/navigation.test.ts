@@ -90,6 +90,7 @@ describe('Phase 9 navigation authority', () => {
     const reducedKeyframes = navigation.match(/@keyframes t37-route-reduced\s*\{[\s\S]*?\n\}/)?.[0] ?? '';
     expect(reducedKeyframes).toContain('opacity');
     expect(reducedKeyframes).not.toContain('transform');
+    expect(legacy).not.toMatch(/\.play-surface\s*\{[^}]*animation:\s*surface-in/s);
     expect(navigation).not.toContain('@media (prefers-reduced-motion: reduce)');
   });
 

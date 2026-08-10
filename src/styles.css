@@ -1212,7 +1212,6 @@ kbd,
   border: 1px solid var(--edge);
   border-radius: 18px;
   box-shadow: var(--shadow);
-  animation: surface-in 180ms var(--ease) both;
 }
 
 .game-arena {
