@@ -116,9 +116,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     probe/STOP ambiguity; all other dimensions pass.
 26. `F3C FIRST CONTRACT REPAIR REJECTED` — priority and hash vectors pass; three P1
     schema/domain ambiguities and one stale-status P3 remain.
-27. `F3C SECOND CONTRACT REPAIR CANDIDATE; QA NEXT` — every nested field, domain byte,
-    version literal, cursor payload, and status/null combination is frozen.
-28. `PENDING` — seeded reverse implementation, F3C fixture/test, later content, migration, UI,
+27. `F3C SEEDED-REVERSE CONTRACT ACCEPTED` — closure QA reports P0–P3/GAP all zero;
+    only the authoring tool and standalone reverse test are open.
+28. `F3C SEEDED-REVERSE TOOL/TEST IMPLEMENTATION; NEXT` — implementation candidate and
+    independent QA precede any search run, fixture, content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -342,6 +343,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   freezes all numeric widths, half-open bounds, version literals, nested records,
   descriptors, frames, cursor/result payloads, and a five-row status/null matrix; and
   updates F3A/F3B status. Implementation remains closed pending new QA.
+- Closure fix `09e90c5` corrects the F3A source to `a1e37f1`; F2 remains `74148ec` and
+  F3B remains `308233c`. Independent QA accepts full range `89ae4ad..09e90c5` with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The two implementation paths are now open;
+  search execution, final JSON/Core test, published content, and later work remain closed.
 
 ### Stage F3B accepted status
 
@@ -759,13 +764,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Commit the exact five-path second contract repair, then run independent read-only QA over
-`9737663..repair2` and the full `89ae4ad..repair2` contract. QA must reconstruct the
-domain bytes, nested schema, cursor/result payloads, and every status/null row; reproduce
-the fixed vectors; and recheck the already-passing priority, equivalence, two-path scope,
-and protected exclusions. Only acceptance may open the tool plus standalone Node test.
-Do not run a sixth forward round or reverse search; keep final F3C JSON/test, later
-content, deferred identity, T27/`progress.md`, and missing Ice archive closed.
+Implement the accepted seeded-reverse contract only in
+`tools/search-puzzle-v3-prototype.mjs` and
+`tools/search-puzzle-v3-prototype-reverse.test.mjs`. Preserve byte-identical forward
+behavior, run the standalone contract test plus final typecheck/full suite/build, commit
+the bounded source candidate, and request independent implementation QA before any
+reverse search. Keep final F3C JSON/Core test, later content, deferred identity,
+T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

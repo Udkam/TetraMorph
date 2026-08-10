@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED-REVERSE CONTRACT SECOND REPAIR CANDIDATE; QA NEXT**
+Status: **F3C SEEDED-REVERSE CONTRACT ACCEPTED; TOOL AND TEST IMPLEMENTATION NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -605,6 +605,9 @@ with `P0 0 / P1 3 / P2 0 / P3 1 / GAP 0`: priority, vectors, equivalence, state,
 scope, and exclusions pass, but domain/shard bytes, nested JSON/null states, and one
 F3A-only summary remain ambiguous or stale. The following complete protocol, schema,
 and status matrix are the authoritative second repair.
+Independent closure QA accepts `89ae4ad..09e90c5` with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; implementation may now open only on the two paths
+named below. This is not tool, search-result, fixture, or content acceptance.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

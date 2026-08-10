@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE CONTRACT SECOND REPAIR CANDIDATE; QA NEXT**
+Status: **STAGE F3C SEEDED-REVERSE CONTRACT ACCEPTED; TOOL AND TEST IMPLEMENTATION NEXT**
 
 ## Active objective
 
@@ -541,6 +541,13 @@ only; it is not F3 source acceptance.
   shard-trie identity, every domain byte and version literal, all nested JSON/frame/
   placement/result payloads, the status/null matrix, and this stale F3A/F3B summary.
   Implementation remains closed until the second repair is independently accepted.
+- Independent closure QA accepts full contract range `89ae4ad..09e90c5` with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. F2/F3A/F3B source references, all domain bytes,
+  nested schema, cursor/result payloads, status/null and STOP matrices, hash vectors,
+  path scope, and protected exclusions pass. Implementation is now open only for
+  `tools/search-puzzle-v3-prototype.mjs` and
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs`; reverse search and all product
+  content remain closed until the implementation candidate passes independent QA.
 
 ## Current checkpoint state
 

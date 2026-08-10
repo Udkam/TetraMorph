@@ -508,6 +508,9 @@ adding unrelated badges or ornamental effects.
   and version literal, enumerates every nested output/cursor/result field, and defines a
   total status/null matrix including trie-build RSS. Probe accounting and STOP priority
   already pass. Tool implementation remains closed until this schema repair is accepted.
+- Closure QA accepts `89ae4ad..09e90c5` with P0–P3 and GAP all zero. This opens only
+  the existing authoring tool plus its new standalone reverse-contract test; it does not
+  accept a generated setup, final F3C fixture, published level, Core change, or UI work.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

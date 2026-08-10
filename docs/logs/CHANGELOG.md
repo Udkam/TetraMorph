@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded-reverse contract accepted
+
+- One-line closure `09e90c5` corrects the F3A source to `a1e37f1`; F2 remains
+  `74148ec` and F3B remains `308233c`.
+- Independent QA accepts full contract range `89ae4ad..09e90c5` with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including exact domain/schema/hash bytes,
+  cursor/result and null/STOP matrices, scope, and protected exclusions.
+- Implementation is open only for the existing authoring tool and new standalone
+  reverse test. No reverse search, fixture, Core/content, migration, or UI path is open.
+
 ## 2026-08-11 — T37 Stage F3C seeded-reverse schema closure candidate
 
 - Independent QA rejects first repair `9737663` with
