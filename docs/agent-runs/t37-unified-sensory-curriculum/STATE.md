@@ -83,7 +83,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     content, unlocks, migration, and UI. Behavior source `74148ec` plus corrections
     through `1507dab` close strict-search mechanics and representative ordinary/
     one-anchor/two-anchor certificates with two independent P0–P3-zero reviews.
-13. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
+13. `F3 CONTRACT CANDIDATE; SOURCE CLOSED` — validator capability, injected mechanics,
+    and one non-published ten-row certificate are split into bounded checkpoints.
+14. `PENDING` — later content, migration, UI, final gates, and push.
 
 ### Stage F1 frozen status
 
@@ -439,15 +441,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Freeze the bounded Stage F3 capability contract before code: extend canonical Puzzle
-validation from the current headroom subset to 3–10 contiguous bottom target rows,
-5–20 legal zero-clear setup placements, and 0–4 immutable anchors in the visible bottom
-twelve rows, with direct board/clear/support/target-mapping/preview/proof tests. Every
-anchor must own a replay-verified landing/support effect. Then obtain one complete
-strict certificate for an unanchored ten-target-row prototype before reauthoring
-`tm-puzzle-46`. Do not begin Intro boards, the 46-level module, v6 migration, mastery
-groups, or Puzzle UI. Keep unified 10×20 physics, D1/Stage-E player verdicts, deferred
-identity, protected T27/`progress.md`, and the missing Ice archive separate.
+Independently review the Stage F3 contract in `docs/CURRENT_TASK.md`, `docs/DESIGN.md`,
+and `docs/phases/t37-puzzle-curriculum-v3.md`. Confirm it preserves all current
+definitions/hashes, separates structural validation from per-anchor replay evidence,
+keeps App/UI closed, and requires a non-published ten-row strict certificate. Only then
+open F3A in `src/game/core/puzzles.ts` and its direct test. Do not begin Intro boards,
+the 46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20
+physics, D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and
+the missing Ice archive separate.
 
 ## Do not repeat
 

@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F2 STRICT SEARCH ACCEPTED; F3 DEFINITION CAPABILITY NEXT**
+Status: **F2 STRICT SEARCH ACCEPTED; F3 CAPABILITY CONTRACT CANDIDATE**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -326,6 +326,33 @@ The F2 proof fixtures use the current headroom rule first. Wider anchor placemen
 ten-row validation are a later Core-definition checkpoint with direct board, clear,
 support, target-mapping, preview, and proof tests. No renderer-painted obstacle or hand-
 injected ordinary board is admitted.
+
+### Stage F3 bounded checkpoints
+
+- **F3A — structural validator:** expand `replayPuzzleSetup` and
+  `validatePuzzleDefinition(..., false)` to 3–10 contiguous bottom rows, 5–20 legal
+  zero-clear drops, and 0–4 unique anchors in visible rows 8–19. Anchors remain outside
+  the hidden buffer and may occupy only a setup-derived `.` cell. Ordinary cells plus
+  anchors may not complete an initial row. Canonical validation keeps every current
+  published definition exact; no roster or behavior hash changes.
+- **F3B — injected-definition mechanics:** one test-only four-anchor definition proves
+  initial board/target ownership and clear/support/target mapping. Every anchor owns an
+  independent successful public-route witness compared with a copy removing only that
+  anchor; the witness proves a changed real lock signature or direct support cells.
+  Static validation does not substitute for that evidence. Preview coverage asserts
+  the injected state's bottom-twelve-row projection and reruns existing two-piece queue
+  tests; UI source stays closed.
+- **F3C — ten-row admission:** a new T37-only authoring artifact records one legal,
+  unanchored, non-published ten-row definition and one public route with exact initial/
+  final hashes, lock signatures, and full shorter-depth statistics. The opt-in proof
+  uses no beam, timeout, or state cap. It must pass before `tm-puzzle-46` changes.
+
+The F3 source boundary starts with `src/game/core/puzzles.ts` and its direct test. Any
+additional Core source path requires a failing direct mechanics test first. New
+authoring evidence lives under a T37 path; historical T15/T32 route JSON and scripts
+remain untouched. After F3A/F3B/F3C are green, run final typecheck, complete suite,
+build, and independent read-only QA. Since no published/rendered state changes, F3 has
+no browser-evidence requirement.
 
 ## Progress v6 and revision-3 migration
 

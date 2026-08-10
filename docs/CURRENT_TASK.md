@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F2 STRICT SEARCH ACCEPTED; STAGE F3 DEFINITION CAPABILITY NEXT**
+Status: **STAGE F2 STRICT SEARCH ACCEPTED; STAGE F3 CAPABILITY CONTRACT CANDIDATE**
 
 ## Active objective
 
@@ -27,8 +27,8 @@ operation metric, proof schema, admission fixtures, and rev2 behavior-hash basel
 Stage F2 behavior source `74148ec` repairs the strict public-control search before any
 published Puzzle definition changes. Its false-positive fixture and status/comment
 follow-ups close at `1507dab`; two independent read-only reviews accept the full range
-with P0–P3 all zero. Stage F3 must now extend definition validation before any board is
-reauthored.
+with P0–P3 all zero. Stage F3 now has a bounded capability contract candidate; source
+remains closed until that contract passes independent review.
 
 ## Frozen product direction
 
@@ -90,7 +90,7 @@ reauthored.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F2 STRICT SEARCH ACCEPTED; F3 CAPABILITY NEXT** — the exact
+6. **Puzzle curriculum — F2 ACCEPTED; F3 CAPABILITY CONTRACT CANDIDATE** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted source `74148ec` covers counter-clockwise SRS, anchor-supported
@@ -238,6 +238,47 @@ later bounded checkpoint is green.
   difference. The seven-path range excludes T27, `t27-r1-followup`, and `progress.md`.
   F2 is accepted; Stage F3 may open only definition capability/validation, while
   curriculum content, migration, unlocks, and UI remain closed.
+
+### Stage F3 definition-capability contract (2026-08-10)
+
+F3 changes what a clean-room authoring definition may express; it does not publish a
+new board. The unified well remains exactly 10 columns × 20 visible rows with the
+existing hidden buffer, SRS, queue, clear, target, and anchor mechanics.
+
+1. **F3A structural validator** owns only `src/game/core/puzzles.ts` and
+   `src/game/core/puzzles.test.ts`. It expands legal authoring overrides to 3–10
+   contiguous nonempty bottom target rows, 5–20 seeded legal zero-clear setup drops,
+   and 0–4 unique immutable anchors at visible coordinates `x=0..9`, `y=8..19`.
+   Every anchor must occupy `.` in the setup-derived board; hidden/out-of-range,
+   duplicate, target-covered, malformed, or fifth anchors fail closed. Canonical mode
+   also rejects any row whose ordinary cells plus anchors total ten. Canonical mode
+   still requires each current published definition byte-for-byte, so this checkpoint
+   changes no live board, order, seed, name, route, or revision-2 behavior hash.
+2. **F3B injected-definition mechanics** owns direct tests in `board.test.ts`,
+   `puzzleFlow.test.ts`, and one new `puzzleV3AnchorEvidence.test.ts`; only a failing
+   test may open the smallest owning Core source path. A test-only four-anchor
+   definition must prove exact initial board/targets, line clear and target/support
+   remapping, and one independent successful public-command witness per anchor. Each
+   witness compares the complete definition with a copy removing only that anchor and
+   must show either a changed real lock signature or direct supported cells present
+   only with that anchor. Structural validation alone never claims mechanical
+   relevance. The preview gate asserts that `state.board.slice(-12)` contains every
+   legal target/anchor and reruns the existing two-piece presentation tests; the Puzzle
+   gallery/App remains closed until the 46 definitions are accepted.
+3. **F3C ten-row admission** owns a new T37 authoring artifact plus one opt-in exact
+   Core test. The artifact is test-only and records a legal unanchored ten-row
+   definition, canonical setup replay, public completion route, lock signatures,
+   initial/final hashes, and all shorter-depth certificate statistics. The certificate
+   uses no beam, timeout, or state cap. It must pass before `tm-puzzle-46` is reauthored;
+   the prototype never enters `PUZZLE_DEFINITIONS`, campaign order, storage, UI, or old
+   T15/T32 route artifacts.
+
+Each subcheckpoint stays independently green and reviewable. F3A runs typecheck and
+the direct definition tests; F3B adds direct engine/route coverage; F3C runs its opt-in
+strict certificate. After the last source/test change, run one final typecheck, complete
+suite, and build, then independent read-only QA. Browser evidence is not required
+because no published/rendered product state changes. Intro content, the 46-level module,
+v6 migration, mastery groups, unlocks, and Puzzle UI remain closed through F3.
 
 ## Current checkpoint state
 

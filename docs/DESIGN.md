@@ -357,6 +357,10 @@ adding unrelated badges or ornamental effects.
   soft drop, and hard drop. State deduplication includes anchor-supported placement
   identity. Beam search, a timeout, or a best-known route is never an optimum proof;
   anchored proof initially disables the unproven target-deficit prune.
+- Stage F2 accepts that proof domain after complete ordinary, one-anchor, and two-anchor
+  shorter-depth searches. A direction-specific regression must compare the full C/Q
+  landing domain with a Q-removed domain; the retained representative route alone is
+  not proof that counter-clockwise SRS is necessary.
 - Campaign revision 3 migrates through an explicit 50-ID table into a new v6 storage
   key. Only definition-preserved behavior carries completion and best placement count;
   rebuilt and retired IDs cannot award a new clear. The old v5 key remains untouched
@@ -365,6 +369,14 @@ adding unrelated badges or ornamental effects.
   3–10 bottom target rows, 5–20 legal setup placements, and at most four mechanically
   relevant anchors inside the visible bottom twelve rows. Real variable board
   dimensions remain a separate unopened contract.
+- Stage F3 separates structural legality from gameplay evidence. The definition
+  validator checks bounds, legal zero-clear setup replay, contiguous target ownership,
+  anchor uniqueness, anchor/target separation, and absence of any row completed by the
+  combined ordinary cells and anchors. Mechanical relevance is instead a schema-8
+  authoring obligation: every anchor needs an independent successful public replay
+  compared with a definition removing only that anchor, proving a changed real landing
+  or direct support effect. A test-only ten-row prototype must obtain a complete strict
+  certificate before any published Hard definition adopts that shape.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
