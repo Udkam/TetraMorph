@@ -9,6 +9,7 @@ import {
   replayPuzzleSetup,
   validatePuzzleDefinition,
   type PuzzleDefinition,
+  type PuzzleSetupHistory,
 } from './puzzles';
 import { puzzleLandings } from './puzzleRouteSearch';
 import { createRandomizer, drawPiece } from './random';
@@ -43,6 +44,61 @@ function initialLandingSignatures(definition: PuzzleDefinition, includeAnchors: 
   let state = dispatch(createInitialState(0x51a1f00d, 'puzzle', definition.id), { type: 'start' }).state;
   if (!includeAnchors) state = { ...state, board: createPuzzleBoard(definition, false) };
   return puzzleLandings(state).map(({ lock }) => lock.signature).sort();
+}
+
+const F3A_MIN_SETUP: PuzzleSetupHistory = {
+  seed: 2,
+  placements: [
+    { type: 'J', rotation: 2, x: 3 },
+    { type: 'S', rotation: 0, x: 3 },
+    { type: 'O', rotation: 2, x: 5 },
+    { type: 'L', rotation: 0, x: 3 },
+    { type: 'Z', rotation: 2, x: 4 },
+  ],
+};
+
+const F3A_MAX_SETUP: PuzzleSetupHistory = {
+  seed: 4101007,
+  placements: [
+    { type: 'O', rotation: 2, x: 1 },
+    { type: 'I', rotation: 0, x: 4 },
+    { type: 'J', rotation: 1, x: -1 },
+    { type: 'Z', rotation: 3, x: 8 },
+    { type: 'L', rotation: 0, x: 3 },
+    { type: 'T', rotation: 2, x: 6 },
+    { type: 'S', rotation: 2, x: 3 },
+    { type: 'T', rotation: 2, x: 2 },
+    { type: 'O', rotation: 2, x: 0 },
+    { type: 'S', rotation: 2, x: 7 },
+    { type: 'Z', rotation: 0, x: 4 },
+    { type: 'I', rotation: 2, x: 6 },
+    { type: 'J', rotation: 2, x: 0 },
+    { type: 'L', rotation: 2, x: 3 },
+    { type: 'T', rotation: 3, x: 5 },
+    { type: 'L', rotation: 1, x: -1 },
+    { type: 'S', rotation: 1, x: 0 },
+    { type: 'Z', rotation: 1, x: 3 },
+    { type: 'J', rotation: 1, x: 2 },
+    { type: 'O', rotation: 0, x: 7 },
+  ],
+};
+
+function authoringDefinition(
+  setup: PuzzleSetupHistory,
+  targetRows: number,
+  anchorCells: PuzzleDefinition['anchorCells'] = [],
+): PuzzleDefinition {
+  const source = getPuzzleDefinition('t3r-shaft-01');
+  const boardRows = replayPuzzleSetup(setup).slice(VISIBLE_START_ROW)
+    .map((row) => row.map((cell) => cell ?? '.').join(''));
+  return invalid(source, {
+    name: 'F3A authoring fixture',
+    seed: source.seed + 1,
+    targetRows,
+    setup,
+    boardRows,
+    anchorCells,
+  });
 }
 
 describe('T13 legal endgame workshop definitions', () => {
@@ -212,6 +268,79 @@ describe('T13 legal endgame workshop definitions', () => {
     expect(() => validatePuzzleDefinition(invalid(first, { hiddenCells: [{ x: 0, y: 0, type: 'J' }] }))).toThrow(/hidden buffer/i);
     expect(() => validatePuzzleDefinition(invalid(first, { anchorCells: [{ x: 0, y: 19 }] }))).toThrow(/anchor/i);
     expect(() => validatePuzzleDefinition(invalid(first, { anchorCells: [{ x: 3, y: 16 }, { x: 3, y: 16 }] }))).toThrow(/duplicate/i);
+  });
+
+  it('admits the F3A setup and target-row boundaries without changing canonical definitions', () => {
+    const canonical = getPuzzleDefinition('t3r-shaft-01');
+    const threeRows = invalid(canonical, {
+      name: 'F3A three-row authoring fixture',
+      seed: canonical.seed + 1,
+    });
+    const minimum = authoringDefinition(F3A_MIN_SETUP, 10);
+    const maximum = authoringDefinition(F3A_MAX_SETUP, 10);
+
+    expect(threeRows.targetRows).toBe(3);
+    expect(minimum.setup.placements).toHaveLength(5);
+    expect(maximum.setup.placements).toHaveLength(20);
+    expect(minimum.boardRows.filter((row) => row !== '..........')).toHaveLength(10);
+    expect(maximum.boardRows.filter((row) => row !== '..........')).toHaveLength(10);
+    expect(() => validatePuzzleDefinition(threeRows, false)).not.toThrow();
+    expect(() => validatePuzzleDefinition(minimum, false)).not.toThrow();
+    expect(() => validatePuzzleDefinition(maximum, false)).not.toThrow();
+    expect(() => validatePuzzleDefinition(invalid(minimum, { targetRows: 2 }), false)).toThrow(/target-row/i);
+    expect(() => validatePuzzleDefinition(invalid(maximum, { targetRows: 11 }), false)).toThrow(/target-row/i);
+    expect(() => replayPuzzleSetup({ ...F3A_MIN_SETUP, placements: F3A_MIN_SETUP.placements.slice(0, 4) }))
+      .toThrow(/five through twenty/i);
+    expect(() => replayPuzzleSetup({
+      ...F3A_MAX_SETUP,
+      placements: [...F3A_MAX_SETUP.placements, F3A_MAX_SETUP.placements[0]!],
+    })).toThrow(/five through twenty/i);
+  });
+
+  it('admits four unique anchors only inside empty cells of the bottom twelve visible rows', () => {
+    const base = authoringDefinition(F3A_MAX_SETUP, 10);
+    const fourAnchors = invalid(base, {
+      anchorCells: [{ x: 0, y: 8 }, { x: 9, y: 8 }, { x: 0, y: 9 }, { x: 9, y: 19 }],
+    });
+
+    expect(base.boardRows[19]?.[9]).toBe('.');
+    expect(() => validatePuzzleDefinition(fourAnchors, false)).not.toThrow();
+    expect(() => validatePuzzleDefinition(invalid(fourAnchors, {
+      anchorCells: [...fourAnchors.anchorCells, { x: 1, y: 8 }],
+    }), false)).toThrow(/zero through four/i);
+    const malformedAnchors: unknown[] = [
+      { x: -1, y: 8 },
+      { x: 10, y: 8 },
+      { x: 0, y: -1 },
+      { x: 0, y: 7 },
+      { x: 0, y: 20 },
+      { x: 0.5, y: 8 },
+      { x: 0, y: Number.NaN },
+      { y: 8 },
+      null,
+    ];
+    for (const anchor of malformedAnchors) {
+      expect(() => validatePuzzleDefinition(invalid(base, {
+        anchorCells: [anchor] as unknown as PuzzleDefinition['anchorCells'],
+      }), false)).toThrow(/anchor/i);
+    }
+    expect(() => validatePuzzleDefinition(invalid(base, {
+      anchorCells: null as unknown as PuzzleDefinition['anchorCells'],
+    }), false)).toThrow(/anchor/i);
+    expect(() => validatePuzzleDefinition(invalid(base, { anchorCells: [{ x: 0, y: 8 }, { x: 0, y: 8 }] }), false))
+      .toThrow(/duplicate/i);
+    expect(base.boardRows[10]?.[0]).not.toBe('.');
+    expect(() => validatePuzzleDefinition(invalid(base, { anchorCells: [{ x: 0, y: 10 }] }), false))
+      .toThrow(/target cell/i);
+  });
+
+  it('rejects ordinary cells plus an anchor that complete an initial row in both validation modes', () => {
+    const canonical = getPuzzleDefinition('t3r-shaft-01');
+    expect(canonical.boardRows[18]).toBe('OOSSLJJJT.');
+    const completedByAnchor = invalid(canonical, { anchorCells: [{ x: 9, y: 18 }] });
+
+    expect(() => validatePuzzleDefinition(completedByAnchor)).toThrow(/initially full visible row/i);
+    expect(() => validatePuzzleDefinition(completedByAnchor, false)).toThrow(/initially full visible row/i);
   });
 
   it('restarts a level with the exact same derived board, target ownership, queue, and hash', () => {

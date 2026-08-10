@@ -46,7 +46,7 @@ export interface PuzzleDefinition {
   boardRows: readonly string[];
   /** Always empty: every authored target begins inside the visible well. */
   hiddenCells: readonly PuzzleCell[];
-  /** Zero to two fixed pegs in the visible headroom directly above the target band. */
+  /** Zero to four fixed pegs inside the bottom twelve visible rows. */
   anchorCells: readonly PuzzleAnchorCell[];
 }
 
@@ -135,8 +135,8 @@ export function replayPuzzleSetup(history: PuzzleSetupHistory): Board {
   if (!Number.isSafeInteger(history.seed) || history.seed <= 0 || history.seed > 0xffff_ffff) {
     throw new Error('Puzzle setup history needs a nonzero uint32 seed.');
   }
-  if (!Array.isArray(history.placements) || history.placements.length < 5 || history.placements.length > 15) {
-    throw new Error('Puzzle setup history must contain five through fifteen legal drops.');
+  if (!Array.isArray(history.placements) || history.placements.length < 5 || history.placements.length > 20) {
+    throw new Error('Puzzle setup history must contain five through twenty legal drops.');
   }
 
   let board = createBoard();
@@ -303,7 +303,7 @@ function sameJson(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
-/** Validates T13's derived, legal three-through-seven-row endgames. */
+/** Validates derived, legal three-through-ten-row Puzzle endgames. */
 export function validatePuzzleDefinition(definition: PuzzleDefinition, requireCanonical = true): void {
   if (!PUZZLE_ID_SET.has(definition.id)) throw new Error(`Unknown puzzle id: ${definition.id}`);
   const canonical = PUZZLE_LIBRARY.find((candidate) => candidate.id === definition.id)!;
@@ -316,7 +316,7 @@ export function validatePuzzleDefinition(definition: PuzzleDefinition, requireCa
     || definition.difficulty > PUZZLE_LIBRARY.length || (requireCanonical && definition.difficulty !== canonical.difficulty)) {
     throw new Error(`Puzzle ${definition.id} must retain its authored campaign difficulty.`);
   }
-  if (!Number.isSafeInteger(definition.targetRows) || definition.targetRows < 3 || definition.targetRows > 8
+  if (!Number.isSafeInteger(definition.targetRows) || definition.targetRows < 3 || definition.targetRows > 10
     || (requireCanonical && definition.targetRows !== canonical.targetRows)) {
     throw new Error(`Puzzle ${definition.id} must retain its explicit authored target-row count.`);
   }
@@ -335,10 +335,12 @@ export function validatePuzzleDefinition(definition: PuzzleDefinition, requireCa
 
   let occupied = 0;
   const nonEmptyRows: number[] = [];
+  const ordinaryCellsByRow: number[] = [];
   for (const [y, row] of definition.boardRows.entries()) {
     if (typeof row !== 'string' || row.length !== BOARD_WIDTH) throw new Error(`Puzzle ${definition.id} contains a malformed board row.`);
     if ([...row].some((cell) => cell !== '.' && !PIECE_TYPE_SET.has(cell))) throw new Error(`Puzzle ${definition.id} contains an illegal board cell.`);
     const rowOccupied = [...row].filter((cell) => cell !== '.').length;
+    ordinaryCellsByRow.push(rowOccupied);
     if (rowOccupied === BOARD_WIDTH) throw new Error(`Puzzle ${definition.id} contains an initially full visible row.`);
     if (rowOccupied > 0) {
       nonEmptyRows.push(y);
@@ -360,15 +362,17 @@ export function validatePuzzleDefinition(definition: PuzzleDefinition, requireCa
   if (definition.boardRows.slice(0, expectedStart).some((row) => row !== EMPTY_ROW)) {
     throw new Error(`Puzzle ${definition.id} may not hide targets above its visible endgame band.`);
   }
-  if (!Array.isArray(definition.anchorCells) || definition.anchorCells.length > 2) {
-    throw new Error(`Puzzle ${definition.id} may contain zero, one, or two immutable anchors.`);
+  if (!Array.isArray(definition.anchorCells) || definition.anchorCells.length > 4) {
+    throw new Error(`Puzzle ${definition.id} may contain zero through four immutable anchors.`);
   }
   const anchorKeys = new Set<string>();
-  const headroomStart = Math.max(0, expectedStart - 2);
+  const anchorsByRow = new Map<number, number>();
+  const anchorStart = VISIBLE_HEIGHT - 12;
   for (const anchor of definition.anchorCells) {
-    if (!Number.isSafeInteger(anchor.x) || !Number.isSafeInteger(anchor.y)
-      || anchor.x < 0 || anchor.x >= BOARD_WIDTH || anchor.y < headroomStart || anchor.y >= expectedStart) {
-      throw new Error(`Puzzle ${definition.id} anchor must remain in the visible headroom directly above its endgame band.`);
+    if (anchor === null || typeof anchor !== 'object'
+      || !Number.isSafeInteger(anchor.x) || !Number.isSafeInteger(anchor.y)
+      || anchor.x < 0 || anchor.x >= BOARD_WIDTH || anchor.y < anchorStart || anchor.y >= VISIBLE_HEIGHT) {
+      throw new Error(`Puzzle ${definition.id} anchor must remain inside the bottom twelve visible rows.`);
     }
     if (definition.boardRows[anchor.y]![anchor.x] !== '.') {
       throw new Error(`Puzzle ${definition.id} anchor may not occupy an original target cell.`);
@@ -376,6 +380,12 @@ export function validatePuzzleDefinition(definition: PuzzleDefinition, requireCa
     const key = coordinateKey(anchor.x, anchor.y);
     if (anchorKeys.has(key)) throw new Error(`Puzzle ${definition.id} contains duplicate immutable anchors.`);
     anchorKeys.add(key);
+    anchorsByRow.set(anchor.y, (anchorsByRow.get(anchor.y) ?? 0) + 1);
+  }
+  for (const [y, rowOccupied] of ordinaryCellsByRow.entries()) {
+    if (rowOccupied + (anchorsByRow.get(y) ?? 0) === BOARD_WIDTH) {
+      throw new Error(`Puzzle ${definition.id} ordinary cells plus immutable anchors form an initially full visible row.`);
+    }
   }
   if (requireCanonical && !sameJson(definition.anchorCells, canonical.anchorCells)) {
     throw new Error(`Puzzle ${definition.id} must retain its authored immutable-anchor distribution.`);
