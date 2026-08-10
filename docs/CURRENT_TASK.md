@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3 CAPABILITY CONTRACT FROZEN; STAGE F3A STRUCTURAL VALIDATOR NEXT**
+Status: **STAGE F3A STRUCTURAL VALIDATOR CANDIDATE; INDEPENDENT QA PENDING**
 
 ## Active objective
 
@@ -28,8 +28,9 @@ Stage F2 behavior source `74148ec` repairs the strict public-control search befo
 published Puzzle definition changes. Its false-positive fixture and status/comment
 follow-ups close at `1507dab`; two independent read-only reviews accept the full range
 with P0–P3 all zero. Stage F3's bounded capability contract now passes independent
-read-only review with P0–P3 all zero. Only F3A structural validator source may open;
-published Puzzle content remains closed.
+read-only review with P0–P3 all zero. F3A source candidate `a1e37f1` now implements the
+bounded structural validator and literal preservation gate; independent QA is pending,
+so F3B and published Puzzle content remain closed.
 
 ## Frozen product direction
 
@@ -91,7 +92,7 @@ published Puzzle content remains closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3 CONTRACT FROZEN; F3A NEXT** — the exact
+6. **Puzzle curriculum — F3A SOURCE CANDIDATE; QA PENDING** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted source `74148ec` covers counter-clockwise SRS, anchor-supported
@@ -299,6 +300,24 @@ literal inputs, structural validation remains distinct from per-anchor replay ev
 and the F3C fixture/test/tool split is exact. The four-path range contains no inherited
 T27, `t27-r1-followup`, or `progress.md` path. This freezes the contract and opens F3A
 only; it is not F3 source acceptance.
+
+### Stage F3A structural-validator candidate (2026-08-10)
+
+- Source checkpoint `a1e37f1` changes only `src/game/core/puzzles.ts`, its direct test,
+  and `src/game/core/puzzleV3BehaviorBaseline.test.ts`. It admits 5–20 legal zero-clear
+  setup drops, 3–10 contiguous bottom target rows, and 0–4 unique anchors at visible
+  `x=0..9`, `y=8..19`, while preserving canonical library equality.
+- Malformed, duplicate, out-of-range, or target-covered anchors fail closed. Ordinary
+  cells plus anchors cannot complete an initial row in either canonical or
+  authoring-override validation; the combined-row check precedes canonical anchor
+  distribution equality.
+- The new test embeds all 38 frozen F1 hashes as literals and independently applies the
+  canonical JSON/LF SHA-256 serializer. Its literal table matches the phase contract
+  `38/38` with zero mismatch.
+- Post-source typecheck passes. Focused definition, behavior-baseline, and campaign
+  tests pass `3 files / 16 tests`. This is renderer-independent Core capability with
+  no published board change, so browser evidence is not applicable. Independent QA
+  remains required before F3A acceptance or F3B opens.
 
 ## Current checkpoint state
 

@@ -87,7 +87,35 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     `628f66d..dc035a3` with P0–P3 all zero. Validator capability, injected mechanics,
     and one non-published ten-row certificate remain split into bounded checkpoints;
     only F3A source is open.
-14. `PENDING` — later content, migration, UI, final gates, and push.
+14. `F3A CANDIDATE; QA PENDING` — source `a1e37f1` expands only the frozen structural
+    validator boundary and adds the 38-entry literal preservation gate. F3B remains
+    closed until independent review accepts the exact candidate range.
+15. `PENDING` — F3B/F3C, later content, migration, UI, final gates, and push.
+
+### Stage F3A candidate status
+
+- Task: T37/F3A Puzzle v3 structural validator. Base SHA: `da264f4`; source candidate:
+  `a1e37f1`. Exact source paths are `src/game/core/puzzles.ts`,
+  `src/game/core/puzzles.test.ts`, and
+  `src/game/core/puzzleV3BehaviorBaseline.test.ts`.
+- Capability now admits 5–20 setup drops, 3–10 contiguous bottom target rows, and 0–4
+  unique anchors in visible rows 8–19. It rejects malformed/out-of-range/duplicate/
+  target-covered anchors and any row completed by ordinary cells plus anchors in both
+  validation modes. `PUZZLE_TARGET_ROWS`, `PUZZLE_LIBRARY`, and all live definitions,
+  names, order, seeds, and routes remain untouched.
+- The baseline test owns 38 literal hashes, normalizes ordinary cells without injecting
+  anchors, uses visible row-major target coordinates, sorts cloned anchors by y/x, and
+  hashes one canonical JSON line plus LF. A direct script comparison reports
+  `phase_count=38 test_count=38 mismatch_count=0`.
+- Commands actually run after the last source change: `npm.cmd exec vitest -- run
+  src/game/core/puzzles.test.ts src/game/core/puzzleV3BehaviorBaseline.test.ts
+  src/game/core/puzzleCampaign.test.ts --reporter=verbose --maxWorkers=1`
+  (`3 files / 16 tests`) and `npm.cmd run typecheck` (pass). No browser pass applies
+  because no published/rendered state changed.
+- Blocker: independent read-only QA has not yet reviewed the candidate. Next action:
+  review the exact range from `da264f4` through the candidate-state tip, rerun the two
+  F3A direct test files and typecheck, verify the 38 literal hashes and protected-path
+  exclusions, then either report findings or accept F3A. Do not open F3B during review.
 
 ### Stage F1 frozen status
 
@@ -443,14 +471,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement F3A only in `src/game/core/puzzles.ts`, its direct test, and
-`src/game/core/puzzleV3BehaviorBaseline.test.ts`: admit 3–10 contiguous bottom target
-rows, 5–20 legal zero-clear setup drops, and 0–4 unique anchors in visible rows 8–19;
-reject every combined ordinary-plus-anchor initial full row in canonical and override
-mode; and match all 38 literal F1 behavior hashes. Do not begin F3B/F3C, Intro boards,
-the 46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20
-physics, D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and
-the missing Ice archive separate.
+Obtain independent read-only QA for the F3A candidate range. Require direct source and
+test inspection, typecheck, the two F3A test files, independent 38-literal comparison,
+and exact protected-path exclusion. Do not begin F3B/F3C, Intro boards, the 46-level
+module, v6 migration, mastery groups, or Puzzle UI until the coordinator disposes that
+verdict. Keep unified 10×20 physics, D1/Stage-E player verdicts, deferred identity,
+protected T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
 

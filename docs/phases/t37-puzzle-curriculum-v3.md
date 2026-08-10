@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3 CAPABILITY CONTRACT FROZEN; F3A STRUCTURAL VALIDATOR NEXT**
+Status: **F3A STRUCTURAL VALIDATOR CANDIDATE; INDEPENDENT QA PENDING**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -366,6 +366,12 @@ with `P0 0 / P1 0 / P2 0 / P3 0`. It closes the initial full-row, literal-baseli
 and F3C path/split findings and confirms that the four-path range excludes inherited
 T27 evidence, `t27-r1-followup`, and `progress.md`. This disposition opens F3A only;
 it does not accept any F3 product source or published level.
+
+F3A source checkpoint `a1e37f1` now implements the frozen structural bounds in exactly
+the three declared Core/test paths. The literal serializer matches all 38 revision-2
+behavior hashes, and focused tests pass `16/16` with typecheck green. This is a source
+candidate awaiting independent read-only QA; F3B/F3C and curriculum content remain
+closed.
 
 ## Progress v6 and revision-3 migration
 
