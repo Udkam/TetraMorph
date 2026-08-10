@@ -265,6 +265,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   LF without a terminal LF is `D7CBB36B...C7DC3`. All 32 exact Temp outputs are
   removed, matching Temp count is zero, owned process count is zero, and cumulative new
   fair coverage is 30,000,000. This is not a negative proof.
+- Fourth-round preflight at HEAD `cf9ff86` is red: CPU 97.2%, free memory 11.45 GiB,
+  disk queue zero; after 30 seconds CPU remains 94.0% with 12.33 GiB free. No fourth-
+  round output or owned search process exists, so the fourth round does not start.
 
 ### Stage F3B accepted status
 
