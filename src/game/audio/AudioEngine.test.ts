@@ -381,10 +381,10 @@ describe('AudioEngine accepted production contract', () => {
     expect(scheduledOscillators.every((source) => source.disconnected)).toBe(true);
     expect(scheduledBuffers.every((source) => source.disconnected)).toBe(true);
 
-    context.currentTime = 9;
+    context.currentTime = 8.25;
     audio.play([mutation('freeze')]);
     expect(bufferSources.at(-1)?.starts[0]).toEqual({
-      time: 9,
+      time: 8.25,
       offset: 0.19375,
       duration: 0.44,
     });
