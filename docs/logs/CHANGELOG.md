@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C second fair search round complete
+
+- The same 32 contiguous shards over seeds `1..20000` replay cursor 312,500 and each
+  receive exactly 312,500 new probes under the accepted 900 MiB guard. All return
+  `budget-exhausted` at cursor 625,000 with zero candidate, complete, or memory status.
+- The invocation performs 10,000,000 replay plus 10,000,000 new probes. Cumulative new
+  coverage across both fair rounds is 20,000,000; replay-inclusive accepted placements,
+  failed states, and trie nodes are `582,850 / 581,851 / 337,031`. This remains a fair
+  prefix, not a negative result.
+- The unchanged domain and queue hashes are
+  `9F88718E9DC7793483578E7A82E5C30890CC7F9E61673644AE771777A4639B7E` and
+  `1F6278E6C699C1D81D6EE289BD42C1A820D0B984FFD1C973E50271E94160A27C`; the ordered
+  32-file manifest hashes to
+  `14197EB55C858699317467C48AAF6B1470DE07166FCC6E34E5FEFCE93BA059CC`.
+  All exact Temp outputs are removed and no owned process remains. A third equal round
+  may replay cursor 625,000 and add 312,500 probes per incomplete shard only after a
+  fresh green/amber resource check.
+
 ## 2026-08-10 — T37 Stage F3C first fair search round complete
 
 - All 32 contiguous shards over seeds `1..20000` receive exactly 312,500 new probes

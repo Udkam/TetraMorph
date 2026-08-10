@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FIRST FAIR ROUND COMPLETE; SECOND EQUAL ROUND NEXT**
+Status: **F3C SECOND FAIR ROUND COMPLETE; THIRD EQUAL ROUND NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -537,13 +537,25 @@ Aggregate new probes, accepted placements, failed states, and trie nodes are
 hash is `DC0C992BBF7D72605D849209036AA1F12E3A011D093CE1F8776B6782D7243CA9`.
 All 32 Temp files are removed and owned process count is zero.
 
-This round proves equal scheduling only; it does not exclude any incomplete shard. The
-next allowed operation, after a new green/amber resource check, is the second equal
-round over the same domain and shard order: input cursor 312,500 and new-probe budget
-312,500 per shard, yielding absolute cursor 625,000 when budget-bound. Deterministic
-replay makes the physical work 625,000 probes per shard, while new coverage remains
-10,000,000 total. Stop at candidate or RSS guard; no new seed domain or product path
-opens.
+The first round proves equal scheduling only; it does not exclude any incomplete shard.
+The second equal round preserves the same domain and ascending shard order, replays
+cursor 312,500, and adds another 312,500 probes to every shard. All 32 again return
+`budget-exhausted`, now at cursor 625,000, with zero candidate, complete, or memory
+statuses. Domain and queue digests remain
+`9F88718E9DC7793483578E7A82E5C30890CC7F9E61673644AE771777A4639B7E` and
+`1F6278E6C699C1D81D6EE289BD42C1A820D0B984FFD1C973E50271E94160A27C`.
+The invocation records 10,000,000 replay probes, 10,000,000 new probes, and 20,000,000
+physical attempts; cumulative new coverage across the two rounds is 20,000,000.
+Replay-inclusive accepted placements, failed states, and trie nodes are
+`582,850 / 581,851 / 337,031`. Its ordered filename-and-file-hash manifest is
+`14197EB55C858699317467C48AAF6B1470DE07166FCC6E34E5FEFCE93BA059CC`.
+All 32 exact Temp files are removed and owned process count is zero.
+
+This second round is still a fair prefix, not a negative proof. The next allowed
+operation, after a new green/amber resource check, is a third equal round over the same
+domain and shard order: input cursor 625,000 and new-probe budget 312,500 per shard,
+yielding absolute cursor 937,500 when budget-bound. Stop at candidate or RSS guard; no
+new seed domain or product path opens.
 
 ## Progress v6 and revision-3 migration
 

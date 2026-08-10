@@ -456,6 +456,14 @@ adding unrelated badges or ornamental effects.
   established but no seed range is excluded. The next round may give every incomplete
   shard the same 312,500-probe increment after deterministic replay; it cannot privilege
   one shard or advance the seed domain.
+- The second equal round preserves the same domain and order. Every shard replays
+  cursor 312,500, adds exactly 312,500 new probes, and stops budget-bound at cursor
+  625,000 with no candidate, natural completion, or memory stop. Its invocation performs
+  10,000,000 replay plus 10,000,000 new probes; cumulative new fair coverage is now
+  20,000,000. This remains prefix evidence, so the only admissible continuation is the
+  same increment for every incomplete shard from cursor 625,000 after a fresh resource
+  check; product and final fixture/test paths stay closed until a candidate passes Core
+  replay and exact proof.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

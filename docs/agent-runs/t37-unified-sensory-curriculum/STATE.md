@@ -104,7 +104,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 19. `F3C FAIR-SHARD TOOL ACCEPTED` — source `1a9c9da` passes independent QA.
 20. `F3C FIRST FAIR ROUND COMPLETE; SECOND NEXT` — 32 shards receive equal first
     increments; all remain budget-incomplete with no candidate or memory stop.
-21. `PENDING` — second fair-round candidate, F3C fixture/test, later content, migration, UI,
+21. `F3C SECOND FAIR ROUND COMPLETE; THIRD NEXT` — all 32 shards receive the same
+    second increment and remain budget-incomplete with no candidate or memory stop.
+22. `PENDING` — third fair-round candidate, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -231,6 +233,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   not range exclusion. A second equal round may start only after this checkpoint and a
   fresh resource/Temp check, using cursor 312,500 and 312,500 new probes for every
   incomplete shard in ascending order.
+- Second fair round: all 32 shards run serially over the unchanged `1..20000` domain,
+  replay cursor 312,500, add 312,500 probes each, and stop budget-bound at cursor
+  625,000. Candidate/complete/memory counts are zero; domain and queue digests remain
+  `9F88718E...39B7E` and `1F6278E6...A27C`.
+- The invocation totals are 10,000,000 replay probes, 10,000,000 new probes, and
+  20,000,000 attempted probes. Replay-inclusive accepted/failed/trie-node counts are
+  `582,850 / 581,851 / 337,031`; the ordered 32-file manifest hashes to
+  `14197EB5...59CC`. All exact Temp outputs are removed, matching Temp count is zero,
+  and owned process count is zero. Cumulative new coverage is 20,000,000, but no shard
+  is excluded.
 
 ### Stage F3B accepted status
 
@@ -649,9 +661,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Next exact action
 
 After a fresh resource and exact Temp-target check, run the same 32 shards serially in
-ascending order with cursor 312,500, 312,500 new probes each, and 900 MiB RSS. Stop at
-the first candidate or memory guard; otherwise finish the equal second round, verify
-absolute cursor 625,000 and aggregate new coverage, then remove every exact Temp output
+ascending order with cursor 625,000, 312,500 new probes each, and 900 MiB RSS. Stop at
+the first candidate or memory guard; otherwise finish the equal third round, verify
+absolute cursor 937,500 and aggregate new coverage, then remove every exact Temp output
 and confirm no owned process. Do not change seed domain or privilege a shard. Only a
 candidate may proceed to Core replay and the final F3C JSON/test; keep later content,
 deferred identity, T27/`progress.md`, and missing Ice archive closed.
