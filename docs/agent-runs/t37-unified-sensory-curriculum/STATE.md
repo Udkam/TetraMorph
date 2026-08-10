@@ -94,7 +94,34 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     four-anchor board, remapping, preview projection, and four independent public-route
     witnesses without opening production Core source. Independent QA accepts
     `3aa6766..6c3286c` with P0–P3 all zero.
-16. `PENDING` — F3C, later content, migration, UI, final gates, and push.
+16. `F3C TOOLING DISCOVERY OPEN` — existing ten-row fixtures/local variants are
+    disproven or route-negative. The contract-authorized standalone search tool may
+    now recover one seeded legal setup for a fixed five-lock mask; product data remains
+    closed.
+17. `PENDING` — F3C fixture/test, later content, migration, UI, final gates, and push.
+
+### Stage F3C tooling-discovery status
+
+- The existing F3A maximum fixture is structurally five-lock impossible: its deficit
+  vector `[1,1,3,1,0,0,3,3,2,6]` is separated by zero-deficit columns 4/5 into regions
+  needing 6 and 14 cells. Connected tetrominoes cannot cross the separator without
+  oversupplying it, so both regions would need multiples of four.
+- All one-placement variants produced 19 independent legal ten-row boards. Only moving
+  setup placement 18 from `Z r1/x3` to `Z r1/x7` admitted a five-piece column profile.
+  Complete profile-pruned public-landing DFS then excludes all 120 orders of its
+  `I/J/L/O/T` set after 111,018 landings; direct hard-drop enumeration had already
+  excluded all 360 profile-compatible orders across its three possible type sets.
+- One earlier Core beam probe was stopped at RSS `1,212,444,672` bytes after crossing
+  the 900 MiB guard; it did not OOM and was not retried. The later DFS stayed within the
+  guard and released each process. No listener or temporary file remains.
+- The replacement fixed mask has ten contiguous non-full rows and 80 setup cells. Its
+  complementary holes are exactly a top-accessible `I/O/T/J/L` five-lock route clearing
+  `1/2/2/2/3` rows. This makes the initial target-column deficit exactly five locks and
+  will root-prune every shorter route once a legal setup history exists.
+- Open exactly `tools/search-puzzle-v3-prototype.mjs` as a separate tooling checkpoint.
+  It owns deterministic fixed-mask setup discovery with explicit seed range, node
+  budget, RSS guard, and output path. Two identical smoke runs must match byte-for-byte.
+  No tool result is F3C admission evidence.
 
 ### Stage F3B accepted status
 
@@ -512,17 +539,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement F3C only in
-`docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
-`src/game/core/puzzleV3PrototypeExact.test.ts`. Prove one legal, unanchored,
-non-published ten-row definition and its public completion route with exact canonical
-setup replay, lock signatures, initial/final hashes, and every complete shorter-depth
-certificate statistic; no beam, timeout, or state cap is acceptance evidence. If a
-reusable discovery tool is necessary, open only
-`tools/search-puzzle-v3-prototype.mjs` in an earlier separate tooling checkpoint. Do
-not begin Intro boards, the 46-level module, v6 migration, mastery groups, Puzzle UI,
-or App source. Keep deferred identity, protected T27/`progress.md`, and the missing Ice
-archive separate.
+Implement only `tools/search-puzzle-v3-prototype.mjs` as the standalone F3C discovery
+checkpoint. Search the fixed reversible mask for a seeded legal twenty-drop setup;
+require explicit seed range, node budget, RSS guard, and output path, plus deterministic
+same-type adjacency and no-clear/no-hidden/off-mask rejection. Run two identical small
+smokes to byte equality before one bounded candidate batch. Do not open the final JSON,
+exact test, Intro boards, the 46-level module, v6 migration, mastery groups, Puzzle UI,
+or App source until this tool produces a Core-replayable candidate. Keep deferred
+identity, protected T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
 

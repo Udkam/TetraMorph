@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3B INJECTED MECHANICS ACCEPTED; STAGE F3C TEN-ROW ADMISSION NEXT**
+Status: **STAGE F3C BOUNDED PROTOTYPE TOOLING OPEN; PRODUCT DATA CLOSED**
 
 ## Active objective
 
@@ -353,6 +353,30 @@ only; it is not F3 source acceptance.
   presentation blobs and checkpoint budgets, and verifies that T27,
   `t27-r1-followup`, and `progress.md` are outside the six-path range. F3B is accepted;
   F3C may open only its frozen ten-row fixture/test boundary.
+
+### Stage F3C bounded prototype-tool opening (2026-08-10)
+
+- The legal F3A twenty-drop fixture cannot finish in five locks for any first-bag
+  sequence: zero-deficit columns split its required additions into six- and
+  fourteen-cell regions, neither divisible by one tetromino. Its only
+  profile-compatible single-placement variant also has no route across the complete
+  120-order `I/J/L/O/T` public-landing domain (`111,018` examined landings). A previous
+  broad Core beam crossed the 900 MiB guard and was stopped without OOM or retry.
+- A reversible ten-row mask now fixes a public five-lock `I → O → T → J → L` clear
+  plan with row-release counts `1 / 2 / 2 / 2 / 3`, 80 ordinary setup cells, no full
+  row, no anchor, and an exact five-lock target-column lower bound. The remaining
+  authoring problem is only to find a seeded legal twenty-drop setup for that fixed
+  80-cell complement.
+- The already frozen optional tooling boundary is now active. Only
+  `tools/search-puzzle-v3-prototype.mjs` may be added in an earlier standalone tooling
+  checkpoint. It must use explicit setup-seed range, node budget, RSS guard, and output
+  path; write only a deterministic authoring candidate; reject hidden cells, setup
+  clears, off-mask cells, and touching same-type source tetrominoes; and never claim
+  route or certificate acceptance.
+- Before any substantive search, two identical small smoke runs must produce
+  byte-identical normalized output and exit without residual process/listener. A
+  candidate can enter the final F3C JSON/test pair only after current Core setup replay,
+  the fixed public route, state/lock hashes, and the no-beam exact certificate all pass.
 
 ## Current checkpoint state
 

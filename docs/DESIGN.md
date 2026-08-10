@@ -395,6 +395,13 @@ adding unrelated badges or ornamental effects.
   Independent read-only QA accepts `3aa6766..6c3286c` with P0–P3 all zero after
   reproducing typecheck and all 36 focused tests. F3C may now open only its non-published
   ten-row fixture and exact certificate test.
+- F3C discovery rejects reuse of the F3A twenty-drop fixture: its target-column deficit
+  is separated into non-tetromino-divisible regions, and the sole profile-compatible
+  one-placement variant has no solution in the complete `I/J/L/O/T` order domain.
+  The contract-authorized `tools/search-puzzle-v3-prototype.mjs` checkpoint is therefore
+  open to recover a seeded legal setup for one fixed, reversibly constructed ten-row
+  mask. Tool output remains authoring input only; Core replay and exact proof still own
+  admission.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

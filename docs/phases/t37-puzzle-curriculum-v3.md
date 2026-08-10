@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3B INJECTED MECHANICS ACCEPTED; F3C TEN-ROW ADMISSION NEXT**
+Status: **F3C BOUNDED PROTOTYPE TOOLING OPEN; PRODUCT DATA CLOSED**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -388,6 +388,17 @@ validates all four remove-only witnesses, confirms the presentation blobs are un
 and verifies the six-path range excludes every protected path. F3B is accepted; F3C may
 open only the frozen non-published ten-row fixture/test pair. Published content,
 migration, progression, and UI remain closed.
+
+Initial F3C discovery proves the F3A maximum setup is not a prototype candidate: its
+column deficits split across two regions requiring six and fourteen cells, which no
+five connected tetrominoes can supply. The sole single-placement variant admitting a
+five-piece column profile has no solution across all 120 public-landing orders of its
+`I/J/L/O/T` set. F3C therefore activates its previously frozen optional tooling path,
+`tools/search-puzzle-v3-prototype.mjs`, as a separate earlier checkpoint. The tool may
+search only a fixed reversibly constructed ten-row mask with explicit seed/node/RSS
+bounds and an explicit output path. Its result remains a candidate until the two-path
+fixture/test checkpoint independently replays setup and route and obtains the complete
+strict certificate.
 
 ## Progress v6 and revision-3 migration
 
