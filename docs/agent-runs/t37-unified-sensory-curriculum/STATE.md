@@ -79,8 +79,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 11. `TECHNICAL ACCEPT — PLAYER REVIEW OPEN` — ordinary/Mutation whole-piece material
     source `a184952`, restart-proof test `1058dbd`, evidence `731bf6f`, and complete
     theme/motion/responsive matrix `8e336fe`; independent P0–P3 all zero.
-12. `F1 CONTRACT FROZEN; F2 NEXT` — the contract covers 5/25/16 proof foundation,
-    content, unlocks, migration, and UI; implementation remains pending.
+12. `F2 SOURCE CANDIDATE; QA NEXT` — F1 freezes the 5/25/16 proof foundation,
+    content, unlocks, migration, and UI. Source `74148ec` closes strict-search mechanics
+    and representative ordinary/one-anchor/two-anchor certificates; independent QA is
+    pending before any level definition changes.
 13. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ### Stage F1 frozen status
@@ -111,6 +113,40 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   baseline `e675389` preserve hashes. It also maps v5 `bestPieceCounts` explicitly to
   v6 `bestLockedPieceCounts`; historic hashes may not be derived after those definitions
   are edited.
+
+### Stage F2 source candidate status
+
+- Task: T37/F2 strict public-control proof repair. Base SHA: `1d7e573`; source candidate:
+  `74148ec`. Exact paths are `src/game/core/puzzleRouteSearch.ts`,
+  `src/game/core/puzzleRouteSearch.test.ts`,
+  `src/game/core/puzzleMasteryExact.test.ts`, and the result-triggered
+  `src/puzzleMastery.ts` refresh authorized by F1.
+- The complete landing domain now includes clockwise and counter-clockwise SRS (`C` /
+  `Q`). Proof identity includes numerically ordered target and anchor-support masks;
+  invalid tokens fail explicitly; definition-aware replay and certification use the
+  same injected definition. Anchor/support states conservatively return a zero lock
+  lower bound.
+- Complete depth-ordered enumeration excludes every one-, two-, and three-lock route
+  for both `t5r-drift-08` admissions. One anchor is optimal at four locks with
+  `[1,20,769]`, 790 explored states, 15,371 transitions, hash `e9b71c20`; the test-only
+  second anchor `{x:4,y:16}` is optimal at four locks with `[1,20,750]`, 771 states,
+  14,640 transitions, hash `696f86a0`. Both exact replays end with zero targets, four
+  supported cells, and zero deficit-bound prunes.
+- The existing three ordinary routes and optima do not change. Exact rerun statistics
+  do, so `src/puzzleMastery.ts` refreshes only those counts/frontiers while retaining
+  route, optimum, optimum-plus-five threshold, and technique signature equality.
+- Commands actually run after the last source edit: `npm.cmd run typecheck`;
+  `npm.cmd exec vitest -- run src/game/core/puzzleRouteSearch.test.ts --reporter=verbose
+  --maxWorkers=1` (`8/8`); `npm.cmd exec vitest -- run src/puzzleMastery.test.ts
+  --reporter=verbose --maxWorkers=1` (`4/4`); opt-in exact certificates with one worker
+  (`5/5`); `npm.cmd run test` (`417 passed / 10 skipped`); and `npm.cmd run build`
+  (767 modules, only the existing chunk-size advisory). F2 changes no renderer/UI, so
+  browser evidence is not applicable.
+- Blocker: none in source. Next exact action is independent read-only QA from
+  `1d7e573` through this status checkpoint, with product source ending at `74148ec`,
+  including direct reproduction of the exact suite and protected-path exclusion. Do not
+  open `puzzles.ts`, curriculum content, migration, unlock, or UI until that verdict is
+  dispositioned.
 
 ## Verification state
 
@@ -396,16 +432,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement Stage F2 in `src/game/core/puzzleRouteSearch.ts` and its direct tests: add
-`Q`, both SRS directions, canonical anchor-support identity, definition-aware
-replay/certification,
-and a zero lower bound whenever anchors/support exist. Rerun the three current ordinary
-certificates; only a resulting exact-proof delta may open `src/puzzleMastery.ts`, and
-the equality gate may not be weakened. Then close ordinary, one-anchor, and test-only
-two-anchor admission before changing `puzzles.ts`. Do not begin Intro boards, the
-46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20 physics,
-D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and the
-missing Ice archive separate.
+Run independent read-only QA from `1d7e573` through this status checkpoint, with product
+source ending at `74148ec`: inspect the four exact source/test paths, reproduce the
+focused and opt-in exact gates, verify ordinary/one-anchor/two-anchor proof equality,
+and confirm no protected T27 or `progress.md` path entered the range. Only after QA
+disposition may Stage F3 open definition/content authoring.
+Do not begin Intro boards, the 46-level module, v6 migration, mastery groups, or Puzzle
+UI. Keep unified 10×20 physics, D1/Stage-E player verdicts, deferred identity, protected
+T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
 

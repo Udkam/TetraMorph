@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F1 CONTRACT FROZEN; STAGE F2 STRICT SEARCH NEXT**
+Status: **STAGE F2 STRICT SEARCH SOURCE CANDIDATE; INDEPENDENT QA NEXT**
 
 ## Active objective
 
@@ -22,10 +22,11 @@ The uploader-original Ice WAV remains an explicit provenance follow-up, not a cl
 has been satisfied. On 2026-08-10 the player authorized later work to proceed in bounded
 stages despite that separate archive item. Stage D1 and Stage E now pass their bounded
 implementation, browser-evidence, and independent-QA gates; normal-speed player review
-remains open for both. Stage F1 now freezes the exact stable-ID roster, migration,
+remains open for both. Stage F1 freezes the exact stable-ID roster, migration,
 operation metric, proof schema, admission fixtures, and rev2 behavior-hash baselines.
-Stage F2 repairs the strict public-control search before any published Puzzle definition
-changes.
+Stage F2 source candidate `74148ec` repairs the strict public-control search before any
+published Puzzle definition changes; independent read-only QA is now the only open F2
+gate.
 
 ## Frozen product direction
 
@@ -87,11 +88,12 @@ changes.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F1 CONTRACT FROZEN; F2 STRICT SEARCH NEXT** — the exact
+6. **Puzzle curriculum — F2 STRICT SEARCH SOURCE CANDIDATE; QA NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
-   are frozen. Strict search must now cover counter-clockwise SRS and anchor-supported
-   state before content authoring.
+   are frozen. Candidate `74148ec` now covers counter-clockwise SRS, anchor-supported
+   state identity, definition-aware replay/proof, and exact anchor admission; content
+   authoring remains closed until independent QA passes.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -202,6 +204,28 @@ contract. It makes no product-data change:
 The active source still publishes 50 levels at F1. No level count, board, route,
 certificate, progress value, unlock, or UI surface is considered implemented until its
 later bounded checkpoint is green.
+
+### Stage F2 strict-search candidate (2026-08-10)
+
+- Source checkpoint `74148ec` adds route token `Q`, both public SRS directions, numeric
+  `y,x` target/support canonicalization, support-mask proof identity, explicit invalid
+  token rejection, and definition-aware replay/certification. Anchor-bearing or
+  already-supported states use the conservative zero lower bound.
+- Complete depth-ordered searches prove both admission fixtures finish optimally in
+  four locked tetrominoes. The one-anchor certificate freezes frontiers `[1,20,769]`,
+  790 explored states, 15,371 transitions, and hash `e9b71c20`; the two-anchor copy
+  freezes `[1,20,750]`, 771 states, 14,640 transitions, and hash `696f86a0`. Both have
+  zero deficit-bound prunes, zero remaining targets, and four supported cells.
+- The three existing unanchored routes and optima remain unchanged after the expanded
+  graph. Their exact statistics changed, so the F1-authorized result-triggered path
+  `src/puzzleMastery.ts` is refreshed without weakening equality or changing mastery
+  thresholds/signatures.
+- Final post-source gates pass: typecheck; route tests `8/8`; Mastery tests `4/4`; the
+  opt-in strict suite `5/5`; the complete suite `417 passed / 10 skipped`; and the
+  767-module production build. This is renderer-independent Core/proof work, so no
+  browser-evidence pass is required for F2. Independent read-only QA from `1d7e573`
+  through the Stage-F2 status checkpoint is next, with product source ending at
+  `74148ec`; `puzzles.ts`, content, migration, unlocks, and UI remain closed.
 
 ## Current checkpoint state
 
