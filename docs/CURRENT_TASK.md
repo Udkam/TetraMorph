@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE E WHOLE-PIECE MATERIAL IMPLEMENTATION OPEN — D1 PLAYER REVIEW OPEN**
+Status: **STAGE E TECHNICAL ACCEPT — PLAYER REVIEW OPEN; STAGE F PROOF FOUNDATION NEXT**
 
 ## Active objective
 
@@ -20,8 +20,10 @@ player has since accepted R5 **Action A**, **Ice 2**, the strengthened Bomb impa
 continuous one-through-four-line clearing, and every other preceding Stage-C candidate.
 The uploader-original Ice WAV remains an explicit provenance follow-up, not a claim that
 has been satisfied. On 2026-08-10 the player authorized later work to proceed in bounded
-stages despite that separate archive item. Stage D1 now passes its implementation,
-browser-evidence, and independent-QA gates; normal-speed player review remains open.
+stages despite that separate archive item. Stage D1 and Stage E now pass their bounded
+implementation, browser-evidence, and independent-QA gates; normal-speed player review
+remains open for both. Stage F begins with proof/migration infrastructure rather than
+bulk-editing the published Puzzle list.
 
 ## Frozen product direction
 
@@ -80,9 +82,10 @@ browser-evidence, and independent-QA gates; normal-speed player review remains o
    and no duplicate mounts/listeners/canvases. D1 player review remains open; in-page
    sheets/results remain later work, and site identity is deferred to the final proposal
    gate after its first draft failed semantic clarity.
-5. **Material system — OPEN** — ordinary-piece polish and the four whole-piece Mutation
-   materials, including Next/ghost/clear/audio agreement and once-per-piece triggering.
-6. **Puzzle curriculum** — 5/25/16 content, deduplication, solver certificates,
+5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
+   and the four whole-piece Mutation materials now agree across Next, active/Ghost,
+   settled, clear/activation, player copy, and serialized audio lifecycle.
+6. **Puzzle curriculum — PROOF FOUNDATION NEXT** — 5/25/16 content, deduplication, solver certificates,
    technique links, unlock migration, and UI pagination.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
@@ -117,6 +120,37 @@ E1 preserves current Mutation probabilities, effects, durations, scoring, Bomb o
 Supergravity placement, activation particle timelines, and line-clear geometry. Browser
 evidence begins only from a green source SHA in a new T37 material directory; the
 inherited T27 evidence and `progress.md` remain protected and excluded.
+
+### Stage E disposition (2026-08-10)
+
+- Theme/material checkpoint `fa3a70e` defines the quiet ordinary facet baseline and
+  four complete material palettes. Renderer checkpoint `581c004` replaces the
+  ordinary-body-plus-core path across active, Ghost, Next, settled, and captured-clear
+  drawing without changing Core rules or activation timing.
+- Player-language checkpoint `ba3b0e3` removes visible core/carrier semantics from the
+  Chinese and English rules and gives Next an exact material-plus-effect accessible
+  name. Internal carrier IDs remain unchanged to preserve deterministic one-trigger
+  ownership.
+- Audio checkpoint `a184952` carries separate Mutation transitions along the visual
+  FIFO tail and cancels current/future Mutation voices on restart. Test repair
+  `1058dbd` schedules the post-restart proof at `8.25 s`, before the stale `8.94 s`
+  tail, so the reset assertion fails if timeline cleanup regresses. No accepted asset,
+  recipe, gain, pan, compressor, or activation duration changed.
+- Evidence `731bf6f` binds 20 deterministic frames for all four materials in Next,
+  active plus Ghost, settled, captured clear, and activation to product source
+  `a1849525db8742701c398cd67c4eed5a9f4bc47b`. Matrix repair `8e336fe` adds all three
+  themes, full/reduced motion, Chinese/English, and `1440x900`, `1125x1196`, and
+  `390x844` layouts. All 26 hashes match; every case reports one Canvas, zero DOM board
+  cells, no overflow, and zero browser errors.
+- After the final source/test change, typecheck passes; the complete suite reports
+  `44 passed / 2 skipped` files and `412 passed / 8 skipped` tests; the production
+  build transforms 767 modules. Independent renderer/copy, audio, static, and
+  original-detail visual reviews close their initial P1/P2 findings and report
+  `P0 0 / P1 0 / P2 0 / P3 0`.
+
+Stage E is a bounded technical candidate, not a claim of player visual acceptance.
+Stage F must first freeze the 46-level identity/migration table and prove anchor-aware
+strict search on representative hard cases before any bulk curriculum replacement.
 
 ## Current checkpoint state
 

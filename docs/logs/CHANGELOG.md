@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage E whole-piece materials technically accepted
+
+- Replaced the former ordinary-body-plus-core presentation with four complete Mutation
+  materials across Next, active/Ghost, settled board, captured clear, and activation:
+  cyan ice crystal, contained lava mineral, restrained gold, and violet gravity mass.
+  Ordinary seven-colour pieces gain only a quiet triangular facet baseline. Product
+  checkpoints are `fa3a70e` and `581c004`; deterministic once-per-piece Core rules are
+  unchanged.
+- Checkpoint `ba3b0e3` gives Chinese and English players whole-material rules and exact
+  Next accessible names without visible carrier/core language. Audio checkpoint
+  `a184952` preserves every accepted sound while carrying separate Mutation triggers
+  along the renderer's visual FIFO and cancelling current/future Mutation cues on
+  restart. Test repair `1058dbd` directly proves the old queue tail is reset.
+- Evidence `731bf6f` binds 20 Next/active/Ghost/settled/clear/activation frames to
+  product source `a184952`. Matrix repair `8e336fe` adds all three themes, full/reduced
+  motion, Chinese/English, and desktop/portrait/mobile layouts. All 26 hashes match;
+  every case reports one Canvas, zero DOM cells, no overflow, and zero browser errors.
+- Final typecheck, the complete suite (`44 passed / 2 skipped` files; `412 passed / 8
+  skipped` tests), and the 767-module build pass. Independent audio, static, and
+  original-detail visual QA close their initial P1/P2 findings and report
+  `P0 0 / P1 0 / P2 0 / P3 0`. Protected T27 evidence and `progress.md` remain outside
+  the committed range. Player visual/play review remains open; Puzzle proof foundation
+  is next, and site identity stays deferred to the final proposal gate.
+
 ## 2026-08-10 — T37 Stage D1 route handoff technical candidate awaiting player review
 
 - Replaced URL-route changes with the bounded **Settled Handoff** owner: one latest

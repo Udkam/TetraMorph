@@ -179,7 +179,7 @@ and no Puzzle content is published without strict deterministic proof.
   rapid navigation, history/back/forward, focus continuity, and actual intermediate
   frames rather than endpoint screenshots alone.
 
-### E. Whole-piece material system
+### E. Whole-piece material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN
 
 - Polish ordinary multicolour pieces as the quiet baseline.
 - Replace carrier/badge Mutation rendering with four complete materials: Ice crystal,
@@ -208,7 +208,17 @@ and no Puzzle content is published without strict deterministic proof.
   clear-to-activation continuity, with theme/reduced-motion/responsive coverage. Never
   overwrite inherited T27 evidence.
 
-### F. Puzzle curriculum v3
+Product checkpoints `fa3a70e`, `581c004`, `ba3b0e3`, and `a184952` implement the
+complete material language and audio lifecycle boundary. Direct restart-proof repair
+`1058dbd` closes the independent test finding without changing production code.
+Evidence `731bf6f` plus matrix repair `8e336fe` binds 20 semantic frames and six
+theme/motion/responsive frames to product source `a184952`; 26/26 hashes match with one
+Canvas, zero DOM cells, no overflow, and zero browser errors. Final typecheck, the
+complete suite (`412 passed / 8 skipped`), and the 767-module build pass. Independent
+static, audio, and original-detail visual QA report P0–P3 all zero. Human visual/play
+review remains open.
+
+### F. Puzzle curriculum v3 — PROOF FOUNDATION NEXT
 
 - Author 5 Intro, 25 Easy, and 16 Hard levels with stable IDs, technique tags, and no
   duplicate residual states.

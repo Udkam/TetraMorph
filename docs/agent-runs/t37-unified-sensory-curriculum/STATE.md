@@ -76,8 +76,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
    remain pending.
 10. `DEFERRED TO FINAL PROPOSAL GATE` — the Morph Core draft is rejected for unclear
     Apple-size meaning; no icon product source is retained.
-11. `IN PROGRESS` — ordinary/Mutation whole-piece material system.
-12. `PENDING` — 5/25/16 Puzzle content, exact proofs, unlocks, migration, and UI.
+11. `TECHNICAL ACCEPT — PLAYER REVIEW OPEN` — ordinary/Mutation whole-piece material
+    source `a184952`, restart-proof test `1058dbd`, evidence `731bf6f`, and complete
+    theme/motion/responsive matrix `8e336fe`; independent P0–P3 all zero.
+12. `NEXT` — 5/25/16 Puzzle proof foundation, content, unlocks, migration, and UI.
 13. `PENDING` — final gates, browser evidence, independent QA, changelog, and push.
 
 ## Verification state
@@ -337,21 +339,38 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   not communicate a clear meaning. Its uncommitted SVG/PNG/HTML/test work was removed.
   Identity moves to the final T37 proposal gate; no PWA surface is added and no
   replacement is implemented before player selection.
+- Stage E product checkpoints `fa3a70e`, `581c004`, `ba3b0e3`, and `a184952` replace
+  the complete Mutation body across Next, active/Ghost, settled, and clear; retain
+  quiet facets on ordinary multicolour pieces; remove player-facing core/carrier copy;
+  and serialize audio across transitions with restart cancellation. Core carrier IDs,
+  once-per-piece activation, accepted sound design, and line-clear timing remain frozen.
+- Initial audio QA found that restart reset was implemented but weakly tested after the
+  stale tail had already elapsed. Test-only checkpoint `1058dbd` moves the post-restart
+  trigger to `8.25 s`, before the old `8.94 s` tail; direct tests pass `19/19` and the
+  independent recheck closes the P2.
+- Evidence `731bf6f` contains 20 source-bound material frames and matching hashes.
+  Initial static QA correctly rejected its deep-tide/full-motion-only coverage. Matrix
+  repair `8e336fe` adds six real pages spanning all three themes, full/reduced motion,
+  Chinese/English, three responsive viewports, and all four items. Both audits bind to
+  product source `a184952`, report one Canvas, zero DOM cells, no overflow/errors, and
+  match all 26 PNG hashes.
+- After `1058dbd`, final typecheck, the complete suite (`44 passed / 2 skipped` files;
+  `412 passed / 8 skipped` tests), and the 767-module build pass. Independent static,
+  audio, and original-detail visual QA close P1/P2 and report
+  `P0 0 / P1 0 / P2 0 / P3 0`. No T27 or `progress.md` path enters the candidate.
 
 ## Next exact action
 
-The read-only Stage E audit is complete. Implement E1 in exactly
-`src/game/render/theme.ts`, `src/game/render/theme.test.ts`,
-`src/game/render/TetrisRenderer.ts`, and `src/game/render/TetrisRenderer.test.ts`: replace
-the ordinary-body-plus-core path atomically across active/Ghost/Next/settled/clear, add
-the quiet ordinary facet baseline, and keep all Core rules, activation VFX, clear timing,
-and audio recipes frozen. Commit the first green renderer claim before E2 bilingual
-copy (`src/ui/localization.ts`, `src/App.test.ts`) and E3 AudioEngine cross-transition /
-restart ownership. Then capture real frames in a new T37 material evidence path. Keep
-D1's player verdict separate, leave mode intro/results for D3, and defer site identity
-until the final proposal gate. Preserve inherited T27 and `progress.md`, continue to
-label the missing Ice uploader-original WAV/hash honestly, and do not reopen accepted
-Stage-C sound or clear behavior.
+Freeze Stage F1 before editing published level data: define the exact 5 Intro / 25 Easy /
+16 Hard stable-ID roster, retained/redesigned/retired migration table, operation-count
+meaning, strict certificate schema, and representative ordinary plus multi-anchor proof
+cases. Then extend strict search to model anchor-supported state and validate that
+prototype before authoring the five guided Intro levels or bulk-changing the 50-level
+module. Preserve unified 10×20 physics for the first curriculum pass; express board
+variation through authored target silhouettes and anchors unless a separately proven
+variable-board contract is opened. Keep D1 and Stage E player verdicts separate, defer
+site identity to the final proposal gate, preserve inherited T27/`progress.md`, and do
+not claim the missing Ice uploader-original WAV/hash is archived.
 
 ## Do not repeat
 
