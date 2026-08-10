@@ -90,12 +90,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 14. `F3A ACCEPTED; F3B NEXT` — source `a1e37f1` expands only the frozen structural
     validator boundary and adds the 38-entry literal preservation gate. Independent QA
     accepts `da264f4..b30ee1f` with P0–P3 all zero.
-15. `F3B CANDIDATE; INDEPENDENT QA REQUIRED` — test checkpoint `308233c` proves the
-    injected four-anchor board, remapping, preview projection, and four independent
-    public-route witnesses without opening production Core source.
+15. `F3B ACCEPTED; F3C NEXT` — test checkpoint `308233c` proves the injected
+    four-anchor board, remapping, preview projection, and four independent public-route
+    witnesses without opening production Core source. Independent QA accepts
+    `3aa6766..6c3286c` with P0–P3 all zero.
 16. `PENDING` — F3C, later content, migration, UI, final gates, and push.
 
-### Stage F3B candidate status
+### Stage F3B accepted status
 
 - Task: T37/F3B injected four-anchor mechanics. Base SHA: `3aa6766`; source candidate:
   `308233c`. Exact source paths are `src/game/core/board.test.ts`,
@@ -122,8 +123,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   --reporter=verbose --maxWorkers=1` (`4 files / 36 tests`).
 - No browser evidence applies because the candidate changes no published definition or
   rendered state. No production source, F3C, App/UI, storage, T27,
-  `t27-r1-followup`, or `progress.md` path is owned by this candidate. Independent QA
-  is pending; F3C is not open yet.
+  `t27-r1-followup`, or `progress.md` path is owned by this candidate.
+- Independent read-only QA accepts `3aa6766..6c3286c` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It reproduces typecheck and `4 files / 36 tests`,
+  independently verifies the exact board/targets and all four witnesses, confirms
+  unchanged presentation blobs, passes range diff-check, and finds the cached index
+  empty. The QA made no edit, stage, commit, push, or repository artifact. F3B has no
+  open blocker; F3C may open only its frozen fixture/test boundary.
 
 ### Stage F3A accepted status
 
@@ -506,13 +512,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Run independent read-only QA on the exact F3B candidate range from `3aa6766` through
-the candidate-state checkpoint. Reproduce typecheck and the four-file `36/36` suite;
-verify the exact injected board/targets, two-clear mapping, four remove-only witness
-comparisons, unchanged presentation source, commit budgets, and protected-path
-exclusions. Do not begin F3C, Intro boards, the 46-level module, v6 migration, mastery
-groups, Puzzle UI, or App source before the coordinator disposes the QA verdict. Keep
-deferred identity, protected T27/`progress.md`, and the missing Ice archive separate.
+Implement F3C only in
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
+`src/game/core/puzzleV3PrototypeExact.test.ts`. Prove one legal, unanchored,
+non-published ten-row definition and its public completion route with exact canonical
+setup replay, lock signatures, initial/final hashes, and every complete shorter-depth
+certificate statistic; no beam, timeout, or state cap is acceptance evidence. If a
+reusable discovery tool is necessary, open only
+`tools/search-puzzle-v3-prototype.mjs` in an earlier separate tooling checkpoint. Do
+not begin Intro boards, the 46-level module, v6 migration, mastery groups, Puzzle UI,
+or App source. Keep deferred identity, protected T27/`progress.md`, and the missing Ice
+archive separate.
 
 ## Do not repeat
 

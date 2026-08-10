@@ -389,6 +389,12 @@ adding unrelated badges or ornamental effects.
   definition. Independent read-only QA accepts `da264f4..b30ee1f` with P0–P3 all zero
   after reproducing typecheck, 16/16 focused tests, and all 38 literal hashes. F3B may
   now prove injected four-anchor mechanics; published content remains closed.
+- F3B test checkpoint `308233c` proves exact injected-board ownership, two-clear
+  target/support remapping, the bottom-twelve preview projection, and four independent
+  remove-only anchor witnesses without changing production Core or published content.
+  Independent read-only QA accepts `3aa6766..6c3286c` with P0–P3 all zero after
+  reproducing typecheck and all 36 focused tests. F3C may now open only its non-published
+  ten-row fixture and exact certificate test.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

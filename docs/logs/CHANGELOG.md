@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-10 — T37 Stage F3B injected mechanics accepted
+
+- Test checkpoint `308233c` adds exact four-anchor board/engine coverage and a
+  test-only injected definition with four independent public-command completion
+  witnesses. Removing only the tested anchor changes the first real I lock from rows
+  `24..27` to `33..36` and removes its direct support identity; no production Core or
+  published Puzzle definition changes.
+- Typecheck and the final focused board/flow/evidence/presentation suite pass
+  `4 files / 36 tests`. The unchanged two-piece Puzzle preview test is included;
+  browser evidence is not applicable because no published or rendered state changes.
+- Independent read-only QA accepts `3aa6766..6c3286c` with
+  `P0 0 / P1 0 / P2 0 / P3 0`, reproduces both gates, verifies the exact injected
+  board/targets, two-clear mapping, all four remove-only comparisons, unchanged
+  presentation blobs, commit budgets, and protected-path exclusions. F3C may now open
+  only its frozen non-published ten-row fixture/test pair.
+
 ## 2026-08-10 — T37 Stage F3A Puzzle definition capability accepted
 
 - Source `a1e37f1` expands clean-room authoring validation to 5–20 legal zero-clear

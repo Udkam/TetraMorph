@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3B INJECTED-MECHANICS CANDIDATE; INDEPENDENT QA REQUIRED**
+Status: **STAGE F3B INJECTED MECHANICS ACCEPTED; STAGE F3C TEN-ROW ADMISSION NEXT**
 
 ## Active objective
 
@@ -30,9 +30,10 @@ follow-ups close at `1507dab`; two independent read-only reviews accept the full
 with P0–P3 all zero. Stage F3's bounded capability contract now passes independent
 read-only review with P0–P3 all zero. F3A source `a1e37f1` implements the bounded
 structural validator and literal preservation gate; independent QA accepts the complete
-candidate with P0–P3 all zero. F3B test checkpoint `308233c` now proves the frozen
-injected mechanics without changing production Core source. It remains a candidate
-until independent review; F3C and published Puzzle content stay closed.
+candidate with P0–P3 all zero. F3B test checkpoint `308233c` proves the frozen injected
+mechanics without changing production Core source; independent QA accepts
+`3aa6766..6c3286c` with P0–P3 all zero. F3C may now open only its exact non-published
+ten-row fixture/test pair, while published Puzzle content stays closed.
 
 ## Frozen product direction
 
@@ -324,7 +325,7 @@ only; it is not F3 source acceptance.
   browser evidence is not applicable. F3A is accepted; F3B may open only its frozen
   injected-definition mechanics tests.
 
-### Stage F3B injected-mechanics candidate (2026-08-10)
+### Stage F3B injected-mechanics acceptance (2026-08-10)
 
 - Source checkpoint `308233c` changes only `src/game/core/board.test.ts`,
   `src/game/core/puzzleFlow.test.ts`, and
@@ -346,8 +347,12 @@ only; it is not F3 source acceptance.
   `npm.cmd run typecheck` also passes. The unchanged presentation test confirms the
   two-item Puzzle Next projection. Browser evidence does not apply because no
   published or rendered state changed.
-- This is a candidate, not an acceptance. Independent read-only QA must review the
-  exact F3B range and protected-path exclusions before F3C opens.
+- Independent read-only QA accepts `3aa6766..6c3286c` with
+  `P0 0 / P1 0 / P2 0 / P3 0`. It independently reproduces typecheck and the four-file
+  `36/36` suite, validates all four remove-only witnesses, confirms the unchanged
+  presentation blobs and checkpoint budgets, and verifies that T27,
+  `t27-r1-followup`, and `progress.md` are outside the six-path range. F3B is accepted;
+  F3C may open only its frozen ten-row fixture/test boundary.
 
 ## Current checkpoint state
 

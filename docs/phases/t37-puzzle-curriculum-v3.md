@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3B INJECTED-MECHANICS CANDIDATE; INDEPENDENT QA REQUIRED**
+Status: **F3B INJECTED MECHANICS ACCEPTED; F3C TEN-ROW ADMISSION NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -382,9 +382,12 @@ distinct public-command completion routes each compare with a copy removing only
 tested anchor: the complete definition's first I lock occupies absolute rows `24..27`
 and records those four support identities, while the remove-only replay lands at
 `33..36` with no support identity. Typecheck and the final four-file focused suite
-(`36/36`, including the unchanged two-piece presentation test) pass. This is a
-candidate pending independent read-only QA; F3C, published content, migration,
-progression, and UI remain closed.
+(`36/36`, including the unchanged two-piece presentation test) pass. Independent
+read-only QA accepts `3aa6766..6c3286c` with P0–P3 all zero, reproduces those gates,
+validates all four remove-only witnesses, confirms the presentation blobs are unchanged,
+and verifies the six-path range excludes every protected path. F3B is accepted; F3C may
+open only the frozen non-published ten-row fixture/test pair. Published content,
+migration, progression, and UI remain closed.
 
 ## Progress v6 and revision-3 migration
 
