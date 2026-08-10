@@ -98,7 +98,7 @@ ten-row fixture/test pair, while published Puzzle content stays closed.
 6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C CONTRACT REPAIR QA** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
-   are frozen. Accepted F3A source `74148ec` covers counter-clockwise SRS,
+   are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
    anchor-supported state identity, definition-aware replay/proof, and exact anchor
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
    authoring-tool contract repair remains under QA and content authoring stays closed.
