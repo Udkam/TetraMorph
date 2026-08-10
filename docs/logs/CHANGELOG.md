@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded-reverse schema closure candidate
+
+- Independent QA rejects first repair `9737663` with
+  `P0 0 / P1 3 / P2 0 / P3 1 / GAP 0`. Probe/STOP priority, both empty hash vectors,
+  equivalence, seven-mask state, cursor data, path scope, and exclusions pass.
+- The second repair defines the queue hash over the full domain and the reverse trie over
+  only the current half-open shard; pins every domain integer width and version literal;
+  and enumerates all domain/shard/coverage/evidence/search/setup/frame/cursor/result
+  fields and types.
+- A total status/null matrix now covers trie-build RSS, resumable search stops, candidate,
+  and complete-not-found. The stale F3A-only summary now reflects accepted F3A/F3B and
+  pending F3C contract QA. Implementation and search remain closed.
+
 ## 2026-08-11 — T37 Stage F3C seeded-reverse contract repair candidate
 
 - Exact-range QA rejects `155b82a` with `P0 0 / P1 1 / P2 1 / P3 0 / GAP 0` because

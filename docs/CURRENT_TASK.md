@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE CONTRACT REPAIR CANDIDATE; REPAIR QA NEXT**
+Status: **STAGE F3C SEEDED-REVERSE CONTRACT SECOND REPAIR CANDIDATE; QA NEXT**
 
 ## Active objective
 
@@ -95,12 +95,13 @@ ten-row fixture/test pair, while published Puzzle content stays closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3A ACCEPTED; F3B NEXT** — the exact
+6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C CONTRACT REPAIR QA** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
-   are frozen. Accepted source `74148ec` covers counter-clockwise SRS, anchor-supported
-   state identity, definition-aware replay/proof, and exact anchor admission. Stage F3
-   opens only validator/capability work; content authoring remains closed.
+   are frozen. Accepted F3A source `74148ec` covers counter-clockwise SRS,
+   anchor-supported state identity, definition-aware replay/proof, and exact anchor
+   admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
+   authoring-tool contract repair remains under QA and content authoring stays closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -534,6 +535,12 @@ only; it is not F3 source acceptance.
   genuine stack completion win at their admitted boundary; no-child/out-of-mask/
   duplicate descriptors consume no probe, while every descriptor in a frame's filtered
   canonical list consumes exactly one. Implementation stays closed pending repair QA.
+- Independent QA rejects repair `9737663` with
+  `P0 0 / P1 3 / P2 0 / P3 1 / GAP 0`. Probe/STOP priority, equivalence, cursor data,
+  hash vectors, scope, and exclusions pass. The second repair freezes full-domain versus
+  shard-trie identity, every domain byte and version literal, all nested JSON/frame/
+  placement/result payloads, the status/null matrix, and this stale F3A/F3B summary.
+  Implementation remains closed until the second repair is independently accepted.
 
 ## Current checkpoint state
 

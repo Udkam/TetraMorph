@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED-REVERSE CONTRACT REPAIR CANDIDATE; REPAIR QA NEXT**
+Status: **F3C SEEDED-REVERSE CONTRACT SECOND REPAIR CANDIDATE; QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -600,7 +600,11 @@ Exact-range QA then rejects candidate `155b82a` with
 `P0 0 / P1 1 / P2 1 / P3 0 / GAP 0`: probe/Merkle/cursor bytes and the probe/STOP
 priority machine were ambiguous. Range, equivalence, forbidden masks, memo tuple,
 geometric dedupe, two-file boundary, tests, and protected exclusions pass. The
-following byte protocol and state machine are authoritative repairs.
+first repair freezes those bytes and the state machine. Repair QA rejects `9737663`
+with `P0 0 / P1 3 / P2 0 / P3 1 / GAP 0`: priority, vectors, equivalence, state,
+scope, and exclusions pass, but domain/shard bytes, nested JSON/null states, and one
+F3A-only summary remain ambiguous or stale. The following complete protocol, schema,
+and status matrix are the authoritative second repair.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and
@@ -644,6 +648,14 @@ canonical JSON followed by one LF with no BOM. Hash labels below are their exact
 bytes including the shown terminal NUL. SHA-256 JSON fields are uppercase hexadecimal;
 hash composition uses raw 32-byte digests.
 
+The five domain version strings are exact literals: algorithm
+`seeded-reverse-v1`; setup rules
+`visible-spawn19-vertical-hard-drop-no-clear-no-hidden-no-same-type-touch-v1`; type
+order `I,O,T,S,Z,J,L-v1`; queue generator
+`xorshift32-fisher-yates-seven-bag-v1`; and candidate order
+`type-index/rotation-0..3/x-ascending/absolute-y-ascending/landing-cell-dedupe/real-trie-child-v1`.
+Changing any literal requires a new algorithm/schema contract.
+
 Binary primitives are unsigned `u8`, two's-complement `i8`, big-endian `u32be` and
 `u64be`, plus `bytes(s) = u32be(UTF8(s).length) || UTF8(s)`. Board/cell/forbidden masks
 use bit `(absoluteY - TARGET_TOP) * 10 + x` and encode as 13 unsigned big-endian bytes
@@ -654,35 +666,64 @@ cellMask:mask13)`. The catalog hash is SHA-256 of
 hash is SHA-256 of `"T37-RSHAPES-v1\0" || u32be(7)` followed in
 `I,O,T,S,Z,J,L` order by `u8(typeIndex) || u32be(4)` and, for rotations `0..3`,
 `u8(rotation) || u32be(cellCount)` plus each shape cell as `(dx:i8,dy:i8)` in source
-array order. The full-queue hash is SHA-256 of
-`"T37-RQUEUE-v1\0" || u32be(seedStart) || u32be(seedCount)` followed for every seed in
-ascending full-domain order by `u32be(seed)` and its 20 type indices as `u8`.
-Reverse-trie node
-IDs follow ascending-seed insertion of reversed queues; its hash input is
+array order.
+
+The full-queue hash covers the entire supplied full seed domain, not one shard. It is
+SHA-256 of `"T37-RQUEUE-v1\0" || u32be(fullSeedStart) || u32be(fullSeedCount)` followed
+for every seed in the half-open interval
+`[fullSeedStart, fullSeedStart + fullSeedCount)` by `u32be(seed)` and its 20 type indices
+as `u8`. Accepted production runs use full domain `1..20000` and sequence length 20.
+
+Each reverse trie contains only the current shard's seeds. Root is node 0. Insert seeds
+in ascending order from the shard's half-open seed interval and each exact 20-piece queue
+in reverse; an absent child receives the next consecutive node ID. Its hash input is
 `"T37-RTRIE-v1\0" || u32be(nodeCount)` followed for each ascending node ID by seven
-`u32be` child IDs (`0xFFFFFFFF` for absent), `u32be(seedCount)`, and ascending leaf
-seeds as `u32be`. Domain hash input is `"T37-RDOMAIN-v1\0"`, fixed mask, raw catalog/
-shape-table/full-queue/reverse-trie digests, `u32be` full seed start/count,
-shard count/index/start/end offsets, and length-prefixed algorithm, rule, type-order,
-queue-generator, and candidate-order version strings in that stated order.
+`u32be` child IDs in `I,O,T,S,Z,J,L` order (`0xFFFFFFFF` for absent),
+`u32be(leafSeedCount)`, and ascending leaf seeds as `u32be`.
+
+Domain hash input is exactly `"T37-RDOMAIN-v1\0" || fixedMask:mask13 || rawCatalogHash
+|| rawShapeTableHash || rawFullQueueHash || rawReverseTrieHash ||
+u32be(fullSeedStart) || u32be(fullSeedCount) || u32be(20) || u32be(shardCount) ||
+u32be(shardIndex) || u32be(shardStartOffset) || u32be(shardEndOffsetExclusive) ||
+bytes(algorithmVersion) || bytes(setupRulesVersion) || bytes(typeOrderVersion) ||
+bytes(queueGeneratorVersion) || bytes(candidateOrderVersion)`. Shard offsets are
+zero-based into the full domain, the end is half-open, and accepted production uses
+32 shards with the existing floor partition.
 
 The reverse schema-3 output has exactly these top-level fields:
 `schemaVersion`, `algorithmVersion`, `cursorSchemaVersion`, `claim`, `status`, `phase`,
 `domain`, `shard`, `coverage`, `evidence`, `targetRows`, `targetMaskRows`, `setup`,
 `boardRows`, `search`, and `continuation`. Claim is exactly
 `F3C seeded-reverse setup candidate only; Core route replay and exact proof remain mandatory.`
-Domain records the versions and every hash named above; shard records index and exact
-offset/seed bounds; coverage is `(startProbeCount,newProbeCount,nextProbeCount,complete)`;
-evidence is `(probeHash,memoHash,cursorStateHash,resultHash)`; search records invocation
-budget, processed seeds, trie/catalog counts, cumulative probes, and failed-state count.
-Setup is null or the minimum seed plus forward-order `{type,rotation,x}` placements;
-board rows are null or their exact typed reconstruction. Continuation is null except for
-resumable search-phase stops. Candidate exits 0, valid noncandidate statuses exit 2,
-and invalid input/cursor exits 1 without output.
+`domain` has exactly `algorithmVersion`, `setupRulesVersion`, `typeOrderVersion`,
+`queueGeneratorVersion`, `candidateOrderVersion`, `catalogHash`, `shapeTableHash`,
+`fullQueueHash`, `reverseTrieHash`, `domainHash`, `fullSeedStart`, `fullSeedCount`,
+`sequenceLength`, and `shardCount`. Version values are the literals above; hash values
+are uppercase SHA-256 strings except the two phase-specific nulls defined below;
+`sequenceLength` is 20 and all numeric values are safe JSON integers.
+
+`shard` has exactly `count`, `index`, `startOffset`, `endOffsetExclusive`, `seedStart`,
+and `seedCount`; count/index/offsets equal the domain-hash inputs,
+`seedStart = fullSeedStart + startOffset`, and
+`seedCount = endOffsetExclusive - startOffset`. `coverage` has exactly
+`startProbeCount`, `newProbeCount`,
+`nextProbeCount`, and Boolean `complete`. `evidence` has exactly `probeHash`, `memoHash`,
+`cursorStateHash`, and `resultHash`. `search` has exactly `nodeBudget`, `maxRssMiB`,
+`processedSeeds`, `catalogDescriptorCount`, `reverseTrieNodeCount`, `startProbeCount`,
+`newProbeCount`, `nextProbeCount`, and `failedStateCount`.
+
+`targetRows` is 10 and `targetMaskRows` is the unchanged exact 20-string
+`TARGET_VISIBLE_ROWS` array. `setup` is null or exactly `{seed,placements}`, where seed
+is the minimum seed at the accepted shard leaf and placements is the forward-order array
+of exactly `{type,rotation,x}` with type one of `I,O,T,S,Z,J,L`. `boardRows` is null or
+the exact 20-string visible reconstruction using `.` or the owning type letter. Candidate
+exits 0, valid noncandidate statuses exit 2, and invalid input/cursor exits 1 without
+output.
 
 A failed-state key is the fixed binary tuple
 `depth:u8 || reverseTrieNodeId:u32be || remainingBoard:mask13 || seven forbidden:mask13`
-in `I,O,T,S,Z,J,L` order; JSON stores its uppercase hexadecimal bytes. `memoHash` is
+in `I,O,T,S,Z,J,L` order; it is 109 bytes and JSON stores exactly 218 uppercase
+hexadecimal digits. `memoHash` is
 SHA-256 of `"T37-RMEMO-v1\0" || u32be(count)` plus each fixed-length key's raw bytes
 sorted lexicographically unsigned. Cursor memo storage uses that same sorted key list.
 The required empty-memo vector is the 17-byte label/NUL/count input and hashes to
@@ -693,11 +734,12 @@ A zero-based probe token uses the exact binary fields
 remainingBoard:mask13, seven forbidden:mask13, candidateIndex:u32be, typeIndex:u8,
 rotation:u8, x:i8, absoluteY:u8, cellMask:mask13, outcome:u8`. Outcome is 0
 `cells-not-remaining`, 1 `same-type-forbidden`, 2 `hard-drop-mismatch`, 3
-`child-memo-hit`, 4 `child-pushed`, or 5 `candidate-leaf`. The token is appended only
-after the descriptor's complete outcome is known, then the global and invocation probe
-counts increment by one.
+`child-memo-hit`, 4 `child-pushed`, or 5 `candidate-leaf`. Each token is 140 bytes and
+its cursor JSON form is exactly 280 uppercase hexadecimal digits. The token is appended
+only after the descriptor's complete outcome is known, then the global and invocation
+probe counts increment by one.
 
-Probe blocks contain exactly 1,024 consecutive tokens. Block `k` hashes
+Probe blocks contain exactly 1,024 consecutive tokens. Zero-based block `k` hashes
 `"T37-RPBLOCK-v1\0" || u64be(k) || u32be(1024) || token[0] ... token[1023]`.
 Its Merkle leaf is SHA-256 of `"T37-RPLEAF-v1\0" || u64be(k) || blockHash`. Appending a
 leaf uses binary-carry peaks from level 0 upward; merging existing left and new right
@@ -714,23 +756,38 @@ The required empty-probe-root vector is the 34-byte label/NUL/count/block-size/e
 peaks/empty-partial input and hashes to
 `C07AA09A429443F5FC5F930F033012D8EECE50DB060894EBA7324C211002D0CA`.
 
-A reverse cursor is schema/domain bound and stores cumulative probe count, peaks,
-partial tokens, the placement path, the sorted failed memo, and every DFS frame from
-root to top. A frame stores depth, trie node, remaining mask, seven forbidden masks,
-the next filtered-candidate index, and its entering descriptor (null at root). Resume
-recomputes each candidate list and validates index bounds, every parent/child board,
-forbidden/trie transition, path/frame agreement, memo keys, peak counts, and all domain
-hashes before search. `cursorStateHash` is SHA-256 of
-`"T37-RCURSOR-v1\0" || UTF8(canonicalJson(continuationWithoutCursorStateHash))`.
-Continuation has exactly `cursorSchemaVersion`, `domainHash`, `shardIndex`,
+A continuation has exactly `cursorSchemaVersion`, `domainHash`, `shardIndex`,
 `nextProbeCount`, `probeBlockSize`, `peaks`, `partialProbeTokens`, `placements`,
-`failedMemoKeys`, `frames`, and `cursorStateHash`; `probeBlockSize` is 1,024 and memo
-keys are already sorted. Only search-phase paused-budget or memory-guard output may be
-resumed, and resume/output paths must differ.
-`resultHash` similarly hashes `"T37-RRESULT-v1\0"` plus canonical JSON containing only
-domain hash, status, phase, cumulative probe count, complete flag, probe/memo/cursor
-hashes, and setup; it excludes invocation start/new counts and file paths so one-shot
-and resumed execution at the same state match. Any mismatch fails before a probe.
+`failedMemoKeys`, `frames`, and `cursorStateHash`. `probeBlockSize` is 1,024. `peaks` is
+the minimal level-0-up array defined above; `partialProbeTokens` is an array of 0–1,023
+complete 280-digit token strings; and `failedMemoKeys` is the unsigned-lexicographically
+sorted array of 218-digit key strings.
+
+Cursor `placements` is the reverse-peel path from the first removed forward-last piece
+to the current frame. Every entry and every nonroot entering descriptor has exactly
+`typeIndex`, `rotation`, `x`, `absoluteY`, and `cellMask`; the root entering descriptor
+is null. `frames` is root-to-top and each frame has exactly `depth`, `trieNodeId`,
+`remainingBoard`, `forbiddenMasks`, `nextCandidateIndex`, and `enteringDescriptor`.
+`forbiddenMasks` is an exact seven-element mask-string array in `I,O,T,S,Z,J,L` order.
+The root has depth 0, node 0, the fixed remaining mask, seven zero masks, and the path
+length is always `frames.length - 1`; each path item equals its corresponding nonroot
+frame's entering descriptor.
+
+`cursorStateHash` is SHA-256 of
+`"T37-RCURSOR-v1\0" || UTF8(canonicalJson(continuationWithoutCursorStateHash))`; the
+canonical JSON hash input has no trailing LF. Resume recomputes candidate lists and
+validates exact field sets and types, mask padding/length, index bounds, root identity,
+every parent/child board, forbidden/trie transition, path/frame agreement, memo-key
+shape, peak/partial counts, and every non-null domain hash before any probe. Only
+search-phase `paused-budget` or `memory-guard` output may be resumed, input/output paths
+must differ, and resume continues this stack without prefix replay.
+
+`resultHash` is SHA-256 of `"T37-RRESULT-v1\0" || UTF8(canonicalJson(payload))`, where
+payload has exactly `complete`, `cursorStateHash`, `domainHash`, `memoHash`,
+`nextProbeCount`, `phase`, `probeHash`, `setup`, and `status` with the same values as the
+output. This hash input has no LF. It excludes invocation budget/start/new counts and
+file paths so one-shot and resumed execution at the same state match. Any resumable
+cursor mismatch fails before a probe.
 
 `--node-budget` counts new reverse candidate probes only; time is never a correctness
 budget. After cursor/domain validation and complete trie construction, each search
@@ -753,15 +810,36 @@ advance follows this exact state machine:
    Otherwise loop to step 1, so zero-probe natural exhaustion after the final admitted
    probe also wins over a budget stop.
 
-Trie construction checks RSS before each 1,024-seed group and once after completion.
-A trie-build guard returns `memory-guard` with phase `trie-build`, zero probes, and no
-continuation. In-search `paused-budget` and `memory-guard` carry the complete cursor and
-make no completion claim. Interrupted frames never enter the failed memo. Invalid args,
-resume status, schema, identity, hash, or structural transitions fail before output.
-Statuses remain `candidate`, `complete-not-found`, `paused-budget`, and `memory-guard`;
-phase is `trie-build` or `search`. Reverse files use the canonical JSON/LF serializer;
-identical invocations are byte-identical, while one-shot/split equivalence compares the
-same cumulative probe/memo/cursor/result hashes. The first
+Trie construction allocates root node 0 first, then checks RSS before shard-relative
+seed offsets 0, 1,024, 2,048, and so on, inserting at most that group's next 1,024
+ascending seeds only after the check; it checks once more after all seeds are inserted.
+A guard at any check returns `memory-guard` with phase `trie-build`; even when the
+post-build check fires, `domain.reverseTrieHash` and `domain.domainHash` are both null,
+`coverage` and all search probe counters are zero/false, the probe and memo hashes are
+the fixed empty vectors above, `evidence.cursorStateHash`, setup, board rows, and
+continuation are null, and `resultHash` uses that null domain hash. Other domain fields
+and pre-trie hashes remain populated. Search `processedSeeds` and
+`reverseTrieNodeCount` report the exact inserted-seed and currently allocated-node
+counts; failed-state count is zero. This stop is not resumable.
+
+The complete status/null matrix is:
+
+| status / phase | `coverage.complete` | trie/domain hashes | cursor hash / continuation | setup / board |
+| --- | --- | --- | --- | --- |
+| `memory-guard` / `trie-build` | `false` | `null` / `null` | `null` / `null` | `null` / `null` |
+| `paused-budget` / `search` | `false` | hash / hash | hash / object | `null` / `null` |
+| `memory-guard` / `search` | `false` | hash / hash | hash / object | `null` / `null` |
+| `candidate` / `search` | `false` | hash / hash | `null` / `null` | object / 20 rows |
+| `complete-not-found` / `search` | `true` | hash / hash | `null` / `null` | `null` / `null` |
+
+For every search-phase row, trie construction is complete, `processedSeeds` equals the
+selected shard seed count, `reverseTrieNodeCount` is final, coverage/search start-new-
+next counters agree with `next = start + new`, and probe/memo/result hashes are strings.
+For resumable rows, evidence cursor hash equals the continuation's hash. Interrupted
+frames never enter the failed memo. Invalid args, resume status, schema, identity, hash,
+or structural transitions fail before output. Reverse files use the canonical JSON/LF
+serializer; deterministic repeats are byte-identical, while one-shot/split equivalence
+compares the same cumulative probe/memo/cursor/result hashes. The first
 accepted reverse search round, not yet open, is 32 serial shards with 1,000,000 new
 probes per shard and 900 MiB RSS; every incomplete shard receives one increment before
 another does.
@@ -778,7 +856,11 @@ tamper/version/mask/trie/shard failures; deterministic byte repeats; injected an
 RSS containment; exact empty/partial/full-block and multi-peak digest vectors; all six
 probe outcomes; no-child/out-of-mask/duplicate non-probes; simultaneous budget/RSS,
 candidate/budget, candidate/RSS, complete/budget, and complete/RSS priority; and forward
-`replayPuzzleSetup` reconstruction of every test candidate.
+`replayPuzzleSetup` reconstruction of every test candidate. Tests also pin the five
+version literals, full-domain queue versus shard-local trie digest vector, every exact
+nested key/type set, descriptor/frame/path order, cursor and result payload bytes, and
+all five rows of the status/null matrix, including post-build RSS with discarded trie/
+domain hashes.
 Core, the final F3C JSON/test, published content, and later stages remain closed.
 
 ## Progress v6 and revision-3 migration

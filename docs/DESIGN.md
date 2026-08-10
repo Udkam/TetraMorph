@@ -503,6 +503,11 @@ adding unrelated badges or ornamental effects.
   defines fixed integer/mask encodings, hash domain labels, trie/catalog records,
   canonical JSON, a six-outcome probe token, and a deterministic advance state machine.
   All other contract dimensions pass; implementation remains closed until repair QA.
+- Repair QA rejects `9737663` with three P1s and one stale-status P3. The second repair
+  makes the full queue global but the reverse trie shard-local, pins every domain integer
+  and version literal, enumerates every nested output/cursor/result field, and defines a
+  total status/null matrix including trie-build RSS. Probe accounting and STOP priority
+  already pass. Tool implementation remains closed until this schema repair is accepted.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
