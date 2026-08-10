@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FIFTH FAIR ROUND COMPLETE; SEEDED REVERSE REVIEW NEXT**
+Status: **F3C SEEDED-REVERSE CONTRACT CANDIDATE; CONTRACT QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -588,6 +588,75 @@ one independent read-only design review must evaluate reverse hard-drop peeling 
 the reversed trie of the unchanged seeds `1..20000`. It must freeze equivalence,
 deterministic traversal, bounds, memory accounting, output identity, and Core replay
 requirements before the accepted tool may reopen. No new seed or product path opens.
+
+### Seeded-reverse implementation contract
+
+Independent read-only review accepts freezing this concept with
+`P0 0 / P1 0 / P2 0 / P3 0`. Gaps remain explicit: the 200,000-node unseeded probe is
+not performance, completeness, solvability, or candidate evidence; seeded reverse has
+not been implemented or differentially verified; and lossless resume remains unproven.
+The review opens this docs contract only.
+
+Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
+partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and
+shape tables, spawn row, vertical hard drop, target-band/hidden/off-mask restrictions,
+no-clear setup, and minimum-seed leaf choice. It adds explicit CLI mode
+`--algorithm seeded-reverse-v1` and optional `--resume <explicit-json-path>`. Reverse
+mode keeps the existing required seed/shard, `--node-budget`, `--max-rss-mib`, and
+explicit `--output` arguments; numeric `--cursor` is forbidden, and resume input/output
+must be distinct. Existing forward mode and its schema-2 outputs stay unchanged.
+
+For current board `B`, candidate last piece `P` follows one child type of the reversed
+seed trie. Let `B' = B \ P`; the candidate is legal only when the existing forward
+spawn/rotation/x hard-drop simulation on `B'` lands on exactly `P`. Candidate descriptors
+are precomputed inside the fixed mask and ordered by type index, rotation `0..3`, x
+ascending, then absolute y ascending. Descriptors with the same type and cell mask are
+deduplicated, retaining the first descriptor, matching the accepted forward geometric
+landing dedupe. Each evaluated canonical descriptor is one reverse candidate probe.
+An empty-board depth-20 leaf reverses the placements and chooses the minimum seed stored
+at that trie leaf; that result remains an authoring candidate only.
+
+For each type, `forbidden[type]` is the fixed-mask-clipped four-neighbor union of already
+peeled cells of that type. Candidate `P` must not intersect its type's forbidden mask;
+on acceptance the mask gains the four-neighbor cells of `P`. This checks contact only
+between distinct source pieces and never rejects adjacency within one tetromino.
+Search-state identity is the tuple `(depth, reverseTrieNodeId, remainingBoardMask,
+forbidden[I], forbidden[O], forbidden[T], forbidden[S], forbidden[Z], forbidden[J],
+forbidden[L])`. Any failed memo uses the full tuple. A frame is memoized only after all
+canonical candidates exhaust; budget, memory, candidate, or other STOP propagation may
+not memoize it.
+
+A reverse cursor is schema/version bound to algorithm, mask, shapes, queue generator,
+full seed domain, shard identity, reverse-trie hash, and candidate ordering. It stores
+cumulative probe count, every DFS frame and next-candidate index, board/forbidden/trie
+state, placement path, and the lossless failed memo. Resume continues from that stack
+without replaying prior probes. Probe identity uses deterministic 1,024-probe blocks:
+completed block hashes feed a binary Merkle accumulator, while at most 1,023 canonical
+partial-block tokens remain in the cursor. The accumulator peaks plus partial tokens
+produce the same probe hash for one-shot and split execution. Cursor state and sorted
+memo keys receive SHA-256 hashes; any identity/hash mismatch fails before search.
+
+`--node-budget` counts new reverse candidate probes only; time is never a correctness
+budget. Budget and RSS checks occur before the next candidate. A candidate discovered by
+the last admitted probe wins over a budget stop. Statuses are `candidate`,
+`complete-not-found`, `paused-budget`, and `memory-guard`; invalid arguments/cursors fail
+before output. Paused-budget and in-search memory guard carry a resumable cursor and make
+no completion claim. Only genuine stack exhaustion yields complete-not-found. The first
+accepted reverse search round, not yet open, is 32 serial shards with 1,000,000 new
+probes per shard and 900 MiB RSS; every incomplete shard receives one increment before
+another does.
+
+The only implementation paths after contract QA are
+`tools/search-puzzle-v3-prototype.mjs` and
+`tools/search-puzzle-v3-prototype-reverse.test.mjs`. Tests must prove small-board
+forward/reverse legal-history set equality; floor/piece support, upper and spawn
+blockers; same-type contact in either peel order, separated pieces, and intra-piece
+adjacency; duplicate rotations; reversed queue equality and exact shard union; distinct
+keys for identical board/trie with different forbidden masks; one-shot N probes versus
+lossless N1+resume+N2 equality with zero prefix replay; STOP/memo cleanliness; cursor
+tamper/version/mask/trie/shard failures; deterministic byte repeats; injected and live
+RSS containment; and forward `replayPuzzleSetup` reconstruction of every test candidate.
+Core, the final F3C JSON/test, published content, and later stages remain closed.
 
 ## Progress v6 and revision-3 migration
 

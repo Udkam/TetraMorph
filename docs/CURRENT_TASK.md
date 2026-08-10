@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FIFTH FAIR ROUND COMPLETE; SEEDED REVERSE REVIEW NEXT**
+Status: **STAGE F3C SEEDED-REVERSE CONTRACT CANDIDATE; CONTRACT QA NEXT**
 
 ## Active objective
 
@@ -506,6 +506,24 @@ only; it is not F3 source acceptance.
   and a sixth would spend five, further forward rounds pause for a bounded read-only
   design review of reverse hard-drop peeling constrained by the same reversed seed
   trie. No tool or product path opens until that review freezes a replacement contract.
+- Independent read-only review accepts freezing the seeded-reverse implementation
+  contract with `P0 0 / P1 0 / P2 0 / P3 0`. It does not accept an implementation,
+  prove the mask solvable, or turn the 200,000-node unseeded probe into evidence. The
+  replacement keeps seeds `1..20000`, the 32 contiguous 625-seed shards, fixed mask,
+  queue generator, Core shapes/spawn/vertical hard drop, and every setup restriction.
+  It reverses each exact queue into a trie and peels a candidate last piece only when
+  replaying that placement forward on the remaining board lands on the same cells.
+- Reverse state owns depth, trie node, remaining occupancy, and seven per-type
+  orthogonal forbidden masks. A failed-state memo, if enabled, uses all of those fields;
+  pause never memoizes an incomplete frame. The first implementation must persist its
+  complete DFS stack, placements, failed memo, and probe digest frontier so resume adds
+  new work without replaying the prefix. Candidate, complete-not-found, paused-budget,
+  memory-guard, and invalid-input paths remain distinct.
+- Contract QA must accept the exact docs checkpoint before implementation may touch
+  `tools/search-puzzle-v3-prototype.mjs` and the new standalone Node test
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs`. Forward mode must remain
+  unchanged; Core, final F3C fixture/test, published content, migration, UI, T27, and
+  `progress.md` remain closed.
 
 ## Current checkpoint state
 

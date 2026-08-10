@@ -485,6 +485,18 @@ adding unrelated badges or ornamental effects.
   rules, deterministic ordering, explicit bounds, and Core replay as the admission
   gate. It may not edit the accepted tool or open product paths before a separately
   reviewed contract exists.
+- Independent design review now accepts freezing that contract with P0–P3 all zero.
+  Seeded reverse search is complete for this bounded setup language only when each
+  peeled piece, replayed from Core spawn onto the remaining board, hard-drops to the
+  exact removed cells; the reversed trie supplies the corresponding type from piece 20
+  back to piece 1. Same-type ownership is preserved by seven forbidden masks equal to
+  the fixed-mask-clipped orthogonal neighborhood of already peeled cells of each type.
+- Reverse v1 must be resumable without prefix replay. Its cursor binds algorithm/mask/
+  queue/trie/shard/order identity and serializes the full DFS stack, placement path,
+  failed memo, and a block-based resumable probe digest. Memo keys include depth, trie
+  node, remaining occupancy, and all seven forbidden masks. No interrupted frame enters
+  the failed memo; only real stack exhaustion yields complete-not-found. This contract
+  remains a docs candidate until an exact-range QA accepts it.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

@@ -112,7 +112,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     fourth increment and remain budget-incomplete with no candidate or memory stop.
 24. `F3C FIFTH FAIR ROUND COMPLETE; REVERSE REVIEW NEXT` — all 32 shards receive the
     fifth increment; the forward replay/new ratio reaches 4:1 without a candidate.
-25. `PENDING` — seeded reverse design, F3C fixture/test, later content, migration, UI,
+25. `F3C SEEDED-REVERSE CONTRACT CANDIDATE; QA NEXT` — independent design review
+    accepts freezing the bounded concept with P0–P3 all zero; implementation stays closed.
+26. `PENDING` — seeded reverse implementation, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -300,6 +302,22 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Post-checkpoint resource samples are red at CPU `92.0% / 92.2% / 98.3%`, with
   11.28–11.39 GiB free memory and disk queue zero. No seeded-reverse reviewer or search
   process starts; the independent read-only design review remains the sole next action.
+- Two later goal turns remain red. The third audit starts at 93.9% but falls to amber
+  87.6% with 13.49 GiB free and queue zero, so no blocked disposition applies and one
+  independent read-only review opens. Two newly spawned reviewers fail to return after
+  bounded interrupts and are discarded as coordination failures; they provide no
+  evidence and make no file change.
+- The earlier independent solver-design reviewer then performs the requested no-tool
+  follow-up against the new five-round facts and returns `ACCEPT`,
+  `P0 0 / P1 0 / P2 0 / P3 0`. It accepts contract freezing only, identifies the
+  unseeded probe, unimplemented algorithm, and unproven resume as gaps, and requires
+  full same-type state, lossless cursor/memo, deterministic STOP, differential tests,
+  and final forward Core replay.
+- Contract candidate base is `89ae4ad`; exact docs paths are `docs/CURRENT_TASK.md`,
+  `docs/DESIGN.md`, `docs/phases/t37-puzzle-curriculum-v3.md`, this STATE file, and
+  `docs/logs/CHANGELOG.md`. The proposed implementation paths are only the accepted
+  forward tool and one new standalone Node test. No tool path is open before exact-range
+  contract QA.
 
 ### Stage F3B accepted status
 
@@ -717,15 +735,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Run one independent read-only design review for a bounded seeded-reverse search. It must
-use the unchanged seeds `1..20000`, reverse each exact 20-piece queue into a trie, peel
-only tetrominoes whose forward Core-equivalent hard drop lands on the same cells, reject
-same-type orthogonal contact, and define deterministic ordering, state identity,
-completion, probe/RSS bounds, output hashes, and candidate replay. The review edits no
-file and authorizes no implementation. After its disposition, freeze a separate contract
-checkpoint before reopening `tools/search-puzzle-v3-prototype.mjs`; do not run a sixth
-forward round meanwhile. Keep final F3C JSON/test, later content, deferred identity,
-T27/`progress.md`, and missing Ice archive closed.
+Commit the exact five-path seeded-reverse contract candidate, then run one independent
+read-only QA over base `89ae4ad` through that candidate. QA must validate review
+disposition, forward/reverse equivalence conditions, forbidden-mask sufficiency, full
+state/memo identity, canonical dedupe/order, lossless no-replay cursor, block/Merkle
+probe digest, budget/RSS/STOP precedence, two-path implementation boundary, and all
+protected exclusions. Only an accepted contract may open the tool plus standalone Node
+test implementation. Do not run a sixth forward round or reverse search; keep final F3C
+JSON/test, later content, deferred identity, T27/`progress.md`, and missing Ice archive
+closed.
 
 ## Do not repeat
 

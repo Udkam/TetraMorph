@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded-reverse contract candidate
+
+- Independent read-only design review accepts freezing seeded reversed-trie hard-drop
+  peeling with `P0 0 / P1 0 / P2 0 / P3 0`. This is contract authorization only; it
+  does not accept a tool, candidate setup, or solvability claim.
+- The contract preserves the exact seed/shard/Core setup domain and requires seven
+  same-type forbidden masks, complete state/memo identity, canonical geometric dedupe,
+  lossless DFS cursor resume without prefix replay, block/Merkle probe hashing, distinct
+  STOP statuses, and final forward Core replay.
+- Only `tools/search-puzzle-v3-prototype.mjs` and a new standalone Node test may open
+  after exact-range contract QA. The sixth forward round, reverse search, Core, final
+  fixture/test, published content, T27, and `progress.md` remain closed.
+
 ## 2026-08-11 — T37 Stage F3C fifth fair search round complete
 
 - All 32 contiguous shards receive the same fifth increment and return
