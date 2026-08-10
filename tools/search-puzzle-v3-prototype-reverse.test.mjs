@@ -82,6 +82,85 @@ assert.equal(reverse.hashHex(reverse.memoHash([])),
 assert.equal(reverse.hashHex(reverse.probeRootHash(0, [], [])),
   'C07AA09A429443F5FC5F930F033012D8EECE50DB060894EBA7324C211002D0CA');
 
+const context = {
+  fixedMask,
+  catalog: catalog.descriptors,
+  trie: trie.nodes,
+  sequenceLength: 20,
+};
+const domainHash = Buffer.alloc(32, 7);
+const oneShotState = reverse.createReverseState(context);
+const oneShot = reverse.advanceReverse(context, oneShotState, 1500, Number.MAX_SAFE_INTEGER, () => 0);
+assert.deepEqual({ status: oneShot.status, start: oneShot.startProbeCount, added: oneShot.newProbeCount },
+  { status: 'paused-budget', start: 0, added: 1500 });
+assert(oneShotState.failed.size > 0);
+const splitState = reverse.createReverseState(context);
+const firstSplit = reverse.advanceReverse(context, splitState, 750, Number.MAX_SAFE_INTEGER, () => 0);
+assert.equal(firstSplit.status, 'paused-budget');
+const splitCursor = reverse.makeContinuation(splitState, domainHash, 0);
+const restoredState = reverse.restoreContinuation(splitCursor, context, domainHash, 0);
+const secondSplit = reverse.advanceReverse(context, restoredState, 750, Number.MAX_SAFE_INTEGER, () => 0);
+assert.deepEqual({ status: secondSplit.status, start: secondSplit.startProbeCount, added: secondSplit.newProbeCount },
+  { status: 'paused-budget', start: 750, added: 750 });
+assert.equal(restoredState.probe.nextProbeCount, 1500);
+assert.equal(reverse.hashHex(reverse.probeRootHash(
+  restoredState.probe.nextProbeCount, restoredState.probe.peaks, restoredState.probe.partialTokens,
+)), reverse.hashHex(reverse.probeRootHash(
+  oneShotState.probe.nextProbeCount, oneShotState.probe.peaks, oneShotState.probe.partialTokens,
+)));
+assert.equal(reverse.hashHex(reverse.memoHash(restoredState.failed.values())),
+  reverse.hashHex(reverse.memoHash(oneShotState.failed.values())));
+assert.equal(reverse.canonicalJson(reverse.makeContinuation(restoredState, domainHash, 0)),
+  reverse.canonicalJson(reverse.makeContinuation(oneShotState, domainHash, 0)));
+const activeKey = reverse.failedKey(restoredState.frames.at(-1)).toString('hex').toUpperCase();
+assert.equal(restoredState.failed.has(activeKey), false, 'an interrupted frame must not enter the memo');
+
+const forbiddenVariant = { ...restoredState.frames.at(-1), forbiddenMasks: [...restoredState.frames.at(-1).forbiddenMasks] };
+forbiddenVariant.forbiddenMasks[0] |= 1n;
+assert.notEqual(reverse.failedKey(forbiddenVariant).toString('hex'),
+  reverse.failedKey(restoredState.frames.at(-1)).toString('hex'));
+const badVersion = structuredClone(splitCursor);
+badVersion.cursorSchemaVersion = 2;
+assert.throws(() => reverse.restoreContinuation(badVersion, context, domainHash, 0), /identity/);
+assert.throws(() => reverse.restoreContinuation(splitCursor, context, domainHash, 1), /identity/);
+const badRootState = reverse.restoreContinuation(splitCursor, context, domainHash, 0);
+badRootState.frames[0].remainingBoard ^= 1n;
+const badRoot = reverse.makeContinuation(badRootState, domainHash, 0);
+assert.throws(() => reverse.restoreContinuation(badRoot, context, domainHash, 0), /root/);
+
+function digestProbeVector(count) {
+  const probe = { nextProbeCount: 0, peaks: [], partialTokens: [] };
+  for (let index = 0; index < count; index += 1) {
+    const token = Buffer.alloc(140);
+    token[0] = 1;
+    token.writeBigUInt64BE(BigInt(index), 1);
+    token[139] = index % 6;
+    reverse.appendProbe(probe, token);
+  }
+  return {
+    peaks: probe.peaks.map((peak) => peak && reverse.hashHex(peak)),
+    partial: probe.partialTokens.length,
+    root: reverse.hashHex(reverse.probeRootHash(probe.nextProbeCount, probe.peaks, probe.partialTokens)),
+  };
+}
+
+assert.deepEqual(digestProbeVector(7), {
+  peaks: [], partial: 7, root: 'A1041AE5D999DE1DCEC43D2A7CD3D7572157DDC893AD34075824C46B4514502D',
+});
+assert.deepEqual(digestProbeVector(1024), {
+  peaks: ['967E8FAC44251FAA0D6474D0766644F450675CA344F21E1B7C8EEAED0C629082'],
+  partial: 0,
+  root: 'F71CA897005A5291056E1EDC336EA17E719FA701FF3542777381D7D870D56F4F',
+});
+assert.deepEqual(digestProbeVector(3079), {
+  peaks: [
+    'CC1C7F36A7A91A2566C775B0739E3F8F0735644FE715A586104E9052236A8D29',
+    '59B1D5C9328B7BC12FC0528ABFBA252D786E75E3CE5E566963433449EEA6B72B',
+  ],
+  partial: 7,
+  root: 'CB4FB8340EB17BDD3E42E7A7439EECEA73BE40FF82BDD59BB2ACD828194F1A7E',
+});
+
 const tempRoot = mkdtempSync(join(tmpdir(), 't37-reverse-contract-'));
 try {
   const firstPath = join(tempRoot, 'forward-1500.json');

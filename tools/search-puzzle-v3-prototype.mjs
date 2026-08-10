@@ -338,6 +338,315 @@ function probeRootHash(totalProbeCount, peaks, partialTokens) {
   return labeledHash('T37-RPROOT-v1', parts);
 }
 
+function exactKeys(value, keys, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)
+    || Object.keys(value).sort().join('\0') !== [...keys].sort().join('\0')) {
+    throw new Error(`${label} has an invalid field set.`);
+  }
+}
+
+function neighborMask(mask, fixedMask) {
+  let neighbors = 0n;
+  for (let bit = 0; bit < 100; bit += 1) {
+    if ((mask & (1n << BigInt(bit))) === 0n) continue;
+    const x = bit % WIDTH;
+    const y = Math.floor(bit / WIDTH);
+    if (x > 0) neighbors |= 1n << BigInt(bit - 1);
+    if (x + 1 < WIDTH) neighbors |= 1n << BigInt(bit + 1);
+    if (y > 0) neighbors |= 1n << BigInt(bit - WIDTH);
+    if (y + 1 < 10) neighbors |= 1n << BigInt(bit + WIDTH);
+  }
+  return neighbors & fixedMask;
+}
+
+function hardDropMask(boardMask, descriptor) {
+  const shape = SHAPES[TYPES[descriptor.typeIndex]][descriptor.rotation];
+  const canPlaceMask = (absoluteY) => shape.every(([dx, dy]) => {
+    const x = descriptor.x + dx;
+    const y = absoluteY + dy;
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return false;
+    if (y < TARGET_TOP) return true;
+    return (boardMask & (1n << BigInt((y - TARGET_TOP) * WIDTH + x))) === 0n;
+  });
+  let y = VISIBLE_START - 1;
+  if (!canPlaceMask(y)) return null;
+  while (canPlaceMask(y + 1)) y += 1;
+  return descriptorMask(TYPES[descriptor.typeIndex], descriptor.rotation, descriptor.x, y);
+}
+
+function failedKey(frame) {
+  return Buffer.concat([
+    u8(frame.depth), u32be(frame.trieNodeId), maskBytes(frame.remainingBoard),
+    ...frame.forbiddenMasks.map(maskBytes),
+  ]);
+}
+
+function probeToken(frame, descriptor, candidateIndex, globalProbeIndex, outcome) {
+  const token = Buffer.concat([
+    u8(1), u64be(globalProbeIndex), u8(frame.depth), u32be(frame.trieNodeId),
+    maskBytes(frame.remainingBoard), ...frame.forbiddenMasks.map(maskBytes), u32be(candidateIndex),
+    u8(descriptor.typeIndex), u8(descriptor.rotation), i8(descriptor.x), u8(descriptor.absoluteY),
+    maskBytes(descriptor.cellMask), u8(outcome),
+  ]);
+  if (token.length !== 140) throw new Error('Reverse probe token length drifted.');
+  return token;
+}
+
+function appendProbe(probe, token) {
+  probe.partialTokens.push(token);
+  probe.nextProbeCount += 1;
+  if (probe.partialTokens.length < PROBE_BLOCK_SIZE) return;
+  const blockIndex = Math.floor((probe.nextProbeCount - 1) / PROBE_BLOCK_SIZE);
+  const blockHash = labeledHash('T37-RPBLOCK-v1', [
+    u64be(blockIndex), u32be(PROBE_BLOCK_SIZE), ...probe.partialTokens,
+  ]);
+  let carry = labeledHash('T37-RPLEAF-v1', [u64be(blockIndex), blockHash]);
+  probe.partialTokens = [];
+  let level = 0;
+  while (probe.peaks[level]) {
+    carry = labeledHash('T37-RPNODE-v1', [u32be(level), probe.peaks[level], carry]);
+    probe.peaks[level] = null;
+    level += 1;
+  }
+  probe.peaks[level] = carry;
+  while (probe.peaks.at(-1) === null) probe.peaks.pop();
+}
+
+function frameCandidates(context, frame) {
+  const node = context.trie[frame.trieNodeId];
+  return context.catalog.filter((descriptor) => node.children[descriptor.typeIndex] >= 0);
+}
+
+function createReverseState(context) {
+  return {
+    frames: [{
+      depth: 0, trieNodeId: 0, remainingBoard: context.fixedMask,
+      forbiddenMasks: TYPES.map(() => 0n), nextCandidateIndex: 0, enteringDescriptor: null,
+    }],
+    placements: [],
+    failed: new Map(),
+    probe: { nextProbeCount: 0, peaks: [], partialTokens: [] },
+  };
+}
+
+function sameDescriptor(left, right) {
+  return left && right && left.typeIndex === right.typeIndex && left.rotation === right.rotation
+    && left.x === right.x && left.absoluteY === right.absoluteY && left.cellMask === right.cellMask;
+}
+
+function candidateBoardRows(descriptors) {
+  const rows = Array.from({ length: 20 }, () => Array(WIDTH).fill('.'));
+  for (const descriptor of descriptors) {
+    for (let bit = 0; bit < 100; bit += 1) if (descriptor.cellMask & (1n << BigInt(bit))) {
+      rows[TARGET_TOP - VISIBLE_START + Math.floor(bit / WIDTH)][bit % WIDTH] = TYPES[descriptor.typeIndex];
+    }
+  }
+  return rows.map((row) => row.join(''));
+}
+
+function advanceReverse(context, state, nodeBudget, maxRssBytes, rssBytes = () => process.memoryUsage().rss) {
+  const startProbeCount = state.probe.nextProbeCount;
+  let newProbeCount = 0;
+  for (;;) {
+    while (state.frames.length > 0) {
+      const frame = state.frames.at(-1);
+      if (frame.nextCandidateIndex < frameCandidates(context, frame).length) break;
+      const key = failedKey(frame);
+      state.failed.set(key.toString('hex').toUpperCase(), key);
+      state.frames.pop();
+      if (frame.enteringDescriptor) state.placements.pop();
+    }
+    if (state.frames.length === 0) {
+      return { status: 'complete-not-found', complete: true, startProbeCount, newProbeCount, result: null };
+    }
+    if (newProbeCount === nodeBudget) {
+      return { status: 'paused-budget', complete: false, startProbeCount, newProbeCount, result: null };
+    }
+    if ((newProbeCount === 0 || state.probe.nextProbeCount % PROBE_BLOCK_SIZE === 0)
+      && rssBytes() > maxRssBytes) {
+      return { status: 'memory-guard', complete: false, startProbeCount, newProbeCount, result: null };
+    }
+
+    const frame = state.frames.at(-1);
+    const candidates = frameCandidates(context, frame);
+    const candidateIndex = frame.nextCandidateIndex;
+    const descriptor = candidates[candidateIndex];
+    frame.nextCandidateIndex += 1;
+    let outcome = 0;
+    let childFrame = null;
+    let result = null;
+    if ((descriptor.cellMask & frame.remainingBoard) === descriptor.cellMask) {
+      if ((descriptor.cellMask & frame.forbiddenMasks[descriptor.typeIndex]) !== 0n) outcome = 1;
+      else {
+        const remainingBoard = frame.remainingBoard & ~descriptor.cellMask;
+        if (hardDropMask(remainingBoard, descriptor) !== descriptor.cellMask) outcome = 2;
+        else {
+          const forbiddenMasks = [...frame.forbiddenMasks];
+          forbiddenMasks[descriptor.typeIndex] |= neighborMask(descriptor.cellMask, context.fixedMask);
+          const trieNodeId = context.trie[frame.trieNodeId].children[descriptor.typeIndex];
+          childFrame = {
+            depth: frame.depth + 1, trieNodeId, remainingBoard, forbiddenMasks,
+            nextCandidateIndex: 0, enteringDescriptor: descriptor,
+          };
+          const leaf = childFrame.depth === context.sequenceLength && remainingBoard === 0n
+            && context.trie[trieNodeId].seeds.length > 0;
+          if (leaf) {
+            outcome = 5;
+            const reversePlacements = [...state.placements, descriptor];
+            const forwardDescriptors = reversePlacements.toReversed();
+            result = {
+              seed: Math.min(...context.trie[trieNodeId].seeds),
+              descriptors: forwardDescriptors,
+              placements: forwardDescriptors.map((item) => ({
+                type: TYPES[item.typeIndex], rotation: item.rotation, x: item.x,
+              })),
+              boardRows: candidateBoardRows(forwardDescriptors),
+            };
+          } else {
+            const key = failedKey(childFrame).toString('hex').toUpperCase();
+            if (state.failed.has(key)) outcome = 3;
+            else outcome = 4;
+          }
+        }
+      }
+    }
+    appendProbe(state.probe, probeToken(frame, descriptor, candidateIndex, state.probe.nextProbeCount, outcome));
+    newProbeCount += 1;
+    if (result) return { status: 'candidate', complete: false, startProbeCount, newProbeCount, result };
+    if (outcome === 4) {
+      state.frames.push(childFrame);
+      state.placements.push(descriptor);
+    }
+  }
+}
+
+function continuationBody(state, domainHash, shardIndex) {
+  return {
+    cursorSchemaVersion: REVERSE_CURSOR_SCHEMA_VERSION,
+    domainHash: hashHex(domainHash),
+    shardIndex,
+    nextProbeCount: state.probe.nextProbeCount,
+    probeBlockSize: PROBE_BLOCK_SIZE,
+    peaks: state.probe.peaks.map((peak) => peak === null ? null : hashHex(peak)),
+    partialProbeTokens: state.probe.partialTokens.map((token) => hashHex(token)),
+    placements: state.placements.map(descriptorJson),
+    failedMemoKeys: [...state.failed.keys()].sort(),
+    frames: state.frames.map((frame) => ({
+      depth: frame.depth,
+      trieNodeId: frame.trieNodeId,
+      remainingBoard: maskHex(frame.remainingBoard),
+      forbiddenMasks: frame.forbiddenMasks.map(maskHex),
+      nextCandidateIndex: frame.nextCandidateIndex,
+      enteringDescriptor: frame.enteringDescriptor ? descriptorJson(frame.enteringDescriptor) : null,
+    })),
+  };
+}
+
+function makeContinuation(state, domainHash, shardIndex) {
+  const body = continuationBody(state, domainHash, shardIndex);
+  const cursorStateHash = hashHex(labeledHash('T37-RCURSOR-v1', [Buffer.from(canonicalJson(body))]));
+  return { ...body, cursorStateHash };
+}
+
+function parseDescriptorJson(value, label) {
+  exactKeys(value, ['typeIndex', 'rotation', 'x', 'absoluteY', 'cellMask'], label);
+  if (!Number.isSafeInteger(value.typeIndex) || value.typeIndex < 0 || value.typeIndex >= TYPES.length
+    || !Number.isSafeInteger(value.rotation) || value.rotation < 0 || value.rotation > 3
+    || !Number.isSafeInteger(value.x) || value.x < -128 || value.x > 127
+    || !Number.isSafeInteger(value.absoluteY) || value.absoluteY < 0 || value.absoluteY > 255) {
+    throw new Error(`${label} has invalid descriptor integers.`);
+  }
+  return { ...value, cellMask: parseMaskHex(value.cellMask) };
+}
+
+function restoreContinuation(value, context, domainHash, shardIndex) {
+  exactKeys(value, [
+    'cursorSchemaVersion', 'domainHash', 'shardIndex', 'nextProbeCount', 'probeBlockSize', 'peaks',
+    'partialProbeTokens', 'placements', 'failedMemoKeys', 'frames', 'cursorStateHash',
+  ], 'continuation');
+  const { cursorStateHash, ...body } = value;
+  const expectedHash = hashHex(labeledHash('T37-RCURSOR-v1', [Buffer.from(canonicalJson(body))]));
+  if (cursorStateHash !== expectedHash || body.cursorSchemaVersion !== REVERSE_CURSOR_SCHEMA_VERSION
+    || body.domainHash !== hashHex(domainHash) || body.shardIndex !== shardIndex
+    || body.probeBlockSize !== PROBE_BLOCK_SIZE || !Number.isSafeInteger(body.nextProbeCount)
+    || body.nextProbeCount < 0) throw new Error('Reverse cursor identity is invalid.');
+  if (!Array.isArray(body.peaks) || !Array.isArray(body.partialProbeTokens)
+    || !Array.isArray(body.placements) || !Array.isArray(body.failedMemoKeys) || !Array.isArray(body.frames)) {
+    throw new Error('Reverse cursor arrays are invalid.');
+  }
+  const peaks = body.peaks.map((peak) => {
+    if (peak === null) return null;
+    if (typeof peak !== 'string' || !/^[0-9A-F]{64}$/.test(peak)) throw new Error('Invalid cursor peak.');
+    return Buffer.from(peak, 'hex');
+  });
+  const leafCount = Math.floor(body.nextProbeCount / PROBE_BLOCK_SIZE);
+  const minimumPeakLength = leafCount === 0 ? 0 : Math.floor(Math.log2(leafCount)) + 1;
+  if (peaks.length !== minimumPeakLength
+    || peaks.some((peak, level) => Boolean(peak) !== Boolean(leafCount & (2 ** level)))) {
+    throw new Error('Cursor peak frontier does not match its probe count.');
+  }
+  const partialTokens = body.partialProbeTokens.map((token, index) => {
+    if (typeof token !== 'string' || !/^[0-9A-F]{280}$/.test(token)) throw new Error('Invalid partial probe token.');
+    const bytes = Buffer.from(token, 'hex');
+    const expectedIndex = body.nextProbeCount - body.partialProbeTokens.length + index;
+    if (bytes[0] !== 1 || bytes.readBigUInt64BE(1) !== BigInt(expectedIndex)) throw new Error('Partial token index drift.');
+    return bytes;
+  });
+  if (partialTokens.length !== body.nextProbeCount % PROBE_BLOCK_SIZE) throw new Error('Partial token count drift.');
+  const placements = body.placements.map((item, index) => parseDescriptorJson(item, `placement ${index}`));
+  const failed = new Map();
+  let previous = '';
+  for (const key of body.failedMemoKeys) {
+    if (typeof key !== 'string' || !/^[0-9A-F]{218}$/.test(key) || (previous && previous >= key)) {
+      throw new Error('Invalid or unsorted failed memo key.');
+    }
+    const bytes = Buffer.from(key, 'hex');
+    if (bytes[0] > context.sequenceLength || bytes.readUInt32BE(1) >= context.trie.length
+      || [5, 18, 31, 44, 57, 70, 83, 96].some((offset) => (bytes[offset] & 0xf0) !== 0)) {
+      throw new Error('Failed memo key escapes the reverse domain.');
+    }
+    failed.set(key, bytes);
+    previous = key;
+  }
+  const frames = body.frames.map((frame, index) => {
+    exactKeys(frame, ['depth', 'trieNodeId', 'remainingBoard', 'forbiddenMasks', 'nextCandidateIndex',
+      'enteringDescriptor'], `frame ${index}`);
+    if (!Number.isSafeInteger(frame.depth) || !Number.isSafeInteger(frame.trieNodeId)
+      || !Number.isSafeInteger(frame.nextCandidateIndex) || !Array.isArray(frame.forbiddenMasks)
+      || frame.forbiddenMasks.length !== TYPES.length) throw new Error('Invalid reverse frame integers.');
+    return {
+      depth: frame.depth, trieNodeId: frame.trieNodeId, remainingBoard: parseMaskHex(frame.remainingBoard),
+      forbiddenMasks: frame.forbiddenMasks.map(parseMaskHex), nextCandidateIndex: frame.nextCandidateIndex,
+      enteringDescriptor: frame.enteringDescriptor === null ? null
+        : parseDescriptorJson(frame.enteringDescriptor, `frame ${index} descriptor`),
+    };
+  });
+  if (frames.length === 0 || placements.length !== frames.length - 1) throw new Error('Cursor path length is invalid.');
+  const root = frames[0];
+  if (root.depth !== 0 || root.trieNodeId !== 0 || root.remainingBoard !== context.fixedMask
+    || root.forbiddenMasks.some(Boolean) || root.enteringDescriptor !== null) throw new Error('Cursor root is invalid.');
+  for (let index = 0; index < frames.length; index += 1) {
+    const frame = frames[index];
+    const candidates = frameCandidates(context, frame);
+    if (frame.depth !== index || frame.trieNodeId < 0 || frame.trieNodeId >= context.trie.length
+      || frame.nextCandidateIndex < 0 || frame.nextCandidateIndex > candidates.length) throw new Error('Cursor frame bounds are invalid.');
+    if (index === 0) continue;
+    const parent = frames[index - 1];
+    const entering = frame.enteringDescriptor;
+    if (parent.nextCandidateIndex < 1 || !sameDescriptor(entering, placements[index - 1])
+      || !sameDescriptor(entering, frameCandidates(context, parent)[parent.nextCandidateIndex - 1])
+      || context.trie[parent.trieNodeId].children[entering.typeIndex] !== frame.trieNodeId
+      || frame.remainingBoard !== (parent.remainingBoard & ~entering.cellMask)
+      || hardDropMask(frame.remainingBoard, entering) !== entering.cellMask) throw new Error('Cursor frame transition is invalid.');
+    const expectedForbidden = [...parent.forbiddenMasks];
+    expectedForbidden[entering.typeIndex] |= neighborMask(entering.cellMask, context.fixedMask);
+    if (expectedForbidden.some((mask, type) => mask !== frame.forbiddenMasks[type])) {
+      throw new Error('Cursor forbidden transition is invalid.');
+    }
+  }
+  return { frames, placements, failed, probe: { nextProbeCount: body.nextProbeCount, peaks, partialTokens } };
+}
+
 function parseArguments(argv) {
   const values = new Map();
   for (let index = 0; index < argv.length; index += 2) {
@@ -753,6 +1062,16 @@ export const __reverseTest = Object.freeze({
   reverseDomainHash,
   memoHash,
   probeRootHash,
+  neighborMask,
+  hardDropMask,
+  failedKey,
+  probeToken,
+  appendProbe,
+  createReverseState,
+  advanceReverse,
+  makeContinuation,
+  restoreContinuation,
+  candidateBoardRows,
   sequenceForSeed,
   hashHex,
 });
