@@ -250,10 +250,14 @@ existing hidden buffer, SRS, queue, clear, target, and anchor mechanics.
    contiguous nonempty bottom target rows, 5–20 seeded legal zero-clear setup drops,
    and 0–4 unique immutable anchors at visible coordinates `x=0..9`, `y=8..19`.
    Every anchor must occupy `.` in the setup-derived board; hidden/out-of-range,
-   duplicate, target-covered, malformed, or fifth anchors fail closed. Canonical mode
-   also rejects any row whose ordinary cells plus anchors total ten. Canonical mode
-   still requires each current published definition byte-for-byte, so this checkpoint
-   changes no live board, order, seed, name, route, or revision-2 behavior hash.
+   duplicate, target-covered, malformed, or fifth anchors fail closed. Both canonical
+   validation and `requireCanonical=false` authoring overrides reject any row whose
+   ordinary cells plus anchors total ten. Canonical mode still requires each current
+   published definition byte-for-byte, so this checkpoint changes no live board,
+   order, seed, name, route, or revision-2 behavior hash. A third exact path,
+   `src/game/core/puzzleV3BehaviorBaseline.test.ts`, implements the frozen F1
+   canonical serializer and independently matches all 38 literal baseline hashes; it
+   may not derive expected hashes from the edited definitions.
 2. **F3B injected-definition mechanics** owns direct tests in `board.test.ts`,
    `puzzleFlow.test.ts`, and one new `puzzleV3AnchorEvidence.test.ts`; only a failing
    test may open the smallest owning Core source path. A test-only four-anchor
@@ -265,20 +269,27 @@ existing hidden buffer, SRS, queue, clear, target, and anchor mechanics.
    relevance. The preview gate asserts that `state.board.slice(-12)` contains every
    legal target/anchor and reruns the existing two-piece presentation tests; the Puzzle
    gallery/App remains closed until the 46 definitions are accepted.
-3. **F3C ten-row admission** owns a new T37 authoring artifact plus one opt-in exact
-   Core test. The artifact is test-only and records a legal unanchored ten-row
-   definition, canonical setup replay, public completion route, lock signatures,
-   initial/final hashes, and all shorter-depth certificate statistics. The certificate
-   uses no beam, timeout, or state cap. It must pass before `tm-puzzle-46` is reauthored;
-   the prototype never enters `PUZZLE_DEFINITIONS`, campaign order, storage, UI, or old
-   T15/T32 route artifacts.
+3. **F3C ten-row admission** owns exactly
+   `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
+   `src/game/core/puzzleV3PrototypeExact.test.ts`. The JSON is a source-controlled
+   authoring/test fixture, not generated browser evidence; it records a legal
+   unanchored ten-row definition, canonical setup replay, public completion route,
+   lock signatures, initial/final hashes, and all shorter-depth certificate statistics.
+   The test imports it and checks exact equality with no beam, timeout, or state cap.
+   Those two paths form one source/test checkpoint because neither is meaningful alone.
+   If candidate discovery needs a reusable generator, only
+   `tools/search-puzzle-v3-prototype.mjs` may be added in an earlier, separate tooling
+   checkpoint; its output is never accepted without Core replay/proof. F3C must pass
+   before `tm-puzzle-46` is reauthored, and the prototype never enters
+   `PUZZLE_DEFINITIONS`, campaign order, storage, UI, or old T15/T32 route artifacts.
 
-Each subcheckpoint stays independently green and reviewable. F3A runs typecheck and
-the direct definition tests; F3B adds direct engine/route coverage; F3C runs its opt-in
-strict certificate. After the last source/test change, run one final typecheck, complete
-suite, and build, then independent read-only QA. Browser evidence is not required
-because no published/rendered product state changes. Intro content, the 46-level module,
-v6 migration, mastery groups, unlocks, and Puzzle UI remain closed through F3.
+Each subcheckpoint stays independently green and reviewable. F3A runs typecheck, direct
+definition tests, and literal comparison of all 38 F1 behavior hashes; F3B adds direct
+engine/route coverage; F3C runs its opt-in strict certificate. After the last source/
+test change, run one final typecheck, complete suite, and build, then independent
+read-only QA. Browser evidence is not required because no published/rendered product
+state changes. Intro content, the 46-level module, v6 migration, mastery groups,
+unlocks, and Puzzle UI remain closed through F3.
 
 ## Current checkpoint state
 

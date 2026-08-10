@@ -443,12 +443,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 Independently review the Stage F3 contract in `docs/CURRENT_TASK.md`, `docs/DESIGN.md`,
 and `docs/phases/t37-puzzle-curriculum-v3.md`. Confirm it preserves all current
-definitions/hashes, separates structural validation from per-anchor replay evidence,
-keeps App/UI closed, and requires a non-published ten-row strict certificate. Only then
-open F3A in `src/game/core/puzzles.ts` and its direct test. Do not begin Intro boards,
-the 46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20
-physics, D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and
-the missing Ice archive separate.
+definitions through literal verification of all 38 frozen hashes, rejects ordinary+
+anchor full rows in canonical and override modes, separates structural validation from
+per-anchor replay evidence, keeps App/UI closed, and freezes the exact F3C artifact/
+test/tooling split. Only then open F3A in `src/game/core/puzzles.ts`, its direct test,
+and `src/game/core/puzzleV3BehaviorBaseline.test.ts`. Do not begin Intro boards, the
+46-level module, v6 migration, mastery groups, or Puzzle UI. Keep unified 10×20 physics,
+D1/Stage-E player verdicts, deferred identity, protected T27/`progress.md`, and the
+missing Ice archive separate.
 
 ## Do not repeat
 

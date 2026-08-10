@@ -377,6 +377,10 @@ adding unrelated badges or ornamental effects.
   compared with a definition removing only that anchor, proving a changed real landing
   or direct support effect. A test-only ten-row prototype must obtain a complete strict
   certificate before any published Hard definition adopts that shape.
+- Capability work shares a source module with the canonical library, so structural
+  tests alone are insufficient preservation evidence. Every validator checkpoint also
+  reruns the F1 canonical serializer against the 38 literal revision-2 behavior hashes;
+  expected values are never regenerated from the edited definitions.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
