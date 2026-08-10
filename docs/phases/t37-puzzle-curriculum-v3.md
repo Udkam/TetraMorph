@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FOURTH FAIR ROUND COMPLETE; FIFTH EQUAL ROUND NEXT**
+Status: **F3C FIFTH FAIR ROUND COMPLETE; SEEDED REVERSE REVIEW NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -572,11 +572,22 @@ sorted `filename:SHA256` lines joined with LF and no terminal LF is
 `14D1B742D64C36CC6EC247A92B7467149217C67E5AFD7137DAABE697CF21D616`.
 All 32 exact Temp files are removed and owned process count is zero.
 
-The fourth round is still a fair prefix, not a negative proof. The next allowed
-operation, after a new green/amber resource check, is a fifth equal round over the same
-domain and shard order: input cursor 1,250,000 and new-probe budget 312,500 per shard,
-yielding absolute cursor 1,562,500 when budget-bound. Stop at candidate or RSS guard;
-no new seed domain or product path opens.
+The fifth equal round preserves the same domain and ascending order. Every shard starts
+at cursor 1,250,000, adds 312,500 new probes, and returns `budget-exhausted` at cursor
+1,562,500. Candidate, complete, and memory counts are zero. It records 40,000,000
+replay probes, 10,000,000 new probes, and 50,000,000 physical attempts. Cumulative new
+coverage across all five rounds is 50,000,000. Replay-inclusive accepted placements,
+failed states, and trie nodes are `1,455,294 / 1,453,114 / 337,031`. SHA-256 over the
+sorted `filename:SHA256` lines joined with LF and no terminal LF is
+`A5A6A955372A1A914C87B01A8C3DDC581C5B54B41D8841AA275949FAA6C71EEC`.
+All 32 exact Temp files are removed and owned process count is zero.
+
+This remains a fair prefix, not a negative proof. The fifth invocation spends four
+replay probes for each new probe, and a sixth would spend five. Before any sixth round,
+one independent read-only design review must evaluate reverse hard-drop peeling against
+the reversed trie of the unchanged seeds `1..20000`. It must freeze equivalence,
+deterministic traversal, bounds, memory accounting, output identity, and Core replay
+requirements before the accepted tool may reopen. No new seed or product path opens.
 
 ## Progress v6 and revision-3 migration
 

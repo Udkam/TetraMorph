@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FOURTH FAIR ROUND COMPLETE; FIFTH EQUAL ROUND NEXT**
+Status: **STAGE F3C FIFTH FAIR ROUND COMPLETE; SEEDED REVERSE REVIEW NEXT**
 
 ## Active objective
 
@@ -495,6 +495,17 @@ only; it is not F3 source acceptance.
   All exact outputs are removed and no owned process remains. This is still a fair
   prefix, not a negative proof. A fifth equal round may replay cursor 1,250,000 and add
   312,500 probes per incomplete shard only after a fresh resource check.
+- The fifth equal round keeps all 32 shards synchronized at cursor 1,562,500 with zero
+  candidates, complete shards, or RSS stops. It replays 40,000,000 probes and adds
+  10,000,000 new probes for 50,000,000 physical attempts; cumulative new coverage is
+  50,000,000. Replay-inclusive accepted/failed/trie-node counts are
+  `1,455,294 / 1,453,114 / 337,031`; the ordered manifest digest is
+  `A5A6A955372A1A914C87B01A8C3DDC581C5B54B41D8841AA275949FAA6C71EEC`.
+  All exact outputs are removed and no owned process remains. This still is not a
+  negative proof. Because the fifth invocation spends four replay probes per new probe
+  and a sixth would spend five, further forward rounds pause for a bounded read-only
+  design review of reverse hard-drop peeling constrained by the same reversed seed
+  trie. No tool or product path opens until that review freezes a replacement contract.
 
 ## Current checkpoint state
 

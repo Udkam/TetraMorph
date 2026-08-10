@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C fifth fair search round complete
+
+- All 32 contiguous shards receive the same fifth increment and return
+  `budget-exhausted` at cursor 1,562,500 with zero candidate, complete, or memory
+  status. Domain, queue, range adjacency, and ordering remain unchanged.
+- The invocation performs 40,000,000 replay plus 10,000,000 new probes for 50,000,000
+  physical attempts. Cumulative new fair coverage is 50,000,000; replay-inclusive
+  accepted placements, failed states, and trie nodes are
+  `1,455,294 / 1,453,114 / 337,031`. This remains a fair prefix, not a negative result.
+- The ordered manifest hashes to
+  `A5A6A955372A1A914C87B01A8C3DDC581C5B54B41D8841AA275949FAA6C71EEC`.
+  All exact Temp outputs are removed and no owned process remains. Because replay now
+  costs four times the new coverage and would rise again, a sixth forward round pauses
+  for an independent read-only seeded-reverse design review; no tool or product path
+  opens yet.
+
 ## 2026-08-11 — T37 Stage F3C fourth fair search round complete
 
 - All 32 contiguous shards receive the same fourth increment and return

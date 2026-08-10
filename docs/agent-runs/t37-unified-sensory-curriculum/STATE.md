@@ -110,7 +110,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     third increment and remain budget-incomplete with no candidate or memory stop.
 23. `F3C FOURTH FAIR ROUND COMPLETE; FIFTH NEXT` — all 32 shards receive the same
     fourth increment and remain budget-incomplete with no candidate or memory stop.
-24. `PENDING` — fifth fair-round candidate, F3C fixture/test, later content, migration, UI,
+24. `F3C FIFTH FAIR ROUND COMPLETE; REVERSE REVIEW NEXT` — all 32 shards receive the
+    fifth increment; the forward replay/new ratio reaches 4:1 without a candidate.
+25. `PENDING` — seeded reverse design, F3C fixture/test, later content, migration, UI,
     final gates, and push.
 
 ### Stage F3C tooling-discovery status
@@ -283,6 +285,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `1,164,487 / 1,162,739 / 337,031`; the ordered manifest hash is
   `14D1B742...1D616`. All exact Temp outputs are removed, matching Temp count is zero,
   owned process count is zero, and cumulative new fair coverage is 40,000,000. This is
+  not a negative proof.
+- Fifth-round preflight at HEAD `1f0e6af` is green: CPU 62.9%, free memory 12.96 GiB,
+  disk queue zero, no pre-existing output, and no owned search process. All 32 shards
+  run serially at cursor 1,250,000 with 312,500 new probes each and finish
+  `budget-exhausted` at cursor 1,562,500. Candidate/complete/memory counts are zero;
+  elapsed time is 97.1 seconds.
+- The fifth invocation totals are 40,000,000 replay probes, 10,000,000 new probes, and
+  50,000,000 attempted probes. Replay-inclusive accepted/failed/trie-node counts are
+  `1,455,294 / 1,453,114 / 337,031`; the ordered manifest hash is
+  `A5A6A955...C71EEC`. All exact Temp outputs are removed, matching Temp count is zero,
+  owned process count is zero, and cumulative new fair coverage is 50,000,000. This is
   not a negative proof.
 
 ### Stage F3B accepted status
@@ -701,14 +714,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-After a fresh resource and exact Temp-target check, run the same 32 shards serially in
-ascending order with cursor 1,250,000, 312,500 new probes each, and 900 MiB RSS. The
-wrapper must accept tool exit code 2 and decide from the JSON status. Stop at the first
-candidate or memory guard; otherwise finish the equal fifth round, verify absolute
-cursor 1,562,500 and aggregate all 32 outputs, then remove every exact Temp output and
-confirm no owned process. Do not change seed domain or privilege a shard. Only a
-candidate may proceed to Core replay and the final F3C JSON/test; keep later content,
-deferred identity, T27/`progress.md`, and missing Ice archive closed.
+Run one independent read-only design review for a bounded seeded-reverse search. It must
+use the unchanged seeds `1..20000`, reverse each exact 20-piece queue into a trie, peel
+only tetrominoes whose forward Core-equivalent hard drop lands on the same cells, reject
+same-type orthogonal contact, and define deterministic ordering, state identity,
+completion, probe/RSS bounds, output hashes, and candidate replay. The review edits no
+file and authorizes no implementation. After its disposition, freeze a separate contract
+checkpoint before reopening `tools/search-puzzle-v3-prototype.mjs`; do not run a sixth
+forward round meanwhile. Keep final F3C JSON/test, later content, deferred identity,
+T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

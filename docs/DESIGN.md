@@ -476,6 +476,15 @@ adding unrelated badges or ornamental effects.
   memory bounded. Cumulative new fair coverage is 40,000,000. Until a separately frozen
   algorithm revision is reviewed, only the same fifth-round increment may continue;
   no product path opens.
+- The fifth equal round reaches cursor 1,562,500 on every shard with no candidate,
+  completion, or memory stop. Its 40,000,000 replay probes purchase 10,000,000 new
+  probes; cumulative new coverage is 50,000,000. A sixth round would require 50,000,000
+  replay probes before the same increment, so the forward path now pauses for the
+  previously reserved reverse-peeling design review. The review must keep seeds
+  `1..20000`, the exact queue generator, hard-drop geometry, no-clear/hidden/touch
+  rules, deterministic ordering, explicit bounds, and Core replay as the admission
+  gate. It may not edit the accepted tool or open product paths before a separately
+  reviewed contract exists.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
