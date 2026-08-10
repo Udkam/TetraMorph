@@ -90,7 +90,40 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 14. `F3A ACCEPTED; F3B NEXT` — source `a1e37f1` expands only the frozen structural
     validator boundary and adds the 38-entry literal preservation gate. Independent QA
     accepts `da264f4..b30ee1f` with P0–P3 all zero.
-15. `PENDING` — F3B/F3C, later content, migration, UI, final gates, and push.
+15. `F3B CANDIDATE; INDEPENDENT QA REQUIRED` — test checkpoint `308233c` proves the
+    injected four-anchor board, remapping, preview projection, and four independent
+    public-route witnesses without opening production Core source.
+16. `PENDING` — F3C, later content, migration, UI, final gates, and push.
+
+### Stage F3B candidate status
+
+- Task: T37/F3B injected four-anchor mechanics. Base SHA: `3aa6766`; source candidate:
+  `308233c`. Exact source paths are `src/game/core/board.test.ts`,
+  `src/game/core/puzzleFlow.test.ts`, and
+  `src/game/core/puzzleV3AnchorEvidence.test.ts`.
+- The test-only definition clones `t3r-shaft-01`, uses gameplay seed 49, and adds
+  anchors `(3,8)`, `(4,8)`, `(7,8)`, and `(8,8)`. Its exact bottom-twelve projection
+  contains all 24 setup-derived targets plus the four anchors without overlap; the
+  initial support set is empty.
+- Pure-board and engine-wiring tests map one four-anchor board, target ownership, and
+  four supported cells through clear rows 30 and 36. Anchors and supported cells stay
+  fixed, the clear-row target disappears, and all other target coordinates match the
+  same old-board/row/support mapping used by Core.
+- Four distinct public routes finish the full definition with four locks, three lines,
+  zero targets, and completion `finished`. Removing only the anchor under each first I
+  lock and replaying the same route moves that real lock from rows `24..27` to
+  `33..36`; the complete replay alone retains the four direct support identities.
+- Commands actually run: the first four-file targeted batch passed 29 existing tests
+  but the new suite failed to parse because of one missing right parenthesis; after
+  the one-line repair, the new file passed `7/7`. Final commands are
+  `npm.cmd run typecheck` (pass) and `npm.cmd exec vitest -- run
+  src/game/core/board.test.ts src/game/core/puzzleFlow.test.ts
+  src/game/core/puzzleV3AnchorEvidence.test.ts src/game/render/presentation.test.ts
+  --reporter=verbose --maxWorkers=1` (`4 files / 36 tests`).
+- No browser evidence applies because the candidate changes no published definition or
+  rendered state. No production source, F3C, App/UI, storage, T27,
+  `t27-r1-followup`, or `progress.md` path is owned by this candidate. Independent QA
+  is pending; F3C is not open yet.
 
 ### Stage F3A accepted status
 
@@ -473,15 +506,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Implement F3B only in `src/game/core/board.test.ts`,
-`src/game/core/puzzleFlow.test.ts`, and new
-`src/game/core/puzzleV3AnchorEvidence.test.ts`. Prove one test-only four-anchor
-definition's exact initial board/targets, clear/support/target remapping, bottom-twelve
-preview projection, and one independent successful public-command witness per anchor
-against a copy removing only that anchor. Open the smallest owning Core source path only
-after a direct mechanics test fails. Do not begin F3C, Intro boards, the 46-level module,
-v6 migration, mastery groups, Puzzle UI, or App source. Keep deferred identity,
-protected T27/`progress.md`, and the missing Ice archive separate.
+Run independent read-only QA on the exact F3B candidate range from `3aa6766` through
+the candidate-state checkpoint. Reproduce typecheck and the four-file `36/36` suite;
+verify the exact injected board/targets, two-clear mapping, four remove-only witness
+comparisons, unchanged presentation source, commit budgets, and protected-path
+exclusions. Do not begin F3C, Intro boards, the 46-level module, v6 migration, mastery
+groups, Puzzle UI, or App source before the coordinator disposes the QA verdict. Keep
+deferred identity, protected T27/`progress.md`, and the missing Ice archive separate.
 
 ## Do not repeat
 

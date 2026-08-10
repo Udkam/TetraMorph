@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3A STRUCTURAL VALIDATOR ACCEPTED; STAGE F3B MECHANICS NEXT**
+Status: **STAGE F3B INJECTED-MECHANICS CANDIDATE; INDEPENDENT QA REQUIRED**
 
 ## Active objective
 
@@ -30,8 +30,9 @@ follow-ups close at `1507dab`; two independent read-only reviews accept the full
 with P0–P3 all zero. Stage F3's bounded capability contract now passes independent
 read-only review with P0–P3 all zero. F3A source `a1e37f1` implements the bounded
 structural validator and literal preservation gate; independent QA accepts the complete
-candidate with P0–P3 all zero. F3B test-only mechanics may open, while published Puzzle
-content remains closed.
+candidate with P0–P3 all zero. F3B test checkpoint `308233c` now proves the frozen
+injected mechanics without changing production Core source. It remains a candidate
+until independent review; F3C and published Puzzle content stay closed.
 
 ## Frozen product direction
 
@@ -322,6 +323,31 @@ only; it is not F3 source acceptance.
   This is renderer-independent Core capability with no published board change, so
   browser evidence is not applicable. F3A is accepted; F3B may open only its frozen
   injected-definition mechanics tests.
+
+### Stage F3B injected-mechanics candidate (2026-08-10)
+
+- Source checkpoint `308233c` changes only `src/game/core/board.test.ts`,
+  `src/game/core/puzzleFlow.test.ts`, and
+  `src/game/core/puzzleV3AnchorEvidence.test.ts`. No production Core, published
+  definition, UI, storage, or renderer source changed.
+- The injected definition clones `t3r-shaft-01`, adds four visible-row-8 anchors at
+  `x=3,4,7,8`, and owns its exact bottom-twelve projection, 24 setup-derived targets,
+  target/anchor separation, and empty initial support identity. Pure-board and engine
+  tests independently map targets and supported placements through two clears while
+  all four anchors remain fixed.
+- Four distinct public-command routes each finish the complete definition in four
+  locked tetrominoes and three clears. Replaying the same route after removing only
+  the tested anchor moves the first vertical I lock from absolute rows `24..27` to
+  `33..36` and removes its four direct supported cells, establishing real per-anchor
+  mechanical relevance rather than relying on structural validation.
+- The first targeted batch passed the existing 29 tests but exposed one parse typo in
+  the new file. After the one-line repair, the new evidence file passed `7/7` and the
+  final board/flow/evidence/presentation batch passed `4 files / 36 tests`.
+  `npm.cmd run typecheck` also passes. The unchanged presentation test confirms the
+  two-item Puzzle Next projection. Browser evidence does not apply because no
+  published or rendered state changed.
+- This is a candidate, not an acceptance. Independent read-only QA must review the
+  exact F3B range and protected-path exclusions before F3C opens.
 
 ## Current checkpoint state
 

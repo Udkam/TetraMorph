@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3A STRUCTURAL VALIDATOR ACCEPTED; F3B INJECTED MECHANICS NEXT**
+Status: **F3B INJECTED-MECHANICS CANDIDATE; INDEPENDENT QA REQUIRED**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -374,6 +374,17 @@ read-only QA repeats those gates, verifies the unchanged canonical library and r
 and accepts `da264f4..b30ee1f` with P0–P3 all zero. F3A is accepted; F3B may open only
 the injected-definition mechanics tests, while F3C and curriculum content remain
 closed.
+
+F3B source checkpoint `308233c` changes only the three frozen test paths. Its injected
+four-anchor definition owns the exact 12-row projection and 24 setup-derived targets;
+board and engine tests map target/support ownership through two real clears. Four
+distinct public-command completion routes each compare with a copy removing only the
+tested anchor: the complete definition's first I lock occupies absolute rows `24..27`
+and records those four support identities, while the remove-only replay lands at
+`33..36` with no support identity. Typecheck and the final four-file focused suite
+(`36/36`, including the unchanged two-piece presentation test) pass. This is a
+candidate pending independent read-only QA; F3C, published content, migration,
+progression, and UI remain closed.
 
 ## Progress v6 and revision-3 migration
 
