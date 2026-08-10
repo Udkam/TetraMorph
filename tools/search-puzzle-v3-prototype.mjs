@@ -17,6 +17,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const WIDTH = 10;
 const HEIGHT = 40;
@@ -94,6 +95,248 @@ const TARGET_VISIBLE_ROWS = Object.freeze([
   '#######.##',
   '#######.##',
 ]);
+
+const REVERSE_ALGORITHM_VERSION = 'seeded-reverse-v1';
+const REVERSE_CURSOR_SCHEMA_VERSION = 1;
+const REVERSE_TYPE_ORDER_VERSION = 'I,O,T,S,Z,J,L-v1';
+const REVERSE_CANDIDATE_ORDER_VERSION =
+  'type-index/rotation-0..3/x-ascending/absolute-y-ascending/landing-cell-dedupe/real-trie-child-v1';
+const MASK_BYTES = 13;
+const MASK_HEX_DIGITS = 25;
+const PROBE_BLOCK_SIZE = 1024;
+
+function canonicalJson(value) {
+  if (value === null || typeof value === 'boolean' || typeof value === 'string') return JSON.stringify(value);
+  if (typeof value === 'number') {
+    if (!Number.isSafeInteger(value)) throw new Error('Canonical reverse JSON accepts safe integers only.');
+    return String(value);
+  }
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (typeof value !== 'object') throw new Error('Canonical reverse JSON received an unsupported value.');
+  const keys = Object.keys(value).sort((left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right)));
+  return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`;
+}
+
+function u8(value) {
+  if (!Number.isSafeInteger(value) || value < 0 || value > 0xff) throw new Error('u8 overflow.');
+  return Buffer.from([value]);
+}
+
+function i8(value) {
+  if (!Number.isSafeInteger(value) || value < -0x80 || value > 0x7f) throw new Error('i8 overflow.');
+  return Buffer.from([value & 0xff]);
+}
+
+function u32be(value) {
+  if (!Number.isSafeInteger(value) || value < 0 || value > 0xffff_ffff) throw new Error('u32 overflow.');
+  const bytes = Buffer.allocUnsafe(4);
+  bytes.writeUInt32BE(value);
+  return bytes;
+}
+
+function u64be(value) {
+  const number = typeof value === 'bigint' ? value : BigInt(value);
+  if (number < 0n || number > 0xffff_ffff_ffff_ffffn) throw new Error('u64 overflow.');
+  const bytes = Buffer.allocUnsafe(8);
+  bytes.writeBigUInt64BE(number);
+  return bytes;
+}
+
+function utf8Bytes(value) {
+  const bytes = Buffer.from(value, 'utf8');
+  return Buffer.concat([u32be(bytes.length), bytes]);
+}
+
+function rawSha256(parts) {
+  const hasher = createHash('sha256');
+  for (const part of parts) hasher.update(part);
+  return hasher.digest();
+}
+
+function labeledHash(label, parts = []) {
+  return rawSha256([Buffer.from(`${label}\0`, 'ascii'), ...parts]);
+}
+
+function hashHex(bytes) {
+  return bytes.toString('hex').toUpperCase();
+}
+
+function maskBytes(mask) {
+  if (typeof mask !== 'bigint' || mask < 0n || mask >= (1n << 100n)) throw new Error('Mask overflow.');
+  const bytes = Buffer.alloc(MASK_BYTES);
+  let rest = mask;
+  for (let index = MASK_BYTES - 1; index >= 0; index -= 1) {
+    bytes[index] = Number(rest & 0xffn);
+    rest >>= 8n;
+  }
+  return bytes;
+}
+
+function bytesMask(bytes) {
+  if (!Buffer.isBuffer(bytes) || bytes.length !== MASK_BYTES || (bytes[0] & 0xf0) !== 0) {
+    throw new Error('Mask bytes must be a padded 100-bit unsigned integer.');
+  }
+  let mask = 0n;
+  for (const byte of bytes) mask = (mask << 8n) | BigInt(byte);
+  return mask;
+}
+
+function maskHex(mask) {
+  return mask.toString(16).toUpperCase().padStart(MASK_HEX_DIGITS, '0');
+}
+
+function parseMaskHex(value) {
+  if (typeof value !== 'string' || !/^[0-9A-F]{25}$/.test(value)) throw new Error('Invalid reverse mask.');
+  return bytesMask(Buffer.from(`0${value}`, 'hex'));
+}
+
+function rowsMask(rows = TARGET_VISIBLE_ROWS) {
+  let mask = 0n;
+  const firstMaskRow = TARGET_TOP - VISIBLE_START;
+  for (let row = firstMaskRow; row < rows.length; row += 1) {
+    for (let x = 0; x < WIDTH; x += 1) {
+      if (rows[row][x] === '#') mask |= 1n << BigInt((row - firstMaskRow) * WIDTH + x);
+    }
+  }
+  return mask;
+}
+
+function descriptorBytes(descriptor) {
+  return Buffer.concat([
+    u8(descriptor.typeIndex), u8(descriptor.rotation), i8(descriptor.x), u8(descriptor.absoluteY),
+    maskBytes(descriptor.cellMask),
+  ]);
+}
+
+function descriptorJson(descriptor) {
+  return {
+    typeIndex: descriptor.typeIndex,
+    rotation: descriptor.rotation,
+    x: descriptor.x,
+    absoluteY: descriptor.absoluteY,
+    cellMask: maskHex(descriptor.cellMask),
+  };
+}
+
+function descriptorMask(type, rotation, x, absoluteY) {
+  let mask = 0n;
+  for (const [dx, dy] of SHAPES[type][rotation]) {
+    const cellX = x + dx;
+    const cellY = absoluteY + dy;
+    if (cellX < 0 || cellX >= WIDTH || cellY < TARGET_TOP || cellY >= HEIGHT) return null;
+    mask |= 1n << BigInt((cellY - TARGET_TOP) * WIDTH + cellX);
+  }
+  return mask;
+}
+
+function buildReverseCatalog(fixedMask = rowsMask()) {
+  const descriptors = [];
+  const seen = TYPES.map(() => new Set());
+  for (let typeIndex = 0; typeIndex < TYPES.length; typeIndex += 1) {
+    const type = TYPES[typeIndex];
+    for (let rotation = 0; rotation < 4; rotation += 1) {
+      const shape = SHAPES[type][rotation];
+      const minimumX = -Math.min(...shape.map(([x]) => x)) || 0;
+      const maximumX = WIDTH - 1 - Math.max(...shape.map(([x]) => x));
+      const minimumY = TARGET_TOP - Math.min(...shape.map(([, y]) => y));
+      const maximumY = HEIGHT - 1 - Math.max(...shape.map(([, y]) => y));
+      for (let x = minimumX; x <= maximumX; x += 1) {
+        for (let absoluteY = minimumY; absoluteY <= maximumY; absoluteY += 1) {
+          const cellMask = descriptorMask(type, rotation, x, absoluteY);
+          if (cellMask === null || (cellMask & fixedMask) !== cellMask) continue;
+          const key = maskHex(cellMask);
+          if (seen[typeIndex].has(key)) continue;
+          seen[typeIndex].add(key);
+          descriptors.push(Object.freeze({ typeIndex, rotation, x, absoluteY, cellMask }));
+        }
+      }
+    }
+  }
+  const catalogHash = labeledHash('T37-RCAT-v1', [
+    u32be(descriptors.length), ...descriptors.map(descriptorBytes),
+  ]);
+  return Object.freeze({ descriptors: Object.freeze(descriptors), catalogHash });
+}
+
+function shapeTableHash() {
+  const parts = [u32be(TYPES.length)];
+  for (let typeIndex = 0; typeIndex < TYPES.length; typeIndex += 1) {
+    parts.push(u8(typeIndex), u32be(4));
+    for (let rotation = 0; rotation < 4; rotation += 1) {
+      const shape = SHAPES[TYPES[typeIndex]][rotation];
+      parts.push(u8(rotation), u32be(shape.length));
+      for (const [x, y] of shape) parts.push(i8(x), i8(y));
+    }
+  }
+  return labeledHash('T37-RSHAPES-v1', parts);
+}
+
+function fullQueueHash(seedStart, seedCount) {
+  const parts = [u32be(seedStart), u32be(seedCount)];
+  for (let offset = 0; offset < seedCount; offset += 1) {
+    const seed = seedStart + offset;
+    parts.push(u32be(seed), ...sequenceForSeed(seed, SEQUENCE_LENGTH).map((type) => u8(TYPE_INDEX.get(type))));
+  }
+  return labeledHash('T37-RQUEUE-v1', parts);
+}
+
+function reverseTrieHash(nodes) {
+  const parts = [u32be(nodes.length)];
+  for (const node of nodes) {
+    for (const child of node.children) parts.push(u32be(child < 0 ? 0xffff_ffff : child));
+    parts.push(u32be(node.seeds.length), ...node.seeds.map(u32be));
+  }
+  return labeledHash('T37-RTRIE-v1', parts);
+}
+
+function buildReverseTrie(seedStart, seedCount, maxRssBytes, rssBytes = () => process.memoryUsage().rss) {
+  const nodes = [{ depth: 0, children: Array(TYPES.length).fill(-1), seeds: [] }];
+  let processedSeeds = 0;
+  const guarded = () => rssBytes() > maxRssBytes;
+  for (let offset = 0; offset < seedCount; offset += 1) {
+    if (offset % 1024 === 0 && guarded()) return { nodes, processedSeeds, memoryGuard: true, trieHash: null };
+    const seed = seedStart + offset;
+    let nodeIndex = 0;
+    for (const type of sequenceForSeed(seed, SEQUENCE_LENGTH).toReversed()) {
+      const typeIndex = TYPE_INDEX.get(type);
+      let child = nodes[nodeIndex].children[typeIndex];
+      if (child < 0) {
+        child = nodes.length;
+        nodes[nodeIndex].children[typeIndex] = child;
+        nodes.push({ depth: nodes[nodeIndex].depth + 1, children: Array(TYPES.length).fill(-1), seeds: [] });
+      }
+      nodeIndex = child;
+    }
+    nodes[nodeIndex].seeds.push(seed);
+    processedSeeds += 1;
+  }
+  if (guarded()) return { nodes, processedSeeds, memoryGuard: true, trieHash: null };
+  return { nodes, processedSeeds, memoryGuard: false, trieHash: reverseTrieHash(nodes) };
+}
+
+function reverseDomainHash(identity) {
+  return labeledHash('T37-RDOMAIN-v1', [
+    maskBytes(identity.fixedMask), identity.catalogHash, identity.shapeHash, identity.queueHash, identity.trieHash,
+    u32be(identity.fullSeedStart), u32be(identity.fullSeedCount), u32be(SEQUENCE_LENGTH),
+    u32be(identity.shardCount), u32be(identity.shardIndex), u32be(identity.startOffset), u32be(identity.endOffset),
+    utf8Bytes(REVERSE_ALGORITHM_VERSION), utf8Bytes(SETUP_RULES_VERSION),
+    utf8Bytes(REVERSE_TYPE_ORDER_VERSION), utf8Bytes(QUEUE_GENERATOR_VERSION),
+    utf8Bytes(REVERSE_CANDIDATE_ORDER_VERSION),
+  ]);
+}
+
+function memoHash(keys) {
+  const sorted = [...keys].map((key) => Buffer.isBuffer(key) ? key : Buffer.from(key, 'hex'))
+    .sort(Buffer.compare);
+  return labeledHash('T37-RMEMO-v1', [u32be(sorted.length), ...sorted]);
+}
+
+function probeRootHash(totalProbeCount, peaks, partialTokens) {
+  const parts = [u64be(totalProbeCount), u32be(PROBE_BLOCK_SIZE), u32be(peaks.length)];
+  for (const peak of peaks) parts.push(peak === null ? u8(0) : Buffer.concat([u8(1), peak]));
+  parts.push(u32be(partialTokens.length), ...partialTokens);
+  return labeledHash('T37-RPROOT-v1', parts);
+}
 
 function parseArguments(argv) {
   const values = new Map();
@@ -388,7 +631,8 @@ function searchSetup(fixedRows, trie, options) {
   };
 }
 
-const options = parseArguments(process.argv.slice(2));
+function runForward(argv) {
+const options = parseArguments(argv);
 const fixedRows = targetRows();
 const identity = domainIdentity(options);
 const trieBuild = buildSeedTrie(options.selectedSeedStart, options.selectedSeedCount, options.maxRssBytes);
@@ -477,3 +721,38 @@ process.stdout.write(`${JSON.stringify({
   trieNodeCount: output.search.trieNodeCount,
 })}\n`);
 if (!search.result) process.exitCode = 2;
+}
+
+const isMain = process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
+if (isMain) runForward(process.argv.slice(2));
+
+export const __reverseTest = Object.freeze({
+  TYPES,
+  SHAPES,
+  TARGET_VISIBLE_ROWS,
+  REVERSE_ALGORITHM_VERSION,
+  REVERSE_CURSOR_SCHEMA_VERSION,
+  REVERSE_TYPE_ORDER_VERSION,
+  REVERSE_CANDIDATE_ORDER_VERSION,
+  SETUP_RULES_VERSION,
+  QUEUE_GENERATOR_VERSION,
+  PROBE_BLOCK_SIZE,
+  canonicalJson,
+  maskBytes,
+  bytesMask,
+  maskHex,
+  parseMaskHex,
+  rowsMask,
+  descriptorBytes,
+  descriptorJson,
+  buildReverseCatalog,
+  shapeTableHash,
+  fullQueueHash,
+  buildReverseTrie,
+  reverseTrieHash,
+  reverseDomainHash,
+  memoHash,
+  probeRootHash,
+  sequenceForSeed,
+  hashHex,
+});
