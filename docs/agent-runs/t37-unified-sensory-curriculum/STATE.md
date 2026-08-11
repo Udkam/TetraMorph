@@ -947,13 +947,23 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Next exact action
 
 Retain `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6` unchanged and do
-not retry policy-blocked cleanup. Implement only the first bounded tiling-first source
-checkpoint in `tools/search-puzzle-v3-tiling-first.mjs` and its test: fixed identities,
-seven profiles, MRV strong-cover enumeration, deterministic trace/counts, and small-mask/
-literal-certificate tests. Commit green before adding the isolated order/CLI/output layer.
-No production authoring batch, Core, fixture, product, or reverse continuation opens yet.
-final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the
-missing Ice archive closed.
+not retry policy-blocked cleanup. Candidate `bc70fc3` from base `5acb9c6` changes only
+`tools/search-puzzle-v3-tiling-first.mjs` and its direct test. It implements the first
+bounded source checkpoint: seven fixed-domain profiles, deterministic MRV strong-cover
+enumeration, contact/count enforcement, trace hashes, small-mask independent-set checks,
+and the canonical profile-0 first-tiling fixture.
+
+Actual gates after the last source change: standalone cover contract passes; typecheck
+passes; full Vitest passes `46 passed / 2 skipped` files and `430 passed / 10 skipped`
+tests; production build transforms 767 modules with only the existing >500 kB chunk
+warning. Browser evidence is not applicable to this offline authoring-tool checkpoint.
+Protected T27 paths and `progress.md` remain unstaged and unread.
+
+Blocker: fresh independent read-only QA of `bc70fc3`. If accepted, record that disposition
+before opening the isolated order core, then the CLI/RSS/output layer in further bounded
+source commits. No production authoring batch, Core, fixture, product, reverse continuation,
+final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, or missing Ice
+archive opens yet.
 
 ## Do not repeat
 
