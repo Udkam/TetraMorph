@@ -1146,6 +1146,17 @@ only the real CLI holds the private publication capability, so injected data can
 Next exact action: commit this second docs-only repair and run a third independent contract
 review. No implementation, shard run, Core, or fixture path is open before all-zero QA.
 
+Third independent contract review accepts `4e3eea7..38e05b0` with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It confirms exact claim/schema/hash bytes, removal of
+self-file hashing, QA-expected cross-process records, candidate seed/physics/board replay,
+manifest prefix state, and the pure-test/private-publication separation. The two-path design
+is feasible without changing v1 and introduces no new contract gap.
+
+Next exact action: open only `tools/search-puzzle-v3-tiling-first-v2.mjs` as the first
+≤500-line source checkpoint. Reuse v1 primitives, keep production `preparedDomain` closed,
+run syntax and bounded direct smokes only, and commit that one path before opening the
+standalone v2 test. No production shard, Core, fixture, T27/`progress.md`, icon, or Ice work.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

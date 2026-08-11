@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C sharded tiling v2 contract accepted
+
+- The accepted v1 noncandidate closes seeds 1–20,000. V2 preserves the fixed mask/route,
+  no-touch setup legality, and v1 search primitives while partitioning seeds 20,001–200,000
+  into nine fixed 20,000-seed shards.
+- Two rejected drafts exposed candidate-prefix/full-cover ambiguity, incomplete hash
+  preimages, self-file hashing, and a cross-process forged-candidate gap. The final contract
+  separates reference/runtime coverage, freezes exact schema/hash/manifest bytes, binds
+  independent-QA expectations, and replays candidate physics before manifest acceptance.
+- Independent review accepts `4e3eea7..38e05b0` with P0–P3/GAP all zero. Only the first
+  bounded v2 source path is open; tests, production shards, Core, fixture, and product remain
+  closed until their own checkpoints.
+
 ## 2026-08-12 — T37 Stage F3C tiling-first v1 complete noncandidate accepted
 
 - The player removed the temporary resource gate, after which the one authorized full-domain

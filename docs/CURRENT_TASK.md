@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 CONTRACT REPAIR QA**
+Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 CONTRACT ACCEPTED / SOURCE OPEN**
 
 ## Active objective
 
@@ -943,6 +943,13 @@ only; it is not F3 source acceptance.
   manifest did not bind prior QA expectations or replay candidate physics, and candidate
   publication had no safe positive test seam. The corrections above are docs-only; V2
   implementation and search remain closed pending a fresh all-zero review.
+- Third independent review accepts repair `38e05b0` with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It verifies the exact preimages, manifest/v1
+  predecessor and QA-expected hashes, candidate physical replay, pure test seams, and
+  private production capability without finding a new ambiguity. The contract is accepted.
+  Only the first bounded source checkpoint for
+  `tools/search-puzzle-v3-tiling-first-v2.mjs` is now open; its direct test, production
+  shards, Core, fixture, and product remain closed until their own checkpoints.
 
 ## Current checkpoint state
 
