@@ -9,6 +9,9 @@
   reports P0–P3/GAP all zero and opens one second 1,000,000-probe increment per shard into
   a distinct external directory. Round-one continuations remain read-only until successor
   output QA passes.
+- The attempted exact six-file benchmark cleanup is rejected by terminal policy before
+  execution. The 15,212,052 bytes remain as separate QA artifacts; no shell bypass is
+  permitted, and they do not alter the round-two authorization.
 
 ## 2026-08-11 — T37 Stage F3C candidate-cache QA rejection
 

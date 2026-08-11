@@ -920,8 +920,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Next exact action
 
 Retain the accepted external directory
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. After removing
-only the six verified cache benchmark files, create the absent external directory
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. Exact removal
+of the six verified cache benchmark files is rejected by terminal policy before execution;
+all six remain (15,212,052 bytes). Do not bypass policy. Create the absent external directory
 `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6`. Serially resume shards
 0..31 for exactly 1,000,000 new probes and 900 MiB each, with a resource gate before each
 start. Stop the round on the first candidate, memory guard, or completion. Independently

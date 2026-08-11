@@ -701,6 +701,10 @@ only; it is not F3 source acceptance.
   `t37-reverse-round2-0b744b6`; use the frozen 1,000,000-probe/900-MiB/serial boundary and
   stop the round on the first candidate, memory guard, or completion. Do not delete old
   inputs before the successor set passes independent output QA.
+- Terminal policy rejects the exact six-file benchmark cleanup before execution. All six
+  remain intact (15,212,052 bytes); do not switch shells or bypass policy. They are neither
+  resume inputs nor round-two outputs, so their retention does not block the already
+  accepted distinct-directory second increment.
 
 ## Current checkpoint state
 
