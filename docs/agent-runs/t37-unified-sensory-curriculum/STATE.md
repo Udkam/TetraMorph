@@ -999,11 +999,22 @@ the combined runtime. It independently rebuilds the domain/trie/DFS and all four
 checks domain and work RSS boundaries including strict `>`, confirms budget priority plus
 candidate/natural completion, and verifies STOP memo safety.
 
-Next exact action: implement only final CLI parsing, canonical schema/result hash,
-candidate setup/board mapping, and verified-absent atomic output in the same two paths.
-Run all local gates and fresh full-tool QA before any production authoring batch. No product,
-Core, fixture, reverse continuation, T27/`progress.md`, deferred identity, icon, or missing
-Ice archive work opens yet.
+Final-tool candidate `3fe4313` from base `58f5bab` changes only the same two paths and stays
+within the 500-line source-checkpoint limit. It adds the four-pair strict CLI, schema 1,
+result hash, 20-placement candidate mapping, canonical UTF-8/LF output, and fsynced
+same-directory exclusive hard-link publication to a verified absent target. Valid
+noncandidates exit 2, candidates exit 0, and invalid/existing output exits 1 untouched.
+
+Actual gates after the last source change: standalone full-tool contract passes, including
+two byte-identical real CLI runs; typecheck passes; full Vitest passes
+`46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; build transforms 767
+modules with only the existing >500 kB warning. Browser evidence remains inapplicable.
+
+Blocker: fresh independent full-tool QA of `3fe4313`. Only if accepted and a new resource
+check is green may exactly one full-domain production batch run with work budget 10,000,000,
+RSS 900 MiB, one process, and a new repository-external output. No product/Core/fixture,
+reverse continuation, T27/`progress.md`, deferred identity, icon, or missing Ice archive
+work opens yet.
 
 ## Do not repeat
 
