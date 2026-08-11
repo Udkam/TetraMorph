@@ -130,8 +130,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     reverse history set. Production reverse search remains closed.
 32. `F3C COMPLETE-SET TEST CANDIDATE; QA NEXT` — test-only checkpoint `1686963`
     enumerates one canonical reverse state to completion and passes final local gates.
-33. `PENDING` — fresh independent QA precedes any reverse search run, fixture, content,
-    migration, UI, final integrated gates, or push.
+33. `F3C COMPLETE-SET QA REJECTED` — formal QA reports all-zero findings/GAP, but
+    adversarial QA reports P2 1 / GAP 1 because I/O-only fixtures cannot detect an
+    I/O-filtered helper catalog. Production reverse search remains closed.
+34. `PENDING` — a test-only catalog-integrity/non-I/O repair and fresh independent QA
+    precede any reverse search run, fixture, content, migration, UI, final gates, or push.
 
 ### Stage F3C tooling-discovery status
 
@@ -424,8 +427,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `430 passed / 10 skipped` tests), and 767-module build pass. The suite also executes
   the deferred attack, boundary, file-identity, and byte checks; exact Temp output is
   removed, the coordinator verifies owned search Node count zero, one-path scope is
-  clean, and protected dirt stays unstaged. Blocker: fresh independent QA. One next action: reproduce rather
-  than trust these checks, then report P0–P3/GAP before any search.
+  clean, and protected dirt stays unstaged.
+- Formal QA independently reproduces the whole range with `P0 0 / P1 0 / P2 0 / P3 0 /
+  GAP 0`. Adversarial QA rejects with `P2 1 / GAP 1`: all complete-set fixtures contain
+  only I/O, so filtering the helper catalog to I/O-only descriptors would still pass.
+  Blocker: mutation-sensitive catalog completeness. One next action: reopen only
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs`, independently bind the catalog
+  supplied to each complete traversal, and add a non-I/O exact-set fixture before QA.
 
 ### Stage F3B accepted status
 
@@ -843,15 +851,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Run fresh independent read-only QA over the full implementation/test chain
-`1f85a0a..1686963`, accounting for intervening docs-only checkpoints. Independently
-reproduce the complete canonical reverse sets and all five prior GAP classes: recomputed
-token/descriptor attacks, exact ceiling admission/overflow, hard-link versus distinct
-files, standalone/legacy bytes, and cleanup/zero process. Audit set completeness,
-queue reversal, forbidden masks, support, upper/spawn domain boundaries, scope, and
-commit budgets. Report P0–P3/GAP. Do not run production 32-shard reverse search. Keep
-production tool source, final F3C JSON/Core test, later content, deferred identity,
-T27/`progress.md`, and missing Ice archive closed.
+Modify only `tools/search-puzzle-v3-prototype-reverse.test.mjs`. Make each complete-set
+traversal assert independently derived canonical-catalog completeness and add at least
+one exact non-I/O history-set fixture so I/O-only or fixture-selected catalog filtering
+fails. Run the targeted standalone test, then one final typecheck, complete suite, and
+build before a bounded test-only candidate and fresh independent QA. Do not run the
+production 32-shard reverse search. Keep production tool source, final F3C JSON/Core
+test, later content, deferred identity, T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

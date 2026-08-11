@@ -545,6 +545,11 @@ adding unrelated badges or ornamental effects.
   Separate domain assertions agree with production floor/upper/spawn blocking without
   encoding hidden row-20 cells into the ten-row reverse mask. Final local gates pass;
   fresh read-only QA still controls production-search admission.
+- Formal QA reproduces the whole chain with no finding or GAP, but adversarial QA rejects
+  it with `P2 1 / GAP 1`: all exact-set fixtures contain only I/O pieces, so a regression
+  that filters the helper's canonical catalog to I/O would evade them. The next repair is
+  test-only and must independently bind catalog completeness plus exercise a non-I/O
+  exact history set. Production source and reverse-search admission remain closed.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

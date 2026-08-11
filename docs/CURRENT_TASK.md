@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C COMPLETE-SET TEST CANDIDATE `1686963`; QA NEXT**
+Status: **STAGE F3C COMPLETE-SET QA REJECTED; TEST-ONLY REPAIR**
 
 ## Active objective
 
@@ -613,6 +613,17 @@ only; it is not F3 source acceptance.
   byte, and cleanup checks. Post-last-edit standalone, typecheck, complete suite
   (`46 passed / 2 skipped` files; `430 passed / 10 skipped` tests), and 767-module build
   pass. Production reverse search remains closed pending fresh independent QA.
+- Formal QA accepts the complete implementation/test chain with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including independent live reproduction of the
+  complete sets and all prior attack/boundary/file/byte/cleanup checks. Adversarial QA
+  nevertheless rejects with `P0 0 / P1 0 / P2 1 / P3 0 / GAP 1`: every complete-set
+  fixture uses only I/O, so filtering the helper catalog back to I/O-only descriptors
+  would still pass while violating the canonical-catalog requirement.
+- Reopen only `tools/search-puzzle-v3-prototype-reverse.test.mjs`. The repair must bind
+  each complete-set traversal to independently derived catalog completeness and add at
+  least one exact non-I/O history-set fixture, so an I/O-only or fixture-selected catalog
+  mutation fails automatically. Production source and the first 32-shard reverse round
+  remain closed until the repaired test passes fresh independent QA with no GAP.
 
 ## Current checkpoint state
 

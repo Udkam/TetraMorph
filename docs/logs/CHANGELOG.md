@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C complete-set QA rejected
+
+- Formal QA accepts the full implementation/test chain with P0–P3/GAP all zero, but an
+  independent adversarial review rejects `1686963` with `P2 1 / GAP 1`. Every exact-set
+  fixture uses only I/O, so a helper regression that re-filters the canonical catalog to
+  those types would still pass.
+- Only `tools/search-puzzle-v3-prototype-reverse.test.mjs` may reopen. It must prove the
+  traversal receives an independently complete catalog and add a non-I/O exact-set case.
+  Production source and the first 32-shard reverse round remain closed pending fresh QA.
+
 ## 2026-08-11 — T37 Stage F3C complete-set test candidate
 
 - Test-only checkpoint `1686963` replaces restricted first-candidate assertions with
