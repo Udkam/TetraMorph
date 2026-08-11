@@ -428,6 +428,7 @@ function createReverseState(context) {
     }],
     placements: [],
     failed: new Map(),
+    candidateSeen: false,
     probe: { nextProbeCount: 0, peaks: [], partialTokens: [] },
   };
 }
@@ -454,8 +455,10 @@ function advanceReverse(context, state, nodeBudget, maxRssBytes, rssBytes = () =
     while (state.frames.length > 0) {
       const frame = state.frames.at(-1);
       if (frame.nextCandidateIndex < frameCandidates(context, frame).length) break;
-      const key = failedKey(frame);
-      state.failed.set(key.toString('hex').toUpperCase(), key);
+      if (!state.candidateSeen) {
+        const key = failedKey(frame);
+        state.failed.set(key.toString('hex').toUpperCase(), key);
+      }
       state.frames.pop();
       if (frame.enteringDescriptor) state.placements.pop();
     }
@@ -515,7 +518,10 @@ function advanceReverse(context, state, nodeBudget, maxRssBytes, rssBytes = () =
     }
     appendProbe(state.probe, probeToken(frame, descriptor, candidateIndex, state.probe.nextProbeCount, outcome));
     newProbeCount += 1;
-    if (result) return { status: 'candidate', complete: false, startProbeCount, newProbeCount, result };
+    if (result) {
+      state.candidateSeen = true;
+      return { status: 'candidate', complete: false, startProbeCount, newProbeCount, result };
+    }
     if (outcome === 4) {
       state.frames.push(childFrame);
       state.placements.push(descriptor);
@@ -524,6 +530,7 @@ function advanceReverse(context, state, nodeBudget, maxRssBytes, rssBytes = () =
 }
 
 function continuationBody(state, domainHash, shardIndex) {
+  if (state.candidateSeen) throw new Error('Candidate-bearing reverse state is not resumable.');
   return {
     cursorSchemaVersion: REVERSE_CURSOR_SCHEMA_VERSION,
     domainHash: hashHex(domainHash),
@@ -593,6 +600,7 @@ function restoreContinuation(value, context, domainHash, shardIndex) {
     const bytes = Buffer.from(token, 'hex');
     const expectedIndex = body.nextProbeCount - body.partialProbeTokens.length + index;
     if (bytes[0] !== 1 || bytes.readBigUInt64BE(1) !== BigInt(expectedIndex)) throw new Error('Partial token index drift.');
+    if (bytes[139] === 5) throw new Error('Candidate partial token is not resumable.');
     const tokenNode = bytes.readUInt32BE(10);
     const tokenMasks = [14, 27, 40, 53, 66, 79, 92, 105, 126]
       .map((offset) => bytesMask(bytes.subarray(offset, offset + 13)));
@@ -676,7 +684,10 @@ function restoreContinuation(value, context, domainHash, shardIndex) {
   if (frames.at(-1).nextCandidateIndex >= frameCandidates(context, frames.at(-1)).length) {
     throw new Error('Cursor top frame must be ready for a probe.');
   }
-  return { frames, placements, failed, probe: { nextProbeCount: body.nextProbeCount, peaks, partialTokens } };
+  return {
+    frames, placements, failed, candidateSeen: false,
+    probe: { nextProbeCount: body.nextProbeCount, peaks, partialTokens },
+  };
 }
 
 const REVERSE_CLAIM = 'F3C seeded-reverse setup candidate only; Core route replay and exact proof remain mandatory.';
@@ -776,6 +787,12 @@ function reverseResultHash(values) {
   return hashHex(labeledHash('T37-RRESULT-v1', [Buffer.from(canonicalJson(payload))]));
 }
 function makeReverseOutput(identity, trieBuild, state, advance, domainHash) {
+  if (state?.candidateSeen === true && advance?.status !== 'candidate') {
+    throw new Error('A candidate-bearing reverse state cannot produce another formal output.');
+  }
+  if (advance?.status === 'candidate' && state?.candidateSeen !== true) {
+    throw new Error('Candidate output requires candidate-bearing state.');
+  }
   const options = identity.options;
   const phase = trieBuild.memoryGuard ? 'trie-build' : 'search';
   const status = trieBuild.memoryGuard ? 'memory-guard' : advance.status;

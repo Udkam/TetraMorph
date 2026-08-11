@@ -105,7 +105,9 @@ const splitState = reverse.createReverseState(context);
 const firstSplit = reverse.advanceReverse(context, splitState, 750, Number.MAX_SAFE_INTEGER, () => 0);
 assert.equal(firstSplit.status, 'paused-budget');
 const splitCursor = reverse.makeContinuation(splitState, domainHash, 0);
+assert.equal(Object.hasOwn(splitCursor, 'candidateSeen'), false);
 const restoredState = reverse.restoreContinuation(splitCursor, context, domainHash, 0);
+assert.equal(restoredState.candidateSeen, false);
 const secondSplit = reverse.advanceReverse(context, restoredState, 750, Number.MAX_SAFE_INTEGER, () => 0);
 assert.deepEqual({ status: secondSplit.status, start: secondSplit.startProbeCount, added: secondSplit.newProbeCount },
   { status: 'paused-budget', start: 750, added: 750 });
@@ -237,6 +239,17 @@ const badDescriptorTokenOutput = pausedOutputForState(badDescriptorTokenState, 0
 assert.throws(() => reverse.executeReverse(reverseOptions, {
   resumeOutput: badDescriptorTokenOutput, rssBytes: () => 0,
 }), /token candidate drift/i);
+const candidateTokenState = reverse.restoreContinuation(
+  pausedOutput.continuation, oneSeedContext, oneSeedDomainHash, 0,
+);
+candidateTokenState.probe.partialTokens[0][139] = 5;
+const candidateTokenOutput = pausedOutputForState(candidateTokenState, 0, 1);
+assert.throws(() => reverse.restoreContinuation(
+  candidateTokenOutput.continuation, oneSeedContext, oneSeedDomainHash, 0,
+), /candidate partial token is not resumable/i);
+assert.throws(() => reverse.executeReverse(reverseOptions, {
+  resumeOutput: candidateTokenOutput, rssBytes: () => 0,
+}), /candidate partial token is not resumable/i);
 let rssChecks = 0;
 const postBuildMemory = reverse.executeReverse(reverseOptions, { rssBytes: () => ++rssChecks === 1 ? 0 : Infinity });
 rssChecks = 0;
@@ -257,13 +270,41 @@ const separatedO = catalog.descriptors.find((item) => item.typeIndex === 1 && !(
 assert(touchingO && (reverse.neighborMask(touchingO.cellMask, fixedMask) & floorO.cellMask) && (reverse.neighborMask(floorO.cellMask, fixedMask) & floorO.cellMask));
 assert(separatedO && !(reverse.neighborMask(separatedO.cellMask, fixedMask) & floorO.cellMask));
 assert.equal(reverse.buildReverseCatalog(floorO.cellMask).descriptors.filter((item) => item.typeIndex === 1).length, 1);
+const ORACLE_TYPES = Object.freeze(['I', 'O', 'T', 'S', 'Z', 'J', 'L']);
 const ORACLE_SHAPES = {
   I: [
     [[0, 1], [1, 1], [2, 1], [3, 1]],
     [[2, 0], [2, 1], [2, 2], [2, 3]],
   ],
   O: [[[0, 0], [1, 0], [0, 1], [1, 1]]],
+  T: [
+    [[1, 0], [0, 1], [1, 1], [2, 1]],
+    [[1, 0], [1, 1], [2, 1], [1, 2]],
+    [[0, 1], [1, 1], [2, 1], [1, 2]],
+    [[1, 0], [0, 1], [1, 1], [1, 2]],
+  ],
+  S: [
+    [[1, 0], [2, 0], [0, 1], [1, 1]],
+    [[1, 0], [1, 1], [2, 1], [2, 2]],
+  ],
+  Z: [
+    [[0, 0], [1, 0], [1, 1], [2, 1]],
+    [[2, 0], [1, 1], [2, 1], [1, 2]],
+  ],
+  J: [
+    [[0, 0], [0, 1], [1, 1], [2, 1]],
+    [[1, 0], [2, 0], [1, 1], [1, 2]],
+    [[0, 1], [1, 1], [2, 1], [2, 2]],
+    [[1, 0], [1, 1], [0, 2], [1, 2]],
+  ],
+  L: [
+    [[2, 0], [0, 1], [1, 1], [2, 1]],
+    [[1, 0], [1, 1], [1, 2], [2, 2]],
+    [[0, 1], [1, 1], [2, 1], [0, 2]],
+    [[0, 0], [1, 0], [1, 1], [1, 2]],
+  ],
 };
+assert.deepEqual(reverse.TYPES, ORACLE_TYPES, 'the independent oracle type order must stay explicit');
 function oracleCellsAt(type, rotation, x, absoluteY) {
   const shape = ORACLE_SHAPES[type][rotation];
   return shape.map(([dx, dy]) => [x + dx, absoluteY + dy]);
@@ -283,6 +324,39 @@ function oracleMaskForCells(cells) {
     cellMask |= 1n << BigInt((cellY - 30) * 10 + cellX);
   }
   return cellMask;
+}
+function catalogDescriptorSignature(item) {
+  return `${item.typeIndex},${item.rotation},${item.x},${item.absoluteY},` +
+    item.cellMask.toString(16).toUpperCase().padStart(25, '0');
+}
+function independentCatalogDescriptors(targetMask) {
+  const descriptors = [];
+  for (let typeIndex = 0; typeIndex < ORACLE_TYPES.length; typeIndex += 1) {
+    const type = ORACLE_TYPES[typeIndex];
+    const seenMasks = new Set();
+    for (let rotation = 0; rotation < ORACLE_SHAPES[type].length; rotation += 1) {
+      const shape = ORACLE_SHAPES[type][rotation];
+      const minimumX = -Math.min(...shape.map(([dx]) => dx)) || 0;
+      const maximumX = 9 - Math.max(...shape.map(([dx]) => dx));
+      const minimumY = 30 - Math.min(...shape.map(([, dy]) => dy));
+      const maximumY = 39 - Math.max(...shape.map(([, dy]) => dy));
+      for (let x = minimumX; x <= maximumX; x += 1) {
+        for (let absoluteY = minimumY; absoluteY <= maximumY; absoluteY += 1) {
+          const cellMask = oracleMaskForCells(oracleCellsAt(type, rotation, x, absoluteY));
+          if (cellMask === null || (cellMask & targetMask) !== cellMask) continue;
+          const maskKey = cellMask.toString(16);
+          if (seenMasks.has(maskKey)) continue;
+          seenMasks.add(maskKey);
+          descriptors.push({ typeIndex, rotation, x, absoluteY, cellMask });
+        }
+      }
+    }
+  }
+  return descriptors;
+}
+function catalogSummary(descriptors) {
+  const records = descriptors.map(catalogDescriptorSignature);
+  return { count: records.length, digest: sha256(Buffer.from(records.join('\n'), 'utf8')) };
 }
 function oracleDrop(board, type, rotation, x) {
   const physical = oraclePhysicalDrop(board, type, rotation, x);
@@ -338,12 +412,16 @@ function exactQueueContext(targetMask, forwardQueue) {
     parent = child;
   }
   nodes[parent].seeds.push(77);
-  return {
+  const exactContext = {
     fixedMask: targetMask,
     catalog: reverse.buildReverseCatalog(targetMask).descriptors,
     trie: nodes,
     sequenceLength: forwardQueue.length,
   };
+  assert.deepEqual(catalogSummary(exactContext.catalog),
+    catalogSummary(independentCatalogDescriptors(targetMask)),
+    'the exact traversal must receive the independently complete canonical catalog');
+  return exactContext;
 }
 function reverseTrieQueue(contextValue) {
   const queue = [];
@@ -368,11 +446,16 @@ function completeReverseHistories(targetMask, forwardQueue) {
     'the exact forward queue must enter the reverse trie in reverse order');
   const state = reverse.createReverseState(exactContext);
   const histories = [];
+  let failedCountAfterCandidate = null;
   for (;;) {
     const result = reverse.advanceReverse(
       exactContext, state, 1_000_000, Number.MAX_SAFE_INTEGER, () => 0,
     );
     if (result.status === 'candidate') {
+      assert.equal(state.candidateSeen, true);
+      if (failedCountAfterCandidate === null) failedCountAfterCandidate = state.failed.size;
+      else assert.equal(state.failed.size, failedCountAfterCandidate,
+        'candidate enumeration must not add false failed memo entries');
       histories.push(reverseHistorySignature(result.result));
       continue;
     }
@@ -382,6 +465,14 @@ function completeReverseHistories(targetMask, forwardQueue) {
     break;
   }
   assert.equal(new Set(histories).size, histories.length, 'reverse enumeration returned a duplicate history');
+  if (histories.length > 0) {
+    assert.equal(state.candidateSeen, true);
+    assert.equal(state.failed.size, failedCountAfterCandidate,
+      'successful enumeration must leave the pre-candidate failed memo unchanged');
+  } else {
+    assert.equal(state.candidateSeen, false);
+    assert(state.failed.size > 0, 'candidate-free enumeration must retain normal failed memoization');
+  }
   return { histories, historySet: new Set(histories), context: exactContext, state };
 }
 function compareCompleteHistorySets(queue, targetMask, label) {
@@ -467,9 +558,13 @@ const outcome3 = firstOutcome(branchContext, (state, value) => {
   const key = reverse.failedKey(child);
   state.failed.set(key.toString('hex').toUpperCase(), key);
 });
-const outcome5 = firstOutcome(syntheticContext(floorDescriptor, true));
+const leafContext = syntheticContext(floorDescriptor, true);
+const outcome5 = firstOutcome(leafContext);
 assert.deepEqual([outcome0.outcome, outcome1.outcome, outcome2.outcome, outcome3.outcome, outcome4.outcome, outcome5.outcome],
   [0, 1, 2, 3, 4, 5]);
+assert.equal(outcome5.state.candidateSeen, true);
+assert.throws(() => reverse.makeContinuation(outcome5.state, Buffer.alloc(32, 4), 0),
+  /candidate-bearing reverse state is not resumable/i);
 assert.equal(firstOutcome(branchContext, () => {}, 0, () => Infinity).result.status, 'paused-budget');
 assert.equal(firstOutcome({ ...branchContext, catalog: [] }, () => {}, 0, () => Infinity).result.status,
   'complete-not-found');
@@ -485,8 +580,19 @@ const fakeTrieBuild = { memoryGuard: false, processedSeeds: 1, nodes: outcome5.s
   ? syntheticContext(floorDescriptor, true).trie : [], trieHash: Buffer.alloc(32, 3) };
 const candidateOutput = reverse.makeReverseOutput(fakeIdentity, fakeTrieBuild, outcome5.state,
   outcome5.result, Buffer.alloc(32, 4));
+const candidateFailedCount = outcome5.state.failed.size;
+const afterCandidate = reverse.advanceReverse(
+  leafContext, outcome5.state, 1, Number.MAX_SAFE_INTEGER, () => 0,
+);
+assert.equal(afterCandidate.status, 'complete-not-found');
+assert.equal(outcome5.state.failed.size, candidateFailedCount);
+assert.throws(() => reverse.makeReverseOutput(
+  fakeIdentity, fakeTrieBuild, outcome5.state, afterCandidate, Buffer.alloc(32, 4),
+), /candidate-bearing reverse state cannot produce another formal output/i);
 const completeState = reverse.createReverseState({ ...branchContext, catalog: [] });
 const completeAdvance = reverse.advanceReverse({ ...branchContext, catalog: [] }, completeState, 0, 0, () => Infinity);
+assert.equal(completeState.candidateSeen, false);
+assert(completeState.failed.size > 0, 'candidate-free completion must still memoize failed frames');
 const completeOutput = reverse.makeReverseOutput({ ...fakeIdentity, catalog: { descriptors: [] } },
   { ...fakeTrieBuild, nodes: branchContext.trie }, completeState, completeAdvance, Buffer.alloc(32, 4));
 const topKeys = ['schemaVersion', 'algorithmVersion', 'cursorSchemaVersion', 'claim', 'status', 'phase', 'domain',
@@ -653,6 +759,22 @@ try {
     'the independent oracle must enumerate both separated O orders');
   assert.equal(separatedComparison.backward.histories.length, 2,
     'one canonical reverse state must return both separated O histories before completion');
+
+  const separatedT = [-1, 2, 5].map((x) => oracleDrop(emptyOracleBoard, 'T', 1, x));
+  assert(separatedT.every((placement) => placement?.absoluteY === 37));
+  const separatedTMask = separatedT.reduce((mask, placement) => mask | placement.cellMask, 0n);
+  assert.deepEqual(catalogSummary(independentCatalogDescriptors(separatedTMask)), {
+    count: 3,
+    digest: '507A17B7D0105D0CB56C45BD0858FEFA0A36A8C46C5D66BAD7762C077D3A6362',
+  }, 'the non-I/O fixture must pin its independent catalog');
+  const separatedTComparison = compareCompleteHistorySets(
+    ['T', 'T', 'T'], separatedTMask,
+    'the canonical traversal must enumerate every non-I/O separated placement order',
+  );
+  assert.equal(separatedTComparison.forward.size, 6,
+    'the independent oracle must enumerate all six separated T orders');
+  assert.equal(separatedTComparison.backward.histories.length, 6,
+    'one canonical reverse state must return all six separated T histories before completion');
 
   const touching = [oracleDrop(emptyOracleBoard, 'O', 0, 0), oracleDrop(emptyOracleBoard, 'O', 0, 2)];
   const touchingMask = touching[0].cellMask | touching[1].cellMask;
