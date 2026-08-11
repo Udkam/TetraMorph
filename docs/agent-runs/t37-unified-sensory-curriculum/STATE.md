@@ -125,8 +125,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     and differential-test blockers keep production reverse search closed.
 30. `F3C SEEDED-REVERSE REPAIR CANDIDATE; QA NEXT` — two-path repair `77bc7fc`
     closes all four reported blockers and passes the final local gates.
-31. `PENDING` — independent repair QA precedes any reverse search run, fixture, content,
-    migration, UI, final integrated gates, or push.
+31. `F3C SEEDED-REVERSE REPAIR REJECTED` — independent QA reports P2 1 / GAP 5 because
+    the differential test observes restricted first candidates, not a canonical complete
+    reverse history set. Production reverse search remains closed.
+32. `PENDING` — one test-only complete-set repair and fresh independent QA precede any
+    reverse search run, fixture, content, migration, UI, final integrated gates, or push.
 
 ### Stage F3C tooling-discovery status
 
@@ -397,6 +400,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   are removed, owned search Node count is zero, staged scope was exactly two paths, and
   protected dirt remains unstaged. Blocker: fresh independent repair QA. One next action:
   review the full implementation source chain through `77bc7fc`; do not run search.
+- Independent repair QA rejects with `P0 0 / P1 0 / P2 1 / P3 0 / GAP 5`. The source
+  hardening and path/line scope pass static review, but every `actualReverseOutcome` call
+  stops at the first candidate. Swapping two oracle-selected restricted catalogs cannot
+  prove that one canonical catalog/state enumerates the same complete set as the forward
+  oracle. Support and upper/spawn blockers also remain outside that complete-set matrix.
+  At the coordinator's stop, live token/descriptor, ceiling, hard-link/distinct-file,
+  standalone/legacy-byte, and zero-process reproductions remained GAP rather than pass.
+- Blocker: complete-set evidence. One next action: modify only
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs` so one canonical catalog and state
+  resume after each candidate until `complete-not-found`, then compare all signatures to
+  an independent forward set across same-type, mixed, support, upper-obstruction, and
+  spawn-domain scenarios. Re-run all five deferred live checks before new QA.
 
 ### Stage F3B accepted status
 
@@ -814,14 +829,17 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Run fresh independent read-only repair QA over the full implementation source chain
-`1f85a0a..77bc7fc`, explicitly accounting for the intervening documentation checkpoints.
-Reproduce all four original attacks and their fixed boundary cases; inspect the actual
-forward/reverse set equality, both same-type peel orders, token-frame reconstruction,
-file-identity semantics, exact 1,000,000,000 admission, legacy forward bytes, scope,
-commit budget, Temp cleanup, and protected exclusions. Report P0–P3/GAP. Do not run
-production 32-shard reverse search. Keep final F3C JSON/Core test, later content,
-deferred identity, T27/`progress.md`, and missing Ice archive closed.
+Repair only the standalone reverse test. Replace restricted first-candidate runs with a
+complete enumerator that uses `buildReverseCatalog(targetMask).descriptors`, one real
+reverse state, repeated `advanceReverse` calls after each candidate, and natural
+`complete-not-found`. Compare every returned history with an independently enumerated
+forward set for separated/touching same-type pieces, mixed order, piece support, upper
+obstruction, and the bounded domain's spawn-blocker semantics. Then run the standalone
+test, one final typecheck/full suite/build because test source changed, commit the bounded
+test checkpoint, and obtain fresh independent QA that also closes all five prior GAPs.
+Do not run production 32-shard reverse search. Keep production tool source, final F3C
+JSON/Core test, later content, deferred identity, T27/`progress.md`, and missing Ice
+archive closed.
 
 ## Do not repeat
 

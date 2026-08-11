@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C reverse repair QA rejected
+
+- Independent QA rejects repair `77bc7fc` with `P2 1 / GAP 5`. The replacement test
+  calls `advanceReverse` only to its first candidate and hand-swaps oracle-selected
+  restricted catalogs; it does not enumerate one canonical traversal through
+  `complete-not-found`, so complete forward/reverse history-set equality is unproven.
+- Only the standalone reverse test may reopen. It must compare a canonical-catalog,
+  single-state complete reverse set with an independent forward set across same-type,
+  mixed, support, upper-obstruction, and spawn-domain cases. Production search remains
+  closed, and fresh QA must also execute the five deferred live reproductions.
+
 ## 2026-08-11 — T37 Stage F3C seeded-reverse repair candidate
 
 - Source checkpoint `77bc7fc` changes only the authoring tool and standalone reverse

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE REPAIR CANDIDATE `77bc7fc`; QA NEXT**
+Status: **STAGE F3C SEEDED-REVERSE REPAIR REJECTED; DIFFERENTIAL TEST REPAIR OPEN**
 
 ## Active objective
 
@@ -95,14 +95,15 @@ ten-row fixture/test pair, while published Puzzle content stays closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C REPAIR CANDIDATE QA** — the exact
+6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C DIFFERENTIAL TEST REPAIR OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
    anchor-supported state identity, definition-aware replay/proof, and exact anchor
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
-   repair candidate `77bc7fc` closes the four reported implementation blockers; fresh
-   independent QA is required while content authoring stays closed.
+   QA rejects `77bc7fc` because its replacement differential test still observes only
+   first candidates rather than one canonical traversal's complete history set; content
+   authoring stays closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -586,6 +587,21 @@ only; it is not F3 source acceptance.
   transforms 767 modules with only the existing chunk advisory. Legacy forward bytes,
   Temp cleanup, zero owned search process, exact scope, and protected exclusions pass.
   This remains a candidate; production reverse search is still closed pending QA.
+- Independent repair QA rejects `77bc7fc` with
+  `P0 0 / P1 0 / P2 1 / P3 0 / GAP 5`. Token, ceiling, and file-identity source changes
+  pass static review, but `actualReverseOutcome` stops at the first candidate. The test
+  then swaps oracle-selected restricted catalogs to manufacture separate first results;
+  it never enumerates one canonical production catalog/state through natural completion.
+  Mixed/support/blocker coverage is likewise outside a complete set comparison. The five
+  GAPs are live tamper, descriptor, exact ceiling, NTFS alias/distinct-file, and standalone/
+  legacy-byte reproductions stopped by the coordinator after the P2 became sufficient.
+- Reopen only `tools/search-puzzle-v3-prototype-reverse.test.mjs`. The repair must build
+  the canonical catalog for each bounded target, repeatedly continue the same
+  `advanceReverse` state after every candidate until `complete-not-found`, collect every
+  history, and compare that exact set with an independent forward enumerator. Its matrix
+  must include separated and touching same-type orders, a mixed queue, real piece support,
+  upper obstruction, and the domain's spawn-blocker check. Production source and search
+  remain closed until this test and all five live GAP reproductions pass independent QA.
 
 ## Current checkpoint state
 

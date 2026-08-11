@@ -530,6 +530,14 @@ adding unrelated badges or ornamental effects.
   small-board forward enumerator with real reverse runs for mixed and both same-type
   orders. Direct tamper, hard-link, exact-ceiling, no-output, full-gate, scope, and cleanup
   checks pass locally. No search execution or browser evidence is part of this candidate.
+- Independent QA rejects the differential proof with `P2 1`: each run returns only the
+  first candidate from a catalog pre-restricted to oracle-selected descriptors, and
+  hand-swapping that catalog does not prove one canonical reverse traversal's complete
+  history set. The next repair is test-only. It must continue one state after each leaf,
+  enumerate to `complete-not-found`, and compare its exact canonical-catalog result set
+  with an independent forward oracle across same-type, mixed, support, upper-obstruction,
+  and spawn-domain scenarios. The three production hardening changes remain candidates,
+  not accepted source, until the repaired proof and five deferred live reproductions pass.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
