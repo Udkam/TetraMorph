@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 SHARD CONTRACT QA**
+Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 CONTRACT REPAIR QA**
 
 ## Active objective
 
@@ -806,8 +806,9 @@ only; it is not F3 source acceptance.
   hash `8B233871A95B0A14915D727EC26751F90FF9E5C138E658EEE2E03F7B91814B64`.
   Every shard binds series identity/hash, index/range, seven profile seed counts, an exact
   profile-membership hash, queue/trie hashes and counts, `T37-TDOMAIN-v2`, traversal/memo
-  hashes, `T37-TRESULT-v2`, and canonical external-file SHA-256. A canonical
-  `T37-TSERIES-v2` manifest binds the accepted ordered prefix or all nine results.
+  hashes, and `T37-TRESULT-v2`. Independent QA computes canonical external-file SHA-256
+  after publication; only the later `T37-TSERIES-v2` manifest binds that file hash. No
+  shard output contains a self-referential file hash.
 - Each run is fixed at 10,000,000 work and 900 MiB and uses a new absent repository-external
   path. Only independently accepted natural `complete-not-found` output opens the next
   shard. Candidate stops the series; budget/RSS/exception/schema/hash/QA failure stops it
@@ -825,6 +826,87 @@ only; it is not F3 source acceptance.
   memo, exact schemas/hashes, frozen nested data, forged candidates/proxies, atomic output
   collisions/foreign temps, manifest gap/overlap/order/duplicate/incomplete rejection,
   candidate-prefix termination, and byte-stable v1 standalone regression.
+
+#### V2 contract QA rejection and exact repair
+
+- Contract candidate `8c70843` is rejected with `P0 0 / P1 0 / P2 2 / P3 0 / GAP 2`.
+  It conflated a full cover reference with candidate-prefix coverage, left schema/hash
+  preimages underspecified, described an impossible self-file hash, and lacked an invocable
+  manifest state machine and several attack assertions. Implementation remains closed.
+- All V2 hashes reuse v1 canonical JSON and uppercase SHA-256 over
+  `label + U+0000 + canonicalJson(value)`. The static series body has exact keys
+  `seriesVersion,seedStart,seedCount,shardSize,shardCount,ranges`; each range has exact keys
+  `shardIndex,seedStart,seedCount,seedEndExclusive`. `seriesHash` is
+  `canonicalHash('T37-TSERIES-ID-v2', seriesBody)`. The output `series` object is exactly
+  the series body plus `seriesHash`.
+- `profileMembershipHash` is
+  `canonicalHash('T37-TPROFILE-MEMBERSHIP-v2', profiles)`, where `profiles` is the
+  seven-element array ordered by `countTwoTypeIndex=0..6`; every element has exact keys
+  `countTwoTypeIndex,counts,seeds`, `counts` is the seven-type `I,O,T,S,Z,J,L` count array,
+  and `seeds` is the strictly ascending exact member list. The lists must partition all
+  20,000 shard seeds once with no out-of-range value.
+- Schema-2 shard output has exactly these top-level keys:
+  `algorithmVersion,boardRows,candidate,claim,coverReference,coverage,domain,evidence,phase,`
+  `schemaVersion,search,series,setup,shard,status,targetMaskRows,targetRows`.
+  `series` is defined above. `shard` has exact keys
+  `shardIndex,seedStart,seedCount,seedEndExclusive`. `coverReference` has exact keys
+  `coverBranchProbeCount,strongTilingCount,strongTilingHash` and fixed values
+  `345149`, `373`, and `8B233871...14B64`.
+- `domain` has exactly the v1 traversal/source/setup/type/queue/candidate version fields plus
+  `algorithmVersion,seriesVersion,seriesHash,shardIndex,seedStart,seedCount,`
+  `seedEndExclusive,sequenceLength,targetRows,targetMask,catalogDescriptorCount,catalogHash,`
+  `shapeTableHash,fullQueueHash,reverseTrieHash,reverseTrieNodeCount,profileHash,`
+  `profileCounts,profileSeedCounts,profileMembershipHash,domainHash`. `domainHash` is
+  `canonicalHash('T37-TDOMAIN-v2', domain without domainHash)`.
+- `coverage` has exact keys `complete,workCount,coverBranchProbeCount,orderPieceProbeCount,`
+  `strongTilingCount,completedProfileCount`. `evidence` has exact keys
+  `profileHash,profileMembershipHash,domainHash,traceHash,strongTilingHash,`
+  `failedMemoTraceHash,resultHash`. `search` has exact keys
+  `workBudget,maxRssMiB,processedSeeds,catalogDescriptorCount,reverseTrieNodeCount,`
+  `orderStateCount,failedMemoCount`.
+- `candidate` is null except for `candidate:order`; then it has exact keys
+  `profileIndex,tilingOrdinal,seed,forwardCatalogIndices,peelLocalIndices`. Both index arrays
+  have length 20, the seed lies in the shard, its exact 20-draw profile equals
+  `profileIndex`, `profileIndex === coverage.completedProfileCount`, and
+  `tilingOrdinal + 1 === coverage.strongTilingCount`. `setup` and `boardRows` are derived
+  only from that trusted result. Noncandidate/incomplete outputs require all three null.
+- `resultHash` is `canonicalHash('T37-TRESULT-v2', {status,phase,series,shard,domainHash,`
+  `coverReference,coverage,evidenceWithoutResultHash,candidate,setup,boardRows,search})`.
+  Natural `complete-not-found:cover` alone sets `coverage.complete=true` and must match the
+  full cover reference and full strong-tiling hash. Candidate has `complete=false` and its
+  actual prefix counts/hash; budget/RSS results are also incomplete and cannot advance.
+  A domain-build guard or exception publishes no shard file.
+- The same tool exposes two disjoint production modes. Shard mode accepts exactly
+  `--algorithm tiling-first-sharded-v2 --mode shard --shard-index 0..8 --work-budget`
+  `10000000 --max-rss-mib 900 --output <absent external path>`. Shard index accepts only
+  canonical decimal `0` through `8`; work/RSS must equal the fixed values. Manifest mode
+  accepts exactly `--algorithm tiling-first-sharded-v2 --mode manifest --v1-output <path>`
+  `--input-list <path> --output <absent external path>`. Both outputs use atomic absent-path
+  publication outside the repository.
+- Manifest input list is canonical UTF-8/LF JSON with exact shape `{ "paths": [...] }`,
+  one to nine distinct absolute v2 shard-output paths in index order. The tool independently
+  parses and validates every result/domain hash and computes each exact file SHA-256. It also
+  revalidates the v1 predecessor file as seeds `1..20000`, status `complete-not-found`, file
+  SHA `F9E94210...40B3`, and result hash `C1E315...F758`.
+- Manifest output has exact keys
+  `algorithmVersion,entries,manifestHash,manifestVersion,predecessor,schemaVersion,series,`
+  `status`. Predecessor exact keys are
+  `seedStart,seedCount,seedEndExclusive,status,fileSha256,resultHash`. Entry exact keys are
+  `shardIndex,seedStart,seedCount,seedEndExclusive,status,fileSha256,resultHash`.
+  `manifestHash = canonicalHash('T37-TSERIES-v2', manifest without manifestHash)`.
+  Status is `prefix-complete` for 1–8 ordered natural noncandidates, `candidate` when the
+  final entry is a candidate after only natural noncandidates, or `complete-not-found` only
+  for nine natural noncandidates. Gaps, overlaps, reordering, duplicates, incomplete entries,
+  candidate-not-last, later entries after candidate, tampered file SHA/result, or a wrong v1
+  predecessor fail before manifest publication. The manifest never self-contains its own
+  file SHA.
+- Tests add candidate seed/profile/range proof, candidate-prefix versus full-cover invariants,
+  canonical zero-index parsing (`0` valid; `00,+0,-0,0.0` invalid), strict fixed production
+  values, actual file-byte/result mismatch, candidate-not-last, and fixed v1 file SHA baselines:
+  source `DC5DD801...D741781B`, test `CA146F70...C3A19CA`.
+- Production execution never accepts `preparedDomain`. Test-only injected domains may exercise
+  physical/order/STOP boundaries but are never entered into the V2 private trusted-result
+  registry and can never reach schema/output publication.
 
 ## Current checkpoint state
 

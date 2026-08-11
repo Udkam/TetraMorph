@@ -1113,6 +1113,23 @@ Next exact action: commit and independently review this docs-only contract. Requ
 Core, final fixture, published product, reverse evidence, T27/`progress.md`, identity/icon,
 and Ice remain closed.
 
+Contract QA rejects `8c70843` with `P0 0 / P1 0 / P2 2 / P3 0 / GAP 2` and keeps
+implementation closed. Candidate callback-stop cannot claim the full cover identity; exact
+schema/hash preimages and manifest execution were missing; file SHA was described
+self-referentially; predecessor/state/attack coverage was incomplete.
+
+The docs-only repair now separates immutable `coverReference` from actual runtime
+`coverage`, freezes exact schema-2 object keys and hash payloads/labels, places shard file
+SHA only in independent QA and the manifest, and defines two exact CLI modes. Manifest mode
+revalidates the accepted v1 file as predecessor, reads a canonical external ordered path
+list, validates each v2 output and file SHA, accepts only a natural-noncandidate prefix or a
+terminal candidate, and atomically publishes a non-self-hashing manifest. Production values
+are exactly 10,000,000 work and 900 MiB; test injection cannot publish. Fixed v1 source/test
+file hashes and the missing candidate/parser/tamper tests are now explicit.
+
+Next exact action: commit this three-document repair and obtain fresh all-zero contract QA.
+No implementation or V2 search is open before that acceptance.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

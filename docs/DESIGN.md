@@ -645,7 +645,9 @@ adding unrelated badges or ornamental effects.
   gap, overlap, wrap, reordering, or tenth shard.
 - Each shard reuses the accepted cover/order implementation but has a new schema and hash
   identity. Static series identity, actual per-profile seed membership, queue bytes, trie,
-  domain, traversal, memo, result, and canonical output bytes are independently bound.
+  domain, traversal, memo, and result are bound inside the shard result. The shard file does
+  not self-bind its own SHA-256; independent QA computes that after publication and the
+  series manifest binds it.
   Profile-shape hash alone is insufficient; a membership hash binds every concrete seed.
 - Only natural `complete-not-found` permits the next shard. Budget, RSS, exception,
   malformed output, or incomplete QA stops the series. A candidate stops the series and
@@ -655,6 +657,15 @@ adding unrelated badges or ornamental effects.
   design review changes the mask/route rather than silently extending seeds or weakening
   setup legality. A canonical `T37-TSERIES-v2` prefix/full manifest binds ordered shard
   index, file SHA-256, result hash, and terminal status.
+- V2 uses v1 canonical JSON (UTF-8 byte-sorted object keys, safe integers only) and
+  `canonicalHash(label,value) = SHA-256(UTF8(label + NUL + canonicalJson(value)))` in
+  uppercase hex. Series identity uses `T37-TSERIES-ID-v2`; concrete profile membership
+  uses `T37-TPROFILE-MEMBERSHIP-v2`; domain, result, and manifest use the already named
+  `T37-TDOMAIN-v2`, `T37-TRESULT-v2`, and `T37-TSERIES-v2` labels.
+- The immutable `coverReference` records the accepted full-domain cover totals. Runtime
+  `coverage` is a separate prefix: a candidate stops the interleaved cover callback and
+  therefore never claims full cover. Only natural noncandidate completion must equal the
+  reference totals and full strong-tiling hash.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
