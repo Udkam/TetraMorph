@@ -1027,10 +1027,16 @@ Actual gates after repair: standalone full-tool contract passes; typecheck passe
 Vitest passes `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; build
 transforms 767 modules with only the existing >500 kB warning.
 
-Blocker: targeted independent repair QA of `2b1d216`. Only an all-zero disposition may
-reopen the single green-resource 10,000,000-work / 900 MiB external production batch. No
-product/Core/fixture, reverse continuation, T27/`progress.md`, deferred identity, icon, or
-missing Ice archive work opens yet.
+Targeted QA rejects `2b1d216` with `P0 0 / P1 0 / P2 1 / P3 0 / GAP 0`. The temp ownership
+and forged-candidate findings are closed, including fault injection and a real 20-piece
+candidate. The remaining P2 is a nested-freeze bypass: a pre-frozen parent causes the old
+recursion to skip its mutable child, which can then be changed while the branded result is
+still accepted.
+
+Next exact action: use a cycle-protecting WeakSet, always recurse through first-seen child
+objects, and freeze the parent only after traversal. Add a shallow-frozen-parent/mutable-child
+regression, then rerun all gates and targeted QA. The production batch and all product/Core/
+fixture/reverse/T27/`progress.md`/identity/icon/Ice work remain closed.
 
 ## Do not repeat
 

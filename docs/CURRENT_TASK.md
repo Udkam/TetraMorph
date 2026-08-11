@@ -764,6 +764,10 @@ only; it is not F3 source acceptance.
   setup/board data could masquerade as a search-produced candidate. Production remains
   closed until a repair candidate proves owned-temp cleanup and binds output construction
   to an actual validated search result.
+- Repair `2b1d216` closes those two findings but is rejected with one P2: an already-frozen
+  parent caused recursive freezing to skip a mutable nested profile array. The next repair
+  must traverse every first-seen child using a cycle guard before checking/freezing its
+  parent; production remains closed.
 
 ## Current checkpoint state
 
