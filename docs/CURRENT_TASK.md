@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED REVERSE HALTED; EXACT-COVER AUTHORING REDESIGN OPEN**
+Status: **STAGE F3C TILING-FIRST V1 CONTRACT FROZEN; IMPLEMENTATION OPEN**
 
 ## Active objective
 
@@ -731,6 +731,15 @@ only; it is not F3 source acceptance.
   that enumerates canonical bag-valid/no-touch tilings, then checks seed/order/gravity and
   finally Core replay. Existing round-two continuation remains immutable evidence and is
   never consumed by the new algorithm.
+- Tiling-first v1 opens only `tools/search-puzzle-v3-tiling-first.mjs` and its direct test.
+  It derives all seven 20-draw count profiles from seeds `1..20000`, runs deterministic
+  MRV exact-cover DFS under exact counts and same-type contact exclusion, then checks each
+  canonical tiling's finite hard-drop orders against the unchanged reversed seed trie.
+- `workCount` is exactly cover-branch probes plus order-piece probes. The strict first
+  production boundary, after local gates and independent QA, is one green-resource run at
+  10,000,000 work probes and 900 MiB RSS. V1 has no cursor/resume/shards; budget or memory
+  output is telemetry only and any larger run restarts from zero. Candidate output remains
+  authoring-only until current Core exactly replays 20 drops with zero setup clears.
 
 ## Current checkpoint state
 

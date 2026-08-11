@@ -615,6 +615,19 @@ adding unrelated badges or ornamental effects.
   only its finite hard-drop orders through the unchanged reversed seed trie; accept only a
   candidate that current Core replays to the exact mask with zero setup clears. This is a
   new algorithm/output identity and may not restore or rewrite reverse-v1 continuation.
+- `tiling-first-v1` searches all seven seed-derived count profiles, ordered by the type
+  whose count is two. Its cover state is uncovered mask, remaining counts, and seven
+  forbidden masks. It picks the live-descriptor-minimum uncovered cell (lowest bit tie),
+  branches in catalog order, and uses no uncontracted heuristic pruning.
+- Each complete tiling is identified by 20 sorted catalog indices. Its order search uses
+  only `(remainingSet, trieNodeId)` memo state, reconstructs the board from the remaining
+  set, tries local pieces in catalog order, and writes failed memo only after full unwind.
+  Each tiling owns an isolated memo. The first valid trie leaf uses its minimum seed and
+  reverses the peel order into forward placements.
+- Budget counts only admitted cover branches and order piece attempts. Natural unwind and
+  candidate resolution precede budget, budget precedes RSS, and no STOP state memoizes.
+  Domain/profile/trace/tiling/memo/result hashes plus canonical LF output make repeated
+  runs auditable. V1 is single-run and nonresumable by design.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

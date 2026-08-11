@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED REVERSE HALTED; EXACT-COVER AUTHORING REDESIGN OPEN**
+Status: **F3C TILING-FIRST V1 CONTRACT FROZEN; IMPLEMENTATION OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -699,6 +699,102 @@ strong certificate has no seed-compatible hard-drop order in `1..20000` after co
 704-state checking. A new, separately versioned tool must enumerate canonical strong
 tilings first, match each finite order against the unchanged seed trie second, then demand
 current-Core zero-clear replay. It cannot reuse reverse-v1 cursor or evidence bytes.
+
+### Tiling-first v1 authoring contract
+
+Only `tools/search-puzzle-v3-tiling-first.mjs` and
+`tools/search-puzzle-v3-tiling-first.test.mjs` open. The old tool, Core, fixture, campaign,
+UI, and protected paths remain closed. The new tool imports the accepted geometry, queue,
+trie, canonical JSON, mask, hard-drop, and hash primitives without importing any reverse
+continuation. Its fixed identity is:
+
+- algorithm `tiling-first-v1`, seeds `1..20000`, sequence length 20, target rows 10;
+- the existing 80-cell mask, 662-entry catalog/hash, shape-table hash, full-queue hash,
+  reverse-trie hash, type/candidate order, setup-rule, and queue-generator versions;
+- cover traversal `mrv-cell/catalog-index-v1` and order traversal
+  `remaining-set/trie-node/catalog-index-v1`.
+
+Startup derives every 20-draw type-count tuple from the fixed seed domain. Exactly seven
+profiles must exist: one type has count 2 and the other six have count 3. Profiles are
+deduplicated and ordered by the count-2 type index `0..6`; their canonical tuple stream is
+hashed. Any identity/profile drift fails before a work probe or output.
+
+For each profile, MRV exact-cover DFS starts from the full target, its exact remaining
+counts, and seven zero forbidden masks. A descriptor is live only when all four cells are
+uncovered, its type has remaining count, and it does not intersect that type's accumulated
+four-neighbour forbidden mask. Among uncovered cells, choose the one with the fewest live
+descriptors; ties use the lowest absolute target bit. A zero-live pivot is a static dead
+end. Branches use complete catalog index order. Selection covers four cells, decrements
+one count, and extends only that type's forbidden mask. No reachability, height, random,
+or empirical pruning exists in v1.
+
+A strong tiling has zero uncovered cells, seven zero remaining counts, and exactly 20
+descriptors. Its identity is the ascending array of 20 catalog indices; the same identity
+enters order DFS once. For local bits `0..19` in that ascending order, order state is only
+`(remainingSet:u32,trieNodeId:u32)` and board occupancy is the union of remaining pieces.
+Try remaining pieces in local/catalog order. An order piece probe first binds the real trie
+child, then removes the piece, requires exact `hardDropMask(remainingBoard, descriptor)`,
+checks that tiling's failed memo, and descends. Empty remaining set succeeds only at depth
+20 with a real trie leaf; choose its minimum seed and reverse the peel order to forward
+placements. A tiling owns its memo, which is written only after full state exhaustion;
+STOP never writes memo and no memo crosses tiling/profile boundaries.
+
+The single correctness budget is:
+
+```text
+workCount = coverBranchProbeCount + orderPieceProbeCount
+```
+
+A cover branch consumes one probe when a live descriptor branch begins. An order attempt
+consumes one probe before checking a remaining piece, including no-child, hard-drop miss,
+memo hit, descent, and candidate. MRV scans and zero-probe unwind do not count. At every
+boundary the priority is natural unwind/completion, an already admitted candidate, exact
+budget exhaustion, RSS guard, then the next probe. No `budget + 1` probe is legal; budget
+wins an equal-boundary RSS stop. RSS uses strict `rss > maxRssBytes` before domain build,
+every 1024 trie seeds, after build, before first work, and every 1024 work probes.
+
+CLI accepts only explicit pairs:
+
+```text
+--algorithm tiling-first-v1
+--work-budget 1..1000000000
+--max-rss-mib 128..4096
+--output <non-existing explicit path>
+```
+
+Cursor, resume, shard, custom seed, duplicate, unknown, aliasing, and malformed arguments
+fail before output. V1 is intentionally nonresumable: a larger budget restarts at zero and
+separate budget-exhausted runs cannot be added as coverage.
+
+Schema 1 uses exact top-level fields `schemaVersion`, `algorithmVersion`, `claim`, `status`,
+`phase`, `domain`, `coverage`, `evidence`, `targetRows`, `targetMaskRows`, `setup`,
+`boardRows`, and `search`. Status/phase pairs are candidate/order, complete-not-found/cover,
+budget-exhausted/cover-or-order, and memory-guard/domain-build-or-cover-or-order. Invalid
+exits 1 with no output; all valid states exit 0 only for candidate, otherwise 2. Candidate
+has non-null setup/board rows and `complete=false`; only natural exhaustion of all seven
+profiles may set `complete=true`.
+
+Uppercase SHA-256 identities include profile, domain, ordered work trace, strong tiling,
+failed-memo trace, and result hashes. Work tokens bind global index/kind/profile and the
+complete cover or order pre-probe state, fixed choice, and outcome. Domain excludes budget;
+result binds domain, status/phase, limits, counts, all evidence roots, setup, and board.
+Output uses recursive canonical JSON, UTF-8, one LF, no BOM. It is fully formed before an
+atomic move to a verified absent destination; invalid input cannot touch an existing file.
+
+Direct tests must independently cover all seven profiles and seeds, catalog equivalence,
+small-mask exact sets, counts/contact, certificate union, order/forward-physics set
+equivalence, real blockers/support, trie reversal/leaf seed, memo isolation, STOP/budget/
+RSS priority, identity drift, invalid no-output, schema/nulls, trace vectors, and repeated
+bytes. The first strong tiling is a literal regression: independently pin its complete
+704-state no-seed result together with order-probe, trace, and memo hashes.
+
+After final local gates and fresh independent QA, exactly one production batch may run,
+only while resources are green: full fixed domain, work budget 10,000,000, RSS 900 MiB,
+one process, repository-external output. Stop on candidate, natural completion, exact
+budget, RSS, or system red. Budget/memory output is telemetry only. A candidate still
+requires current-Core 20-drop, zero-clear, exact-mask replay before F3C content opens. If
+the batch exhausts, review its profile/tiling/order/trace counts before any from-zero v1
+increase or separately contracted v2; never return to reverse-v1.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

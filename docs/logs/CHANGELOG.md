@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C tiling-first v1 contract frozen
+
+- The new two-path authoring tool must cover all seven seed-derived 20-draw count profiles,
+  use canonical MRV exact-cover traversal, and test each strong tiling with an isolated
+  `(remainingSet,trieNodeId)` hard-drop order DFS. Reverse-v1 continuation is excluded.
+- Work budget counts cover-branch plus order-piece probes. STOP priority, 900 MiB RSS,
+  domain/trace/certificate/result hashes, canonical output, no-resume semantics, and Core
+  replay admission are frozen. After implementation gates and independent QA, only one
+  green-resource 10,000,000-work batch may run.
+
 ## 2026-08-11 — T37 Stage F3C seeded reverse halted
 
 - Structural review denies a third increment: roots remain at descriptors 36–49/662 in

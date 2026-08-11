@@ -520,6 +520,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   counts `[3,3,3,3,2,3,3]`. The first strong tiling has no seed-compatible hard-drop order
   in the complete `1..20000` trie after 704 states. These are diagnostics, not yet durable
   authoring certificates or product setup acceptance.
+- Tiling-first v1 contract opens only two new tool/test paths. It derives and hashes all
+  seven count profiles, uses MRV cell/catalog-order cover DFS, then isolated remaining-set/
+  trie-node hard-drop order DFS. Work counts cover branches plus order piece attempts;
+  STOP/budget/RSS priority, six evidence hashes, canonical schema, invalid no-output, and
+  nonresumable semantics are frozen. Candidate still requires current-Core replay.
 
 ### Stage F3B accepted status
 
@@ -937,13 +942,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Retain `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6` unchanged. Leave
-the policy-blocked round-one and six benchmark artifacts untouched; do not retry cleanup
-through another shell. Freeze a separate exact-cover-first authoring contract before code:
-canonical tiling certificate/order, bag-count and contact invariants, bounded enumeration,
-seed-trie hard-drop check, hashes/output identity, Core zero-clear replay, and fail-closed
-resource behavior. It must use new tool/test paths or a separately versioned mode and may
-not import continuation state. Final F3C fixture/Core and all product work stay closed.
+Retain `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6` unchanged and do
+not retry policy-blocked cleanup. Implement only the first bounded tiling-first source
+checkpoint in `tools/search-puzzle-v3-tiling-first.mjs` and its test: fixed identities,
+seven profiles, MRV strong-cover enumeration, deterministic trace/counts, and small-mask/
+literal-certificate tests. Commit green before adding the isolated order/CLI/output layer.
+No production authoring batch, Core, fixture, product, or reverse continuation opens yet.
 Only then may a second increment read each old shard and write a distinct successor in a
 new external directory. Accept every successor before deleting the old directory. Keep
 final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the
