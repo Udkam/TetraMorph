@@ -1240,6 +1240,23 @@ Next exact action: run shard index 2 exactly once to absent external path
 then require the same independent raw-byte and p03 cumulative-manifest QA before shard 3.
 No parallel shard, Core, fixture, product, T27/`progress.md`, icon, or Ice path is open.
 
+Shard 2 and p03 manifest accepted (2026-08-12): the sole run ended naturally in 33.768 s
+with exit 2, `complete-not-found:cover`, and 1,406,629 work. Output file SHA-256 is
+`07624A7756F09A3621DAB22993A93589D7AB27863ED5A1FF830B747EF2405D81`; result hash is
+`D50A1606016D7DC22C4FCE7228011C8FE68FDEE4A39CA601F3599AD0D9705129`.
+Independent queue/membership/trie/domain/result/raw-byte QA is all zero.
+
+The ordered p03 input SHA-256 is
+`55846922A5DF494634F3E4EDF8684AB910F23322CDEE61AD8294590B5B3830D3`.
+The 2,246-byte p03 manifest file SHA-256 is
+`673B11ECCDF02E0D39DCFF0E7DBFBDBDF251045144CD8F12F6EDBA597BD83706`; independent
+manifest hash is `06EA7C39F54F24C453B2CC122F2D20958639F7004FCB6FD88D2A5711EF3CAFAB`.
+Final cumulative QA is all zero; prior artifacts are immutable.
+
+Next exact action: run shard index 3 exactly once to absent external path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s03-16039546.json`,
+then require raw-byte and p04 cumulative-manifest QA before shard 4. No later path is open.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
