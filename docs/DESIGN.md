@@ -523,6 +523,13 @@ adding unrelated badges or ornamental effects.
   reverse traversal. A bounded repair may reopen only the same tool and standalone test;
   production search, the final fixture/Core test, published content, migration, and UI
   remain closed until independent repair QA accepts the complete implementation range.
+- Candidate `77bc7fc` implements that bounded repair. Historical partial tokens rebuild
+  their own frame before index/descriptor comparison; cumulative budget admission uses
+  subtraction against the absolute ceiling; existing resume/output files compare native
+  device/inode identity; and the replacement differential test compares an independent
+  small-board forward enumerator with real reverse runs for mixed and both same-type
+  orders. Direct tamper, hard-link, exact-ceiling, no-output, full-gate, scope, and cleanup
+  checks pass locally. No search execution or browser evidence is part of this candidate.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED-REVERSE IMPLEMENTATION REJECTED; BOUNDED REPAIR OPEN**
+Status: **F3C SEEDED-REVERSE REPAIR CANDIDATE `77bc7fc`; QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -620,6 +620,12 @@ hard links cannot overwrite the checkpoint. The standalone suite must replace it
 tautological mask equality with an independent forward oracle run against actual reverse
 traversal, including both same-type peel orders. Only the two implementation paths may
 reopen for this repair; no reverse shard or product path is authorized before repair QA.
+Repair candidate `77bc7fc` stays within those paths and adds direct recomputed-token,
+descriptor, real hard-link, exact-ceiling, and no-output overflow regressions. Its new
+forward oracle independently drops `I`/`O` cells and compares the complete bounded result
+set with actual reverse traversal across separated and touching same-type orders plus a
+mixed queue. Post-last-edit standalone, typecheck, complete test rerun, build, legacy
+bytes, scope, and cleanup pass. Independent repair QA remains mandatory before any shard.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

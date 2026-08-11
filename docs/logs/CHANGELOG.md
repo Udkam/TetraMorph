@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded-reverse repair candidate
+
+- Source checkpoint `77bc7fc` changes only the authoring tool and standalone reverse
+  test. It binds partial tokens to reconstructed frame candidates, enforces the absolute
+  cumulative probe ceiling, rejects existing resume/output hard links by file identity,
+  and replaces the tautological differential assertion with an independent forward
+  oracle compared to real reverse traversal in mixed and both same-type orders.
+- Direct recomputed-token, descriptor, hard-link, `999,999,999 + 1`, and no-output
+  overflow regressions pass. Post-last-edit standalone, typecheck, focused renderer
+  diagnostic (`54/54`), complete rerun (`46` files / `430` tests, `2` / `10` skipped),
+  and 767-module build pass. Forward bytes, exact scope, cleanup, and protected
+  exclusions pass. Production search remains closed pending independent repair QA.
+
 ## 2026-08-11 — T37 Stage F3C seeded-reverse implementation rejected
 
 - Formal QA rejects `1f85a0a..da2c67d` with `P1 2`; adversarial QA independently

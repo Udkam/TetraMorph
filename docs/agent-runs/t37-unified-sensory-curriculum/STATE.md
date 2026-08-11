@@ -123,8 +123,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 29. `F3C SEEDED-REVERSE IMPLEMENTATION REJECTED` — formal QA reports P1 2 and
     adversarial QA reports P1 1 / P2 2. Four distinct restore, ceiling, file-identity,
     and differential-test blockers keep production reverse search closed.
-30. `PENDING` — one bounded repair on the same two tool/test paths, final local gates,
-    and independent repair QA precede any reverse search run, fixture, content,
+30. `F3C SEEDED-REVERSE REPAIR CANDIDATE; QA NEXT` — two-path repair `77bc7fc`
+    closes all four reported blockers and passes the final local gates.
+31. `PENDING` — independent repair QA precedes any reverse search run, fixture, content,
     migration, UI, final integrated gates, or push.
 
 ### Stage F3C tooling-discovery status
@@ -376,10 +377,26 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   index/descriptor, the hard-link overwrite is reproducible, and the forward/reverse
   set test is tautological and never calls the reverse traversal. Both QA Temp areas are
   removed, no search Node remains, and neither reviewer ran production search.
-- Blocker: the four defects above. One next action: repair only
+- The rejected candidate's blocker was the four defects above. Its authorized repair
+  boundary was only
   `tools/search-puzzle-v3-prototype.mjs` and
-  `tools/search-puzzle-v3-prototype-reverse.test.mjs`, run the post-last-edit gates once,
-  and obtain fresh independent QA before opening any reverse shard.
+  `tools/search-puzzle-v3-prototype-reverse.test.mjs`, with post-last-edit gates and
+  fresh independent QA required before any reverse shard.
+- Repair candidate `77bc7fc` changes exactly those two paths with `222` added/modified
+  lines. It binds historical token index/descriptor state, enforces the cumulative
+  1,000,000,000 ceiling before a new probe, detects real NTFS hard links by file identity,
+  and replaces the false-positive mask comparison with an independent forward oracle
+  compared to actual reverse traversal for separated/touching same-type orders and a
+  mixed queue. Direct regressions cover recomputed tamper hashes, descriptor drift,
+  no-overwrite hard links, `999,999,999 + 1`, and no-output `+2` overflow.
+- Post-last-edit standalone and typecheck pass. The initial complete suite encountered an
+  unrelated renderer hook timeout; its focused file passed `54/54`, then the complete
+  rerun passed `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests. Build
+  passes with 767 modules and only the existing chunk advisory. Legacy forward JSON and
+  stdout hashes remain `B334010D...19A2A` and `90075FF8...3E8C42`. Exact Temp artifacts
+  are removed, owned search Node count is zero, staged scope was exactly two paths, and
+  protected dirt remains unstaged. Blocker: fresh independent repair QA. One next action:
+  review the full implementation source chain through `77bc7fc`; do not run search.
 
 ### Stage F3B accepted status
 
@@ -797,16 +814,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Repair the rejected seeded-reverse implementation only in its two authorized tool/test
-paths. Validate the restored partial token's candidate index and exact descriptor against
-the reconstructed frame list; reject `start + nodeBudget` above 1,000,000,000 before the
-first probe; reject existing resume/output hard links by file identity without modifying
-the input; and replace the false-positive mask comparison with an independent small-board
-forward oracle exercised against actual reverse traversal, including both same-type peel
-orders. Run the standalone test while editing, then one final typecheck, full suite, and
-build after the last source change. Commit a bounded repair candidate and request fresh
-independent QA. Do not run production 32-shard reverse search. Keep final F3C JSON/Core
-test, later content, deferred identity, T27/`progress.md`, and missing Ice archive closed.
+Run fresh independent read-only repair QA over the full implementation source chain
+`1f85a0a..77bc7fc`, explicitly accounting for the intervening documentation checkpoints.
+Reproduce all four original attacks and their fixed boundary cases; inspect the actual
+forward/reverse set equality, both same-type peel orders, token-frame reconstruction,
+file-identity semantics, exact 1,000,000,000 admission, legacy forward bytes, scope,
+commit budget, Temp cleanup, and protected exclusions. Report P0–P3/GAP. Do not run
+production 32-shard reverse search. Keep final F3C JSON/Core test, later content,
+deferred identity, T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

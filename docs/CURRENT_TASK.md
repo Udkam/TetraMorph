@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE IMPLEMENTATION REJECTED; BOUNDED REPAIR OPEN**
+Status: **STAGE F3C SEEDED-REVERSE REPAIR CANDIDATE `77bc7fc`; QA NEXT**
 
 ## Active objective
 
@@ -95,14 +95,14 @@ ten-row fixture/test pair, while published Puzzle content stays closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C IMPLEMENTATION REPAIR OPEN** — the exact
+6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C REPAIR CANDIDATE QA** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
    anchor-supported state identity, definition-aware replay/proof, and exact anchor
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
-   reverse implementation QA rejects `da2c67d`; a two-path repair is open while content
-   authoring stays closed.
+   repair candidate `77bc7fc` closes the four reported implementation blockers; fresh
+   independent QA is required while content authoring stays closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -572,6 +572,20 @@ only; it is not F3 source acceptance.
   algebraic mask assertions with an independent forward oracle exercised against the
   actual reverse traversal, including both same-type peel orders. No production reverse
   search may start until the repaired full range passes independent QA.
+- Repair candidate `77bc7fc` changes only those two paths (`222` added/modified lines).
+  Restore now reconstructs each historical token frame and binds its candidate index and
+  exact descriptor; resumed work rejects cumulative counts above 1,000,000,000 before a
+  new probe; existing paths compare NTFS file identity; and the standalone suite drives
+  actual reverse traversal against an independent `I`/`O` forward oracle, including
+  separated and touching same-type pieces in both orders. It also reproduces a recomputed
+  token attack, a real hard-link alias without overwrite, exact `999,999,999 + 1` success,
+  and `+2` no-output rejection.
+- Post-last-edit standalone and typecheck pass. The first full run hit an unrelated
+  renderer `beforeAll` timeout; that file then passed `54/54`, and the required complete
+  rerun passed `46` files / `430` tests with `2` files / `10` tests skipped. The build
+  transforms 767 modules with only the existing chunk advisory. Legacy forward bytes,
+  Temp cleanup, zero owned search process, exact scope, and protected exclusions pass.
+  This remains a candidate; production reverse search is still closed pending QA.
 
 ## Current checkpoint state
 
