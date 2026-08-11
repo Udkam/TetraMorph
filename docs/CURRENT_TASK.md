@@ -744,6 +744,11 @@ only; it is not F3 source acceptance.
   10,000,000 work probes and 900 MiB RSS. V1 has no cursor/resume/shards; budget or memory
   output is telemetry only and any larger run restarts from zero. Candidate output remains
   authoring-only until current Core exactly replays 20 drops with zero setup clears.
+- Cover candidate `bc70fc3` passes standalone, typecheck, the full 430-test suite, and the
+  767-module build. Fresh read-only QA independently reproduces the canonical first tiling,
+  checks 80 random small masks by exhaustive oracle, and accepts with P0–P3/GAP all zero.
+  The next bounded source layer is the isolated hard-drop/trie order DFS; CLI/RSS/output
+  remain closed until that core receives its own green checkpoint.
 
 ## Current checkpoint state
 

@@ -959,11 +959,17 @@ tests; production build transforms 767 modules with only the existing >500 kB ch
 warning. Browser evidence is not applicable to this offline authoring-tool checkpoint.
 Protected T27 paths and `progress.md` remain unstaged and unread.
 
-Blocker: fresh independent read-only QA of `bc70fc3`. If accepted, record that disposition
-before opening the isolated order core, then the CLI/RSS/output layer in further bounded
-source commits. No production authoring batch, Core, fixture, product, reverse continuation,
-final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, or missing Ice
-archive opens yet.
+Independent read-only QA accepts `bc70fc3` with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for
+the cover checkpoint. It independently reproduces the 1,542-probe fixture and both hashes,
+matches 80 random small masks against exhaustive enumeration, and verifies MRV tie/catalog
+order, contact/separation, budget 0/1, natural completion, and callback priority.
+
+Next exact action: implement only the isolated hard-drop/trie order DFS and direct tests in
+the same two tool paths, including the canonical 443-state / 5,982-probe no-seed result,
+order trace/memo hashes, physical-drop set equivalence, memo isolation, and shared-budget
+boundaries. Commit it green before opening CLI/RSS/output. No production authoring batch,
+Core, fixture, product, reverse continuation, final F3C JSON/Core work, later content,
+T27/`progress.md`, deferred identity, or missing Ice archive opens yet.
 
 ## Do not repeat
 
