@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 import { __tilingTest as tiling } from './search-puzzle-v3-tiling-first.mjs';
 
 const { base } = tiling;
+const toolPath = fileURLToPath(new URL('./search-puzzle-v3-tiling-first.mjs', import.meta.url));
 const EMPTY_SHA256 = 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855';
 
 assert.equal(tiling.ALGORITHM_VERSION, 'tiling-first-v1');
@@ -313,7 +319,7 @@ assert.deepEqual({
 
 const preDomainGuard = tiling.buildTilingDomain({ maxRssBytes: 0, rssBytes: () => 1 });
 assert.deepEqual(preDomainGuard,
-  { memoryGuard: true, phase: 'domain-build', processedSeeds: 0 });
+  { memoryGuard: true, phase: 'domain-build', processedSeeds: 0, reverseTrieNodeCount: 0 });
 let midDomainChecks = 0;
 const midDomainGuard = tiling.buildTilingDomain({
   maxRssBytes: 0,
@@ -322,8 +328,12 @@ const midDomainGuard = tiling.buildTilingDomain({
     return midDomainChecks >= 3 ? 1 : 0;
   },
 });
-assert.deepEqual(midDomainGuard,
-  { memoryGuard: true, phase: 'domain-build', processedSeeds: 1024 });
+assert.deepEqual({
+  memoryGuard: midDomainGuard.memoryGuard,
+  phase: midDomainGuard.phase,
+  processedSeeds: midDomainGuard.processedSeeds,
+}, { memoryGuard: true, phase: 'domain-build', processedSeeds: 1024 });
+assert(midDomainGuard.reverseTrieNodeCount > 1);
 let postDomainChecks = 0;
 const postDomainGuard = tiling.buildTilingDomain({
   maxRssBytes: 0,
@@ -333,7 +343,8 @@ const postDomainGuard = tiling.buildTilingDomain({
   },
 });
 assert.deepEqual(postDomainGuard,
-  { memoryGuard: true, phase: 'domain-build', processedSeeds: 20_000 });
+  { memoryGuard: true, phase: 'domain-build', processedSeeds: 20_000,
+    reverseTrieNodeCount: 282_615 });
 
 const combinedDomain = tiling.buildTilingDomain();
 assert.equal(combinedDomain.memoryGuard, false);
@@ -381,7 +392,24 @@ assert.deepEqual({
   strongTilingCount: 1, orderPieceProbeCount: 0,
 });
 const combinedCanonical = tiling.executeTilingSearch({ ...combinedInput, workBudget: 7524 });
-assert.deepEqual(combinedCanonical, {
+assert.deepEqual({
+  status: combinedCanonical.status,
+  phase: combinedCanonical.phase,
+  complete: combinedCanonical.complete,
+  domainHash: combinedCanonical.domainHash,
+  workCount: combinedCanonical.workCount,
+  coverBranchProbeCount: combinedCanonical.coverBranchProbeCount,
+  orderPieceProbeCount: combinedCanonical.orderPieceProbeCount,
+  orderStateCount: combinedCanonical.orderStateCount,
+  failedMemoCount: combinedCanonical.failedMemoCount,
+  strongTilingCount: combinedCanonical.strongTilingCount,
+  completedProfileCount: combinedCanonical.completedProfileCount,
+  traceHash: combinedCanonical.traceHash,
+  strongTilingHash: combinedCanonical.strongTilingHash,
+  failedMemoTraceHash: combinedCanonical.failedMemoTraceHash,
+  candidate: combinedCanonical.candidate,
+  processedSeeds: combinedCanonical.processedSeeds,
+}, {
   status: 'budget-exhausted', phase: 'cover', complete: false,
   domainHash: '51BC5DF570FE1356D1BE34584B2B06322AA72FFB988E6C1B37ABFE92D49C0D34',
   workCount: 7524, coverBranchProbeCount: 1542, orderPieceProbeCount: 5982,
@@ -450,6 +478,146 @@ assert.equal(naturalWinsLimits.complete, true);
 assert.equal(naturalWinsLimits.workCount, 0);
 assert.equal(naturalRssChecks, 0, 'zero-probe natural completion must beat budget and RSS');
 
+const canonicalOutput = tiling.makeTilingOutput(combinedCanonical,
+  { workBudget: 7524, maxRssMiB: 900 });
+assert.deepEqual(Object.keys(canonicalOutput).sort(), [
+  'algorithmVersion', 'boardRows', 'claim', 'coverage', 'domain', 'evidence', 'phase',
+  'schemaVersion', 'search', 'setup', 'status', 'targetMaskRows', 'targetRows',
+]);
+assert.deepEqual(Object.keys(canonicalOutput.coverage).sort(), [
+  'complete', 'completedProfileCount', 'coverBranchProbeCount', 'orderPieceProbeCount',
+  'strongTilingCount', 'workCount',
+]);
+assert.deepEqual(Object.keys(canonicalOutput.evidence).sort(), [
+  'domainHash', 'failedMemoTraceHash', 'profileHash', 'resultHash', 'strongTilingHash',
+  'traceHash',
+]);
+assert.deepEqual(Object.keys(canonicalOutput.search).sort(), [
+  'catalogDescriptorCount', 'failedMemoCount', 'maxRssMiB', 'orderStateCount',
+  'processedSeeds', 'reverseTrieNodeCount', 'workBudget',
+]);
+assert.equal(canonicalOutput.schemaVersion, 1);
+assert.equal(canonicalOutput.setup, null);
+assert.equal(canonicalOutput.boardRows, null);
+assert.equal(canonicalOutput.evidence.resultHash,
+  '1918339339B9D9ABF4F703BC194EA274CE699286B882E0250CAB74F2F53BEFC6');
+const tamperedCoverage = { ...canonicalOutput.coverage, workCount: 7523 };
+assert.notEqual(tiling.tilingResultHash({
+  status: canonicalOutput.status,
+  phase: canonicalOutput.phase,
+  domainHash: canonicalOutput.domain.domainHash,
+  coverage: tamperedCoverage,
+  evidence: {
+    profileHash: canonicalOutput.evidence.profileHash,
+    domainHash: canonicalOutput.evidence.domainHash,
+    traceHash: canonicalOutput.evidence.traceHash,
+    strongTilingHash: canonicalOutput.evidence.strongTilingHash,
+    failedMemoTraceHash: canonicalOutput.evidence.failedMemoTraceHash,
+  },
+  setup: null,
+  boardRows: null,
+  search: canonicalOutput.search,
+}), canonicalOutput.evidence.resultHash);
+const fakeCandidateArtifacts = tiling.candidateArtifacts(combinedDomain, {
+  seed: 49,
+  forwardCatalogIndices: firstRun.stoppedTiling.catalogIndices,
+});
+assert.equal(fakeCandidateArtifacts.setup.placements.length, 20);
+assert(fakeCandidateArtifacts.setup.placements.every((placement) =>
+  Object.keys(placement).sort().join(',') === 'rotation,type,x'));
+assert.equal(fakeCandidateArtifacts.boardRows.length, 20);
+assert.deepEqual(fakeCandidateArtifacts.boardRows.map((row) => row.replace(/[IOTSZJL]/g, '#')),
+  base.TARGET_VISIBLE_ROWS);
+const fakeCandidateOutput = tiling.makeTilingOutput({
+  ...combinedCanonical,
+  status: 'candidate',
+  phase: 'order',
+  complete: false,
+  candidate: { seed: 49 },
+  ...fakeCandidateArtifacts,
+}, { workBudget: 7524, maxRssMiB: 900 });
+assert.equal(fakeCandidateOutput.status, 'candidate');
+assert.equal(fakeCandidateOutput.setup.seed, 49);
+assert.equal(fakeCandidateOutput.setup.placements.length, 20);
+assert.throws(() => tiling.makeTilingOutput({
+  ...combinedCanonical,
+  setup: fakeCandidateArtifacts.setup,
+  boardRows: null,
+}, { workBudget: 7524, maxRssMiB: 900 }), /output state/i);
+const domainMemoryResult = tiling.executeTilingSearch({
+  workBudget: 1, maxRssBytes: 0, rssBytes: () => 1,
+});
+const domainMemoryOutput = tiling.makeTilingOutput(domainMemoryResult,
+  { workBudget: 1, maxRssMiB: 128 });
+assert.equal(domainMemoryOutput.status, 'memory-guard');
+assert.equal(domainMemoryOutput.phase, 'domain-build');
+assert.equal(domainMemoryOutput.domain.reverseTrieHash, null);
+assert.equal(domainMemoryOutput.domain.domainHash, null);
+assert.equal(domainMemoryOutput.setup, null);
+
+const cliRoot = mkdtempSync(join(tmpdir(), 't37-tiling-cli-'));
+try {
+  const outputA = join(cliRoot, 'nested', 'first.json');
+  const outputB = join(cliRoot, 'nested', 'second.json');
+  const cliArgs = (output) => [
+    toolPath, '--algorithm', 'tiling-first-v1', '--work-budget', '1',
+    '--max-rss-mib', '900', '--output', output,
+  ];
+  const firstCli = spawnSync(process.execPath, cliArgs(outputA), { encoding: 'utf8' });
+  assert.equal(firstCli.status, 2, firstCli.stderr);
+  assert.equal(firstCli.stderr, '');
+  const firstBytes = readFileSync(outputA);
+  assert.equal(tiling.sha256Hex(firstBytes),
+    '62EFFA6717279AC32962E756CDC6A6AE90E94BDB064EDCAEC545B1E0714624F5');
+  assert.equal(firstBytes[0] === 0xef && firstBytes[1] === 0xbb && firstBytes[2] === 0xbf, false);
+  assert.equal(firstBytes.at(-1), 0x0a);
+  assert.notEqual(firstBytes.at(-2), 0x0a);
+  const parsed = JSON.parse(firstBytes.toString('utf8'));
+  assert.equal(`${base.canonicalJson(parsed)}\n`, firstBytes.toString('utf8'));
+  assert.equal(parsed.evidence.resultHash,
+    '8DB2124AAD3349460146B24E0E15984F1EA2B63060F01FB62699A66EE787E376');
+  assert.deepEqual(JSON.parse(firstCli.stdout), {
+    phase: 'cover',
+    resultHash: parsed.evidence.resultHash,
+    status: 'budget-exhausted',
+    workCount: 1,
+  });
+  const secondCli = spawnSync(process.execPath, cliArgs(outputB), { encoding: 'utf8' });
+  assert.equal(secondCli.status, 2, secondCli.stderr);
+  assert.deepEqual(readFileSync(outputB), firstBytes, 'two fixed-domain CLI runs must match byte-for-byte');
+  const beforeExisting = readFileSync(outputA);
+  const existingCli = spawnSync(process.execPath, cliArgs(outputA), { encoding: 'utf8' });
+  assert.equal(existingCli.status, 1);
+  assert.deepEqual(readFileSync(outputA), beforeExisting);
+  const invalidOutput = join(cliRoot, 'invalid.json');
+  const invalidCli = spawnSync(process.execPath,
+    [...cliArgs(invalidOutput), '--cursor', 'forbidden'], { encoding: 'utf8' });
+  assert.equal(invalidCli.status, 1);
+  assert.match(invalidCli.stderr, /unknown tiling option/i);
+  assert.equal(existsSync(invalidOutput), false);
+  const sentinel = join(cliRoot, 'sentinel.json');
+  writeFileSync(sentinel, 'sentinel', { encoding: 'utf8' });
+  assert.throws(() => tiling.parseTilingArguments([
+    '--algorithm', 'tiling-first-v1', '--work-budget', '1e3',
+    '--max-rss-mib', '900', '--output', join(cliRoot, 'unused.json'),
+  ]), /canonical positive integer/i);
+  assert.throws(() => tiling.parseTilingArguments([
+    '--algorithm', 'tiling-first-v1', '--work-budget', '1',
+    '--max-rss-mib', '900', '--output', sentinel,
+  ]), /must not already exist/i);
+  assert.throws(() => tiling.parseTilingArguments([
+    '--algorithm', 'tiling-first-v1', '--work-budget', '1', '--work-budget', '2',
+    '--max-rss-mib', '900', '--output', join(cliRoot, 'duplicate.json'),
+  ]), /duplicate tiling option/i);
+  assert.throws(() => tiling.parseTilingArguments([
+    '--algorithm', 'tiling-first-v1', '--work-budget', '1',
+    '--max-rss-mib', '127', '--output', join(cliRoot, 'low-rss.json'),
+  ]), /128 through 4096/i);
+  assert.equal(readFileSync(sentinel, 'utf8'), 'sentinel');
+} finally {
+  rmSync(cliRoot, { recursive: true, force: true });
+}
+
 assert.throws(() => tiling.coverCatalog(0n, []), /positive multiple of four/i);
 assert.throws(() => tiling.enumerateStrongTilings({
   fixedMask: floorO.cellMask, catalog: singleCatalog, profiles: singleProfile, workBudget: -1,
@@ -459,4 +627,4 @@ assert.throws(() => tiling.searchTilingOrders({
   catalog: supportCatalog, trie: exactTrieForForwardTypes([1, 1]), workBudget: 1,
 }), /catalog identity/i);
 
-process.stdout.write('tiling-first cover/order contract: all standalone checks pass\n');
+process.stdout.write('tiling-first full tool contract: all standalone checks pass\n');
