@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SECOND REVERSE ROUND ACCEPTED; STRUCTURAL REVIEW OPEN**
+Status: **F3C SEEDED REVERSE HALTED; EXACT-COVER AUTHORING REDESIGN OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -687,6 +687,18 @@ resumable `paused-budget`; cumulative coverage is 64,000,000 probes and no termi
 occurs. Independent output QA reconstructs every formal restore/hash and accepts with
 P0–P3/GAP all zero. The accepted round-two set supersedes round one, but no third increment
 opens until a bounded structural/scaling review chooses continuation or redesign.
+The review chooses redesign and permanently stops reverse v1 at that cursor. Every root
+remains at descriptor 36–49/662 in the initial I-type band; second-round root progress is
+348 descriptors, memo growth is near-linear, and three depth-19 residual masks are not
+tetrominoes. A third round, wider seeds, and higher budgets are closed.
+
+The fixed mask nevertheless passes two static necessary-condition checks. One exact cover
+uses 20 pieces; a stronger cover also has type counts `[3,3,3,3,2,3,3]` (two full bags plus
+six distinct third-bag draws) and no orthogonally touching same-type pieces. The first
+strong certificate has no seed-compatible hard-drop order in `1..20000` after complete
+704-state checking. A new, separately versioned tool must enumerate canonical strong
+tilings first, match each finite order against the unchanged seed trie second, then demand
+current-Core zero-clear replay. It cannot reuse reverse-v1 cursor or evidence bytes.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

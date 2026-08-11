@@ -604,6 +604,17 @@ adding unrelated badges or ornamental effects.
   one as the sole required continuation. A third increment is not automatic: review
   depth/progress, memo reuse, storage growth, and the fixed-mask feasibility boundary
   before allocating more probes or changing semantics.
+- That review halts `seeded-reverse-v1`: roots remain in the first I-type descriptor band,
+  memo/storage growth is near-linear, and three nominal depth-19 states leave disconnected
+  four-cell residues. A third equal round is not authorized. This does not prove the mask
+  impossible: deterministic diagnostics find both an unconstrained 20-piece exact cover
+  and a `[3,3,3,3,2,3,3]` seven-bag-count cover with no same-type contact. The first such
+  constrained tiling has no compatible seed/hard-drop order in `1..20000`.
+- The replacement authoring direction is tiling-first, then order: enumerate canonical
+  exact-cover certificates under bag-count/contact rules; for each certificate, search
+  only its finite hard-drop orders through the unchanged reversed seed trie; accept only a
+  candidate that current Core replays to the exact mask with zero setup clears. This is a
+  new algorithm/output identity and may not restore or rewrite reverse-v1 continuation.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

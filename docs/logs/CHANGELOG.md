@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C seeded reverse halted
+
+- Structural review denies a third increment: roots remain at descriptors 36–49/662 in
+  the I band, failed memo growth stays near-linear, and all three depth-19 residues are
+  disconnected non-tetromino four-cell sets. The accepted forward 50M and reverse 64M
+  traversals remain fair prefixes, not negative proofs.
+- Bounded diagnostics prove a 20-piece exact cover and a stronger bag-count/no-same-touch
+  cover with counts `[3,3,3,3,2,3,3]`. The first constrained certificate has no compatible
+  seed/hard-drop order in `1..20000` after a complete 704-state fixed-tiling check.
+  Reverse v1 stops at 2M/shard; a separately versioned exact-cover-first authoring contract
+  opens without consuming its continuations.
+
 ## 2026-08-11 — T37 Stage F3C second reverse round accepted
 
 - All 32 shards resume from 1,000,000 and add exactly 1,000,000 probes. Every output is

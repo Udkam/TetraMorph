@@ -511,6 +511,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   formal restore and five hashes, lineage, canonical bytes, NTFS identity, and both
   manifests. Round two must remain. Round one is deletion-eligible but its exact cleanup
   is already policy-blocked; do not retry or bypass. Third-round search remains closed.
+- Structural review stops reverse v1 at 2,000,000 probes/shard. Root indices are only
+  36–49/662 and remain in the I segment; round-two progress totals 348 root descriptors,
+  memo growth is near-linear, and all three depth-19 residues are non-tetromino masks.
+  No third increment, wider seed range, or larger budget is permitted.
+- Read-only feasibility diagnostics close the static-mask gap: unconstrained exact cover
+  succeeds in 35 states; bag-count/no-same-touch exact cover succeeds in 437 states with
+  counts `[3,3,3,3,2,3,3]`. The first strong tiling has no seed-compatible hard-drop order
+  in the complete `1..20000` trie after 704 states. These are diagnostics, not yet durable
+  authoring certificates or product setup acceptance.
 
 ### Stage F3B accepted status
 
@@ -930,11 +939,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 Retain `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6` unchanged. Leave
 the policy-blocked round-one and six benchmark artifacts untouched; do not retry cleanup
-through another shell. Perform one bounded read-only structural/scaling review of the two
-million-probe continuations, fixed-mask tiling/physics feasibility, memo reuse, and storage
-growth. It must choose one next action: authorize one equal third increment, or stop search
-and open a separately contracted authoring redesign. Do not run either path before that
-decision is recorded.
+through another shell. Freeze a separate exact-cover-first authoring contract before code:
+canonical tiling certificate/order, bag-count and contact invariants, bounded enumeration,
+seed-trie hard-drop check, hashes/output identity, Core zero-clear replay, and fail-closed
+resource behavior. It must use new tool/test paths or a separately versioned mode and may
+not import continuation state. Final F3C fixture/Core and all product work stay closed.
 Only then may a second increment read each old shard and write a distinct successor in a
 new external directory. Accept every successor before deleting the old directory. Keep
 final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SECOND REVERSE ROUND ACCEPTED; STRUCTURAL REVIEW OPEN**
+Status: **STAGE F3C SEEDED REVERSE HALTED; EXACT-COVER AUTHORING REDESIGN OPEN**
 
 ## Active objective
 
@@ -715,6 +715,22 @@ only; it is not F3 source acceptance.
   Round two is accepted and must remain. Round one is deletion-eligible but retained
   because terminal policy has already blocked its exact cleanup; do not retry or bypass.
   No third increment opens before a bounded structural/scaling review.
+- The structural review rejects a third increment. After 2,000,000 probes per shard,
+  every root is only at descriptor 36–49 of 662 (still inside the initial I-type segment),
+  second-round root progress totals 348 descriptors, failed memos remain near-linear, and
+  all three depth-19 residual four-cell masks are non-tetrominoes. Together with the
+  accepted forward 50,000,000-probe history, another blind increment has low value.
+- Static feasibility is positive: a 20-piece exact cover appears in 35 states; a stronger
+  cover satisfying two full bags plus six distinct third-bag draws and no same-type
+  orthogonal contact appears in 437 states with counts `[3,3,3,3,2,3,3]`. Exhaustively
+  matching that first certificate tiling against the `1..20000` reversed seed trie and
+  hard-drop physics completes in 704 states with no seed. The mask is therefore not
+  statically impossible, but the first certificate is not a runnable setup.
+- `seeded-reverse-v1` is frozen at 2,000,000 probes per shard: no third increment, wider
+  seed domain, or higher budget. Open a separate exact-cover-first authoring tool contract
+  that enumerates canonical bag-valid/no-touch tilings, then checks seed/order/gravity and
+  finally Core replay. Existing round-two continuation remains immutable evidence and is
+  never consumed by the new algorithm.
 
 ## Current checkpoint state
 
