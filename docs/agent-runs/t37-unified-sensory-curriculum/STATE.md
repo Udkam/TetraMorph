@@ -1010,11 +1010,19 @@ two byte-identical real CLI runs; typecheck passes; full Vitest passes
 `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; build transforms 767
 modules with only the existing >500 kB warning. Browser evidence remains inapplicable.
 
-Blocker: fresh independent full-tool QA of `3fe4313`. Only if accepted and a new resource
-check is green may exactly one full-domain production batch run with work budget 10,000,000,
-RSS 900 MiB, one process, and a new repository-external output. No product/Core/fixture,
-reverse continuation, T27/`progress.md`, deferred identity, icon, or missing Ice archive
-work opens yet.
+Fresh full-tool QA rejects `3fe4313` with `P0 0 / P1 1 / P2 1 / P3 0 / GAP 2`; the
+10,000,000-work production batch is forbidden. Fault injection proves that recording a
+random temp path before a successful `open('wx')` can unlink a foreign colliding file after
+the eighth EEXIST. QA also proves that hand-assembled setup/board data can be labeled as a
+candidate without a validated search result.
+
+Next exact action: repair only the two tool paths. Track cleanup ownership only after the
+exclusive open succeeds, add an EEXIST foreign-file preservation regression, and require
+output construction to receive the exact opaque result produced by `executeTilingSearch`.
+Candidate schema tests must use a real prepared-domain cover/order candidate, not a forged
+status/setup. Run all gates and fresh repair QA before reconsidering the production batch.
+No product/Core/fixture, reverse continuation, T27/`progress.md`, deferred identity, icon,
+or missing Ice archive work opens yet.
 
 ## Do not repeat
 

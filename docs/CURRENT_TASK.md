@@ -759,6 +759,11 @@ only; it is not F3 source acceptance.
   7,524-work combined trace and verifies domain/search RSS matrices plus strict stop
   priority. Only the final CLI/schema/result-hash/atomic-output checkpoint remains before
   full-tool QA and the one authorized 10,000,000-work production batch.
+- Initial final-tool candidate `3fe4313` is rejected by full-tool QA (`P1 1 / P2 1`): a
+  failed exclusive temp open could unlink an unowned colliding file, and hand-assembled
+  setup/board data could masquerade as a search-produced candidate. Production remains
+  closed until a repair candidate proves owned-temp cleanup and binds output construction
+  to an actual validated search result.
 
 ## Current checkpoint state
 
