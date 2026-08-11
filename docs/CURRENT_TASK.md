@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C SEEDED-REVERSE REPAIR REJECTED; DIFFERENTIAL TEST REPAIR OPEN**
+Status: **STAGE F3C COMPLETE-SET TEST CANDIDATE `1686963`; QA NEXT**
 
 ## Active objective
 
@@ -95,15 +95,14 @@ ten-row fixture/test pair, while published Puzzle content stays closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C DIFFERENTIAL TEST REPAIR OPEN** — the exact
+6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C COMPLETE-SET TEST QA** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
    anchor-supported state identity, definition-aware replay/proof, and exact anchor
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
-   QA rejects `77bc7fc` because its replacement differential test still observes only
-   first candidates rather than one canonical traversal's complete history set; content
-   authoring stays closed.
+   test candidate `1686963` replaces first-candidate evidence with one canonical
+   traversal's complete history set; independent QA is next and content stays closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -602,6 +601,18 @@ only; it is not F3 source acceptance.
   must include separated and touching same-type orders, a mixed queue, real piece support,
   upper obstruction, and the domain's spawn-blocker check. Production source and search
   remain closed until this test and all five live GAP reproductions pass independent QA.
+- Test-only candidate `1686963` changes one authorized path (`172` added/modified lines).
+  Each target uses the canonical catalog and a single state; every returned candidate is
+  recorded, then the same state continues until natural `complete-not-found`. The exact
+  set is compared with an independent physical-drop oracle for separated and touching
+  O/O, both O/I queue orders, a real piece-supported landing, and a floating upper
+  negative. Domain checks independently match floor/upper blockers to production
+  `landing` and explicitly keep the row-20 spawn blocker outside the reverse mask.
+- The same standalone suite retains the recomputed token/descriptor, real hard-link,
+  distinct-existing-file, exact 1,000,000,000, no-output overflow, Core replay, forward
+  byte, and cleanup checks. Post-last-edit standalone, typecheck, complete suite
+  (`46 passed / 2 skipped` files; `430 passed / 10 skipped` tests), and 767-module build
+  pass. Production reverse search remains closed pending fresh independent QA.
 
 ## Current checkpoint state
 

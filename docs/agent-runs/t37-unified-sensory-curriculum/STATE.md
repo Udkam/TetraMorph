@@ -128,8 +128,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 31. `F3C SEEDED-REVERSE REPAIR REJECTED` — independent QA reports P2 1 / GAP 5 because
     the differential test observes restricted first candidates, not a canonical complete
     reverse history set. Production reverse search remains closed.
-32. `PENDING` — one test-only complete-set repair and fresh independent QA precede any
-    reverse search run, fixture, content, migration, UI, final integrated gates, or push.
+32. `F3C COMPLETE-SET TEST CANDIDATE; QA NEXT` — test-only checkpoint `1686963`
+    enumerates one canonical reverse state to completion and passes final local gates.
+33. `PENDING` — fresh independent QA precedes any reverse search run, fixture, content,
+    migration, UI, final integrated gates, or push.
 
 ### Stage F3C tooling-discovery status
 
@@ -412,6 +414,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   resume after each candidate until `complete-not-found`, then compare all signatures to
   an independent forward set across same-type, mixed, support, upper-obstruction, and
   spawn-domain scenarios. Re-run all five deferred live checks before new QA.
+- Test-only candidate `1686963` changes exactly that path with `172` added/modified lines.
+  It builds the canonical catalog per target, runs one reverse state through every leaf
+  and natural completion, rejects duplicate histories, and compares the exact set with
+  an independent physical-drop oracle. Scenarios cover both separated O/O orders,
+  touching O/O exclusion, O/I versus I/O, real piece support, floating upper geometry,
+  in-domain floor/upper blockers, and an explicitly out-of-domain row-20 spawn blocker.
+- Post-last-edit standalone, typecheck, complete suite (`46 passed / 2 skipped` files;
+  `430 passed / 10 skipped` tests), and 767-module build pass. The suite also executes
+  the deferred attack, boundary, file-identity, and byte checks; exact Temp output is
+  removed, the coordinator verifies owned search Node count zero, one-path scope is
+  clean, and protected dirt stays unstaged. Blocker: fresh independent QA. One next action: reproduce rather
+  than trust these checks, then report P0–P3/GAP before any search.
 
 ### Stage F3B accepted status
 
@@ -829,17 +843,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Repair only the standalone reverse test. Replace restricted first-candidate runs with a
-complete enumerator that uses `buildReverseCatalog(targetMask).descriptors`, one real
-reverse state, repeated `advanceReverse` calls after each candidate, and natural
-`complete-not-found`. Compare every returned history with an independently enumerated
-forward set for separated/touching same-type pieces, mixed order, piece support, upper
-obstruction, and the bounded domain's spawn-blocker semantics. Then run the standalone
-test, one final typecheck/full suite/build because test source changed, commit the bounded
-test checkpoint, and obtain fresh independent QA that also closes all five prior GAPs.
-Do not run production 32-shard reverse search. Keep production tool source, final F3C
-JSON/Core test, later content, deferred identity, T27/`progress.md`, and missing Ice
-archive closed.
+Run fresh independent read-only QA over the full implementation/test chain
+`1f85a0a..1686963`, accounting for intervening docs-only checkpoints. Independently
+reproduce the complete canonical reverse sets and all five prior GAP classes: recomputed
+token/descriptor attacks, exact ceiling admission/overflow, hard-link versus distinct
+files, standalone/legacy bytes, and cleanup/zero process. Audit set completeness,
+queue reversal, forbidden masks, support, upper/spawn domain boundaries, scope, and
+commit budgets. Report P0–P3/GAP. Do not run production 32-shard reverse search. Keep
+production tool source, final F3C JSON/Core test, later content, deferred identity,
+T27/`progress.md`, and missing Ice archive closed.
 
 ## Do not repeat
 

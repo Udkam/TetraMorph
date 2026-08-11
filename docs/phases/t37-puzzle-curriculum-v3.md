@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C SEEDED-REVERSE REPAIR REJECTED; DIFFERENTIAL TEST REPAIR OPEN**
+Status: **F3C COMPLETE-SET TEST CANDIDATE `1686963`; QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -633,6 +633,12 @@ the canonical catalog, continue one state after every candidate through
 `complete-not-found`, and compare every history against an independent forward oracle,
 including same-type, mixed, support, upper-obstruction, and spawn-domain cases. Fresh QA
 must also run the five deferred tamper/ceiling/file/byte/process checks before any shard.
+Test checkpoint `1686963` now uses the canonical catalog and one state per target,
+continues after every candidate to natural completion, and compares exact reverse sets
+with an independent physical-drop oracle across same-type, mixed-order, support, and
+floating-upper scenarios. Floor/upper blockers agree with production landing, while the
+spawn blocker is explicitly outside the ten-row reverse domain. All local gates and the
+five deferred regression classes pass; fresh independent QA remains required.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

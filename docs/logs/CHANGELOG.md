@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C complete-set test candidate
+
+- Test-only checkpoint `1686963` replaces restricted first-candidate assertions with
+  one canonical catalog/state that resumes after every candidate through natural
+  completion. Exact reverse history sets now match an independent physical-drop oracle
+  for separated/contacting O/O, both mixed queue orders, piece support, and floating
+  upper geometry; floor/upper/spawn domain boundaries are explicit.
+- Prior token, descriptor, exact-ceiling, hard-link, distinct-file, forward-byte, Core,
+  and cleanup regressions remain active. Post-last-edit standalone, typecheck, complete
+  suite (`46` files / `430` tests passed; `2` / `10` skipped), 767-module build, exact
+  one-path scope, Temp cleanup, and zero owned process pass. Search remains QA-closed.
+
 ## 2026-08-11 — T37 Stage F3C reverse repair QA rejected
 
 - Independent QA rejects repair `77bc7fc` with `P2 1 / GAP 5`. The replacement test

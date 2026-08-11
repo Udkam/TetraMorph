@@ -538,6 +538,13 @@ adding unrelated badges or ornamental effects.
   with an independent forward oracle across same-type, mixed, support, upper-obstruction,
   and spawn-domain scenarios. The three production hardening changes remain candidates,
   not accepted source, until the repaired proof and five deferred live reproductions pass.
+- Test checkpoint `1686963` now performs that complete enumeration with one canonical
+  catalog/state per target and resumes after every candidate through natural completion.
+  Exact sets match an independent physical-drop oracle across both O/O orders and
+  contact rejection, opposite mixed queues, piece support, and a floating upper negative.
+  Separate domain assertions agree with production floor/upper/spawn blocking without
+  encoding hidden row-20 cells into the ten-row reverse mask. Final local gates pass;
+  fresh read-only QA still controls production-search admission.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
