@@ -1379,6 +1379,23 @@ The JSON is literal canonical UTF-8/LF with the frozen schema; the opt-in test r
 repository fixture, rebuilds every value through current Core, proves the canonical base is
 unchanged, and runs the exact certificate only when `PUZZLE_EXACT_CERTIFICATES=1`.
 
+The first implementation writer stops before editing because the contract omitted nested
+key names and top scalar literals. No file was created. The completed schema repair freezes:
+artifact version `t37-puzzle-v3-ten-row-prototype-v1`, schema 1, and claim
+`T37 F3C non-published ten-row prototype; current-Core replay and no-beam exact certificate are mandatory.`
+
+Provenance exact keys are `algorithmVersion,candidateIdentitySha256,manifestFileSha256,`
+`manifestHash,manifestInputFileSha256,placementSha256,profileIndex,rawFileSha256,`
+`rawResultHash,seriesVersion,shardIndex,targetMask,tilingOrdinal,typedBoardSha256`. Route exact
+keys are `commandStream,cumulativeClears,finalStateHash,initialStateHash,lockSignatures,`
+`lowerBounds,metrics,remainingTargetCounts,rowReleaseCounts`; metrics are
+`commandCount,locks,moveCount,rotationCount`. Certificate exact keys are
+`deficitBoundPrunes,exhaustedFrontierWidths,exploredStateCount,initialStateHash,optimalLocks,`
+`transitionCount`.
+
+Next exact action: the same single writer may now create only the two final paths, using these
+literal names and values. Any further schema ambiguity stops before editing.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

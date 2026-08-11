@@ -688,13 +688,22 @@ adding unrelated badges or ornamental effects.
   `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
   `src/game/core/puzzleV3PrototypeExact.test.ts`. The canonical JSON has exact top keys
   `artifactVersion,certificate,claim,definition,provenance,route,schemaVersion`.
+  Scalar literals are `artifactVersion="t37-puzzle-v3-ten-row-prototype-v1"`,
+  `schemaVersion=1`, and
+  `claim="T37 F3C non-published ten-row prototype; current-Core replay and no-beam exact certificate are mandatory."`.
   Definition exact keys are `anchorCells,baseId,boardRows,gameplaySeed,hiddenCells,setup,`
   `targetRows`; setup exact keys are `placements,seed`. `baseId` is the literal
   `t3r-shaft-01`, used only as an injected non-published validation host because
   `validatePuzzleDefinition(..., false)` still requires a registered ID. The canonical
-  product definition must remain byte-identical. Provenance binds raw/result/candidate/manifest identities;
-  route binds command stream, five lock signatures, row-release/remaining-target sequences,
-  and initial/final state hashes; certificate binds the no-beam optimum statistics.
+  product definition must remain byte-identical. Provenance exact keys are
+  `algorithmVersion,candidateIdentitySha256,manifestFileSha256,manifestHash,`
+  `manifestInputFileSha256,placementSha256,profileIndex,rawFileSha256,rawResultHash,`
+  `seriesVersion,shardIndex,targetMask,tilingOrdinal,typedBoardSha256`.
+  Route exact keys are `commandStream,cumulativeClears,finalStateHash,initialStateHash,`
+  `lockSignatures,lowerBounds,metrics,remainingTargetCounts,rowReleaseCounts`; metrics exact
+  keys are `commandCount,locks,moveCount,rotationCount`. Certificate exact keys are
+  `deficitBoundPrunes,exhaustedFrontierWidths,exploredStateCount,initialStateHash,`
+  `optimalLocks,transitionCount`.
 - Frozen route literals are command stream
   `SHTTTTTTTTTTTTLLLLHTTTTTTTTTTTTCCRHTTTTTTTTTTTTCCLLLHTTTTTTTTTTTTQRRRHTTTTTTTTTTTT`,
   metrics `82 commands / 5 locks / 5 rotations / 11 moves`, cumulative clears

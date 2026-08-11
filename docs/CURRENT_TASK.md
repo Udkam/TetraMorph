@@ -86,6 +86,9 @@ Only `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
 `src/game/core/puzzleV3PrototypeExact.test.ts` are open for one final non-product proof
 checkpoint. Published Puzzle definitions, runtime Core, UI, T27/`progress.md`, icon, and Ice
 remain closed.
+The first writer correctly stopped before creating either path because nested exact keys and
+three scalar literals were underspecified. `docs/DESIGN.md` now freezes every top/nested key,
+artifact/schema version, and claim string; no implementer-selected field name is permitted.
 
 ## Frozen product direction
 
@@ -1005,7 +1008,8 @@ only; it is not F3 source acceptance.
   accepted as the series candidate. Shards 5–8 are closed. Current-Core setup replay passes;
   the gameplay seed, route signatures, and final two-path schema are frozen. Only the
   the corrected independent fixed-route/exact-certificate diagnostic is accepted all-zero.
-  Only the frozen prototype JSON and direct opt-in exact test are open; product stays closed.
+  Only the fully schema-frozen prototype JSON and direct opt-in exact test are open; product
+  stays closed.
 
 ## Current checkpoint state
 

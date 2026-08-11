@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C final prototype schema completed
+
+- The first final-file writer stops before editing because nested key names and top scalar
+  literals were not fully specified. No artifact or test was created.
+- The contract now freezes artifact/schema/claim literals and every provenance, route,
+  metrics, and certificate key. The same exact two-path implementation boundary reopens.
+
 ## 2026-08-12 — T37 Stage F3C current-Core route and certificate accepted
 
 - A fresh independent no-file replay accepts the exact 82-command public route, five lock
