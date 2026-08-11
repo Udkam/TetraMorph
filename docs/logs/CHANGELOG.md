@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C first reverse round complete
+
+- All 32 serial 625-seed shards receive exactly one 1,000,000-probe increment. Every file
+  is `paused-budget` with no candidate, memory guard, or completion; totals are 20,000
+  seeds, 32,000,000 probes, 342,213 failed states, 338,728 trie nodes, and 81,077,752 bytes.
+- Independent output QA reports P0–P3/GAP all zero and reproduces ordered manifest
+  `2FEE91319AF99ADFBCE42BED649BDE53076C383AD11BA2FFB64D4FE147873F25`.
+  Terminal safety policy rejects both attempted cleanup forms before execution, leaving
+  the exact 32-file Temp directory intact. No second round or product work opens yet.
+
 ## 2026-08-11 — T37 Stage F3C enumeration repair accepted
 
 - Formal and adversarial QA independently accept `77fe380` with P0–P3/GAP all zero.

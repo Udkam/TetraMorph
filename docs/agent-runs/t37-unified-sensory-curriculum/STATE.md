@@ -141,8 +141,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     passes final local gates.
 36. `F3C ENUMERATION REPAIR ACCEPTED` — formal and adversarial QA both report P0–P3/GAP
     all zero and authorize the frozen first production reverse round.
-37. `PENDING` — run one fair increment across all 32 serial shards; no second increment,
-    fixture, content, migration, UI, final gates, or push opens before round review.
+37. `F3C FIRST REVERSE ROUND COMPLETE` — all 32 shards receive one fair increment and
+    stop at 1,000,000 probes without a candidate; independent output QA is all zero.
+38. `TEMP CLEANUP BLOCKED` — terminal safety policy rejects both exact deletion forms
+    before execution. No second increment or later product work opens before cleanup.
 
 ### Stage F3C tooling-discovery status
 
@@ -463,6 +465,21 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   attacks, ceiling, NTFS, legacy vectors, scope, and cleanup. Adversarial QA separately
   accepts with the same all-zero verdict, including 120/120 five-I histories and three
   restricted-catalog mutations. Both authorize only the frozen first reverse round.
+- First reverse round runs at HEAD `e436c29` with repository-external outputs and serial
+  resource gates. Shards 0..31 each cover 625 adjacent seeds and stop at exactly 1,000,000
+  new probes with `paused-budget`; no setup, memory, or complete status occurs. Totals:
+  20,000 seeds, 32,000,000 probes, 342,213 failed states, 338,728 trie nodes, and
+  81,077,752 bytes. Manifest SHA-256 is
+  `2FEE91319AF99ADFBCE42BED649BDE53076C383AD11BA2FFB64D4FE147873F25`;
+  first/last hashes are `2BEB131A...C6C131` / `61858545...9EFF0`.
+- Independent round-output QA accepts with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, directly
+  reproducing all 32 files, canonical LF, domain continuity, schema/status/null fields,
+  common and per-shard hashes, totals, and manifest. Owned search Node and staging counts
+  are zero; protected dirt is unchanged.
+- Cleanup blocker: both recursive directory deletion and explicit 32-file non-recursive
+  deletion are rejected by terminal safety policy before execution. The intact path is
+  `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` (32 files,
+  81,077,752 bytes). Do not attempt shell switching or policy bypass.
 
 ### Stage F3B accepted status
 
@@ -880,15 +897,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-After a fresh non-red resource, Temp, owned-process, staging, and HEAD check, run the first
-fair production reverse round only: shard indexes 0..31 serially, seeds 1..20000,
-`--shard-count 32`, `--node-budget 1000000`, `--max-rss-mib 900`, and unique external
-Temp outputs. Do not pass `--resume` on this first increment. Stop immediately on any
-candidate, memory guard, completion, invalid output, or unexpected exit; otherwise every
-incomplete shard receives exactly one increment before any second does. Record hashes,
-status, probe counts, cleanup, and zero process before deciding the next slice. Keep final
-F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the missing
-Ice archive closed.
+Remove only the already verified external directory
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` through a user/manual
+or otherwise permitted workflow, then verify matching Temp count and owned search Node
+count are zero. Do not retry through another shell or bypass the terminal safety policy.
+After cleanup, perform a bounded round review before authorizing any second increment.
+Keep final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the
+missing Ice archive closed.
 
 ## Do not repeat
 

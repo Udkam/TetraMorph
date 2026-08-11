@@ -572,6 +572,13 @@ adding unrelated badges or ornamental effects.
   shard, repository-external outputs, one increment for every incomplete shard before any
   second increment. Content, Core fixture, migration, UI, and later search rounds stay
   closed.
+- The first reverse round completes all 32 first increments with 32,000,000 total probes
+  and no candidate; all outputs are resumable `paused-budget`, not negative certificates.
+  Independent output QA reproduces the contiguous 1..20000 domain, schema/hashes, 342,213
+  failed states, 338,728 trie nodes, 81,077,752 bytes, and ordered manifest
+  `2FEE9131...873F25` with no finding or GAP. Terminal policy blocks deletion of the exact
+  external Temp directory before execution, so second-round and product admission remain
+  closed until cleanup is performed and verified.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

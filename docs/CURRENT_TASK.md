@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C ENUMERATION REPAIR ACCEPTED; FIRST REVERSE ROUND OPEN**
+Status: **STAGE F3C FIRST REVERSE ROUND COMPLETE; TEMP CLEANUP BLOCKED**
 
 ## Active objective
 
@@ -661,6 +661,21 @@ only; it is not F3 source acceptance.
   exactly one increment before any second increment. Stop the round on the first candidate,
   memory guard, or completion. Final F3C fixture/Core work and all later product stages
   remain closed until the round is recorded and reviewed.
+- First reverse round at `e436c29` completes all 32 serial first increments. Every shard
+  covers its contiguous 625-seed slice, returns `paused-budget` at exactly 1,000,000 new
+  probes, and has no setup candidate, memory guard, or complete result. The round totals
+  20,000 processed seeds, 32,000,000 probes, 342,213 failed states, 338,728 trie nodes,
+  and 81,077,752 output bytes. A budget stop is not a proof that any shard is exhausted.
+- The ordered manifest SHA-256 is
+  `2FEE91319AF99ADFBCE42BED649BDE53076C383AD11BA2FFB64D4FE147873F25`;
+  first/last file hashes are `2BEB131A...C6C131` and `61858545...9EFF0`. Independent
+  output QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, reproducing all identities,
+  counters, hashes, LF bytes, and the manifest.
+- Exact Temp cleanup is blocked: both recursive and explicit 32-file PowerShell deletion
+  were rejected by the terminal safety policy before execution. The intact directory is
+  `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` with 32 files and
+  81,077,752 bytes; owned search-process count is zero. Do not start a second increment or
+  later product work until that exact directory is removed and zero-state is verified.
 
 ## Current checkpoint state
 
