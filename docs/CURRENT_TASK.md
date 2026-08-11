@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C V2 SERIES CANDIDATE + CORE SETUP ACCEPTED / FIXED ROUTE DIAGNOSTIC OPEN**
+Status: **STAGE F3C V2 CANDIDATE + CORE ROUTE/CERTIFICATE ACCEPTED / FINAL TWO PATHS OPEN**
 
 ## Active objective
 
@@ -79,6 +79,13 @@ The pending independent replay must compare literal command stream
 metrics `82/5/5/11`, state hashes `bec0ea65/8e34e0c8`, and certificate
 `5 locks / [1] frontier / 1 explored / 0 transitions / 1 prune`; reviewers may not invent
 alternate expected counts.
+Fresh independent current-Core replay now accepts every value with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; the canonical base definition remains unchanged with
+SHA-256 `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1`.
+Only `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
+`src/game/core/puzzleV3PrototypeExact.test.ts` are open for one final non-product proof
+checkpoint. Published Puzzle definitions, runtime Core, UI, T27/`progress.md`, icon, and Ice
+remain closed.
 
 ## Frozen product direction
 
@@ -997,8 +1004,8 @@ only; it is not F3 source acceptance.
   accepted. Shards 1–3 are accepted noncandidates; shard 4 and the five-entry manifest are
   accepted as the series candidate. Shards 5–8 are closed. Current-Core setup replay passes;
   the gameplay seed, route signatures, and final two-path schema are frozen. Only the
-  corrected in-memory fixed-route/exact-certificate diagnostic with frozen base ID is open;
-  fixture and product stay closed.
+  the corrected independent fixed-route/exact-certificate diagnostic is accepted all-zero.
+  Only the frozen prototype JSON and direct opt-in exact test are open; product stays closed.
 
 ## Current checkpoint state
 

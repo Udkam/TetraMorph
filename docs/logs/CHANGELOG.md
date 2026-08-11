@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C current-Core route and certificate accepted
+
+- A fresh independent no-file replay accepts the exact 82-command public route, five lock
+  signatures, target contraction, lower bounds, and `bec0ea65 → 8e34e0c8` state hashes.
+- The no-beam proof certifies five locks with frontier `[1]`, one explored state, zero
+  transitions, and one deficit prune. Independent review is P0–P3/GAP all zero.
+- Canonical `t3r-shaft-01` remains byte-identical. Only the frozen prototype JSON and one
+  direct opt-in Core test are open; no product or published Puzzle path is authorized.
+
 ## 2026-08-12 — T37 Stage F3C route literals frozen for independent QA
 
 - A reviewer harness stops on its own unsupported `87` command expectation after both Core

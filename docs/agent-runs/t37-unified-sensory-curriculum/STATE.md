@@ -1360,6 +1360,25 @@ metrics `82,5,5,11`; state hashes `bec0ea65,8e34e0c8`; exact certificate
 Next exact action: assign a fresh independent reviewer one no-file full replay using only
 these literals and base ID `t3r-shaft-01`. No final path opens before all-zero disposition.
 
+Final independent current-Core replay accepted (2026-08-12): one fresh no-file probe under
+`e5daf92` exits 0 without rerun. It reproduces the raw 20-drop board, active/Next/bag state,
+the exact 82-command stream and `82/5/5/11` metrics, all five frozen landing signatures,
+row releases `1,2,2,2,3`, cumulative clears `1,3,5,7,10`, target counts `74,58,42,26,0`,
+and lower bounds `5,4,3,2,1,0`. State hashes are `bec0ea65 → 8e34e0c8`.
+
+The no-beam certificate is exactly five locks, exhausted frontier `[1]`, one explored state,
+zero transitions, one deficit-bound prune, and initial hash `bec0ea65`. Canonical
+`t3r-shaft-01` remains the same reference and bytes before/after, SHA-256
+`7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1`. Process, raw file,
+HEAD, status, and index are unchanged. Independent disposition is P0–P3/GAP all zero.
+
+Next exact action: add only
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
+`src/game/core/puzzleV3PrototypeExact.test.ts` as one bounded non-product proof checkpoint.
+The JSON is literal canonical UTF-8/LF with the frozen schema; the opt-in test reads only the
+repository fixture, rebuilds every value through current Core, proves the canonical base is
+unchanged, and runs the exact certificate only when `PUZZLE_EXACT_CERTIFICATES=1`.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
