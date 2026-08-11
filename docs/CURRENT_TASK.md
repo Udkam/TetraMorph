@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 TEST ACCEPTED / SHARD 0 OPEN**
+Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 SHARD 0 ACCEPTED / SHARD 1 OPEN**
 
 ## Active objective
 
@@ -47,10 +47,13 @@ The v2 standalone test is accepted through initial candidate `71f0a54` and gap r
 It stays within 497 lines and passes 145 checks. Fresh independent QA confirms all five
 explicit repair attacks and reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Final v1/v2
 standalones, typecheck, the complete `430 passed / 10 skipped` suite, and the 767-module
-build pass. Exactly one shard-0 production run is now open at the frozen external path
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s00-16039546.json`.
-No retry or later shard is authorized before independent raw-byte/output QA. Core, fixture,
-product, T27/`progress.md`, identity/icon, and Ice paths remain closed.
+build pass. Shard 0 is accepted as a natural complete noncandidate: independent raw-byte QA
+rebuilds its queue, trie, domain, and result hashes with all findings zero. Its accepted
+prefix manifest hash is `4A8C0D8A3F3CF33B016D92C55CC979F0FE4BD9B76C57426071786A409B1DDB43`.
+Exactly one shard-1 production run is now open at frozen external path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s01-16039546.json`.
+No retry or later shard is authorized before independent output and cumulative-manifest QA.
+Core, fixture, product, T27/`progress.md`, identity/icon, and Ice paths remain closed.
 
 ## Frozen product direction
 
@@ -964,9 +967,10 @@ only; it is not F3 source acceptance.
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It verifies the exact preimages, manifest/v1
   predecessor and QA-expected hashes, candidate physical replay, pure test seams, and
   private production capability without finding a new ambiguity. The contract is accepted.
-  The bounded source chain `1a36e73..1ceb1bc` and test chain `71f0a54..caba9d0` now pass
-  final independent all-zero QA and all source gates. One shard-0 run is open at the
-  frozen external path; later shards, Core, fixture, and product remain closed.
+  The bounded source chain `1a36e73..1ceb1bc` and test chain `71f0a54..caba9d0` pass
+  final independent all-zero QA and all source gates. Shard 0 and its prefix manifest are
+  accepted; one shard-1 run is open at the frozen external path. Later shards, Core,
+  fixture, and product remain closed.
 
 ## Current checkpoint state
 

@@ -1201,6 +1201,26 @@ raw canonical bytes, schema, all identities/hashes/work arithmetic, and candidat
 present before creating a QA-expected prefix manifest or opening shard 1. Core, fixture,
 product, T27/`progress.md`, icon, and Ice remain closed.
 
+Shard 0 and prefix manifest accepted (2026-08-12): the only production run ended naturally
+in 32.967 s with exit 2, `complete-not-found:cover`, and 1,407,110 work. The 4,338-byte
+output has file SHA-256 `A790570DE8FB8FB07E93765B6C311755BD65E3B9952A6A2BC42B7FD19682CABE`
+and result hash `EB9A3C44609ED82B23F08BAC4235A195934BFF99B8268ACF7C6B1F36C5A8EFEC`.
+Independent raw-byte QA rebuilds all 20,000 queues, seven memberships, the 282,530-node trie,
+domain, canonical result preimage, and work arithmetic with `P0–P3/GAP` all zero.
+
+The QA-expected one-entry input is 291 bytes with SHA-256
+`5FD83DFA0E72E49864EF96952E3643DE763DCB7D548EAC02CD74334EBFBA5321`.
+The exactly-once manifest run ended `prefix-complete`/exit 2; its 1,710-byte file SHA-256 is
+`E6DABF9EBB6B63B0CA2987D2CE5190EBCBDFA1389B97FECAE5D229BDECB60505`, and independently
+recomputed manifest hash is `4A8C0D8A3F3CF33B016D92C55CC979F0FE4BD9B76C57426071786A409B1DDB43`.
+Final manifest QA is all zero. Shard 0 and its manifest must not be rerun or replaced.
+
+Next exact action: run shard index 1 exactly once with the same fixed work/RSS, publishing
+only to absent external path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s01-16039546.json`.
+Apply the same raw-byte and cumulative-manifest QA before opening shard 2. No parallel shard,
+Core, fixture, product, T27/`progress.md`, icon, or Ice path is open.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
