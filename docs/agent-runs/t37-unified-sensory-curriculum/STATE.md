@@ -490,6 +490,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   result depends only on seven child-availability bits. Open one bounded performance
   checkpoint that caches the identical ordered result by at most 128 masks. It must keep
   old continuation acceptance and all probe, memo, cursor, and result hashes invariant.
+- Candidate `8317373` uses a context-keyed WeakMap and passes final local gates. Real
+  round-one shard-00 resumes are byte-identical for 10,000 and 100,000 probes; the latter
+  changes from 8.313 s to 1.240 s. Independent QA nevertheless rejects with
+  `P0 0 / P1 0 / P2 0 / P3 1 / GAP 2`: catalog replacement is stale, the mask oracle is
+  coupled to the implementation, and reuse is not protected by a filter-call counter.
 
 ### Stage F3B accepted status
 
@@ -908,10 +913,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Next exact action
 
 Retain the accepted external directory
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. Implement
-and verify only the order-preserving `frameCandidates()` cache in the production reverse
-tool and its standalone test. Require old-cursor resume plus split/one-shot probe, memo,
-cursor, result, and canonical-byte equivalence, final gates, and fresh independent QA.
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. Reopen only
+the order-preserving `frameCandidates()` cache and standalone test. Bind cached masks to
+the current catalog identity; independently test raw-child predicate equivalence for all
+128 masks; count filters for repeated masks, changed masks, and distinct contexts. Keep
+old-cursor resume plus split/one-shot probe, memo, cursor, result, and canonical-byte
+equivalence, final gates, and fresh independent QA.
 Only then may a second increment read each old shard and write a distinct successor in a
 new external directory. Accept every successor before deleting the old directory. Keep
 final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the

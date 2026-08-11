@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FIRST REVERSE ROUND ACCEPTED; CONTINUATION PERFORMANCE REVIEW OPEN**
+Status: **STAGE F3C FIRST REVERSE ROUND ACCEPTED; CANDIDATE-CACHE REPAIR OPEN**
 
 ## Active objective
 
@@ -685,6 +685,12 @@ only; it is not F3 source acceptance.
   a new external directory. Validate all successor files first; only then may the prior
   directory be removed. Product content and UI work remain closed during this bounded
   performance slice.
+- Candidate `8317373` preserves real 10,000- and 100,000-probe resume bytes and improves
+  the latter measurement from 8.313 s to 1.240 s, but independent QA rejects admission
+  with `P0 0 / P1 0 / P2 0 / P3 1 / GAP 2`. Reopen only the cache and standalone test:
+  invalidate on catalog identity replacement, independently enumerate all 128 child masks
+  against the original predicate, and count `filter()` calls across repeated masks and
+  distinct contexts. A fresh all-zero QA verdict remains mandatory.
 
 ## Current checkpoint state
 

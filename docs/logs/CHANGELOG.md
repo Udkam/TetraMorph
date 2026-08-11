@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C candidate-cache QA rejection
+
+- Candidate `8317373` keeps 10,000- and 100,000-probe real-resume outputs byte-identical
+  and reduces the latter single measurement from 8.313 s to 1.240 s. Final standalone,
+  typecheck, 430-test suite, and build pass.
+- Independent QA reports `P0 0 / P1 0 / P2 0 / P3 1 / GAP 2`: catalog replacement can
+  leave a stale context cache, while tests lack an independent 128-mask oracle and a
+  `filter()` call counter. Only those two source/test paths reopen; second-round search
+  remains closed.
+
 ## 2026-08-11 — T37 Stage F3C continuation retention correction
 
 - The accepted 32-file first-round output is the only resumable state for its 32 shards.

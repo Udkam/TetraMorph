@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FIRST REVERSE ROUND ACCEPTED; CONTINUATION PERFORMANCE REVIEW OPEN**
+Status: **F3C FIRST REVERSE ROUND ACCEPTED; CANDIDATE-CACHE REPAIR OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -672,6 +672,11 @@ distinct successor set passes review. A bounded performance slice may cache the 
 ordered `frameCandidates()` result by seven-type availability mask, but it must prove
 old-cursor compatibility and byte-identical probe/hash behavior under fresh QA before
 any second increment. Product work remains closed.
+Candidate `8317373` meets byte equivalence and performance intent, but fresh QA rejects
+its regression closure with `P3 1 / GAP 2`. The cache must reset when catalog identity is
+replaced; tests must derive an independent oracle from raw trie children for all 128 masks
+and count actual filters for same-mask reuse and context isolation. No search opens on the
+rejected candidate.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

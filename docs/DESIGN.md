@@ -586,6 +586,12 @@ adding unrelated badges or ornamental effects.
   A fresh source candidate, equivalence tests, full gates, and independent QA are required
   before any second increment. Resume input and output remain distinct external paths;
   old files are deleted only after all new files are independently accepted.
+- Candidate `8317373` proves byte equivalence and a credible 6.70× sample speedup, but its
+  first independent QA is `P3 1 / GAP 2`: replacing a context's catalog can leave stale
+  candidates, the mask oracle is not independent, and array identity alone does not prove
+  one filter per cached mask. The repair must bind each context cache to catalog identity,
+  enumerate all 128 masks from raw child arrays, and use a counting catalog across same-
+  mask and cross-context calls. Production search remains closed until fresh all-zero QA.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
