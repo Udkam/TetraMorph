@@ -172,9 +172,152 @@ assert.deepEqual({
 });
 assert.deepEqual(canonicalFirst(), firstRun, 'canonical cover traversal must repeat byte-for-byte');
 
+function exactTrieForForwardTypes(types, seeds = [77]) {
+  const nodes = [{ depth: 0, children: Array(7).fill(-1), seeds: [] }];
+  let parent = 0;
+  for (const typeIndex of types.toReversed()) {
+    const child = nodes.length;
+    nodes[parent].children[typeIndex] = child;
+    nodes.push({ depth: nodes[parent].depth + 1, children: Array(7).fill(-1), seeds: [] });
+    parent = child;
+  }
+  nodes[parent].seeds.push(...seeds);
+  return nodes;
+}
+
+function independentDropMask(boardMask, descriptor) {
+  const shape = base.SHAPES[base.TYPES[descriptor.typeIndex]][descriptor.rotation];
+  const canPlace = (absoluteY) => shape.every(([dx, dy]) => {
+    const x = descriptor.x + dx;
+    const y = absoluteY + dy;
+    if (x < 0 || x >= 10 || y < 0 || y >= 40) return false;
+    return y < 30 || !(boardMask & (1n << BigInt((y - 30) * 10 + x)));
+  });
+  let absoluteY = 19;
+  if (!canPlace(absoluteY)) return null;
+  while (canPlace(absoluteY + 1)) absoluteY += 1;
+  let mask = 0n;
+  for (const [dx, dy] of shape) {
+    const x = descriptor.x + dx;
+    const y = absoluteY + dy;
+    if (y < 30) return null;
+    mask |= 1n << BigInt((y - 30) * 10 + x);
+  }
+  return mask;
+}
+
+function independentForwardAccepts(descriptors, order) {
+  let board = 0n;
+  for (const localIndex of order) {
+    const descriptor = descriptors[localIndex];
+    if (independentDropMask(board, descriptor) !== descriptor.cellMask) return false;
+    board |= descriptor.cellMask;
+  }
+  return true;
+}
+
+const supportedOther = catalog.find((descriptor) => descriptor.typeIndex !== floorO.typeIndex
+  && !(descriptor.cellMask & floorO.cellMask)
+  && base.hardDropMask(floorO.cellMask, descriptor) === descriptor.cellMask
+  && base.hardDropMask(0n, descriptor) !== descriptor.cellMask);
+assert(supportedOther, 'the order oracle needs one real supported non-O piece');
+const supportCatalog = [floorO, supportedOther];
+const supportTiling = { profileIndex: 0, catalogIndices: [0, 1] };
+const twoOrders = [[0, 1], [1, 0]];
+const oracleOrders = new Set(twoOrders.filter((order) =>
+  independentForwardAccepts(supportCatalog, order)).map((order) => order.join(',')));
+const searchedOrders = new Set();
+for (const order of twoOrders) {
+  const trie = exactTrieForForwardTypes(order.map((index) => supportCatalog[index].typeIndex), [91, 77]);
+  const result = tiling.searchTilingOrders({
+    tiling: supportTiling, catalog: supportCatalog, trie, workBudget: 20,
+  });
+  if (result.status === 'candidate') {
+    searchedOrders.add(result.candidate.forwardCatalogIndices.join(','));
+    assert.equal(result.candidate.seed, 77, 'a real leaf must choose its minimum seed');
+    const exactBoundary = tiling.searchTilingOrders({
+      tiling: supportTiling, catalog: supportCatalog, trie,
+      workBudget: result.orderPieceProbeCount,
+    });
+    assert.equal(exactBoundary.status, 'candidate', 'a last admitted probe must beat budget');
+    assert.equal(exactBoundary.workCount, result.orderPieceProbeCount);
+  }
+}
+assert.deepEqual(searchedOrders, oracleOrders,
+  'order DFS must equal the independent forward physical-drop permutation set');
+assert.deepEqual([...oracleOrders], ['0,1']);
+
+const isolatedFailure = tiling.searchTilingOrders({
+  tiling: supportTiling,
+  catalog: supportCatalog,
+  trie: exactTrieForForwardTypes([supportedOther.typeIndex, floorO.typeIndex]),
+  workBudget: 20,
+});
+const isolatedSuccess = tiling.searchTilingOrders({
+  tiling: supportTiling,
+  catalog: supportCatalog,
+  trie: exactTrieForForwardTypes([floorO.typeIndex, supportedOther.typeIndex]),
+  workBudget: 20,
+});
+assert.equal(isolatedFailure.status, 'complete-not-found');
+assert.equal(isolatedSuccess.status, 'candidate', 'failed memo must not cross tilings/runs');
+
+const fullTrie = base.buildReverseTrie(1, 20_000, Number.MAX_SAFE_INTEGER, () => 0);
+assert.equal(fullTrie.memoryGuard, false);
+assert.equal(fullTrie.processedSeeds, 20_000);
+assert.equal(fullTrie.nodes.length, 282_615);
+assert.equal(base.hashHex(base.fullQueueHash(1, 20_000)),
+  '9FAE1D03284F99CF356FD48320B55CD78D30CBAF1340AF4371B8182C795EEB67');
+assert.equal(base.hashHex(fullTrie.trieHash),
+  '4C78BE1A2353B67A20F8C77C55E3DC433B0C304D960B16DA6223CE3DAC769981');
+const canonicalOrderInput = {
+  tiling: firstRun.stoppedTiling,
+  catalog,
+  trie: fullTrie.nodes,
+  initialWorkCount: 1542,
+};
+const canonicalOrder = tiling.searchTilingOrders({
+  ...canonicalOrderInput, workBudget: 7524,
+});
+assert.deepEqual(canonicalOrder, {
+  status: 'complete-not-found',
+  complete: true,
+  workCount: 7524,
+  orderPieceProbeCount: 5982,
+  orderStateCount: 443,
+  failedMemoCount: 424,
+  traceHash: '3BF73A16B8B99DB6879271C7D1B43A8872752627F92F547B39A58681812C1173',
+  failedMemoTraceHash: '25E37B72BDA08E653C4783B47F0A7691FE9D4C94E837388F83352034F4D57181',
+  candidate: null,
+});
+assert.deepEqual(tiling.searchTilingOrders({ ...canonicalOrderInput, workBudget: 7524 }),
+  canonicalOrder, 'canonical order traversal must repeat byte-for-byte');
+const oneShort = tiling.searchTilingOrders({ ...canonicalOrderInput, workBudget: 7523 });
+assert.equal(oneShort.status, 'budget-exhausted');
+assert.equal(oneShort.workCount, 7523);
+assert.equal(oneShort.orderPieceProbeCount, 5981);
+assert(oneShort.failedMemoCount < canonicalOrder.failedMemoCount,
+  'STOP must not memoize the interrupted path');
+const zeroOrderBudget = tiling.searchTilingOrders({ ...canonicalOrderInput, workBudget: 1542 });
+assert.deepEqual({
+  status: zeroOrderBudget.status,
+  workCount: zeroOrderBudget.workCount,
+  orderPieceProbeCount: zeroOrderBudget.orderPieceProbeCount,
+  failedMemoCount: zeroOrderBudget.failedMemoCount,
+  traceHash: zeroOrderBudget.traceHash,
+  failedMemoTraceHash: zeroOrderBudget.failedMemoTraceHash,
+}, {
+  status: 'budget-exhausted', workCount: 1542, orderPieceProbeCount: 0,
+  failedMemoCount: 0, traceHash: EMPTY_SHA256, failedMemoTraceHash: EMPTY_SHA256,
+});
+
 assert.throws(() => tiling.coverCatalog(0n, []), /positive multiple of four/i);
 assert.throws(() => tiling.enumerateStrongTilings({
   fixedMask: floorO.cellMask, catalog: singleCatalog, profiles: singleProfile, workBudget: -1,
 }), /work budget/i);
+assert.throws(() => tiling.searchTilingOrders({
+  tiling: { profileIndex: 0, catalogIndices: [0, 0] },
+  catalog: supportCatalog, trie: exactTrieForForwardTypes([1, 1]), workBudget: 1,
+}), /catalog identity/i);
 
-process.stdout.write('tiling-first cover contract: all standalone checks pass\n');
+process.stdout.write('tiling-first cover/order contract: all standalone checks pass\n');

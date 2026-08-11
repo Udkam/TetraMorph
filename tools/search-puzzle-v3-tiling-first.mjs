@@ -193,6 +193,160 @@ function enumerateStrongTilings({ fixedMask, catalog, profiles, workBudget, onTi
   };
 }
 
+function remainingSetHex(value) {
+  if (!Number.isInteger(value) || value < 0 || value > 0xffff_ffff) {
+    throw new Error('Remaining-set value is invalid.');
+  }
+  return value.toString(16).toUpperCase().padStart(8, '0');
+}
+
+function remainingBoard(descriptors, remainingSet) {
+  let board = 0n;
+  for (let localIndex = 0; localIndex < descriptors.length; localIndex += 1) {
+    if (remainingSet & (2 ** localIndex)) board |= descriptors[localIndex].cellMask;
+  }
+  return board;
+}
+
+function orderStateKey(remainingSet, trieNodeId) {
+  return `${remainingSetHex(remainingSet)}:${trieNodeId}`;
+}
+
+function orderToken(workIndex, profileIndex, tilingOrdinal, state,
+  localIndex, catalogIndex, outcome) {
+  return {
+    workIndex, kind: 'order', profileIndex, tilingOrdinal,
+    depth: state.pieceCount - countBits(BigInt(state.remainingSet)),
+    remainingSet: remainingSetHex(state.remainingSet), trieNodeId: state.trieNodeId,
+    localIndex, catalogIndex, outcome,
+  };
+}
+
+function failedMemoToken(profileIndex, tilingOrdinal, remainingSet, trieNodeId) {
+  return { profileIndex, tilingOrdinal, remainingSet: remainingSetHex(remainingSet), trieNodeId };
+}
+
+function searchTilingOrders({
+  tiling, catalog, trie, workBudget, initialWorkCount = 0, tilingOrdinal = 0,
+}) {
+  if (!tiling || !Array.isArray(tiling.catalogIndices) || tiling.catalogIndices.length < 1
+    || tiling.catalogIndices.length > 31 || !Array.isArray(catalog) || !Array.isArray(trie)
+    || trie.length === 0) throw new Error('Order-search input is invalid.');
+  if (!Number.isSafeInteger(workBudget) || workBudget < 0 || workBudget > 1_000_000_000
+    || !Number.isSafeInteger(initialWorkCount) || initialWorkCount < 0
+    || initialWorkCount > workBudget || !Number.isSafeInteger(tilingOrdinal)
+    || tilingOrdinal < 0) throw new Error('Order-search budget or ordinal is invalid.');
+  const profileIndex = tiling.profileIndex;
+  if (!Number.isSafeInteger(profileIndex) || profileIndex < 0) {
+    throw new Error('Order-search profile index is invalid.');
+  }
+  const indices = tiling.catalogIndices;
+  if (indices.some((index, position) => !Number.isSafeInteger(index) || index < 0
+    || index >= catalog.length || (position > 0 && index <= indices[position - 1]))) {
+    throw new Error('Strong-tiling catalog identity is invalid.');
+  }
+  const descriptors = indices.map((index) => catalog[index]);
+  let tilingMask = 0n;
+  for (const descriptor of descriptors) {
+    if (!descriptor || !Number.isInteger(descriptor.typeIndex) || descriptor.typeIndex < 0
+      || descriptor.typeIndex >= base.TYPES.length || countBits(descriptor.cellMask) !== 4
+      || (tilingMask & descriptor.cellMask)) throw new Error('Strong-tiling descriptor is invalid.');
+    tilingMask |= descriptor.cellMask;
+  }
+  const trace = createHash('sha256');
+  const memoTrace = createHash('sha256');
+  const failedMemo = new Set();
+  const pieceCount = descriptors.length;
+  const fullSet = (2 ** pieceCount) - 1;
+  let workCount = initialWorkCount;
+  let orderPieceProbeCount = 0;
+  let orderStateCount = 1;
+  let candidate = null;
+  let stopped = false;
+
+  function appendProbe(state, localIndex, outcome) {
+    trace.update(`${base.canonicalJson(orderToken(
+      workCount, profileIndex, tilingOrdinal, state, localIndex, indices[localIndex], outcome,
+    ))}\n`, 'utf8');
+    workCount += 1;
+    orderPieceProbeCount += 1;
+  }
+
+  function addFailedMemo(remainingSet, trieNodeId) {
+    const key = orderStateKey(remainingSet, trieNodeId);
+    if (failedMemo.has(key)) throw new Error('Failed order memo repeated.');
+    failedMemo.add(key);
+    memoTrace.update(`${base.canonicalJson(failedMemoToken(
+      profileIndex, tilingOrdinal, remainingSet, trieNodeId,
+    ))}\n`, 'utf8');
+  }
+
+  function visit(remainingSet, trieNodeId, peelLocalIndices) {
+    const node = trie[trieNodeId];
+    if (!node || !Array.isArray(node.children) || node.children.length !== base.TYPES.length) {
+      throw new Error('Reverse trie node is invalid.');
+    }
+    const state = { remainingSet, trieNodeId, pieceCount };
+    for (let localIndex = 0; localIndex < pieceCount; localIndex += 1) {
+      if (!(remainingSet & (2 ** localIndex))) continue;
+      if (workCount === workBudget) {
+        stopped = true;
+        return STOP;
+      }
+      const descriptor = descriptors[localIndex];
+      const childId = node.children[descriptor.typeIndex];
+      if (!Number.isInteger(childId) || childId < 0) {
+        appendProbe(state, localIndex, 'no-child');
+        continue;
+      }
+      const nextSet = remainingSet - (2 ** localIndex);
+      const nextBoard = remainingBoard(descriptors, nextSet);
+      if (base.hardDropMask(nextBoard, descriptor) !== descriptor.cellMask) {
+        appendProbe(state, localIndex, 'hard-drop-miss');
+        continue;
+      }
+      orderStateCount += 1;
+      const child = trie[childId];
+      if (!child || !Array.isArray(child.seeds)) throw new Error('Reverse trie child is invalid.');
+      const nextKey = orderStateKey(nextSet, childId);
+      if (nextSet === 0 && child.seeds.length > 0) {
+        appendProbe(state, localIndex, 'candidate');
+        const peel = [...peelLocalIndices, localIndex];
+        candidate = {
+          seed: Math.min(...child.seeds),
+          peelLocalIndices: peel,
+          forwardCatalogIndices: peel.toReversed().map((index) => indices[index]),
+        };
+        return candidate;
+      }
+      if (failedMemo.has(nextKey)) {
+        appendProbe(state, localIndex, 'memo-hit');
+        continue;
+      }
+      appendProbe(state, localIndex, nextSet === 0 ? 'dead-leaf' : 'descend');
+      if (nextSet !== 0) {
+        const result = visit(nextSet, childId, [...peelLocalIndices, localIndex]);
+        if (result === STOP || result) return result;
+      }
+    }
+    addFailedMemo(remainingSet, trieNodeId);
+    return null;
+  }
+
+  visit(fullSet, 0, []);
+  return {
+    status: candidate ? 'candidate' : stopped ? 'budget-exhausted' : 'complete-not-found',
+    complete: !candidate && !stopped,
+    workCount,
+    orderPieceProbeCount,
+    orderStateCount,
+    failedMemoCount: failedMemo.size,
+    traceHash: trace.digest('hex').toUpperCase(),
+    failedMemoTraceHash: memoTrace.digest('hex').toUpperCase(),
+    candidate,
+  };
+}
+
 export const __tilingTest = Object.freeze({
   ALGORITHM_VERSION,
   COVER_TRAVERSAL_VERSION,
@@ -206,5 +360,11 @@ export const __tilingTest = Object.freeze({
   selectPivot,
   coverToken,
   enumerateStrongTilings,
+  remainingSetHex,
+  remainingBoard,
+  orderStateKey,
+  orderToken,
+  failedMemoToken,
+  searchTilingOrders,
   base,
 });
