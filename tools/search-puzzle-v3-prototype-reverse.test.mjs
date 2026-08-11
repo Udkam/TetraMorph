@@ -257,9 +257,6 @@ const separatedO = catalog.descriptors.find((item) => item.typeIndex === 1 && !(
 assert(touchingO && (reverse.neighborMask(touchingO.cellMask, fixedMask) & floorO.cellMask) && (reverse.neighborMask(floorO.cellMask, fixedMask) & floorO.cellMask));
 assert(separatedO && !(reverse.neighborMask(separatedO.cellMask, fixedMask) & floorO.cellMask));
 assert.equal(reverse.buildReverseCatalog(floorO.cellMask).descriptors.filter((item) => item.typeIndex === 1).length, 1);
-const obstacleRows = Array(40).fill(0), ownerRows = reverse.TYPES.map(() => Array(40).fill(0)), permissiveRows = Array(40).fill(1023);
-obstacleRows[39] = 1; assert.equal(reverse.landing(obstacleRows, ownerRows[0], permissiveRows, 'I', 0, 0).y, 37);
-obstacleRows[20] = 1; assert.equal(reverse.landing(obstacleRows, ownerRows[0], permissiveRows, 'I', 0, 0), null);
 const ORACLE_SHAPES = {
   I: [
     [[0, 1], [1, 1], [2, 1], [3, 1]],
@@ -267,31 +264,47 @@ const ORACLE_SHAPES = {
   ],
   O: [[[0, 0], [1, 0], [0, 1], [1, 1]]],
 };
-function oracleDrop(board, type, rotation, x) {
+function oracleCellsAt(type, rotation, x, absoluteY) {
   const shape = ORACLE_SHAPES[type][rotation];
-  const cellsAt = (y) => shape.map(([dx, dy]) => [x + dx, y + dy]);
-  const canPlace = (y) => cellsAt(y).every(([cellX, cellY]) =>
+  return shape.map(([dx, dy]) => [x + dx, absoluteY + dy]);
+}
+function oraclePhysicalDrop(board, type, rotation, x) {
+  const canPlace = (absoluteY) => oracleCellsAt(type, rotation, x, absoluteY).every(([cellX, cellY]) =>
     cellX >= 0 && cellX < 10 && cellY >= 0 && cellY < 40 && !board.has(`${cellX},${cellY}`));
-  let y = 19;
-  if (!canPlace(y)) return null;
-  while (canPlace(y + 1)) y += 1;
-  const cells = cellsAt(y);
+  let absoluteY = 19;
+  if (!canPlace(absoluteY)) return null;
+  while (canPlace(absoluteY + 1)) absoluteY += 1;
+  return { type, rotation, x, absoluteY, cells: oracleCellsAt(type, rotation, x, absoluteY) };
+}
+function oracleMaskForCells(cells) {
   let cellMask = 0n;
   for (const [cellX, cellY] of cells) {
-    if (cellY < 30) return null;
+    if (cellX < 0 || cellX >= 10 || cellY < 30 || cellY >= 40) return null;
     cellMask |= 1n << BigInt((cellY - 30) * 10 + cellX);
   }
-  return { type, rotation, x, absoluteY: y, cells, cellMask };
+  return cellMask;
+}
+function oracleDrop(board, type, rotation, x) {
+  const physical = oraclePhysicalDrop(board, type, rotation, x);
+  if (!physical) return null;
+  const cellMask = oracleMaskForCells(physical.cells);
+  if (cellMask === null) return null;
+  const nextCells = oracleCellsAt(type, rotation, x, physical.absoluteY + 1);
+  return {
+    ...physical,
+    cellMask,
+    supportedByPiece: nextCells.some(([cellX, cellY]) => board.has(`${cellX},${cellY}`)),
+  };
 }
 function oracleSignature(placements) {
   return placements.map((item) =>
-    `${item.type}:${item.rotation}:${item.x}:${item.absoluteY}:${reverse.maskHex(item.cellMask)}`).join('/');
+    `${item.type}:${item.rotation}:${item.x}:${item.absoluteY}:${item.cellMask.toString(16).toUpperCase().padStart(25, '0')}`).join('/');
 }
-function independentForwardSet(queue, targetMask) {
-  const histories = new Set();
+function independentForwardHistories(queue, targetMask) {
+  const histories = new Map();
   function visit(index, board, placements, boardMask) {
     if (index === queue.length) {
-      if (boardMask === targetMask) histories.add(oracleSignature(placements));
+      if (boardMask === targetMask) histories.set(oracleSignature(placements), placements);
       return;
     }
     const type = queue[index];
@@ -315,13 +328,7 @@ function independentForwardSet(queue, targetMask) {
   visit(0, new Map(), [], 0n);
   return histories;
 }
-function descriptorFromOracle(item) {
-  return {
-    typeIndex: reverse.TYPES.indexOf(item.type), rotation: item.rotation, x: item.x,
-    absoluteY: item.absoluteY, cellMask: item.cellMask,
-  };
-}
-function exactQueueContext(targetMask, catalogOrder, forwardQueue) {
+function exactQueueContext(targetMask, forwardQueue) {
   const nodes = [{ depth: 0, children: Array(7).fill(-1), seeds: [] }];
   let parent = 0;
   for (const type of forwardQueue.toReversed()) {
@@ -331,13 +338,103 @@ function exactQueueContext(targetMask, catalogOrder, forwardQueue) {
     parent = child;
   }
   nodes[parent].seeds.push(77);
-  return { fixedMask: targetMask, catalog: catalogOrder, trie: nodes, sequenceLength: forwardQueue.length };
+  return {
+    fixedMask: targetMask,
+    catalog: reverse.buildReverseCatalog(targetMask).descriptors,
+    trie: nodes,
+    sequenceLength: forwardQueue.length,
+  };
 }
-function actualReverseOutcome(targetMask, catalogOrder, forwardQueue) {
-  const exactContext = exactQueueContext(targetMask, catalogOrder, forwardQueue);
-  return reverse.advanceReverse(exactContext, reverse.createReverseState(exactContext),
-    100, Number.MAX_SAFE_INTEGER, () => 0);
+function reverseTrieQueue(contextValue) {
+  const queue = [];
+  let nodeIndex = 0;
+  for (let depth = 0; depth < contextValue.sequenceLength; depth += 1) {
+    const childTypes = contextValue.trie[nodeIndex].children
+      .map((child, typeIndex) => ({ child, typeIndex })).filter(({ child }) => child >= 0);
+    assert.equal(childTypes.length, 1, 'bounded exact-queue trie must have one child per depth');
+    queue.push(reverse.TYPES[childTypes[0].typeIndex]);
+    nodeIndex = childTypes[0].child;
+  }
+  return queue;
 }
+function reverseHistorySignature(result) {
+  return oracleSignature(result.descriptors.map((item) => ({
+    ...item, type: reverse.TYPES[item.typeIndex],
+  })));
+}
+function completeReverseHistories(targetMask, forwardQueue) {
+  const exactContext = exactQueueContext(targetMask, forwardQueue);
+  assert.deepEqual(reverseTrieQueue(exactContext), forwardQueue.toReversed(),
+    'the exact forward queue must enter the reverse trie in reverse order');
+  const state = reverse.createReverseState(exactContext);
+  const histories = [];
+  for (;;) {
+    const result = reverse.advanceReverse(
+      exactContext, state, 1_000_000, Number.MAX_SAFE_INTEGER, () => 0,
+    );
+    if (result.status === 'candidate') {
+      histories.push(reverseHistorySignature(result.result));
+      continue;
+    }
+    assert.equal(result.status, 'complete-not-found', 'bounded enumeration must end naturally');
+    assert.equal(result.complete, true);
+    assert.equal(state.frames.length, 0);
+    break;
+  }
+  assert.equal(new Set(histories).size, histories.length, 'reverse enumeration returned a duplicate history');
+  return { histories, historySet: new Set(histories), context: exactContext, state };
+}
+function compareCompleteHistorySets(queue, targetMask, label) {
+  const forward = independentForwardHistories(queue, targetMask);
+  const backward = completeReverseHistories(targetMask, queue);
+  assert.deepEqual([...backward.historySet].sort(), [...forward.keys()].sort(), label);
+  return { forward, backward };
+}
+function oraclePlacementAt(type, rotation, x, absoluteY) {
+  const cells = oracleCellsAt(type, rotation, x, absoluteY);
+  const cellMask = oracleMaskForCells(cells);
+  assert.notEqual(cellMask, null, 'manual oracle placement must stay in the reverse domain');
+  return { type, rotation, x, absoluteY, cells, cellMask, supportedByPiece: false };
+}
+function boardFromPlacements(placements) {
+  const board = new Map();
+  for (const placement of placements) {
+    for (const [cellX, cellY] of placement.cells) board.set(`${cellX},${cellY}`, placement.type);
+  }
+  return board;
+}
+function rowsFromBoard(board) {
+  const rows = Array(40).fill(0);
+  for (const key of board.keys()) {
+    const [cellX, cellY] = key.split(',').map(Number);
+    rows[cellY] |= 1 << cellX;
+  }
+  return rows;
+}
+
+const ownerRows = reverse.TYPES.map(() => Array(40).fill(0));
+const permissiveRows = Array(40).fill(1023);
+const floorBlockerBoard = new Map([['0,39', 'blocker']]);
+const floorBlockerLanding = oraclePhysicalDrop(floorBlockerBoard, 'I', 0, 0);
+assert.equal(floorBlockerLanding.absoluteY, 37);
+assert.equal(reverse.landing(rowsFromBoard(floorBlockerBoard), ownerRows[0], permissiveRows, 'I', 0, 0).y,
+  floorBlockerLanding.absoluteY);
+const inDomainUpperBlockerBoard = new Map([['0,30', 'blocker']]);
+const inDomainUpperLanding = oraclePhysicalDrop(inDomainUpperBlockerBoard, 'I', 0, 0);
+assert.equal(inDomainUpperLanding.absoluteY, 28);
+assert.equal(reverse.landing(rowsFromBoard(inDomainUpperBlockerBoard), ownerRows[0], permissiveRows, 'I', 0, 0).y,
+  inDomainUpperLanding.absoluteY);
+assert.equal(oracleDrop(inDomainUpperBlockerBoard, 'I', 0, 0), null,
+  'an upper obstruction that leaves the piece above row 30 is outside the reverse landing domain');
+const horizontalIAtZero = catalog.descriptors.find((item) => item.typeIndex === 0 && item.rotation === 0 && item.x === 0);
+assert.equal(reverse.hardDropMask(1n, horizontalIAtZero), null,
+  'production-domain hard drop must reject a landing above the ten-row mask');
+const outsideDomainSpawnBlockerBoard = new Map([['0,20', 'blocker']]);
+assert.equal(oraclePhysicalDrop(outsideDomainSpawnBlockerBoard, 'I', 0, 0), null);
+assert.equal(reverse.landing(rowsFromBoard(outsideDomainSpawnBlockerBoard), ownerRows[0], permissiveRows,
+  'I', 0, 0), null);
+assert.equal(oracleMaskForCells([[0, 20]]), null,
+  'the spawn blocker is deliberately outside rows 30..39 and must not be encoded as a reverse mask');
 function syntheticContext(descriptor, leaf, depth = 1) {
   const nodes = [{ depth: 0, children: Array(7).fill(-1), seeds: [] }];
   let parent = 0;
@@ -468,6 +565,11 @@ try {
   assert.equal(hardLinkResume.status, 1, hardLinkResume.stderr.toString());
   assert.equal(sha256(readFileSync(splitAPath)), beforeHardLink);
   assert.equal(sha256(readFileSync(hardLinkPath)), beforeHardLink);
+  const distinctExistingPath = join(tempRoot, 'reverse-distinct-existing.json');
+  writeFileSync(distinctExistingPath, 'not-a-resume-alias\n', 'utf8');
+  const distinctExisting = runReverse(distinctExistingPath, 1, ['--resume', splitAPath]);
+  assert.equal(distinctExisting.status, 2, distinctExisting.stderr.toString());
+  assert.equal(JSON.parse(readFileSync(distinctExistingPath)).coverage.startProbeCount, 7);
 
   const maxProbes = 1_000_000_000;
   const maxMinusOneResumePath = join(tempRoot, 'reverse-max-minus-one.json');
@@ -544,35 +646,54 @@ try {
   const emptyOracleBoard = new Map();
   const separated = [oracleDrop(emptyOracleBoard, 'O', 0, 0), oracleDrop(emptyOracleBoard, 'O', 0, 4)];
   const separatedMask = separated[0].cellMask | separated[1].cellMask;
-  const separatedDescriptors = separated.map(descriptorFromOracle);
-  const separatedForward = independentForwardSet(['O', 'O'], separatedMask);
-  const separatedRuns = [separatedDescriptors, separatedDescriptors.toReversed()]
-    .map((order) => actualReverseOutcome(separatedMask, order, ['O', 'O']));
-  assert.deepEqual(separatedRuns.map((result) => result.status), ['candidate', 'candidate']);
-  const separatedReverse = new Set(separatedRuns.map((result) => oracleSignature(
-    result.result.descriptors.map((item) => ({ ...item, type: reverse.TYPES[item.typeIndex] })),
-  )));
-  assert.equal(separatedForward.size, 2, 'the independent oracle must enumerate both separated O orders');
-  assert.deepEqual([...separatedReverse].sort(), [...separatedForward].sort());
+  const separatedComparison = compareCompleteHistorySets(
+    ['O', 'O'], separatedMask, 'canonical reverse traversal must enumerate both separated O orders',
+  );
+  assert.equal(separatedComparison.forward.size, 2,
+    'the independent oracle must enumerate both separated O orders');
+  assert.equal(separatedComparison.backward.histories.length, 2,
+    'one canonical reverse state must return both separated O histories before completion');
 
   const touching = [oracleDrop(emptyOracleBoard, 'O', 0, 0), oracleDrop(emptyOracleBoard, 'O', 0, 2)];
   const touchingMask = touching[0].cellMask | touching[1].cellMask;
-  const touchingDescriptors = touching.map(descriptorFromOracle);
-  const touchingForward = independentForwardSet(['O', 'O'], touchingMask);
-  const touchingRuns = [touchingDescriptors, touchingDescriptors.toReversed()]
-    .map((order) => actualReverseOutcome(touchingMask, order, ['O', 'O']));
-  assert.equal(touchingForward.size, 0);
-  assert.deepEqual(touchingRuns.map((result) => result.status), ['complete-not-found', 'complete-not-found']);
+  const touchingComparison = compareCompleteHistorySets(
+    ['O', 'O'], touchingMask, 'same-type contact must exclude both placement orders',
+  );
+  assert.equal(touchingComparison.forward.size, 0);
+  assert.equal(touchingComparison.backward.histories.length, 0);
 
   const mixed = [oracleDrop(emptyOracleBoard, 'O', 0, 0), oracleDrop(emptyOracleBoard, 'I', 0, 4)];
   const mixedMask = mixed[0].cellMask | mixed[1].cellMask;
-  const mixedForward = independentForwardSet(['O', 'I'], mixedMask);
-  const mixedResult = actualReverseOutcome(mixedMask, mixed.map(descriptorFromOracle), ['O', 'I']);
-  assert.equal(mixedResult.status, 'candidate');
-  const mixedReverse = new Set([oracleSignature(mixedResult.result.descriptors.map((item) =>
-    ({ ...item, type: reverse.TYPES[item.typeIndex] })))]);
-  assert.equal(mixedForward.size, 1, 'the independent oracle must preserve the fixed mixed queue order');
-  assert.deepEqual([...mixedReverse], [...mixedForward]);
+  const mixedOI = compareCompleteHistorySets(
+    ['O', 'I'], mixedMask, 'canonical reverse traversal must preserve O/I queue order',
+  );
+  const mixedIO = compareCompleteHistorySets(
+    ['I', 'O'], mixedMask, 'canonical reverse traversal must preserve I/O queue order',
+  );
+  assert.equal(mixedOI.forward.size, 1);
+  assert.equal(mixedIO.forward.size, 1);
+  assert.notDeepEqual([...mixedOI.forward.keys()], [...mixedIO.forward.keys()],
+    'opposite mixed queues must produce different ordered histories');
+
+  const supportBase = oracleDrop(emptyOracleBoard, 'O', 0, 0);
+  const supportBoard = boardFromPlacements([supportBase]);
+  const supportedI = oracleDrop(supportBoard, 'I', 0, 0);
+  assert.equal(supportedI.supportedByPiece, true, 'the second piece must land on the first piece');
+  const supportMask = supportBase.cellMask | supportedI.cellMask;
+  const supportComparison = compareCompleteHistorySets(
+    ['O', 'I'], supportMask, 'piece-supported histories must match exactly',
+  );
+  assert([...supportComparison.forward.values()].some((history) =>
+    history.some((placement) => placement.supportedByPiece)),
+  'the compared forward set must contain a real piece-supported landing');
+
+  const floatingI = oraclePlacementAt('I', 0, 0, supportedI.absoluteY - 2);
+  const floatingMask = supportBase.cellMask | floatingI.cellMask;
+  const floatingComparison = compareCompleteHistorySets(
+    ['O', 'I'], floatingMask, 'a floating upper placement must be absent from both complete sets',
+  );
+  assert.equal(floatingComparison.forward.size, 0);
+  assert.equal(floatingComparison.backward.histories.length, 0);
 } finally {
   typeHook.deregister();
 }
