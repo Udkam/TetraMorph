@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C sharded tiling v2 candidate accepted
+
+- Shard 4 finds a candidate at seed `106933`, profile 1, tiling ordinal 82 after 240,468
+  work. Output file SHA is `74550EA86D7C9424F71C904B6A8678C6FAE48C2C0719C0F93A13338CB5DA9891`;
+  result hash is `A0C94A2D1C96F5AA595296AF614E0BE762AD88A371C578A235102F2CF31F7819`.
+- Independent QA rebuilds the full authoring physics, target mask, typed board, and all hash
+  identities with P0–P3/GAP zero. The five-entry candidate manifest hash is
+  `25BF784987C3FE466F7DA084076959EAA0E4825F4FEF646EE9E1F016DA89616D`.
+- The series stops at shard 4; shards 5–8 are permanently closed. Only exact current-Core
+  replay and strict-certificate preparation are open; no fixture or product edit is allowed.
+
 ## 2026-08-12 — T37 Stage F3C sharded tiling v2 shard 3 accepted
 
 - Shard 3 completes naturally in 33.067 seconds with no candidate and 1,400,585 work.

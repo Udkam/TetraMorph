@@ -1270,6 +1270,29 @@ Next exact action: run shard index 4 exactly once to absent external path
 `C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s04-16039546.json`,
 then require raw-byte and p05 cumulative-manifest QA before shard 5. No later path is open.
 
+Shard 4 series candidate and p05 manifest accepted (2026-08-12): the only shard-4 run
+finds `candidate:order` in 6.659 s at seed `106933`, profile 1, tiling ordinal 82, after
+240,468 work. Its 5,470-byte file SHA-256 is
+`74550EA86D7C9424F71C904B6A8678C6FAE48C2C0719C0F93A13338CB5DA9891`; result hash is
+`A0C94A2D1C96F5AA595296AF614E0BE762AD88A371C578A235102F2CF31F7819`.
+Independent QA rebuilds the 662-descriptor catalog, seed queue, forward/peel permutations,
+20 spawn-19 hard drops, no overlap/hidden/clear/same-type touch, target mask, and typed board.
+Candidate identity hash is `0BC992097687B867AB10EA372467D0FE0F6FD7F4AF9FE552E8D168CB4C478C28`;
+placement hash is `B2D5C90F4BE0018F6B9BCB63A371E2B735E220A5607E1599D0532730E9E1F6DA`;
+typed board hash is `9EE9FBC3C1AC6197DECB642B87C957F0534E219E95D455CEC7DF1C17CA4B409E`.
+
+The ordered p05 input SHA-256 is
+`23F8D13471DDD39627A4883C6B142F5D51CAB3D9000D067E0AD0FB15509630A3`.
+The final 2,770-byte candidate manifest file SHA-256 is
+`59596FA1C1FE2A5347BAA579690B4A5EBC78C9C0BA6B05085FB16C0C0DCC74D1`; independently
+recomputed manifest hash is `25BF784987C3FE466F7DA084076959EAA0E4825F4FEF646EE9E1F016DA89616D`.
+All shard/input/manifest reviews report P0–P3/GAP zero. Shards 5–8 are permanently closed.
+
+Next exact action: read and execute only the minimal existing current-Core replay seam for
+the accepted 20 placements. Verify zero setup clears, final occupancy and typed ownership,
+then prepare the fixed five-lock route and strict state-hash/exact-certificate evidence.
+Do not modify a fixture, published Puzzle definition, UI, T27/`progress.md`, icon, or Ice.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

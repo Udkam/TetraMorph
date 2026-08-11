@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 SHARDS 0–3 ACCEPTED / SHARD 4 OPEN**
+Status: **STAGE F3C TILING-FIRST V2 SERIES CANDIDATE ACCEPTED / CURRENT-CORE REPLAY OPEN**
 
 ## Active objective
 
@@ -57,10 +57,14 @@ Shard 2 is accepted with the same independent evidence; the three-entry cumulati
 manifest hash is `06EA7C39F54F24C453B2CC122F2D20958639F7004FCB6FD88D2A5711EF3CAFAB`.
 Shard 3 is accepted; the four-entry manifest hash is
 `AA2C0EB19EE7EB7027567517D5C268C7739F26E63E2E506B665BB12FB78D30EE`.
-Exactly one shard-4 production run is now open at frozen external path
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s04-16039546.json`.
-No retry or later shard is authorized before independent output and cumulative-manifest QA.
-Core, fixture, product, T27/`progress.md`, identity/icon, and Ice paths remain closed.
+Shard 4 finds the accepted authoring candidate at seed `106933`, profile 1, tiling ordinal
+82. Independent raw-byte and physical QA rebuild all 20 visible hard drops, no-clear,
+no-hidden, no-touch ownership, target mask, and typed board with all findings zero. The final
+five-entry candidate manifest hash is
+`25BF784987C3FE466F7DA084076959EAA0E4825F4FEF646EE9E1F016DA89616D`.
+Shards 5–8 are permanently closed. Only minimal current-Core replay of these exact 20
+placements is open next; fixture, product, UI, T27/`progress.md`, identity/icon, and Ice
+paths remain closed.
 
 ## Frozen product direction
 
@@ -976,9 +980,9 @@ only; it is not F3 source acceptance.
   private production capability without finding a new ambiguity. The contract is accepted.
   The bounded source chain `1a36e73..1ceb1bc` and test chain `71f0a54..caba9d0` pass
   final independent all-zero QA and all source gates. Shard 0 and its prefix manifest are
-  accepted. Shards 1–3 and the four-entry prefix manifest are also accepted; one shard-4 run
-  is open at the frozen external path. Later shards, Core,
-  fixture, and product remain closed.
+  accepted. Shards 1–3 are accepted noncandidates; shard 4 and the five-entry manifest are
+  accepted as the series candidate. Shards 5–8 are closed. Only exact current-Core replay
+  and certificate preparation are open; fixture and product remain closed.
 
 ## Current checkpoint state
 
