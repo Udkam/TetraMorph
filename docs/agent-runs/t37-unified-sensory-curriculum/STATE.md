@@ -139,8 +139,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 35. `F3C ENUMERATION REPAIR CANDIDATE; QA NEXT` — two-path checkpoint `77fe380`
     returns all six three-T histories, closes catalog-filter mutation sensitivity, and
     passes final local gates.
-36. `PENDING` — fresh double independent QA precedes any reverse search, fixture,
-    content, migration, UI, final gates, or push.
+36. `F3C ENUMERATION REPAIR ACCEPTED` — formal and adversarial QA both report P0–P3/GAP
+    all zero and authorize the frozen first production reverse round.
+37. `PENDING` — run one fair increment across all 32 serial shards; no second increment,
+    fixture, content, migration, UI, final gates, or push opens before round review.
 
 ### Stage F3C tooling-discovery status
 
@@ -456,6 +458,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   the restored standalone passes. Final typecheck, full suite (`46 passed / 2 skipped`
   files; `430 passed / 10 skipped` tests), and 767-module build pass. Temp and owned
   search-process counts are zero; protected dirt remains unstaged.
+- Formal QA accepts with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, independently reproducing
+  the complete sets, unchanged first-candidate bytes/cost, state/output gates, envelope
+  attacks, ceiling, NTFS, legacy vectors, scope, and cleanup. Adversarial QA separately
+  accepts with the same all-zero verdict, including 120/120 five-I histories and three
+  restricted-catalog mutations. Both authorize only the frozen first reverse round.
 
 ### Stage F3B accepted status
 
@@ -873,13 +880,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Run fresh double independent read-only QA over the complete source/test chain through
-`77fe380`, accounting for intervening docs-only checkpoints. Reproduce the three-T six-
-history set, I/O-filter mutation failure, candidate/no-candidate memo behavior, candidate
-cursor/output fail-closed gates, outcome-5 token rejection, all earlier token/ceiling/
-NTFS/legacy-byte checks, exact path/line budget, Temp cleanup, and zero owned process.
-Report P0–P3/GAP. Do not run production shards; keep final F3C JSON/Core work, later
-content, T27/`progress.md`, deferred identity, and the missing Ice archive closed.
+After a fresh non-red resource, Temp, owned-process, staging, and HEAD check, run the first
+fair production reverse round only: shard indexes 0..31 serially, seeds 1..20000,
+`--shard-count 32`, `--node-budget 1000000`, `--max-rss-mib 900`, and unique external
+Temp outputs. Do not pass `--resume` on this first increment. Stop immediately on any
+candidate, memory guard, completion, invalid output, or unexpected exit; otherwise every
+incomplete shard receives exactly one increment before any second does. Record hashes,
+status, probe counts, cleanup, and zero process before deciding the next slice. Keep final
+F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the missing
+Ice archive closed.
 
 ## Do not repeat
 

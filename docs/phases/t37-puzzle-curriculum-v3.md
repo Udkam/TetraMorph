@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C ENUMERATION REPAIR CANDIDATE `77fe380`; QA NEXT**
+Status: **F3C ENUMERATION REPAIR ACCEPTED; FIRST REVERSE ROUND OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -656,6 +656,12 @@ bounded in-memory enumeration. Candidate-bearing states cannot create a cursor o
 formal output, and resumable tokens reject outcome 5. An independent seven-type catalog
 oracle pins the three-T target to three descriptors and all six history orders. Final
 standalone/typecheck/full-suite/build gates pass; production search remains QA-closed.
+Formal and adversarial QA both accept with P0–P3/GAP all zero. Independent attacks cover
+six three-T and 120 five-I histories, three catalog-filter mutations, candidate cursor/
+output mismatch, outcome-5 resumability, earlier envelope/ceiling/NTFS vectors, bytes,
+scope, and cleanup. Only the first 32-shard fair reverse round now opens under the frozen
+1,000,000-probe, 900 MiB, serial, one-increment-each boundary; later rounds and all product
+work remain closed.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

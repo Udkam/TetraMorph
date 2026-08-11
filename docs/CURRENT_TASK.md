@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C ENUMERATION REPAIR CANDIDATE `77fe380`; QA NEXT**
+Status: **STAGE F3C ENUMERATION REPAIR ACCEPTED; FIRST REVERSE ROUND OPEN**
 
 ## Active objective
 
@@ -649,6 +649,18 @@ only; it is not F3 source acceptance.
   on catalog count/digest, while candidate-free paths still add failed memo entries.
   Standalone, typecheck, full suite (`46 passed / 2 skipped` files; `430 passed / 10
   skipped` tests), and 767-module build pass. Search remains closed for fresh QA.
+- Formal and adversarial QA independently accept the full repair chain with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Both reproduce the six three-T histories,
+  candidate/no-candidate memo semantics, state/output fail-closed gates, outcome-5 and
+  prior envelope attacks, ceiling, NTFS identity, legacy bytes, scope, and cleanup. The
+  adversarial pass additionally enumerates 120/120 five-I histories and defeats three
+  catalog-filter mutations.
+- This accepts the authoring implementation and opens only the first production reverse
+  round: 32 serial shards over seeds 1..20000, 625 seeds per shard, 1,000,000 new probes
+  and 900 MiB RSS each, with repository-external outputs. Every incomplete shard receives
+  exactly one increment before any second increment. Stop the round on the first candidate,
+  memory guard, or completion. Final F3C fixture/Core work and all later product stages
+  remain closed until the round is recorded and reviewed.
 
 ## Current checkpoint state
 

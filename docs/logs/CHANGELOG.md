@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C enumeration repair accepted
+
+- Formal and adversarial QA independently accept `77fe380` with P0–P3/GAP all zero.
+  Complete non-I/O and five-I history sets, three restricted-catalog mutations,
+  candidate-state fail-closed output/cursor gates, envelope attacks, ceiling, NTFS,
+  legacy bytes, exact scope, and cleanup all pass.
+- Only the first fair production reverse round is now open: 32 serial shards over seeds
+  1..20000, 1,000,000 new probes and 900 MiB RSS per shard, external outputs, and one
+  increment per incomplete shard before any second increment. All content and UI remain
+  closed pending round evidence and review.
+
 ## 2026-08-11 — T37 Stage F3C enumeration repair candidate
 
 - Source checkpoint `77fe380` changes only the authoring tool and standalone reverse test.

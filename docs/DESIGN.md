@@ -565,6 +565,13 @@ adding unrelated badges or ornamental effects.
   reject candidate outcome 5. The independent seven-type catalog oracle plus a three-T
   fixture proves three descriptors and all six history orders. Final local gates pass;
   fresh independent QA still controls search admission.
+- Formal and adversarial QA both accept with P0–P3/GAP all zero. The latter also obtains
+  120/120 histories for five separated I pieces and catches type-filtered, fixture-filtered,
+  and post-assertion-filtered catalogs. This freezes the repair and opens only the first
+  fair reverse round: 32 serial 625-seed shards, 1,000,000 new probes and 900 MiB RSS per
+  shard, repository-external outputs, one increment for every incomplete shard before any
+  second increment. Content, Core fixture, migration, UI, and later search rounds stay
+  closed.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
