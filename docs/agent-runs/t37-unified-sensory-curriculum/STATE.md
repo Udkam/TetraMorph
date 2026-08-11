@@ -1328,6 +1328,22 @@ Next exact action: run exactly one corrected no-file diagnostic with those three
 assertions and the otherwise unchanged frozen route/certificate procedure. Stop on any new
 mismatch. The two final fixture/test paths remain closed until all-zero independent review.
 
+The corrected primary diagnostic passes, but the first independent review stops before its
+certificate because the contract had not frozen the injected definition ID. Route, five
+signatures, row releases, remaining targets, lower-bound sequence, and completion all match;
+using reviewer's `tm-puzzle-46` host yields initial hash `547ea48a`, not `bec0ea65`.
+No repository or process residue changed. This is a contract GAP, not a route failure.
+
+Read-back of the primary probe confirms it spread canonical `t3r-shaft-01` without overriding
+`id`; therefore `bec0ea65` binds literal base ID `t3r-shaft-01`. That ID is now frozen only as
+the non-published validation host. Final fixture `definition` exact keys are
+`anchorCells,baseId,boardRows,gameplaySeed,hiddenCells,setup,targetRows`; the direct test must
+assert the registered `t3r-shaft-01` product definition is unchanged before and after replay.
+
+Next exact action: perform one fresh independent full diagnostic with base ID
+`t3r-shaft-01`, then accept or reject the primary route/hash/certificate evidence. Do not
+create either final path before P0–P3/GAP all zero.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

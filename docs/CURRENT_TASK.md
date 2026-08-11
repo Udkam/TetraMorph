@@ -71,6 +71,9 @@ The five frozen lock signatures release `1 / 2 / 2 / 2 / 3` rows. Only an in-mem
 state-hash, and no-beam exact-certificate diagnostic is open next. The final boundary, if
 that passes, is exactly the canonical prototype JSON and direct opt-in Core test named in
 `docs/DESIGN.md`; product, UI, T27/`progress.md`, identity/icon, and Ice remain closed.
+The injected definition uses literal `baseId=t3r-shaft-01`; this registered ID is required
+by the noncanonical validator and is part of the state-hash domain. It is a test host only:
+the real `t3r-shaft-01` definition must remain unchanged.
 
 ## Frozen product direction
 
@@ -989,8 +992,8 @@ only; it is not F3 source acceptance.
   accepted. Shards 1–3 are accepted noncandidates; shard 4 and the five-entry manifest are
   accepted as the series candidate. Shards 5–8 are closed. Current-Core setup replay passes;
   the gameplay seed, route signatures, and final two-path schema are frozen. Only the
-  corrected in-memory fixed-route/exact-certificate diagnostic is open; fixture and product
-  stay closed.
+  corrected in-memory fixed-route/exact-certificate diagnostic with frozen base ID is open;
+  fixture and product stay closed.
 
 ## Current checkpoint state
 

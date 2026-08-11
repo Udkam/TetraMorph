@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C validation base ID frozen
+
+- Independent replay confirms the route but exposes that `stateHash` includes the injected
+  definition ID. The primary probe used `t3r-shaft-01`; a reviewer-selected ID correctly
+  produced a different hash and stopped before certificate acceptance.
+- `baseId=t3r-shaft-01` is now explicit as a non-published validation host, not a product
+  replacement. The final test must prove the registered level remains unchanged.
+
 ## 2026-08-12 — T37 Stage F3C route diagnostic precondition corrected
 
 - The first no-file route probe stops before any lock because it expected six Next pieces.

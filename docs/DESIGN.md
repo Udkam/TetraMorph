@@ -688,8 +688,11 @@ adding unrelated badges or ornamental effects.
   `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
   `src/game/core/puzzleV3PrototypeExact.test.ts`. The canonical JSON has exact top keys
   `artifactVersion,certificate,claim,definition,provenance,route,schemaVersion`.
-  Definition binds prototype ID, target rows, setup seed/placements, typed board, gameplay
-  seed, hidden cells, and anchors; provenance binds raw/result/candidate/manifest identities;
+  Definition exact keys are `anchorCells,baseId,boardRows,gameplaySeed,hiddenCells,setup,`
+  `targetRows`; setup exact keys are `placements,seed`. `baseId` is the literal
+  `t3r-shaft-01`, used only as an injected non-published validation host because
+  `validatePuzzleDefinition(..., false)` still requires a registered ID. The canonical
+  product definition must remain byte-identical. Provenance binds raw/result/candidate/manifest identities;
   route binds command stream, five lock signatures, row-release/remaining-target sequences,
   and initial/final state hashes; certificate binds the no-beam optimum statistics.
 - The fixture stores literals only. Its direct opt-in test must rebuild setup, route, state
