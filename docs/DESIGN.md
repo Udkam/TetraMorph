@@ -5906,6 +5906,33 @@ length assertion with exact identity of the accepted first-four prefix; Intro-05
 new total. The source slice remains within 500 hand-authored changed lines and changes no
 published roster, UI, progression, sensory behavior, protected T27 evidence, or icon.
 
+### F4E exact-run resource recovery
+
+The coordinator-observed first execution reached the current-Core exact-certificate search
+and terminated with V8 heap exhaustion under Node's default old-space ceiling. Its terminal
+reported `exit 134`, 398.7 seconds, and approximately 4,050 / 4,062 MiB; those exact historical
+numbers were not recoverable from a separately readable raw transcript and are not treated as
+independently verified evidence. Independently reproducible facts are that it published no
+candidate, left no staging file, and changed no validator, clue, Core, arguments, output,
+landing domain, lower bound, or certificate logic.
+
+At recovery review the machine has 31.84 GiB physical memory. Free physical and virtual
+memory are live values and are deliberately not frozen as a durable amount. Local Node
+confirms `--max-old-space-size=8192` yields an 8.19 GiB heap limit. Immediately before
+execution, both reported free physical memory and free virtual memory must exceed that
+8.19 GiB limit; otherwise the command does not start. Independent recovery review accepted
+the current facts and semantic identity with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+Exactly one resource-only recovery may therefore replace the command's first line with:
+
+```powershell
+node --max-old-space-size=8192 "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v1.mjs" `
+```
+
+All remaining arguments are exactly the accepted command above. Authorization depends on the
+current reproducible facts, not on the uncorroborated exact historical telemetry. A second OOM or any semantic
+gate failure is a stop condition; it does not authorize another heap increase, a rerun, a
+beam/state cap, a different route, or broader search.
+
 ## T37 final experience backlog
 
 After the complete 5/25/16 Endgame curriculum is published and verified, the final

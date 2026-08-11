@@ -8727,6 +8727,19 @@ plus independent byte/behavior review opens Intro-05 source. Published curriculu
 later Easy/Hard work, sensory behavior, protected T27/follow-up and `progress.md` paths, and
 the icon remain closed.
 
+The coordinator-observed first candidate run reached the uncapped exact certificate and then
+reported default-heap exhaustion (`exit 134`, 398.7 seconds, roughly 4,050 / 4,062 MiB).
+Those exact historical figures could not be independently recovered from a raw transcript and
+are not an acceptance premise. Independently verified facts are that final output and staging
+remain absent and all frozen bytes/Core inputs are unchanged. The machine has 31.84 GiB
+physical memory; its free memory is dynamic and is not frozen as a durable number. Node
+reports an 8.19 GiB heap limit for `--max-old-space-size=8192`; immediately before execution,
+reported free physical and virtual memory must each exceed that limit. Independent recovery
+review is accepted at `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The authorized command changes
+only the Node launcher flag; validator, clue, Core tree, arguments, proof domain, and output
+stay byte-identical. One reviewed recovery is allowed; another OOM or any semantic failure
+stops F4E.
+
 The player additionally deferred the newest line-clear feedback to the final experience
 stage: line-clear count must eventually drive a meaningful 1–4-line reward hierarchy, and
 the current clear presentation must last longer. This is recorded now but must not interrupt

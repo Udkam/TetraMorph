@@ -249,3 +249,20 @@ old screenshot.
 - Blocker: none; source remains closed by design.
 - Next action: commit only the five contract documents, then run exactly the one candidate
   command frozen in `docs/DESIGN.md`. Failure is a stop condition, not retry authorization.
+
+## F4E-R2 — default-heap exact-run stop
+
+- Contract checkpoint: `fbcff2e`.
+- Command: exact accepted command; validator, clue, Core tree, and output pins all matched.
+- Coordinator observation: terminal reported exit `134`, 398.7 seconds, and default old-space
+  exhaustion near 4,050 / 4,062 MiB in the uncapped current-Core certificate search. The exact
+  historical telemetry is not independently recoverable and is not an acceptance premise.
+- Independently reproducible facts: neither final output nor staging exists;
+  validator/clue/Core are unchanged; the machine has 31.84 GiB physical memory; and Node
+  exposes an 8.19 GiB heap with the proposed flag. Free physical and virtual memory are
+  dynamic; both must exceed that heap limit in the immediate execution preflight.
+- Recovery candidate: add only `--max-old-space-size=8192`, which local Node reports as an
+  8.19 GiB heap limit. Do not change any validator byte, argument, proof domain, or route.
+- Verification: independent resource-recovery review accepts with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including the dynamic execution preflight.
+- Next action: commit the docs-only recovery and execute exactly once if that preflight passes.

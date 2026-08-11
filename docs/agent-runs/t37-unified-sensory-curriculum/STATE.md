@@ -1917,6 +1917,21 @@ Next exact action: commit only these five contract documents, verify the frozen 
 absent output once more, then run exactly the command in `docs/DESIGN.md`. Do not retry if it
 fails or broaden discovery without a new reviewed contract.
 
+The contract committed as `fbcff2e`, after which the exact command ran once. The coordinator's
+terminal reported `exit 134` after 398.7 seconds and default old-space exhaustion near
+4,050 / 4,062 MiB, but those exact historical figures lack a separately recoverable raw
+transcript and are not independently verified. Current reproducible facts are: no candidate
+or staging exists; frozen bytes and Core are unchanged; the process released; the machine has
+31.84 GiB physical; and `node --max-old-space-size=8192` reports an 8.19 GiB heap limit. Free
+physical and virtual memory are dynamic rather than frozen evidence; both must exceed that
+heap limit in the immediate execution preflight.
+
+Independent resource-recovery review accepts the clause with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including the dynamic physical/virtual-memory gate.
+Next exact action: commit these status docs and run once with only the frozen 8,192 MiB
+launcher flag added. Validator/input/Core/arguments/domain/output remain unchanged. A second
+OOM or any semantic failure is a stop condition.
+
 Final-stage reminder from player testing: after 5/25/16 publication, make 1–4-line clears
 award increasingly meaningful feedback and lengthen the current clear presentation. This is
 deferred deliberately and must be implemented before the final icon/overall acceptance.
