@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C TILING-FIRST V1 CONTRACT FROZEN; IMPLEMENTATION OPEN**
+Status: **F3C EXACT PROTOTYPE ACCEPTED; F3D DEPTH TELEMETRY OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -27,6 +27,13 @@ No published definition changes in F1. The order is:
 
 The old T15/T32 route JSON and evidence are historical artifacts. They are not edited
 to impersonate v3 proof.
+
+Before step 4, F3D closes one schema-8 implementation gap discovered by the post-F3C
+inventory. Every exact search-loop depth that begins records
+`lockedPieces,frontierStates,transitions,boundPrunes`; aggregate frontier/explored/
+transition/prune fields are derived from those records and must remain byte-equivalent to
+the accepted results. This is proof telemetry only. The live 50 definitions, mastery,
+progress, selector, and the future v3 draft roster remain unchanged.
 
 ## Frozen published roster
 

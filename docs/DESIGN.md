@@ -722,6 +722,12 @@ adding unrelated badges or ornamental effects.
   `433 passed / 11 skipped` suite, and the 767-module production build pass. This closes F3C
   authoring proof only; publishing or altering product Puzzle definitions requires the next
   curriculum slice and its own bounded contract.
+- Post-F3C inventory confirms the live campaign remains 50 levels and exposes one schema-8
+  prerequisite: exact certificates need per-exhausted-depth transition and bound-prune
+  counts, while current Core retains only their aggregates. F3D adds immutable records with
+  keys `lockedPieces,frontierStates,transitions,boundPrunes` without changing the search
+  domain or any result. Legacy widths/totals are derived from these records. Product content
+  remains closed until this telemetry passes existing mastery and F3C exact proofs.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

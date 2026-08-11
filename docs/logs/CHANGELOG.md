@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3D schema-8 proof telemetry contracted
+
+- Post-F3C inventory confirms that the live product still publishes the accepted 50-level
+  campaign; the 5/25/16 roster has not silently entered product data.
+- Schema 8 needs literal transition/prune totals for every exhausted lock depth, but the
+  accepted Core certificate exposes only aggregate totals. F3D opens exactly the search
+  certificate plus its existing mastery/F3C exact tests to add immutable depth records.
+- Every legacy width and aggregate must be derived from those records without changing any
+  route, optimum, state hash, replay, or count. Product definitions and later curriculum,
+  progression, UI, sensory, and icon paths remain closed.
+
 ## 2026-08-12 — T37 Stage F3C exact ten-row prototype proof accepted
 
 - Commit `b2c3bc5` adds only the canonical non-published prototype artifact and its direct

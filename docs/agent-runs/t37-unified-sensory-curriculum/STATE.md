@@ -1405,10 +1405,22 @@ Exact-path commit `b2c3bc5` contains only those two files. After that source com
 `npm.cmd run build` (767 modules) all pass. Browser evidence is not applicable because this
 checkpoint contains no product/runtime/UI change. F3C is closed.
 
-Next exact action: perform one read-only current-product curriculum inventory. Freeze the
-first bounded F3D product contract in docs before authorizing any Puzzle definition, unlock,
-UI, or fixture edit. T27/`progress.md`, audio, transitions, Mutation visuals, and icon remain
-outside this next inventory.
+The read-only inventory confirms the live product remains 50 levels / 10 Intro / 20 Easy /
+20 Hard. The target delta is five rebuilt Intro, five current Intro moving unchanged into
+Easy, four retired Hard IDs, three rebuilt Hard definitions, and 38 behavior-preserved
+definitions. Existing progression seams are reusable later, but no product flip is safe
+until all 46 v3 definitions and certificates are green.
+
+The inventory also finds that schema 8 requires per-depth transition/prune statistics that
+the current exact certificate does not expose. F3D is therefore frozen as a three-path
+proof-telemetry checkpoint: `puzzleRouteSearch.ts`, `puzzleMasteryExact.test.ts`, and
+`puzzleV3PrototypeExact.test.ts`. It records exact
+`lockedPieces,frontierStates,transitions,boundPrunes` entries and derives every legacy
+aggregate without changing routes, hashes, optima, or totals.
+
+Next exact action: implement only F3D, run the normal focused tests and one opt-in exact
+mastery/F3C pass, then obtain fresh independent QA. No Puzzle definition, certificate
+artifact, progress/mastery/UI, T27/`progress.md`, sensory, or icon path is open.
 
 ## Do not repeat
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C V2 CANDIDATE + CORE ROUTE/CERTIFICATE ACCEPTED / FINAL TWO PATHS OPEN**
+Status: **STAGE F3C ACCEPTED / F3D SCHEMA-8 DEPTH TELEMETRY CONTRACT OPEN**
 
 ## Active objective
 
@@ -98,6 +98,36 @@ action is a read-only inventory of the current Puzzle curriculum and reusable un
 seams; no product level edit is authorized until that inventory becomes a committed bounded
 F3D contract.
 
+### Stage F3D schema-8 depth-telemetry contract (2026-08-12)
+
+The inventory confirms that the live product still has 50 levels in its accepted
+10 Intro / 20 Easy / 20 Hard campaign. F3C proves authoring capability only. It also finds
+one prerequisite gap before the first v3 definition: schema 8 requires literal proof totals
+for each exhausted lock depth, while `PuzzleOptimalRouteCertificate` currently exposes only
+frontier widths and aggregate transition/prune totals.
+
+F3D is a proof-telemetry-only Core checkpoint. It may edit exactly
+`src/game/core/puzzleRouteSearch.ts`, `src/game/core/puzzleMasteryExact.test.ts`, and
+`src/game/core/puzzleV3PrototypeExact.test.ts`. It adds one frozen depth record with exact
+keys `lockedPieces,frontierStates,transitions,boundPrunes` for every loop depth that is
+actually exhausted. `lockedPieces` is the number already locked at that frontier;
+`transitions` counts every emitted exhaustive landing, and `boundPrunes` counts both parent
+and child deficit-bound rejections at that depth.
+
+The legacy certificate totals remain public and must be derived exactly from the records:
+frontier widths are the ordered `frontierStates`; explored states, transitions, and prunes
+are their respective sums. Existing route, optimum, state hash, replay, and aggregate values
+must not change. The accepted F3C prototype must produce exactly
+`[{lockedPieces:0,frontierStates:1,transitions:0,boundPrunes:1}]`. Any changed proof result
+stops the slice instead of refreshing curriculum data.
+
+Normal focused tests plus one opt-in run of the existing mastery and F3C exact suites are
+required, followed by typecheck, full suite, build, and independent read-only QA. Browser
+evidence is not applicable. Published definitions, the draft Intro module/artifacts,
+progress/mastery data, UI, T27/`progress.md`, audio, materials, transitions, and icon remain
+closed. Only after F3D acceptance may a docs-only F4A contract open one non-published
+`t3r-shaft-01` authoring candidate.
+
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
@@ -158,14 +188,15 @@ F3D contract.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3A/F3B ACCEPTED; F3C COMPLETE-SET TEST QA** — the exact
+6. **Puzzle curriculum — F3C ACCEPTED; F3D PROOF TELEMETRY NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
    anchor-supported state identity, definition-aware replay/proof, and exact anchor
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
-   test candidate `1686963` replaces first-candidate evidence with one canonical
-   traversal's complete history set; independent QA is next and content stays closed.
+   final proof `b2c3bc5` supplies one canonical ten-row setup, current-Core route, and
+   no-beam exact certificate with independent QA all zero. F3D now adds only the
+   per-depth proof telemetry required by schema 8; curriculum content stays closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
@@ -1016,8 +1047,9 @@ only; it is not F3 source acceptance.
   accepted as the series candidate. Shards 5–8 are closed. Current-Core setup replay passes;
   the gameplay seed, route signatures, and final two-path schema are frozen. Only the
   the corrected independent fixed-route/exact-certificate diagnostic is accepted all-zero.
-  Only the fully schema-frozen prototype JSON and direct opt-in exact test are open; product
-  stays closed.
+  The fully schema-frozen prototype JSON and direct opt-in exact test are accepted at
+  `b2c3bc5`; product stays closed. F3D may add only the per-depth proof telemetry required
+  by schema 8 before any Intro candidate is authored.
 
 ## Current checkpoint state
 
