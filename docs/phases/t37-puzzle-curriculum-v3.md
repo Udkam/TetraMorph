@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FIRST REVERSE ROUND COMPLETE; TEMP CLEANUP BLOCKED**
+Status: **F3C FIRST REVERSE ROUND ACCEPTED; CONTINUATION PERFORMANCE REVIEW OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -666,9 +666,12 @@ The first round then completes all 32 first increments: each 625-seed shard stop
 `paused-budget` after exactly 1,000,000 new probes, with no candidate, memory guard, or
 completion. Totals are 32,000,000 probes, 342,213 failed states, 338,728 trie nodes, and
 81,077,752 bytes; ordered manifest is `2FEE9131...873F25`. Independent output QA reports
-P0–P3/GAP all zero. Both recursive and explicit-file cleanup commands are blocked by the
-terminal safety policy before execution, so the exact external Temp directory remains
-intact and no second increment or product slice opens.
+P0–P3/GAP all zero. Its 32 files are also the only continuation inputs, so the prior
+cleanup-first order is invalid: keep the exact external Temp directory intact until a
+distinct successor set passes review. A bounded performance slice may cache the same
+ordered `frameCandidates()` result by seven-type availability mask, but it must prove
+old-cursor compatibility and byte-identical probe/hash behavior under fresh QA before
+any second increment. Product work remains closed.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

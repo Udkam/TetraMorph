@@ -480,6 +480,16 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   deletion are rejected by terminal safety policy before execution. The intact path is
   `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` (32 files,
   81,077,752 bytes). Do not attempt shell switching or policy bypass.
+- Correction: those 32 files are the unique `--resume` inputs. Deleting them before a
+  distinct successor set exists would discard 32,000,000 probes. Preserve them read-only.
+- Read-only review decodes all 342,213 failed-memo keys (mean depth 8.792; modes at 8–9)
+  and the final 576 tokens from every shard. The tail outcomes are
+  `[11134,152,6950,4,192,0]`; because this is only 0.0576% of a DFS trace, it is not an
+  unbiased whole-round estimate. No candidate outcome occurs.
+- `frameCandidates()` filters all 662 descriptors at least twice per probe although its
+  result depends only on seven child-availability bits. Open one bounded performance
+  checkpoint that caches the identical ordered result by at most 128 masks. It must keep
+  old continuation acceptance and all probe, memo, cursor, and result hashes invariant.
 
 ### Stage F3B accepted status
 
@@ -897,12 +907,14 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Remove only the already verified external directory
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` through a user/manual
-or otherwise permitted workflow, then verify matching Temp count and owned search Node
-count are zero. Do not retry through another shell or bypass the terminal safety policy.
-After cleanup, perform a bounded round review before authorizing any second increment.
-Keep final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the
+Retain the accepted external directory
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. Implement
+and verify only the order-preserving `frameCandidates()` cache in the production reverse
+tool and its standalone test. Require old-cursor resume plus split/one-shot probe, memo,
+cursor, result, and canonical-byte equivalence, final gates, and fresh independent QA.
+Only then may a second increment read each old shard and write a distinct successor in a
+new external directory. Accept every successor before deleting the old directory. Keep
+final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the
 missing Ice archive closed.
 
 ## Do not repeat

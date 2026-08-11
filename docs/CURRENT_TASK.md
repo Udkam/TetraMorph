@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FIRST REVERSE ROUND COMPLETE; TEMP CLEANUP BLOCKED**
+Status: **STAGE F3C FIRST REVERSE ROUND ACCEPTED; CONTINUATION PERFORMANCE REVIEW OPEN**
 
 ## Active objective
 
@@ -671,11 +671,20 @@ only; it is not F3 source acceptance.
   first/last file hashes are `2BEB131A...C6C131` and `61858545...9EFF0`. Independent
   output QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, reproducing all identities,
   counters, hashes, LF bytes, and the manifest.
-- Exact Temp cleanup is blocked: both recursive and explicit 32-file PowerShell deletion
-  were rejected by the terminal safety policy before execution. The intact directory is
-  `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` with 32 files and
-  81,077,752 bytes; owned search-process count is zero. Do not start a second increment or
-  later product work until that exact directory is removed and zero-state is verified.
+- The 32 accepted JSON files are also the only resumable continuation inputs for their
+  shards. Deleting them before producing successors would discard all 32,000,000 probes;
+  the earlier cleanup-first instruction is withdrawn. Keep
+  `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` intact and read-only.
+- A read-only round review finds 342,213 failed states concentrated around depths 8–10
+  (mean 8.792). The 18,432-token continuation tails contain outcomes
+  `[11134,152,6950,4,192,0]`; this tail-biased 0.0576% sample is diagnostic, not a whole-
+  round rate. It exposes repeated `frameCandidates()` filtering as the safe performance
+  hotspot: cache the same ordered candidates by seven-type availability mask, prove old
+  cursor and probe/hash equivalence, and obtain fresh QA before a second increment.
+- Any second increment must read the accepted round-one files and write distinct paths in
+  a new external directory. Validate all successor files first; only then may the prior
+  directory be removed. Product content and UI work remain closed during this bounded
+  performance slice.
 
 ## Current checkpoint state
 

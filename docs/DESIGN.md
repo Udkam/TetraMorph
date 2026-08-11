@@ -576,9 +576,16 @@ adding unrelated badges or ornamental effects.
   and no candidate; all outputs are resumable `paused-budget`, not negative certificates.
   Independent output QA reproduces the contiguous 1..20000 domain, schema/hashes, 342,213
   failed states, 338,728 trie nodes, 81,077,752 bytes, and ordered manifest
-  `2FEE9131...873F25` with no finding or GAP. Terminal policy blocks deletion of the exact
-  external Temp directory before execution, so second-round and product admission remain
-  closed until cleanup is performed and verified.
+  `2FEE9131...873F25` with no finding or GAP. Those files are the unique continuation
+  inputs, so they must remain intact until distinct successor outputs have passed review;
+  cleanup-before-resume is invalid and would force a 32,000,000-probe replay.
+- The bounded performance review may change only internal candidate lookup while keeping
+  descriptor order and every formal token/hash/cursor byte invariant. Candidate lists
+  depend solely on the trie node's seven-type availability mask, so at most 128 ordered
+  lists may be cached instead of filtering all 662 descriptors at least twice per probe.
+  A fresh source candidate, equivalence tests, full gates, and independent QA are required
+  before any second increment. Resume input and output remain distinct external paths;
+  old files are deleted only after all new files are independently accepted.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

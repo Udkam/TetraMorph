@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C continuation retention correction
+
+- The accepted 32-file first-round output is the only resumable state for its 32 shards.
+  The earlier cleanup-first order is withdrawn: deleting it now would replay 32,000,000
+  probes. Keep it intact until distinct successor files are generated and accepted.
+- A bounded read-only review opens only an order-preserving candidate-cache performance
+  slice. The last 576 tokens per shard contain outcomes `[11134,152,6950,4,192,0]`, while
+  all failed memos have mean depth 8.792. These are diagnostic signals, not a negative
+  certificate or authority for another search round. Fresh equivalence QA controls the
+  next increment.
+
 ## 2026-08-11 — T37 Stage F3C first reverse round complete
 
 - All 32 serial 625-seed shards receive exactly one 1,000,000-probe increment. Every file
@@ -8,7 +19,8 @@
 - Independent output QA reports P0–P3/GAP all zero and reproduces ordered manifest
   `2FEE91319AF99ADFBCE42BED649BDE53076C383AD11BA2FFB64D4FE147873F25`.
   Terminal safety policy rejects both attempted cleanup forms before execution, leaving
-  the exact 32-file Temp directory intact. No second round or product work opens yet.
+  the exact 32-file Temp directory intact. This preserves the required continuation;
+  no second round or product work opens before the bounded performance review.
 
 ## 2026-08-11 — T37 Stage F3C enumeration repair accepted
 
