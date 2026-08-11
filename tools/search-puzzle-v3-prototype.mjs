@@ -15,7 +15,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -593,7 +593,24 @@ function restoreContinuation(value, context, domainHash, shardIndex) {
     const bytes = Buffer.from(token, 'hex');
     const expectedIndex = body.nextProbeCount - body.partialProbeTokens.length + index;
     if (bytes[0] !== 1 || bytes.readBigUInt64BE(1) !== BigInt(expectedIndex)) throw new Error('Partial token index drift.');
-    const tokenNode = bytes.readUInt32BE(10), tokenMasks = [14, 27, 40, 53, 66, 79, 92, 105, 126].map((offset) => bytesMask(bytes.subarray(offset, offset + 13))); if (context.trie[tokenNode]?.depth !== bytes[9] || tokenMasks.some((mask) => (mask & ~context.fixedMask) !== 0n) || bytes[122] >= 7 || bytes[123] >= 4 || bytes[139] >= 6) throw new Error('Partial token domain drift.');
+    const tokenNode = bytes.readUInt32BE(10);
+    const tokenMasks = [14, 27, 40, 53, 66, 79, 92, 105, 126]
+      .map((offset) => bytesMask(bytes.subarray(offset, offset + 13)));
+    if (context.trie[tokenNode]?.depth !== bytes[9]
+      || tokenMasks.some((mask) => (mask & ~context.fixedMask) !== 0n)
+      || bytes[122] >= TYPES.length || bytes[123] >= 4 || bytes[139] >= 6) {
+      throw new Error('Partial token domain drift.');
+    }
+    const tokenFrame = {
+      depth: bytes[9], trieNodeId: tokenNode, remainingBoard: tokenMasks[0],
+      forbiddenMasks: tokenMasks.slice(1, 8),
+    };
+    const tokenCandidate = frameCandidates(context, tokenFrame)[bytes.readUInt32BE(118)];
+    const tokenDescriptor = {
+      typeIndex: bytes[122], rotation: bytes[123], x: bytes.readInt8(124),
+      absoluteY: bytes[125], cellMask: tokenMasks[8],
+    };
+    if (!sameDescriptor(tokenCandidate, tokenDescriptor)) throw new Error('Partial token candidate drift.');
     return bytes;
   });
   if (partialTokens.length !== body.nextProbeCount % PROBE_BLOCK_SIZE) throw new Error('Partial token count drift.');
@@ -669,6 +686,12 @@ function pathIdentity(path) {
   const identity = resolve(realpathSync.native(existing), ...tail);
   return process.platform === 'win32' ? identity.toLowerCase() : identity;
 }
+function sameExistingFile(leftPath, rightPath) {
+  if (!existsSync(leftPath) || !existsSync(rightPath)) return false;
+  const left = statSync(leftPath, { bigint: true });
+  const right = statSync(rightPath, { bigint: true });
+  return left.dev === right.dev && left.ino === right.ino;
+}
 function parseReverseArguments(argv) {
   const values = new Map();
   for (let index = 0; index < argv.length; index += 2) {
@@ -702,7 +725,8 @@ function parseReverseArguments(argv) {
   if (!outputValue) throw new Error('--output is required.');
   const outputPath = resolve(outputValue);
   const resumePath = values.has('--resume') ? resolve(values.get('--resume')) : null;
-  if (resumePath && pathIdentity(resumePath) === pathIdentity(outputPath)) {
+  if (resumePath && (pathIdentity(resumePath) === pathIdentity(outputPath)
+    || sameExistingFile(resumePath, outputPath))) {
     throw new Error('Reverse resume input and output paths must be distinct.');
   }
   return {
@@ -872,6 +896,9 @@ function executeReverse(options, hooks = {}) {
   const state = hooks.resumeOutput
     ? validateResumeOutput(hooks.resumeOutput, identity, context, domainHash, trieBuild)
     : createReverseState(context);
+  if (state.probe.nextProbeCount > MAX_PROBES - options.nodeBudget) {
+    throw new Error(`Reverse probe count may not exceed ${MAX_PROBES}.`);
+  }
   const advance = advanceReverse(context, state, options.nodeBudget, options.maxRssMiB * 1024 * 1024, rssBytes);
   return makeReverseOutput(identity, trieBuild, state, advance, domainHash);
 }

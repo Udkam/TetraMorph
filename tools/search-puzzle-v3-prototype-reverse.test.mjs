@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, linkSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { registerHooks, stripTypeScriptTypes } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -186,6 +186,57 @@ const reverseOptions = reverse.parseReverseArguments([
   '--max-rss-mib', '128', '--output', join(tmpdir(), 'unused-t37-reverse.json'),
 ]);
 const pausedOutput = reverse.executeReverse(reverseOptions, { rssBytes: () => 0 });
+const oneSeedTrie = reverse.buildReverseTrie(11, 1, Number.MAX_SAFE_INTEGER, () => 0);
+const oneSeedContext = {
+  fixedMask, catalog: catalog.descriptors, trie: oneSeedTrie.nodes, sequenceLength: 20,
+};
+const oneSeedDomainHash = Buffer.from(pausedOutput.domain.domainHash, 'hex');
+const oneSeedIdentity = {
+  options: reverseOptions, fixedMask, catalog, catalogHash: catalog.catalogHash,
+  shapeHash: reverse.shapeTableHash(), queueHash: reverse.fullQueueHash(11, 1), trieHash: oneSeedTrie.trieHash,
+};
+function pausedOutputForState(state, startProbeCount, newProbeCount, nodeBudget = reverseOptions.nodeBudget) {
+  return reverse.makeReverseOutput({
+    ...oneSeedIdentity, options: { ...oneSeedIdentity.options, nodeBudget },
+  }, oneSeedTrie, state, {
+    status: 'paused-budget', complete: false, startProbeCount, newProbeCount, result: null,
+  }, oneSeedDomainHash);
+}
+function stateAtProbeCount(count) {
+  const state = reverse.restoreContinuation(pausedOutput.continuation, oneSeedContext, oneSeedDomainHash, 0);
+  const template = state.probe.partialTokens[0];
+  const partialCount = count % reverse.PROBE_BLOCK_SIZE;
+  state.probe.nextProbeCount = count;
+  state.probe.partialTokens = Array.from({ length: partialCount }, (_, index) => {
+    const token = Buffer.from(template);
+    token.writeBigUInt64BE(BigInt(count - partialCount + index), 1);
+    return token;
+  });
+  const leafCount = Math.floor(count / reverse.PROBE_BLOCK_SIZE);
+  const peakLength = leafCount === 0 ? 0 : Math.floor(Math.log2(leafCount)) + 1;
+  state.probe.peaks = Array.from({ length: peakLength }, (_, level) =>
+    leafCount & (2 ** level) ? Buffer.alloc(32, level + 1) : null);
+  return state;
+}
+const badCandidateTokenState = reverse.restoreContinuation(
+  pausedOutput.continuation, oneSeedContext, oneSeedDomainHash, 0,
+);
+badCandidateTokenState.probe.partialTokens[0].writeUInt32BE(0xffff_ffff, 118);
+const badCandidateTokenOutput = pausedOutputForState(badCandidateTokenState, 0, 1);
+assert.throws(() => reverse.restoreContinuation(
+  badCandidateTokenOutput.continuation, oneSeedContext, oneSeedDomainHash, 0,
+), /token candidate drift/i);
+assert.throws(() => reverse.executeReverse(reverseOptions, {
+  resumeOutput: badCandidateTokenOutput, rssBytes: () => 0,
+}), /token candidate drift/i);
+const badDescriptorTokenState = reverse.restoreContinuation(
+  pausedOutput.continuation, oneSeedContext, oneSeedDomainHash, 0,
+);
+badDescriptorTokenState.probe.partialTokens[0][124] ^= 1;
+const badDescriptorTokenOutput = pausedOutputForState(badDescriptorTokenState, 0, 1);
+assert.throws(() => reverse.executeReverse(reverseOptions, {
+  resumeOutput: badDescriptorTokenOutput, rssBytes: () => 0,
+}), /token candidate drift/i);
 let rssChecks = 0;
 const postBuildMemory = reverse.executeReverse(reverseOptions, { rssBytes: () => ++rssChecks === 1 ? 0 : Infinity });
 rssChecks = 0;
@@ -209,6 +260,84 @@ assert.equal(reverse.buildReverseCatalog(floorO.cellMask).descriptors.filter((it
 const obstacleRows = Array(40).fill(0), ownerRows = reverse.TYPES.map(() => Array(40).fill(0)), permissiveRows = Array(40).fill(1023);
 obstacleRows[39] = 1; assert.equal(reverse.landing(obstacleRows, ownerRows[0], permissiveRows, 'I', 0, 0).y, 37);
 obstacleRows[20] = 1; assert.equal(reverse.landing(obstacleRows, ownerRows[0], permissiveRows, 'I', 0, 0), null);
+const ORACLE_SHAPES = {
+  I: [
+    [[0, 1], [1, 1], [2, 1], [3, 1]],
+    [[2, 0], [2, 1], [2, 2], [2, 3]],
+  ],
+  O: [[[0, 0], [1, 0], [0, 1], [1, 1]]],
+};
+function oracleDrop(board, type, rotation, x) {
+  const shape = ORACLE_SHAPES[type][rotation];
+  const cellsAt = (y) => shape.map(([dx, dy]) => [x + dx, y + dy]);
+  const canPlace = (y) => cellsAt(y).every(([cellX, cellY]) =>
+    cellX >= 0 && cellX < 10 && cellY >= 0 && cellY < 40 && !board.has(`${cellX},${cellY}`));
+  let y = 19;
+  if (!canPlace(y)) return null;
+  while (canPlace(y + 1)) y += 1;
+  const cells = cellsAt(y);
+  let cellMask = 0n;
+  for (const [cellX, cellY] of cells) {
+    if (cellY < 30) return null;
+    cellMask |= 1n << BigInt((cellY - 30) * 10 + cellX);
+  }
+  return { type, rotation, x, absoluteY: y, cells, cellMask };
+}
+function oracleSignature(placements) {
+  return placements.map((item) =>
+    `${item.type}:${item.rotation}:${item.x}:${item.absoluteY}:${reverse.maskHex(item.cellMask)}`).join('/');
+}
+function independentForwardSet(queue, targetMask) {
+  const histories = new Set();
+  function visit(index, board, placements, boardMask) {
+    if (index === queue.length) {
+      if (boardMask === targetMask) histories.add(oracleSignature(placements));
+      return;
+    }
+    const type = queue[index];
+    for (let rotation = 0; rotation < ORACLE_SHAPES[type].length; rotation += 1) {
+      const shape = ORACLE_SHAPES[type][rotation];
+      const minX = Math.min(...shape.map(([dx]) => dx));
+      const maxX = Math.max(...shape.map(([dx]) => dx));
+      for (let x = -minX; x < 10 - maxX; x += 1) {
+        const landed = oracleDrop(board, type, rotation, x);
+        if (!landed || (landed.cellMask & targetMask) !== landed.cellMask) continue;
+        const touchesSameType = landed.cells.some(([cellX, cellY]) =>
+          [[cellX - 1, cellY], [cellX + 1, cellY], [cellX, cellY - 1], [cellX, cellY + 1]]
+            .some(([nearX, nearY]) => board.get(`${nearX},${nearY}`) === type));
+        if (touchesSameType) continue;
+        const nextBoard = new Map(board);
+        for (const [cellX, cellY] of landed.cells) nextBoard.set(`${cellX},${cellY}`, type);
+        visit(index + 1, nextBoard, [...placements, landed], boardMask | landed.cellMask);
+      }
+    }
+  }
+  visit(0, new Map(), [], 0n);
+  return histories;
+}
+function descriptorFromOracle(item) {
+  return {
+    typeIndex: reverse.TYPES.indexOf(item.type), rotation: item.rotation, x: item.x,
+    absoluteY: item.absoluteY, cellMask: item.cellMask,
+  };
+}
+function exactQueueContext(targetMask, catalogOrder, forwardQueue) {
+  const nodes = [{ depth: 0, children: Array(7).fill(-1), seeds: [] }];
+  let parent = 0;
+  for (const type of forwardQueue.toReversed()) {
+    const child = nodes.length;
+    nodes[parent].children[reverse.TYPES.indexOf(type)] = child;
+    nodes.push({ depth: nodes[parent].depth + 1, children: Array(7).fill(-1), seeds: [] });
+    parent = child;
+  }
+  nodes[parent].seeds.push(77);
+  return { fixedMask: targetMask, catalog: catalogOrder, trie: nodes, sequenceLength: forwardQueue.length };
+}
+function actualReverseOutcome(targetMask, catalogOrder, forwardQueue) {
+  const exactContext = exactQueueContext(targetMask, catalogOrder, forwardQueue);
+  return reverse.advanceReverse(exactContext, reverse.createReverseState(exactContext),
+    100, Number.MAX_SAFE_INTEGER, () => 0);
+}
 function syntheticContext(descriptor, leaf, depth = 1) {
   const nodes = [{ depth: 0, children: Array(7).fill(-1), seeds: [] }];
   let parent = 0;
@@ -331,6 +460,35 @@ try {
   const beforeSamePath = sha256(readFileSync(splitAPath));
   assert.equal(runReverse(splitAPath, 1, ['--resume', join(tempRoot, '.', 'reverse-7.json')]).status, 1);
   assert.equal(sha256(readFileSync(splitAPath)), beforeSamePath);
+
+  const hardLinkPath = join(tempRoot, 'reverse-7-hard-link.json');
+  linkSync(splitAPath, hardLinkPath);
+  const beforeHardLink = sha256(readFileSync(splitAPath));
+  const hardLinkResume = runReverse(hardLinkPath, 1, ['--resume', splitAPath]);
+  assert.equal(hardLinkResume.status, 1, hardLinkResume.stderr.toString());
+  assert.equal(sha256(readFileSync(splitAPath)), beforeHardLink);
+  assert.equal(sha256(readFileSync(hardLinkPath)), beforeHardLink);
+
+  const maxProbes = 1_000_000_000;
+  const maxMinusOneResumePath = join(tempRoot, 'reverse-max-minus-one.json');
+  const maxMinusOneState = stateAtProbeCount(maxProbes - 1);
+  const maxMinusOneOutput = pausedOutputForState(
+    maxMinusOneState, 0, maxProbes - 1, maxProbes - 1,
+  );
+  writeFileSync(maxMinusOneResumePath, `${reverse.canonicalJson(maxMinusOneOutput)}\n`, 'utf8');
+  const maxBoundaryPath = join(tempRoot, 'reverse-max.json');
+  const maxBoundary = runReverse(maxBoundaryPath, 1, ['--resume', maxMinusOneResumePath]);
+  assert.equal(maxBoundary.status, 2, maxBoundary.stderr.toString());
+  assert.deepEqual(JSON.parse(readFileSync(maxBoundaryPath)).coverage, {
+    startProbeCount: maxProbes - 1, newProbeCount: 1, nextProbeCount: maxProbes, complete: false,
+  });
+  const overflowPath = join(tempRoot, 'reverse-max-plus-one.json');
+  const beforeOverflow = sha256(readFileSync(maxMinusOneResumePath));
+  const overflow = runReverse(overflowPath, 2, ['--resume', maxMinusOneResumePath]);
+  assert.equal(overflow.status, 1, overflow.stderr.toString());
+  assert.match(overflow.stderr.toString(), /probe count may not exceed 1000000000/i);
+  assert.equal(existsSync(overflowPath), false);
+  assert.equal(sha256(readFileSync(maxMinusOneResumePath)), beforeOverflow);
 } finally {
   rmSync(tempRoot, { recursive: true });
 }
@@ -382,22 +540,39 @@ try {
     settled |= descriptor.cellMask;
   }
   assert(usedSupport, 'Core candidate must exercise piece support');
-  const pair = coreCandidate.result.descriptors.slice(0, 2);
-  const pairMask = pair[0].cellMask | pair[1].cellMask;
-  const pairCatalog = reverse.buildReverseCatalog(pairMask).descriptors;
-  const forward = new Set();
-  const backward = new Set();
-  for (const first of pairCatalog.filter((item) => item.typeIndex === pair[0].typeIndex))
-    for (const last of pairCatalog.filter((item) => item.typeIndex === pair[1].typeIndex)) {
-      if ((first.cellMask | last.cellMask) !== pairMask || (first.cellMask & last.cellMask)) continue;
-      const signature = `${reverse.maskHex(first.cellMask)}/${reverse.maskHex(last.cellMask)}`;
-      if (reverse.hardDropMask(0n, first) === first.cellMask
-        && reverse.hardDropMask(first.cellMask, last) === last.cellMask) forward.add(signature);
-      if (reverse.hardDropMask(pairMask & ~last.cellMask, last) === last.cellMask
-        && reverse.hardDropMask(0n, first) === first.cellMask) backward.add(signature);
-    }
-  assert(forward.size > 0);
-  assert.deepEqual([...backward].sort(), [...forward].sort());
+
+  const emptyOracleBoard = new Map();
+  const separated = [oracleDrop(emptyOracleBoard, 'O', 0, 0), oracleDrop(emptyOracleBoard, 'O', 0, 4)];
+  const separatedMask = separated[0].cellMask | separated[1].cellMask;
+  const separatedDescriptors = separated.map(descriptorFromOracle);
+  const separatedForward = independentForwardSet(['O', 'O'], separatedMask);
+  const separatedRuns = [separatedDescriptors, separatedDescriptors.toReversed()]
+    .map((order) => actualReverseOutcome(separatedMask, order, ['O', 'O']));
+  assert.deepEqual(separatedRuns.map((result) => result.status), ['candidate', 'candidate']);
+  const separatedReverse = new Set(separatedRuns.map((result) => oracleSignature(
+    result.result.descriptors.map((item) => ({ ...item, type: reverse.TYPES[item.typeIndex] })),
+  )));
+  assert.equal(separatedForward.size, 2, 'the independent oracle must enumerate both separated O orders');
+  assert.deepEqual([...separatedReverse].sort(), [...separatedForward].sort());
+
+  const touching = [oracleDrop(emptyOracleBoard, 'O', 0, 0), oracleDrop(emptyOracleBoard, 'O', 0, 2)];
+  const touchingMask = touching[0].cellMask | touching[1].cellMask;
+  const touchingDescriptors = touching.map(descriptorFromOracle);
+  const touchingForward = independentForwardSet(['O', 'O'], touchingMask);
+  const touchingRuns = [touchingDescriptors, touchingDescriptors.toReversed()]
+    .map((order) => actualReverseOutcome(touchingMask, order, ['O', 'O']));
+  assert.equal(touchingForward.size, 0);
+  assert.deepEqual(touchingRuns.map((result) => result.status), ['complete-not-found', 'complete-not-found']);
+
+  const mixed = [oracleDrop(emptyOracleBoard, 'O', 0, 0), oracleDrop(emptyOracleBoard, 'I', 0, 4)];
+  const mixedMask = mixed[0].cellMask | mixed[1].cellMask;
+  const mixedForward = independentForwardSet(['O', 'I'], mixedMask);
+  const mixedResult = actualReverseOutcome(mixedMask, mixed.map(descriptorFromOracle), ['O', 'I']);
+  assert.equal(mixedResult.status, 'candidate');
+  const mixedReverse = new Set([oracleSignature(mixedResult.result.descriptors.map((item) =>
+    ({ ...item, type: reverse.TYPES[item.typeIndex] })))]);
+  assert.equal(mixedForward.size, 1, 'the independent oracle must preserve the fixed mixed queue order');
+  assert.deepEqual([...mixedReverse], [...mixedForward]);
 } finally {
   typeHook.deregister();
 }
