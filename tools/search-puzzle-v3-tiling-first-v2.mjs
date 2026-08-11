@@ -27,6 +27,8 @@ const HASH_PATTERN = /^[0-9A-F]{64}$/;
 const REPOSITORY_ROOT = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), '..'));
 const PUBLISH_CAPABILITY = Object.freeze({});
 const TRUSTED_RESULTS = new WeakMap();
+const REPLAY_CONTEXTS = new WeakSet();
+const MANIFEST_TEST_DEPENDENCIES = new WeakSet();
 
 function exactKeys(value, keys, label) {
   if (!value || typeof value !== 'object' || Array.isArray(value)
@@ -245,13 +247,9 @@ function validateCandidateShape(output) {
     || !Array.isArray(output.boardRows) || output.boardRows.length !== 20) {
     throw new Error('V2 candidate arrays are invalid.');
   }
-  const queue = base.sequenceForSeed(candidate.seed, 20);
-  const counts = v1.typeCounts(queue);
-  const profileIndex = counts.indexOf(2);
-  if (profileIndex !== candidate.profileIndex || profileIndex !== output.coverage.completedProfileCount
-    || candidate.tilingOrdinal + 1 !== output.coverage.strongTilingCount
-    || base.canonicalJson(counts) !== base.canonicalJson(output.domain.profileCounts[profileIndex])) {
-    throw new Error('V2 candidate profile or prefix is invalid.');
+  if (candidate.profileIndex !== output.coverage.completedProfileCount
+    || candidate.tilingOrdinal + 1 !== output.coverage.strongTilingCount) {
+    throw new Error('V2 candidate prefix is invalid.');
   }
   for (const placement of output.setup.placements) {
     exactKeys(placement, ['type', 'rotation', 'x'], 'V2 setup placement');
@@ -262,10 +260,62 @@ function validateCandidateShape(output) {
   }
 }
 
-function validateCandidateReplay(output) {
+function createCandidateReplayContext(config) {
+  exactKeys(config, ['types', 'catalog', 'targetMask', 'visibleMask', 'rowMasks',
+    'sequenceForSeed', 'hardDropMask', 'neighborMask', 'candidateBoardRows'], 'Candidate replay context');
+  const { types, catalog, targetMask, visibleMask, rowMasks,
+    sequenceForSeed, hardDropMask, neighborMask, candidateBoardRows } = config;
+  if (!Array.isArray(types) || base.canonicalJson(types) !== base.canonicalJson(base.TYPES)
+    || !Array.isArray(catalog) || catalog.length < 20 || typeof targetMask !== 'bigint'
+    || targetMask <= 0n || v1.countBits(targetMask) !== 80 || typeof visibleMask !== 'bigint'
+    || visibleMask <= 0n || (targetMask & visibleMask) !== targetMask || !Array.isArray(rowMasks)
+    || rowMasks.length < 1 || [sequenceForSeed, hardDropMask, neighborMask, candidateBoardRows]
+      .some((value) => typeof value !== 'function')) {
+    throw new Error('Candidate replay context is invalid.');
+  }
+  let rowUnion = 0n;
+  for (const rowMask of rowMasks) {
+    if (typeof rowMask !== 'bigint' || rowMask <= 0n || (rowMask & visibleMask) !== rowMask
+      || (rowUnion & rowMask) !== 0n) throw new Error('Candidate replay rows are invalid.');
+    rowUnion |= rowMask;
+  }
+  if (rowUnion !== visibleMask || catalog.some((descriptor) => !descriptor
+    || !Number.isInteger(descriptor.typeIndex) || descriptor.typeIndex < 0 || descriptor.typeIndex > 6
+    || !Number.isInteger(descriptor.rotation) || descriptor.rotation < 0 || descriptor.rotation > 3
+    || !Number.isInteger(descriptor.x) || typeof descriptor.cellMask !== 'bigint'
+    || descriptor.cellMask <= 0n || v1.countBits(descriptor.cellMask) !== 4)) {
+    throw new Error('Candidate replay catalog or visible rows are invalid.');
+  }
+  const context = deepFreeze({
+    types: [...types], catalog: [...catalog], targetMask, visibleMask, rowMasks: [...rowMasks],
+    sequenceForSeed, hardDropMask, neighborMask, candidateBoardRows,
+  });
+  REPLAY_CONTEXTS.add(context);
+  return context;
+}
+
+let productionReplayContext = null;
+function getProductionReplayContext() {
+  if (productionReplayContext) return productionReplayContext;
+  productionReplayContext = createCandidateReplayContext({
+    types: base.TYPES,
+    catalog: base.buildReverseCatalog(base.rowsMask()).descriptors,
+    targetMask: base.rowsMask(),
+    visibleMask: (1n << 100n) - 1n,
+    rowMasks: Array.from({ length: 10 }, (_, row) => 0x3ffn << BigInt(row * 10)),
+    sequenceForSeed: (seed, count) => base.sequenceForSeed(seed, count),
+    hardDropMask: (board, descriptor) => base.hardDropMask(board, descriptor),
+    neighborMask: (mask) => base.neighborMask(mask, base.rowsMask()),
+    candidateBoardRows: (descriptors) => base.candidateBoardRows(descriptors),
+  });
+  return productionReplayContext;
+}
+
+function replayCandidateWithContext(output, context) {
+  if (!REPLAY_CONTEXTS.has(context)) throw new Error('Candidate replay context is not registered.');
   validateCandidateShape(output);
   const { candidate } = output;
-  const catalog = base.buildReverseCatalog(base.rowsMask()).descriptors;
+  const { catalog } = context;
   const indices = candidate.forwardCatalogIndices;
   if (new Set(indices).size !== 20 || indices.some((index) => index >= catalog.length)) {
     throw new Error('V2 candidate catalog indices are invalid.');
@@ -275,33 +325,46 @@ function validateCandidateReplay(output) {
   if (base.canonicalJson(expectedPeel) !== base.canonicalJson(candidate.peelLocalIndices)) {
     throw new Error('V2 candidate peel order is invalid.');
   }
-  const queue = base.sequenceForSeed(candidate.seed, 20);
+  const queue = context.sequenceForSeed(candidate.seed, 20);
+  if (!Array.isArray(queue) || queue.length !== 20
+    || queue.some((type) => !context.types.includes(type))) throw new Error('V2 candidate queue is invalid.');
+  const counts = context.types.map((type) => queue.filter((entry) => entry === type).length);
+  const profileIndex = counts.indexOf(2);
+  if (profileIndex !== candidate.profileIndex || counts.filter((count) => count === 2).length !== 1
+    || counts.some((count, index) => count !== (index === profileIndex ? 2 : 3))
+    || base.canonicalJson(counts) !== base.canonicalJson(output.domain.profileCounts[profileIndex])) {
+    throw new Error('V2 candidate queue profile is invalid.');
+  }
   let board = 0n;
   const typedMasks = Array.from({ length: 7 }, () => 0n);
   const descriptors = [];
   for (const [position, index] of indices.entries()) {
     const descriptor = catalog[index];
     const placement = output.setup.placements[position];
-    if (queue[position] !== base.TYPES[descriptor.typeIndex]
+    if ((descriptor.cellMask & context.visibleMask) !== descriptor.cellMask
+      || queue[position] !== context.types[descriptor.typeIndex]
       || placement.type !== queue[position] || placement.rotation !== descriptor.rotation
-      || placement.x !== descriptor.x || base.hardDropMask(board, descriptor) !== descriptor.cellMask
+      || placement.x !== descriptor.x || context.hardDropMask(board, descriptor) !== descriptor.cellMask
       || (board & descriptor.cellMask) !== 0n
-      || (base.neighborMask(descriptor.cellMask, base.rowsMask()) & typedMasks[descriptor.typeIndex]) !== 0n) {
+      || (context.neighborMask(descriptor.cellMask) & typedMasks[descriptor.typeIndex]) !== 0n) {
       throw new Error('V2 candidate physical replay failed.');
     }
     board |= descriptor.cellMask;
     typedMasks[descriptor.typeIndex] |= descriptor.cellMask;
-    for (let row = 0; row < 10; row += 1) {
-      const rowMask = 0x3ffn << BigInt(row * 10);
+    for (const rowMask of context.rowMasks) {
       if ((board & rowMask) === rowMask) throw new Error('V2 candidate clears during setup.');
     }
     descriptors.push(descriptor);
   }
-  if (board !== base.rowsMask()
-    || base.canonicalJson(base.candidateBoardRows(descriptors)) !== base.canonicalJson(output.boardRows)) {
+  if (board !== context.targetMask
+    || base.canonicalJson(context.candidateBoardRows(descriptors)) !== base.canonicalJson(output.boardRows)) {
     throw new Error('V2 candidate board does not reconstruct the target.');
   }
   return output;
+}
+
+function validateCandidateReplay(output) {
+  return replayCandidateWithContext(output, getProductionReplayContext());
 }
 
 const TOP_LEVEL_KEYS = [
@@ -310,7 +373,8 @@ const TOP_LEVEL_KEYS = [
   'targetMaskRows', 'targetRows',
 ];
 
-function validateShardOutput(output) {
+function validateShardOutputData(output, candidateReplay) {
+  if (typeof candidateReplay !== 'function') throw new Error('Candidate replay validator is invalid.');
   exactKeys(output, TOP_LEVEL_KEYS, 'V2 shard output');
   exactKeys(output.coverReference, ['coverBranchProbeCount', 'strongTilingCount', 'strongTilingHash'],
     'V2 cover reference');
@@ -370,14 +434,26 @@ function validateShardOutput(output) {
       throw new Error('V2 natural completion does not match the cover reference.');
     }
   }
-  if (output.status === 'candidate') validateCandidateReplay(output);
+  if (output.status === 'candidate') candidateReplay(output);
   else if (output.candidate !== null || output.setup !== null || output.boardRows !== null) {
     throw new Error('V2 noncandidate output contains candidate artifacts.');
   }
   return output;
 }
 
-function formatShardOutputForTest(result) {
+function validateShardOutput(output) {
+  return validateShardOutputData(output, validateCandidateReplay);
+}
+
+function validateShardOutputForTest(output, candidateReplayContext) {
+  if (!REPLAY_CONTEXTS.has(candidateReplayContext)) {
+    throw new Error('Candidate replay context is not registered.');
+  }
+  return validateShardOutputData(output,
+    (candidate) => replayCandidateWithContext(candidate, candidateReplayContext));
+}
+
+function formatShardOutputData(result, candidateReplay) {
   const domain = result?.domain;
   const shard = validateDomain(domain);
   const coverage = {
@@ -418,8 +494,18 @@ function formatShardOutputForTest(result) {
     targetRows: 10, targetMaskRows: base.TARGET_VISIBLE_ROWS,
     candidate: result.candidate, setup: result.setup, boardRows: result.boardRows, search,
   };
-  validateShardOutput(output);
+  validateShardOutputData(output, candidateReplay);
   return deepFreeze(output);
+}
+
+function formatShardOutputForTest(result, candidateReplayContext = null) {
+  const replay = candidateReplayContext === null ? validateCandidateReplay
+    : (output) => replayCandidateWithContext(output, candidateReplayContext);
+  return formatShardOutputData(result, replay);
+}
+
+function formatTrustedShardOutput(result) {
+  return formatShardOutputData(result, validateCandidateReplay);
 }
 
 function executeShardSearch(shardIndex) {
@@ -432,7 +518,7 @@ function executeShardSearch(shardIndex) {
   if (result.domainHash !== domain.domainHash || result.processedSeeds !== SHARD_SIZE) {
     throw new Error('V1 returned a result for the wrong V2 domain.');
   }
-  const output = formatShardOutputForTest(result);
+  const output = formatTrustedShardOutput(result);
   TRUSTED_RESULTS.set(result, output);
   return result;
 }
@@ -475,27 +561,68 @@ function validateV1PredecessorBytes(bytes) {
   });
 }
 
-function validateShardBytes(bytes, expectedFileSha256, expectedResultHash) {
+function validateShardBytesData(bytes, expectedFileSha256, expectedResultHash, validateOutput) {
   if (!HASH_PATTERN.test(expectedFileSha256) || !HASH_PATTERN.test(expectedResultHash)
     || v1.sha256Hex(bytes) !== expectedFileSha256) throw new Error('Shard file hash differs from QA expectation.');
-  const output = validateShardOutput(parseCanonicalBytes(bytes, 'V2 shard output'));
+  const output = validateOutput(parseCanonicalBytes(bytes, 'V2 shard output'));
   if (output.evidence.resultHash !== expectedResultHash) {
     throw new Error('Shard result hash differs from QA expectation.');
   }
   return { output, fileSha256: expectedFileSha256 };
 }
 
-function buildManifestData({ predecessorBytes, records }) {
+function validateShardBytes(bytes, expectedFileSha256, expectedResultHash) {
+  return validateShardBytesData(bytes, expectedFileSha256, expectedResultHash, validateShardOutput);
+}
+
+function validateShardBytesForTest(bytes, expectedFileSha256, expectedResultHash, candidateReplayContext) {
+  if (!REPLAY_CONTEXTS.has(candidateReplayContext)) {
+    throw new Error('Candidate replay context is not registered.');
+  }
+  return validateShardBytesData(bytes, expectedFileSha256, expectedResultHash,
+    (output) => validateShardOutputForTest(output, candidateReplayContext));
+}
+
+const PRODUCTION_MANIFEST_DEPENDENCIES = Object.freeze({
+  validatePredecessorBytes: validateV1PredecessorBytes,
+  validateShardRecord: validateShardBytes,
+});
+
+function createManifestTestDependencies(candidateReplayContext,
+  validatePredecessorBytes = validateV1PredecessorBytes) {
+  if (!REPLAY_CONTEXTS.has(candidateReplayContext) || typeof validatePredecessorBytes !== 'function') {
+    throw new Error('Manifest test dependencies are invalid.');
+  }
+  const dependencies = Object.freeze({
+    validatePredecessorBytes,
+    validateShardRecord: (bytes, fileHash, resultHash) =>
+      validateShardBytesForTest(bytes, fileHash, resultHash, candidateReplayContext),
+  });
+  MANIFEST_TEST_DEPENDENCIES.add(dependencies);
+  return dependencies;
+}
+
+function buildManifestData({ predecessorBytes, records }, dependencies = null) {
   if (!Array.isArray(records) || records.length < 1 || records.length > SHARD_COUNT) {
     throw new Error('Manifest needs one through nine shard records.');
   }
-  const predecessor = validateV1PredecessorBytes(predecessorBytes);
+  const validators = dependencies ?? PRODUCTION_MANIFEST_DEPENDENCIES;
+  if (dependencies !== null && !MANIFEST_TEST_DEPENDENCIES.has(dependencies)) {
+    throw new Error('Manifest validators are not registered test dependencies.');
+  }
+  const predecessor = validators.validatePredecessorBytes(predecessorBytes);
+  exactKeys(predecessor, ['seedStart', 'seedCount', 'seedEndExclusive', 'status',
+    'fileSha256', 'resultHash'], 'Manifest predecessor');
+  if (![predecessor.seedStart, predecessor.seedCount, predecessor.seedEndExclusive]
+    .every((value) => Number.isSafeInteger(value) && value >= 0)
+    || predecessor.status !== 'complete-not-found' || !HASH_PATTERN.test(predecessor.fileSha256)
+    || !HASH_PATTERN.test(predecessor.resultHash)) throw new Error('Manifest predecessor is invalid.');
   const entries = [];
   const seenHashes = new Set();
   let candidateSeen = false;
   for (const [position, record] of records.entries()) {
     exactKeys(record, ['bytes', 'expectedFileSha256', 'expectedResultHash'], 'Manifest data record');
-    const { output, fileSha256 } = validateShardBytes(
+    const { output, fileSha256 } = validators.validateShardRecord(
       record.bytes, record.expectedFileSha256, record.expectedResultHash,
     );
     const hashIdentity = `${fileSha256}:${output.evidence.resultHash}`;
@@ -634,9 +761,11 @@ export const __tilingV2Test = Object.freeze({
   PROFILE_HASH, TARGET_MASK, CATALOG_HASH, SHAPE_TABLE_HASH, FULL_STRONG_TILING_HASH,
   V1_FILE_HASH, V1_RESULT_HASH, SERIES_BODY, SERIES_HASH, SERIES, COVER_REFERENCE,
   exactKeys, deepFreeze, shardRange, profileMembership, buildShardDomain, validateDomain,
-  validateCandidateShape, validateCandidateReplay, validateShardOutput, formatShardOutputForTest,
-  parseCanonicalBytes, validateV1PredecessorBytes, validateShardBytes, buildManifestData,
-  externalPath, buildManifestFromFiles, parseArguments, canonicalBytes,
+  validateCandidateShape, createCandidateReplayContext, replayCandidateWithContext,
+  validateCandidateReplay, validateShardOutput, validateShardOutputForTest, formatShardOutputForTest,
+  parseCanonicalBytes, validateV1PredecessorBytes, validateShardBytes, validateShardBytesForTest,
+  createManifestTestDependencies, buildManifestData, externalPath, buildManifestFromFiles,
+  parseArguments, canonicalBytes,
 });
 
 const isMain = process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
