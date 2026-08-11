@@ -89,6 +89,14 @@ remain closed.
 The first writer correctly stopped before creating either path because nested exact keys and
 three scalar literals were underspecified. `docs/DESIGN.md` now freezes every top/nested key,
 artifact/schema version, and claim string; no implementer-selected field name is permitted.
+The corrected contract is now implemented and accepted at `b2c3bc5`. Artifact/test SHA-256
+values are respectively `3AF6478949DA431A8BC063E1152DFD918FCEE5C61E8CE67B18ADE4764340E46A`
+and `CB2DAD4A2970BD0789502F0B91445FF132A2A52209B6528913F9BF9BA7EF4A9E`.
+Independent QA is P0–P3/GAP all zero; final typecheck, full suite
+(`433 passed / 11 skipped`), and production build pass. F3C is closed. The only open next
+action is a read-only inventory of the current Puzzle curriculum and reusable unlock/proof
+seams; no product level edit is authorized until that inventory becomes a committed bounded
+F3D contract.
 
 ## Frozen product direction
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C exact ten-row prototype proof accepted
+
+- Commit `b2c3bc5` adds only the canonical non-published prototype artifact and its direct
+  current-Core proof test. Their SHA-256 values are `3AF6478949DA431A8BC063E1152DFD918FCEE5C61E8CE67B18ADE4764340E46A`
+  and `CB2DAD4A2970BD0789502F0B91445FF132A2A52209B6528913F9BF9BA7EF4A9E`.
+- Independent candidate QA reports P0–P3/GAP all zero, including repository-only input,
+  canonical base identity, literal setup/route replay, and the opt-in no-beam certificate.
+- Final typecheck, the complete suite (`433 passed / 11 skipped`), and the 767-module build
+  pass. F3C closes without publishing a product level; the next step is read-only curriculum
+  inventory followed by a separately committed F3D contract.
+
 ## 2026-08-12 — T37 Stage F3C canonical base hash corrected before implementation
 
 - The final-file writer stops before editing after detecting that the frozen canonical

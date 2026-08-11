@@ -716,6 +716,12 @@ adding unrelated badges or ornamental effects.
   Independent pre-implementation replay accepts every frozen literal with P0–P3/GAP zero;
   canonical `t3r-shaft-01` remains byte-identical with SHA-256
   `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
+- The final two-path proof is accepted at `b2c3bc5`. Independent candidate QA reports
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; the normal direct test passes three tests with the
+  exact certificate skipped, and the opt-in run passes all four. Final typecheck, the full
+  `433 passed / 11 skipped` suite, and the 767-module production build pass. This closes F3C
+  authoring proof only; publishing or altering product Puzzle definitions requires the next
+  curriculum slice and its own bounded contract.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

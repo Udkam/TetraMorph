@@ -1393,8 +1393,22 @@ keys are `commandStream,cumulativeClears,finalStateHash,initialStateHash,lockSig
 `deficitBoundPrunes,exhaustedFrontierWidths,exploredStateCount,initialStateHash,optimalLocks,`
 `transitionCount`.
 
-Next exact action: the same single writer may now create only the two final paths, using these
-literal names and values. Any further schema ambiguity stops before editing.
+The final writer then creates exactly the two authorized files from corrected HEAD `e547b7e`.
+The artifact is 2,821 bytes / one LF-terminated line with SHA-256
+`3AF6478949DA431A8BC063E1152DFD918FCEE5C61E8CE67B18ADE4764340E46A`; the 315-line test
+hashes to `CB2DAD4A2970BD0789502F0B91445FF132A2A52209B6528913F9BF9BA7EF4A9E`.
+Independent read-only QA rebuilds schema, setup, route, state hashes, product-base identity,
+and the opt-in no-beam certificate with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+
+Exact-path commit `b2c3bc5` contains only those two files. After that source commit,
+`npm.cmd run typecheck`, the complete suite (`433 passed / 11 skipped`), and
+`npm.cmd run build` (767 modules) all pass. Browser evidence is not applicable because this
+checkpoint contains no product/runtime/UI change. F3C is closed.
+
+Next exact action: perform one read-only current-product curriculum inventory. Freeze the
+first bounded F3D product contract in docs before authorizing any Puzzle definition, unlock,
+UI, or fixture edit. T27/`progress.md`, audio, transitions, Mutation visuals, and icon remain
+outside this next inventory.
 
 ## Do not repeat
 
