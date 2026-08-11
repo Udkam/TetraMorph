@@ -528,22 +528,34 @@ assert(fakeCandidateArtifacts.setup.placements.every((placement) =>
 assert.equal(fakeCandidateArtifacts.boardRows.length, 20);
 assert.deepEqual(fakeCandidateArtifacts.boardRows.map((row) => row.replace(/[IOTSZJL]/g, '#')),
   base.TARGET_VISIBLE_ROWS);
-const fakeCandidateOutput = tiling.makeTilingOutput({
+assert.throws(() => tiling.makeTilingOutput({
   ...combinedCanonical,
   status: 'candidate',
   phase: 'order',
   complete: false,
   candidate: { seed: 49 },
   ...fakeCandidateArtifacts,
-}, { workBudget: 7524, maxRssMiB: 900 });
-assert.equal(fakeCandidateOutput.status, 'candidate');
-assert.equal(fakeCandidateOutput.setup.seed, 49);
-assert.equal(fakeCandidateOutput.setup.placements.length, 20);
-assert.throws(() => tiling.makeTilingOutput({
-  ...combinedCanonical,
-  setup: fakeCandidateArtifacts.setup,
-  boardRows: null,
 }, { workBudget: 7524, maxRssMiB: 900 }), /output state/i);
+const physicalPeel = [3, 7, 8, 12, 6, 13, 14, 17, 0, 5, 2, 9, 15, 10, 11, 18, 1, 19, 16, 4];
+const firstDescriptors = firstRun.stoppedTiling.catalogIndices.map((index) => catalog[index]);
+const physicalForward = physicalPeel.toReversed();
+const candidateTrie = exactTrieForForwardTypes(
+  physicalForward.map((localIndex) => firstDescriptors[localIndex].typeIndex), [49],
+);
+const realCandidateResult = tiling.executeTilingSearch({
+  workBudget: 10_000,
+  maxRssBytes: Number.POSITIVE_INFINITY,
+  rssBytes: () => 0,
+  preparedDomain: { ...combinedDomain, trie: candidateTrie, processedSeeds: 1 },
+});
+const realCandidateOutput = tiling.makeTilingOutput(realCandidateResult,
+  { workBudget: 10_000, maxRssMiB: 900 });
+assert.equal(realCandidateOutput.status, 'candidate');
+assert.equal(realCandidateOutput.setup.seed, 49);
+assert.equal(realCandidateOutput.setup.placements.length, 20);
+assert.equal(Object.isFrozen(combinedCanonical), true);
+assert.equal(Object.isFrozen(combinedCanonical.domain), true);
+assert.throws(() => { combinedCanonical.setup = fakeCandidateArtifacts.setup; }, TypeError);
 const domainMemoryResult = tiling.executeTilingSearch({
   workBudget: 1, maxRssBytes: 0, rssBytes: () => 1,
 });
@@ -614,6 +626,16 @@ try {
     '--max-rss-mib', '127', '--output', join(cliRoot, 'low-rss.json'),
   ]), /128 through 4096/i);
   assert.equal(readFileSync(sentinel, 'utf8'), 'sentinel');
+  const raceOutput = join(cliRoot, 'race.json');
+  const foreignTemporary = join(cliRoot,
+    `.race.json.${process.pid}.${'00'.repeat(8)}.tmp`);
+  writeFileSync(foreignTemporary, 'foreign-owner', { encoding: 'utf8' });
+  assert.throws(() => tiling.writeAtomicAbsent(
+    raceOutput, Buffer.from('{}\n'), () => Buffer.alloc(8),
+  ), /EEXIST|already exists/i);
+  assert.equal(existsSync(raceOutput), false);
+  assert.equal(readFileSync(foreignTemporary, 'utf8'), 'foreign-owner',
+    'a temp path not created by this invocation must never be unlinked');
 } finally {
   rmSync(cliRoot, { recursive: true, force: true });
 }

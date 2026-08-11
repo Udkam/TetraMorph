@@ -15,9 +15,21 @@ const CLAIM = 'F3C tiling-first setup candidate only; current Core replay and ex
 const PROFILE_HASH = '115B19D4A4B6394E3032729222DC16B611313B9C88C6B61E81B3D2520FE98AD4';
 const EMPTY_SHA256 = 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855';
 const STOP = Symbol('tiling-first-stop');
+const VALIDATED_SEARCH_RESULTS = new WeakSet();
 
 function sha256Hex(bytes) {
   return createHash('sha256').update(bytes).digest('hex').toUpperCase();
+}
+
+function registerSearchResult(result) {
+  const freeze = (value) => {
+    if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+    for (const child of Object.values(value)) freeze(child);
+    return Object.freeze(value);
+  };
+  freeze(result);
+  VALIDATED_SEARCH_RESULTS.add(result);
+  return result;
 }
 
 function hashSnapshot(hasher) {
@@ -544,7 +556,7 @@ function executeTilingSearch({
   }
   const domain = preparedDomain ?? buildTilingDomain({ maxRssBytes, rssBytes });
   if (domain.memoryGuard) {
-    return {
+    const result = {
       status: 'memory-guard', phase: 'domain-build', complete: false,
       domain: tilingDomainObject(null, null), domainHash: null,
       workCount: 0, coverBranchProbeCount: 0,
@@ -555,6 +567,7 @@ function executeTilingSearch({
       processedSeeds: domain.processedSeeds, catalogDescriptorCount: 662,
       reverseTrieNodeCount: domain.reverseTrieNodeCount,
     };
+    return registerSearchResult(result);
   }
   if (!domain.fixedMask || !Array.isArray(domain.catalog) || !Array.isArray(domain.profiles)
     || !Array.isArray(domain.trie) || !domain.identity || !domain.domainHash) {
@@ -595,7 +608,7 @@ function executeTilingSearch({
     : runtime.stopStatus ?? (cover.complete ? 'complete-not-found' : null);
   if (!status) throw new Error('Combined tiling search stopped without a terminal status.');
   const artifacts = candidateArtifacts(domain, candidate);
-  return {
+  const result = {
     status,
     phase: candidate ? 'order' : runtime.stopPhase ?? 'cover',
     complete: status === 'complete-not-found',
@@ -617,6 +630,7 @@ function executeTilingSearch({
     catalogDescriptorCount: domain.catalog.length,
     reverseTrieNodeCount: domain.trie.length,
   };
+  return registerSearchResult(result);
 }
 
 function tilingResultHash({ status, phase, domainHash, coverage, evidence, setup, boardRows, search }) {
@@ -662,7 +676,8 @@ function makeTilingOutput(result, { workBudget, maxRssMiB }) {
     && base.canonicalJson(result.boardRows.map((row) => row.replace(/[IOTSZJL]/g, '#')))
       === base.canonicalJson(base.TARGET_VISIBLE_ROWS);
   const hashOrNull = (value) => value === null || /^[0-9A-F]{64}$/.test(value);
-  if (!result || !allowed.has(`${result.status}:${result.phase}`)
+  if (!result || !VALIDATED_SEARCH_RESULTS.has(result)
+    || !allowed.has(`${result.status}:${result.phase}`)
     || !Number.isSafeInteger(workBudget) || workBudget < 1 || workBudget > 1_000_000_000
     || !Number.isSafeInteger(maxRssMiB) || maxRssMiB < 128 || maxRssMiB > 4096
     || result.complete !== (result.status === 'complete-not-found')
@@ -674,6 +689,10 @@ function makeTilingOutput(result, { workBudget, maxRssMiB }) {
     || ![result.traceHash, result.strongTilingHash, result.failedMemoTraceHash]
       .every((value) => /^[0-9A-F]{64}$/.test(value))
     || (result.phase === 'domain-build') !== (result.domainHash === null)
+    || (result.status === 'candidate') !== (result.candidate !== null)
+    || (result.status === 'candidate' && (result.candidate.seed !== result.setup?.seed
+      || result.candidate.forwardCatalogIndices?.length !== 20
+      || result.candidate.peelLocalIndices?.length !== 20))
     || (result.status === 'candidate' ? !(setupValid && boardValid)
       : result.setup !== null || result.boardRows !== null)) {
     throw new Error('Tiling output state is invalid.');
@@ -776,20 +795,23 @@ function parseTilingArguments(argv) {
   };
 }
 
-function writeAtomicAbsent(outputPath, bytes) {
-  if (!Buffer.isBuffer(bytes) || bytes.length === 0 || pathEntryExists(outputPath)) {
+function writeAtomicAbsent(outputPath, bytes, nonceBytes = randomBytes) {
+  if (!Buffer.isBuffer(bytes) || bytes.length === 0 || typeof nonceBytes !== 'function'
+    || pathEntryExists(outputPath)) {
     throw new Error('Atomic tiling output input is invalid or already exists.');
   }
   mkdirSync(dirname(outputPath), { recursive: true });
   if (pathEntryExists(outputPath)) throw new Error('Tiling output appeared before publication.');
   let temporaryPath = null;
+  let ownedTemporaryPath = null;
   let descriptor = null;
   try {
     for (let attempt = 0; attempt < 8; attempt += 1) {
       temporaryPath = resolve(dirname(outputPath),
-        `.${basename(outputPath)}.${process.pid}.${randomBytes(8).toString('hex')}.tmp`);
+        `.${basename(outputPath)}.${process.pid}.${nonceBytes(8).toString('hex')}.tmp`);
       try {
         descriptor = openSync(temporaryPath, 'wx', 0o600);
+        ownedTemporaryPath = temporaryPath;
         break;
       } catch (error) {
         if (error?.code !== 'EEXIST' || attempt === 7) throw error;
@@ -802,7 +824,7 @@ function writeAtomicAbsent(outputPath, bytes) {
     linkSync(temporaryPath, outputPath);
   } finally {
     if (descriptor !== null) closeSync(descriptor);
-    if (temporaryPath && pathEntryExists(temporaryPath)) unlinkSync(temporaryPath);
+    if (ownedTemporaryPath && pathEntryExists(ownedTemporaryPath)) unlinkSync(ownedTemporaryPath);
   }
 }
 
