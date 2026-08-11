@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C sharded tiling v2 shard 1 accepted
+
+- The single shard-1 run completes naturally in 32.987 seconds with no candidate and
+  1,391,577 work. Output file SHA-256 is
+  `54F6B655ECAD938CC2887E2B519E2C868592DC3786AE5367E104A6C61E27AFCB`.
+- Independent raw-byte QA rebuilds the shard domain and result with P0–P3/GAP all zero;
+  result hash is `BC66D8E9C4BC2D5690C788FCC8FC9E247930384348F1E1F226DA630B6DE348C8`.
+- The ordered two-entry prefix manifest is independently accepted with hash
+  `3D1C2E167C1AF1DFDF293E9162B48596F6A738643F46BBFC48D16DE87D978A04`.
+  Exactly one shard-2 run is open; prior-run retries and later shards remain closed.
+
 ## 2026-08-12 — T37 Stage F3C sharded tiling v2 shard 0 accepted
 
 - The single authorized shard-0 run completes naturally in 32.967 seconds with no candidate,
