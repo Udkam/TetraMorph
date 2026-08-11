@@ -5,7 +5,6 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-
 import * as v2Module from './search-puzzle-v3-tiling-first-v2.mjs';
 import { __tilingTest as v1 } from './search-puzzle-v3-tiling-first.mjs';
 const { __tilingV2Test: v2 } = v2Module;
@@ -284,10 +283,11 @@ throws(() => v2.profileMembership(brokenProfiles, v2.shardRange(0)), /incomplete
 const duplicateProfiles = clone(oracleByShard[0]);
 duplicateProfiles[0].seeds[1] = duplicateProfiles[0].seeds[0];
 throws(() => v2.profileMembership(duplicateProfiles, v2.shardRange(0)), /strict partition/);
+const unsortedProfiles = clone(oracleByShard[0]); [unsortedProfiles[0].seeds[0], unsortedProfiles[0].seeds[1]] = [unsortedProfiles[0].seeds[1], unsortedProfiles[0].seeds[0]]; throws(() => v2.profileMembership(unsortedProfiles, v2.shardRange(0)), /strict partition/);
+const outOfRangeProfiles = clone(oracleByShard[0]); outOfRangeProfiles[0].seeds[0] = 20_000; throws(() => v2.profileMembership(outOfRangeProfiles, v2.shardRange(0)), /strict partition/);
 const wrongProfile = clone(oracleByShard[0]);
 wrongProfile[0].counts[0] = 3;
 throws(() => v2.profileMembership(wrongProfile, v2.shardRange(0)), /counts drifted/);
-
 throws(() => v2.buildShardDomain(0, { maxRssBytes: 0, rssBytes: () => 1 }), /memory guard/);
 const realDomain = v2.buildShardDomain(0);
 deepEqual({
@@ -348,6 +348,8 @@ const hiddenCatalog = toy0.catalog.map((descriptor) => ({ ...descriptor }));
 hiddenCatalog[0].cellMask = 0xfn << 100n;
 const hiddenContext = createToyContext({ ...toy0, catalog: hiddenCatalog });
 throws(() => v2.replayCandidateWithContext(candidate0, hiddenContext), /physical replay/);
+const mismatchCatalog = toy0.catalog.map((descriptor) => ({ ...descriptor })); mismatchCatalog[0].cellMask = (1n << 3n) | (1n << 10n) | (1n << 34n) | (1n << 50n);
+const mismatchContext = createToyContext({ ...toy0, catalog: mismatchCatalog }); throws(() => v2.replayCandidateWithContext(candidate0, mismatchContext), /board does not reconstruct/);
 const completeOutputs = Array.from({ length: 9 }, (_, index) =>
   v2.formatShardOutputForTest(makeResult(makeDomain(index))));
 const budgetOutput = v2.formatShardOutputForTest(makeResult(makeDomain(0), {
@@ -368,6 +370,8 @@ wrongHash.coverage.workCount -= 1;
 throws(() => v2.validateShardOutput(wrongHash), /invalid/);
 const artifactBudget = rehashOutput({ ...clone(budgetOutput), candidate: clone(candidate0.candidate) });
 throws(() => v2.validateShardOutput(artifactBudget), /candidate artifacts/);
+const extraTop = rehashOutput({ ...clone(completeOutputs[0]), qaExtra: true }); throws(() => v2.validateShardOutput(extraTop), /field set/);
+const extraSetup = clone(candidate0); extraSetup.setup.qaExtra = true; throws(() => v2.validateShardOutputForTest(rehashOutput(extraSetup), toy0.context), /field set/);
 equal(v1.sha256Hex(V1_BYTES), v2.V1_FILE_HASH);
 deepEqual(v2.validateV1PredecessorBytes(V1_BYTES), {
   seedStart: 1,
@@ -380,8 +384,8 @@ deepEqual(v2.validateV1PredecessorBytes(V1_BYTES), {
 throws(() => v2.validateV1PredecessorBytes(Buffer.from('{}\n')), /identity|unsupported/);
 deepEqual(v2.parseCanonicalBytes(Buffer.from('{"a":1}\n'), 'fixture'), { a: 1 });
 for (const bytes of [Buffer.from('{"a":1}\r\n'), Buffer.from('{"a":1}\n\n'),
-  Buffer.from('{"b":1,"a":2}\n'), Buffer.from([0xef, 0xbb, 0xbf, 0x7b, 0x7d, 0x0a])]) {
-  throws(() => v2.parseCanonicalBytes(bytes, 'fixture'), /canonical|valid JSON/);
+  Buffer.from('{"b":1,"a":2}\n'), Buffer.from([0xc3, 0x28]), Buffer.from([0xef, 0xbb, 0xbf, 0x7b, 0x7d, 0x0a])]) {
+  throws(() => v2.parseCanonicalBytes(bytes, 'fixture'), /canonical|valid JSON|valid UTF-8/);
 }
 const deps0 = v2.createManifestTestDependencies(toy0.context);
 throws(() => v2.buildManifestData({ predecessorBytes: V1_BYTES,
@@ -400,7 +404,6 @@ deepEqual(Object.keys(full).sort(), ['algorithmVersion', 'entries', 'manifestHas
 const fullBody = { ...full };
 delete fullBody.manifestHash;
 equal(full.manifestHash, independentHash('T37-TSERIES-v2', fullBody));
-
 const toy1 = createToy(1);
 const candidate1 = v2.formatShardOutputForTest(toy1.result, toy1.context);
 const deps1 = v2.createManifestTestDependencies(toy1.context);
@@ -433,7 +436,6 @@ forgedCandidate.setup.placements[0].x += 1;
 const forgedRehashed = rehashOutput(forgedCandidate);
 throws(() => v2.buildManifestData({ predecessorBytes: V1_BYTES,
   records: [record(forgedRehashed)] }, deps0), /physical replay/);
-
 const testRoot = mkdtempSync(join(tmpdir(), 't37-v2-standalone-'));
 try {
   const predecessorPath = join(testRoot, 'v1.json');
@@ -492,5 +494,4 @@ try {
 } finally {
   rmSync(testRoot, { recursive: true, force: true });
 }
-
 process.stdout.write('tiling-first v2 standalone: ' + checks + ' checks pass\n');
