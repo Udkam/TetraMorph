@@ -1257,6 +1257,19 @@ Next exact action: run shard index 3 exactly once to absent external path
 `C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s03-16039546.json`,
 then require raw-byte and p04 cumulative-manifest QA before shard 4. No later path is open.
 
+Shard 3 and p04 accepted (2026-08-12): the sole run ended in 33.067 s with exit 2,
+`complete-not-found:cover`, and 1,400,585 work. Output file SHA-256 is
+`B2A3673736833D0AE8F4BC5505D5978C0917F454342FB3F874E143C49919F111`; result hash is
+`9E0BEC10FA6D272781FE546F3E89F965DC5462DA3E9E15D0E293225B8A2E72A3`.
+Independent shard QA is all zero. P04 input SHA-256 is
+`B697D678D4891B460A677637547AB60AA7236AE22A353A9E85063DF9071C96C7`; manifest file
+SHA-256 is `86AA294038A4B55169ED6F8E05D1A22411F4BB52686BE56FC513C01BDF7D3F34`, and manifest
+hash is `AA2C0EB19EE7EB7027567517D5C268C7739F26E63E2E506B665BB12FB78D30EE`.
+
+Next exact action: run shard index 4 exactly once to absent external path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s04-16039546.json`,
+then require raw-byte and p05 cumulative-manifest QA before shard 5. No later path is open.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
