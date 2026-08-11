@@ -558,6 +558,13 @@ adding unrelated badges or ornamental effects.
   only in-memory enumeration after a candidate; pre-candidate memoization, all serialized
   cursor fields/hashes, candidate `continuation: null`, probe bytes, and first-candidate
   production behavior remain frozen.
+- Candidate `77fe380` implements that boundary with an internal state-level candidate
+  marker. Normal DFS memoization is byte-identical until the first result; bounded
+  in-memory enumeration then stops adding false failed states. Candidate-bearing states
+  cannot serialize a cursor or a later non-candidate output, and resumable partial tokens
+  reject candidate outcome 5. The independent seven-type catalog oracle plus a three-T
+  fixture proves three descriptors and all six history orders. Final local gates pass;
+  fresh independent QA still controls search admission.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

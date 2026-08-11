@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C NON-I/O ENUMERATION DEFECT; TWO-PATH REPAIR**
+Status: **STAGE F3C ENUMERATION REPAIR CANDIDATE `77fe380`; QA NEXT**
 
 ## Active objective
 
@@ -637,6 +637,18 @@ only; it is not F3 source acceptance.
   deterministic reverse bytes, probe accounting, and first-candidate production cost.
   No production shard may run before final gates and fresh independent QA accept the full
   repair range.
+- Repair candidate `77fe380` changes exactly those two paths (`145` added/modified lines).
+  A state-level candidate marker leaves all pre-first-candidate memoization untouched,
+  prevents later successful frames from entering the failed memo, and is deliberately
+  excluded from the frozen cursor schema. Candidate-bearing states cannot create a
+  continuation or any later formal output; recomputed resumable tokens with outcome 5
+  fail closed.
+- The independent seven-type catalog enumerator pins the three-T target to three canonical
+  descriptors and six physical history orders. One real reverse state now returns all six
+  without duplicate histories or post-candidate memo growth. An I/O-only mutation fails
+  on catalog count/digest, while candidate-free paths still add failed memo entries.
+  Standalone, typecheck, full suite (`46 passed / 2 skipped` files; `430 passed / 10
+  skipped` tests), and 767-module build pass. Search remains closed for fresh QA.
 
 ## Current checkpoint state
 

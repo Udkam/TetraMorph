@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C enumeration repair candidate
+
+- Source checkpoint `77fe380` changes only the authoring tool and standalone reverse test.
+  It preserves failed memoization before the first candidate, prevents successful
+  candidate-enumeration frames from becoming false failed states, and fails closed on
+  candidate-bearing cursor/output attempts without changing the frozen schema.
+- A seven-type independent catalog oracle and separated three-T target now prove all six
+  history orders; an I/O-only mutation fails on the pinned three-descriptor summary.
+  Standalone, typecheck, the full `46`-file/`430`-test suite, 767-module build, exact scope,
+  Temp cleanup, and zero owned process pass. Production search remains QA-closed.
+
 ## 2026-08-11 — T37 Stage F3C non-I/O enumeration defect
 
 - A mutation-sensitive three-T fixture proves six physical forward orders, but the real

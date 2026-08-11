@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C NON-I/O ENUMERATION DEFECT; TWO-PATH REPAIR**
+Status: **F3C ENUMERATION REPAIR CANDIDATE `77fe380`; QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -650,6 +650,12 @@ subtree is still memoized as failed when its frame later exhausts, causing the m
 orders. Reopen only the authoring tool and standalone reverse test. Preserve the frozen
 cursor/output schema, probe and legacy byte vectors, candidate null continuation, and all
 pre-first-candidate behavior; fresh QA still controls production-search admission.
+Candidate `77fe380` adds an internal candidate marker that leaves the production path
+through its first result unchanged, then disables only false failed-memo writes during
+bounded in-memory enumeration. Candidate-bearing states cannot create a cursor or later
+formal output, and resumable tokens reject outcome 5. An independent seven-type catalog
+oracle pins the three-T target to three descriptors and all six history orders. Final
+standalone/typecheck/full-suite/build gates pass; production search remains QA-closed.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

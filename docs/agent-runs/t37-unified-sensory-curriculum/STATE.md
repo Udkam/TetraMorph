@@ -136,8 +136,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 34. `F3C NON-I/O ENUMERATION DEFECT` — a three-T target has six independent forward
     orders but the real reverse state returns three, exposing successful frames wrongly
     memoized as failed after candidate return.
-35. `PENDING` — a two-path traversal/test repair and fresh independent QA precede any
-    reverse search, fixture, content, migration, UI, final gates, or push.
+35. `F3C ENUMERATION REPAIR CANDIDATE; QA NEXT` — two-path checkpoint `77fe380`
+    returns all six three-T histories, closes catalog-filter mutation sensitivity, and
+    passes final local gates.
+36. `PENDING` — fresh double independent QA precedes any reverse search, fixture,
+    content, migration, UI, final gates, or push.
 
 ### Stage F3C tooling-discovery status
 
@@ -441,6 +444,18 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   Blocker: false failed memo after candidate return. Reopen only the production authoring
   tool and standalone reverse test while keeping every serialized contract and all
   pre-first-candidate behavior frozen.
+- Source candidate `77fe380` changes only those two paths with `145` added/modified lines.
+  The internal `candidateSeen` marker is false for every fresh/restored state, flips only
+  after the outcome-5 probe is recorded, and prevents later exhausted frames from entering
+  the failed memo. It never enters continuation JSON. Candidate-bearing continuation or
+  later formal output fails closed, as does a recomputed resumable token carrying outcome
+  5. Candidate-free completion still memoizes failures.
+- The independent seven-type catalog oracle pins the separated three-T target to count 3
+  and its fixed digest. One canonical state returns all six forward permutations without
+  duplicates or memo growth. The deliberate I/O-only mutation fails `0` versus `3`, then
+  the restored standalone passes. Final typecheck, full suite (`46 passed / 2 skipped`
+  files; `430 passed / 10 skipped` tests), and 767-module build pass. Temp and owned
+  search-process counts are zero; protected dirt remains unstaged.
 
 ### Stage F3B accepted status
 
@@ -858,15 +873,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Modify only `tools/search-puzzle-v3-prototype.mjs` and
-`tools/search-puzzle-v3-prototype-reverse.test.mjs`. Keep normal failed memoization before
-the first candidate, but do not let a subtree that has already emitted a candidate become
-a false failed memo during same-state enumeration. Preserve the cursor/output schema,
-candidate null continuation, probe vectors, legacy/reverse bytes, and first-candidate
-cost. Keep the independent catalog assertion and require all six three-T histories.
-Then run the standalone test followed by one final typecheck, complete suite, and build
-before fresh QA. Do not run production shards; keep later content, T27/`progress.md`,
-deferred identity, and the missing Ice archive closed.
+Run fresh double independent read-only QA over the complete source/test chain through
+`77fe380`, accounting for intervening docs-only checkpoints. Reproduce the three-T six-
+history set, I/O-filter mutation failure, candidate/no-candidate memo behavior, candidate
+cursor/output fail-closed gates, outcome-5 token rejection, all earlier token/ceiling/
+NTFS/legacy-byte checks, exact path/line budget, Temp cleanup, and zero owned process.
+Report P0–P3/GAP. Do not run production shards; keep final F3C JSON/Core work, later
+content, T27/`progress.md`, deferred identity, and the missing Ice archive closed.
 
 ## Do not repeat
 
