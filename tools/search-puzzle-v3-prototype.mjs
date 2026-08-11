@@ -415,9 +415,28 @@ function appendProbe(probe, token) {
   while (probe.peaks.at(-1) === null) probe.peaks.pop();
 }
 
+const FRAME_CANDIDATE_CACHE = new WeakMap();
+function frameCandidateTypeMask(node) {
+  let typeMask = 0;
+  for (let typeIndex = 0; typeIndex < TYPES.length; typeIndex += 1) {
+    if (node.children[typeIndex] >= 0) typeMask |= 1 << typeIndex;
+  }
+  return typeMask;
+}
+
 function frameCandidates(context, frame) {
   const node = context.trie[frame.trieNodeId];
-  return context.catalog.filter((descriptor) => node.children[descriptor.typeIndex] >= 0);
+  const typeMask = frameCandidateTypeMask(node);
+  let candidatesByTypeMask = FRAME_CANDIDATE_CACHE.get(context);
+  if (!candidatesByTypeMask) {
+    candidatesByTypeMask = new Map();
+    FRAME_CANDIDATE_CACHE.set(context, candidatesByTypeMask);
+  }
+  if (!candidatesByTypeMask.has(typeMask)) {
+    candidatesByTypeMask.set(typeMask,
+      context.catalog.filter((descriptor) => typeMask & (1 << descriptor.typeIndex)));
+  }
+  return candidatesByTypeMask.get(typeMask);
 }
 
 function createReverseState(context) {
@@ -1367,6 +1386,8 @@ export const __reverseTest = Object.freeze({
   failedKey,
   probeToken,
   appendProbe,
+  frameCandidateTypeMask,
+  frameCandidates,
   createReverseState,
   advanceReverse,
   makeContinuation,

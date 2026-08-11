@@ -95,6 +95,24 @@ const context = {
   trie: trie.nodes,
   sequenceLength: 20,
 };
+const cachedCandidatesByTypeMask = new Map();
+for (let trieNodeId = 0; trieNodeId < context.trie.length; trieNodeId += 1) {
+  const frame = { trieNodeId };
+  const typeMask = reverse.frameCandidateTypeMask(context.trie[trieNodeId]);
+  const expected = context.catalog.filter((descriptor) => typeMask & (1 << descriptor.typeIndex));
+  const actual = reverse.frameCandidates(context, frame);
+  assert.deepEqual(actual, expected);
+  if (cachedCandidatesByTypeMask.has(typeMask)) {
+    assert.strictEqual(actual, cachedCandidatesByTypeMask.get(typeMask));
+  } else {
+    cachedCandidatesByTypeMask.set(typeMask, actual);
+  }
+}
+assert([...cachedCandidatesByTypeMask.keys()].every((typeMask) =>
+  Number.isInteger(typeMask) && typeMask >= 0 && typeMask < (1 << reverse.TYPES.length)));
+assert(cachedCandidatesByTypeMask.size <= (1 << reverse.TYPES.length));
+assert(cachedCandidatesByTypeMask.size < context.trie.length);
+assert.deepEqual(reverse.frameCandidates({ ...context, catalog: [] }, { trieNodeId: 0 }), []);
 const domainHash = Buffer.alloc(32, 7);
 const oneShotState = reverse.createReverseState(context);
 const oneShot = reverse.advanceReverse(context, oneShotState, 1500, Number.MAX_SAFE_INTEGER, () => 0);
@@ -255,7 +273,7 @@ const postBuildMemory = reverse.executeReverse(reverseOptions, { rssBytes: () =>
 rssChecks = 0;
 const searchMemory = reverse.executeReverse(reverseOptions, { rssBytes: () => ++rssChecks <= 2 ? 0 : Infinity });
 const liveMemory = reverse.executeReverse({
-  ...reverseOptions, maxRssMiB: Math.max(0, Math.floor(process.memoryUsage().rss / 1024 / 1024) - 1),
+  ...reverseOptions, maxRssMiB: 0,
 });
 assert.equal(liveMemory.phase, 'trie-build');
 assert.equal(postBuildMemory.search.processedSeeds, 1);
