@@ -502,6 +502,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Fresh independent QA accepts with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, reproducing the
   stale replacement, 128-mask oracle, Proxy counts, byte identities, performance signal,
   exact scope, old manifest, and zero owned process. It authorizes only round two.
+- Round two writes 32 distinct successors under
+  `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6`. Each starts at
+  1,000,000, adds 1,000,000, and stops `paused-budget` at 2,000,000. Totals are 64,000,000
+  cumulative probes, 668,936 failed memos, 338,728 trie nodes, and 149,218,738 bytes;
+  manifest is `A56F8BC0...5DC757`.
+- Independent output QA accepts with P0–P3/GAP all zero after rebuilding every trie/domain,
+  formal restore and five hashes, lineage, canonical bytes, NTFS identity, and both
+  manifests. Round two must remain. Round one is deletion-eligible but its exact cleanup
+  is already policy-blocked; do not retry or bypass. Third-round search remains closed.
 
 ### Stage F3B accepted status
 
@@ -919,14 +928,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Retain the accepted external directory
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. Exact removal
-of the six verified cache benchmark files is rejected by terminal policy before execution;
-all six remain (15,212,052 bytes). Do not bypass policy. Create the absent external directory
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6`. Serially resume shards
-0..31 for exactly 1,000,000 new probes and 900 MiB each, with a resource gate before each
-start. Stop the round on the first candidate, memory guard, or completion. Independently
-verify every successor before deleting any round-one input or opening a third increment.
+Retain `C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6` unchanged. Leave
+the policy-blocked round-one and six benchmark artifacts untouched; do not retry cleanup
+through another shell. Perform one bounded read-only structural/scaling review of the two
+million-probe continuations, fixed-mask tiling/physics feasibility, memo reuse, and storage
+growth. It must choose one next action: authorize one equal third increment, or stop search
+and open a separately contracted authoring redesign. Do not run either path before that
+decision is recorded.
 Only then may a second increment read each old shard and write a distinct successor in a
 new external directory. Accept every successor before deleting the old directory. Keep
 final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the

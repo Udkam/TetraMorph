@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C second reverse round accepted
+
+- All 32 shards resume from 1,000,000 and add exactly 1,000,000 probes. Every output is
+  `paused-budget`; cumulative coverage is 64,000,000 probes with no candidate, memory
+  guard, or completion. Outputs total 149,218,738 bytes and 668,936 failed memos; manifest
+  is `A56F8BC0BE16D82EF63E76E164EFCE773F3B2BD4F9BA029981565E0E7E5DC757`.
+- Independent QA rebuilds every trie/domain and accepts canonical bytes, five evidence
+  hashes, formal continuation restore, old-memo subset lineage, distinct file identity,
+  and unchanged round-one manifest with P0–P3/GAP all zero. Round one is superseded but
+  remains because its cleanup path is policy-blocked. Third-round search is review-closed.
+
 ## 2026-08-11 — T37 Stage F3C candidate cache accepted
 
 - Repair `0b744b6` invalidates cached masks on catalog identity replacement and adds an

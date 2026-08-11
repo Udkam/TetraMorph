@@ -598,6 +598,12 @@ adding unrelated badges or ornamental effects.
   than baseline. Final gates and fresh QA pass with P0–P3/GAP all zero. Only the second
   equal increment now opens, with old inputs read-only and distinct new outputs retained
   together until successor QA authorizes rotation.
+- The second equal increment reaches 2,000,000 probes per shard with no candidate or other
+  terminal status. Independent output QA accepts all canonical bytes, formal restores,
+  hashes, lineage, and distinct files with P0–P3/GAP all zero. Round two supersedes round
+  one as the sole required continuation. A third increment is not automatic: review
+  depth/progress, memo reuse, storage growth, and the fixed-mask feasibility boundary
+  before allocating more probes or changing semantics.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

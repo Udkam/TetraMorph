@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C CANDIDATE CACHE ACCEPTED; SECOND REVERSE ROUND OPEN**
+Status: **STAGE F3C SECOND REVERSE ROUND ACCEPTED; STRUCTURAL REVIEW OPEN**
 
 ## Active objective
 
@@ -705,6 +705,16 @@ only; it is not F3 source acceptance.
   remain intact (15,212,052 bytes); do not switch shells or bypass policy. They are neither
   resume inputs nor round-two outputs, so their retention does not block the already
   accepted distinct-directory second increment.
+- Round two completes all 32 serial successors. Every shard is `paused-budget` at
+  `1,000,000 + 1,000,000 = 2,000,000` probes, with no candidate, memory guard, or
+  completion. The new set contains 668,936 failed memos, 338,728 trie nodes, and
+  149,218,738 bytes; manifest is `A56F8BC0...5DC757`.
+- Independent output QA reconstructs every shard domain/trie and validates formal resume,
+  domain/probe/memo/cursor/result hashes, old-memo subset lineage, distinct NTFS identity,
+  canonical bytes, and both manifests with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+  Round two is accepted and must remain. Round one is deletion-eligible but retained
+  because terminal policy has already blocked its exact cleanup; do not retry or bypass.
+  No third increment opens before a bounded structural/scaling review.
 
 ## Current checkpoint state
 

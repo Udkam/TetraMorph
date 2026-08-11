@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C CANDIDATE CACHE ACCEPTED; SECOND REVERSE ROUND OPEN**
+Status: **F3C SECOND REVERSE ROUND ACCEPTED; STRUCTURAL REVIEW OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -682,6 +682,11 @@ Repair `0b744b6` closes the stale-catalog and both regression gaps. Final gates 
 Fresh QA reports P0–P3/GAP all zero. The second equal increment may now run serially from
 the accepted round-one inputs into distinct round-two outputs; both sets remain until the
 successors receive independent output QA.
+Round two then advances every shard from 1,000,000 to 2,000,000 probes. All 32 remain
+resumable `paused-budget`; cumulative coverage is 64,000,000 probes and no terminal result
+occurs. Independent output QA reconstructs every formal restore/hash and accepts with
+P0–P3/GAP all zero. The accepted round-two set supersedes round one, but no third increment
+opens until a bounded structural/scaling review chooses continuation or redesign.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and
