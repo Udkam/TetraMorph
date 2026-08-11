@@ -956,9 +956,9 @@ only; it is not F3 source acceptance.
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It verifies the exact preimages, manifest/v1
   predecessor and QA-expected hashes, candidate physical replay, pure test seams, and
   private production capability without finding a new ambiguity. The contract is accepted.
-  Only the first bounded source checkpoint for
-  `tools/search-puzzle-v3-tiling-first-v2.mjs` is now open; its direct test, production
-  shards, Core, fixture, and product remain closed until their own checkpoints.
+  The bounded source chain `1a36e73..1ceb1bc` and its final independent all-zero QA are
+  now also accepted. Only `tools/search-puzzle-v3-tiling-first-v2.test.mjs` is open for
+  the next bounded checkpoint; production shards, Core, fixture, and product remain closed.
 
 ## Current checkpoint state
 
