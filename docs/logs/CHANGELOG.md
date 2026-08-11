@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C route diagnostic precondition corrected
+
+- The first no-file route probe stops before any lock because it expected six Next pieces.
+  Core correctly exposes active `I`, five-item Next `[O,T,J,L,S]`, and remaining bag `[Z]`.
+- No route, certificate, source, or artifact was produced. One corrected no-file diagnostic
+  is open with the same frozen seed/signatures; final fixture/product paths remain closed.
+
 ## 2026-08-12 — T37 Stage F3C candidate passes current-Core setup replay
 
 - A no-file current-Core probe replays the accepted 20-drop setup and exactly reproduces its

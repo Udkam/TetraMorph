@@ -1317,6 +1317,17 @@ Next exact action: run one no-file in-memory diagnostic using `validatePuzzleDef
 `certifyOptimalPuzzleRouteForDefinition`. Freeze its exact route/hashes/certificate only
 after independent review; do not create the two final paths yet.
 
+First route diagnostic stopped before route replay (2026-08-12): exit 1 in 2.930 s because
+the probe incorrectly expected the complete residual seven-bag in `startedState.queue`.
+Core intentionally exposes only `NEXT_QUEUE_SIZE=5`: active `I`, queue `O,T,J,L,S`, and
+remaining randomizer bag `[Z]`. No five-lock step, certificate, or file write ran; matching
+Node residue is zero and repository state is unchanged. This is a probe GAP, not candidate
+or Core rejection.
+
+Next exact action: run exactly one corrected no-file diagnostic with those three queue-state
+assertions and the otherwise unchanged frozen route/certificate procedure. Stop on any new
+mismatch. The two final fixture/test paths remain closed until all-zero independent review.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

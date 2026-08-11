@@ -677,7 +677,10 @@ adding unrelated badges or ornamental effects.
   not a claim inferred from an unkeyed hash.
 - The accepted series stops at shard 4 with authoring seed `106933`. That seed belongs only
   to the 20-drop setup. The non-published Core prototype uses the smallest positive gameplay
-  seed whose first bag begins `I,O,T,J,L`: `4091` (`I,O,T,J,L,S,Z`). The fixed route locks
+  seed whose first bag begins `I,O,T,J,L`: `4091` (`I,O,T,J,L,S,Z`). After `start`, Core
+  exposes active `I`, the five-item Next queue `O,T,J,L,S`, and the remaining bag `[Z]`;
+  the public queue is deliberately not a six-item copy of the whole residual bag. The
+  fixed route locks
   `I:3,30|4,30|5,30|6,30`, `O:0,31|1,31|0,32|1,32`,
   `T:4,33|5,33|6,33|5,34`, `J:0,35|1,35|2,35|2,36`, and
   `L:6,37|7,37|7,38|7,39`, releasing `1/2/2/2/3` target rows.

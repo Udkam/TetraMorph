@@ -65,6 +65,8 @@ five-entry candidate manifest hash is
 Shards 5–8 are permanently closed. Current `replayPuzzleSetup` now independently accepts
 the exact 20 placements and reproduces all 80 typed cells with zero hidden cells. Authoring
 seed `106933` remains setup-only; gameplay seed `4091` supplies `I → O → T → J → L`.
+After `start`, this is represented as active `I`, Next `[O,T,J,L,S]`, and remaining bag
+`[Z]`; `NEXT_QUEUE_SIZE=5` means the UI queue does not contain the whole residual bag.
 The five frozen lock signatures release `1 / 2 / 2 / 2 / 3` rows. Only an in-memory route,
 state-hash, and no-beam exact-certificate diagnostic is open next. The final boundary, if
 that passes, is exactly the canonical prototype JSON and direct opt-in Core test named in
@@ -987,7 +989,8 @@ only; it is not F3 source acceptance.
   accepted. Shards 1–3 are accepted noncandidates; shard 4 and the five-entry manifest are
   accepted as the series candidate. Shards 5–8 are closed. Current-Core setup replay passes;
   the gameplay seed, route signatures, and final two-path schema are frozen. Only the
-  in-memory fixed-route/exact-certificate diagnostic is open; fixture and product stay closed.
+  corrected in-memory fixed-route/exact-certificate diagnostic is open; fixture and product
+  stay closed.
 
 ## Current checkpoint state
 
