@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 CONTRACT FROZEN; IMPLEMENTATION OPEN**
+Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 CONTRACT REVIEW**
 
 ## Active objective
 
@@ -778,6 +778,17 @@ only; it is not F3 source acceptance.
   batch had started and the authorization remained unconsumed. On 2026-08-12 the player
   explicitly resumed T37 and removed the resource constraint until completion; the batch
   may now run after the remaining process/source/output-path preflight passes.
+- Resume-authority checkpoint `e8ad83c` passes the non-resource preflight and the one
+  production run completes naturally in 31.468 seconds with exit code 2 and a canonical
+  `complete-not-found:cover` output. It exhausts all 7 profiles, 373 strong tilings, and
+  `1,410,179 = 345,149 cover + 1,065,030 order` work probes below the 10,000,000 budget.
+  External output SHA-256 is
+  `F9E94210ECB61E4284F3434363833748B1D5990E58DB666A90A2836FB0A840B3`; bound
+  `resultHash` is `C1E315E66B819593279E485DC24AC2FE4E9CC7B7543724748222A45B42FBF758`.
+  Independent output QA verifies canonical UTF-8/LF bytes, schema, all domain identities,
+  20,000 processed seeds, work arithmetic, hashes, and complete-vs-stop semantics with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. V1 is a valid fixed-domain noncandidate and must
+  not be rerun or receive a larger budget; F3C fixture/Core admission remains closed.
 
 ## Current checkpoint state
 

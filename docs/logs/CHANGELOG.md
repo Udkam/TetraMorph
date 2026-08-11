@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C tiling-first v1 complete noncandidate accepted
+
+- The player removed the temporary resource gate, after which the one authorized full-domain
+  production run completed naturally in 31.468 seconds. Its canonical external JSON is 2,713
+  bytes with SHA-256 `F9E94210ECB61E4284F3434363833748B1D5990E58DB666A90A2836FB0A840B3`.
+- The result is `complete-not-found:cover`, not a budget or memory stop: all seven profiles,
+  373 strong tilings, 20,000 seeds, and 1,410,179 work probes are complete. Bound result hash
+  is `C1E315E66B819593279E485DC24AC2FE4E9CC7B7543724748222A45B42FBF758`.
+- Independent output QA validates canonical bytes, schema, domain identities, work arithmetic,
+  hashes, and stop semantics with P0–P3/GAP all zero. The fixed v1 domain is accepted as fully
+  searched with no candidate; repeating it or increasing the same budget is prohibited.
+
 ## 2026-08-11 — T37 Stage F3C tiling-first authoring tool accepted
 
 - The two-path `tiling-first-v1` tool now derives all seven fixed-domain profiles, performs

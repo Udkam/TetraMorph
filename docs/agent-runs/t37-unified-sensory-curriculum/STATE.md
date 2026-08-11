@@ -1073,6 +1073,25 @@ reserved external path. After an actual output exists, perform independent outpu
 hash QA before any Core/fixture admission. Product, reverse, T27/`progress.md`, deferred
 identity, icon, and Ice work remain closed.
 
+Production result (2026-08-12): the single authorized command completed naturally in
+31.468 seconds with Node exit code 2 and published the canonical external file
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-10m-61909d4.json`. The file is
+2,713 bytes, UTF-8 without BOM or CR, has one terminal LF, and SHA-256
+`F9E94210ECB61E4284F3434363833748B1D5990E58DB666A90A2836FB0A840B3`. Status is
+`complete-not-found:cover`; coverage is complete for all 7 profiles and 373 strong tilings,
+with `1,410,179 = 345,149 cover + 1,065,030 order` work probes, 75,315 order states,
+74,219 failed memos, and all 20,000 seeds processed. Result hash is
+`C1E315E66B819593279E485DC24AC2FE4E9CC7B7543724748222A45B42FBF758`.
+
+Independent read-only output QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It
+independently reconstructs the fixed mask/domain/profile hashes, validates queue/trie/
+catalog/shape identities, canonical bytes and result hash, and proves that budget, RSS,
+exception, or publication interruption cannot yield this complete terminal state. V1 is
+accepted as a fixed-domain noncandidate: do not rerun it or increase its budget. The next
+exact action is a bounded v2 contract review that changes the search domain only when the
+change preserves legal 20-drop setup replay, zero setup clears, the fixed five-lock route,
+and unanchored ten-row admission. No Core/fixture/product path is open yet.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
