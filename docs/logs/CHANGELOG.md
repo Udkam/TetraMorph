@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C candidate passes current-Core setup replay
+
+- A no-file current-Core probe replays the accepted 20-drop setup and exactly reproduces its
+  80 typed target cells with no hidden cells or setup clear. No source file changes.
+- Setup seed `106933` remains authoring-only. Gameplay seed `4091` supplies the frozen
+  `I → O → T → J → L` route; five lock signatures and `1/2/2/2/3` row releases are fixed.
+- The final non-product boundary is frozen to one canonical prototype JSON plus one opt-in
+  exact Core test. Only an in-memory route/state-hash/no-beam-certificate diagnostic is open.
+
 ## 2026-08-12 — T37 Stage F3C sharded tiling v2 candidate accepted
 
 - Shard 4 finds a candidate at seed `106933`, profile 1, tiling ordinal 82 after 240,468

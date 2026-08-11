@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V2 SERIES CANDIDATE ACCEPTED / CURRENT-CORE REPLAY OPEN**
+Status: **STAGE F3C V2 SERIES CANDIDATE + CORE SETUP ACCEPTED / FIXED ROUTE DIAGNOSTIC OPEN**
 
 ## Active objective
 
@@ -62,9 +62,13 @@ Shard 4 finds the accepted authoring candidate at seed `106933`, profile 1, tili
 no-hidden, no-touch ownership, target mask, and typed board with all findings zero. The final
 five-entry candidate manifest hash is
 `25BF784987C3FE466F7DA084076959EAA0E4825F4FEF646EE9E1F016DA89616D`.
-Shards 5–8 are permanently closed. Only minimal current-Core replay of these exact 20
-placements is open next; fixture, product, UI, T27/`progress.md`, identity/icon, and Ice
-paths remain closed.
+Shards 5–8 are permanently closed. Current `replayPuzzleSetup` now independently accepts
+the exact 20 placements and reproduces all 80 typed cells with zero hidden cells. Authoring
+seed `106933` remains setup-only; gameplay seed `4091` supplies `I → O → T → J → L`.
+The five frozen lock signatures release `1 / 2 / 2 / 2 / 3` rows. Only an in-memory route,
+state-hash, and no-beam exact-certificate diagnostic is open next. The final boundary, if
+that passes, is exactly the canonical prototype JSON and direct opt-in Core test named in
+`docs/DESIGN.md`; product, UI, T27/`progress.md`, identity/icon, and Ice remain closed.
 
 ## Frozen product direction
 
@@ -981,8 +985,9 @@ only; it is not F3 source acceptance.
   The bounded source chain `1a36e73..1ceb1bc` and test chain `71f0a54..caba9d0` pass
   final independent all-zero QA and all source gates. Shard 0 and its prefix manifest are
   accepted. Shards 1–3 are accepted noncandidates; shard 4 and the five-entry manifest are
-  accepted as the series candidate. Shards 5–8 are closed. Only exact current-Core replay
-  and certificate preparation are open; fixture and product remain closed.
+  accepted as the series candidate. Shards 5–8 are closed. Current-Core setup replay passes;
+  the gameplay seed, route signatures, and final two-path schema are frozen. Only the
+  in-memory fixed-route/exact-certificate diagnostic is open; fixture and product stay closed.
 
 ## Current checkpoint state
 

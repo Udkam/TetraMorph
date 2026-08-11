@@ -675,6 +675,23 @@ adding unrelated badges or ornamental effects.
   and manifest termination, but they never receive the production publication capability
   and cannot write an accepted shard or manifest. Independent QA remains a workflow gate,
   not a claim inferred from an unkeyed hash.
+- The accepted series stops at shard 4 with authoring seed `106933`. That seed belongs only
+  to the 20-drop setup. The non-published Core prototype uses the smallest positive gameplay
+  seed whose first bag begins `I,O,T,J,L`: `4091` (`I,O,T,J,L,S,Z`). The fixed route locks
+  `I:3,30|4,30|5,30|6,30`, `O:0,31|1,31|0,32|1,32`,
+  `T:4,33|5,33|6,33|5,34`, `J:0,35|1,35|2,35|2,36`, and
+  `L:6,37|7,37|7,38|7,39`, releasing `1/2/2/2/3` target rows.
+- Final F3C publication remains a two-path non-product proof:
+  `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
+  `src/game/core/puzzleV3PrototypeExact.test.ts`. The canonical JSON has exact top keys
+  `artifactVersion,certificate,claim,definition,provenance,route,schemaVersion`.
+  Definition binds prototype ID, target rows, setup seed/placements, typed board, gameplay
+  seed, hidden cells, and anchors; provenance binds raw/result/candidate/manifest identities;
+  route binds command stream, five lock signatures, row-release/remaining-target sequences,
+  and initial/final state hashes; certificate binds the no-beam optimum statistics.
+- The fixture stores literals only. Its direct opt-in test must rebuild setup, route, state
+  hashes, and `certifyOptimalPuzzleRouteForDefinition` from current Core without reading Temp,
+  generating expected values, using a beam as proof, or applying a time/state cap.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

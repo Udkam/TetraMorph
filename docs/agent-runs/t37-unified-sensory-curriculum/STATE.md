@@ -1293,6 +1293,30 @@ the accepted 20 placements. Verify zero setup clears, final occupancy and typed 
 then prepare the fixed five-lock route and strict state-hash/exact-certificate evidence.
 Do not modify a fixture, published Puzzle definition, UI, T27/`progress.md`, icon, or Ice.
 
+Current-Core setup admission accepted (2026-08-12): a no-file Vite SSR probe re-hashes the
+accepted shard-4 bytes, calls current `replayPuzzleSetup` on its exact setup, and reproduces
+all 20 visible typed rows, 80 occupied target cells, zero hidden cells, and the frozen mask.
+Exit is 0 and the middleware server closes with no matching Node process. No source changed.
+
+Two distinct seeds are now frozen: authoring/setup seed `106933`, and gameplay seed `4091`
+whose first bag is `I,O,T,J,L,S,Z`. The five expected lock signatures are
+`I:3,30|4,30|5,30|6,30`, `O:0,31|1,31|0,32|1,32`,
+`T:4,33|5,33|6,33|5,34`, `J:0,35|1,35|2,35|2,36`, and
+`L:6,37|7,37|7,38|7,39`. Cumulative clears are `1,3,5,7,10`; remaining original target
+counts are `74,58,42,26,0`.
+
+If the in-memory route and exact proof pass, the only implementation paths are
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
+`src/game/core/puzzleV3PrototypeExact.test.ts`. The JSON exact top keys are
+`artifactVersion,certificate,claim,definition,provenance,route,schemaVersion`; nested
+definition/provenance/route/certificate objects bind every value named in `docs/DESIGN.md`.
+The test must use current Core and literal fixture expectations, never Temp or beam proof.
+
+Next exact action: run one no-file in-memory diagnostic using `validatePuzzleDefinition`,
+`exhaustivePuzzleLandings`, `replayPuzzleRouteForDefinition`, state hashes, lower bound, and
+`certifyOptimalPuzzleRouteForDefinition`. Freeze its exact route/hashes/certificate only
+after independent review; do not create the two final paths yet.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
