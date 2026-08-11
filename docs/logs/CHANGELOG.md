@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C route literals frozen for independent QA
+
+- A reviewer harness stops on its own unsupported `87` command expectation after both Core
+  and direct counting return the correct value 82. No hash/certificate claim was accepted.
+- The exact route, `82/5/5/11` metrics, `bec0ea65 → 8e34e0c8` hashes, and five-lock
+  no-beam certificate statistics are now literal review inputs. A fresh reviewer is required.
+
 ## 2026-08-12 — T37 Stage F3C validation base ID frozen
 
 - Independent replay confirms the route but exposes that `stateHash` includes the injected

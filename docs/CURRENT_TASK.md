@@ -74,6 +74,11 @@ that passes, is exactly the canonical prototype JSON and direct opt-in Core test
 The injected definition uses literal `baseId=t3r-shaft-01`; this registered ID is required
 by the noncanonical validator and is part of the state-hash domain. It is a test host only:
 the real `t3r-shaft-01` definition must remain unchanged.
+The pending independent replay must compare literal command stream
+`SHTTTTTTTTTTTTLLLLHTTTTTTTTTTTTCCRHTTTTTTTTTTTTCCLLLHTTTTTTTTTTTTQRRRHTTTTTTTTTTTT`,
+metrics `82/5/5/11`, state hashes `bec0ea65/8e34e0c8`, and certificate
+`5 locks / [1] frontier / 1 explored / 0 transitions / 1 prune`; reviewers may not invent
+alternate expected counts.
 
 ## Frozen product direction
 

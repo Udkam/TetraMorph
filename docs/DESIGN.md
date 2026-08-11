@@ -695,6 +695,12 @@ adding unrelated badges or ornamental effects.
   product definition must remain byte-identical. Provenance binds raw/result/candidate/manifest identities;
   route binds command stream, five lock signatures, row-release/remaining-target sequences,
   and initial/final state hashes; certificate binds the no-beam optimum statistics.
+- Frozen route literals are command stream
+  `SHTTTTTTTTTTTTLLLLHTTTTTTTTTTTTCCRHTTTTTTTTTTTTCCLLLHTTTTTTTTTTTTQRRRHTTTTTTTTTTTT`,
+  metrics `82 commands / 5 locks / 5 rotations / 11 moves`, cumulative clears
+  `[1,3,5,7,10]`, remaining targets `[74,58,42,26,0]`, and hashes
+  `bec0ea65 → 8e34e0c8`. The expected exact certificate is five locks, exhausted frontier
+  `[1]`, one explored state, zero landing transitions, and one deficit-bound prune.
 - The fixture stores literals only. Its direct opt-in test must rebuild setup, route, state
   hashes, and `certifyOptimalPuzzleRouteForDefinition` from current Core without reading Temp,
   generating expected values, using a beam as proof, or applying a time/state cap.

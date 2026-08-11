@@ -1344,6 +1344,22 @@ Next exact action: perform one fresh independent full diagnostic with base ID
 `t3r-shaft-01`, then accept or reject the primary route/hash/certificate evidence. Do not
 create either final path before P0–P3/GAP all zero.
 
+The next independent harness again stops before state hashes/certificate, this time because
+it added a non-contract `commandCount=87` assertion after both independent character counting
+and current `metricsForPuzzleRoute` had already returned the correct value 82. Exit is 1;
+setup, queue, signatures, clears, target counts, lower bounds, completion, route equality,
+HEAD/status/raw bytes, and cleanup all pass. This is reviewer-harness failure, not evidence
+against the candidate.
+
+The literal pending-review values are now frozen: command stream
+`SHTTTTTTTTTTTTLLLLHTTTTTTTTTTTTCCRHTTTTTTTTTTTTCCLLLHTTTTTTTTTTTTQRRRHTTTTTTTTTTTT`;
+metrics `82,5,5,11`; state hashes `bec0ea65,8e34e0c8`; exact certificate
+`optimalLocks=5`, `exhaustedFrontierWidths=[1]`, `exploredStateCount=1`,
+`transitionCount=0`, `deficitBoundPrunes=1`.
+
+Next exact action: assign a fresh independent reviewer one no-file full replay using only
+these literals and base ID `t3r-shaft-01`. No final path opens before all-zero disposition.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
