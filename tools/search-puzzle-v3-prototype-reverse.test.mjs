@@ -95,24 +95,44 @@ const context = {
   trie: trie.nodes,
   sequenceLength: 20,
 };
-const cachedCandidatesByTypeMask = new Map();
-for (let trieNodeId = 0; trieNodeId < context.trie.length; trieNodeId += 1) {
-  const frame = { trieNodeId };
-  const typeMask = reverse.frameCandidateTypeMask(context.trie[trieNodeId]);
-  const expected = context.catalog.filter((descriptor) => typeMask & (1 << descriptor.typeIndex));
-  const actual = reverse.frameCandidates(context, frame);
+const allTypeMasks = Array.from({ length: 1 << reverse.TYPES.length }, (_, typeMask) => ({
+  children: reverse.TYPES.map((_, typeIndex) => typeMask & (1 << typeIndex) ? typeIndex : -1),
+}));
+const exhaustiveCandidateContext = { ...context, trie: allTypeMasks };
+for (let typeMask = 0; typeMask < allTypeMasks.length; typeMask += 1) {
+  const node = allTypeMasks[typeMask];
+  const expected = context.catalog.filter((descriptor) => node.children[descriptor.typeIndex] >= 0);
+  const actual = reverse.frameCandidates(exhaustiveCandidateContext, { trieNodeId: typeMask });
+  assert.equal(reverse.frameCandidateTypeMask(node), typeMask);
   assert.deepEqual(actual, expected);
-  if (cachedCandidatesByTypeMask.has(typeMask)) {
-    assert.strictEqual(actual, cachedCandidatesByTypeMask.get(typeMask));
-  } else {
-    cachedCandidatesByTypeMask.set(typeMask, actual);
-  }
 }
-assert([...cachedCandidatesByTypeMask.keys()].every((typeMask) =>
-  Number.isInteger(typeMask) && typeMask >= 0 && typeMask < (1 << reverse.TYPES.length)));
-assert(cachedCandidatesByTypeMask.size <= (1 << reverse.TYPES.length));
-assert(cachedCandidatesByTypeMask.size < context.trie.length);
-assert.deepEqual(reverse.frameCandidates({ ...context, catalog: [] }, { trieNodeId: 0 }), []);
+let candidateFilterCalls = 0;
+const countingCatalog = new Proxy(context.catalog, {
+  get(target, property, receiver) {
+    if (property !== 'filter') return Reflect.get(target, property, receiver);
+    return (predicate, thisArg) => {
+      candidateFilterCalls += 1;
+      return Array.prototype.filter.call(target, predicate, thisArg);
+    };
+  },
+});
+const repeatedMaskContext = {
+  ...context, catalog: countingCatalog, trie: [allTypeMasks[5], allTypeMasks[5], allTypeMasks[6]],
+};
+const firstCachedCandidates = reverse.frameCandidates(repeatedMaskContext, { trieNodeId: 0 });
+assert.strictEqual(reverse.frameCandidates(repeatedMaskContext, { trieNodeId: 1 }), firstCachedCandidates);
+assert.equal(candidateFilterCalls, 1);
+reverse.frameCandidates(repeatedMaskContext, { trieNodeId: 2 });
+reverse.frameCandidates(repeatedMaskContext, { trieNodeId: 2 });
+assert.equal(candidateFilterCalls, 2);
+reverse.frameCandidates({ ...repeatedMaskContext }, { trieNodeId: 0 });
+assert.equal(candidateFilterCalls, 3);
+const replaceableCatalogContext = {
+  ...context, catalog: [context.catalog[0]], trie: [allTypeMasks[1]],
+};
+assert.equal(reverse.frameCandidates(replaceableCatalogContext, { trieNodeId: 0 }).length, 1);
+replaceableCatalogContext.catalog = [];
+assert.deepEqual(reverse.frameCandidates(replaceableCatalogContext, { trieNodeId: 0 }), []);
 const domainHash = Buffer.alloc(32, 7);
 const oneShotState = reverse.createReverseState(context);
 const oneShot = reverse.advanceReverse(context, oneShotState, 1500, Number.MAX_SAFE_INTEGER, () => 0);

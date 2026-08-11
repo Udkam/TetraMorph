@@ -427,11 +427,12 @@ function frameCandidateTypeMask(node) {
 function frameCandidates(context, frame) {
   const node = context.trie[frame.trieNodeId];
   const typeMask = frameCandidateTypeMask(node);
-  let candidatesByTypeMask = FRAME_CANDIDATE_CACHE.get(context);
-  if (!candidatesByTypeMask) {
-    candidatesByTypeMask = new Map();
-    FRAME_CANDIDATE_CACHE.set(context, candidatesByTypeMask);
+  let cache = FRAME_CANDIDATE_CACHE.get(context);
+  if (!cache || cache.catalog !== context.catalog) {
+    cache = { catalog: context.catalog, candidatesByTypeMask: new Map() };
+    FRAME_CANDIDATE_CACHE.set(context, cache);
   }
+  const { candidatesByTypeMask } = cache;
   if (!candidatesByTypeMask.has(typeMask)) {
     candidatesByTypeMask.set(typeMask,
       context.catalog.filter((descriptor) => typeMask & (1 << descriptor.typeIndex)));
