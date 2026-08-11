@@ -311,6 +311,145 @@ assert.deepEqual({
   failedMemoCount: 0, traceHash: EMPTY_SHA256, failedMemoTraceHash: EMPTY_SHA256,
 });
 
+const preDomainGuard = tiling.buildTilingDomain({ maxRssBytes: 0, rssBytes: () => 1 });
+assert.deepEqual(preDomainGuard,
+  { memoryGuard: true, phase: 'domain-build', processedSeeds: 0 });
+let midDomainChecks = 0;
+const midDomainGuard = tiling.buildTilingDomain({
+  maxRssBytes: 0,
+  rssBytes: () => {
+    midDomainChecks += 1;
+    return midDomainChecks >= 3 ? 1 : 0;
+  },
+});
+assert.deepEqual(midDomainGuard,
+  { memoryGuard: true, phase: 'domain-build', processedSeeds: 1024 });
+let postDomainChecks = 0;
+const postDomainGuard = tiling.buildTilingDomain({
+  maxRssBytes: 0,
+  rssBytes: () => {
+    postDomainChecks += 1;
+    return postDomainChecks === 23 ? 1 : 0;
+  },
+});
+assert.deepEqual(postDomainGuard,
+  { memoryGuard: true, phase: 'domain-build', processedSeeds: 20_000 });
+
+const combinedDomain = tiling.buildTilingDomain();
+assert.equal(combinedDomain.memoryGuard, false);
+assert.equal(combinedDomain.processedSeeds, 20_000);
+assert.equal(combinedDomain.domainHash,
+  '51BC5DF570FE1356D1BE34584B2B06322AA72FFB988E6C1B37ABFE92D49C0D34');
+assert.deepEqual({
+  algorithmVersion: combinedDomain.identity.algorithmVersion,
+  fullSeedStart: combinedDomain.identity.fullSeedStart,
+  fullSeedCount: combinedDomain.identity.fullSeedCount,
+  reverseTrieNodeCount: combinedDomain.identity.reverseTrieNodeCount,
+  reverseTrieHash: combinedDomain.identity.reverseTrieHash,
+  profileHash: combinedDomain.identity.profileHash,
+}, {
+  algorithmVersion: 'tiling-first-v1',
+  fullSeedStart: 1,
+  fullSeedCount: 20_000,
+  reverseTrieNodeCount: 282_615,
+  reverseTrieHash: '4C78BE1A2353B67A20F8C77C55E3DC433B0C304D960B16DA6223CE3DAC769981',
+  profileHash: '115B19D4A4B6394E3032729222DC16B611313B9C88C6B61E81B3D2520FE98AD4',
+});
+const combinedInput = {
+  maxRssBytes: Number.POSITIVE_INFINITY,
+  rssBytes: () => 0,
+  preparedDomain: combinedDomain,
+};
+const combinedZero = tiling.executeTilingSearch({ ...combinedInput, workBudget: 0 });
+assert.deepEqual({
+  status: combinedZero.status, phase: combinedZero.phase, workCount: combinedZero.workCount,
+  traceHash: combinedZero.traceHash, strongTilingCount: combinedZero.strongTilingCount,
+}, {
+  status: 'budget-exhausted', phase: 'cover', workCount: 0,
+  traceHash: EMPTY_SHA256, strongTilingCount: 0,
+});
+const beforeFirstTiling = tiling.executeTilingSearch({ ...combinedInput, workBudget: 1541 });
+assert.equal(beforeFirstTiling.phase, 'cover');
+assert.equal(beforeFirstTiling.strongTilingCount, 0);
+const atFirstTiling = tiling.executeTilingSearch({ ...combinedInput, workBudget: 1542 });
+assert.deepEqual({
+  status: atFirstTiling.status, phase: atFirstTiling.phase,
+  workCount: atFirstTiling.workCount, strongTilingCount: atFirstTiling.strongTilingCount,
+  orderPieceProbeCount: atFirstTiling.orderPieceProbeCount,
+}, {
+  status: 'budget-exhausted', phase: 'order', workCount: 1542,
+  strongTilingCount: 1, orderPieceProbeCount: 0,
+});
+const combinedCanonical = tiling.executeTilingSearch({ ...combinedInput, workBudget: 7524 });
+assert.deepEqual(combinedCanonical, {
+  status: 'budget-exhausted', phase: 'cover', complete: false,
+  domainHash: '51BC5DF570FE1356D1BE34584B2B06322AA72FFB988E6C1B37ABFE92D49C0D34',
+  workCount: 7524, coverBranchProbeCount: 1542, orderPieceProbeCount: 5982,
+  orderStateCount: 443, failedMemoCount: 424, strongTilingCount: 1,
+  completedProfileCount: 0,
+  traceHash: '6BDC4EB7A77DD81D9E3EF54F6A292858302BEB20342DAA8CAEA49E3D9E015479',
+  strongTilingHash: '06A49A48903ED102042EDFE94804480B9A2ED4F1FFDAB4FCA8C010C9FD433C35',
+  failedMemoTraceHash: '25E37B72BDA08E653C4783B47F0A7691FE9D4C94E837388F83352034F4D57181',
+  candidate: null, processedSeeds: 20_000,
+});
+let coverRssChecks = 0;
+const searchMemory = tiling.executeTilingSearch({
+  ...combinedInput,
+  workBudget: 2000,
+  maxRssBytes: 0,
+  rssBytes: (phase) => {
+    if (phase !== 'cover') return 0;
+    coverRssChecks += 1;
+    return coverRssChecks === 2 ? 1 : 0;
+  },
+});
+assert.deepEqual({ status: searchMemory.status, phase: searchMemory.phase,
+  workCount: searchMemory.workCount },
+{ status: 'memory-guard', phase: 'cover', workCount: 1024 });
+let equalBoundaryRssChecks = 0;
+const budgetWinsRss = tiling.executeTilingSearch({
+  ...combinedInput, workBudget: 0, maxRssBytes: 0,
+  rssBytes: () => { equalBoundaryRssChecks += 1; return 1; },
+});
+assert.equal(budgetWinsRss.status, 'budget-exhausted');
+assert.equal(equalBoundaryRssChecks, 0, 'budget must win an equal-boundary RSS stop');
+const tinyDomain = {
+  memoryGuard: false,
+  fixedMask: floorO.cellMask,
+  catalog: singleCatalog,
+  profiles: singleProfile,
+  trie: exactTrieForForwardTypes([floorO.typeIndex], [91, 77]),
+  identity: { fixture: 'single-o' },
+  domainHash: 'TINY-DOMAIN',
+  processedSeeds: 2,
+};
+const tinyCandidate = tiling.executeTilingSearch({
+  workBudget: 2, maxRssBytes: Number.POSITIVE_INFINITY,
+  rssBytes: () => 0, preparedDomain: tinyDomain,
+});
+assert.deepEqual({
+  status: tinyCandidate.status, phase: tinyCandidate.phase,
+  workCount: tinyCandidate.workCount, coverBranchProbeCount: tinyCandidate.coverBranchProbeCount,
+  orderPieceProbeCount: tinyCandidate.orderPieceProbeCount, candidate: tinyCandidate.candidate,
+}, {
+  status: 'candidate', phase: 'order', workCount: 2,
+  coverBranchProbeCount: 1, orderPieceProbeCount: 1,
+  candidate: {
+    profileIndex: 0, tilingOrdinal: 0, seed: 77,
+    peelLocalIndices: [0], forwardCatalogIndices: [0],
+  },
+});
+const staticDeadDomain = { ...tinyDomain, catalog: [], identity: { fixture: 'static-dead' } };
+let naturalRssChecks = 0;
+const naturalWinsLimits = tiling.executeTilingSearch({
+  workBudget: 0, maxRssBytes: 0, preparedDomain: staticDeadDomain,
+  rssBytes: () => { naturalRssChecks += 1; return 1; },
+});
+assert.equal(naturalWinsLimits.status, 'complete-not-found');
+assert.equal(naturalWinsLimits.complete, true);
+assert.equal(naturalWinsLimits.workCount, 0);
+assert.equal(naturalRssChecks, 0, 'zero-probe natural completion must beat budget and RSS');
+
 assert.throws(() => tiling.coverCatalog(0n, []), /positive multiple of four/i);
 assert.throws(() => tiling.enumerateStrongTilings({
   fixedMask: floorO.cellMask, catalog: singleCatalog, profiles: singleProfile, workBudget: -1,

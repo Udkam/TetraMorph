@@ -11,6 +11,46 @@ function sha256Hex(bytes) {
   return createHash('sha256').update(bytes).digest('hex').toUpperCase();
 }
 
+function hashSnapshot(hasher) {
+  return hasher.copy().digest('hex').toUpperCase();
+}
+
+function createWorkRuntime({
+  workBudget, initialWorkCount = 0, maxRssBytes = Number.POSITIVE_INFINITY,
+  rssBytes = () => process.memoryUsage().rss,
+}) {
+  if (!Number.isSafeInteger(workBudget) || workBudget < 0 || workBudget > 1_000_000_000
+    || !Number.isSafeInteger(initialWorkCount) || initialWorkCount < 0
+    || initialWorkCount > workBudget || typeof rssBytes !== 'function'
+    || !(maxRssBytes >= 0)) throw new Error('Work runtime input is invalid.');
+  return {
+    workBudget,
+    workCount: initialWorkCount,
+    maxRssBytes,
+    rssBytes,
+    trace: createHash('sha256'),
+    memoTrace: createHash('sha256'),
+    stopStatus: null,
+    stopPhase: null,
+  };
+}
+
+function admitWork(runtime, phase) {
+  if (runtime.stopStatus) return false;
+  if (runtime.workCount === runtime.workBudget) {
+    runtime.stopStatus = 'budget-exhausted';
+    runtime.stopPhase = phase;
+    return false;
+  }
+  if (runtime.workCount % 1024 === 0
+    && runtime.rssBytes(phase) > runtime.maxRssBytes) {
+    runtime.stopStatus = 'memory-guard';
+    runtime.stopPhase = phase;
+    return false;
+  }
+  return true;
+}
+
 function countBits(mask) {
   let count = 0;
   for (let rest = mask; rest; rest &= rest - 1n) count += 1;
@@ -99,7 +139,9 @@ function coverToken(workIndex, profileIndex, state, pivotBit, catalogIndex, outc
   };
 }
 
-function enumerateStrongTilings({ fixedMask, catalog, profiles, workBudget, onTiling = () => false }) {
+function enumerateStrongTilings({
+  fixedMask, catalog, profiles, workBudget, onTiling = () => false, runtime: suppliedRuntime = null,
+}) {
   if (!Number.isSafeInteger(workBudget) || workBudget < 0 || workBudget > 1_000_000_000) {
     throw new Error('Internal cover work budget is invalid.');
   }
@@ -107,10 +149,10 @@ function enumerateStrongTilings({ fixedMask, catalog, profiles, workBudget, onTi
     throw new Error('Exact-cover profile input is invalid.');
   }
   const context = coverCatalog(fixedMask, catalog);
-  const trace = createHash('sha256');
+  const runtime = suppliedRuntime ?? createWorkRuntime({ workBudget });
+  if (runtime.workBudget !== workBudget) throw new Error('Cover runtime budget drifted.');
   const tilingHasher = createHash('sha256');
   const seenTilings = new Set();
-  let workCount = 0;
   let coverBranchProbeCount = 0;
   let strongTilingCount = 0;
   let completedProfileCount = 0;
@@ -129,7 +171,7 @@ function enumerateStrongTilings({ fixedMask, catalog, profiles, workBudget, onTi
       strongTilingCount += 1;
       tilingHasher.update(`${profileIndex}:${indices.join(',')}\n`, 'utf8');
       const tiling = { profileIndex, catalogIndices: indices };
-      if (onTiling(tiling) === true) {
+      if (onTiling(tiling, { tilingOrdinal: strongTilingCount - 1, runtime }) === true) {
         stoppedTiling = tiling;
         stopReason = 'callback-stop';
         return STOP;
@@ -139,8 +181,8 @@ function enumerateStrongTilings({ fixedMask, catalog, profiles, workBudget, onTi
     const pivot = selectPivot(context, state);
     if (!pivot || pivot.entries.length === 0) return null;
     for (const { descriptor, catalogIndex } of pivot.entries) {
-      if (workCount === workBudget) {
-        stopReason = 'budget-exhausted';
+      if (!admitWork(runtime, 'cover')) {
+        stopReason = runtime.stopStatus;
         return STOP;
       }
       const nextCounts = [...state.remainingCounts];
@@ -154,10 +196,10 @@ function enumerateStrongTilings({ fixedMask, catalog, profiles, workBudget, onTi
         chosen: [...state.chosen, catalogIndex],
       };
       const outcome = nextState.uncoveredMask === 0n ? 'strong-tiling' : 'descend';
-      trace.update(`${base.canonicalJson(coverToken(
-        workCount, profileIndex, state, pivot.bit, catalogIndex, outcome,
+      runtime.trace.update(`${base.canonicalJson(coverToken(
+        runtime.workCount, profileIndex, state, pivot.bit, catalogIndex, outcome,
       ))}\n`, 'utf8');
-      workCount += 1;
+      runtime.workCount += 1;
       coverBranchProbeCount += 1;
       if (visit(profileIndex, nextState) === STOP) return STOP;
     }
@@ -183,11 +225,11 @@ function enumerateStrongTilings({ fixedMask, catalog, profiles, workBudget, onTi
   return {
     status: stopReason,
     complete: stopReason === 'complete-not-found',
-    workCount,
+    workCount: runtime.workCount,
     coverBranchProbeCount,
     strongTilingCount,
     completedProfileCount,
-    traceHash: trace.digest('hex').toUpperCase(),
+    traceHash: hashSnapshot(runtime.trace),
     strongTilingHash: tilingHasher.digest('hex').toUpperCase(),
     stoppedTiling,
   };
@@ -228,6 +270,7 @@ function failedMemoToken(profileIndex, tilingOrdinal, remainingSet, trieNodeId) 
 
 function searchTilingOrders({
   tiling, catalog, trie, workBudget, initialWorkCount = 0, tilingOrdinal = 0,
+  runtime: suppliedRuntime = null,
 }) {
   if (!tiling || !Array.isArray(tiling.catalogIndices) || tiling.catalogIndices.length < 1
     || tiling.catalogIndices.length > 31 || !Array.isArray(catalog) || !Array.isArray(trie)
@@ -253,22 +296,23 @@ function searchTilingOrders({
       || (tilingMask & descriptor.cellMask)) throw new Error('Strong-tiling descriptor is invalid.');
     tilingMask |= descriptor.cellMask;
   }
-  const trace = createHash('sha256');
-  const memoTrace = createHash('sha256');
+  const runtime = suppliedRuntime ?? createWorkRuntime({ workBudget, initialWorkCount });
+  if (runtime.workBudget !== workBudget || runtime.workCount !== initialWorkCount) {
+    throw new Error('Order runtime boundary drifted.');
+  }
   const failedMemo = new Set();
   const pieceCount = descriptors.length;
   const fullSet = (2 ** pieceCount) - 1;
-  let workCount = initialWorkCount;
   let orderPieceProbeCount = 0;
   let orderStateCount = 1;
   let candidate = null;
   let stopped = false;
 
   function appendProbe(state, localIndex, outcome) {
-    trace.update(`${base.canonicalJson(orderToken(
-      workCount, profileIndex, tilingOrdinal, state, localIndex, indices[localIndex], outcome,
+    runtime.trace.update(`${base.canonicalJson(orderToken(
+      runtime.workCount, profileIndex, tilingOrdinal, state, localIndex, indices[localIndex], outcome,
     ))}\n`, 'utf8');
-    workCount += 1;
+    runtime.workCount += 1;
     orderPieceProbeCount += 1;
   }
 
@@ -276,7 +320,7 @@ function searchTilingOrders({
     const key = orderStateKey(remainingSet, trieNodeId);
     if (failedMemo.has(key)) throw new Error('Failed order memo repeated.');
     failedMemo.add(key);
-    memoTrace.update(`${base.canonicalJson(failedMemoToken(
+    runtime.memoTrace.update(`${base.canonicalJson(failedMemoToken(
       profileIndex, tilingOrdinal, remainingSet, trieNodeId,
     ))}\n`, 'utf8');
   }
@@ -289,7 +333,7 @@ function searchTilingOrders({
     const state = { remainingSet, trieNodeId, pieceCount };
     for (let localIndex = 0; localIndex < pieceCount; localIndex += 1) {
       if (!(remainingSet & (2 ** localIndex))) continue;
-      if (workCount === workBudget) {
+      if (!admitWork(runtime, 'order')) {
         stopped = true;
         return STOP;
       }
@@ -335,15 +379,175 @@ function searchTilingOrders({
 
   visit(fullSet, 0, []);
   return {
-    status: candidate ? 'candidate' : stopped ? 'budget-exhausted' : 'complete-not-found',
+    status: candidate ? 'candidate' : stopped ? runtime.stopStatus : 'complete-not-found',
     complete: !candidate && !stopped,
-    workCount,
+    workCount: runtime.workCount,
     orderPieceProbeCount,
     orderStateCount,
     failedMemoCount: failedMemo.size,
-    traceHash: trace.digest('hex').toUpperCase(),
-    failedMemoTraceHash: memoTrace.digest('hex').toUpperCase(),
+    traceHash: hashSnapshot(runtime.trace),
+    failedMemoTraceHash: hashSnapshot(runtime.memoTrace),
     candidate,
+  };
+}
+
+function canonicalHash(label, value) {
+  return sha256Hex(Buffer.from(`${label}\0${base.canonicalJson(value)}`, 'utf8'));
+}
+
+function buildTilingDomain({
+  maxRssBytes = Number.POSITIVE_INFINITY,
+  rssBytes = () => process.memoryUsage().rss,
+} = {}) {
+  if (!(maxRssBytes >= 0) || typeof rssBytes !== 'function') {
+    throw new Error('Domain-build memory input is invalid.');
+  }
+  const guarded = () => rssBytes('domain-build') > maxRssBytes;
+  if (guarded()) return { memoryGuard: true, phase: 'domain-build', processedSeeds: 0 };
+  const fixedMask = base.rowsMask();
+  const catalogBuild = base.buildReverseCatalog(fixedMask);
+  const profileBuild = deriveProfiles(1, 20_000);
+  const fixedHashes = {
+    targetMask: base.maskHex(fixedMask),
+    catalogDescriptorCount: catalogBuild.descriptors.length,
+    catalogHash: base.hashHex(catalogBuild.catalogHash),
+    shapeTableHash: base.hashHex(base.shapeTableHash()),
+    fullQueueHash: base.hashHex(base.fullQueueHash(1, 20_000)),
+  };
+  if (fixedHashes.targetMask !== 'DFF7FCFFFBFE3DFE3FFCFF387'
+    || fixedHashes.catalogDescriptorCount !== 662
+    || fixedHashes.catalogHash !== '6A4739D980BAA5AC7D6DAA631A88742421630F6762583738018DE3541E9A6B39'
+    || fixedHashes.shapeTableHash !== '868FB052469D00DED00A967177B58A34F7267EE48E6F3BA68AF0C852CFF2C2DE'
+    || fixedHashes.fullQueueHash !== '9FAE1D03284F99CF356FD48320B55CD78D30CBAF1340AF4371B8182C795EEB67'
+    || profileBuild.profileHash !== '115B19D4A4B6394E3032729222DC16B611313B9C88C6B61E81B3D2520FE98AD4'
+    || base.REVERSE_ALGORITHM_VERSION !== 'seeded-reverse-v1'
+    || base.SETUP_RULES_VERSION
+      !== 'visible-spawn19-vertical-hard-drop-no-clear-no-hidden-no-same-type-touch-v1'
+    || base.REVERSE_TYPE_ORDER_VERSION !== 'I,O,T,S,Z,J,L-v1'
+    || base.QUEUE_GENERATOR_VERSION !== 'xorshift32-fisher-yates-seven-bag-v1'
+    || base.REVERSE_CANDIDATE_ORDER_VERSION
+      !== 'type-index/rotation-0..3/x-ascending/absolute-y-ascending/landing-cell-dedupe/real-trie-child-v1') {
+    throw new Error('Tiling-first fixed identity drifted.');
+  }
+  const trieBuild = base.buildReverseTrie(1, 20_000, maxRssBytes,
+    () => rssBytes('domain-build'));
+  if (trieBuild.memoryGuard || guarded()) {
+    return { memoryGuard: true, phase: 'domain-build', processedSeeds: trieBuild.processedSeeds };
+  }
+  const trieHash = base.hashHex(trieBuild.trieHash);
+  if (trieBuild.nodes.length !== 282_615
+    || trieHash !== '4C78BE1A2353B67A20F8C77C55E3DC433B0C304D960B16DA6223CE3DAC769981') {
+    throw new Error('Tiling-first reverse trie identity drifted.');
+  }
+  const identity = {
+    algorithmVersion: ALGORITHM_VERSION,
+    coverTraversalVersion: COVER_TRAVERSAL_VERSION,
+    orderTraversalVersion: ORDER_TRAVERSAL_VERSION,
+    sourceAlgorithmVersion: base.REVERSE_ALGORITHM_VERSION,
+    setupRulesVersion: base.SETUP_RULES_VERSION,
+    typeOrderVersion: base.REVERSE_TYPE_ORDER_VERSION,
+    queueGeneratorVersion: base.QUEUE_GENERATOR_VERSION,
+    candidateOrderVersion: base.REVERSE_CANDIDATE_ORDER_VERSION,
+    fullSeedStart: 1,
+    fullSeedCount: 20_000,
+    sequenceLength: 20,
+    targetRows: 10,
+    targetMask: fixedHashes.targetMask,
+    catalogDescriptorCount: fixedHashes.catalogDescriptorCount,
+    catalogHash: fixedHashes.catalogHash,
+    shapeTableHash: fixedHashes.shapeTableHash,
+    fullQueueHash: fixedHashes.fullQueueHash,
+    reverseTrieHash: trieHash,
+    reverseTrieNodeCount: trieBuild.nodes.length,
+    profileHash: profileBuild.profileHash,
+    profileCounts: profileBuild.profiles.map(({ counts }) => counts),
+  };
+  return {
+    memoryGuard: false,
+    fixedMask,
+    catalog: catalogBuild.descriptors,
+    profiles: profileBuild.profiles,
+    trie: trieBuild.nodes,
+    identity,
+    domainHash: canonicalHash('T37-TDOMAIN-v1', identity),
+    processedSeeds: trieBuild.processedSeeds,
+  };
+}
+
+function executeTilingSearch({
+  workBudget, maxRssBytes, rssBytes = () => process.memoryUsage().rss, preparedDomain = null,
+}) {
+  if (!Number.isSafeInteger(workBudget) || workBudget < 0 || workBudget > 1_000_000_000
+    || !(maxRssBytes >= 0) || typeof rssBytes !== 'function') {
+    throw new Error('Combined tiling search input is invalid.');
+  }
+  const domain = preparedDomain ?? buildTilingDomain({ maxRssBytes, rssBytes });
+  if (domain.memoryGuard) {
+    return {
+      status: 'memory-guard', phase: 'domain-build', complete: false,
+      domainHash: null, workCount: 0, coverBranchProbeCount: 0,
+      orderPieceProbeCount: 0, orderStateCount: 0, failedMemoCount: 0,
+      strongTilingCount: 0, completedProfileCount: 0,
+      traceHash: sha256Hex(Buffer.alloc(0)), strongTilingHash: sha256Hex(Buffer.alloc(0)),
+      failedMemoTraceHash: sha256Hex(Buffer.alloc(0)), candidate: null,
+      processedSeeds: domain.processedSeeds,
+    };
+  }
+  if (!domain.fixedMask || !Array.isArray(domain.catalog) || !Array.isArray(domain.profiles)
+    || !Array.isArray(domain.trie) || !domain.identity || !domain.domainHash) {
+    throw new Error('Prepared tiling domain is invalid.');
+  }
+  const runtime = createWorkRuntime({ workBudget, maxRssBytes, rssBytes });
+  let candidate = null;
+  let orderPieceProbeCount = 0;
+  let orderStateCount = 0;
+  let failedMemoCount = 0;
+  const cover = enumerateStrongTilings({
+    fixedMask: domain.fixedMask,
+    catalog: domain.catalog,
+    profiles: domain.profiles,
+    workBudget,
+    runtime,
+    onTiling: (tiling, { tilingOrdinal }) => {
+      const order = searchTilingOrders({
+        tiling,
+        catalog: domain.catalog,
+        trie: domain.trie,
+        workBudget,
+        initialWorkCount: runtime.workCount,
+        tilingOrdinal,
+        runtime,
+      });
+      orderPieceProbeCount += order.orderPieceProbeCount;
+      orderStateCount += order.orderStateCount;
+      failedMemoCount += order.failedMemoCount;
+      if (order.candidate) {
+        candidate = { profileIndex: tiling.profileIndex, tilingOrdinal, ...order.candidate };
+        return true;
+      }
+      return runtime.stopStatus !== null;
+    },
+  });
+  const status = candidate ? 'candidate'
+    : runtime.stopStatus ?? (cover.complete ? 'complete-not-found' : null);
+  if (!status) throw new Error('Combined tiling search stopped without a terminal status.');
+  return {
+    status,
+    phase: candidate ? 'order' : runtime.stopPhase ?? 'cover',
+    complete: status === 'complete-not-found',
+    domainHash: domain.domainHash,
+    workCount: runtime.workCount,
+    coverBranchProbeCount: cover.coverBranchProbeCount,
+    orderPieceProbeCount,
+    orderStateCount,
+    failedMemoCount,
+    strongTilingCount: cover.strongTilingCount,
+    completedProfileCount: cover.completedProfileCount,
+    traceHash: hashSnapshot(runtime.trace),
+    strongTilingHash: cover.strongTilingHash,
+    failedMemoTraceHash: hashSnapshot(runtime.memoTrace),
+    candidate,
+    processedSeeds: domain.processedSeeds,
   };
 }
 
@@ -352,6 +556,9 @@ export const __tilingTest = Object.freeze({
   COVER_TRAVERSAL_VERSION,
   ORDER_TRAVERSAL_VERSION,
   sha256Hex,
+  hashSnapshot,
+  createWorkRuntime,
+  admitWork,
   countBits,
   typeCounts,
   deriveProfiles,
@@ -366,5 +573,8 @@ export const __tilingTest = Object.freeze({
   orderToken,
   failedMemoToken,
   searchTilingOrders,
+  canonicalHash,
+  buildTilingDomain,
+  executeTilingSearch,
   base,
 });
