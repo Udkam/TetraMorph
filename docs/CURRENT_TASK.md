@@ -772,7 +772,8 @@ only; it is not F3 source acceptance.
   cycle/nested mutation, opaque-result copying, real 20-piece candidate, temp ownership,
   CLI, schema, and hash attacks with P0–P3/GAP all zero. Exactly one 10,000,000-work,
   900 MiB, full-domain external batch is authorized, but only after an immediate green
-  resource check; QA's last CPU sample was amber at 75.8%, so no batch has started yet.
+  resource check. The first live sample was 75.5% CPU and the bounded five-sample follow-up
+  averaged 72.7% (maximum 76.4%), both amber, so no batch has started yet.
 
 ## Current checkpoint state
 

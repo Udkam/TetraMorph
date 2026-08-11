@@ -1048,10 +1048,16 @@ nested/cyclic freeze, copy/Proxy attacks, a real 20-piece seed-49 candidate, res
 ban is lifted and exactly one full-domain, 10,000,000-work, 900 MiB, single-process,
 repository-external production batch is authorized.
 
-Next exact action: immediately recheck CPU/RAM/disk queue. QA's last sample is amber at
-75.8% CPU, so no batch has started. Run only if the new sample is green; otherwise retain
-authorization without consuming it. After an actual output exists, perform independent
-output/schema/hash QA before any Core/fixture admission. Product, reverse, T27/`progress.md`,
+The post-acceptance live gate remained amber: the first sample was 75.5% CPU with 15.36 GiB
+free RAM and a 0.023 disk queue; a bounded five-sample follow-up averaged 72.7% CPU (maximum
+76.4%) with 15.68 GiB free RAM and a 0.025 average disk queue. No matching search process
+exists, both source paths are clean, and the reserved external path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-10m-61909d4.json` remains absent.
+The one production authorization is therefore unconsumed.
+
+Next exact action: immediately recheck CPU/RAM/disk queue and run the authorized batch only
+if that new sample is green. After an actual output exists, perform independent output/
+schema/hash QA before any Core/fixture admission. Product, reverse, T27/`progress.md`,
 deferred identity, icon, and Ice work remain closed.
 
 ## Do not repeat
