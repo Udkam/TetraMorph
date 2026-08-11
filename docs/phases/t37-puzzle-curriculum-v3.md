@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C FIRST REVERSE ROUND ACCEPTED; CANDIDATE-CACHE REPAIR OPEN**
+Status: **F3C CANDIDATE CACHE ACCEPTED; SECOND REVERSE ROUND OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -677,6 +677,11 @@ its regression closure with `P3 1 / GAP 2`. The cache must reset when catalog id
 replaced; tests must derive an independent oracle from raw trie children for all 128 masks
 and count actual filters for same-mask reuse and context isolation. No search opens on the
 rejected candidate.
+Repair `0b744b6` closes the stale-catalog and both regression gaps. Final gates pass;
+100,000 real resumed probes remain byte-identical and improve from 8.313 s to 1.296 s.
+Fresh QA reports P0–P3/GAP all zero. The second equal increment may now run serially from
+the accepted round-one inputs into distinct round-two outputs; both sets remain until the
+successors receive independent output QA.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and

@@ -592,6 +592,12 @@ adding unrelated badges or ornamental effects.
   one filter per cached mask. The repair must bind each context cache to catalog identity,
   enumerate all 128 masks from raw child arrays, and use a counting catalog across same-
   mask and cross-context calls. Production search remains closed until fresh all-zero QA.
+- Repair `0b744b6` closes all three findings: catalog replacement resets the context cache,
+  an independent raw-child oracle covers all 128 masks, and a Proxy proves one filter per
+  context/mask. Real resume bytes remain fixed and the 100,000-probe sample is 6.41× faster
+  than baseline. Final gates and fresh QA pass with P0–P3/GAP all zero. Only the second
+  equal increment now opens, with old inputs read-only and distinct new outputs retained
+  together until successor QA authorizes rotation.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C candidate cache accepted
+
+- Repair `0b744b6` invalidates cached masks on catalog identity replacement and adds an
+  independent 128-mask oracle plus counting-Proxy reuse tests. Real 10,000/100,000-probe
+  resume bytes remain fixed; the latter takes 1.296 s versus the 8.313 s baseline.
+- Standalone, typecheck, the complete 430-test suite, and build pass. Fresh independent QA
+  reports P0–P3/GAP all zero and opens one second 1,000,000-probe increment per shard into
+  a distinct external directory. Round-one continuations remain read-only until successor
+  output QA passes.
+
 ## 2026-08-11 — T37 Stage F3C candidate-cache QA rejection
 
 - Candidate `8317373` keeps 10,000- and 100,000-probe real-resume outputs byte-identical

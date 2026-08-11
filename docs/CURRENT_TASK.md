@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C FIRST REVERSE ROUND ACCEPTED; CANDIDATE-CACHE REPAIR OPEN**
+Status: **STAGE F3C CANDIDATE CACHE ACCEPTED; SECOND REVERSE ROUND OPEN**
 
 ## Active objective
 
@@ -691,6 +691,16 @@ only; it is not F3 source acceptance.
   invalidate on catalog identity replacement, independently enumerate all 128 child masks
   against the original predicate, and count `filter()` calls across repeated masks and
   distinct contexts. A fresh all-zero QA verdict remains mandatory.
+- Repair `0b744b6` binds each context cache to catalog identity and adds independent
+  128-mask plus counting-Proxy coverage. Final standalone, typecheck, full suite
+  (`46 passed / 2 skipped` files; `430 passed / 10 skipped` tests), and 767-module build
+  pass. Repair resumes remain byte-identical; 100,000 probes take 1.296 s versus the
+  8.313 s baseline. Fresh QA accepts with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+- This opens exactly one second increment per incomplete shard. Read round-one files from
+  `t37-reverse-round1-e436c29` without modification and write distinct successors under
+  `t37-reverse-round2-0b744b6`; use the frozen 1,000,000-probe/900-MiB/serial boundary and
+  stop the round on the first candidate, memory guard, or completion. Do not delete old
+  inputs before the successor set passes independent output QA.
 
 ## Current checkpoint state
 

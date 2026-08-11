@@ -495,6 +495,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   changes from 8.313 s to 1.240 s. Independent QA nevertheless rejects with
   `P0 0 / P1 0 / P2 0 / P3 1 / GAP 2`: catalog replacement is stale, the mask oracle is
   coupled to the implementation, and reuse is not protected by a filter-call counter.
+- Repair `0b744b6` resets a context's cache when catalog identity changes. Its standalone
+  test independently enumerates all 128 raw-child masks and counts filters for repeated,
+  changed, and cross-context masks. Real repair resume files match the frozen baseline
+  bytes; the 100,000-probe sample is 1.296 s versus 8.313 s. Final local gates pass.
+- Fresh independent QA accepts with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, reproducing the
+  stale replacement, 128-mask oracle, Proxy counts, byte identities, performance signal,
+  exact scope, old manifest, and zero owned process. It authorizes only round two.
 
 ### Stage F3B accepted status
 
@@ -913,12 +920,12 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 ## Next exact action
 
 Retain the accepted external directory
-`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. Reopen only
-the order-preserving `frameCandidates()` cache and standalone test. Bind cached masks to
-the current catalog identity; independently test raw-child predicate equivalence for all
-128 masks; count filters for repeated masks, changed masks, and distinct contexts. Keep
-old-cursor resume plus split/one-shot probe, memo, cursor, result, and canonical-byte
-equivalence, final gates, and fresh independent QA.
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round1-e436c29` unchanged. After removing
+only the six verified cache benchmark files, create the absent external directory
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-reverse-round2-0b744b6`. Serially resume shards
+0..31 for exactly 1,000,000 new probes and 900 MiB each, with a resource gate before each
+start. Stop the round on the first candidate, memory guard, or completion. Independently
+verify every successor before deleting any round-one input or opening a third increment.
 Only then may a second increment read each old shard and write a distinct successor in a
 new external directory. Accept every successor before deleting the old directory. Keep
 final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the
