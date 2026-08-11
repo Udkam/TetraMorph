@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C canonical base hash corrected before implementation
+
+- The final-file writer stops before editing after detecting that the frozen canonical
+  `t3r-shaft-01` SHA-256 had been truncated to 61 hexadecimal characters.
+- Independent current-Core serialization confirms 625 bytes and the full SHA-256
+  `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
+  The two-path proof boundary reopens with this corrected literal; no product file changed.
+
 ## 2026-08-12 — T37 Stage F3C final prototype schema completed
 
 - The first final-file writer stops before editing because nested key names and top scalar

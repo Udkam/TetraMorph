@@ -81,7 +81,7 @@ metrics `82/5/5/11`, state hashes `bec0ea65/8e34e0c8`, and certificate
 alternate expected counts.
 Fresh independent current-Core replay now accepts every value with
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; the canonical base definition remains unchanged with
-SHA-256 `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1`.
+SHA-256 `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
 Only `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
 `src/game/core/puzzleV3PrototypeExact.test.ts` are open for one final non-product proof
 checkpoint. Published Puzzle definitions, runtime Core, UI, T27/`progress.md`, icon, and Ice

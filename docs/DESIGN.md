@@ -715,7 +715,7 @@ adding unrelated badges or ornamental effects.
   generating expected values, using a beam as proof, or applying a time/state cap.
   Independent pre-implementation replay accepts every frozen literal with P0–P3/GAP zero;
   canonical `t3r-shaft-01` remains byte-identical with SHA-256
-  `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1`.
+  `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

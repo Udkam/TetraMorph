@@ -1369,7 +1369,7 @@ and lower bounds `5,4,3,2,1,0`. State hashes are `bec0ea65 → 8e34e0c8`.
 The no-beam certificate is exactly five locks, exhausted frontier `[1]`, one explored state,
 zero transitions, one deficit-bound prune, and initial hash `bec0ea65`. Canonical
 `t3r-shaft-01` remains the same reference and bytes before/after, SHA-256
-`7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1`. Process, raw file,
+`7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`. Process, raw file,
 HEAD, status, and index are unchanged. Independent disposition is P0–P3/GAP all zero.
 
 Next exact action: add only
