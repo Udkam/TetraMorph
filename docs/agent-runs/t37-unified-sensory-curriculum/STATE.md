@@ -994,9 +994,16 @@ full Vitest passes `46 passed / 2 skipped` files and `430 passed / 10 skipped` t
 transforms 767 modules with only the existing >500 kB warning. Browser evidence remains
 inapplicable to this offline tool checkpoint.
 
-Blocker: fresh independent read-only QA of `25d1480`. If accepted, record disposition and
-open the final CLI/parser/schema/result-hash/absent-path atomic-output checkpoint only. No
-production batch or product/Core/fixture/reverse/T27/`progress.md` work opens yet.
+Independent read-only QA accepts `25d1480` with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for
+the combined runtime. It independently rebuilds the domain/trie/DFS and all four hashes,
+checks domain and work RSS boundaries including strict `>`, confirms budget priority plus
+candidate/natural completion, and verifies STOP memo safety.
+
+Next exact action: implement only final CLI parsing, canonical schema/result hash,
+candidate setup/board mapping, and verified-absent atomic output in the same two paths.
+Run all local gates and fresh full-tool QA before any production authoring batch. No product,
+Core, fixture, reverse continuation, T27/`progress.md`, deferred identity, icon, or missing
+Ice archive work opens yet.
 
 ## Do not repeat
 

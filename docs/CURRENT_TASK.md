@@ -754,6 +754,11 @@ only; it is not F3 source acceptance.
   subsets plus N−1/N/N+1 boundaries, reproduces 443 states / 5,982 probes / 424 memos and
   both hashes, and accepts with P0–P3/GAP all zero. The remaining tool layer is split into
   a combined runner/domain/RSS checkpoint and a final CLI/schema/atomic-output checkpoint.
+- Combined candidate `25d1480` passes the same gates and independent QA with P0–P3/GAP all
+  zero. QA independently rebuilds the domain/trie and interleaved traversal, reproduces the
+  7,524-work combined trace and verifies domain/search RSS matrices plus strict stop
+  priority. Only the final CLI/schema/result-hash/atomic-output checkpoint remains before
+  full-tool QA and the one authorized 10,000,000-work production batch.
 
 ## Current checkpoint state
 
