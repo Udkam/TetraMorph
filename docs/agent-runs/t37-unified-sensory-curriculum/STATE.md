@@ -1033,10 +1033,18 @@ candidate. The remaining P2 is a nested-freeze bypass: a pre-frozen parent cause
 recursion to skip its mutable child, which can then be changed while the branded result is
 still accepted.
 
-Next exact action: use a cycle-protecting WeakSet, always recurse through first-seen child
-objects, and freeze the parent only after traversal. Add a shallow-frozen-parent/mutable-child
-regression, then rerun all gates and targeted QA. The production batch and all product/Core/
-fixture/reverse/T27/`progress.md`/identity/icon/Ice work remain closed.
+Nested-freeze repair `61909d4` from base `c1c542b` changes only the same two paths. A local
+WeakSet prevents cycles while every first-seen object traverses children before the parent
+freeze check. The exact shallow-frozen-parent/mutable-child attack now freezes the child,
+rejects mutation with `TypeError`, and keeps the original branded result output-valid.
+
+Actual gates after repair: standalone full-tool contract passes; typecheck passes; full
+Vitest passes `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; build
+transforms 767 modules with only the existing >500 kB warning.
+
+Blocker: final targeted QA of `61909d4`. Only an all-zero disposition may reopen the one
+green-resource 10,000,000-work / 900 MiB external batch. All product/Core/fixture/reverse/
+T27/`progress.md`/identity/icon/Ice work remains closed.
 
 ## Do not repeat
 
