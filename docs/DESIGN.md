@@ -550,6 +550,14 @@ adding unrelated badges or ornamental effects.
   that filters the helper's canonical catalog to I/O would evade them. The next repair is
   test-only and must independently bind catalog completeness plus exercise a non-I/O
   exact history set. Production source and reverse-search admission remain closed.
+- That non-I/O fixture exposes a production traversal defect rather than only a test hole:
+  three separated vertical T placements have six forward permutations, while one real
+  reverse state emits three and then completes. Exhausted frames are currently memoized
+  as failed even after their subtree emitted a candidate, which prunes the complementary
+  orders. The authoring tool and standalone test may reopen together. The fix must affect
+  only in-memory enumeration after a candidate; pre-candidate memoization, all serialized
+  cursor fields/hashes, candidate `continuation: null`, probe bytes, and first-candidate
+  production behavior remain frozen.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

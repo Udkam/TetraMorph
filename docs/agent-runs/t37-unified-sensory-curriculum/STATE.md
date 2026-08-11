@@ -133,8 +133,11 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 33. `F3C COMPLETE-SET QA REJECTED` — formal QA reports all-zero findings/GAP, but
     adversarial QA reports P2 1 / GAP 1 because I/O-only fixtures cannot detect an
     I/O-filtered helper catalog. Production reverse search remains closed.
-34. `PENDING` — a test-only catalog-integrity/non-I/O repair and fresh independent QA
-    precede any reverse search run, fixture, content, migration, UI, final gates, or push.
+34. `F3C NON-I/O ENUMERATION DEFECT` — a three-T target has six independent forward
+    orders but the real reverse state returns three, exposing successful frames wrongly
+    memoized as failed after candidate return.
+35. `PENDING` — a two-path traversal/test repair and fresh independent QA precede any
+    reverse search, fixture, content, migration, UI, final gates, or push.
 
 ### Stage F3C tooling-discovery status
 
@@ -431,9 +434,13 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 - Formal QA independently reproduces the whole range with `P0 0 / P1 0 / P2 0 / P3 0 /
   GAP 0`. Adversarial QA rejects with `P2 1 / GAP 1`: all complete-set fixtures contain
   only I/O, so filtering the helper catalog to I/O-only descriptors would still pass.
-  Blocker: mutation-sensitive catalog completeness. One next action: reopen only
-  `tools/search-puzzle-v3-prototype-reverse.test.mjs`, independently bind the catalog
-  supplied to each complete traversal, and add a non-I/O exact-set fixture before QA.
+  The mutation-sensitive three-T fixture independently proves six forward histories but
+  the canonical reverse traversal emits only three before natural completion. Its first
+  targeted run therefore fails as intended. Static trace identifies unconditional failed
+  memo insertion when a frame exhausts even after a candidate came from its subtree.
+  Blocker: false failed memo after candidate return. Reopen only the production authoring
+  tool and standalone reverse test while keeping every serialized contract and all
+  pre-first-candidate behavior frozen.
 
 ### Stage F3B accepted status
 
@@ -851,13 +858,15 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
 
 ## Next exact action
 
-Modify only `tools/search-puzzle-v3-prototype-reverse.test.mjs`. Make each complete-set
-traversal assert independently derived canonical-catalog completeness and add at least
-one exact non-I/O history-set fixture so I/O-only or fixture-selected catalog filtering
-fails. Run the targeted standalone test, then one final typecheck, complete suite, and
-build before a bounded test-only candidate and fresh independent QA. Do not run the
-production 32-shard reverse search. Keep production tool source, final F3C JSON/Core
-test, later content, deferred identity, T27/`progress.md`, and missing Ice archive closed.
+Modify only `tools/search-puzzle-v3-prototype.mjs` and
+`tools/search-puzzle-v3-prototype-reverse.test.mjs`. Keep normal failed memoization before
+the first candidate, but do not let a subtree that has already emitted a candidate become
+a false failed memo during same-state enumeration. Preserve the cursor/output schema,
+candidate null continuation, probe vectors, legacy/reverse bytes, and first-candidate
+cost. Keep the independent catalog assertion and require all six three-T histories.
+Then run the standalone test followed by one final typecheck, complete suite, and build
+before fresh QA. Do not run production shards; keep later content, T27/`progress.md`,
+deferred identity, and the missing Ice archive closed.
 
 ## Do not repeat
 

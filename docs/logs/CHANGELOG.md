@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C non-I/O enumeration defect
+
+- A mutation-sensitive three-T fixture proves six physical forward orders, but the real
+  canonical reverse state emits only three before completion. The targeted standalone
+  run fails on that exact set difference; exhausted successful frames are being recorded
+  as failed and prune the complementary orders.
+- The prior test-only repair boundary is superseded. Only the authoring tool and its
+  standalone reverse test may reopen, preserving cursor/output schemas, legacy and reverse
+  bytes, probe accounting, and all pre-first-candidate production behavior. Search remains
+  closed through final gates and fresh independent QA.
+
 ## 2026-08-11 — T37 Stage F3C complete-set QA rejected
 
 - Formal QA accepts the full implementation/test chain with P0–P3/GAP all zero, but an

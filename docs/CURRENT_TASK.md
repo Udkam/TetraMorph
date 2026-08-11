@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C COMPLETE-SET QA REJECTED; TEST-ONLY REPAIR**
+Status: **STAGE F3C NON-I/O ENUMERATION DEFECT; TWO-PATH REPAIR**
 
 ## Active objective
 
@@ -624,6 +624,19 @@ only; it is not F3 source acceptance.
   least one exact non-I/O history-set fixture, so an I/O-only or fixture-selected catalog
   mutation fails automatically. Production source and the first 32-shard reverse round
   remain closed until the repaired test passes fresh independent QA with no GAP.
+- The first mutation-sensitive non-I/O fixture supersedes that test-only boundary. Three
+  separated vertical T placements have six independent forward orders, but the real
+  canonical reverse state returns only three before `complete-not-found`. The targeted
+  standalone run fails on the exact `6` versus `3` set difference. Static tracing shows
+  that a frame which already produced a candidate is still inserted into the failed memo
+  when it later exhausts, so an equivalent later order is incorrectly pruned.
+- Reopen only `tools/search-puzzle-v3-prototype.mjs` and its standalone reverse test. The
+  repair must keep failed-state memoization unchanged before the first candidate, prevent
+  successful candidate-enumeration state from becoming a false failed memo entry, and
+  preserve the frozen cursor schema, candidate `continuation: null`, legacy forward bytes,
+  deterministic reverse bytes, probe accounting, and first-candidate production cost.
+  No production shard may run before final gates and fresh independent QA accept the full
+  repair range.
 
 ## Current checkpoint state
 

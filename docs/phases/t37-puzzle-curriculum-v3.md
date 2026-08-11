@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C COMPLETE-SET QA REJECTED; TEST-ONLY REPAIR**
+Status: **F3C NON-I/O ENUMERATION DEFECT; TWO-PATH REPAIR**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -644,6 +644,12 @@ with `P2 1 / GAP 1` because all complete-set fixtures remain I/O-only: filtering
 helper catalog to those two types would evade the exact-set matrix. The test-only repair
 must independently prove catalog completeness and add at least one non-I/O complete-set
 fixture. No production reverse shard may run before fresh QA closes that mutation hole.
+The first three-T fixture then reveals a deeper defect: its independent forward set has
+six orders, but one canonical reverse state returns three and completes. A successful
+subtree is still memoized as failed when its frame later exhausts, causing the missing
+orders. Reopen only the authoring tool and standalone reverse test. Preserve the frozen
+cursor/output schema, probe and legacy byte vectors, candidate null continuation, and all
+pre-first-candidate behavior; fresh QA still controls production-search admission.
 
 Reverse v1 preserves the existing seed domain `1..20000`, shard count 32, exact floor
 partition into 625 seeds each, 20-piece queue generator, fixed 80-cell mask, type and
