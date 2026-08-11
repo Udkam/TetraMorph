@@ -982,12 +982,21 @@ matches 512 deterministic remaining sets, reproduces 443 / 5,982 / 424 and both 
 checks a no-memo exhaustive oracle, and verifies candidate/natural budget priority,
 minimum leaf seed, and forward reversal.
 
-Next exact action: implement the bounded combined runner/domain/RSS-stop checkpoint in the
-same two paths, preserving one global cover+order work budget and ordered trace. Commit and
-QA it green before adding CLI parsing, canonical schema/result hash, and absent-path atomic
-output in a final source checkpoint. No production authoring batch, Core, fixture, product,
-reverse continuation, final F3C JSON/Core work, later content, T27/`progress.md`, deferred
-identity, or missing Ice archive opens yet.
+Combined-runtime candidate `25d1480` from base `0b45c6b` changes only the same two paths.
+It pins the complete fixed domain and version identity, constructs the 282,615-node trie,
+shares one budget and ordered trace across cover/order work, and applies strict RSS guards
+before/mid/after domain build plus work boundaries. At budget 7,524 the first profile-0
+tiling yields 1,542 cover + 5,982 order probes with combined trace
+`6BDC4EB7A77DD81D9E3EF54F6A292858302BEB20342DAA8CAEA49E3D9E015479`.
+
+Actual gates after the last source change: standalone contract passes; typecheck passes;
+full Vitest passes `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; build
+transforms 767 modules with only the existing >500 kB warning. Browser evidence remains
+inapplicable to this offline tool checkpoint.
+
+Blocker: fresh independent read-only QA of `25d1480`. If accepted, record disposition and
+open the final CLI/parser/schema/result-hash/absent-path atomic-output checkpoint only. No
+production batch or product/Core/fixture/reverse/T27/`progress.md` work opens yet.
 
 ## Do not repeat
 
