@@ -964,11 +964,21 @@ the cover checkpoint. It independently reproduces the 1,542-probe fixture and bo
 matches 80 random small masks against exhaustive enumeration, and verifies MRV tie/catalog
 order, contact/separation, budget 0/1, natural completion, and callback priority.
 
-Next exact action: implement only the isolated hard-drop/trie order DFS and direct tests in
-the same two tool paths, including the canonical 443-state / 5,982-probe no-seed result,
-order trace/memo hashes, physical-drop set equivalence, memo isolation, and shared-budget
-boundaries. Commit it green before opening CLI/RSS/output. No production authoring batch,
-Core, fixture, product, reverse continuation, final F3C JSON/Core work, later content,
+Order candidate `801584d` from base `d90109e` changes only the same tool and direct-test
+paths. It reconstructs each board from `remainingSet`, traverses real reversed-trie children
+in local/catalog order, checks exact hard drops, isolates `(remainingSet,trieNodeId)` failed
+memos per run, reverses peel order for forward placements, and chooses the leaf minimum seed.
+The canonical profile-0 tiling naturally exhausts at 443 states / 5,982 order probes / 424
+failed memos, with pinned order and memo trace hashes.
+
+Actual gates after the last source change: standalone cover/order contract passes;
+typecheck passes; full Vitest passes `46 passed / 2 skipped` files and
+`430 passed / 10 skipped` tests; the build transforms 767 modules with only the existing
+>500 kB warning. Browser evidence remains inapplicable to this offline tool checkpoint.
+
+Blocker: fresh independent read-only QA of `801584d`. If accepted, record disposition and
+open only the bounded combined runner/domain/CLI/RSS/output layer. No production authoring
+batch, Core, fixture, product, reverse continuation, final F3C JSON/Core work, later content,
 T27/`progress.md`, deferred identity, or missing Ice archive opens yet.
 
 ## Do not repeat
