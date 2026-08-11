@@ -1016,13 +1016,21 @@ random temp path before a successful `open('wx')` can unlink a foreign colliding
 the eighth EEXIST. QA also proves that hand-assembled setup/board data can be labeled as a
 candidate without a validated search result.
 
-Next exact action: repair only the two tool paths. Track cleanup ownership only after the
-exclusive open succeeds, add an EEXIST foreign-file preservation regression, and require
-output construction to receive the exact opaque result produced by `executeTilingSearch`.
-Candidate schema tests must use a real prepared-domain cover/order candidate, not a forged
-status/setup. Run all gates and fresh repair QA before reconsidering the production batch.
-No product/Core/fixture, reverse continuation, T27/`progress.md`, deferred identity, icon,
-or missing Ice archive work opens yet.
+Repair candidate `2b1d216` from base `bb58d6c` changes only the same two paths. Temp cleanup
+ownership is assigned only after successful exclusive creation; a deterministic eight-way
+EEXIST regression preserves the foreign file. Search results are registered in a private
+WeakSet and recursively frozen, so copied, assembled, or mutated envelopes cannot reach
+output construction. Candidate schema coverage now comes from an actual 20-piece
+cover/order/custom-trie leaf search producing seed 49.
+
+Actual gates after repair: standalone full-tool contract passes; typecheck passes; full
+Vitest passes `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; build
+transforms 767 modules with only the existing >500 kB warning.
+
+Blocker: targeted independent repair QA of `2b1d216`. Only an all-zero disposition may
+reopen the single green-resource 10,000,000-work / 900 MiB external production batch. No
+product/Core/fixture, reverse continuation, T27/`progress.md`, deferred identity, icon, or
+missing Ice archive work opens yet.
 
 ## Do not repeat
 
