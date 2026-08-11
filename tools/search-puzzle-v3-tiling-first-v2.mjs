@@ -1,3 +1,7 @@
+import { readFileSync, realpathSync } from 'node:fs';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
 import { __tilingTest as v1 } from './search-puzzle-v3-tiling-first.mjs';
 
 const { base } = v1;
@@ -20,6 +24,8 @@ const FULL_STRONG_TILING_HASH = '8B233871A95B0A14915D727EC26751F90FF9E5C138E658E
 const V1_FILE_HASH = 'F9E94210ECB61E4284F3434363833748B1D5990E58DB666A90A2836FB0A840B3';
 const V1_RESULT_HASH = 'C1E315E66B819593279E485DC24AC2FE4E9CC7B7543724748222A45B42FBF758';
 const HASH_PATTERN = /^[0-9A-F]{64}$/;
+const REPOSITORY_ROOT = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), '..'));
+const PUBLISH_CAPABILITY = Object.freeze({});
 const TRUSTED_RESULTS = new WeakMap();
 
 function exactKeys(value, keys, label) {
@@ -153,8 +159,15 @@ function buildShardDomain(shardIndex, {
   fixedHashes.reverseTrieHash = base.hashHex(trieBuild.trieHash);
   if (fixedHashes.targetMask !== TARGET_MASK || fixedHashes.catalogDescriptorCount !== 662
     || fixedHashes.catalogHash !== CATALOG_HASH || fixedHashes.shapeTableHash !== SHAPE_TABLE_HASH
-    || profileBuild.profileHash !== PROFILE_HASH
-    || base.SETUP_RULES_VERSION !== 'visible-spawn19-vertical-hard-drop-no-clear-no-hidden-no-same-type-touch-v1') {
+    || profileBuild.profileHash !== PROFILE_HASH || trieBuild.processedSeeds !== range.seedCount
+    || v1.COVER_TRAVERSAL_VERSION !== 'mrv-cell/catalog-index-v1'
+    || v1.ORDER_TRAVERSAL_VERSION !== 'remaining-set/trie-node/catalog-index-v1'
+    || base.REVERSE_ALGORITHM_VERSION !== 'seeded-reverse-v1'
+    || base.SETUP_RULES_VERSION !== 'visible-spawn19-vertical-hard-drop-no-clear-no-hidden-no-same-type-touch-v1'
+    || base.REVERSE_TYPE_ORDER_VERSION !== 'I,O,T,S,Z,J,L-v1'
+    || base.QUEUE_GENERATOR_VERSION !== 'xorshift32-fisher-yates-seven-bag-v1'
+    || base.REVERSE_CANDIDATE_ORDER_VERSION
+      !== 'type-index/rotation-0..3/x-ascending/absolute-y-ascending/landing-cell-dedupe/real-trie-child-v1') {
     throw new Error('Shard fixed identity drifted.');
   }
   const identity = domainBody(range, profileBuild, membership, fixedHashes, trieBuild);
@@ -224,6 +237,9 @@ function validateCandidateShape(output) {
     || !Array.isArray(output.setup.placements) || output.setup.placements.length !== 20) {
     throw new Error('V2 candidate range or cardinality is invalid.');
   }
+  if (!Number.isSafeInteger(candidate.profileIndex) || candidate.profileIndex < 0
+    || candidate.profileIndex > 6 || !Number.isSafeInteger(candidate.tilingOrdinal)
+    || candidate.tilingOrdinal < 0) throw new Error('V2 candidate ordinal is invalid.');
   if (candidate.forwardCatalogIndices.some((index) => !Number.isSafeInteger(index) || index < 0)
     || candidate.peelLocalIndices.some((index) => !Number.isSafeInteger(index) || index < 0)
     || !Array.isArray(output.boardRows) || output.boardRows.length !== 20) {
@@ -244,6 +260,48 @@ function validateCandidateShape(output) {
       throw new Error('V2 setup placement is invalid.');
     }
   }
+}
+
+function validateCandidateReplay(output) {
+  validateCandidateShape(output);
+  const { candidate } = output;
+  const catalog = base.buildReverseCatalog(base.rowsMask()).descriptors;
+  const indices = candidate.forwardCatalogIndices;
+  if (new Set(indices).size !== 20 || indices.some((index) => index >= catalog.length)) {
+    throw new Error('V2 candidate catalog indices are invalid.');
+  }
+  const sorted = [...indices].sort((left, right) => left - right);
+  const expectedPeel = indices.toReversed().map((index) => sorted.indexOf(index));
+  if (base.canonicalJson(expectedPeel) !== base.canonicalJson(candidate.peelLocalIndices)) {
+    throw new Error('V2 candidate peel order is invalid.');
+  }
+  const queue = base.sequenceForSeed(candidate.seed, 20);
+  let board = 0n;
+  const typedMasks = Array.from({ length: 7 }, () => 0n);
+  const descriptors = [];
+  for (const [position, index] of indices.entries()) {
+    const descriptor = catalog[index];
+    const placement = output.setup.placements[position];
+    if (queue[position] !== base.TYPES[descriptor.typeIndex]
+      || placement.type !== queue[position] || placement.rotation !== descriptor.rotation
+      || placement.x !== descriptor.x || base.hardDropMask(board, descriptor) !== descriptor.cellMask
+      || (board & descriptor.cellMask) !== 0n
+      || (base.neighborMask(descriptor.cellMask, base.rowsMask()) & typedMasks[descriptor.typeIndex]) !== 0n) {
+      throw new Error('V2 candidate physical replay failed.');
+    }
+    board |= descriptor.cellMask;
+    typedMasks[descriptor.typeIndex] |= descriptor.cellMask;
+    for (let row = 0; row < 10; row += 1) {
+      const rowMask = 0x3ffn << BigInt(row * 10);
+      if ((board & rowMask) === rowMask) throw new Error('V2 candidate clears during setup.');
+    }
+    descriptors.push(descriptor);
+  }
+  if (board !== base.rowsMask()
+    || base.canonicalJson(base.candidateBoardRows(descriptors)) !== base.canonicalJson(output.boardRows)) {
+    throw new Error('V2 candidate board does not reconstruct the target.');
+  }
+  return output;
 }
 
 const TOP_LEVEL_KEYS = [
@@ -267,7 +325,9 @@ function validateShardOutput(output) {
   const range = validateDomain(output.domain);
   const allowed = new Set(['candidate:order', 'complete-not-found:cover', 'budget-exhausted:cover',
     'budget-exhausted:order', 'memory-guard:cover', 'memory-guard:order']);
-  const integers = [...Object.values(output.coverage).slice(1), output.search.processedSeeds,
+  const integers = [output.coverage.workCount, output.coverage.coverBranchProbeCount,
+    output.coverage.orderPieceProbeCount, output.coverage.strongTilingCount,
+    output.coverage.completedProfileCount, output.search.processedSeeds,
     output.search.catalogDescriptorCount, output.search.reverseTrieNodeCount,
     output.search.orderStateCount, output.search.failedMemoCount];
   const evidence = { ...output.evidence };
@@ -305,11 +365,12 @@ function validateShardOutput(output) {
   if (output.status === 'complete-not-found') {
     if (output.coverage.coverBranchProbeCount !== COVER_REFERENCE.coverBranchProbeCount
       || output.coverage.strongTilingCount !== COVER_REFERENCE.strongTilingCount
+      || output.coverage.completedProfileCount !== 7
       || output.evidence.strongTilingHash !== COVER_REFERENCE.strongTilingHash) {
       throw new Error('V2 natural completion does not match the cover reference.');
     }
   }
-  if (output.status === 'candidate') validateCandidateShape(output);
+  if (output.status === 'candidate') validateCandidateReplay(output);
   else if (output.candidate !== null || output.setup !== null || output.boardRows !== null) {
     throw new Error('V2 noncandidate output contains candidate artifacts.');
   }
@@ -376,11 +437,213 @@ function executeShardSearch(shardIndex) {
   return result;
 }
 
+function parseCanonicalBytes(bytes, label) {
+  if (!Buffer.isBuffer(bytes) || bytes.length === 0) throw new Error(`${label} is empty.`);
+  const text = bytes.toString('utf8');
+  if (!Buffer.from(text, 'utf8').equals(bytes)) throw new Error(`${label} is not valid UTF-8.`);
+  let value;
+  try { value = JSON.parse(text); } catch { throw new Error(`${label} is not valid JSON.`); }
+  if (`${base.canonicalJson(value)}\n` !== text) throw new Error(`${label} is not canonical UTF-8/LF JSON.`);
+  return value;
+}
+
+function validateV1PredecessorBytes(bytes) {
+  const fileSha256 = v1.sha256Hex(bytes);
+  const output = parseCanonicalBytes(bytes, 'V1 predecessor');
+  const evidence = {
+    profileHash: output.evidence?.profileHash,
+    domainHash: output.evidence?.domainHash,
+    traceHash: output.evidence?.traceHash,
+    strongTilingHash: output.evidence?.strongTilingHash,
+    failedMemoTraceHash: output.evidence?.failedMemoTraceHash,
+  };
+  const recomputed = v1.tilingResultHash({
+    status: output.status, phase: output.phase, domainHash: output.domain?.domainHash,
+    coverage: output.coverage, evidence, setup: output.setup, boardRows: output.boardRows,
+    search: output.search,
+  });
+  if (fileSha256 !== V1_FILE_HASH || output.schemaVersion !== 1
+    || output.algorithmVersion !== 'tiling-first-v1' || output.status !== 'complete-not-found'
+    || output.phase !== 'cover' || output.coverage?.complete !== true
+    || output.domain?.fullSeedStart !== 1 || output.domain?.fullSeedCount !== 20_000
+    || output.evidence?.resultHash !== V1_RESULT_HASH || recomputed !== V1_RESULT_HASH) {
+    throw new Error('V1 predecessor identity is invalid.');
+  }
+  return deepFreeze({
+    seedStart: 1, seedCount: 20_000, seedEndExclusive: 20_001,
+    status: 'complete-not-found', fileSha256, resultHash: V1_RESULT_HASH,
+  });
+}
+
+function validateShardBytes(bytes, expectedFileSha256, expectedResultHash) {
+  if (!HASH_PATTERN.test(expectedFileSha256) || !HASH_PATTERN.test(expectedResultHash)
+    || v1.sha256Hex(bytes) !== expectedFileSha256) throw new Error('Shard file hash differs from QA expectation.');
+  const output = validateShardOutput(parseCanonicalBytes(bytes, 'V2 shard output'));
+  if (output.evidence.resultHash !== expectedResultHash) {
+    throw new Error('Shard result hash differs from QA expectation.');
+  }
+  return { output, fileSha256: expectedFileSha256 };
+}
+
+function buildManifestData({ predecessorBytes, records }) {
+  if (!Array.isArray(records) || records.length < 1 || records.length > SHARD_COUNT) {
+    throw new Error('Manifest needs one through nine shard records.');
+  }
+  const predecessor = validateV1PredecessorBytes(predecessorBytes);
+  const entries = [];
+  const seenHashes = new Set();
+  let candidateSeen = false;
+  for (const [position, record] of records.entries()) {
+    exactKeys(record, ['bytes', 'expectedFileSha256', 'expectedResultHash'], 'Manifest data record');
+    const { output, fileSha256 } = validateShardBytes(
+      record.bytes, record.expectedFileSha256, record.expectedResultHash,
+    );
+    const hashIdentity = `${fileSha256}:${output.evidence.resultHash}`;
+    if (output.shard.shardIndex !== position || candidateSeen || seenHashes.has(hashIdentity)
+      || !['complete-not-found', 'candidate'].includes(output.status)
+      || (output.status === 'complete-not-found' && output.coverage.complete !== true)
+      || (output.status === 'candidate' && position !== records.length - 1)) {
+      throw new Error('Manifest shard prefix is invalid.');
+    }
+    candidateSeen = output.status === 'candidate';
+    seenHashes.add(hashIdentity);
+    entries.push({ ...output.shard, status: output.status, fileSha256,
+      resultHash: output.evidence.resultHash });
+  }
+  const status = candidateSeen ? 'candidate'
+    : entries.length === SHARD_COUNT ? 'complete-not-found' : 'prefix-complete';
+  const body = {
+    schemaVersion: SCHEMA_VERSION, algorithmVersion: ALGORITHM_VERSION,
+    manifestVersion: MANIFEST_VERSION, series: SERIES, predecessor, entries, status,
+  };
+  return deepFreeze({ ...body, manifestHash: v1.canonicalHash('T37-TSERIES-v2', body) });
+}
+
+function insideRepository(path) {
+  const rel = relative(REPOSITORY_ROOT, path);
+  return rel === '' || (rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel));
+}
+
+function externalPath(raw, { mustExist = false, mustBeAbsent = false } = {}) {
+  if (typeof raw !== 'string' || !isAbsolute(raw)) throw new Error('Path must be absolute.');
+  const target = resolve(raw);
+  const exists = v1.pathEntryExists(target);
+  if ((mustExist && !exists) || (mustBeAbsent && exists)) throw new Error('Path existence contract failed.');
+  let anchor = exists ? target : dirname(target);
+  while (!v1.pathEntryExists(anchor)) {
+    const parent = dirname(anchor);
+    if (parent === anchor) throw new Error('Path has no existing ancestor.');
+    anchor = parent;
+  }
+  const realTarget = exists ? realpathSync(target)
+    : resolve(realpathSync(anchor), relative(anchor, target));
+  if (insideRepository(realTarget)) throw new Error('Path must be outside the repository.');
+  return target;
+}
+
+function buildManifestFromFiles(v1Path, inputListPath) {
+  const predecessorPath = externalPath(v1Path, { mustExist: true });
+  const list = parseCanonicalBytes(readFileSync(resolve(inputListPath)), 'Manifest input list');
+  exactKeys(list, ['records'], 'Manifest input list');
+  if (!Array.isArray(list.records) || list.records.length < 1 || list.records.length > SHARD_COUNT) {
+    throw new Error('Manifest input list has an invalid record count.');
+  }
+  const seen = new Set();
+  const records = list.records.map((record) => {
+    exactKeys(record, ['path', 'expectedFileSha256', 'expectedResultHash'], 'Manifest input record');
+    const path = externalPath(record.path, { mustExist: true });
+    const identity = realpathSync(path).toLowerCase();
+    if (seen.has(identity)) throw new Error('Manifest input paths must be distinct.');
+    seen.add(identity);
+    return { bytes: readFileSync(path), expectedFileSha256: record.expectedFileSha256,
+      expectedResultHash: record.expectedResultHash };
+  });
+  return buildManifestData({ predecessorBytes: readFileSync(predecessorPath), records });
+}
+
+function parseArguments(argv) {
+  if (!Array.isArray(argv) || argv.length % 2 !== 0) throw new Error('Expected explicit --name value pairs.');
+  const values = new Map();
+  for (let index = 0; index < argv.length; index += 2) {
+    const name = argv[index];
+    if (!name?.startsWith('--') || argv[index + 1] === undefined || values.has(name)) {
+      throw new Error('CLI options must be unique explicit pairs.');
+    }
+    values.set(name, argv[index + 1]);
+  }
+  if (values.get('--algorithm') !== ALGORITHM_VERSION) throw new Error('Unsupported V2 algorithm.');
+  const mode = values.get('--mode');
+  const required = mode === 'shard'
+    ? ['--algorithm', '--mode', '--shard-index', '--work-budget', '--max-rss-mib', '--output']
+    : mode === 'manifest'
+      ? ['--algorithm', '--mode', '--v1-output', '--input-list', '--output'] : [];
+  if (required.length === 0 || [...values.keys()].sort().join('\0') !== required.sort().join('\0')) {
+    throw new Error('CLI mode has an invalid option set.');
+  }
+  const outputPath = externalPath(values.get('--output'), { mustBeAbsent: true });
+  if (mode === 'shard') {
+    if (!/^[0-8]$/.test(values.get('--shard-index') ?? '')
+      || values.get('--work-budget') !== String(WORK_BUDGET)
+      || values.get('--max-rss-mib') !== String(MAX_RSS_MIB)) {
+      throw new Error('Shard mode requires canonical fixed production values.');
+    }
+    return { mode, shardIndex: Number(values.get('--shard-index')), outputPath };
+  }
+  const inputList = values.get('--input-list');
+  if (!inputList || !v1.pathEntryExists(resolve(inputList))) throw new Error('Manifest input list is missing.');
+  return { mode, v1Path: externalPath(values.get('--v1-output'), { mustExist: true }),
+    inputListPath: resolve(inputList), outputPath };
+}
+
+function canonicalBytes(value) {
+  return Buffer.from(`${base.canonicalJson(value)}\n`, 'utf8');
+}
+
+function publishShard(result, outputPath, capability) {
+  const output = TRUSTED_RESULTS.get(result);
+  if (capability !== PUBLISH_CAPABILITY || !output) throw new Error('Shard publication is not authorized.');
+  v1.writeAtomicAbsent(outputPath, canonicalBytes(output));
+  return output;
+}
+
+function publishManifest(manifest, outputPath, capability) {
+  if (capability !== PUBLISH_CAPABILITY) throw new Error('Manifest publication is not authorized.');
+  v1.writeAtomicAbsent(outputPath, canonicalBytes(manifest));
+}
+
+function runCli(argv) {
+  const options = parseArguments(argv);
+  if (options.mode === 'shard') {
+    const result = executeShardSearch(options.shardIndex);
+    const output = publishShard(result, options.outputPath, PUBLISH_CAPABILITY);
+    process.stdout.write(`${base.canonicalJson({ status: output.status, phase: output.phase,
+      shardIndex: output.shard.shardIndex, workCount: output.coverage.workCount,
+      resultHash: output.evidence.resultHash })}\n`);
+    return output.status === 'candidate' ? 0 : 2;
+  }
+  const manifest = buildManifestFromFiles(options.v1Path, options.inputListPath);
+  publishManifest(manifest, options.outputPath, PUBLISH_CAPABILITY);
+  process.stdout.write(`${base.canonicalJson({ status: manifest.status,
+    entryCount: manifest.entries.length, manifestHash: manifest.manifestHash })}\n`);
+  return manifest.status === 'candidate' ? 0 : 2;
+}
+
 export const __tilingV2Test = Object.freeze({
   ALGORITHM_VERSION, SCHEMA_VERSION, SERIES_VERSION, MANIFEST_VERSION, CLAIM,
   SHARD_COUNT, SHARD_SIZE, SERIES_SEED_START, SERIES_SEED_COUNT, WORK_BUDGET, MAX_RSS_MIB,
   PROFILE_HASH, TARGET_MASK, CATALOG_HASH, SHAPE_TABLE_HASH, FULL_STRONG_TILING_HASH,
   V1_FILE_HASH, V1_RESULT_HASH, SERIES_BODY, SERIES_HASH, SERIES, COVER_REFERENCE,
   exactKeys, deepFreeze, shardRange, profileMembership, buildShardDomain, validateDomain,
-  validateCandidateShape, validateShardOutput, formatShardOutputForTest, v1,
+  validateCandidateShape, validateCandidateReplay, validateShardOutput, formatShardOutputForTest,
+  parseCanonicalBytes, validateV1PredecessorBytes, validateShardBytes, buildManifestData,
+  externalPath, buildManifestFromFiles, parseArguments, canonicalBytes,
 });
+
+const isMain = process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
+if (isMain) {
+  try { process.exitCode = runCli(process.argv.slice(2)); }
+  catch (error) {
+    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  }
+}
