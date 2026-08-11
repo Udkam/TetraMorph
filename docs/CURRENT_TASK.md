@@ -775,8 +775,9 @@ only; it is not F3 source acceptance.
   resource check. The first live sample was 75.5% CPU and the bounded five-sample follow-up
   averaged 72.7% (maximum 76.4%), both amber. Two later goal continuations also remained
   amber, ending with a 70.5% immediate sample. After three consecutive blocked turns no
-  batch has started, the authorization is unconsumed, and continuation now waits for a
-  genuinely green resource sample.
+  batch had started and the authorization remained unconsumed. On 2026-08-12 the player
+  explicitly resumed T37 and removed the resource constraint until completion; the batch
+  may now run after the remaining process/source/output-path preflight passes.
 
 ## Current checkpoint state
 

@@ -1059,12 +1059,19 @@ Two subsequent goal continuations revalidated the same boundary. The first obser
 18-second 73.2% CPU average (75.8% maximum); the third consecutive turn ended with an
 immediate 70.5% CPU sample, 15.79 GiB free RAM, and a 0.026 disk queue. CPU therefore
 remained amber on all three turns. No batch, matching process, or output exists, and the
-goal is externally blocked until a genuinely green sample permits the authorized run.
+goal was externally blocked until a genuinely green sample permitted the authorized run.
 
-Next exact action: immediately recheck CPU/RAM/disk queue and run the authorized batch only
-if that new sample is green. After an actual output exists, perform independent output/
-schema/hash QA before any Core/fixture admission. Product, reverse, T27/`progress.md`,
-deferred identity, icon, and Ice work remain closed.
+Resume authority (2026-08-12): the player explicitly instructed T37 to continue and to
+ignore resource constraints until completion. This removes the CPU/RAM/disk-queue gate but
+does not widen the batch: it remains exactly one 10,000,000-work, 900 MiB, single-process,
+repository-external run. Live preflight at `ee6419b` confirms `main`, an empty staging area,
+clean tool source, zero matching processes, absent reserved output, Node `v24.12.0`, and tool
+SHA-256 `DC5DD8018BC703A3C1375B548BC5CF359E37C0CB0BC8CE8B9830F280D741781B`.
+
+Next exact action: commit this resume authority, then run the authorized batch once at the
+reserved external path. After an actual output exists, perform independent output/schema/
+hash QA before any Core/fixture admission. Product, reverse, T27/`progress.md`, deferred
+identity, icon, and Ice work remain closed.
 
 ## Do not repeat
 
