@@ -632,6 +632,29 @@ adding unrelated badges or ornamental effects.
   candidate resolution precede budget, budget precedes RSS, and no STOP state memoizes.
   Domain/profile/trace/tiling/memo/result hashes plus canonical LF output make repeated
   runs auditable. V1 is single-run and nonresumable by design.
+- The accepted v1 production output exhausts all seven profiles and 373 strong tilings for
+  seeds `1..20000` with no candidate. Its `complete-not-found` result closes that domain;
+  neither a larger v1 work budget nor a repeated v1 run can add evidence.
+- `tiling-first-sharded-v2` changes only seed membership. The target mask, public five-lock
+  `I → O → T → J → L` route, 20-drop setup length, zero setup clears, visible hard-drop
+  physics, and no-same-type orthogonal-contact rule remain unchanged. The contact rule is
+  mandatory because current `replayPuzzleSetup` rejects merged same-type owners.
+- V2 owns the contiguous new seed series `20001..200000`, partitioned into exactly nine
+  20,000-seed shards. Shard `i` (`0..8`) is
+  `[20001 + i*20000, 20001 + (i+1)*20000)`. The formula admits no user-selected range,
+  gap, overlap, wrap, reordering, or tenth shard.
+- Each shard reuses the accepted cover/order implementation but has a new schema and hash
+  identity. Static series identity, actual per-profile seed membership, queue bytes, trie,
+  domain, traversal, memo, result, and canonical output bytes are independently bound.
+  Profile-shape hash alone is insufficient; a membership hash binds every concrete seed.
+- Only natural `complete-not-found` permits the next shard. Budget, RSS, exception,
+  malformed output, or incomplete QA stops the series. A candidate stops the series and
+  remains authoring-only until current Core setup replay, the fixed route, lock/state
+  hashes, and the no-beam exact certificate pass.
+- If all nine shards complete without a candidate, `1..200000` is closed and the next
+  design review changes the mask/route rather than silently extending seeds or weakening
+  setup legality. A canonical `T37-TSERIES-v2` prefix/full manifest binds ordered shard
+  index, file SHA-256, result hash, and terminal status.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

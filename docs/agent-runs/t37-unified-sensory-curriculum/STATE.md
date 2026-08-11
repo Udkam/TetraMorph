@@ -1092,6 +1092,27 @@ exact action is a bounded v2 contract review that changes the search domain only
 change preserves legal 20-drop setup replay, zero setup clears, the fixed five-lock route,
 and unanchored ten-row admission. No Core/fixture/product path is open yet.
 
+V2 contract candidate (2026-08-12): source inspection corrects the proposed no-touch
+relaxation. `src/game/core/puzzles.ts` lines 129–175 make merged same-type owners a current
+setup-replay rejection, so V2 preserves no-touch, mask, route, physics, and every v1 search
+primitive. It changes only seed membership to the contiguous series `20001..200000`, nine
+fixed 20,000-seed shards with index-derived ranges and no caller-selected boundaries.
+
+Frozen identities are `tiling-first-sharded-v2`, schema 2,
+`seed-series-20001-200000-20000-v1`, `T37-TDOMAIN-v2`, `T37-TRESULT-v2`, and
+`T37-TSERIES-v2`. Per-shard evidence binds exact seed membership in addition to profile
+shape, queue/trie/domain/traversal/memo/result/output hashes; shared cover evidence remains
+345,149 probes, 373 tilings, and hash
+`8B233871A95B0A14915D727EC26751F90FF9E5C138E658EEE2E03F7B91814B64`.
+Only a QA-accepted natural noncandidate opens the next shard; candidate stops for Core and
+strict certificate replay; every incomplete or invalid terminal stops. Nine noncandidates
+close cumulative `1..200000` and force mask/route review.
+
+Next exact action: commit and independently review this docs-only contract. Require
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` before adding the two new v2 tool/test paths. V1,
+Core, final fixture, published product, reverse evidence, T27/`progress.md`, identity/icon,
+and Ice remain closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

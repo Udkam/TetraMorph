@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 CONTRACT REVIEW**
+Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 SHARD CONTRACT QA**
 
 ## Active objective
 
@@ -789,6 +789,42 @@ only; it is not F3 source acceptance.
   20,000 processed seeds, work arithmetic, hashes, and complete-vs-stop semantics with
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. V1 is a valid fixed-domain noncandidate and must
   not be rerun or receive a larger budget; F3C fixture/Core admission remains closed.
+
+### Stage F3C tiling-first sharded v2 contract candidate (2026-08-12)
+
+- Core evidence rejects the initially considered no-touch relaxation:
+  `replayPuzzleSetup` checks every new setup cell against orthogonal same-type owners and
+  throws on a merge. V2 therefore preserves setup rules version
+  `visible-spawn19-vertical-hard-drop-no-clear-no-hidden-no-same-type-touch-v1`, the fixed
+  mask/route, all traversal versions, and the accepted exact-cover implementation.
+- V2 algorithm identity is `tiling-first-sharded-v2`, schema 2, series version
+  `seed-series-20001-200000-20000-v1`. It covers exactly seeds `20001..200000` as nine
+  fixed shards: index `i=0..8`, start `20001+i*20000`, count `20000`, exclusive end
+  `20001+(i+1)*20000`. CLI accepts only shard index plus the existing explicit algorithm,
+  work-budget, RSS, and absent external output path; seed ranges are never caller supplied.
+- Static cover identity remains 345,149 cover probes, 373 strong tilings, and strong-tiling
+  hash `8B233871A95B0A14915D727EC26751F90FF9E5C138E658EEE2E03F7B91814B64`.
+  Every shard binds series identity/hash, index/range, seven profile seed counts, an exact
+  profile-membership hash, queue/trie hashes and counts, `T37-TDOMAIN-v2`, traversal/memo
+  hashes, `T37-TRESULT-v2`, and canonical external-file SHA-256. A canonical
+  `T37-TSERIES-v2` manifest binds the accepted ordered prefix or all nine results.
+- Each run is fixed at 10,000,000 work and 900 MiB and uses a new absent repository-external
+  path. Only independently accepted natural `complete-not-found` output opens the next
+  shard. Candidate stops the series; budget/RSS/exception/schema/hash/QA failure stops it
+  without advancing. A candidate still needs current Core 20-drop replay, zero setup clears,
+  the fixed five-lock route, lock/state hashes, and the opt-in no-beam exact certificate.
+- If all nine shards are complete noncandidates, cumulative `1..200000` is frozen closed and
+  the next contract must reconsider mask/route. It may not remove no-touch or silently add
+  later seeds. V1 files and evidence remain immutable.
+- Contract review opens no implementation yet. After independent P0–P3/GAP all-zero QA,
+  implementation may add only `tools/search-puzzle-v3-tiling-first-v2.mjs` and
+  `tools/search-puzzle-v3-tiling-first-v2.test.mjs`, in separate ≤500-line checkpoints,
+  importing v1 primitives rather than copying or changing either accepted v1 file.
+- Direct tests must cover range math/overflow/duplicates, seven-profile membership oracles,
+  no-touch, shared cover identity, physical order, work/RSS/STOP boundaries, no incomplete
+  memo, exact schemas/hashes, frozen nested data, forged candidates/proxies, atomic output
+  collisions/foreign temps, manifest gap/overlap/order/duplicate/incomplete rejection,
+  candidate-prefix termination, and byte-stable v1 standalone regression.
 
 ## Current checkpoint state
 
