@@ -773,7 +773,10 @@ only; it is not F3 source acceptance.
   CLI, schema, and hash attacks with P0–P3/GAP all zero. Exactly one 10,000,000-work,
   900 MiB, full-domain external batch is authorized, but only after an immediate green
   resource check. The first live sample was 75.5% CPU and the bounded five-sample follow-up
-  averaged 72.7% (maximum 76.4%), both amber, so no batch has started yet.
+  averaged 72.7% (maximum 76.4%), both amber. Two later goal continuations also remained
+  amber, ending with a 70.5% immediate sample. After three consecutive blocked turns no
+  batch has started, the authorization is unconsumed, and continuation now waits for a
+  genuinely green resource sample.
 
 ## Current checkpoint state
 

@@ -1055,6 +1055,12 @@ exists, both source paths are clean, and the reserved external path
 `C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-10m-61909d4.json` remains absent.
 The one production authorization is therefore unconsumed.
 
+Two subsequent goal continuations revalidated the same boundary. The first observed an
+18-second 73.2% CPU average (75.8% maximum); the third consecutive turn ended with an
+immediate 70.5% CPU sample, 15.79 GiB free RAM, and a 0.026 disk queue. CPU therefore
+remained amber on all three turns. No batch, matching process, or output exists, and the
+goal is externally blocked until a genuinely green sample permits the authorized run.
+
 Next exact action: immediately recheck CPU/RAM/disk queue and run the authorized batch only
 if that new sample is green. After an actual output exists, perform independent output/
 schema/hash QA before any Core/fixture admission. Product, reverse, T27/`progress.md`,
