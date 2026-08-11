@@ -1130,6 +1130,22 @@ file hashes and the missing candidate/parser/tamper tests are now explicit.
 Next exact action: commit this three-document repair and obtain fresh all-zero contract QA.
 No implementation or V2 search is open before that acceptance.
 
+Second contract QA rejects `4e3eea7` with `P0 0 / P1 0 / P2 2 / P3 0 / GAP 1`.
+The first findings are closed, but fixed claim/manifest/preimage bytes were ambiguous;
+manifest trusted self-consistent external hashes without prior QA expectations or candidate
+physics replay; and the private production registry left no safe positive candidate test.
+
+The second docs-only repair fixes the exact claim and manifest strings, makes the result-hash
+preimage use literal key `evidence` with six exact non-result fields, and changes manifest
+input to ordered `{path,expectedFileSha256,expectedResultHash}` records created only from
+independent all-zero QA. Manifest re-reads current bytes and independently replays any
+candidate's queue, shard/profile membership, 20 hard drops, no-clear/no-hidden/no-touch mask,
+and typed board. Pure in-memory formatter/validator seams provide candidate-positive tests;
+only the real CLI holds the private publication capability, so injected data cannot publish.
+
+Next exact action: commit this second docs-only repair and run a third independent contract
+review. No implementation, shard run, Core, or fixture path is open before all-zero QA.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

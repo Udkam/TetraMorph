@@ -666,6 +666,15 @@ adding unrelated badges or ornamental effects.
   `coverage` is a separate prefix: a candidate stops the interleaved cover callback and
   therefore never claims full cover. Only natural noncandidate completion must equal the
   reference totals and full strong-tiling hash.
+- Trust is split across process boundaries. Shard publication requires the module-private
+  production result registry and an unexported capability. Manifest input records bind the
+  independently QA-accepted expected file and result hashes, then re-read current bytes.
+  Candidate records additionally replay their seed queue, 20 physical hard drops, mask,
+  no-touch ownership, and board rows before manifest acceptance.
+- Pure formatter/validator seams may accept synthetic test data to cover candidate schemas
+  and manifest termination, but they never receive the production publication capability
+  and cannot write an accepted shard or manifest. Independent QA remains a workflow gate,
+  not a claim inferred from an unkeyed hash.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

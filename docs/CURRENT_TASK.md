@@ -870,8 +870,13 @@ only; it is not F3 source acceptance.
   `profileIndex`, `profileIndex === coverage.completedProfileCount`, and
   `tilingOrdinal + 1 === coverage.strongTilingCount`. `setup` and `boardRows` are derived
   only from that trusted result. Noncandidate/incomplete outputs require all three null.
-- `resultHash` is `canonicalHash('T37-TRESULT-v2', {status,phase,series,shard,domainHash,`
-  `coverReference,coverage,evidenceWithoutResultHash,candidate,setup,boardRows,search})`.
+- Fixed shard `claim` is exactly
+  `F3C sharded tiling setup candidate only; current Core replay and exact proof remain mandatory.`
+  `resultHash` is `canonicalHash('T37-TRESULT-v2', {status,phase,series,shard,domainHash,`
+  `coverReference,coverage,evidence,candidate,setup,boardRows,search})`, where the literal
+  key is `evidence` and its value has exactly
+  `profileHash,profileMembershipHash,domainHash,traceHash,strongTilingHash,`
+  `failedMemoTraceHash`—never `resultHash` and never a key named `evidenceWithoutResultHash`.
   Natural `complete-not-found:cover` alone sets `coverage.complete=true` and must match the
   full cover reference and full strong-tiling hash. Candidate has `complete=false` and its
   actual prefix counts/hash; budget/RSS results are also incomplete and cannot advance.
@@ -883,12 +888,24 @@ only; it is not F3 source acceptance.
   accepts exactly `--algorithm tiling-first-sharded-v2 --mode manifest --v1-output <path>`
   `--input-list <path> --output <absent external path>`. Both outputs use atomic absent-path
   publication outside the repository.
-- Manifest input list is canonical UTF-8/LF JSON with exact shape `{ "paths": [...] }`,
-  one to nine distinct absolute v2 shard-output paths in index order. The tool independently
-  parses and validates every result/domain hash and computes each exact file SHA-256. It also
-  revalidates the v1 predecessor file as seeds `1..20000`, status `complete-not-found`, file
-  SHA `F9E94210...40B3`, and result hash `C1E315...F758`.
-- Manifest output has exact keys
+- Manifest input list is canonical UTF-8/LF JSON with exact top-level shape
+  `{ "records": [...] }`. Each of one to nine ordered records has exactly
+  `path,expectedFileSha256,expectedResultHash`; `path` is a distinct absolute external v2
+  shard-output path, and the two uppercase 64-hex expectations are copied from that shard's
+  independent all-zero QA disposition by the coordinator. Manifest mode re-reads current
+  bytes, recomputes canonical file/domain/result hashes, and requires equality with both
+  expectations. It also revalidates the v1 predecessor file as seeds `1..20000`, status
+  `complete-not-found`, file SHA
+  `F9E94210ECB61E4284F3434363833748B1D5990E58DB666A90A2836FB0A840B3`, and result hash
+  `C1E315E66B819593279E485DC24AC2FE4E9CC7B7543724748222A45B42FBF758`.
+- For a candidate record, manifest validation independently regenerates the 20-draw queue
+  from its seed, requires exact type/profile/shard membership, resolves every forward catalog
+  index to the recorded setup placement, replays all 20 visible-spawn hard drops in order,
+  rejects overlap, hidden cells, intermediate clears, and orthogonal same-type owners, then
+  requires the reconstructed mask and typed `boardRows` to equal the output. This is an
+  external authoring validation only; current Core replay and strict certificate still follow.
+- Manifest output uses `schemaVersion=2` and exact
+  `manifestVersion=tiling-first-sharded-v2-manifest-v1`; it has exact keys
   `algorithmVersion,entries,manifestHash,manifestVersion,predecessor,schemaVersion,series,`
   `status`. Predecessor exact keys are
   `seedStart,seedCount,seedEndExclusive,status,fileSha256,resultHash`. Entry exact keys are
@@ -903,10 +920,29 @@ only; it is not F3 source acceptance.
 - Tests add candidate seed/profile/range proof, candidate-prefix versus full-cover invariants,
   canonical zero-index parsing (`0` valid; `00,+0,-0,0.0` invalid), strict fixed production
   values, actual file-byte/result mismatch, candidate-not-last, and fixed v1 file SHA baselines:
-  source `DC5DD801...D741781B`, test `CA146F70...C3A19CA`.
-- Production execution never accepts `preparedDomain`. Test-only injected domains may exercise
-  physical/order/STOP boundaries but are never entered into the V2 private trusted-result
-  registry and can never reach schema/output publication.
+  source `DC5DD8018BC703A3C1375B548BC5CF359E37C0CB0BC8CE8B9830F280D741781B`, test
+  `CA146F7045486ACE2479EE74D30B2B603B908C91BE61BD5534C609C04C3A19CA`.
+- Production execution never accepts `preparedDomain`. Its result must be the original object
+  in a module-private registry and shard/manifest publication additionally requires an
+  unexported module-private capability held only by the real CLI path. Neither capability nor
+  a publication function accepting arbitrary bytes is exported.
+- Pure exported test seams may format and validate an injected candidate plus build an
+  in-memory manifest, so positive candidate schema/termination and all failure cases are
+  reachable. These seams return data only, never register it, never receive the private
+  capability, never call atomic publication, and are explicitly rejected by the production
+  publisher. Atomic absent-path tests exercise the already accepted v1 primitive separately.
+- Independent QA approval cannot be inferred by code. The coordinator creates each manifest
+  input record only after QA reports all-zero findings and supplies the expected hashes;
+  manifest equality and candidate replay prevent later replacement or self-consistent
+  hand-authored candidate substitution.
+
+#### Second contract repair disposition
+
+- Repair `4e3eea7` closes the original cover/self-hash/manifest findings but is rejected with
+  `P0 0 / P1 0 / P2 2 / P3 0 / GAP 1`: three fixed strings/preimage keys remained ambiguous,
+  manifest did not bind prior QA expectations or replay candidate physics, and candidate
+  publication had no safe positive test seam. The corrections above are docs-only; V2
+  implementation and search remain closed pending a fresh all-zero review.
 
 ## Current checkpoint state
 
