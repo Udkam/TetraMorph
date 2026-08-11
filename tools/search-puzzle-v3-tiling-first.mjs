@@ -22,10 +22,12 @@ function sha256Hex(bytes) {
 }
 
 function registerSearchResult(result) {
+  const seen = new WeakSet();
   const freeze = (value) => {
-    if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+    if (!value || typeof value !== 'object' || seen.has(value)) return value;
+    seen.add(value);
     for (const child of Object.values(value)) freeze(child);
-    return Object.freeze(value);
+    return Object.isFrozen(value) ? value : Object.freeze(value);
   };
   freeze(result);
   VALIDATED_SEARCH_RESULTS.add(result);

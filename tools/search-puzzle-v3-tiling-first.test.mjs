@@ -366,6 +366,28 @@ assert.deepEqual({
   reverseTrieHash: '4C78BE1A2353B67A20F8C77C55E3DC433B0C304D960B16DA6223CE3DAC769981',
   profileHash: '115B19D4A4B6394E3032729222DC16B611313B9C88C6B61E81B3D2520FE98AD4',
 });
+const mutableNestedProfile = [...combinedDomain.identity.profileCounts[0]];
+const shallowFrozenProfiles = Object.freeze([
+  mutableNestedProfile,
+  ...combinedDomain.identity.profileCounts.slice(1).map((counts) => [...counts]),
+]);
+const nestedFreezeResult = tiling.executeTilingSearch({
+  workBudget: 0,
+  maxRssBytes: Number.POSITIVE_INFINITY,
+  rssBytes: () => 0,
+  preparedDomain: {
+    ...combinedDomain,
+    catalog: [],
+    profiles: [profileBuild.profiles[0]],
+    identity: { ...combinedDomain.identity, profileCounts: shallowFrozenProfiles },
+  },
+});
+assert.equal(Object.isFrozen(shallowFrozenProfiles), true);
+assert.equal(Object.isFrozen(mutableNestedProfile), true,
+  'a shallow-frozen parent must not skip recursively freezing its mutable child');
+assert.throws(() => { mutableNestedProfile[0] = 99; }, TypeError);
+assert.equal(tiling.makeTilingOutput(nestedFreezeResult,
+  { workBudget: 1, maxRssMiB: 900 }).status, 'complete-not-found');
 const combinedInput = {
   maxRssBytes: Number.POSITIVE_INFINITY,
   rssBytes: () => 0,
