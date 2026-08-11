@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 CONTRACT ACCEPTED / SOURCE OPEN**
+Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 SOURCE ACCEPTED / TEST OPEN**
 
 ## Active objective
 
@@ -34,6 +34,15 @@ candidate with P0–P3 all zero. F3B test checkpoint `308233c` proves the frozen
 mechanics without changing production Core source; independent QA accepts
 `3aa6766..6c3286c` with P0–P3 all zero. F3C may now open only its exact non-published
 ten-row fixture/test pair, while published Puzzle content stays closed.
+
+The accepted sharded-v2 source is the bounded commit chain `1a36e73`, `2a85d63`,
+`a7110aa`, and `1ceb1bc`. Its final SHA-256 is
+`16039546E0BEBF62CA6644DB4518A92CE8D7A9AF8693BC8EF3461FD033C1F5DC`.
+Independent source QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`: private
+production publication remains unreachable through the exported facade, while branded
+pure-test replay contexts cover candidate-positive validation without opening search.
+Only `tools/search-puzzle-v3-tiling-first-v2.test.mjs` is now open; production shards,
+Core, fixture, product, T27/`progress.md`, identity/icon, and Ice paths remain closed.
 
 ## Frozen product direction
 

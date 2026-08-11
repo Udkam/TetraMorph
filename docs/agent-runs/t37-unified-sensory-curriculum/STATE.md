@@ -1157,6 +1157,21 @@ Next exact action: open only `tools/search-puzzle-v3-tiling-first-v2.mjs` as the
 run syntax and bounded direct smokes only, and commit that one path before opening the
 standalone v2 test. No production shard, Core, fixture, T27/`progress.md`, icon, or Ice work.
 
+V2 source candidate accepted (2026-08-12): the implementation is split across bounded
+commits `1a36e73`, `2a85d63`, `a7110aa`, and `1ceb1bc`; every source checkpoint remains
+below 500 changed lines. Final source SHA-256 is
+`16039546E0BEBF62CA6644DB4518A92CE8D7A9AF8693BC8EF3461FD033C1F5DC`.
+Fresh independent source QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including
+production-context authenticity, shallow-copy/Proxy rejection, branded pure toy replay,
+candidate manifest replay, and the absence of publication/search capabilities from the
+exported facade. No production search or output was created.
+
+Next exact action: add only `tools/search-puzzle-v3-tiling-first-v2.test.mjs` as a
+standalone ≤500-line checkpoint. It must independently test series/range/membership
+identities, exported/private boundaries, candidate and noncandidate validation, manifest
+tamper/predecessor rules, and strict CLI parsing without running a production shard. All
+product/Core/fixture/T27/`progress.md`/icon/Ice paths remain closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

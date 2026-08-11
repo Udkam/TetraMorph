@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C sharded tiling v2 source accepted
+
+- The bounded source candidate is split across `1a36e73`, `2a85d63`, `a7110aa`, and
+  `1ceb1bc`; every checkpoint remains below the 500-line source limit. Final source
+  SHA-256 is `16039546E0BEBF62CA6644DB4518A92CE8D7A9AF8693BC8EF3461FD033C1F5DC`.
+- The implementation fixes all nine ranges and series identities, preserves the v1
+  traversal and legal no-touch setup, binds canonical shard/manifest bytes, replays
+  candidates, and keeps production execution/publication behind private capabilities.
+- Fresh independent source QA reports P0–P3/GAP all zero. Only the standalone v2 test
+  path is open next; no production shard, Core, fixture, or product path is authorized.
+
 ## 2026-08-12 — T37 Stage F3C sharded tiling v2 contract accepted
 
 - The accepted v1 noncandidate closes seeds 1–20,000. V2 preserves the fixed mask/route,
