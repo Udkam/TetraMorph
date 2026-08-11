@@ -1042,9 +1042,17 @@ Actual gates after repair: standalone full-tool contract passes; typecheck passe
 Vitest passes `46 passed / 2 skipped` files and `430 passed / 10 skipped` tests; build
 transforms 767 modules with only the existing >500 kB warning.
 
-Blocker: final targeted QA of `61909d4`. Only an all-zero disposition may reopen the one
-green-resource 10,000,000-work / 900 MiB external batch. All product/Core/fixture/reverse/
-T27/`progress.md`/identity/icon/Ice work remains closed.
+Final targeted QA accepts `61909d4` with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Standalone,
+nested/cyclic freeze, copy/Proxy attacks, a real 20-piece seed-49 candidate, result hash,
+8x EEXIST ownership, and default CLI rejection of prepared-domain input all pass. The tool
+ban is lifted and exactly one full-domain, 10,000,000-work, 900 MiB, single-process,
+repository-external production batch is authorized.
+
+Next exact action: immediately recheck CPU/RAM/disk queue. QA's last sample is amber at
+75.8% CPU, so no batch has started. Run only if the new sample is green; otherwise retain
+authorization without consuming it. After an actual output exists, perform independent
+output/schema/hash QA before any Core/fixture admission. Product, reverse, T27/`progress.md`,
+deferred identity, icon, and Ice work remain closed.
 
 ## Do not repeat
 

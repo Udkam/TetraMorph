@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-11 — T37 Stage F3C tiling-first authoring tool accepted
+
+- The two-path `tiling-first-v1` tool now derives all seven fixed-domain profiles, performs
+  canonical MRV strong-cover search, checks isolated hard-drop/trie orders, and shares one
+  deterministic cover/order work budget with fixed domain, trace, tiling, memo, and result
+  hashes. Strict CLI/schema/RSS and canonical absent-path publication are included.
+- Final repairs preserve foreign temp files after failed exclusive creation and bind output
+  to a recursively frozen, privately registered search result. Standalone, typecheck, the
+  full `430 passed / 10 skipped` suite, and the 767-module build pass.
+- Fresh final QA accepts `61909d4` with P0–P3/GAP all zero and authorizes one full-domain,
+  10,000,000-work, 900 MiB, single-process external batch only under a fresh green resource
+  sample. Its last 75.8% CPU sample was amber, so authorization remains unconsumed.
+
 ## 2026-08-11 — T37 Stage F3C tiling-first v1 contract frozen
 
 - The new two-path authoring tool must cover all seven seed-derived 20-draw count profiles,

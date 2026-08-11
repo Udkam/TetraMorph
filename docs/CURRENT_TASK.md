@@ -768,6 +768,11 @@ only; it is not F3 source acceptance.
   parent caused recursive freezing to skip a mutable nested profile array. The next repair
   must traverse every first-seen child using a cycle guard before checking/freezing its
   parent; production remains closed.
+- Nested-freeze repair `61909d4` closes the last P2. Final targeted QA passes standalone,
+  cycle/nested mutation, opaque-result copying, real 20-piece candidate, temp ownership,
+  CLI, schema, and hash attacks with P0–P3/GAP all zero. Exactly one 10,000,000-work,
+  900 MiB, full-domain external batch is authorized, but only after an immediate green
+  resource check; QA's last CPU sample was amber at 75.8%, so no batch has started yet.
 
 ## Current checkpoint state
 
