@@ -785,8 +785,13 @@ Direct tests must independently cover all seven profiles and seeds, catalog equi
 small-mask exact sets, counts/contact, certificate union, order/forward-physics set
 equivalence, real blockers/support, trie reversal/leaf seed, memo isolation, STOP/budget/
 RSS priority, identity drift, invalid no-output, schema/nulls, trace vectors, and repeated
-bytes. The first strong tiling is a literal regression: independently pin its complete
-704-state no-seed result together with order-probe, trace, and memo hashes.
+bytes. The canonical first strong tiling is a literal regression under global profile
+order: profile 0, cover work 1,542, cover trace hash
+`695A6D69E8504B78704A39CB19EF6F25BB5FB165172E70F4B54D4E7F3F93C88E`, strong-tiling hash
+`06A49A48903ED102042EDFE94804480B9A2ED4F1FFDAB4FCA8C010C9FD433C35`, and a complete
+no-seed order result of 443 states / 5,982 piece probes. Independently pin its order trace
+and memo hashes. The earlier 704-state profile-4 certificate remains diagnostic provenance
+and is not a v1 first-tiling oracle.
 
 After final local gates and fresh independent QA, exactly one production batch may run,
 only while resources are green: full fixed domain, work budget 10,000,000, RSS 900 MiB,

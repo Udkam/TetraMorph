@@ -624,6 +624,10 @@ adding unrelated badges or ornamental effects.
   set, tries local pieces in catalog order, and writes failed memo only after full unwind.
   Each tiling owns an isolated memo. The first valid trie leaf uses its minimum seed and
   reverses the peel order into forward placements.
+- The canonical first-tiling oracle follows global profile order and is therefore profile 0,
+  not the earlier profile-4 feasibility certificate. It takes 1,542 cover probes and its
+  exhaustive no-seed order check takes 443 states / 5,982 piece probes. The profile-4
+  704-state result remains noncanonical diagnostic provenance.
 - Budget counts only admitted cover branches and order piece attempts. Natural unwind and
   candidate resolution precede budget, budget precedes RSS, and no STOP state memoizes.
   Domain/profile/trace/tiling/memo/result hashes plus canonical LF output make repeated

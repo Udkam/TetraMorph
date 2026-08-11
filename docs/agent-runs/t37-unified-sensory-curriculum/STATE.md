@@ -525,6 +525,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   trie-node hard-drop order DFS. Work counts cover branches plus order piece attempts;
   STOP/budget/RSS priority, six evidence hashes, canonical schema, invalid no-output, and
   nonresumable semantics are frozen. Candidate still requires current-Core replay.
+- Contract correction: the 704-state feasibility check is profile 4, not the globally first
+  v1 tiling. Frozen profile order makes profile 0 canonical first; its cover work is 1,542
+  and its complete no-seed order result is 443 states / 5,982 piece probes. Source tests
+  must pin that oracle and retain the profile-4 number as provenance only.
 
 ### Stage F3B accepted status
 
@@ -948,8 +952,6 @@ checkpoint in `tools/search-puzzle-v3-tiling-first.mjs` and its test: fixed iden
 seven profiles, MRV strong-cover enumeration, deterministic trace/counts, and small-mask/
 literal-certificate tests. Commit green before adding the isolated order/CLI/output layer.
 No production authoring batch, Core, fixture, product, or reverse continuation opens yet.
-Only then may a second increment read each old shard and write a distinct successor in a
-new external directory. Accept every successor before deleting the old directory. Keep
 final F3C JSON/Core work, later content, T27/`progress.md`, deferred identity, and the
 missing Ice archive closed.
 

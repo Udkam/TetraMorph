@@ -735,6 +735,10 @@ only; it is not F3 source acceptance.
   It derives all seven 20-draw count profiles from seeds `1..20000`, runs deterministic
   MRV exact-cover DFS under exact counts and same-type contact exclusion, then checks each
   canonical tiling's finite hard-drop orders against the unchanged reversed seed trie.
+- The earlier 704-state fixed-certificate result belongs to profile 4 and remains diagnostic
+  provenance only. Under the frozen profile order, v1's canonical first tiling is profile 0:
+  cover work 1,542, followed by a complete no-seed order check of 443 states and 5,982
+  piece probes. Tests must use that profile-0 result as the first-tiling regression.
 - `workCount` is exactly cover-branch probes plus order-piece probes. The strict first
   production boundary, after local gates and independent QA, is one green-resource run at
   10,000,000 work probes and 900 MiB RSS. V1 has no cursor/resume/shards; budget or memory
