@@ -499,6 +499,9 @@ function formatShardOutputData(result, candidateReplay) {
 }
 
 function formatShardOutputForTest(result, candidateReplayContext = null) {
+  if (candidateReplayContext !== null && !REPLAY_CONTEXTS.has(candidateReplayContext)) {
+    throw new Error('Candidate replay context is not registered.');
+  }
   const replay = candidateReplayContext === null ? validateCandidateReplay
     : (output) => replayCandidateWithContext(output, candidateReplayContext);
   return formatShardOutputData(result, replay);
