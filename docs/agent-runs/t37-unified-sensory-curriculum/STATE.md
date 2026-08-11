@@ -976,10 +976,18 @@ typecheck passes; full Vitest passes `46 passed / 2 skipped` files and
 `430 passed / 10 skipped` tests; the build transforms 767 modules with only the existing
 >500 kB warning. Browser evidence remains inapplicable to this offline tool checkpoint.
 
-Blocker: fresh independent read-only QA of `801584d`. If accepted, record disposition and
-open only the bounded combined runner/domain/CLI/RSS/output layer. No production authoring
-batch, Core, fixture, product, reverse continuation, final F3C JSON/Core work, later content,
-T27/`progress.md`, deferred identity, or missing Ice archive opens yet.
+Independent read-only QA accepts `801584d` with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for
+the isolated order layer. It independently rebuilds serializer/trie/board/drop behavior,
+matches 512 deterministic remaining sets, reproduces 443 / 5,982 / 424 and both hashes,
+checks a no-memo exhaustive oracle, and verifies candidate/natural budget priority,
+minimum leaf seed, and forward reversal.
+
+Next exact action: implement the bounded combined runner/domain/RSS-stop checkpoint in the
+same two paths, preserving one global cover+order work budget and ordered trace. Commit and
+QA it green before adding CLI parsing, canonical schema/result hash, and absent-path atomic
+output in a final source checkpoint. No production authoring batch, Core, fixture, product,
+reverse continuation, final F3C JSON/Core work, later content, T27/`progress.md`, deferred
+identity, or missing Ice archive opens yet.
 
 ## Do not repeat
 

@@ -749,6 +749,11 @@ only; it is not F3 source acceptance.
   checks 80 random small masks by exhaustive oracle, and accepts with P0–P3/GAP all zero.
   The next bounded source layer is the isolated hard-drop/trie order DFS; CLI/RSS/output
   remain closed until that core receives its own green checkpoint.
+- Order candidate `801584d` also passes standalone and all repository gates. A second
+  independent QA rebuilds the 20,000-seed trie and physical-drop oracle, checks 512 board
+  subsets plus N−1/N/N+1 boundaries, reproduces 443 states / 5,982 probes / 424 memos and
+  both hashes, and accepts with P0–P3/GAP all zero. The remaining tool layer is split into
+  a combined runner/domain/RSS checkpoint and a final CLI/schema/atomic-output checkpoint.
 
 ## Current checkpoint state
 
