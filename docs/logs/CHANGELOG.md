@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3C sharded tiling v2 test accepted
+
+- Initial standalone candidate `71f0a54` passed 139 checks but independent review found five
+  missing direct attacks. Repair `caba9d0` adds invalid UTF-8, membership ordering/range,
+  rehashed extra-schema, and final-mask mismatch coverage while staying at 497 lines.
+- Final test SHA-256 is
+  `617A31CA0B3D442E1A66AAC686A579A25CB3D34E90BC5F949AD1106690511994`; fresh independent
+  QA reports P0–P3/GAP all zero and 145 checks pass.
+- Both standalone tools, typecheck, the complete `430 passed / 10 skipped` suite, and the
+  767-module build pass. One shard-0 run is open at its frozen external path; no retry,
+  later shard, Core, fixture, or product path is authorized before independent output QA.
+
 ## 2026-08-12 — T37 Stage F3C sharded tiling v2 source accepted
 
 - The bounded source candidate is split across `1a36e73`, `2a85d63`, `a7110aa`, and

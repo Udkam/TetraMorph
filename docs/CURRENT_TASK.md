@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 SOURCE ACCEPTED / TEST OPEN**
+Status: **STAGE F3C TILING-FIRST V1 COMPLETE-NOT-FOUND ACCEPTED; V2 TEST ACCEPTED / SHARD 0 OPEN**
 
 ## Active objective
 
@@ -41,8 +41,16 @@ The accepted sharded-v2 source is the bounded commit chain `1a36e73`, `2a85d63`,
 Independent source QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`: private
 production publication remains unreachable through the exported facade, while branded
 pure-test replay contexts cover candidate-positive validation without opening search.
-Only `tools/search-puzzle-v3-tiling-first-v2.test.mjs` is now open; production shards,
-Core, fixture, product, T27/`progress.md`, identity/icon, and Ice paths remain closed.
+The v2 standalone test is accepted through initial candidate `71f0a54` and gap repair
+`caba9d0`; final test SHA-256 is
+`617A31CA0B3D442E1A66AAC686A579A25CB3D34E90BC5F949AD1106690511994`.
+It stays within 497 lines and passes 145 checks. Fresh independent QA confirms all five
+explicit repair attacks and reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Final v1/v2
+standalones, typecheck, the complete `430 passed / 10 skipped` suite, and the 767-module
+build pass. Exactly one shard-0 production run is now open at the frozen external path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s00-16039546.json`.
+No retry or later shard is authorized before independent raw-byte/output QA. Core, fixture,
+product, T27/`progress.md`, identity/icon, and Ice paths remain closed.
 
 ## Frozen product direction
 
@@ -956,9 +964,9 @@ only; it is not F3 source acceptance.
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It verifies the exact preimages, manifest/v1
   predecessor and QA-expected hashes, candidate physical replay, pure test seams, and
   private production capability without finding a new ambiguity. The contract is accepted.
-  The bounded source chain `1a36e73..1ceb1bc` and its final independent all-zero QA are
-  now also accepted. Only `tools/search-puzzle-v3-tiling-first-v2.test.mjs` is open for
-  the next bounded checkpoint; production shards, Core, fixture, and product remain closed.
+  The bounded source chain `1a36e73..1ceb1bc` and test chain `71f0a54..caba9d0` now pass
+  final independent all-zero QA and all source gates. One shard-0 run is open at the
+  frozen external path; later shards, Core, fixture, and product remain closed.
 
 ## Current checkpoint state
 

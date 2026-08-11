@@ -1172,6 +1172,35 @@ identities, exported/private boundaries, candidate and noncandidate validation, 
 tamper/predecessor rules, and strict CLI parsing without running a production shard. All
 product/Core/fixture/T27/`progress.md`/icon/Ice paths remain closed.
 
+V2 standalone test accepted (2026-08-12): initial candidate `71f0a54` added one 496-line
+path and passed 139 checks, but independent QA rejected it with five explicit coverage
+gaps. Repair `caba9d0` closes invalid UTF-8, distinct-unsorted and out-of-range membership,
+rehash-before-extra-schema, and final-visible-mask mismatch attacks without changing source.
+The final file has 497 lines, SHA-256
+`617A31CA0B3D442E1A66AAC686A579A25CB3D34E90BC5F949AD1106690511994`, and passes 145
+checks. Fresh independent review reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+
+Final gates after the last test change pass: v1 standalone in 6.533 s, v2 standalone in
+8.576 s, typecheck, `430 passed / 10 skipped`, and a 767-module build. The first full-suite
+attempt had one 10-second `TetrisRenderer.test.ts` dynamic-import hook timeout; its isolated
+54/54 test passed in 2.97 s, and the single diagnostic full-suite rerun passed in 24.39 s.
+No renderer or product file changed.
+
+Frozen production identities are v1 source
+`DC5DD8018BC703A3C1375B548BC5CF359E37C0CB0BC8CE8B9830F280D741781B`, v1 test
+`CA146F7045486ACE2479EE74D30B2B603B908C91BE61BD5534C609C04C3A19CA`, v2 source
+`16039546E0BEBF62CA6644DB4518A92CE8D7A9AF8693BC8EF3461FD033C1F5DC`, and the v2 test
+hash above. The accepted v1 output remains
+`F9E94210ECB61E4284F3434363833748B1D5990E58DB666A90A2836FB0A840B3`.
+
+Next exact action: run shard index 0 exactly once with fixed work 10,000,000 and RSS 900 MiB,
+publishing only to absent external path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-tiling-first-sharded-v2-s00-16039546.json`.
+Record the first exit/stdout and never auto-retry exit 2 or any failure. Independently verify
+raw canonical bytes, schema, all identities/hashes/work arithmetic, and candidate physics if
+present before creating a QA-expected prefix manifest or opening shard 1. Core, fixture,
+product, T27/`progress.md`, icon, and Ice remain closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
