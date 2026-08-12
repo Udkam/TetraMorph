@@ -131,8 +131,53 @@ const INTRO_03: PuzzleDefinition = Object.freeze({
   anchorCells: Object.freeze([]),
 });
 
+const INTRO_04: PuzzleDefinition = Object.freeze({
+  id: 't3r-cascade-06',
+  name: '留口',
+  difficulty: 4,
+  targetRows: 4,
+  seed: 83,
+  setup: Object.freeze({
+    seed: 49,
+    placements: Object.freeze([
+      Object.freeze({ type: 'I', rotation: 0, x: 6 }),
+      Object.freeze({ type: 'L', rotation: 0, x: 1 }),
+      Object.freeze({ type: 'T', rotation: 1, x: -1 }),
+      Object.freeze({ type: 'J', rotation: 0, x: 7 }),
+      Object.freeze({ type: 'O', rotation: 0, x: 8 }),
+      Object.freeze({ type: 'Z', rotation: 1, x: 1 }),
+      Object.freeze({ type: 'S', rotation: 0, x: 5 }),
+    ]),
+  }),
+  boardRows: Object.freeze([
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '...Z..SSOO',
+    'T.ZZ.SSJOO',
+    'TTZL...JJJ',
+    'TLLL..IIII',
+  ]),
+  hiddenCells: Object.freeze([]),
+  anchorCells: Object.freeze([]),
+});
+
 export const PUZZLE_V3_INTRO_DRAFTS: readonly PuzzleDefinition[] = Object.freeze([
   INTRO_01,
   INTRO_02,
   INTRO_03,
+  INTRO_04,
 ]);
