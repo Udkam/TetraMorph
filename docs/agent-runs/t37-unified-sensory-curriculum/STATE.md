@@ -145,6 +145,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     stop at 1,000,000 probes without a candidate; independent output QA is all zero.
 38. `TEMP CLEANUP BLOCKED` — terminal safety policy rejects both exact deletion forms
     before execution. No second increment or later product work opens before cleanup.
+39. `F4D R3 CANDIDATE FROZEN; QA NEXT` — setup `49`, gameplay seed `83`, and two
+    exact four-lock routes replace the infeasible terminal-I route constraint while retaining
+    the local clear and explicit corridor lesson. Source remains closed for independent QA.
 
 ### Stage F3C tooling-discovery status
 
@@ -1749,6 +1752,24 @@ five authorized docs paths, and leaves protected T27/follow-up/progress paths is
 Next exact action: resume repository-external search for both complete routes and the strict
 proof. Source/product/UI/sensory/protected T27/icon paths remain closed until a fully qualified
 candidate is independently frozen.
+
+F4D R3 freezes that qualified candidate. Seven legal zero-clear setup drops derive 28 targets
+and exact gap vector `[5,2,3,2]`; serialized definition is 647 bytes / SHA-256
+`4D542D3A270F4B22352F026FDE1DD4FCC5E1DBB2A4EBC7DC321400616484941A`. Setup seed `49`
+uses `I0@6,L0@1,T1@-1,J0@7,O0@8,Z1@1,S0@5`; gameplay seed `83` opens `SZJT` and is
+unique across the 53 prior definitions. Pairwise exact/topology/near admissions are all false.
+
+Both routes share local S release 1 and lock-2 Z release 0 while retaining opening `[4]`.
+The shared J then migrates the sole opening to `[0]` or `[1]`, and final T finishes. Releases
+are `[1,0,2,1]` / `[1,0,1,2]`, final hashes `98105716` / `e8e07748`, first divergence lock 2.
+Uncapped proof fixes initial `faa34545`, optimum 4, 12 explored states, 308 transitions,
+and 93 prunes. Canonical artifact is 1,477 bytes / SHA-256 `EC17469F...EFB1A`.
+Freeze-audit script/output hashes are `4F6EC55E...C742C7A` / `56DEA01D...52A4DB`.
+
+Next exact action: obtain fresh independent R3 contract/candidate QA. If all findings/GAP are
+zero, commit the docs freeze and open only the definition append, certificate JSON, and exact
+test, within the 500-line cap and without editing existing Intro tests. Do not
+edit product integration, later curriculum, sensory, protected T27, or icon paths first.
 
 ## Do not repeat
 

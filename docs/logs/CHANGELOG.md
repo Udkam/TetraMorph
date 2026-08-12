@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-12 — T37 Intro-04 R3 candidate frozen for QA
+
+- A complete current-Core candidate corrects R2's two remaining infeasible assumptions:
+  exact row gaps are `[5,2,3,2]`, and the only opening migrates after the third lock instead
+  of ending in a forced vertical I.
+- Setup `49` / gameplay `83` produces two four-lock S-Z-J-T solutions that first diverge at
+  lock 2, release `[1,0,2,1]` and `[1,0,1,2]`, and complete through openings 0 or 1.
+- All 53 pairwise admissions pass; uncapped proof excludes shorter routes with 12 explored
+  states and 308 transitions. Source remains closed pending fresh independent R3 QA.
+
 ## 2026-08-12 — T37 Stage F4C Intro-03 accepted
 
 - Source `95f3316` adds only the non-published Intro-03 draft, canonical schema-8 artifact,

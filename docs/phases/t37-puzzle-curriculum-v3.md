@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT R2 ACCEPTED — DISCOVERY ACTIVE**
+Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 R3 CANDIDATE FROZEN — CONTRACT QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -354,14 +354,15 @@ bytes with SHA-256
 `IIIILLL... / OO.TLZZJJJ / OOTTT.ZZ.J`. Product data and imports remain byte-identical.
 
 The draft uses exactly seven legal zero-clear seeded setup drops, 28 ordinary targets in world
-rows 36–39, one through four gaps per row, twelve total gaps, and no hidden or anchor cells.
+rows 36–39, exact gap vector `[5,2,3,2]`, twelve total gaps, and no hidden or anchor cells.
 Exactly one `openingX` is empty from world rows 20 through 39; every other column owns at least
 one target in the four-row band. Its gameplay seed is unique across live 50 plus Intro-01/02/03,
 and all 53 pairwise exact/topology/near comparisons are false.
 
 For each unfinished route state, `deepestTargetY` is the maximum current original-target y and
-`openingColumns` is the set of columns empty from world row 20 through that y. Both routes must
-start with and preserve exactly `[openingX]` after every non-final lock. This definition is
+`openingColumns` is the set of columns empty from world row 20 through that y. Both routes
+start with `[openingX]`, restore it after lock 1, and preserve it through lock 2. Lock 3 uses
+that corridor and migrates the sole opening; lock 4 uses the new opening to finish. This is
 recomputed after ordinary row-clear mapping; it does not confuse original target identity,
 visible coordinates, or a screenshot cavity with a traversable opening.
 
@@ -370,17 +371,17 @@ Immediately before it, that row's only gaps are exactly two contiguous cells sup
 by the local lock and the span includes `openingX`. Merging the lock yields only full row 39.
 The lock supplies exactly `(openingX,39)` in the corridor, releases one row without finishing,
 and has at least one off-row survivor; current Core clear mapping must place every survivor
-outside `openingX` and restore `[openingX]` as the sole corridor. All other intermediate locks
-release zero and preserve the same opening.
+outside `openingX` and restore `[openingX]` as the sole corridor. Lock 2 releases zero and
+preserves the same opening.
 
-The final lock is a vertical I at `openingX`, world y=36..39. It uses the opening, releases the
-remaining three target rows, reaches zero targets, and finishes. Each route therefore owns
-exactly two positive releases, `1` then `3`. Candidate evidence freezes the opening coordinate,
-local index/row/signatures, every post-lock opening set, releases, remaining targets, local
-pre/post state hashes, survivor mapping, and final hashes.
+Lock 3 is the shared J through `openingX`: it releases two rows then leaves opening `[0]` in
+the primary, or one row then leaves opening `[1]` in the alternative. The final T uses that
+migrated opening and releases the remaining one or two rows. Releases are `[1,0,2,1]` and
+`[1,0,1,2]`. Candidate evidence freezes the opening coordinate, lock signatures, every
+post-lock opening set, releases, remaining targets, local pre/post hashes, and final hashes.
 
-The strict primary optimum is four through six locks. One alternative diverges at lock 2,
-uses at most optimum plus two locks, and proves the same complete invariant. Schema-8 keeps
+The strict primary optimum is four locks. One equally optimal alternative diverges at lock 2
+and proves the same local-clear/corridor-migration invariant. Schema-8 keeps
 the accepted field order, serializers, hash domains, one alternative,
 `solutionMultiplicity='multiple'`, `proof.kind='exhaustive-shorter-depths'`,
 `proof.lowerBoundVersion='target-column-deficit-v1'`, and `techniqueEvidenceId=null`.
@@ -413,6 +414,17 @@ candidates over eight unique boards, but no candidate is frozen here. Independen
 exact range `16570db..a09b64f` reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; only
 repository-external candidate discovery reopens. No source path opens before a complete
 candidate passes every setup, route, admission, hash, and uncapped exact-proof gate.
+
+R3 admits setup seed `49` with `I0@6,L0@1,T1@-1,J0@7,O0@8,Z1@1,S0@5`, gameplay seed
+`83`, and floor rows `...Z..SSOO / T.ZZ.SSJOO / TTZL...JJJ / TLLL..IIII`. The definition
+is 647 bytes / `4D542D3A...4941A`, passes all 53 pairwise comparisons, and has unique seed.
+Both stored S-Z-J-T routes finish in four locks and first diverge at Z. Full current-Core
+landing enumeration excludes depths 1–3 and finds seven four-lock geometries; the canonical
+proof records 12 explored states, 308 transitions, and 93 bound prunes. Candidate mechanics
+and schema-8 hashes are frozen in the authoritative current-task/state records. The source
+boundary remains exactly the definition append, one certificate JSON, and one exact test,
+with at most 500 hand-authored changed lines and no existing Intro-test edit. Source opens
+only after fresh independent R3 QA.
 
 ## Frozen published roster
 

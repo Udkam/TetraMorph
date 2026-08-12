@@ -792,15 +792,21 @@ adding unrelated badges or ornamental effects.
   A four-row draft begins with one unique top-to-target corridor and exactly 28 targets from
   seven legal zero-clear setup drops. Lock 1 fills the exact contiguous two-cell bottom-row
   gap including that corridor, clears only the bottom row, leaves a non-corridor survivor,
-  and restores the same sole corridor after Core row mapping. Every later non-final lock
-  preserves it; the final vertical I actually uses it to clear the remaining three target
-  rows. Both stored routes first diverge at lock 2 and must prove this full sequence, not
+  and restores the same sole corridor after Core row mapping. A zero-clear Z staging lock
+  preserves it; the shared J then uses that corridor to clear one or two rows and migrate
+  the only opening to the side, where the final T clears the remaining two or one. Both
+  stored routes first diverge at lock 2 and must prove this full sequence, not
   infer it from a name, screenshot, hole count, or final solvability. The live three-row
   definition and all prior draft bytes remain pinned until the atomic campaign switch.
 - Independent review accepts exact R2 docs range `16570db..a09b64f` with
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Only repository-external candidate discovery is
   open; the three-path draft/certificate/test source boundary remains closed until every
   setup, route, admission, hash, and exact-proof literal is independently frozen.
+- R3 freezes the qualifying setup-49/gameplay-83 candidate rather than forcing the rejected
+  terminal-I shape. Its exact gap vector is `[5,2,3,2]`; releases are `[1,0,2,1]` and
+  `[1,0,1,2]`, both routes are strictly optimal in four locks, and seven optimal geometries
+  exist in the complete four-lock landing domain. Contract QA precedes the bounded three-path
+  implementation, while live product data stays unchanged.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

@@ -360,3 +360,28 @@ one contract-shaped first lock for each. None is frozen and no source path is op
 - Next action: continue repository-external complete-candidate discovery. Freeze no setup,
   route, seed, or source until current-Core replay, both route invariants, 53 pairwise
   exclusions, canonical hashes, and uncapped exact proof all pass.
+
+## F4D — Intro-04 R3 candidate freeze
+
+- Task ID: `T37-F4D-CANDIDATE-R3`
+- Base SHA: `3632f4c9`
+- Status: qualified docs candidate; independent QA next; source closed.
+
+Setup `49` and placements `I0@6,L0@1,T1@-1,J0@7,O0@8,Z1@1,S0@5` derive the exact four
+floor rows `...Z..SSOO / T.ZZ.SSJOO / TTZL...JJJ / TLLL..IIII`. The candidate corrects
+R2's per-row cap to exact gaps `[5,2,3,2]` and replaces the unavailable terminal-I invariant
+with an explicit corridor migration: local S restores `[4]`, Z preserves it, J uses it and
+migrates the opening to `[0]`/`[1]`, and T uses the migrated opening to finish.
+
+Gameplay seed `83` is unique and all 53 pairwise admissions pass. Primary/alternative releases
+are `[1,0,2,1]` / `[1,0,1,2]`, both are exactly four locks, and first divergence is lock 2.
+Exact proof records initial `faa34545`, 12 states, 308 transitions, 93 prunes, and no shorter
+route. Definition/artifact pins are 647 bytes / `4D542D3A...4941A` and 1,477 bytes /
+`EC17469F...EFB1A`. TEMP freeze script/output hash `4F6EC55E...C742C7A` /
+`56DEA01D...52A4DB`; independent complete-domain evidence `3D6E2386...CCE27` finds seven
+optimal geometries. No repository source or protected path changed.
+
+- Blocker: fresh independent R3 contract/candidate QA.
+- Next action: repair any finding; with all-zero QA, commit this docs freeze and open only
+  the authorized definition/artifact/exact-test paths, under 500 hand-authored lines and
+  without changing existing Intro tests.

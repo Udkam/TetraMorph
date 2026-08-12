@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT R2 ACCEPTED — DISCOVERY ACTIVE**
+Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 R3 CANDIDATE FROZEN — CONTRACT QA NEXT**
 
 ## Active objective
 
@@ -408,8 +408,8 @@ The draft uses `targetRows=4` only through `validatePuzzleDefinition(draft, fals
 product, progression, lessons, localization, and mastery registries remain unchanged.
 
 Exactly seven legal seeded setup hard drops must clear no rows and produce 28 ordinary targets
-only in world rows 36–39. Each row has one through four gaps, total gaps equal twelve, and
-hidden/anchor arrays are empty. There is one literal `openingX`: every board cell from world
+only in world rows 36–39. The candidate freezes gap counts `[5,2,3,2]`, total gaps twelve, and
+empty hidden/anchor arrays. There is one literal `openingX`: every board cell from world
 row 20 through 39 in that column is initially empty, while every other column contains at
 least one target in rows 36–39. The gameplay seed is unique against the live 50 and Intro-01
 through Intro-03; pairwise exact, normalized-topology, and near-topology comparisons against
@@ -417,10 +417,11 @@ all 53 are false.
 
 For any unfinished state, define `deepestTargetY` as the greatest current original-target
 row. `openingColumns(state)` contains each x whose board cells from world row 20 through
-`deepestTargetY` are all empty. Initially and after every non-final lock in both stored routes,
-this set must equal exactly `[openingX]`: the route may neither seal the corridor nor create a
-second top-accessible corridor. The candidate freeze must pin `openingX`, each post-lock set,
-and state hashes; a level name, screenshot, hole count, or final solution is not evidence.
+`deepestTargetY` are all empty. Both routes begin with `[openingX]`, restore it after the local
+clear, and preserve it through the zero-clear staging lock. The penultimate clear must use
+`openingX` and leave exactly one new side opening; the final lock must use that migrated
+opening to finish. Candidate evidence pins every opening set and state hash; a label,
+screenshot, hole count, or final solvability alone is not evidence.
 
 Both routes share local-clear lock 1 and the same world row 39; there is no pre-local lock.
 Immediately before that lock, the empty cells of row 39 are exactly the local lock's row-39
@@ -432,18 +433,17 @@ clear mapping must retain every survivor outside `openingX`; after settlement th
 again the unique opening. This is the mechanical meaning of “local clear that retains the
 only opening”; it is an ordinary Puzzle row clear, not Bomb-style area removal.
 
-Every later non-final lock releases zero rows and preserves `[openingX]`. Immediately
-before the final lock it is still the only opening. The final lock is one vertical I whose
-four cells occupy `openingX` from world rows 36 through 39; it releases exactly the remaining
-three target rows, reduces original targets to zero, and finishes. Thus each route has exactly
-two positive release events, local `1` then terminal `3`; candidate admission freezes literal
-signatures, releases, remaining-target arrays, local pre/post boards, survivor mapping, and
-final hashes.
+Lock 2 releases zero and preserves `[openingX]`. Lock 3 places the shared J through that
+corridor, releases two rows in the primary or one row in the alternative, and migrates the
+sole opening to x=0 or x=1. The final T occupies the migrated opening, releases the remaining
+one or two rows, reduces original targets to zero, and finishes. Releases are therefore
+`[1,0,2,1]` and `[1,0,1,2]`; candidate admission freezes literal signatures, releases,
+remaining-target arrays, local pre/post boards, survivor mapping, and final hashes.
 
-The primary optimum is four through six locks. One stored alternative first diverges at lock
-2, is no longer than optimum plus two, and independently proves the complete opening/local
-clear/final-I invariant. `solutionMultiplicity='multiple'` means distinct completing routes,
-not necessarily two optimal routes. Schema 8 retains the accepted key order and hash domains,
+The strict primary optimum is exactly four locks. One stored alternative first diverges at
+lock 2 and is also exactly four locks. `solutionMultiplicity='multiple'` means distinct
+completing routes; the independent complete landing-domain enumeration finds seven distinct
+optimal geometries. Schema 8 retains the accepted key order and hash domains,
 one alternative, `exhaustive-shorter-depths`, `target-column-deficit-v1`, and
 `techniqueEvidenceId=null`; only an uncapped, no-beam current-Core shorter-depth proof may
 certify optimality.
@@ -477,6 +477,32 @@ candidates across eight unique boards. These are discovery evidence, not a froze
 Independent review of exact range `16570db..a09b64f` reports
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Repository-external candidate discovery is open again;
 all three source paths remain closed until one complete candidate passes every frozen gate.
+
+### F4D R3 candidate freeze and source authorization (2026-08-12)
+
+The qualified candidate uses setup seed `49`, placements
+`I0@6,L0@1,T1@-1,J0@7,O0@8,Z1@1,S0@5`, and typed floor rows
+`...Z..SSOO / T.ZZ.SSJOO / TTZL...JJJ / TLLL..IIII`. Its 647-byte serialized definition
+hashes to `4D542D3A270F4B22352F026FDE1DD4FCC5E1DBB2A4EBC7DC321400616484941A`.
+Gameplay seed `83` opens `S Z J T`; all 53 prior pairwise exact/topology/near comparisons
+are false and no prior definition shares the seed.
+
+The shared first S lock `S:5,38|6,38|4,39|5,39` completes only row 39, releases one row,
+retains 20 targets, maps survivors `(5,38),(6,38)` to `(5,39),(6,39)` outside the corridor,
+and restores opening `[4]`.
+The lock-2 Z alternatives release zero and preserve `[4]`. The shared J then uses x=4 and
+leaves respectively 5 targets/opening `[0]` after two rows or 13 targets/opening `[1]`
+after one. The final T uses that migrated opening and releases the remaining one or two rows.
+Final hashes are `98105716` and `e8e07748`; the routes first diverge at lock 2.
+
+Uncapped current-Core proof returns initial `faa34545`, optimum 4, depth records
+`{0,1,19,14},{1,5,85,79},{2,6,204,0}`, 12 explored states, 308 transitions, and 93
+deficit-bound prunes. The canonical schema-8 artifact is 1,477 bytes with SHA-256
+`EC17469F6D7F48CBBFB8A2863D24C79D3232B10DAD851204D52B8BF5D69EFB1A`;
+authoring/behavior hashes are `98e249aaeb79bed609792482f1fe88c96bb34a17819766fc5285873e854fe82f`
+and `1e4e881c631f4a0aaec407e4ec432980f36142b074166b3aa7f4f6fd067156ac`.
+Fresh independent contract/candidate QA must report all zero before the three-path source
+checkpoint opens; product integration and all later work remain closed meanwhile.
 
 ## Frozen product direction
 
@@ -538,7 +564,7 @@ all three source paths remain closed until one complete candidate passes every f
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT R2 ACCEPTED / DISCOVERY ACTIVE** — the exact
+6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 R3 CANDIDATE FROZEN / QA NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -557,8 +583,9 @@ all three source paths remain closed until one complete candidate passes every f
    suite (`445 / 14 skipped`), and build gates pass; three independent reviews are all zero.
    Published curriculum content remains closed until the later atomic switch. F4D's accepted
    contract reached an eight-drop setup contradiction inside its generated index-1 family.
-   Independent review accepts the seven-drop R2 revision with P0–P3/GAP all zero, reopening
-   only repository-external candidate discovery; source remains closed until candidate freeze.
+   Independent review accepted the seven-drop R2 revision before discovery. R3 now freezes
+   the qualifying four-lock corridor-migration candidate; only fresh all-zero R3 QA may open
+   the three-path definition/artifact/exact-test source checkpoint.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
