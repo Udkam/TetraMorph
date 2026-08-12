@@ -217,5 +217,10 @@ repair restores the F4B paragraph and defines the bridge check as an interior ru
 `{x,y}` whose shifted destination `{x,y+1}` is support, with separate left/right source cells
 whose shifted destinations are empty.
 
+Re-QA closes those two P1 issues, then reports P2 because the phase summary could allow the
+alternative to clear four rows in one event. The repair now requires both routes to start
+`[0,0]`, then use at least two positive releases summing to four, strictly reduce targets on
+each positive event, and finish at zero; the exact arrays may differ.
+
 - Blocker: candidate discovery is closed pending two all-zero reviews of the repaired SHA.
 - Next action: independent read-only contract re-QA only.

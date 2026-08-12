@@ -2,6 +2,8 @@
 
 ## 2026-08-12 — T37 Stage F4C contract repaired after first QA
 
+- Second re-QA finds one P2 release ambiguity: the alternative now explicitly shares the
+  complete `[0,0]` then at-least-two-positive/sum-four/finish-zero invariant.
 - First review rejects `588e065` with `P1 2 / P3 1`: an Intro-02 final-three-row paragraph
   sat under the F4C heading, and source-run cells were conflated with shifted blocker cells.
 - The repair returns that paragraph to F4B and defines an interior bridge source `{x,y}` whose

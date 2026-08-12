@@ -273,11 +273,12 @@ two-dimensional cells. Candidate admission freezes literal support/bridge signat
 source-run coordinates, shifted blocker coordinates, and the pre-bridge board evidence for
 each route. A name, screenshot, four-row count, or generic structural score is not evidence.
 
-The primary strict optimum is four or five locks. The first two releases are `[0,0]`; at least
-two later positive release events sum to four, each lowers the remaining original-target
-count, and the final state is finished at zero. One stored alternative diverges at lock 1 or
-2, proves the same teaching invariant, and is no longer than optimum plus two. Schema-8 keeps
-one alternative, `solutionMultiplicity='multiple'`, `techniqueEvidenceId=null`,
+The primary strict optimum is four or five locks. For both primary and alternative, the first
+two releases are `[0,0]`; at least two later positive release events sum to four, each lowers
+the remaining original-target count, and the final state is finished at zero. Their exact
+release arrays need not match. One stored alternative diverges at lock 1 or 2, proves the same
+support/bridge geometry and complete release invariant, and is no longer than optimum plus
+two. Schema-8 keeps one alternative, `solutionMultiplicity='multiple'`, `techniqueEvidenceId=null`,
 `proof.kind='exhaustive-shorter-depths'`, and
 `proof.lowerBoundVersion='target-column-deficit-v1'`. Beam output may discover but never
 certify the candidate.

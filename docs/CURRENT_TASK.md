@@ -332,12 +332,14 @@ left and right spans cross open space. The test freezes literal support/bridge s
 source-run coordinates, and shifted blocker coordinates for each route after discovery; a
 generic predicate alone is insufficient.
 
-The primary optimum is four or five locks. Its first two releases are `[0,0]`; the remaining
-locks contain at least two positive release events whose sum is exactly four, each strictly
-reduces remaining original targets, and the final state finishes with zero targets. Exactly
-one stored alternative diverges at lock 1 or 2, uses at most optimum plus two locks, and proves
-the same support/bridge and release sequence. `solutionMultiplicity='multiple'` retains its
-schema meaning of distinct completing routes; only the primary owns the strict optimum proof.
+The primary optimum is four or five locks. In both primary and alternative, the first two
+releases are `[0,0]`; the remaining locks contain at least two positive release events whose
+sum is exactly four, every positive event strictly reduces remaining original targets, and
+the final state finishes with zero targets. Their exact release arrays need not be identical.
+Exactly one stored alternative diverges at lock 1 or 2, uses at most optimum plus two locks,
+and proves the same support/bridge and complete release invariant.
+`solutionMultiplicity='multiple'` retains its schema meaning of distinct completing routes;
+only the primary owns the strict optimum proof.
 
 F4C may append `src/game/core/puzzleV3IntroDefinitions.ts`, create
 `docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-03.json`, and create

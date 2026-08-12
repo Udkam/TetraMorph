@@ -779,8 +779,9 @@ adding unrelated badges or ornamental effects.
   second owns a horizontal bridge whose complete one-cell downward displacement is blocked
   only by that first lock. An interior horizontal-run source cell maps to a shifted blocker
   one row below, and source cells on both sides map to empty shifted destinations. Both routes
-  must prove that coordinate mapping before later locks clear the four rows in at least two
-  events.
+  must prove that coordinate mapping. In each route the first two locks clear zero, and at
+  least two later positive events clear all four rows while strictly reducing original
+  targets; the two routes need not share the same exact release array.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

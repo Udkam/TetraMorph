@@ -1607,8 +1607,9 @@ compatibility edit.
 The F4C contract admits exactly eight legal zero-clear setup drops / 32 targets / four floor
 rows / eight gaps, with 1..4 gaps per row, no anchors/hidden cells, unique gameplay seed, and
 zero pairwise exact/topology/near matches against live 50 plus Intro-01/02. Primary optimum is
-four or five locks. The first two locks clear zero and retain all targets; at least two later
-positive releases sum to four and finish.
+four or five locks. In both stored routes, the first two locks clear zero and retain all
+targets; at least two later positive releases sum to four, each strictly lowers remaining
+targets, and the route finishes at zero. Exact release arrays may differ.
 
 Support-before-bridge evidence is coordinate-causal. For both primary and the sole early-
 divergent alternative, lock 1 creates support on setup-empty cells. Lock 2 owns a same-y run
@@ -1625,8 +1626,14 @@ F4C heading and an impossible/ambiguous same-coordinate reading of “blocker in
 second review finds no additional issue. The docs-only repair moves the F4B paragraph above
 the F4C heading and freezes the source-to-shifted-destination mapping above.
 
-Next exact action: commit this F4C contract repair and obtain two fresh independent reviews of
-the repaired SHA. Discovery/source stay closed until both report
+Re-QA of `1532460` closes both original P1 findings but reports one P2: phase/STATE did not
+unambiguously apply the later two-event/sum-four release rule to the alternative. It also
+reports one P3 because the next action still said to commit an already committed repair. The
+follow-up text now binds both routes to the complete release invariant and updates the
+checkpoint.
+
+Next exact action: commit this minimal F4C release/state clarification, then obtain two fresh
+independent reviews of that new SHA. Discovery/source stay closed until both report
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Product, progression/UI, sensory work, protected T27
 paths, and icon remain closed.
 
