@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CONTRACT NEXT**
+Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CONTRACT FROZEN — QA NEXT**
 
 ## Active objective
 
@@ -296,6 +296,51 @@ the append-compatible Intro-01 pin, an empty index, and unchanged protected dirt
 F4B is accepted outside product. F4C must first resolve and freeze the Intro-03 four-row
 support-before-bridge contract before any new source or discovery path opens.
 
+### Stage F4C non-published Intro-03 authoring contract (2026-08-12)
+
+F4C rebuilds stable ID `t3r-shaft-03` as the four-row lesson frozen by the v3 roster. The
+current live definition and `PUZZLE_TARGET_ROWS` still say three rows; that is a pinned legacy
+baseline, not a constraint on the noncanonical draft. F4C uses `targetRows=4` through the
+already accepted `validatePuzzleDefinition(draft, false)` seam and leaves `puzzles.ts`, the
+live 50, and all product imports unchanged until the later atomic 46-level switch.
+
+The draft keeps name `托台`, difficulty 3, no anchors, and no hidden cells. Exactly eight legal
+seeded zero-clear setup drops produce 32 ordinary targets in exactly the four contiguous floor
+rows (visible 16..19 / world 36..39). Each row has one through four gaps and the total gap
+count is eight. Its gameplay seed is unique across the live 50 and all earlier drafts, and
+pairwise exact/topology/near comparisons against those 52 definitions are all false.
+
+Both stored completing routes must prove support before bridge from current-Core world
+coordinates. Lock 1 is the support and lock 2 is the bridge; both release zero rows and leave
+all 32 original targets. Every support cell was empty in the initial setup board. Before lock
+2, shift every bridge cell down by one world row. Every shifted cell remains inside the board;
+the nonempty set of occupied destinations must consist entirely of lock-1 support cells, with
+no setup, floor, or unrelated blocker. The bridge contains a same-y horizontal run of at least
+three consecutive cells. At least one blocker lies strictly inside that run, and there is a
+run cell on each side of it whose below-cell is empty. Removing the support footprint would
+therefore let the complete bridge descend, while its left and right spans cross open space.
+The test freezes literal support/bridge signatures, run coordinates, and blocker coordinates
+for each route after discovery; a generic predicate alone is insufficient.
+
+The primary optimum is four or five locks. Its first two releases are `[0,0]`; the remaining
+locks contain at least two positive release events whose sum is exactly four, each strictly
+reduces remaining original targets, and the final state finishes with zero targets. Exactly
+one stored alternative diverges at lock 1 or 2, uses at most optimum plus two locks, and proves
+the same support/bridge and release sequence. `solutionMultiplicity='multiple'` retains its
+schema meaning of distinct completing routes; only the primary owns the strict optimum proof.
+
+F4C may append `src/game/core/puzzleV3IntroDefinitions.ts`, create
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-03.json`, and create
+`src/game/core/puzzleV3Intro03Exact.test.ts`, at no more than 500 hand-authored changed lines.
+No prior test needs a compatibility edit: Intro-01/02 already pin their own IDs and indices
+without asserting draft-array length. The schema-8 key order, serializers, hash domains,
+`exhaustive-shorter-depths`, `target-column-deficit-v1`, one alternative, and
+`techniqueEvidenceId=null` remain unchanged. The new test pins live Intro-03 at 625 serialized
+bytes / SHA-256 `0979CED2EEA842DC7722E8236229CBD4566CC6468D17E67007FD316D7740A7D2`,
+Intro-01 at 622 / `DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`,
+and Intro-02 at 621 / `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+Discovery and source remain closed until fresh independent contract QA reports all zero.
+
 The certificate contains exactly one alternative entry. In each route, the only positive row
 release is the final value `3`; all preceding values are zero, remaining original targets are
 24 before that release and zero after it, and the final locked-piece signature is the frozen
@@ -368,7 +413,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT NEXT** — the exact
+6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT FROZEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -381,8 +426,9 @@ closed.
    has ten historical near pairs. The non-published Intro-01 draft now lives in an
    independently accepted three-path checkpoint at `cfbcab4`. Intro-02 is accepted in the
    isolated four-path source checkpoint `c571f54`, with all writer and independent gates
-   green. Only the docs-first Intro-03 support-before-bridge contract opens next; discovery,
-   source, and published curriculum content remain closed until that contract passes review.
+   green. The docs-first Intro-03 contract now binds four target rows and a causal
+   support-before-bridge geometry check. Discovery, source, and published curriculum content
+   remain closed until two fresh contract reviews report all zero.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

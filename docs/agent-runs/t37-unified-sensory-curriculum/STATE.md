@@ -1596,6 +1596,32 @@ define literal support/bridge board coordinates and route events before any disc
 fresh independent contract QA all zero. Do not open source, product integration, progression,
 UI, sensory, protected T27 paths, or icon work yet.
 
+F4C fact reconciliation confirms the live `t3r-shaft-03` definition is targetRows 3,
+625 serialized bytes, SHA-256
+`0979CED2EEA842DC7722E8236229CBD4566CC6468D17E67007FD316D7740A7D2`, while the frozen v3
+roster requires a four-row rebuild. `validatePuzzleDefinition(draft, false)` already accepts
+3..10 contiguous rows, so the draft may use targetRows 4 without touching live Core data.
+Existing Intro-01/02 tests contain no whole-array length assertion; index-2 append requires no
+compatibility edit.
+
+The F4C contract admits exactly eight legal zero-clear setup drops / 32 targets / four floor
+rows / eight gaps, with 1..4 gaps per row, no anchors/hidden cells, unique gameplay seed, and
+zero pairwise exact/topology/near matches against live 50 plus Intro-01/02. Primary optimum is
+four or five locks. The first two locks clear zero and retain all targets; at least two later
+positive releases sum to four and finish.
+
+Support-before-bridge evidence is coordinate-causal. For both primary and the sole early-
+divergent alternative, lock 1 creates support on setup-empty cells. Lock 2 owns a same-y run
+of at least three cells. In the board immediately before lock 2, every occupied destination of
+the entire bridge shifted down one row is a lock-1 support cell; there is no floor/setup/other
+blocker. A blocker lies inside the horizontal run, and the run has an empty below-cell on each
+side. Candidate freeze must bind literal signatures, run, blockers, route hashes, state hashes,
+and exact telemetry.
+
+Next exact action: commit the docs-only F4C contract and obtain two fresh independent reviews.
+Discovery/source stay closed until both report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Product,
+progression/UI, sensory work, protected T27 paths, and icon remain closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

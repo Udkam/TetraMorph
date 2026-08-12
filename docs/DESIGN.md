@@ -773,6 +773,12 @@ adding unrelated badges or ornamental effects.
   unchanged. Intro-03 may begin only as a docs-first contract that converts “four-row
   support before bridge” into literal board coordinates and route events; a visual label or
   target-row count alone is not evidence that the player actually builds support and uses it.
+- F4C resolves the legacy-row conflict explicitly: live `t3r-shaft-03` remains a pinned
+  three-row product definition, while its isolated v3 rebuild uses four target rows through
+  noncanonical validation. The first route lock creates support on cells empty in setup; the
+  second owns a horizontal bridge whose complete one-cell downward displacement is blocked
+  only by that first lock, with open span on both sides of an interior support. Both routes
+  must prove that geometry before later locks clear the four rows in at least two events.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

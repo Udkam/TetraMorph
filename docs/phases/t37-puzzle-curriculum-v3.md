@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT NEXT**
+Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT FROZEN — QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -237,6 +237,60 @@ separate byte/hash, topology, setup, route, well, and exact-certificate reconstr
 F4B is accepted as an authoring-only draft. F4C opens only a docs-first contract for
 `t3r-shaft-03`; no candidate discovery or source edit is authorized until its four-row
 support-before-bridge lesson is made mechanically testable and independently accepted.
+
+## F4C Intro-03 authoring admission
+
+The stable ID remains `t3r-shaft-03`, but the v3 rebuild deliberately changes its authored
+height from the live three-row baseline to the roster's four-row lesson. The historical
+`t3r-` prefix and live `PUZZLE_TARGET_ROWS` entry do not override the new contract. The draft
+uses `targetRows=4` through noncanonical validation only; product data remains byte-identical
+until the complete campaign switches atomically.
+
+Exactly eight legal, seeded, zero-clear setup drops preserve 32 ordinary cells in exactly the
+four contiguous floor rows. Each row has `1..4` gaps, the gap total is eight, and no target,
+anchor, or ordinary cell exists above the band. Hidden and anchor arrays are empty. The
+gameplay seed is unique across live 50 plus earlier drafts, and every pairwise exact,
+normalized-topology, and near-topology flag against those 52 definitions is false.
+
+Both primary and alternative routes bind the following direct-Core teaching evidence:
+
+1. lock 1 is the support and lock 2 is the bridge;
+2. both locks release zero rows and retain all 32 original targets;
+3. every support cell was empty in the initial setup board;
+4. immediately before the bridge, shifting every bridge cell down one row remains in bounds;
+5. every occupied destination in that shift is a support cell from lock 1, the blocker set is
+   nonempty, and no setup, floor, or unrelated blocker contributes;
+6. the bridge owns a same-y horizontal run of at least three consecutive cells;
+7. one shifted blocker is strictly inside that run, while at least one run cell on each side
+   has an empty below-cell.
+
+Thus the complete bridge would descend without the just-authored support and visibly spans
+open space on both sides. Candidate admission freezes literal support/bridge signatures,
+horizontal-run coordinates, blocker coordinates, and the pre-bridge board evidence for each
+route. A name, screenshot, four-row count, or generic structural score is not evidence.
+
+The primary strict optimum is four or five locks. The first two releases are `[0,0]`; at least
+two later positive release events sum to four, each lowers the remaining original-target
+count, and the final state is finished at zero. One stored alternative diverges at lock 1 or
+2, proves the same teaching invariant, and is no longer than optimum plus two. Schema-8 keeps
+one alternative, `solutionMultiplicity='multiple'`, `techniqueEvidenceId=null`,
+`proof.kind='exhaustive-shorter-depths'`, and
+`proof.lowerBoundVersion='target-column-deficit-v1'`. Beam output may discover but never
+certify the candidate.
+
+The source checkpoint is limited to three paths and 500 hand-authored changed lines:
+
+- append `src/game/core/puzzleV3IntroDefinitions.ts` at draft index 2;
+- create `docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-03.json`;
+- create `src/game/core/puzzleV3Intro03Exact.test.ts`.
+
+Existing Intro tests require no edit. The test pins live Intro-03 at 625 serialized bytes /
+SHA-256 `0979CED2EEA842DC7722E8236229CBD4566CC6468D17E67007FD316D7740A7D2`,
+Intro-01 at 622 / `DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`,
+and Intro-02 at 621 / `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+It also enforces canonical one-line UTF-8/LF schema-8 bytes, every hash and literal route,
+full setup replay, pairwise admission, exact telemetry, product isolation, and deep freezing.
+Fresh independent contract QA must be all zero before discovery or source creation.
 
 ## Frozen published roster
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4C Intro-03 contract frozen
+
+- The v3 draft deliberately uses four target rows while pinning the unchanged live three-row
+  definition; existing noncanonical validation already supports the rebuild without Core work.
+- Both routes must prove a causal two-lock lesson: a zero-clear support is followed by a
+  horizontal bridge whose only downward blockers are cells from that support, with open span
+  on both sides, before at least two later events clear all four rows.
+- F4C is limited to one draft append, one schema-8 JSON, and one direct test under 500 lines.
+  Candidate discovery waits for two fresh all-zero contract reviews.
+
 ## 2026-08-12 — T37 Stage F4B Intro-02 accepted
 
 - Follow-up fact correction distinguishes the 621-byte serialized draft definition

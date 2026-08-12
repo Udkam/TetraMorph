@@ -192,3 +192,24 @@ dirty paths.
 - Blocker: none.
 - Next action: freeze and independently review a docs-only F4C `t3r-shaft-03` four-row
   support-before-bridge contract before candidate discovery or any source edit.
+
+## F4C — Intro-03 authoring contract
+
+- Task ID: `T37-F4C-CONTRACT`
+- Base SHA: `6636cd0` (F4B artifact-identity correction)
+- Status: contract frozen; independent QA pending; no source path open.
+
+The new draft keeps stable ID/name/difficulty `t3r-shaft-03` / `托台` / 3 but deliberately
+uses four target rows. Live Intro-03 remains the pinned three-row product baseline until the
+later atomic campaign switch. Eight legal zero-clear setup drops must produce 32 targets and
+eight gaps in the four floor rows, without anchors or hidden cells.
+
+Both stored routes must use lock 1 as support and lock 2 as a horizontal bridge. The first two
+locks clear nothing. Immediately before lock 2, every blocker encountered by shifting the
+complete bridge down one row must be a cell from lock 1; at least one blocker is inside a
+three-cell-or-longer horizontal run, with open below-cells to its left and right. Candidate
+evidence freezes both routes' signatures, run cells, blockers, releases, remaining targets,
+hashes, and strict exact telemetry.
+
+- Blocker: candidate discovery is closed pending two all-zero contract reviews.
+- Next action: independent read-only contract QA only.
