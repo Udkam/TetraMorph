@@ -227,5 +227,5 @@ asked to create a commit that already existed. This checkpoint correction remove
 instruction; it does not change the contract body.
 
 - Blocker: candidate discovery is closed pending two all-zero reviews of the repaired SHA.
-- Next action: commit this checkpoint-only correction, then independent read-only confirmation
-  of its SHA; open only bounded candidate discovery after two all-zero confirmations.
+- Next action: obtain two independent all-zero confirmations of the current HEAD containing
+  this record; then open only bounded repository-external candidate discovery.

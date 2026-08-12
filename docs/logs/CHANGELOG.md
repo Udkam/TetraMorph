@@ -2,8 +2,8 @@
 
 ## 2026-08-12 — T37 Stage F4C contract repaired after first QA
 
-- Final body review is P0/P1/P2/GAP zero; the last checkpoint-only correction removes a stale
-  “commit this clarification” next step before final P3 confirmation.
+- Final body review is P0/P1/P2/GAP zero; the checkpoint now stably asks for review of the
+  current HEAD containing its own record, avoiding another stale “commit this” instruction.
 - Second re-QA finds one P2 release ambiguity: the alternative now explicitly shares the
   complete `[0,0]` then at-least-two-positive/sum-four/finish-zero invariant.
 - First review rejects `588e065` with `P1 2 / P3 1`: an Intro-02 final-three-row paragraph

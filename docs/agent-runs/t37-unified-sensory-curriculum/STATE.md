@@ -1636,8 +1636,8 @@ Both final reviews of contract body `66c567d` report
 `P0 0 / P1 0 / P2 0 / GAP 0`; each retains only the same P3 because this checkpoint sentence
 still described an already completed commit. No product-rule or feasibility finding remains.
 
-Next exact action: commit only this checkpoint correction, then obtain two fresh independent
-read-only confirmations that the resulting SHA has
+Next exact action: obtain two fresh independent read-only confirmations of the current HEAD
+that contains this record, requiring
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Product, progression/UI, sensory work, protected T27
 paths, and icon remain closed. Once both confirmations are all zero, open only bounded
 repository-external candidate discovery for F4C; source creation remains closed until a fully
