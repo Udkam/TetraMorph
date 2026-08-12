@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT NEXT**
+Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT FROZEN — DOCS QA OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -343,6 +343,58 @@ full run is authoritative. Three independent source reviews report
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Intro-03 is accepted outside product. F4D must begin
 docs-first with stable ID `t3r-cascade-06`; no Intro-04 discovery or source edit opens before
 its local-clear/only-opening contract passes independent review.
+
+## F4D Intro-04 authoring admission
+
+F4D preserves stable ID/name/difficulty `t3r-cascade-06` / `留口` / 4 but rebuilds the live
+three-row product as a non-published four-row draft. The live definition remains 627 serialized
+bytes with SHA-256
+`7B10203C8C02B1C575761BFDE6F471E8CD298FE0E7B3FD3AC3E8E1E25D1CDAFE`, setup seed
+`5200003`, gameplay seed `1717986918`, and floor rows
+`IIIILLL... / OO.TLZZJJJ / OOTTT.ZZ.J`. Product data and imports remain byte-identical.
+
+The draft uses exactly eight legal zero-clear seeded setup drops, 32 ordinary targets in world
+rows 36–39, one through four gaps per row, eight total gaps, and no hidden or anchor cells.
+Exactly one `openingX` is empty from world rows 20 through 39; every other column owns at least
+one target in the four-row band. Its gameplay seed is unique across live 50 plus Intro-01/02/03,
+and all 53 pairwise exact/topology/near comparisons are false.
+
+For each unfinished route state, `deepestTargetY` is the maximum current original-target y and
+`openingColumns` is the set of columns empty from world row 20 through that y. Both routes must
+start with and preserve exactly `[openingX]` after every non-final lock. This definition is
+recomputed after ordinary row-clear mapping; it does not confuse original target identity,
+visible coordinates, or a screenshot cavity with a traversable opening.
+
+The shared local-clear lock is lock 1 or 2 and clears world row 39. Earlier releases are zero.
+Immediately before it, that row's only gaps are exactly two or three contiguous cells supplied
+by the local lock and the span includes `openingX`. Merging the lock yields only full row 39.
+The lock supplies exactly `(openingX,39)` in the corridor, releases one row without finishing,
+and has at least one off-row survivor; current Core clear mapping must place every survivor
+outside `openingX` and restore `[openingX]` as the sole corridor. All other intermediate locks
+release zero and preserve the same opening.
+
+The final lock is a vertical I at `openingX`, world y=36..39. It uses the opening, releases the
+remaining three target rows, reaches zero targets, and finishes. Each route therefore owns
+exactly two positive releases, `1` then `3`. Candidate evidence freezes the opening coordinate,
+local index/row/signatures, every post-lock opening set, releases, remaining targets, local
+pre/post state hashes, survivor mapping, and final hashes.
+
+The strict primary optimum is four or five locks. One alternative diverges by lock 1 or 2,
+uses at most optimum plus two locks, and proves the same complete invariant. Schema-8 keeps
+the accepted field order, serializers, hash domains, one alternative,
+`solutionMultiplicity='multiple'`, `proof.kind='exhaustive-shorter-depths'`,
+`proof.lowerBoundVersion='target-column-deficit-v1'`, and `techniqueEvidenceId=null`.
+Heuristic/beam output may discover only; the primary needs uncapped current-Core proof.
+
+The source boundary is exactly three paths and at most 500 hand-authored changed lines: append
+draft index 3 in `src/game/core/puzzleV3IntroDefinitions.ts`, create
+`puzzle-v3-intro-04.json`, and create `puzzleV3Intro04Exact.test.ts`. Existing Intro tests do
+not change. The direct test pins live Intro-04 at 627 /
+`7B10203C8C02B1C575761BFDE6F471E8CD298FE0E7B3FD3AC3E8E1E25D1CDAFE` and accepted drafts
+at Intro-01 622 / `DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`,
+Intro-02 621 / `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`, and
+Intro-03 682 / `A825A82CE4B96DDA78E2FB7A2C696F354CAC49B6C63AF5FDAA7722665F53EC9E`.
+Independent contract QA precedes all discovery and source creation.
 
 ## Frozen published roster
 

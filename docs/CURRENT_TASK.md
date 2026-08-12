@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT NEXT**
+Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT FROZEN — DOCS QA OPEN**
 
 ## Active objective
 
@@ -392,6 +392,73 @@ the bounded three-path source gate opens only after this docs freeze passes fres
 review. Implementation must preserve these literals, remain under 500 hand-authored changed
 lines, and keep the live 50 product library unchanged.
 
+Source `95f3316` implements those three paths in 336 added lines and passes focused
+`23 / 3 skipped`, opt-in exact `5/5`, typecheck, final full `445 / 14 skipped`, and build
+gates. Three independent source reviews report P0–P3/GAP all zero. Intro-03 is accepted
+outside product.
+
+### Stage F4D non-published Intro-04 authoring contract (2026-08-12)
+
+F4D rebuilds stable ID/name/difficulty `t3r-cascade-06` / `留口` / 4 as a four-row lesson.
+The current product remains a pinned three-row definition with setup seed `5200003`, gameplay
+seed `1717986918`, floor rows `IIIILLL... / OO.TLZZJJJ / OOTTT.ZZ.J`, serialized size
+627 bytes, and SHA-256
+`7B10203C8C02B1C575761BFDE6F471E8CD298FE0E7B3FD3AC3E8E1E25D1CDAFE`.
+The draft uses `targetRows=4` only through `validatePuzzleDefinition(draft, false)`; live
+product, progression, lessons, localization, and mastery registries remain unchanged.
+
+Exactly eight legal seeded setup hard drops must clear no rows and produce 32 ordinary targets
+only in world rows 36–39. Each row has one through four gaps, total gaps equal eight, and
+hidden/anchor arrays are empty. There is one literal `openingX`: every board cell from world
+row 20 through 39 in that column is initially empty, while every other column contains at
+least one target in rows 36–39. The gameplay seed is unique against the live 50 and Intro-01
+through Intro-03; pairwise exact, normalized-topology, and near-topology comparisons against
+all 53 are false.
+
+For any unfinished state, define `deepestTargetY` as the greatest current original-target
+row. `openingColumns(state)` contains each x whose board cells from world row 20 through
+`deepestTargetY` are all empty. Initially and after every non-final lock in both stored routes,
+this set must equal exactly `[openingX]`: the route may neither seal the corridor nor create a
+second top-accessible corridor. The candidate freeze must pin `openingX`, each post-lock set,
+and state hashes; a level name, screenshot, hole count, or final solution is not evidence.
+
+Both routes share one local-clear lock index, either 1 or 2, and the same world row 39. Every
+earlier lock releases zero rows. Immediately before that lock, the empty cells of row 39 are
+exactly the local lock's row-39 cells: one contiguous span of length two or three containing
+`openingX`. Merging the complete lock into the pre-lock board yields exactly one full row,
+row 39. The lock owns exactly one cell at `(openingX,39)`, releases exactly one row, strictly
+reduces original targets without finishing, and leaves at least one off-row survivor. Ordinary
+clear mapping must retain every survivor outside `openingX`; after settlement the corridor is
+again the unique opening. This is the mechanical meaning of “local clear that retains the
+only opening”; it is an ordinary Puzzle row clear, not Bomb-style area removal.
+
+Every non-final, non-local lock releases zero rows and preserves `[openingX]`. Immediately
+before the final lock it is still the only opening. The final lock is one vertical I whose
+four cells occupy `openingX` from world rows 36 through 39; it releases exactly the remaining
+three target rows, reduces original targets to zero, and finishes. Thus each route has exactly
+two positive release events, local `1` then terminal `3`; candidate admission freezes literal
+signatures, releases, remaining-target arrays, local pre/post boards, survivor mapping, and
+final hashes.
+
+The primary optimum is four or five locks. One stored alternative first diverges by lock 1 or
+2, is no longer than optimum plus two, and independently proves the complete opening/local
+clear/final-I invariant. `solutionMultiplicity='multiple'` means distinct completing routes,
+not necessarily two optimal routes. Schema 8 retains the accepted key order and hash domains,
+one alternative, `exhaustive-shorter-depths`, `target-column-deficit-v1`, and
+`techniqueEvidenceId=null`; only an uncapped, no-beam current-Core shorter-depth proof may
+certify optimality.
+
+The later source checkpoint is limited to three paths and 500 hand-authored changed lines:
+append draft index 3 in `src/game/core/puzzleV3IntroDefinitions.ts`, create
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-04.json`, and create
+`src/game/core/puzzleV3Intro04Exact.test.ts`. Existing Intro tests require no edit. The new
+test pins the live baseline above and accepted draft baselines Intro-01 622 /
+`DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`, Intro-02 621 /
+`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`, and Intro-03 682 /
+`A825A82CE4B96DDA78E2FB7A2C696F354CAC49B6C63AF5FDAA7722665F53EC9E`.
+Fresh independent contract QA must be all zero before repository-external candidate discovery;
+no Intro-04 source path is open now.
+
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
@@ -452,7 +519,7 @@ lines, and keep the live 50 product library unchanged.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT NEXT** — the exact
+6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT FROZEN / DOCS QA OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -469,8 +536,9 @@ lines, and keep the live 50 product library unchanged.
    support-before-bridge geometry check. Source `95f3316` adds the isolated non-product
    Intro-03 draft, schema-8 artifact, and exact test. Focused, exact, typecheck, final full
    suite (`445 / 14 skipped`), and build gates pass; three independent reviews are all zero.
-   Published curriculum content remains closed until the later atomic switch. F4D now opens
-   docs-first for the Intro-04 local-clear/only-opening contract.
+   Published curriculum content remains closed until the later atomic switch. F4D now has a
+   mechanically frozen local-clear/only-opening contract; discovery and source remain closed
+   until independent docs QA is all zero.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

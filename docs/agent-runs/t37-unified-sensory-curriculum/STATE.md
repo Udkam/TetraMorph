@@ -1684,6 +1684,27 @@ preservation/release evidence, bind schema-8 hashes and finite proof bounds, and
 independent contract QA before candidate discovery. Do not open Intro-04 source, product
 integration, progression/UI, sensory, protected T27 paths, or icon work yet.
 
+F4D fact reconciliation corrects the live baseline to 627 bytes / SHA-256
+`7B10203C8C02B1C575761BFDE6F471E8CD298FE0E7B3FD3AC3E8E1E25D1CDAFE`, targetRows 3,
+setup `5200003`, gameplay seed `1717986918`, and floor rows
+`IIIILLL... / OO.TLZZJJJ / OOTTT.ZZ.J`. Accepted draft pins are Intro-01 622 /
+`DFC1...FDA8`, Intro-02 621 / `1E67...A9EB`, and Intro-03 682 / `A825...EC9E`.
+
+The F4D contract now freezes a four-row, eight-setup-drop, 32-target draft with one unique
+top-to-target opening column. Both routes must preserve that sole opening after each non-final
+lock. At shared lock index 1 or 2, a piece supplies exactly a contiguous two- or three-cell
+bottom-row gap including the opening, clears only row 39 without finishing, has an off-row
+survivor mapped outside the corridor, and restores the same sole opening. Intermediate locks
+clear zero; the final vertical I occupies opening y=36..39 and clears the remaining three
+target rows. Each route has exactly two positive releases, `1` then `3`, and freezes all
+opening sets, signatures, target counts, survivor mapping, and hashes. Primary optimum is four
+or five with uncapped no-beam proof; one early-divergent alternative is at most optimum plus
+two. Pairwise admission covers live 50 plus the three accepted drafts.
+
+Next exact action: commit only the five F4D contract documents, then obtain two fresh
+independent all-zero contract reviews. Discovery and all source/product/UI/sensory/protected/
+icon paths remain closed until that gate passes.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

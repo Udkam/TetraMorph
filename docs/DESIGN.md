@@ -786,6 +786,16 @@ adding unrelated badges or ornamental effects.
   F4C now permits only repository-external heuristic discovery. It does not authorize a
   draft append, certificate file, or test until a complete candidate survives current-Core
   replay, pairwise admission, route-invariant checks, and strict shorter-depth proof.
+- F4C source `95f3316` is accepted outside product after focused, exact, typecheck, full-suite,
+  build, and three independent all-zero reviews. The live 50 remain unchanged.
+- F4D makes “local clear that retains the only opening” causal and coordinate-verifiable.
+  A four-row draft begins with one unique top-to-target corridor. A lock at index 1 or 2 fills
+  a contiguous two- or three-cell bottom-row gap including that corridor, clears only the
+  bottom row, leaves a non-corridor survivor, and restores the same sole corridor after Core
+  row mapping. Every intermediate lock preserves it; the final vertical I actually uses it
+  to clear the remaining three target rows. Both stored routes must prove this full sequence,
+  not infer it from a name, screenshot, hole count, or final solvability. The live three-row
+  definition and all prior draft bytes remain pinned until the atomic campaign switch.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

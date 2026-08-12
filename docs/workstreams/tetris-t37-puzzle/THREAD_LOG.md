@@ -278,3 +278,38 @@ each report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
   then commit and independently review a mechanically testable four-row local-clear/
   only-opening contract before discovery. Product, progression/UI, sensory, protected T27
   paths, and icon remain closed.
+
+## F4D — Intro-04 authoring contract
+
+- Task ID: `T37-F4D-CONTRACT`
+- Base SHA: `877ceb6f5fd6d5c915b3c695cc364196f15a6943`
+- Status: contract frozen; independent docs QA pending; no source path open.
+
+Live `t3r-cascade-06` remains targetRows 3 with setup seed `5200003`, gameplay seed
+`1717986918`, rows `IIIILLL... / OO.TLZZJJJ / OOTTT.ZZ.J`, 627 serialized bytes, and
+SHA-256 `7B10203C8C02B1C575761BFDE6F471E8CD298FE0E7B3FD3AC3E8E1E25D1CDAFE`.
+The non-published v3 draft deliberately uses four rows through noncanonical validation.
+
+The frozen lesson begins with 32 targets from eight legal zero-clear setup drops and exactly
+one column empty from world rows 20 through 39. Both routes recompute and preserve that sole
+opening after every non-final lock. At lock 1 or 2, one piece fills a two- or three-cell
+contiguous bottom-row gap including the opening, clears only row 39 without finishing, retains
+at least one off-row survivor outside the opening, and restores the same sole corridor after
+ordinary Core clear mapping. Intermediate locks clear nothing. The final vertical I occupies
+the corridor at y=36..39 and clears the remaining three target rows. Both routes therefore
+have exactly two positive releases, `1` then `3`, and prove the full coordinate/state chain.
+
+Primary optimum is four or five locks. One early-divergent alternative may be at most optimum
+plus two. Unique seed, all 53 pairwise structure exclusions, schema-8 serialization/hashes,
+and uncapped no-beam shorter-depth proof remain mandatory. Accepted prior draft pins are
+Intro-01 622 / `DFC1...FDA8`, Intro-02 621 / `1E67...A9EB`, and Intro-03 682 /
+`A825...EC9E`.
+
+The eventual source boundary is three paths / at most 500 hand-authored changed lines:
+`puzzleV3IntroDefinitions.ts`, `puzzle-v3-intro-04.json`, and
+`puzzleV3Intro04Exact.test.ts`. Existing Intro tests, product definitions, progress, UI,
+sensory, protected T27 paths, and icon remain closed.
+
+- Blocker: discovery is closed pending fresh independent contract QA.
+- Next action: commit this docs-only contract and obtain two independent reports with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; repair any finding before discovery.
