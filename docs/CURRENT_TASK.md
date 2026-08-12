@@ -1,14 +1,20 @@
-# Current Task — T37 Unified Material Feedback and Puzzle Curriculum
+# Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **STAGE F4D INTRO-04 ACCEPTED / F4E INTRO-05 CONTRACT ACCEPTED — DISCOVERY NEXT**
+Status: **ENDGAME NAMESPACE MIGRATION CONTRACT ACCEPTED / STORAGE CAPABILITY NEXT / INTRO-05 PAUSED**
 
 ## Active objective
 
 Rebuild TetraMorph around one coherent physical-material language, then restructure
-Puzzle into a certified 5/25/16 learning curriculum. T37 supersedes the rejected T36
+Endgame into a certified 5/25/16 learning curriculum. T37 supersedes the rejected T36
 audible palette and combines four user-visible concerns that must agree rather than be
 polished independently: tactile sound, page transitions, ordinary/Mutation piece
-materials, and Puzzle progression.
+materials, and Endgame progression.
+
+Stage N0 below is the sole current namespace authority. Any former domain term, identifier,
+path, key, symbol, proof status, or “next action” elsewhere in this append-only task history
+describes the repository at its earlier checkpoint only. It is not an active alias or
+implementation instruction after 2026-08-12. The concise current curriculum authority is
+`docs/phases/t37-endgame-curriculum-v3.md`.
 
 The player temporarily interrupted the audio gate for one bounded Core correction.
 Mutation now restores its 0.1-second-per-cell fastest tier. A Supergravity-covered
@@ -564,6 +570,99 @@ contract QA is all zero; repository-external candidate discovery is open, while 
 closed until a complete candidate passes every setup, route, support, admission, hash, and
 uncapped-proof gate.
 
+### Stage N0 canonical Endgame namespace migration (2026-08-12)
+
+The player has retired both the Chinese product term `解谜` and the complete active
+`puzzle` namespace. The only canonical names after this migration are Chinese `残局`,
+English `Endgame`, code/type/file namespace `endgame` / `Endgame`, and the internal mode
+literal `'endgame'`. This is not a display-only alias. Active product, Core, runtime,
+renderer, audio, navigation, persistence, authoring, QA API, DOM/test IDs, CSS selectors,
+tests, tools, and filenames must stop producing or owning the retired names.
+
+The canonical URL surface is `/endgames` and `/play/endgame/:id`. N0 is a namespace-only
+publication: it preserves all 50 currently live boards, their order, category split,
+unlocks, and campaign revision 2. Generic ordinals 21–50 map one-to-one onto the
+`tm-endgame-*` family, including 34, 40, 42, and 43 while those four boards remain live;
+the already neutral `t3r-*`, `t5r-*`, and `t6r-*` IDs remain stable. N0 writes
+`tetramorph:endgame-completion:v6` with `version:6` and `campaignRevision:2`. The later
+5/25/16 publication alone writes v7/revision 3 and retires canonical ordinals
+34/40/42/43. This prevents a naming migration from prematurely deleting player records.
+
+The mode-introduction key advances to `tetramorph:mode-rule-intros:v2`, and normal
+route/history/storage writers emit only canonical Endgame values. Old URLs, history
+payloads, progress keys, IDs, field names, and the retired mode literal may be read only
+inside `src/legacyEndgameMigration.ts`; its direct test is
+`src/legacyEndgameMigration.test.ts`. That pure boundary returns canonical data or a
+structured failure, normalizes valid old URLs through one React-owned `replaceState`
+(never `pushState`), and exports no retired alias into the live domain.
+
+Persistence conversion is failure-safe. `BrowserPlatform.readStorageState()` distinguishes
+`value`, `missing`, and `failed`; an uncertain higher-priority read suppresses default/canonical
+writes rather than masking possible progress with an empty record. The source priority is
+canonical v6, current TetraMorph v5, historical v5, v4, v3, v2, then v1. Selection stops at
+the first present key: a corrupt or unreadable higher-priority record blocks fallback to an
+older snapshot and remains for recovery. Conversion maps completion IDs, best piece counts,
+selected/deep-linked IDs, and the recorded rule-introduction mode. It writes v6, reads back
+through the tri-state API, parses and verifies semantic equality, then removes legacy keys
+independently. Cleanup is not atomic: failed `removeItem` calls leave only those keys and
+retry idempotently next boot. Tests inject unavailable storage, get/set/readback/remove
+throws, quota failure, invalid canonical plus valid legacy, and partial multi-key cleanup.
+No leaderboard migration is needed because Endgame records are not stored there.
+
+The namespace enters deterministic Core state and serialized authoring domains. Changing
+`GameMode`, `GameState` fields, IDs, schema literals, and the state-hash payload intentionally
+invalidates old authoring/certificate hashes. The repository-external F4E proof checkpoints
+produced under the retired mode are marked `ABANDONED_LEGACY_PUZZLE_MODE`: they may not be
+resumed, merged, or cited as Endgame proof. Definition geometry, seeds, public command
+streams, lock signatures, releases, and remaining-target behavior are expected to remain
+mechanically equivalent; every state hash, behavior hash, certificate hash, and exact proof
+must be rebuilt in the canonical Endgame domain before F4E reopens.
+
+The migration uses three reviewable checkpoints before proof work resumes:
+
+1. a two-path BrowserPlatform capability checkpoint:
+   `src/platform/browserPlatform.ts` and `src/platform/browserPlatform.test.ts`;
+2. an isolated two-path legacy decoder checkpoint: `src/legacyEndgameMigration.ts` and
+   `src/legacyEndgameMigration.test.ts`;
+3. canonical Endgame fixture copies/conversions plus
+   `docs/workstreams/tetris-t37-endgame/fixtures/fixture-migration-manifest.json`, using the
+   exact source/target table in the Endgame workstream log while old artifacts stay immutable;
+4. one exact atomic namespace checkpoint covering every active source/test/tool consumer.
+
+Checkpoint 4 is an explicit exception to the normal 10-path / 500-line budget. At base
+`227fc14217d836698f1a498d3959260459337a2e`, the canonical namespace is directly shared by
+82 tracked paths including `README.md`; splitting `GameMode`, the `GameState` field family,
+IDs, consumers, DOM/CSS,
+and tests would either fail typecheck or create two mutable truths that change deterministic
+hashes. The authorized current-path manifest and deterministic filename targets are recorded
+in `docs/workstreams/tetris-t37-endgame/THREAD_LOG.md`. The writer may edit in bounded local
+batches but must not commit an intermediate dual namespace or a non-typechecking state.
+Legacy migration, fixture conversion, canonical rename, regenerated proof artifacts, QA,
+and coordinator acceptance remain separate commits.
+
+The canonical checkpoint gate is all of the following:
+
+- `rg -i 'puzzle' README.md src scripts tools package.json index.html` matches only
+  `src/legacyEndgameMigration.ts` and `src/legacyEndgameMigration.test.ts`; their matches are
+  exact read-only input literals, never active symbols, exports, selectors, routes, keys,
+  or filenames;
+- `rg '解谜|谜题' src` returns no matches, and player copy is exactly `残局` / `Endgame`;
+- no active source, test, style, script, or tool filename contains the retired namespace;
+- old progress, best counts, unlocks, selected IDs, history, and deep links migrate to the
+  canonical domain, and failure-path tests prove legacy keys are retained until readback;
+- typecheck, the complete test suite, build, and a bilingual browser/history/storage audit
+  pass before Endgame certificates are regenerated.
+
+Historical docs, evidence, and archived workstream artifacts preserve the terms that were
+true when captured. They are not active aliases and are not rewritten to impersonate new
+evidence. The active Stage-F phase document and workstream move to Endgame-named paths now.
+
+Independent contract review first reported storage-version, cleanup, history, manifest, and
+fixture gaps. The repaired contract now passes focused re-review with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Only the two-path BrowserPlatform capability checkpoint
+opens next; the isolated decoder, fixtures, atomic namespace switch, proof regeneration, and
+curriculum remain closed until their preceding checkpoints are green.
+
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
@@ -592,9 +691,9 @@ uncapped-proof gate.
   column composition, exact facet network, or full-strength bloom. Every cell of a
   Mutation piece may release its item, but the piece triggers exactly once. Board,
   active piece, ghost, Next, clear feedback, and audio must agree.
-- **Puzzle:** ship exactly 46 levels split into 5 Intro, 25 Easy, and 16 Hard levels.
+- **Endgame:** ship exactly 46 levels split into 5 Intro, 25 Easy, and 16 Hard levels.
   Intro is fully rebuilt around guided 3–4-row positions. Easy stays fully open and
-  teaches reusable techniques while retaining normal residual-board puzzles. Hard uses
+  teaches reusable techniques while retaining normal residual-board positions. Hard uses
   distinctive, related applications such as tall trick boards, multiple anchors,
   hollow/two-wall/top structures, triangles, pyramids, and bounded board-shape variants.
   Repeated residual boards are removed. Every published level requires a deterministic
@@ -624,7 +723,7 @@ uncapped-proof gate.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4D INTRO-04 ACCEPTED; F4E INTRO-05 CONTRACT ACCEPTED / DISCOVERY NEXT** — the exact
+6. **Endgame curriculum — N0 CANONICAL NAMESPACE CONTRACT IN REVIEW; INTRO-05 PROOF PAUSED** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -646,8 +745,11 @@ uncapped-proof gate.
    Independent review accepted the seven-drop R2 revision before discovery. R3 then froze and
    implemented the qualifying four-lock corridor-migration candidate; contract and source QA
    are all zero. F4E now freezes causal Current/Next-1/Next-2 planning for independent
-   contract QA before any discovery or source edit. Formal and adversarial reviews now report
-   P0–P3/GAP all zero, opening only repository-external candidate discovery.
+   contract QA before any discovery or source edit. The later namespace decision invalidates
+   every old-domain hash and closes that discovery route. N0 must first preserve the live
+   50-board revision-2 campaign under canonical Endgame names, complete failure-safe save and
+   route conversion, regenerate fixtures/proofs, and pass all gates. Only then may Intro-05
+   discovery restart in the canonical Core.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

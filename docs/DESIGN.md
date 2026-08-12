@@ -3,7 +3,44 @@
 > The current page-facing identity is the plain-text `TetraMorph`. Older `Tetra` and
 > `Tetris` headings below are retained only as historical contract provenance.
 
-## 2026-08-09 T37 — Unified material feedback and Puzzle curriculum
+## 2026-08-12 T37 — Canonical Endgame namespace
+
+The product domain is now **残局** in Chinese and **Endgame** in English. The retired
+Chinese label and active `puzzle` namespace are not aliases: Core uses mode `'endgame'`,
+types/files/symbols use `Endgame` / `endgame`, the library uses `/endgames`, play uses
+`/play/endgame/:id`, and the currently live generic ordinals 21–50 move to the
+`tm-endgame-*` family. Neutral level IDs remain stable.
+
+N0 is name-only at the campaign layer: all 50 live boards and campaign revision 2 remain.
+It writes `tetramorph:endgame-completion:v6` with schema version 6/revision 2. The later
+5/25/16 publication alone writes v7/revision 3 and retires canonical ordinals 34, 40, 42,
+and 43. A namespace change must not pre-apply that curriculum projection.
+
+One isolated legacy migration boundary may recognize retired input values solely to preserve
+existing progress and deep links. Storage reads distinguish value, absence, and failure;
+uncertain data suppresses an empty canonical write. Conversion verifies a canonical write
+through parse/equality readback, then removes old keys independently and idempotently.
+Failed cleanup retains only the affected keys for a later retry. Normal product APIs never
+expose or emit the old domain. Historical documentation and evidence retain their original
+wording as provenance.
+
+Because the domain literal, private state fields, IDs, and schema strings participate in
+deterministic hashes, all Endgame behavior hashes and exact certificates are regenerated.
+Gameplay geometry, fixed queues, public commands, lock outcomes, and progression semantics
+must otherwise remain equivalent. The old F4E search checkpoints are explicitly non-proof.
+
+The rename is intentionally atomic across active Core, runtime, rendering, audio, UI,
+navigation, persistence, authoring, QA, DOM/CSS, tests, tools, and filenames. A temporary
+dual-field `GameState` is forbidden: object spread and independent mutation would make one
+alias stale and corrupt state identity. The exact exception and final zero-retired-name gate
+are authoritative in `docs/CURRENT_TASK.md` and the Endgame workstream log.
+
+## 2026-08-09 T37 — Historical pre-N0 material/curriculum contract
+
+> This section records the names and checkpoints that existed before the canonical Endgame
+> decision above. Any former namespace shown below is provenance, not a current product,
+> code, route, persistence, or authoring alias. Current implementation follows the Endgame
+> phase document and N0 contract.
 
 **Status: IN PROGRESS.** T36 was technically safe but failed human listening. Repeated
 isolated redesigns also left transitions, ordinary pieces, Mutation materials, and

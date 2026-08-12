@@ -1,9 +1,9 @@
-# T37 Unified Material Feedback and Puzzle Curriculum — Bounded State
+# T37 Unified Material Feedback and Endgame Curriculum — Bounded State
 
 ## Objective
 
 Deliver one coherent TetraMorph material language across tactile sound, route motion,
-ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
+ordinary/Mutation pieces, and a strictly certified 5/25/16 Endgame curriculum.
 
 ## Immutable base and boundaries
 
@@ -16,6 +16,10 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   respawned merely to fill capacity.
 - Use exact-path staging and short reviewable checkpoints. The coordinator owns final
   changelog, independent-QA disposition, and push.
+
+The 2026-08-12 Endgame checkpoint near the end of this append-only file supersedes every
+older namespace, persistence version, proof-resume instruction, and next action recorded
+above it. Those older literals remain historical state only, not active aliases.
 
 ## Human decisions frozen for T37
 
@@ -30,7 +34,7 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
   `3BED43DFC335615C6C61A1989DA7B95CCA129C74F41622A1205EF99A59A569B8`): retain its
   triangular facets, continuous materials, bounded glow hierarchy, and sparse item
   motifs; do not copy its labels/layout or rename Supergravity to Collapse.
-- Puzzle publication count is 46: 5 Intro, 25 Easy, 16 Hard. Easy is open; Hard uses
+- Endgame publication count is 46: 5 Intro, 25 Easy, 16 Hard. Easy is open; Hard uses
   related technique prerequisites at certified optimum plus five operations.
 - Human listening accepts R5 **Action A** (exact T28 `35509a7` recipe/mixer) and
   **Ice 2** (Freesound `819779 / sbml / Ice cubes`). The R3 Studio clear/countdown
@@ -1815,6 +1819,36 @@ Next exact action: run repository-external F4E candidate discovery. Freeze no se
 route, or hash and edit no source until one candidate passes both two-hop support chains,
 all 54 comparisons, seed uniqueness, canonical hashes, and uncapped current-Core proof.
 
+## 2026-08-12 Endgame namespace checkpoint
+
+The player expanded the naming change from display copy to complete retirement of the active
+Chinese label and `puzzle` namespace. Canonical names are `残局`, `Endgame`, and `endgame`.
+This affects `GameMode`, `GameState`, IDs `tm-puzzle-21..50`, URLs, storage, history, QA,
+DOM/CSS, active authoring schemas, filenames, state hashes, and certificates. A targeted
+inventory at base `227fc14` finds 82 tracked active README/source/script/tool paths by content or
+filename. Protected T27/follow-up/progress paths remain untouched.
+
+All four running compact F4E proof shards were stopped and their processes verified released.
+Their checkpoints are marked `ABANDONED_LEGACY_PUZZLE_MODE`; they are not resumable proof.
+The earlier candidate geometry, seed 3887, routes, two-hop support checks, and admission work
+remain discovery clues only. The corrected six-lock audit excludes only the frozen no-Hold
+`S-Z-J-T-L-I` strict-chain domain, not the complete public domain.
+
+The migration is docs-first. N0 preserves the live 50-board campaign at revision 2 and
+writes canonical Endgame schema v6; the later 46-board publication alone advances to
+revision 3/schema v7 and retires four canonical IDs. Storage reads become value/missing/failed
+tri-state, writes require validated readback, and per-key cleanup is idempotent rather than
+falsely described as atomic. One isolated legacy parser, canonical authoring-fixture
+conversion, then one authorized atomic active-namespace checkpoint are required; no dual
+`GameState` field bridge is allowed. Historical docs/evidence remain provenance.
+
+Independent focused re-review reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` after the exact
+version, tri-state, route-owner, fixture-count, sentinel, and legacy-input repairs. Next exact
+action: implement only `src/platform/browserPlatform.ts` and its direct test as the
+BrowserPlatform storage-capability checkpoint. Do not resume Intro-05, later curriculum,
+sensory expansion, protected evidence, or icon work before canonical Endgame Core and its
+full gate are green.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
@@ -1822,5 +1856,5 @@ all 54 comparisons, seed uniqueness, canonical hashes, and uncapped current-Core
 - Do not reopen Action A, Ice 2, or the frozen Studio subset without new explicit player
   feedback; do not treat newly extended cues as accepted merely because they share the
   selected grammar.
-- Do not redesign all Puzzle UI before strict level data and proof contracts are green.
+- Do not redesign all Endgame UI before strict level data and proof contracts are green.
 - Do not reread broad logs after compaction; continue from this file one stage at a time.
