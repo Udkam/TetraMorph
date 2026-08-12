@@ -735,11 +735,13 @@ adding unrelated badges or ornamental effects.
   are rejected; changing only the gameplay seed is not a rebuild. It remains outside the
   live library until the complete 46-level corpus and migration are ready for an atomic
   product switch.
-- Fresh independent review accepts the repaired F4A contract with P0–P3/GAP all zero.
-  Discovery may now search only for that non-published Intro-01 candidate. A beam result is
-  a discovery witness, never proof; repository acceptance still requires literal Core
-  replay, an exhaustive shorter-depth certificate, one early-divergent alternative, and the
-  frozen structural/teaching review.
+- A post-acceptance probe corrects the F4A fingerprint gate before source creation. The live
+  50 definitions already yield ten historical near-candidate pairs, so a globally empty
+  combined audit is impossible. The repaired gate compares the draft against every live
+  definition and rejects any exact, normalized-topology, or near-topology match. Discovery
+  pauses for fresh QA. After it reopens, a beam result remains discovery only; acceptance
+  still requires literal replay, exhaustive proof, an early-divergent alternative, and the
+  structural/teaching review.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

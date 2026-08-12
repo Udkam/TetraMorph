@@ -1444,16 +1444,21 @@ topology, or near candidates from `auditPuzzleFingerprints` over the live 50 plu
 Exactly one alternative is stored; both `[1,2]` clear events reduce original targets. The
 workstream log must record the final gap vector and teaching review.
 
-Fresh independent repair review reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It confirms
-the six-drop/24-cell geometry is satisfiable, the structural fingerprint gates cannot be
-bypassed by changing only a seed, and the current definition-level replay/search/proof seams
-cover the contract. No repository file or index entry changed during review.
+Fresh independent repair review initially reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, but
+a current-Core probe then disproves its whole-audit-empty assumption before any source is
+created. `auditPuzzleFingerprints(PUZZLE_DEFINITIONS)` itself returns exact 0 / topology 0 /
+near 10, so adding any draft can never make all three combined arrays empty. The first local
+candidate has gap vector `[3,2,1]`, uses the live gameplay seed in the discovery witness, and
+adds a near match against `t5r-rift-10`; it is discarded.
 
-Next exact action: commit this docs-only acceptance, then run bounded read-only discovery for
-one non-published Intro-01 candidate. Do not create source until one candidate satisfies the
-gap vector, fingerprint, four-or-five-lock route, `[1,2]` releases, and early-divergent
-alternative gates. The eventual source checkpoint remains exactly the three frozen paths.
-Progress/mastery/UI, other drafts, T27/`progress.md`, sensory, and icon remain closed.
+The corrected rule requires every `comparePuzzleTopologies(liveDefinition, draft)` result to
+set `exactMatch`, `topologyMatch`, and `nearTopology` false. This isolates new draft conflicts
+without pretending historical live-live near pairs do not exist.
+
+Next exact action: commit this docs-only correction and obtain fresh independent contract QA.
+Discovery and source editing remain closed until P0–P3/GAP are zero. The eventual source
+checkpoint remains exactly the three frozen paths. Progress/mastery/UI, other drafts,
+T27/`progress.md`, sensory, and icon remain closed.
 
 ## Do not repeat
 

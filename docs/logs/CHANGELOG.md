@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4A fingerprint admission corrected before source
+
+- A current-Core probe shows the unchanged live 50 definitions already contain ten
+  historical near-candidate pairs, so the accepted requirement that the combined audit be
+  globally empty is impossible.
+- The corrected admission compares the draft individually against every live definition and
+  rejects exact, normalized-topology, or near-topology matches involving the draft.
+- The first local candidate also fails that repaired gate and used the live gameplay seed;
+  it is discarded. Discovery and source editing pause for fresh contract QA.
+
 ## 2026-08-12 — T37 Stage F4A repaired contract accepted; Intro-01 discovery opened
 
 - Fresh independent review reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for the repaired

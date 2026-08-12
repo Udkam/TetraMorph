@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 DISCOVERY OPEN**
+Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A FINGERPRINT CONTRACT QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -60,11 +60,12 @@ product code. The certificate uses the schema-8 key order shown below and is can
 
 The draft object, setup object, every placement object, `boardRows`, `hiddenCells`,
 `anchorCells`, and the exported draft-array container are all frozen.
-`auditPuzzleFingerprints([...PUZZLE_DEFINITIONS, draft])` must return empty
-`exactConflicts`, `topologyConflicts`, and `nearCandidates`. This check is independent of
-the required unique gameplay seed and behavior hash. The writer log records the final gap
-vector and a concise teaching review of the two-stage route; seed-only differentiation is
-rejected.
+Every `comparePuzzleTopologies(liveDefinition, draft)` result must have `exactMatch=false`,
+`topologyMatch=false`, and `nearTopology=false`. This pairwise rule is independent of the
+required unique gameplay seed and behavior hash. It deliberately does not require the
+whole-library audit arrays to be empty: current Core reports exact 0 / topology 0 / near 10
+for the unchanged live 50 alone. The writer log records the final gap vector and a concise
+teaching review of the two-stage route; seed-only differentiation is rejected.
 
 `authoringDefinitionHash` is lowercase SHA-256 of one UTF-8 JSON line plus exactly one LF.
 `JSON.stringify` receives this exact insertion order:
@@ -111,12 +112,11 @@ independently rebuild every field from current Core, while also pinning the unch
 search, but no beam/null/timeout/cap result enters the certificate. Contract QA precedes
 all discovery and source editing.
 
-The fresh independent repair review reports
-`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`: six drops fit the 24-cell geometry, structural and
-near-fingerprint gates cannot be bypassed by changing only a seed, and current Core exposes
-the required definition replay, strict optimum, and alternate-route seams. Candidate
-discovery is now open; live product integration and every other curriculum definition remain
-closed.
+The first fresh repair review reported all zero, but a subsequent current-Core probe found
+that its whole-audit-empty conclusion was wrong: the live 50 already produce ten historical
+near pairs. F4A therefore pauses again before source creation. Fresh independent QA must
+accept the pairwise draft-versus-live rule above before candidate discovery reopens; live
+product integration and every other curriculum definition remain closed.
 
 ## Frozen published roster
 

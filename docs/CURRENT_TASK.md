@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3D ACCEPTED / F4A INTRO-01 DISCOVERY OPEN**
+Status: **STAGE F3D ACCEPTED / F4A INTRO-01 FINGERPRINT CONTRACT QA NEXT**
 
 ## Active objective
 
@@ -154,10 +154,13 @@ The draft module exports only `PUZZLE_V3_INTRO_DRAFTS`, a deeply frozen readonly
 containing one literal deeply frozen `PuzzleDefinition`. It uses only type imports and is
 not imported by `puzzles.ts`, any product barrel, progress, UI, or renderer. The draft keeps
 name `补行`, difficulty 1, no anchors/hidden cells, targetRows 3, and a gameplay seed unique
-across live and draft definitions. `auditPuzzleFingerprints([...PUZZLE_DEFINITIONS, draft])`
-must report zero exact, topology, and near candidates; a different gameplay seed or behavior
-hash alone is not evidence of a rebuild. The workstream log records the two-stage teaching
-review, including the new gap vector and why the optimal `[1,2]` release sequence is readable.
+across live and draft definitions. For every live definition,
+`comparePuzzleTopologies(live, draft)` must report `exactMatch=false`,
+`topologyMatch=false`, and `nearTopology=false`; a different gameplay seed or behavior hash
+alone is not evidence of a rebuild. The whole-library audit is not asserted empty because
+the unchanged live 50 already contain ten historical near-candidate pairs. The workstream
+log records the two-stage teaching review, including the new gap vector and why the optimal
+`[1,2]` release sequence is readable.
 
 The strict optimum is four or five locked tetrominoes. The chosen optimal replay has exactly
 two positive row-release events `[1,2]`, remains unfinished after the first, and finishes all
@@ -175,11 +178,10 @@ still has 50 definitions and canonical `t3r-shaft-01` remains the same reference
 serialized bytes with SHA-256
 `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
 
-Fresh independent review of the repaired contract reports
-`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. F4A discovery is therefore open, but only for the
-non-published Intro-01 candidate described above. Discovery may emit temporary diagnostics;
-the first repository source checkpoint remains limited to the three named paths and may not
-alter or import into the live 50-level product.
+A post-acceptance current-Core probe corrects one more contract error: the live-only
+`auditPuzzleFingerprints(PUZZLE_DEFINITIONS)` result is exact 0 / topology 0 / near 10, so
+requiring the combined audit arrays to be globally empty can never pass. Candidate discovery
+and source editing pause until fresh QA accepts the pairwise draft-versus-live rule above.
 
 The certificate contains exactly one alternative entry. Both positive clear events must
 strictly reduce remaining original targets. Normal direct tests, one
@@ -251,7 +253,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3D ACCEPTED; F4A INTRO-01 DISCOVERY OPEN** — the exact
+6. **Puzzle curriculum — F3D ACCEPTED; F4A FINGERPRINT CONTRACT QA NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -259,9 +261,10 @@ closed.
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
    final proof `b2c3bc5` supplies one canonical ten-row setup, current-Core route, and
    no-beam exact certificate with independent QA all zero. Accepted F3D source `7f31802`
-   supplies schema-8 per-depth telemetry without proof drift. Fresh F4A contract QA is
-   all zero; only one non-published Intro-01 candidate is open for discovery and later
-   three-path authoring, while published curriculum content stays closed.
+   supplies schema-8 per-depth telemetry without proof drift. A current-Core probe found
+   the prior whole-audit-empty fingerprint rule impossible because the live library already
+   has ten historical near pairs. Pairwise draft-versus-live repair QA is next; discovery,
+   authoring, and published curriculum content are closed until it passes.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
