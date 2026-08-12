@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3D ACCEPTED / F4A INTRO-01 FINGERPRINT CONTRACT QA NEXT**
+Status: **STAGE F3D ACCEPTED / F4A INTRO-01 DISCOVERY OPEN**
 
 ## Active objective
 
@@ -178,10 +178,12 @@ still has 50 definitions and canonical `t3r-shaft-01` remains the same reference
 serialized bytes with SHA-256
 `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
 
-A post-acceptance current-Core probe corrects one more contract error: the live-only
+A post-acceptance current-Core probe corrected one more contract error: the live-only
 `auditPuzzleFingerprints(PUZZLE_DEFINITIONS)` result is exact 0 / topology 0 / near 10, so
-requiring the combined audit arrays to be globally empty can never pass. Candidate discovery
-and source editing pause until fresh QA accepts the pairwise draft-versus-live rule above.
+requiring the combined audit arrays to be globally empty can never pass. Fresh independent
+HEAD verification reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for the pairwise
+draft-versus-live rule above. Candidate discovery is open again; source creation still waits
+for a fully qualified candidate.
 
 The certificate contains exactly one alternative entry. Both positive clear events must
 strictly reduce remaining original targets. Normal direct tests, one
@@ -253,7 +255,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3D ACCEPTED; F4A FINGERPRINT CONTRACT QA NEXT** — the exact
+6. **Puzzle curriculum — F3D ACCEPTED; F4A INTRO-01 DISCOVERY OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -263,8 +265,9 @@ closed.
    no-beam exact certificate with independent QA all zero. Accepted F3D source `7f31802`
    supplies schema-8 per-depth telemetry without proof drift. A current-Core probe found
    the prior whole-audit-empty fingerprint rule impossible because the live library already
-   has ten historical near pairs. Pairwise draft-versus-live repair QA is next; discovery,
-   authoring, and published curriculum content are closed until it passes.
+   has ten historical near pairs. Fresh pairwise draft-versus-live repair QA is all zero;
+   non-published Intro-01 discovery is open, while source authoring and published curriculum
+   content remain closed until a fully qualified candidate exists.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

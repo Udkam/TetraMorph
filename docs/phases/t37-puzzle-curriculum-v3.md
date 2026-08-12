@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A FINGERPRINT CONTRACT QA NEXT**
+Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 DISCOVERY OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -114,9 +114,11 @@ all discovery and source editing.
 
 The first fresh repair review reported all zero, but a subsequent current-Core probe found
 that its whole-audit-empty conclusion was wrong: the live 50 already produce ten historical
-near pairs. F4A therefore pauses again before source creation. Fresh independent QA must
-accept the pairwise draft-versus-live rule above before candidate discovery reopens; live
-product integration and every other curriculum definition remain closed.
+near pairs. The gate was repaired to the pairwise rule above. Fresh independent verification
+on the corrected HEAD reproduces exact 0 / topology 0 / near 10 for live-only data, confirms
+comparison does not depend on stable ID, and reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+Candidate discovery is open again; source creation, live product integration, and every other
+curriculum definition remain closed.
 
 ## Frozen published roster
 

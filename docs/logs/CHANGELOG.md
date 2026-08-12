@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4A pairwise fingerprint gate accepted
+
+- Fresh independent verification on the corrected HEAD reproduces the live-only baseline
+  exact 0 / topology 0 / near 10 and confirms topology comparison does not use stable ID.
+- The pairwise draft-versus-live admission receives
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; non-published Intro-01 discovery reopens.
+- Source creation still requires one candidate that passes every geometry, unique-seed,
+  route, release, alternative, and pairwise fingerprint gate.
+
 ## 2026-08-12 — T37 Stage F4A fingerprint admission corrected before source
 
 - A current-Core probe shows the unchanged live 50 definitions already contain ten

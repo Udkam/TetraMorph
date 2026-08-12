@@ -1455,10 +1455,15 @@ The corrected rule requires every `comparePuzzleTopologies(liveDefinition, draft
 set `exactMatch`, `topologyMatch`, and `nearTopology` false. This isolates new draft conflicts
 without pretending historical live-live near pairs do not exist.
 
-Next exact action: commit this docs-only correction and obtain fresh independent contract QA.
-Discovery and source editing remain closed until P0–P3/GAP are zero. The eventual source
-checkpoint remains exactly the three frozen paths. Progress/mastery/UI, other drafts,
-T27/`progress.md`, sensory, and icon remain closed.
+Fresh independent verification on corrected HEAD `056e9f4` reproduces the live-only exact 0 /
+topology 0 / near 10 baseline, confirms `comparePuzzleTopologies` does not use ID, and accepts
+the pairwise draft-versus-live gate with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+
+Next exact action: commit this docs-only acceptance and resume bounded read-only discovery.
+Do not create source until one candidate satisfies every geometry, unique-seed, pairwise
+fingerprint, four-or-five-lock route, `[1,2]` release, and early-divergent alternative gate.
+The eventual source checkpoint remains exactly the three frozen paths. Progress/mastery/UI,
+other drafts, T27/`progress.md`, sensory, and icon remain closed.
 
 ## Do not repeat
 
