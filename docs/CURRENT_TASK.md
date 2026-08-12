@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 CONTRACT NEXT**
+Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 CONTRACT QA NEXT**
 
 ## Active objective
 
@@ -212,6 +212,41 @@ the 767-module build pass. Independent source QA reports
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, independently rebuilding all hashes, setup, routes,
 fingerprints, and exact telemetry. F4A is accepted without importing the draft into product.
 
+### Stage F4B non-published Intro-02 authoring contract (2026-08-12)
+
+F4B authors only rebuilt stable ID `t3r-shaft-02` and keeps the live 50-level library
+unchanged. One writer may modify `src/game/core/puzzleV3IntroDefinitions.ts` to append the
+second draft, create `docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-02.json`, and create
+`src/game/core/puzzleV3Intro02Exact.test.ts`. The checkpoint remains at most 500 hand-authored
+changed lines, and the module still has only type imports and the sole exported symbol
+`PUZZLE_V3_INTRO_DRAFTS`.
+
+The draft keeps name `留井`, difficulty 2, targetRows 3, and no anchors/hidden cells. It uses
+exactly six legal zero-clear setup drops occupying exactly the three floor rows, with six
+total empty target cells. Exactly one board column is empty in all three target rows; no
+other column is a three-row well. Each row still has one through four gaps. The gameplay seed
+is unique across live and all v3 drafts.
+
+The strict optimum is three or four locks. Before the final lock, every settled piece clears
+zero rows and leaves all three original well-column targets empty. The final lock is a
+vertical I whose four cells share the well column and world rows `36..39`; it releases all
+three target rows at once and finishes. This proves the route-critical lesson is preserving
+the well until it is useful, not merely containing a vertical cavity in the screenshot.
+Exactly one stored alternative diverges at lock 1 or 2, finishes within optimum plus two,
+and satisfies the same no-early-clear/final-well-I evidence.
+
+Every pairwise `comparePuzzleTopologies(other, draft)` against the 50 live definitions and
+accepted Intro-01 draft must report all three match flags false. Intro-01 and live Intro-02
+remain byte-pinned: accepted draft 622 bytes / SHA-256
+`DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`; live canonical
+Intro-02 626 bytes / SHA-256
+`E83542E1A19A248EA26261A7504913A6A6B155DA9EA089622DF1BC04BDEC55B4`.
+
+F4B reuses the exact F4A schema-8 key order, hash preimages, proof kind, lower bound,
+`solutionMultiplicity='multiple'`, one alternative, and `techniqueEvidenceId=null`. Discovery
+may use a beam, but all stored fields require literal current-Core replay and an exhaustive
+shorter-depth certificate. Contract QA must be all zero before discovery or source editing.
+
 The certificate contains exactly one alternative entry. Both positive clear events must
 strictly reduce remaining original targets. Normal direct tests, one
 `PUZZLE_EXACT_CERTIFICATES=1` direct run, current
@@ -282,7 +317,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B CONTRACT NEXT** — the exact
+6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B CONTRACT QA NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -295,8 +330,8 @@ closed.
    has ten historical near pairs. Fresh pairwise draft-versus-live repair QA is all zero;
    pairwise draft-versus-live repair QA is all zero. The non-published Intro-01 candidate is
    now lives in an independently accepted three-path non-product checkpoint at `cfbcab4`.
-   Intro-02 requires its own docs-first authoring contract next; published curriculum
-   content remains closed.
+   Intro-02 now has a docs-only well-preservation contract; discovery and source stay closed
+   until independent contract QA is all zero. Published curriculum content remains closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

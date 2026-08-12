@@ -753,6 +753,11 @@ adding unrelated badges or ornamental effects.
   hash reconstruction, typecheck, `437 passed / 12 skipped`, and a 767-module build. The
   candidate remains non-published. Intro-02 begins only after a new contract freezes its
   distinct well-preservation lesson and rejects structural/route duplication with Intro-01.
+- Intro-02 teaches preservation rather than immediate completion. Its three target rows share
+  one unique empty column; every pre-final lock must avoid clearing or filling those three
+  well targets, and the final vertical I must occupy the well and release all three rows.
+  A second early-divergent route must exhibit the same invariant. This makes the lesson
+  mechanically testable instead of inferring “well play” from board appearance.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

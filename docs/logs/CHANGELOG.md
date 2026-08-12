@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4B Intro-02 contract frozen
+
+- F4B opens only the second non-published Intro draft, its schema-8 artifact, and direct exact
+  test, still below 500 changed lines and outside the live library.
+- The definition must expose one unique three-row well; every pre-final lock preserves it and
+  clears nothing, while the final vertical I releases all three rows. One early-divergent
+  alternative must prove the same lesson.
+- Live Intro-02 and accepted Intro-01 bytes/hashes, unique seed, pairwise structure, exact
+  proof, and v8 serializers are mandatory. Discovery waits for independent contract QA.
+
 ## 2026-08-12 — T37 Stage F4A Intro-01 accepted
 
 - Source `cfbcab4` adds only the non-published draft module, canonical schema-8 certificate,

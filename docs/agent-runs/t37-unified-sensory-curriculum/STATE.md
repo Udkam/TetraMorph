@@ -1508,6 +1508,22 @@ both live definitions and the accepted Intro-01 draft. Do not edit source until 
 contract QA is all zero. Published curriculum, progress/mastery/UI, sensory work, and icon
 remain closed.
 
+F4B contract now opens only a second non-published draft append, its schema-8 JSON, and direct
+test. The candidate must have six legal setup drops / 24 targets / six gaps in the three floor
+rows, with exactly one column empty across all three. Its exact optimum is three or four locks;
+all pre-final locks clear zero rows and preserve the three well targets, and the final vertical
+I occupies the well at world rows `36..39`, clears all three rows, and finishes. One stored
+lock-1-or-2-divergent alternative must prove the same invariant within optimum plus two.
+
+Pairwise structure must be distinct from live 50 and Intro-01. Pinned baselines are live
+Intro-02 626 bytes / `E83542E1A19A248EA26261A7504913A6A6B155DA9EA089622DF1BC04BDEC55B4`
+and accepted Intro-01 622 bytes /
+`DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`.
+
+Next exact action: commit this docs-only F4B contract and obtain fresh independent contract
+QA. Discovery and source editing remain closed until P0–P3/GAP are zero. No product, other
+draft, progression/UI, sensory, or icon path opens.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

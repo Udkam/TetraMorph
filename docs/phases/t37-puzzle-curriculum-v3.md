@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 CONTRACT NEXT**
+Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 CONTRACT QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -150,6 +150,37 @@ four with the exact case skipped; opt-in passes `5/5`. Typecheck, the complete
 `437 passed / 12 skipped` suite, and the 767-module build pass. Independent source QA reports
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. F4A is accepted; the draft remains outside the live
 50-level library. F4B must freeze a separate Intro-02 contract before any further source edit.
+
+## F4B Intro-02 authoring admission
+
+F4B appends only a non-published `t3r-shaft-02` draft to
+`puzzleV3IntroDefinitions.ts`, plus `puzzle-v3-intro-02.json` and
+`puzzleV3Intro02Exact.test.ts`. The module retains only type imports and the one exported
+draft array; the three-path checkpoint remains at most 500 hand-authored changed lines.
+
+The definition is a legal six-drop, zero-clear, anchor-free three-floor-row setup with 24
+ordinary targets and exactly six empty cells. Exactly one column is empty in all three target
+rows; all other columns contain at least one target, and every row has one through four gaps.
+The gameplay seed is distinct from all 50 live definitions and every earlier v3 draft.
+
+Its exact optimum is three or four locks. All locks before the last have zero row releases
+and keep the three original well-column target coordinates empty. The final lock is a vertical
+I at that well column with world-space cells `y=36,37,38,39`; it releases exactly three rows
+and finishes. One stored alternative diverges at lock 1 or 2, uses at most optimum plus two
+locks, and proves the same no-early-clear/final-well-I sequence. Both routes are literal
+current-Core evidence; beam output cannot prove optimum or absence.
+
+Pairwise exact, normalized-topology, and near-topology flags are false against every live
+definition and accepted Intro-01 draft. The accepted Intro-01 draft stays 622 bytes with
+SHA-256 `DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`; canonical live
+Intro-02 stays 626 bytes with SHA-256
+`E83542E1A19A248EA26261A7504913A6A6B155DA9EA089622DF1BC04BDEC55B4`.
+
+The schema remains exactly certificate v8 with F4A field order and serializers,
+`proof.kind='exhaustive-shorter-depths'`,
+`proof.lowerBoundVersion='target-column-deficit-v1'`, one alternative,
+`solutionMultiplicity='multiple'`, and `techniqueEvidenceId=null`. Fresh independent contract
+QA precedes all discovery and source editing.
 
 ## Frozen published roster
 
