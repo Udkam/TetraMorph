@@ -749,6 +749,10 @@ adding unrelated badges or ornamental effects.
   preserves the same lesson. Current-Core strict proof exhausts every shorter depth, and
   pairwise structure review finds no exact, normalized, or near match against the live 50.
   This is a non-published authoring candidate only.
+- F4A source `cfbcab4` is accepted with independent P0–P3/GAP all zero, complete replay and
+  hash reconstruction, typecheck, `437 passed / 12 skipped`, and a 767-module build. The
+  candidate remains non-published. Intro-02 begins only after a new contract freezes its
+  distinct well-preservation lesson and rejects structural/route duplication with Intro-01.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

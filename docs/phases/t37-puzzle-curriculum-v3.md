@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 CANDIDATE FROZEN**
+Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 CONTRACT NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -145,7 +145,11 @@ The frozen hashes are authoring
 `28f617b83044422656734990b9284cdd6a5263bb2b1de4239e0e30db2d400542`, primary route
 `a897b832ba90342d9fe8f7cd3c4bb35d6eaea14a81b28318319ab2322aff1d3f`, and alternative
 route `001ae5539a0708110a8d7dfd8dcd91eab489e0059cd75fb9e7e32b378b069529`.
-The source checkpoint may now create only the three contracted non-product paths.
+Source `cfbcab4` creates only the three contracted non-product paths. Normal direct tests pass
+four with the exact case skipped; opt-in passes `5/5`. Typecheck, the complete
+`437 passed / 12 skipped` suite, and the 767-module build pass. Independent source QA reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. F4A is accepted; the draft remains outside the live
+50-level library. F4B must freeze a separate Intro-02 contract before any further source edit.
 
 ## Frozen published roster
 

@@ -1488,6 +1488,26 @@ Next exact action: commit this candidate freeze, then create only
 `src/game/core/puzzleV3Intro01Exact.test.ts`. Run normal and opt-in direct tests, live roster/
 behavior regression, then the required final gates. No other path opens.
 
+Source commit `cfbcab4` adds exactly those three paths, 335 lines total. The module has only
+a type import and `PUZZLE_V3_INTRO_DRAFTS` export; every draft container is frozen and no
+product path imports it. The schema-8 artifact is 1,447 bytes, one LF line, no BOM or CR.
+Normal focused tests pass `15 passed / 1 skipped`; the opt-in exact test passes `5/5` in
+13.76 seconds. Post-source typecheck, the complete `437 passed / 12 skipped` suite, and the
+767-module build pass.
+
+Independent source QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It independently rebuilds
+all four hashes, the 625-byte canonical live base, the six-drop board and pairwise comparison,
+both route replays, first divergence, and the strict three-depth certificate. The commit has
+only the three authorized paths; index stays empty and protected T27/`progress.md` state is
+unchanged. F4A is accepted.
+
+Next exact action: create a docs-only F4B contract for rebuilt stable ID `t3r-shaft-02`, whose
+distinct lesson is preserving a three-row well. Reuse the schema-8 and pairwise admission
+rules, require a route-critical preserved well and reject topology/route duplication against
+both live definitions and the accepted Intro-01 draft. Do not edit source until independent
+contract QA is all zero. Published curriculum, progress/mastery/UI, sensory work, and icon
+remain closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

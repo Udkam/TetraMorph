@@ -89,3 +89,54 @@ recorded only as coordinator-reported integration evidence.
 - Blocker: none.
 - Next action: the coordinator records F3D documentation acceptance and opens only the
   bounded F4A contract.
+
+## F4A — non-published Intro-01 authoring
+
+- Task ID: `T37-F4A` (coordinator-owned implementation; independent QA
+  `/root/f4a_candidate_b`)
+- Base SHA: `4e1ab52922de90ef39e9e133f2938a7dc3d7b299`
+- Source commit: `cfbcab4ba6fa797f4cf5c11f268ef68366ba675f`
+- Status: accepted; remains outside the live 50-level library.
+
+### Exact source paths
+
+- `src/game/core/puzzleV3IntroDefinitions.ts`
+- `docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-01.json`
+- `src/game/core/puzzleV3Intro01Exact.test.ts`
+
+The draft uses setup seed `2080886771`, gameplay seed `1212`, and gap vector `[2,2,2]`.
+Its optimal four-lock replay releases rows `[0,1,0,2]`, leaving 16 original targets after
+the first clear; one four-lock route diverges at lock 1. This makes the teaching sequence
+readable as “complete one row, preserve the remaining structure, then complete two rows”
+instead of presenting three simultaneous one-row clears. Pairwise comparison against every
+live definition returns no exact, normalized-topology, or near-topology match.
+
+### Commands and evidence
+
+- Normal focused gate:
+  `npm.cmd run test -- src/game/core/puzzleV3Intro01Exact.test.ts src/game/core/puzzles.test.ts src/game/core/puzzleV3BehaviorBaseline.test.ts`
+  -> `15 passed / 1 skipped`.
+- Exact gate with `PUZZLE_EXACT_CERTIFICATES=1`:
+  `npm.cmd run test -- src/game/core/puzzleV3Intro01Exact.test.ts` -> `5/5` passed.
+- `npm.cmd run typecheck` passed.
+- Complete `npm.cmd run test` passed `437 / 12 skipped`.
+- `npm.cmd run build` passed with 767 modules.
+- Browser evidence is not applicable because the draft is not product-imported and changes
+  no runtime, renderer, UI, or playable level.
+
+Exact proof returns optimum 4, initial `ad14d5ee`, depths
+`{0,1,34,0},{1,34,1184,440},{2,744,13239,0}`, totals 779 explored states / 14,457
+transitions / 440 bound prunes, primary final `b9fe55b0`, and alternative final `f8aef200`.
+
+### Independent QA
+
+Independent read-only source QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It verifies
+the three-path/335-line boundary, deep freezing and product isolation, canonical schema and
+hashes, live 50 and canonical 625-byte base, setup/seed/fingerprint admission, both routes,
+and current-Core exact telemetry. Index and inherited protected dirty paths remain unchanged.
+
+### Blocker and next action
+
+- Blocker: none.
+- Next action: freeze and independently review a docs-only F4B Intro-02 well-preservation
+  contract before opening any new source path.

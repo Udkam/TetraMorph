@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3D ACCEPTED / F4A INTRO-01 CANDIDATE FROZEN**
+Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 CONTRACT NEXT**
 
 ## Active objective
 
@@ -205,6 +205,13 @@ respectively `f3e6d4b728c52f57641315d188e09368c15b862d36cc268d378e3558e82a0aa1`,
 `a897b832ba90342d9fe8f7cd3c4bb35d6eaea14a81b28318319ab2322aff1d3f`, and
 `001ae5539a0708110a8d7dfd8dcd91eab489e0059cd75fb9e7e32b378b069529`.
 
+Source `cfbcab4` creates only the frozen draft module, canonical schema-8 JSON, and direct
+current-Core test. Normal focused tests pass `15 passed / 1 skipped`; the opt-in direct exact
+run passes `5/5`. Post-source typecheck, the complete suite (`437 passed / 12 skipped`), and
+the 767-module build pass. Independent source QA reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, independently rebuilding all hashes, setup, routes,
+fingerprints, and exact telemetry. F4A is accepted without importing the draft into product.
+
 The certificate contains exactly one alternative entry. Both positive clear events must
 strictly reduce remaining original targets. Normal direct tests, one
 `PUZZLE_EXACT_CERTIFICATES=1` direct run, current
@@ -275,7 +282,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3D ACCEPTED; F4A INTRO-01 CANDIDATE FROZEN** — the exact
+6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B CONTRACT NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -287,8 +294,9 @@ closed.
    the prior whole-audit-empty fingerprint rule impossible because the live library already
    has ten historical near pairs. Fresh pairwise draft-versus-live repair QA is all zero;
    pairwise draft-versus-live repair QA is all zero. The non-published Intro-01 candidate is
-   now independently replayed and exact-certified; only its frozen three-path source
-   checkpoint opens next, while published curriculum content remains closed.
+   now lives in an independently accepted three-path non-product checkpoint at `cfbcab4`.
+   Intro-02 requires its own docs-first authoring contract next; published curriculum
+   content remains closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

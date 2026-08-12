@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4A Intro-01 accepted
+
+- Source `cfbcab4` adds only the non-published draft module, canonical schema-8 certificate,
+  and direct current-Core test: 335 lines across three paths.
+- Normal focused tests pass `15 passed / 1 skipped`; opt-in exact passes `5/5`. Typecheck,
+  the complete `437 passed / 12 skipped` suite, and the 767-module build pass.
+- Independent source QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including live-50
+  isolation and complete hash/replay/exact-proof reconstruction. F4B Intro-02 contract is next.
+
 ## 2026-08-12 — T37 Stage F4A Intro-01 candidate frozen
 
 - A six-drop `[2,2,2]` floor board with unique gameplay seed `1212` passes validator and
