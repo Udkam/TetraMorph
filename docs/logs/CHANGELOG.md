@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4C Intro-03 accepted
+
+- Source `95f3316` adds only the non-published Intro-03 draft, canonical schema-8 artifact,
+  and direct exact test: 336 lines across three paths; the live 50 remain unchanged.
+- Setup seed `37220` builds gap vector `[3,1,1,3]`. Two five-lock routes diverge at lock 1,
+  prove O-support before the horizontal-I bridge, and release `[0,0,2,1,1]`.
+- Opt-in exact proof establishes optimum 5 over 2,498 states and 46,762 transitions.
+  Typecheck/build pass; the final full suite passes `445 / 14 skipped` after the unrelated
+  renderer hook timeout passed its isolated `54/54` rerun.
+- Three independent source reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+  F4D opens docs-first for Intro-04 local-clear/only-opening authoring.
+
 ## 2026-08-12 — T37 Stage F4C contract accepted; discovery opened
 
 - Two independent reviews of `3e9811a` report P0–P3/GAP all zero after the row-height,

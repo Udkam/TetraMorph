@@ -251,3 +251,30 @@ preimplementation QA; the docs freeze still needs fresh independent review.
 - Blocker: none.
 - Next action: independently review this docs-only freeze, repair any finding, then commit
   the all-zero freeze and implement only the authorized three-path Intro-03 source checkpoint.
+
+## F4C — Intro-03 source acceptance
+
+- Task ID: `T37-F4C-SOURCE`
+- Base SHA: `0ac4c4215a60363d3a238205528818376224592b`
+- Candidate SHA: `95f331601d598280d7f6a10f29e387e987ed0a3a`
+- Status: accepted outside product; live 50 unchanged.
+
+The source checkpoint adds exactly
+`src/game/core/puzzleV3IntroDefinitions.ts`,
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-03.json`, and
+`src/game/core/puzzleV3Intro03Exact.test.ts`: three paths and 336 added lines. It reproduces
+the frozen setup, both lock-1-divergent five-lock routes, releases `[0,0,2,1,1]`, canonical
+schema-8 bytes and hashes, initial `9ac8a069`, optimum 5, 2,498 explored states, 46,762
+transitions, and 3,034 deficit-bound prunes.
+
+Normal focused tests pass `23 / 3 skipped`; the opt-in exact gate passes `5/5`; typecheck
+passes; the final complete suite passes `445 / 14 skipped`; and the build transforms 767
+modules. One earlier full-suite run hit an unrelated renderer `beforeAll` timeout, followed
+by an isolated `54/54` pass and the clean final full pass. Three independent source reviews
+each report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+
+- Blocker: none for the next docs-only contract.
+- Next action: reconcile the live `t3r-cascade-06` baseline with the frozen Intro-04 role,
+  then commit and independently review a mechanically testable four-row local-clear/
+  only-opening contract before discovery. Product, progression/UI, sensory, protected T27
+  paths, and icon remain closed.

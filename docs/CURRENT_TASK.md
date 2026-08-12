@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CANDIDATE FROZEN — DOCS QA OPEN**
+Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT NEXT**
 
 ## Active objective
 
@@ -452,7 +452,7 @@ lines, and keep the live 50 product library unchanged.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 CANDIDATE FROZEN / DOCS QA OPEN** — the exact
+6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -466,10 +466,11 @@ lines, and keep the live 50 product library unchanged.
    independently accepted three-path checkpoint at `cfbcab4`. Intro-02 is accepted in the
    isolated four-path source checkpoint `c571f54`, with all writer and independent gates
    green. The docs-first Intro-03 contract now binds four target rows and a causal
-   support-before-bridge geometry check. A fully qualified five-lock candidate passes
-   preimplementation QA and is frozen above. The three-path source slice remains closed only
-   until fresh independent review accepts the candidate-freeze documentation; published
-   curriculum content remains closed until the later atomic switch.
+   support-before-bridge geometry check. Source `95f3316` adds the isolated non-product
+   Intro-03 draft, schema-8 artifact, and exact test. Focused, exact, typecheck, final full
+   suite (`445 / 14 skipped`), and build gates pass; three independent reviews are all zero.
+   Published curriculum content remains closed until the later atomic switch. F4D now opens
+   docs-first for the Intro-04 local-clear/only-opening contract.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

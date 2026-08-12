@@ -1669,6 +1669,21 @@ freeze; repair any finding, then commit the all-zero freeze and open only the th
 source slice. Product, progression/UI, sensory work, protected T27 paths, and icon remain
 closed.
 
+F4C is accepted outside product. Candidate-freeze checkpoint `0ac4c42` was followed by source
+`95f3316`, containing exactly three paths and 336 added lines. Normal focused tests pass
+`23 / 3 skipped`; the opt-in Intro-03 exact gate passes `5/5`; typecheck passes; the clean
+final full suite passes `445 / 14 skipped`; and the build transforms 767 modules. The first
+full-suite attempt's unrelated renderer hook timeout passed an isolated `54/54` rerun before
+the clean final full pass. Three independent source reviews report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The live 50 remain unchanged.
+
+Next exact action: perform only a docs-first F4D fact reconciliation and contract for stable
+ID `t3r-cascade-06`, whose frozen role is “four-row local clear that retains the only
+opening.” Pin the live baseline, define literal opening coordinates plus per-lock
+preservation/release evidence, bind schema-8 hashes and finite proof bounds, and require fresh
+independent contract QA before candidate discovery. Do not open Intro-04 source, product
+integration, progression/UI, sensory, protected T27 paths, or icon work yet.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CANDIDATE FROZEN — DOCS QA OPEN**
+Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -333,6 +333,16 @@ preimplementation QA; this freeze still requires its own fresh independent docs 
 After that review is all zero, the source gate opens only for the previously bounded three
 paths and 500-line limit. Implementation must reproduce these literals and canonical
 schema-8 hashes; temporary discovery scripts are not production inputs.
+
+Source `95f3316` fulfills that gate in exactly three paths and 336 added lines while leaving
+the live 50 unchanged. The normal focused gate passes `23 / 3 skipped`; the opt-in Intro-03
+exact gate passes `5/5` and reproduces optimum 5. Typecheck, the final full suite
+(`445 / 14 skipped`), and the 767-module build pass. The first full-suite attempt hit an
+unrelated renderer `beforeAll` timeout whose isolated `54/54` rerun passed; the clean final
+full run is authoritative. Three independent source reviews report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Intro-03 is accepted outside product. F4D must begin
+docs-first with stable ID `t3r-cascade-06`; no Intro-04 discovery or source edit opens before
+its local-clear/only-opening contract passes independent review.
 
 ## Frozen published roster
 
