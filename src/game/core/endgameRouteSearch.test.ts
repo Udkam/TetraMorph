@@ -6,7 +6,6 @@ import t32Changed46To50File from '../../../docs/workstreams/tetris-t37-endgame/f
 import { createInitialState, dispatch, stateHash } from './engine';
 import { getEndgameDefinition, type EndgameDefinition } from './endgames';
 import {
-  ENDGAME_PROOF_FIELD_POLICY,
   ENDGAME_PROOF_FRONTIER_TESTING,
   decodeEndgameRoute,
   encodeEndgameRoute,
@@ -212,7 +211,8 @@ describe('Phase-7 Endgame route search', () => {
     const key = ENDGAME_PROOF_FRONTIER_TESTING.encode(started, started);
     const decoded = ENDGAME_PROOF_FRONTIER_TESTING.decode(key, started);
     expect(ENDGAME_PROOF_FRONTIER_TESTING.encode(decoded, started)).toBe(key);
-    expect(Object.keys(ENDGAME_PROOF_FIELD_POLICY).sort()).toEqual(Object.keys(started).sort());
+    expect(Object.keys(ENDGAME_PROOF_FRONTIER_TESTING.fieldPolicy).sort())
+      .toEqual(Object.keys(started).sort());
 
     const occupied = started.endgameTargetCells[0]!;
     for (const material of [BEDROCK_CELL, SURVIVAL_STONE_CELL]) {

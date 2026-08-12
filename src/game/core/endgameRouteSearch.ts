@@ -302,7 +302,7 @@ export function endgameRouteStateKey(state: GameState): string {
 export type EndgameProofFieldStorage = 'encoded' | 'template-invariant' | 'proof-quotiented';
 
 /** @internal Compile-time tripwire: new GameState fields must receive an explicit proof policy. */
-export const ENDGAME_PROOF_FIELD_POLICY = {
+const ENDGAME_PROOF_FIELD_POLICY = Object.freeze({
   board: 'encoded',
   active: 'encoded',
   queue: 'encoded',
@@ -364,7 +364,7 @@ export const ENDGAME_PROOF_FIELD_POLICY = {
   elapsedTicks: 'proof-quotiented',
   randomizer: 'encoded',
   seed: 'template-invariant',
-} as const satisfies Readonly<Record<keyof GameState, EndgameProofFieldStorage>>;
+} as const satisfies Readonly<Record<keyof GameState, EndgameProofFieldStorage>>);
 
 type EndgameProofFrontierContext = Readonly<{ template: GameState }>;
 const PIECE_TYPE_SET = new Set<string>(PIECE_TYPES);
@@ -398,7 +398,8 @@ function assertCells(cells: readonly Cell[], label: string): void {
 }
 
 function assertProofDecisionDomain(state: GameState): void {
-  if (state.mode !== 'endgame' || state.endgameId === null || state.seed <= 0) {
+  if (state.mode !== 'endgame' || state.endgameId === null
+    || !isUint(state.seed, 0xffff_ffff) || state.seed === 0) {
     proofKeyError('state is not a seeded Endgame');
   }
   if (state.endgameGoal !== 'original-targets-cleared' || state.endgameCompletion !== 'active') {
@@ -428,6 +429,10 @@ function assertProofDecisionDomain(state: GameState): void {
   assertCells(state.endgameTargetCells, 'target cells');
   assertCells(state.endgameAnchorSupportedCells, 'supported cells');
   if (state.endgameTargetCells.length === 0) proofKeyError('active decision has no remaining target');
+  if (state.endgameAnchorSupportedCells.length > 0
+    && !state.board.some((row) => row.includes(ANCHOR_CELL))) {
+    proofKeyError('supported cells require an immutable anchor');
+  }
   for (const [label, cells] of [
     ['target cells', state.endgameTargetCells],
     ['supported cells', state.endgameAnchorSupportedCells],
@@ -578,6 +583,7 @@ function decodeProofFrontierStateKey(key: string, context: EndgameProofFrontierC
 
 /** @internal Focused tests exercise the private proof codec without changing general key callers. */
 export const ENDGAME_PROOF_FRONTIER_TESTING = Object.freeze({
+  fieldPolicy: ENDGAME_PROOF_FIELD_POLICY,
   encode(state: GameState, template: GameState): string {
     return proofFrontierStateKey(state, createProofFrontierContext(template));
   },
