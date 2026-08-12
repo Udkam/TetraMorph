@@ -294,6 +294,9 @@ describe.runIf(RUN_EXACT)('Puzzle v3 ten-row exact certificate', () => {
       artifact.route.commandStream,
     );
     expect(certificate).not.toBeNull();
+    expect(certificate?.exhaustedDepths).toEqual([
+      { lockedPieces: 0, frontierStates: 1, transitions: 0, boundPrunes: 1 },
+    ]);
     expect(certificate && {
       deficitBoundPrunes: certificate.deficitBoundPrunes,
       exhaustedFrontierWidths: certificate.exhaustedFrontierWidths,

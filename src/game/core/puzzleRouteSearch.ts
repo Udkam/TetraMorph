@@ -68,10 +68,19 @@ export interface PuzzleAlternativeSearchResult {
   firstDivergenceLock: number | null;
 }
 
+export type PuzzleOptimalRouteDepthRecord = Readonly<{
+  lockedPieces: number;
+  frontierStates: number;
+  transitions: number;
+  boundPrunes: number;
+}>;
+
 export interface PuzzleOptimalRouteCertificate {
   levelId: PuzzleId;
   /** Exact minimum number of locked pieces in the complete public-control domain. */
   optimalLocks: number;
+  /** Immutable proof telemetry for every decision frontier the exact search entered. */
+  exhaustedDepths: readonly PuzzleOptimalRouteDepthRecord[];
   /** Width of every fully exhausted decision frontier at depths 0..optimalLocks - 2. */
   exhaustedFrontierWidths: readonly number[];
   /** Number of unique decision states whose complete landing domains were expanded. */
@@ -328,22 +337,20 @@ export function certifyOptimalPuzzleRouteForDefinition(
   const initialStateHash = stateHash(canonicalStart);
   const started = withoutUndoHistory(canonicalStart);
   let frontier: GameState[] = [started];
-  const exhaustedFrontierWidths: number[] = [];
-  let exploredStateCount = 0;
-  let transitionCount = 0;
-  let deficitBoundPrunes = 0;
+  const exhaustedDepths: PuzzleOptimalRouteDepthRecord[] = [];
 
   for (let depth = 0; depth < optimalLocks - 1 && frontier.length > 0; depth += 1) {
-    exhaustedFrontierWidths.push(frontier.length);
-    exploredStateCount += frontier.length;
+    const frontierStates = frontier.length;
+    let transitions = 0;
+    let boundPrunes = 0;
     const nextFrontier = new Map<string, GameState>();
     for (const parent of frontier) {
       if (depth + puzzleRouteLockLowerBound(parent) >= optimalLocks) {
-        deficitBoundPrunes += 1;
+        boundPrunes += 1;
         continue;
       }
       for (const landing of exhaustivePuzzleLandings(parent)) {
-        transitionCount += 1;
+        transitions += 1;
         if (landing.state.status === 'finished') {
           throw new Error(`Puzzle ${levelId} has a shorter route than the ${optimalLocks}-lock candidate.`);
         }
@@ -351,20 +358,41 @@ export function certifyOptimalPuzzleRouteForDefinition(
         const nextDepth = depth + 1;
         if (nextDepth >= optimalLocks - 1) continue;
         if (nextDepth + puzzleRouteLockLowerBound(landing.state) >= optimalLocks) {
-          deficitBoundPrunes += 1;
+          boundPrunes += 1;
           continue;
         }
         const key = puzzleRouteStateKey(landing.state);
         if (!nextFrontier.has(key)) nextFrontier.set(key, landing.state);
       }
     }
+    exhaustedDepths.push(Object.freeze({
+      lockedPieces: depth,
+      frontierStates,
+      transitions,
+      boundPrunes,
+    }));
     frontier = [...nextFrontier.values()];
   }
+
+  const frozenExhaustedDepths = Object.freeze(exhaustedDepths);
+  const exhaustedFrontierWidths = Object.freeze(frozenExhaustedDepths.map((record) => (
+    record.frontierStates
+  )));
+  const exploredStateCount = frozenExhaustedDepths.reduce((total, record) => (
+    total + record.frontierStates
+  ), 0);
+  const transitionCount = frozenExhaustedDepths.reduce((total, record) => (
+    total + record.transitions
+  ), 0);
+  const deficitBoundPrunes = frozenExhaustedDepths.reduce((total, record) => (
+    total + record.boundPrunes
+  ), 0);
 
   return Object.freeze({
     levelId,
     optimalLocks,
-    exhaustedFrontierWidths: Object.freeze(exhaustedFrontierWidths),
+    exhaustedDepths: frozenExhaustedDepths,
+    exhaustedFrontierWidths,
     exploredStateCount,
     transitionCount,
     deficitBoundPrunes,
