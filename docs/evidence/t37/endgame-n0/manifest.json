@@ -1,0 +1,14 @@
+{
+  "sourceSha": "1a348c29c877981d960a78ed52507eff4f8f0a4f",
+  "capturedAt": "2026-08-12T17:25:44.003Z",
+  "algorithm": "sha256",
+  "files": {
+    "README.md": "1034ab9d3e9b300e1b40c8a6b7e313c284a0fb4d2e80dc8fcb782ea247caebe7",
+    "audit.json": "2fcc39c248efa6d55443b1ed8454fbe5a8712e6796278bfcf91c3322101a4fb2",
+    "capture-endgame-n0.mjs": "6e89a3e5ed039ce7f3b9e6cb337dc34e00cc6a66204156eef4ebd09594fceb85",
+    "endgame-library-en-1440x900.png": "081baf1fc0ffdff95ae2756ff41c01f190ef5d5de9f6dec924a50fdab858d7bc",
+    "endgame-library-zh-1440x900.png": "fdd3e6ae6e0709dc762a8ee95b805fdc51b6c2e4d2ef718b128701334e330f52",
+    "home-en-1440x900.png": "cf0ed0db0dfe1080f52a72633f1d0c0354a2665d9b8e1597b7c61e6b5661cef0",
+    "home-zh-1440x900.png": "797fbec5f1dbfb14a334fb8e5d84b87563ed867bc4c17ea9afb9a7f454dc7853"
+  }
+}

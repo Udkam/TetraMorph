@@ -1,0 +1,85 @@
+{
+  "sourceSha": "1a348c29c877981d960a78ed52507eff4f8f0a4f",
+  "capturedAt": "2026-08-12T17:25:44.003Z",
+  "chinese": {
+    "home": {
+      "path": "/",
+      "documentLanguage": "zh-CN",
+      "modeLabels": [
+        "经典",
+        "生存",
+        "异变",
+        "残局"
+      ],
+      "canvasCount": 0,
+      "horizontalOverflow": false
+    },
+    "library": {
+      "path": "/endgames",
+      "historyState": {
+        "tetramorphRoute": {
+          "version": 2,
+          "navigation": {
+            "screen": "endgame-library",
+            "mode": "endgame",
+            "selectedEndgameId": "t3r-shaft-01"
+          }
+        }
+      },
+      "titleText": "残局",
+      "categoryLabels": [
+        "入门",
+        "简单",
+        "困难"
+      ],
+      "levelCount": 10,
+      "selectedLevelId": "t3r-shaft-01",
+      "levelListLabel": "共 50 个残局",
+      "canvasCount": 0,
+      "horizontalOverflow": false
+    },
+    "errors": [],
+    "passed": true
+  },
+  "english": {
+    "home": {
+      "path": "/",
+      "documentLanguage": "en",
+      "modeLabels": [
+        "Classic",
+        "Survival",
+        "Mutation",
+        "Endgame"
+      ],
+      "canvasCount": 0,
+      "horizontalOverflow": false
+    },
+    "library": {
+      "path": "/endgames",
+      "historyState": {
+        "tetramorphRoute": {
+          "version": 2,
+          "navigation": {
+            "screen": "endgame-library",
+            "mode": "endgame",
+            "selectedEndgameId": "t3r-shaft-01"
+          }
+        }
+      },
+      "titleText": "Endgame",
+      "categoryLabels": [
+        "Intro",
+        "Easy",
+        "Hard"
+      ],
+      "levelCount": 10,
+      "selectedLevelId": "t3r-shaft-01",
+      "levelListLabel": "50 Endgame levels",
+      "canvasCount": 0,
+      "horizontalOverflow": false
+    },
+    "errors": [],
+    "passed": true
+  },
+  "passed": true
+}
