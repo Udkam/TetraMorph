@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4B Intro-02 accepted
+
+- Source `c571f54` changes only the four frozen non-product paths (340 additions, two
+  deletions) and preserves the live 50-level library plus the accepted Intro-01 artifact.
+- Normal Intro/live regression passes `19 passed / 2 skipped`, combined opt-in exact passes
+  `10/10`, typecheck passes, the complete suite passes `441 passed / 13 skipped`, and the
+  767-module build passes.
+- Two independent source reviews report P0–P3/GAP all zero after rebuilding all bytes,
+  hashes, topology comparisons, legal setup, both well-preserving routes, and exact proof.
+  Only a docs-first Intro-03 support-before-bridge contract opens next.
+
 ## 2026-08-12 — T37 Stage F4B Intro-02 candidate frozen
 
 - A legal six-drop `[4,1,1]` board exposes one unique x=6 well and passes all 51 pairwise

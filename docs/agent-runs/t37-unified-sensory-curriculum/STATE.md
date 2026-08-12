@@ -1568,6 +1568,31 @@ Independent preimplementation QA reproduces every value and reports
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Next exact action: commit this candidate freeze, then
 implement only the four contracted paths and run focused normal/exact tests plus final gates.
 
+F4B source base is `48275bdd2e9c069bac1a62218ee2deeef67fa68f`; source commit is
+`c571f54dfe0077b5dc88554671ed0f25c5abb335`. It changes only the four contracted paths,
+with 340 additions and two deletions. The canonical Intro-02 artifact is 621 bytes and hashes
+to `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+
+Final source-bound gates pass: normal Intro-01/02 plus live roster/behavior regression is
+`19 passed / 2 skipped`; combined opt-in Intro exact is `10/10`; typecheck passes; the full
+suite is `441 passed / 13 skipped`; build transforms 767 modules. Browser evidence does not
+apply because neither draft is product-imported and no runtime, UI, renderer, or playable
+definition changed.
+
+Two independent source reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They independently
+rebuild raw artifact bytes and all four hashes, verify the live-50 and accepted Intro-01
+baselines, replay the legal six-drop setup and both four-lock routes, prove the open-well and
+final vertical-I invariant, and reproduce the exact optimum/telemetry. Index remains empty;
+protected T27 evidence, `docs/evidence/t27-r1-followup/**`, and `progress.md` remain unchanged.
+F4B is accepted outside product.
+
+Next exact action: perform a docs-first F4C fact reconciliation and contract for stable ID
+`t3r-shaft-03`. The frozen roster calls the lesson “four-row support before bridge”, while the
+current product metadata still describes the old live definition; pin both baselines and
+define literal support/bridge board coordinates and route events before any discovery. Require
+fresh independent contract QA all zero. Do not open source, product integration, progression,
+UI, sensory, protected T27 paths, or icon work yet.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

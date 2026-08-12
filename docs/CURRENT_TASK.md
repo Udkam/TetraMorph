@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 CANDIDATE FROZEN**
+Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CONTRACT NEXT**
 
 ## Active objective
 
@@ -281,6 +281,18 @@ Frozen SHA-256 values are authoring
 `17a81baa80e064389305e7dd44d9ee0c48bcb3e9713e1378a6f38ba7fdcd042a`, and alternative
 route `648350cc55b43e319d1b555984abd716102549753900c144d01a0d48a116a1d2`.
 
+Source `c571f54` appends the accepted non-published Intro-02 draft and changes only the four
+contracted paths, with 340 additions and two deletions. The canonical artifact is 621 bytes
+with SHA-256 `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+Normal Intro-01/02 plus live-roster/baseline tests pass `19 passed / 2 skipped`; the combined
+opt-in Intro exact run passes `10/10`. Post-source typecheck, the complete suite
+(`441 passed / 13 skipped`), and the 767-module build pass. Two fresh independent source
+reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, independently rebuilding the setup,
+well invariant, both routes, all hashes, and exact proof while confirming live-50 isolation,
+the append-compatible Intro-01 pin, an empty index, and unchanged protected dirty paths.
+F4B is accepted outside product. F4C must first resolve and freeze the Intro-03 four-row
+support-before-bridge contract before any new source or discovery path opens.
+
 The certificate contains exactly one alternative entry. In each route, the only positive row
 release is the final value `3`; all preceding values are zero, remaining original targets are
 24 before that release and zero after it, and the final locked-piece signature is the frozen
@@ -353,7 +365,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B INTRO-02 CANDIDATE FROZEN** — the exact
+6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -364,9 +376,10 @@ closed.
    supplies schema-8 per-depth telemetry without proof drift. A current-Core probe found
    the prior whole-audit-empty fingerprint rule impossible because the live library already
    has ten historical near pairs. The non-published Intro-01 draft now lives in an
-   independently accepted three-path checkpoint at `cfbcab4`. The Intro-02 well-preservation
-   candidate is independently replayed and exact-certified; only its frozen four-path
-   checkpoint opens next, while source and published curriculum content remain closed.
+   independently accepted three-path checkpoint at `cfbcab4`. Intro-02 is accepted in the
+   isolated four-path source checkpoint `c571f54`, with all writer and independent gates
+   green. Only the docs-first Intro-03 support-before-bridge contract opens next; discovery,
+   source, and published curriculum content remain closed until that contract passes review.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

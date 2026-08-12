@@ -140,3 +140,53 @@ and current-Core exact telemetry. Index and inherited protected dirty paths rema
 - Blocker: none.
 - Next action: freeze and independently review a docs-only F4B Intro-02 well-preservation
   contract before opening any new source path.
+
+## F4B — non-published Intro-02 authoring
+
+- Task ID: `T37-F4B` (coordinator-owned implementation; independent source review by two
+  read-only workers)
+- Base SHA: `48275bdd2e9c069bac1a62218ee2deeef67fa68f`
+- Source commit: `c571f54dfe0077b5dc88554671ed0f25c5abb335`
+- Status: accepted; remains outside the live 50-level library.
+
+### Exact source paths
+
+- `src/game/core/puzzleV3IntroDefinitions.ts`
+- `docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-02.json`
+- `src/game/core/puzzleV3Intro02Exact.test.ts`
+- `src/game/core/puzzleV3Intro01Exact.test.ts`
+
+The source appends stable ID `t3r-shaft-02`, pins Intro-01 by ID/index/bytes/hash without a
+whole-array length assertion, and changes 340 added plus two deleted lines. The six legal
+setup drops create the `[4,1,1]` floor mask and unique x=6 well. Both four-lock routes keep
+the well open through three zero-clear locks, then use the same vertical I at y36..39 to
+release all three rows. The canonical artifact is 621 bytes with SHA-256
+`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+
+### Commands and evidence
+
+- Normal focused gate over Intro-01/02, `puzzles.test.ts`, and the v3 behavior baseline:
+  `19 passed / 2 skipped`.
+- Combined opt-in Intro exact gate with `PUZZLE_EXACT_CERTIFICATES=1`: `10/10` passed.
+- `npm.cmd run typecheck` passed.
+- Complete `npm.cmd run test` passed `441 / 13 skipped`.
+- `npm.cmd run build` passed with 767 modules.
+- Browser evidence is not applicable because the drafts are not imported by product code.
+
+Exact proof returns optimum 4, initial `3aadbdab`, depths
+`{0,1,17,0},{1,17,589,206},{2,383,13661,0}`, totals 401 explored states / 14,267
+transitions / 206 bound prunes, primary final `b060114c`, and alternative final `e78bd4f0`.
+
+### Independent QA
+
+Two fresh read-only source reviews each report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+They independently verify the exact four-path/line boundary, product isolation, deep freezing,
+canonical bytes and hashes, pinned live/Intro-01 baselines, every topology comparison, legal
+setup, both routes, well coordinates, exact telemetry, empty index, and unchanged protected
+dirty paths.
+
+### Blocker and next action
+
+- Blocker: none.
+- Next action: freeze and independently review a docs-only F4C `t3r-shaft-03` four-row
+  support-before-bridge contract before candidate discovery or any source edit.

@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 CANDIDATE FROZEN**
+Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -223,6 +223,18 @@ behavior `f19aecb90dbba04a1cac3e38b6714806f5ca44709a8a558cd6935f501fae23cb`, pri
 `17a81baa80e064389305e7dd44d9ee0c48bcb3e9713e1378a6f38ba7fdcd042a`, and alternative
 `648350cc55b43e319d1b555984abd716102549753900c144d01a0d48a116a1d2`. The four-path source
 checkpoint may now open; product integration remains closed.
+
+Source `c571f54` implements exactly the four contracted paths with 340 additions and two
+deletions. The Intro-02 artifact is 621 bytes with SHA-256
+`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`; accepted Intro-01
+and both pinned live definitions remain unchanged. Normal Intro/live regression passes
+`19 passed / 2 skipped`, combined opt-in Intro exact passes `10/10`, typecheck passes, the
+complete suite passes `441 passed / 13 skipped`, and the production build transforms 767
+modules. Two independent source reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` after
+separate byte/hash, topology, setup, route, well, and exact-certificate reconstruction.
+F4B is accepted as an authoring-only draft. F4C opens only a docs-first contract for
+`t3r-shaft-03`; no candidate discovery or source edit is authorized until its four-row
+support-before-bridge lesson is made mechanically testable and independently accepted.
 
 ## Frozen published roster
 
