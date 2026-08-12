@@ -1870,6 +1870,57 @@ and mechanically useful geometry only as clues. Do not resume, merge, or cite an
 `ABANDONED_LEGACY_PUZZLE_MODE` checkpoint, and do not open Intro-05 source/search until the
 canonical contract passes all-zero review.
 
+## 2026-08-13 canonical Intro-05 recovery contract candidate
+
+The fact reconciliation and one-shot external validator are now frozen, but discovery has
+not run. Core base/tree are `33ac2eb02e8828d25749229b2a5233abf6faae17` /
+`e86bacb4f2595b1b1d0109509c14d87429e3c0f5`. The 633-byte clue hashes to
+`959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`; the
+26,059-byte validator hashes to
+`6237614A8B1AB729E52E3AB466E9EA1DDF444321FDB7C1E3510A8DE468A9E773`.
+Syntax/help checks pass. The candidate output does not exist.
+
+The validator imports the current Core through one Vite SSR server, verifies the frozen Core
+tree and clean worktree, rebuilds the eight-drop four-row setup, validates seed/topology
+admission against live 50 plus four drafts, reconstructs both routes through complete public
+landings, proves both two-hop support chains, and runs the uncapped shorter-depth certificate.
+It treats `H` as hard drop and proves Hold absence from the command domain, not token spelling.
+It has no resume/checkpoint option and writes the sole output only after every gate succeeds.
+
+The first review rejected `A5703556...2A875` for missing frozen input/self assertions,
+untracked-Core and Vite-config isolation, post-proof reconciliation, close-before-publish
+ordering, and quoted Windows paths. The current hash above contains those repairs and the
+rejected bytes are not executable under this contract.
+
+The next review rejected `DD795484...D34B4` because stdout failure after atomic rename could
+leave an output from a failed command, and because “documentation-only descendant” was not
+enforced. The current bytes admit only the five contract-document paths after the frozen base
+and perform no I/O after rename. Both older hashes remain unauthorized.
+
+A publication-tail review rejected `5237C9A5...E67DB`: cleanup could delete an unowned
+staging filename after exclusive creation failed, while absence-then-rename was not an atomic
+no-replace guarantee. The current bytes mark ownership only after exclusive creation, use a
+random staging name, publish through a same-volume hard link that fails on an existing final
+path, and make post-publication staging cleanup best-effort. All three older hashes are
+unauthorized.
+
+Next exact action: obtain two independent all-zero contract/validator reviews. Repair any
+finding and refreeze hashes. Only then execute the exact command in `docs/DESIGN.md`. A
+complete output still requires independent byte/behavior audit before the four-path source
+slice opens. Do not edit the later roster, UI, progression, sensory, protected T27/follow-up,
+`progress.md`, or icon paths meanwhile.
+
+That gate is now green. Two independent read-only reviews of the exact 26,059-byte validator
+and 633-byte clue report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They confirm the semantic
+setup/route/support/admission/certificate gates and the exclusive no-replace publication tail.
+Next exact action: commit only these five contract documents, verify the frozen Core tree and
+absent output once more, then run exactly the command in `docs/DESIGN.md`. Do not retry if it
+fails or broaden discovery without a new reviewed contract.
+
+Final-stage reminder from player testing: after 5/25/16 publication, make 1–4-line clears
+award increasingly meaningful feedback and lengthen the current clear presentation. This is
+deferred deliberately and must be implemented before the final icon/overall acceptance.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

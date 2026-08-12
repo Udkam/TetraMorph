@@ -8682,3 +8682,52 @@ with P0 0 / P1 0 / P2 0 / P3 0 after verifying the portable evidence dependency,
 `1.0.0-rc.1` package/lock alignment, source-bound Phase-E/F audits, and consistent current
 status records. No product or evidence change followed the accepted source; coordinator
 closure and ordinary push are the only remaining operations.
+
+## 2026-08-13 — canonical Intro-05 recovery contract candidate
+
+Status: **DOCS/VALIDATOR REVIEWS ACCEPTED; ONE FRESH DISCOVERY RUN OPEN**.
+
+F4E is bound to accepted Core base `33ac2eb02e8828d25749229b2a5233abf6faae17`
+and Core tree `e86bacb4f2595b1b1d0109509c14d87429e3c0f5`. A targeted current-Core
+reconciliation confirms the live `t3r-shaft-04` baseline remains 625 serialized bytes,
+SHA-256 `E973122AAA271F92CFD61D35814EB2079DA977817FF0A60F6F56DDDC0060D7A2`,
+ready-state hash `6569e505`, gameplay seed `2309737967`, setup seed `5200006`, and
+opening active/queue `O / T,S,I,J,Z`; F4E still means a separately validated replacement
+draft, not an in-place live product edit.
+
+The sole neutral clue proposes setup seed `37220`, gameplay seed `3887`, eight placements
+`I0@5,T0@2,S0@4,L0@0,J2@7,Z0@2,O0@0,L2@7`, and two seven-lock physical-pose routes.
+Its 633-byte input hashes to
+`959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`.
+These values are discovery hints only. In particular, no earlier state hash, route hash,
+admission result, bounded search, or certificate is accepted.
+
+The reviewed fail-closed validator is 26,059 bytes and hashes to
+`6237614A8B1AB729E52E3AB466E9EA1DDF444321FDB7C1E3510A8DE468A9E773`.
+`node --check` and `--help` pass, but the candidate command has not run. Its exact command,
+output path, proof domain, causal checks, admission requirements, and four-path eventual
+source boundary are frozen in `docs/DESIGN.md`. The output path is currently absent.
+
+The first contract-review pass rejected the prior 23,480-byte validator. The corrected
+version pins its input and own bytes, rejects tracked or untracked Core changes, disables
+repository Vite configuration, repeats HEAD/Core/module/input/self checks after the exact
+proof, and closes Vite before publishing. Windows paths in the command are quoted. The
+next review additionally rejected `DD795484...D34B4`; the current validator allows only the
+five committed contract-document paths after the Core base and performs no output after the
+atomic publication. A publication-tail review then rejected `5237C9A5...E67DB` for temp-file
+ownership and destination replacement races. The current bytes use an exclusively created,
+randomly named owned staging file and a same-volume hard-link no-replace publication. None of
+the three rejected byte sequences is authorized.
+
+Two final read-only reviews of the exact 26,059-byte validator and 633-byte clue report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They verify the semantic Core gates, exact byte pins,
+five-document committed-descendant allowlist, Windows command, Vite lifecycle, and exclusive
+no-replace publication. One fresh candidate execution is now open. Only a complete candidate
+plus independent byte/behavior review opens Intro-05 source. Published curriculum integration,
+later Easy/Hard work, sensory behavior, protected T27/follow-up and `progress.md` paths, and
+the icon remain closed.
+
+The player additionally deferred the newest line-clear feedback to the final experience
+stage: line-clear count must eventually drive a meaningful 1–4-line reward hierarchy, and
+the current clear presentation must last longer. This is recorded now but must not interrupt
+the Endgame curriculum or enter the Intro-05 candidate.

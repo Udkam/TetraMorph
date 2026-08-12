@@ -209,6 +209,26 @@ reconciliation and reviewed authoring contract; the abandoned checkpoints remain
 
 There is no dual-mode bridge and no intermediate commit that exports both namespaces.
 
+## F4E canonical Intro-05 recovery gate
+
+Intro-05 discovery starts fresh from Core base
+`33ac2eb02e8828d25749229b2a5233abf6faae17` and Core tree
+`e86bacb4f2595b1b1d0109509c14d87429e3c0f5`. The frozen external clue and validator
+hashes are respectively `95905367...87F42` and `6237614A...9E773`; the only authorized
+candidate path is initially absent and existing output is a hard failure. The exact command
+and complete gates are in `docs/DESIGN.md`.
+
+The current Core must rebuild the setup, both complete-public-domain routes, two causal
+support hops, 54-way admission, all canonical hashes, and an uncapped shorter-depth proof.
+No stopped checkpoint, prior hash, bounded search, or human-readable route is accepted as
+proof. Two all-zero contract reviews precede the one candidate run; an independently audited
+complete candidate precedes the four-path Intro-05 source slice. Until that sequence closes,
+the fifth Intro board is not accepted or published.
+
+That contract gate is now closed: two independent reviews of the final frozen bytes report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Exactly one fresh candidate execution is open; no
+source or publication path is open until its output passes independent byte and behavior QA.
+
 ## F5 final 5 / 25 / 16 roster
 
 The following order is future revision-3 product truth. N0 must not publish it early.
@@ -267,6 +287,11 @@ Every published level requires Core replay of its canonical route, an exhaustive
 shorter-depth rejection, deterministic per-depth telemetry, a canonical Endgame state/hash
 schema, and independent byte/hash review. A bounded search result, a legacy-domain proof,
 or a human-readable route alone is not a certificate.
+
+The final experience stage follows curriculum publication. It owns the requested longer
+line-clear presentation and a clear-count-derived 1/2/3/4-line reward hierarchy, followed by
+the deferred site-icon proposal. Neither concern may be folded into F4E or a later curriculum
+data/proof slice.
 
 ## Acceptance boundary
 

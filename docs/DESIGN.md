@@ -5821,3 +5821,97 @@ claims bind to the corrected candidate. Final acceptance additionally requires a
 install from the committed lockfile, the full project gates, scoped dependency and
 secret scans, synchronized status documents, and an independent read-only QA pass on
 the exact frozen range.
+
+## T37 F4E canonical Intro-05 recovery contract
+
+F4E resumes from accepted canonical Endgame source, not from a stopped proof checkpoint.
+The frozen Core base is `33ac2eb02e8828d25749229b2a5233abf6faae17`; its
+`src/game/core` tree is `e86bacb4f2595b1b1d0109509c14d87429e3c0f5`. The eventual
+candidate command may run from a documentation-only descendant only when that Core tree
+still matches exactly and `git diff --quiet HEAD -- src/game/core` succeeds.
+
+Two repository-external inputs are frozen before discovery:
+
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-clue-v1.json` — 633 bytes,
+  SHA-256 `959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v1.mjs` —
+  26,059 bytes, SHA-256
+  `6237614A8B1AB729E52E3AB466E9EA1DDF444321FDB7C1E3510A8DE468A9E773`.
+
+The clue owns only a proposed setup, gameplay seed, and two physical-pose routes. It owns
+no board rows, state/hash result, admission result, certificate, or acceptance claim. The
+validator rebuilds all of those through the current Core. It has no resume/checkpoint
+option, rejects an existing output, limits and structurally parses the clue, pins its own
+and the input bytes, binds the Core tree and tracked/untracked worktree, disables repository
+Vite configuration, rejects every committed descendant path outside the five contract
+documents, then repeats those checks after proof. It successfully closes Vite before writing,
+creates a uniquely named staging file exclusively, and publishes with a same-volume hard link
+whose existing-destination failure cannot overwrite the final path. It cleans only staging
+bytes it owns; cleanup after publication is best-effort and cannot turn success into failure.
+The one authorized
+output is the initially absent path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v1.json`.
+Any failure must leave that output absent.
+
+After two independent read-only reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`,
+the exact discovery command is:
+
+```powershell
+node "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v1.mjs" `
+  --root "E:\Proj\reproduction-tetris" `
+  --input "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-clue-v1.json" `
+  --output "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v1.json" `
+  --expect-core-base 33ac2eb02e8828d25749229b2a5233abf6faae17 `
+  --expect-core-tree e86bacb4f2595b1b1d0109509c14d87429e3c0f5 `
+  --expect-input-bytes 633 `
+  --expect-input-sha 959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42 `
+  --expect-validator-sha 6237614A8B1AB729E52E3AB466E9EA1DDF444321FDB7C1E3510A8DE468A9E773 `
+  --id t3r-shaft-04 `
+  --difficulty 5 `
+  --target-rows 4 `
+  --max-primary-locks 7 `
+  --max-alternative-extra 2
+```
+
+The validator must derive exactly eight legal zero-clear setup drops, 32 targets in the
+bottom four rows, gap counts `1..3` summing to eight, no hidden cells or anchors, a unique
+gameplay seed, and 54 nonmatching exact/topology/near-topology comparisons. Both routes
+must be reconstructed lock-by-lock from `exhaustiveEndgameLandings`; their first three
+pieces must be literal Current/Next-1/Next-2 with releases `[0,0,0]`. They share lock 1,
+first diverge at lock 2 or 3, and each proves complete nonempty lock-1-to-2 and
+lock-2-to-3 blocker ownership plus remove-then-descend counterfactuals. Each later has at
+least two positive release events summing to four and reaches zero targets. The primary
+uses five through seven locks and the alternative is at most two locks longer.
+
+Only `certifyOptimalEndgameRouteForDefinition` over `exhaustiveEndgameLandings` may prove
+the primary. No beam or state cap is accepted. Route token `H` means hard drop; Hold is
+absent because the current public `GameCommand` domain has no Hold command. The output
+must contain the full shorter-depth telemetry, new canonical state and SHA-256 hashes,
+causal evidence, admission comparisons, and a deterministically ordered schema-8 fixture
+candidate. A bounded zero-hit, prior hash, or mechanically equivalent old-domain replay
+is not proof.
+
+The earlier 23,480-byte / `A5703556...2A875` and 25,478-byte /
+`DD795484...D34B4`, and 25,754-byte / `5237C9A5...E67DB` validators are rejected by
+review and must never run. They collectively
+lacked frozen-byte assertions, untracked-Core and Vite-config isolation, post-proof
+reconciliation, committed-descendant enforcement, no-I/O-after-publish ordering, and
+exclusive owned no-replace publication. Only a complete,
+independently audited output from the current frozen validator opens the four-path source boundary:
+`src/game/core/endgameV3IntroDefinitions.ts`,
+`docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-05.json`,
+`src/game/core/endgameV3Intro05Exact.test.ts`, and
+`src/game/core/endgameV3Intro04Exact.test.ts`. Intro-04 may replace only its fixed total
+length assertion with exact identity of the accepted first-four prefix; Intro-05 owns the
+new total. The source slice remains within 500 hand-authored changed lines and changes no
+published roster, UI, progression, sensory behavior, protected T27 evidence, or icon.
+
+## T37 final experience backlog
+
+After the complete 5/25/16 Endgame curriculum is published and verified, the final
+experience stage must revisit line clearing before the deferred site icon. One-through-four
+line clears need visibly increasing reward feedback derived from the achieved clear count,
+and the accepted classic row-clear presentation needs a longer readable duration. Exact
+timings, reward grammar, audio alignment, reduced-motion behavior, and scoring boundaries
+remain design work for that final stage; no interim curriculum slice may silently change
+them.

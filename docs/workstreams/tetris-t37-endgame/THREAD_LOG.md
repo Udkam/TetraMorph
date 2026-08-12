@@ -219,3 +219,33 @@ old screenshot.
 - Protected inherited T27/follow-up and `progress.md` paths remained outside every commit.
 - Next action: create and independently review a canonical Intro-05 authoring contract.
   The stopped pre-N0 proof shards remain abandoned and may supply discovery clues only.
+
+## F4E-R1 — canonical Intro-05 recovery contract candidate
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-RECOVERY-001`.
+- Base: `33ac2eb02e8828d25749229b2a5233abf6faae17`.
+- Frozen Core tree: `e86bacb4f2595b1b1d0109509c14d87429e3c0f5`.
+- Repository changes: docs contract/status only; no Core, fixture, product, evidence, or
+  protected local path is opened.
+- External clue: 633 bytes /
+  `959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`.
+- External validator: 26,059 bytes /
+  `6237614A8B1AB729E52E3AB466E9EA1DDF444321FDB7C1E3510A8DE468A9E773`;
+  `node --check` and `--help` pass.
+- Repair: the first review rejected `A5703556...2A875`; the current bytes add input/self
+  pins, tracked/untracked Core isolation, `configFile:false`, post-proof reconciliation,
+  Vite close-before-publish ordering, and quoted Windows command paths.
+- Repair 2: review rejected `DD795484...D34B4`; the current bytes enforce a five-document
+  committed-descendant allowlist and perform no I/O after atomic publication.
+- Repair 3: publication-tail review rejected `5237C9A5...E67DB`; the current bytes mark
+  staging ownership only after exclusive creation, use a random staging name, and publish
+  through same-volume hard-link no-replace semantics with best-effort staging cleanup.
+- Candidate output: absent; discovery and proof have not run.
+- Boundary: stopped outputs supply setup/route clues only. The new validator rebuilds every
+  board, route, support, admission, state/hash, and uncapped certificate result through the
+  current canonical Core and writes only after all gates pass.
+- Verification: two independent final-byte contract/validator reviews report
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; the candidate was not run during review.
+- Blocker: none; source remains closed by design.
+- Next action: commit only the five contract documents, then run exactly the one candidate
+  command frozen in `docs/DESIGN.md`. Failure is a stop condition, not retry authorization.
