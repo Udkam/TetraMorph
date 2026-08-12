@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT ACCEPTED — DISCOVERY OPEN**
+Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CANDIDATE FROZEN — DOCS QA OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -303,6 +303,36 @@ only in repository-external temporary paths and may use heuristic search solely 
 upper bound. Source creation remains closed until current Core independently replays the legal
 eight-drop setup, both qualifying routes and pairwise admission, then exhaustively excludes
 every shorter solution without beam, timeout, or state cap.
+
+### F4C frozen candidate
+
+Repository-external discovery admits one five-lock candidate for implementation. Setup seed
+`37220` replays `I T S L J Z O L` as eight legal zero-clear drops. Its typed floor rows are
+`...ZJOOSLL`, `L.ZZJOOSSL`, `L.ZJJTTTSL`, and `LLIIIIT...`, yielding gap vector
+`[3,1,1,3]`. Gameplay seed `2900` is unused by the live 50 and Intro-01/02 and opens
+`O I T S J`; all 52 prior exact/topology/near comparisons are false.
+
+Primary route
+`SHTTTHTTTCCLLLHTTTTTTTTTTTTQLLLHTTTTTTTTTTTTRRRRHTTTTTTTTTTTT`
+uses support `O:4,34|5,34|4,35|5,35` and bridge `I:3,33|4,33|5,33|6,33`.
+The sole alternative
+`SLHTTTLHTTTLLDDDDDDDDDDDDCLDCHTTTTTTTTTTTTQLLLHTTTTTTTTTTTTRRRRHTTTTTTTTTTTT`
+diverges at lock 1 with support `O:3,34|4,34|3,35|4,35` and bridge
+`I:2,33|3,33|4,33|5,33`. Both then use the same `T`, `S`, and `J` signatures, release
+`[0,0,2,1,1]`, retain `[32,32,16,7,0]` targets, and end at hashes `7e21cf71` and
+`92a715fe`. The alternative's soft drops are ordinary exhaustive public controls and do not
+violate the accepted contract.
+
+Primary and alternative source runs are respectively `x3..6@y33` and `x2..5@y33`; shifted
+blockers are respectively `(4,34),(5,34)` and `(3,34),(4,34)`, with both shifted span
+endpoints open. Strict proof fixes initial hash `9ac8a069`, optimum 5, exhausted depths
+`{0,1,9,0},{1,9,153,0},{2,153,5369,3034},{3,2335,41231,0}`, 2,498 explored
+states, 46,762 transitions, and 3,034 bound prunes. Candidate mechanics passed read-only
+preimplementation QA; this freeze still requires its own fresh independent docs review.
+
+After that review is all zero, the source gate opens only for the previously bounded three
+paths and 500-line limit. Implementation must reproduce these literals and canonical
+schema-8 hashes; temporary discovery scripts are not production inputs.
 
 ## Frozen published roster
 

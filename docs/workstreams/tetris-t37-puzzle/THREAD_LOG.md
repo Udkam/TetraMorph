@@ -237,3 +237,17 @@ open yet.
 - Blocker: none for bounded external discovery.
 - Next action: search outside the repository for a qualifying four-lock candidate; require
   independent current-Core replay, exact proof, and preimplementation QA before source.
+
+### Candidate freeze
+
+Repository-external construction found a legal candidate using setup seed `37220`, gameplay
+seed `2900`, four-row gap vector `[3,1,1,3]`, and primary/alternative five-lock releases
+`[0,0,2,1,1]`. The routes diverge at lock 1 and prove the required O-support/horizontal-I
+bridge geometry. Current-Core exact proof returns optimum 5, initial hash `9ac8a069`, 2,498
+explored states, 46,762 transitions, and 3,034 deficit-bound prunes. Pairwise admission
+against live 50 plus Intro-01/02 is all false. Candidate mechanics passed read-only
+preimplementation QA; the docs freeze still needs fresh independent review.
+
+- Blocker: none.
+- Next action: independently review this docs-only freeze, repair any finding, then commit
+  the all-zero freeze and implement only the authorized three-path Intro-03 source checkpoint.

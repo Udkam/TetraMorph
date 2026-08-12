@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CONTRACT ACCEPTED — DISCOVERY OPEN**
+Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CANDIDATE FROZEN — DOCS QA OPEN**
 
 ## Active objective
 
@@ -362,9 +362,35 @@ sensory, and icon remain closed.
 Two independent final reviews of current HEAD `3e9811a` report
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They accept the four-row/live-three-row isolation,
 source-to-shifted-blocker geometry, both-route release invariant, schema/baselines, and the
-three-path/500-line feasibility. Only bounded repository-external candidate discovery is open.
-No draft/source file may be created until a candidate passes legal setup replay, pairwise
-admission, unique seed, both route invariants, and strict current-Core exact proof.
+three-path/500-line feasibility. At contract acceptance, only bounded repository-external
+candidate discovery was open; no draft/source file could be created until a candidate passed
+legal setup replay, pairwise admission, unique seed, both route invariants, and strict
+current-Core exact proof. The following freeze records that later gate.
+
+### F4C candidate freeze and source authorization (2026-08-12)
+
+The admitted candidate uses setup seed `37220` and placements
+`I0@2,T2@5,S1@6,L3@8,J3@3,Z1@1,O0@5,L1@-1`, deriving typed floor rows
+`...ZJOOSLL / L.ZZJOOSSL / L.ZJJTTTSL / LLIIIIT...` and gap vector `[3,1,1,3]`.
+Unique gameplay seed `2900` opens `O I T S J`; all 52 prior pairwise exact/topology/near
+checks are false.
+
+Primary route
+`SHTTTHTTTCCLLLHTTTTTTTTTTTTQLLLHTTTTTTTTTTTTRRRRHTTTTTTTTTTTT`
+and alternative
+`SLHTTTLHTTTLLDDDDDDDDDDDDCLDCHTTTTTTTTTTTTQLLLHTTTTTTTTTTTTRRRRHTTTTTTTTTTTT`
+both release `[0,0,2,1,1]`, retain `[32,32,16,7,0]` targets, and finish in five locks.
+They diverge at lock 1 and end at `7e21cf71` and `92a715fe`. Their support/bridge pairs are
+respectively `O:4,34|5,34|4,35|5,35` with `I:3,33|4,33|5,33|6,33`, and
+`O:3,34|4,34|3,35|4,35` with `I:2,33|3,33|4,33|5,33`. Literal shifted blockers are
+`(4,34),(5,34)` and `(3,34),(4,34)`, with the run endpoints open.
+
+Unbounded exact proof returns initial `9ac8a069`, optimum 5, depth records
+`{0,1,9,0},{1,9,153,0},{2,153,5369,3034},{3,2335,41231,0}`, 2,498 explored
+states and 46,762 transitions. Candidate mechanics passed read-only preimplementation QA;
+the bounded three-path source gate opens only after this docs freeze passes fresh independent
+review. Implementation must preserve these literals, remain under 500 hand-authored changed
+lines, and keep the live 50 product library unchanged.
 
 ## Frozen product direction
 
@@ -426,7 +452,7 @@ admission, unique seed, both route invariants, and strict current-Core exact pro
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 DISCOVERY OPEN** — the exact
+6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 CANDIDATE FROZEN / DOCS QA OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -440,9 +466,10 @@ admission, unique seed, both route invariants, and strict current-Core exact pro
    independently accepted three-path checkpoint at `cfbcab4`. Intro-02 is accepted in the
    isolated four-path source checkpoint `c571f54`, with all writer and independent gates
    green. The docs-first Intro-03 contract now binds four target rows and a causal
-   support-before-bridge geometry check. Both final contract reviews are all zero; only
-   repository-external candidate discovery is open. Source and published curriculum content
-   remain closed until a fully qualified candidate passes preimplementation QA.
+   support-before-bridge geometry check. A fully qualified five-lock candidate passes
+   preimplementation QA and is frozen above. The three-path source slice remains closed only
+   until fresh independent review accepts the candidate-freeze documentation; published
+   curriculum content remains closed until the later atomic switch.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

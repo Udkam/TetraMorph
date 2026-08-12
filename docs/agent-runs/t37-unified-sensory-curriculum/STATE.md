@@ -1656,6 +1656,19 @@ and run the unbounded shorter-depth certificate. Stop and repair the design only
 invariant proves infeasible; do not silently loosen it. Product, progression/UI, sensory,
 protected T27 paths, and icon remain closed.
 
+F4C candidate discovery is complete. Setup seed `37220` with placements
+`I0@2,T2@5,S1@6,L3@8,J3@3,Z1@1,O0@5,L1@-1` produces gap vector `[3,1,1,3]`;
+gameplay seed `2900` opens `OITSJ`. Primary and lock-1-divergent alternative both finish in
+five locks with releases `[0,0,2,1,1]`, remaining targets `[32,32,16,7,0]`, and the
+literal O-support/I-bridge mapping. Strict proof fixes initial `9ac8a069`, optimum 5, 2,498
+explored states, and 46,762 transitions. Pairwise admission is all false and candidate
+mechanics passed read-only preimplementation QA.
+
+Next exact action: obtain fresh independent review of this uncommitted docs-only candidate
+freeze; repair any finding, then commit the all-zero freeze and open only the three-path F4C
+source slice. Product, progression/UI, sensory work, protected T27 paths, and icon remain
+closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
