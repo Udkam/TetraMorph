@@ -145,9 +145,9 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     stop at 1,000,000 probes without a candidate; independent output QA is all zero.
 38. `TEMP CLEANUP BLOCKED` — terminal safety policy rejects both exact deletion forms
     before execution. No second increment or later product work opens before cleanup.
-39. `F4D R3 CANDIDATE FROZEN; QA NEXT` — setup `49`, gameplay seed `83`, and two
+39. `F4D ACCEPTED; F4E CONTRACT NEXT` — setup `49`, gameplay seed `83`, and two
     exact four-lock routes replace the infeasible terminal-I route constraint while retaining
-    the local clear and explicit corridor lesson. Source remains closed for independent QA.
+    the local clear and explicit corridor lesson. Source and independent QA are green.
 
 ### Stage F3C tooling-discovery status
 
@@ -1770,6 +1770,18 @@ Next exact action: obtain fresh independent R3 contract/candidate QA. If all fin
 zero, commit the docs freeze and open only the definition append, certificate JSON, and exact
 test, within the 500-line cap and without editing existing Intro tests. Do not
 edit product integration, later curriculum, sensory, protected T27, or icon paths first.
+
+That gate closed: both contract/candidate reviews and both source reviews report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Source `d3aafc0` owns exactly three paths and 381
+added lines. Focused passes `16 / 4 skipped`, Intro-04 exact `5/5`, typecheck passes, isolated
+renderer `54/54`, clean final full suite `449 / 15 skipped`, and build 767 modules. Intro-04
+is accepted outside product.
+
+Next exact action: author and independently review only the F4E Intro-05 docs contract. Pin
+the live baseline and Current/Next-1/Next-2 planning invariant, and explicitly authorize the
+minimum append-compatible change to Intro-04's fixed four-draft test before any Intro-05
+source append. Product integration, later curriculum, sensory, protected T27, and icon remain
+closed.
 
 ## Do not repeat
 

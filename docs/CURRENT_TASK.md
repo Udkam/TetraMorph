@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 R3 CANDIDATE FROZEN — CONTRACT QA NEXT**
+Status: **STAGE F4D INTRO-04 ACCEPTED / F4E INTRO-05 CONTRACT NEXT**
 
 ## Active objective
 
@@ -501,8 +501,16 @@ deficit-bound prunes. The canonical schema-8 artifact is 1,477 bytes with SHA-25
 `EC17469F6D7F48CBBFB8A2863D24C79D3232B10DAD851204D52B8BF5D69EFB1A`;
 authoring/behavior hashes are `98e249aaeb79bed609792482f1fe88c96bb34a17819766fc5285873e854fe82f`
 and `1e4e881c631f4a0aaec407e4ec432980f36142b074166b3aa7f4f6fd067156ac`.
-Fresh independent contract/candidate QA must report all zero before the three-path source
-checkpoint opens; product integration and all later work remain closed meanwhile.
+Fresh independent contract/candidate QA reported all zero before the three-path source
+checkpoint opened; product integration and all later work remained closed meanwhile.
+
+Source `d3aafc0` implements only the frozen definition, canonical certificate, and exact test
+in 381 added lines. Focused Intro-01–04 passes `16 / 4 skipped`; opt-in Intro-04 exact passes
+`5/5`; typecheck, clean final full suite (`449 / 15 skipped`), and the 767-module build pass.
+The first full run's unrelated renderer setup timeout passed isolated `54/54` before the clean
+final run. Two independent source reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+Intro-04 is accepted outside product. F4E must begin docs-first and explicitly account for
+Intro-04's current fixed draft-count assertion before any Intro-05 source append.
 
 ## Frozen product direction
 
@@ -564,7 +572,7 @@ checkpoint opens; product integration and all later work remain closed meanwhile
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 R3 CANDIDATE FROZEN / QA NEXT** — the exact
+6. **Puzzle curriculum — F4D INTRO-04 ACCEPTED; F4E INTRO-05 CONTRACT NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -583,9 +591,9 @@ checkpoint opens; product integration and all later work remain closed meanwhile
    suite (`445 / 14 skipped`), and build gates pass; three independent reviews are all zero.
    Published curriculum content remains closed until the later atomic switch. F4D's accepted
    contract reached an eight-drop setup contradiction inside its generated index-1 family.
-   Independent review accepted the seven-drop R2 revision before discovery. R3 now freezes
-   the qualifying four-lock corridor-migration candidate; only fresh all-zero R3 QA may open
-   the three-path definition/artifact/exact-test source checkpoint.
+   Independent review accepted the seven-drop R2 revision before discovery. R3 then froze and
+   implemented the qualifying four-lock corridor-migration candidate; contract and source QA
+   are all zero. F4E next defines Current/Next-1/Next-2 planning before any source edit.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

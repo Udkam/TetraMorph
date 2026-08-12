@@ -385,3 +385,20 @@ optimal geometries. No repository source or protected path changed.
 - Next action: repair any finding; with all-zero QA, commit this docs freeze and open only
   the authorized definition/artifact/exact-test paths, under 500 hand-authored lines and
   without changing existing Intro tests.
+
+## F4D — Intro-04 source acceptance
+
+- Task ID: `T37-F4D-SOURCE-R3`
+- Base/candidate: `ca8ceec..d3aafc0`
+- Exact paths: definition append, `puzzle-v3-intro-04.json`, Intro-04 exact test.
+- Status: accepted outside product; F4E docs contract next.
+
+The source checkpoint adds 381 lines across exactly three authorized paths. Writer gates are
+focused `16 / 4 skipped`, Intro-04 exact `5/5`, typecheck, isolated renderer `54/54`, clean
+final full `449 / 15 skipped`, and build 767 modules. Formal source QA also runs all four
+Intro exact suites `20/20`; formal and adversarial reviews both report P0–P3/GAP all zero.
+Protected T27/follow-up/progress paths remain unstaged and outside the commit.
+
+- Blocker: none for docs-only F4E contract authoring.
+- Next action: freeze and independently review the Intro-05 Current/Next-1/Next-2 planning
+  contract, including the append-compatible Intro-04 test boundary.

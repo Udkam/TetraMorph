@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4D Intro-04 accepted
+
+- Source `d3aafc0` adds only the non-published Intro-04 definition, schema-8 artifact, and
+  exact test in 381 lines; the live 50 remain unchanged.
+- The two optimal four-lock routes prove a local bottom-row clear, zero-clear Z branch, and
+  J-to-T migration of the only opening. Current-Core exact proof excludes every shorter route.
+- Focused, opt-in exact, typecheck, clean full suite (`449 / 15 skipped`), build, and two
+  independent P0–P3/GAP-zero source reviews pass. F4E opens docs-first.
+
 ## 2026-08-12 — T37 Intro-04 R3 candidate frozen for QA
 
 - A complete current-Core candidate corrects R2's two remaining infeasible assumptions:

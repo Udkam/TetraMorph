@@ -807,6 +807,10 @@ adding unrelated badges or ornamental effects.
   `[1,0,1,2]`, both routes are strictly optimal in four locks, and seven optimal geometries
   exist in the complete four-lock landing domain. Contract QA precedes the bounded three-path
   implementation, while live product data stays unchanged.
+- Intro-04 source `d3aafc0` is accepted outside product after focused, exact, typecheck,
+  clean full-suite, build, and two independent P0–P3/GAP-zero reviews. Intro-05 remains
+  docs-first; its source boundary must include or precede the minimum append-compatible repair
+  to Intro-04's fixed four-draft assertion.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

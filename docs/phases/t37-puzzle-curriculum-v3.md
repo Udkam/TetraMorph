@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 R3 CANDIDATE FROZEN — CONTRACT QA NEXT**
+Status: **F4D INTRO-04 ACCEPTED; F4E INTRO-05 CONTRACT NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -425,6 +425,12 @@ and schema-8 hashes are frozen in the authoritative current-task/state records. 
 boundary remains exactly the definition append, one certificate JSON, and one exact test,
 with at most 500 hand-authored changed lines and no existing Intro-test edit. Source opens
 only after fresh independent R3 QA.
+
+Both contract reviews and both source reviews report P0–P3/GAP all zero. Source `d3aafc0`
+adds exactly the three frozen paths in 381 lines; focused, exact, typecheck, clean full suite,
+and build pass. Intro-04 remains outside the live 50 until the atomic switch. F4E starts with
+a docs-first contract and must not append Intro-05 while Intro-04's exact test still asserts a
+fixed total of four drafts without an authorized append-compatible repair.
 
 ## Frozen published roster
 
