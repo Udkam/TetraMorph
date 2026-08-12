@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME NAMESPACE MIGRATION CONTRACT ACCEPTED / STORAGE CAPABILITY NEXT / INTRO-05 PAUSED**
+Status: **ENDGAME NAMESPACE SOURCE GREEN / FINAL N0 EVIDENCE RECAPTURE PENDING / INTRO-05 PAUSED**
 
 ## Active objective
 
@@ -15,6 +15,12 @@ path, key, symbol, proof status, or “next action” elsewhere in this append-o
 describes the repository at its earlier checkpoint only. It is not an active alias or
 implementation instruction after 2026-08-12. The concise current curriculum authority is
 `docs/phases/t37-endgame-curriculum-v3.md`.
+
+The atomic canonical source is now green. Its final acceptance correction makes home mode
+labels follow the active language (`残局` / `Endgame`), makes the library's total-count
+accessibility copy neutral about locked Hard levels, and places real App-boot route/storage
+migration coverage inside the sole isolated compatibility test. A fresh browser capture and
+independent review must bind to the corrected source before N0 closes and Intro-05 resumes.
 
 The player temporarily interrupted the audio gate for one bounded Core correction.
 Mutation now restores its 0.1-second-per-cell fastest tier. A Supergravity-covered

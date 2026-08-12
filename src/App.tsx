@@ -701,7 +701,6 @@ export function ModeHome({
           >
             {MODE_ORDER.map((mode, index) => {
               const item = modeCopy(language, mode);
-              const visibleLabel = modeCopy('en', mode).label;
               return (
                 <button
                   key={mode}
@@ -717,7 +716,7 @@ export function ModeHome({
                 >
                   <span className="mode-gate__glyph"><ModeGlyph mode={mode} /></span>
                   <span className="mode-gate__body">
-                    <strong>{visibleLabel}</strong>
+                    <strong>{item.label}</strong>
                   </span>
                   <span className="mode-gate__action" aria-hidden="true">
                     <svg viewBox="0 0 28 24" focusable="false">

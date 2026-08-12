@@ -393,7 +393,7 @@ const COPY: Record<AppLanguage, Translation> = {
       selectedEndgame: (name) => `已选残局：${name}`,
       endgameBoard: (name) => `${name}棋盘轮廓`,
       startEndgame: (name) => `开始 ${name}`,
-      endgameList: (count) => `${count} 个开放残局`,
+      endgameList: (count) => `共 ${count} 个残局`,
       endgameCategory: (category, count) => `${category}，${count} 关`,
       masteryThreshold: (technique, prerequisite, required, best) => best === null
         ? `在“${prerequisite}”中用 ${required} 步内通关，掌握“${technique}”后解锁。`
@@ -534,7 +534,7 @@ const COPY: Record<AppLanguage, Translation> = {
       selectedEndgame: (name) => `Selected endgame: ${name}`,
       endgameBoard: (name) => `${name} board outline`,
       startEndgame: (name) => `Start ${name}`,
-      endgameList: (count) => `${count} open endgame routes`,
+      endgameList: (count) => `${count} Endgame levels`,
       endgameCategory: (category, count) => `${category}, ${count} levels`,
       masteryThreshold: (technique, prerequisite, required, best) => best === null
         ? `Finish “${prerequisite}” in ${required} moves or fewer to master “${technique}”.`

@@ -556,6 +556,7 @@ describe('Endgame progress boot persistence', () => {
     expect(localStorage.getItem(ENDGAME_PROGRESS_KEY)).toBe(current);
     view.unmount();
   });
+
 });
 
 describe('Survival stone timing presentation', () => {
@@ -1954,10 +1955,10 @@ describe('T6 frontend mode binding', () => {
       !button?.hasAttribute('data-selected') && !button?.hasAttribute('aria-pressed')
     ))).toBe(true);
     expect([classic, survival, mutation, endgame].map((button) => button?.querySelector('strong')?.textContent)).toEqual([
-      'Classic',
-      'Survival',
-      'Mutation',
-      'Endgame',
+      '经典',
+      '生存',
+      '异变',
+      '残局',
     ]);
     expect(view.container.textContent).not.toMatch(/马拉松|竞速|等级|速度档/);
     expect(view.container.textContent).not.toContain('选择模式');
@@ -2035,6 +2036,9 @@ describe('T6 frontend mode binding', () => {
     const english = render(createElement(ModeHome, { onEnter, language: 'en' }));
     expect(english.container.querySelector('.mode-home-tagline')).toBeNull();
     expect(english.container.textContent).not.toContain('Transform the way blocks fall.');
+    expect([...english.container.querySelectorAll('[data-testid^="enter-"] strong')].map((label) => label.textContent)).toEqual([
+      'Classic', 'Survival', 'Mutation', 'Endgame',
+    ]);
     english.unmount();
   });
 
@@ -2077,7 +2081,7 @@ describe('T6 frontend mode binding', () => {
     expect(parseReducedMotionOverride('off')).toBe(false);
     expect(view.container.querySelector('.app')?.getAttribute('data-reduced-motion')).toBe('true');
     expect(view.container.querySelector('[data-testid="language-en"]')).toBeNull();
-    expect(view.container.querySelector('[data-testid="enter-marathon"] strong')?.textContent).toBe('Classic');
+    expect(view.container.querySelector('[data-testid="enter-marathon"] strong')?.textContent).toBe('经典');
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -2664,7 +2668,7 @@ describe('T6 frontend mode binding', () => {
     expect(rows).toHaveLength(10);
     expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(0, 10).map((level) => level.id));
     expect(rows.every((row) => row.dataset.unlocked === 'true')).toBe(true);
-    expect(view.container.querySelector('[data-testid="level-list"]')?.getAttribute('aria-label')).toBe('50 个开放残局');
+    expect(view.container.querySelector('[data-testid="level-list"]')?.getAttribute('aria-label')).toBe('共 50 个残局');
     expect(view.container.querySelector('[data-testid="campaign-availability"], [data-testid="campaign-rules"]')).toBeNull();
     expect(view.container.querySelectorAll('.console-band, .console-bands, .console-nodes')).toHaveLength(0);
     expect(view.container.querySelector('[data-testid="endgame-lesson"]')?.textContent).toContain('先完成一行');

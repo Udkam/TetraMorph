@@ -1,10 +1,44 @@
-import { describe, expect, it } from 'vitest';
+// @vitest-environment jsdom
+
+import { act, createElement, type ReactNode } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import App from './App';
+import { ENDGAME_CAMPAIGN_REVISION, ENDGAME_PROGRESS_KEY } from './endgameProgress';
+import { appHistoryStateFor } from './navigation/appRoute';
 import type { PlatformStorageRead } from './platform/browserPlatform';
 import {
   migrateEndgameProgressStorage,
   migrateEndgameRuleIntrosStorage,
   normalizeEndgameRoute,
 } from './legacyEndgameMigration';
+
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+vi.mock('./game/runtime/GameRuntime', () => ({
+  randomRunSeed: () => 0x51a1f00d,
+  GameRuntime: class {},
+}));
+
+function renderApp(): { readonly container: HTMLDivElement; unmount(): void } {
+  const container = document.createElement('div');
+  document.body.append(container);
+  const root: Root = createRoot(container);
+  act(() => root.render(createElement(App) as ReactNode));
+  return {
+    container,
+    unmount: () => act(() => {
+      root.unmount();
+      container.remove();
+    }),
+  };
+}
+
+afterEach(() => {
+  localStorage.clear();
+  window.history.replaceState({}, '', '/');
+  document.body.replaceChildren();
+});
 
 interface MemoryOptions {
   readonly failedReads?: ReadonlySet<string>;
@@ -295,5 +329,68 @@ describe('isolated Endgame URL and history normalization', () => {
         navigation: { selectedEndgameId: 't3r-shaft-01' },
       });
     }
+  });
+});
+
+describe('isolated migration consumed by real App boot', () => {
+  it('normalizes the retired library URL and selected level through one history replacement', () => {
+    const retiredHistory = {
+      tetramorphRoute: {
+        version: 1,
+        navigation: {
+          screen: 'puzzle-library',
+          mode: 'puzzle',
+          selectedPuzzleId: 'tm-puzzle-22',
+        },
+      },
+    };
+    window.history.replaceState(retiredHistory, '', '/puzzles');
+    localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['endgame']));
+    const replaceState = vi.spyOn(window.history, 'replaceState');
+
+    const view = renderApp();
+
+    expect(replaceState).toHaveBeenCalledTimes(1);
+    expect(window.location.pathname).toBe('/endgames');
+    expect(window.history.state).toEqual(appHistoryStateFor({
+      screen: 'endgame-library',
+      mode: 'endgame',
+      selectedEndgameId: 'tm-endgame-22',
+    }));
+    expect(view.container.querySelector('[data-testid="endgame-library"]')).not.toBeNull();
+    expect(view.container.querySelector('[data-level-id="tm-endgame-22"]')?.getAttribute('aria-pressed')).toBe('true');
+    view.unmount();
+    replaceState.mockRestore();
+  });
+
+  it('migrates retired progress and introductions before the first interactive route', () => {
+    const retiredProgressKey = 'tetramorph:puzzle-completion:v5';
+    const retiredIntroKey = 'tetramorph:mode-rule-intros:v1';
+    localStorage.setItem(retiredProgressKey, JSON.stringify({
+      version: 5,
+      campaignRevision: 2,
+      completedLevelIds: ['t3r-shaft-01', 'tm-puzzle-21'],
+      bestPieceCounts: { 't3r-shaft-01': 3, 'tm-puzzle-21': 7 },
+    }));
+    localStorage.setItem(retiredIntroKey, JSON.stringify(['puzzle', 'marathon']));
+
+    const view = renderApp();
+
+    expect(JSON.parse(localStorage.getItem(ENDGAME_PROGRESS_KEY) ?? 'null')).toEqual({
+      version: 6,
+      campaignRevision: ENDGAME_CAMPAIGN_REVISION,
+      completedLevelIds: ['t3r-shaft-01', 'tm-endgame-21'],
+      bestPieceCounts: { 't3r-shaft-01': 3, 'tm-endgame-21': 7 },
+    });
+    expect(JSON.parse(localStorage.getItem('tetramorph:mode-rule-intros:v2') ?? 'null'))
+      .toEqual(['marathon', 'endgame']);
+    expect(localStorage.getItem(retiredProgressKey)).toBeNull();
+    expect(localStorage.getItem(retiredIntroKey)).toBeNull();
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')?.click());
+    expect(view.container.querySelector('[data-testid="entry-mode-rules"]')).toBeNull();
+    expect(view.container.querySelector('[data-testid="endgame-library"]')).not.toBeNull();
+    expect(view.container.querySelector('[data-level-id="t3r-shaft-01"]')?.getAttribute('data-best-pieces')).toBe('3');
+    view.unmount();
   });
 });

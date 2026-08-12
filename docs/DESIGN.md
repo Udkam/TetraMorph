@@ -29,6 +29,13 @@ deterministic hashes, all Endgame behavior hashes and exact certificates are reg
 Gameplay geometry, fixed queues, public commands, lock outcomes, and progression semantics
 must otherwise remain equivalent. The old F4E search checkpoints are explicitly non-proof.
 
+Visible mode names follow the selected language: the Chinese home uses `残局`, while the
+English home uses `Endgame`. Campaign-count accessibility copy reports the total number of
+levels without claiming that every Hard level is already unlocked. Real App boot coverage
+must exercise the isolated legacy route and storage boundary; retired input literals remain
+confined to that boundary and its direct test rather than being reconstructed in normal App
+tests.
+
 The rename is intentionally atomic across active Core, runtime, rendering, audio, UI,
 navigation, persistence, authoring, QA, DOM/CSS, tests, tools, and filenames. A temporary
 dual-field `GameState` is forbidden: object spread and independent mutation would make one
