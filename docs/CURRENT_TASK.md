@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3D ACCEPTED / F4A INTRO-01 AUTHORING CONTRACT QA NEXT**
+Status: **STAGE F3D ACCEPTED / F4A INTRO-01 CONTRACT REPAIR QA NEXT**
 
 ## Active objective
 
@@ -144,13 +144,20 @@ library. One writer may create exactly
 hand-authored changed lines. `docs/workstreams/tetris-t37-puzzle/THREAD_LOG.md` is a later
 docs-only feedback checkpoint, not part of the source commit.
 
-The draft module exports only `PUZZLE_V3_INTRO_DRAFTS`, a frozen readonly array containing
-one literal frozen `PuzzleDefinition`. It uses only type imports and is not imported by
-`puzzles.ts`, any product barrel, progress, UI, or renderer. The draft keeps name `补行`,
-difficulty 1, no anchors/hidden cells, and targetRows 3. Its setup uses 7–10 legal seeded
-zero-clear drops, occupies at most six visible rows, leaves 1–4 gaps in each target row with
-at least one 1–2-gap row, and uses a gameplay seed unique across live and draft definitions.
-Its behavior hash must differ from every live definition.
+The first contract review correctly rejects an impossible capacity rule: three non-full
+target rows hold at most 27 ordinary cells, while seven preserved tetrominoes require 28.
+The repaired draft therefore uses exactly six legal seeded zero-clear drops. Validator and
+test must prove exactly the three contiguous floor rows are occupied; their top-to-floor gap
+counts each lie in `1..4`, sum to six, and are not the live board's `[3,1,2]`.
+
+The draft module exports only `PUZZLE_V3_INTRO_DRAFTS`, a deeply frozen readonly array
+containing one literal deeply frozen `PuzzleDefinition`. It uses only type imports and is
+not imported by `puzzles.ts`, any product barrel, progress, UI, or renderer. The draft keeps
+name `补行`, difficulty 1, no anchors/hidden cells, targetRows 3, and a gameplay seed unique
+across live and draft definitions. `auditPuzzleFingerprints([...PUZZLE_DEFINITIONS, draft])`
+must report zero exact, topology, and near candidates; a different gameplay seed or behavior
+hash alone is not evidence of a rebuild. The workstream log records the two-stage teaching
+review, including the new gap vector and why the optimal `[1,2]` release sequence is readable.
 
 The strict optimum is four or five locked tetrominoes. The chosen optimal replay has exactly
 two positive row-release events `[1,2]`, remains unfinished after the first, and finishes all
@@ -168,7 +175,9 @@ still has 50 definitions and canonical `t3r-shaft-01` remains the same reference
 serialized bytes with SHA-256
 `7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
 
-Normal direct tests, one `PUZZLE_EXACT_CERTIFICATES=1` direct run, current
+The certificate contains exactly one alternative entry. Both positive clear events must
+strictly reduce remaining original targets. Normal direct tests, one
+`PUZZLE_EXACT_CERTIFICATES=1` direct run, current
 `puzzles.test.ts`, and the 38-entry behavior-baseline test are required before candidate QA.
 Any exact-proof failure stops; it does not loosen the domain or design criteria. Contract QA
 must first report all zero before discovery or implementation begins. Product publication,

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4A contract rejected and repaired before discovery
+
+- Independent review rejects the first F4A contract with P1 1 / P2 1: seven setup drops
+  cannot fit three non-full rows, and a unique gameplay seed can make a copied board's
+  behavior hash look different.
+- The repair requires exactly six legal drops, exactly three occupied floor rows, a changed
+  six-gap ordering, and zero exact/topology/near fingerprint conflicts against all 50 live
+  definitions. Exactly one alternative and two target-reducing `[1,2]` clears are required.
+- Discovery and all source editing remain closed until fresh contract QA is all zero.
+
 ## 2026-08-12 — T37 Stage F3D accepted and F4A Intro-01 contracted
 
 - Source `7f31802` adds immutable schema-8 `exhaustedDepths` telemetry and derives every

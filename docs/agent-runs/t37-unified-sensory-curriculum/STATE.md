@@ -1427,15 +1427,26 @@ evidence is not applicable. The detailed writer record is in
 
 F4A is now a docs-frozen, non-published `t3r-shaft-01` authoring contract. Its only source
 paths are `puzzleV3IntroDefinitions.ts`, `puzzle-v3-intro-01.json`, and
-`puzzleV3Intro01Exact.test.ts`; the live 50-level library remains unchanged. The draft uses
-three target rows, 7–10 setup drops, at most six occupied visible rows, exact optimum four
-or five, positive releases `[1,2]`, and a lock-1-or-2 divergent route within optimum plus
-two. The phase contract freezes all schema-8 key order and authoring/behavior/route hash
-preimages.
+`puzzleV3Intro01Exact.test.ts`; the live 50-level library remains unchanged. The repaired
+draft uses three target rows, exactly six setup drops, a non-live gap ordering, zero exact/
+topology/near fingerprint conflicts, exact optimum four or five, positive releases `[1,2]`,
+and a lock-1-or-2 divergent route within optimum plus two. The phase contract freezes all
+schema-8 key order and authoring/behavior/route hash preimages.
 
-Next exact action: obtain fresh independent docs-only QA of the F4A contract. Discovery and
-all source editing remain closed until P0–P3/GAP are zero. Progress/mastery/UI, other level
-drafts, T27/`progress.md`, sensory, and icon remain closed.
+First independent F4A contract review rejects with `P0 0 / P1 1 / P2 1 / P3 0 / GAP 0`.
+P1 proves the 7–10-drop requirement impossible: exactly three non-full rows hold at most 27
+cells but seven drops preserve 28. P2 proves unique seed/behavior hash cannot reject a copied
+board because gameplay seed itself changes that hash.
+
+The repaired contract requires exactly six legal drops occupying only the three floor rows,
+gap counts in `1..4` summing to six and differing from live `[3,1,2]`, and zero exact,
+topology, or near candidates from `auditPuzzleFingerprints` over the live 50 plus draft.
+Exactly one alternative is stored; both `[1,2]` clear events reduce original targets. The
+workstream log must record the final gap vector and teaching review.
+
+Next exact action: commit this docs-only repair and obtain a fresh independent full contract
+QA. Discovery and source editing remain closed until P0–P3/GAP are zero. Progress/mastery/
+UI, other drafts, T27/`progress.md`, sensory, and icon remain closed.
 
 ## Do not repeat
 

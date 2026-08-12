@@ -730,9 +730,11 @@ adding unrelated badges or ornamental effects.
   remains closed until this telemetry passes existing mastery and F3C exact proofs.
 - F3D is accepted at `7f31802` with independent P0–P3/GAP all zero and unchanged proof
   results. F4A next authors one non-published `t3r-shaft-01` draft: a readable three-row,
-  7–10-drop board, exact four-or-five-lock optimum, two-stage `[1,2]` row release, and a
-  divergent replay. It remains outside the live library until the complete 46-level corpus
-  and migration are ready for an atomic product switch.
+  exactly-six-drop board, exact four-or-five-lock optimum, two-stage `[1,2]` row release,
+  and one divergent replay. Exact/topology/near fingerprint conflicts with all live levels
+  are rejected; changing only the gameplay seed is not a rebuild. It remains outside the
+  live library until the complete 46-level corpus and migration are ready for an atomic
+  product switch.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

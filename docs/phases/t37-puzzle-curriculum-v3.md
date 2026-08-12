@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 CONTRACT QA NEXT**
+Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A CONTRACT REPAIR QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -43,15 +43,28 @@ no search result changes.
 
 The first definition checkpoint is authoring-only. It creates one draft module, one
 schema-8 certificate JSON, and one direct exact test for stable ID `t3r-shaft-01`; the live
-50-level library remains byte-identical. The draft is a three-target-row, anchor-free board
-from 7–10 legal zero-clear setup drops, no more than six occupied visible rows, and 1–4
-gaps in each target row with at least one row having only 1–2 gaps. Its exact optimum is
-four or five locks. The chosen optimum has exactly two positive row releases `[1,2]`, and
-a second valid route diverges at lock 1 or 2 within optimum plus two locks.
+50-level library remains byte-identical. Initial review rejects the original 7–10-drop
+criterion because three non-full rows hold at most 27 cells while seven tetrominoes preserve
+28. The repaired draft is an anchor-free board from exactly six legal zero-clear setup drops
+occupying exactly the three contiguous floor rows. Its top-to-floor gap counts each lie in
+`1..4`, sum to six, and do not equal the live level's `[3,1,2]`.
+
+The draft's exact optimum is four or five locks. The chosen optimum has exactly two positive
+row releases `[1,2]`; both strictly reduce remaining original targets, and the first leaves
+the puzzle unfinished. Exactly one second valid route diverges at lock 1 or 2 within optimum
+plus two locks.
 
 The draft module exports only frozen `PUZZLE_V3_INTRO_DRAFTS`; it is not imported by live
 product code. The certificate uses the schema-8 key order shown below and is canonical
 `JSON.stringify(entry) + "\n"` in UTF-8 without BOM or CR.
+
+The draft object, setup object, every placement object, `boardRows`, `hiddenCells`,
+`anchorCells`, and the exported draft-array container are all frozen.
+`auditPuzzleFingerprints([...PUZZLE_DEFINITIONS, draft])` must return empty
+`exactConflicts`, `topologyConflicts`, and `nearCandidates`. This check is independent of
+the required unique gameplay seed and behavior hash. The writer log records the final gap
+vector and a concise teaching review of the two-stage route; seed-only differentiation is
+rejected.
 
 `authoringDefinitionHash` is lowercase SHA-256 of one UTF-8 JSON line plus exactly one LF.
 `JSON.stringify` receives this exact insertion order:
@@ -75,9 +88,9 @@ product code. The certificate uses the schema-8 key order shown below and is can
 }
 ```
 
-`hiddenCells` is numeric `y,x,type` sorted and serialized with coordinate key order
-`x,y,type`; it is empty in F4A. `anchorCells` is numeric `y,x` sorted and serialized with
-key order `x,y`; it is also empty in F4A. `behaviorHash` uses the already frozen
+`hiddenCells` is sorted by numeric `y`, numeric `x`, then lexical `type`, and serialized
+with coordinate key order `x,y,type`; it is empty in F4A. `anchorCells` is numeric `y,x`
+sorted and serialized with key order `x,y`; it is also empty in F4A. `behaviorHash` uses the already frozen
 `puzzle-behavior-v1` payload. `routeHash` and every alternative `routeHash` are lowercase
 SHA-256 of `UTF8("puzzle-route-v2\0" + commandStream)` with no trailing LF.
 
