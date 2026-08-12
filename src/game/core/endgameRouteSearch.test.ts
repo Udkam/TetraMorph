@@ -6,6 +6,8 @@ import t32Changed46To50File from '../../../docs/workstreams/tetris-t37-endgame/f
 import { createInitialState, dispatch, stateHash } from './engine';
 import { getEndgameDefinition, type EndgameDefinition } from './endgames';
 import {
+  ENDGAME_PROOF_FIELD_POLICY,
+  ENDGAME_PROOF_FRONTIER_TESTING,
   decodeEndgameRoute,
   encodeEndgameRoute,
   exhaustiveEndgameLandings,
@@ -18,7 +20,7 @@ import {
   replayEndgameRoute,
   replayEndgameRouteForDefinition,
 } from './endgameRouteSearch';
-import type { GameCommand, GameState, EndgameId } from './types';
+import { BEDROCK_CELL, SURVIVAL_STONE_CELL, type GameCommand, type GameState, type EndgameId } from './types';
 
 type RecordedRoute = {
   id: 'primary' | 'alternate';
@@ -198,6 +200,31 @@ describe('Phase-7 Endgame route search', () => {
     expect(endgameRouteLockLowerBound(ordinary)).toBeGreaterThan(0);
     expect(endgameRouteLockLowerBound(anchored)).toBe(0);
     expect(endgameRouteLockLowerBound(supported)).toBe(0);
+  });
+
+  it('round-trips only canonical proof decisions and rejects lossy board materials', () => {
+    const raw = startedEndgame('t5r-arc-13');
+    const started = {
+      ...raw,
+      endgameUndoHistory: Object.freeze([]),
+      endgameActiveSpawnCheckpoint: null,
+    };
+    const key = ENDGAME_PROOF_FRONTIER_TESTING.encode(started, started);
+    const decoded = ENDGAME_PROOF_FRONTIER_TESTING.decode(key, started);
+    expect(ENDGAME_PROOF_FRONTIER_TESTING.encode(decoded, started)).toBe(key);
+    expect(Object.keys(ENDGAME_PROOF_FIELD_POLICY).sort()).toEqual(Object.keys(started).sort());
+
+    const occupied = started.endgameTargetCells[0]!;
+    for (const material of [BEDROCK_CELL, SURVIVAL_STONE_CELL]) {
+      const board = started.board.map((row) => [...row]);
+      board[occupied.y]![occupied.x] = material;
+      expect(() => ENDGAME_PROOF_FRONTIER_TESTING.encode({ ...started, board }, started))
+        .toThrow('Bedrock, Survival stone, or unknown material');
+    }
+    expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(`${key}~extra`, started))
+      .toThrow('exactly 11 segments');
+    expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(key.replace(/~playing$/, '~paused'), started))
+      .toThrow('active-playing decision');
   });
 
   it('replays one- and two-anchor definitions through the same six-lock public route', () => {

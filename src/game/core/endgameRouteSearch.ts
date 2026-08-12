@@ -1,6 +1,19 @@
+import { canPlace } from './board';
+import { BOARD_HEIGHT, BOARD_WIDTH, NEXT_QUEUE_SIZE } from './constants';
 import { createInitialState, dispatch, stateHash } from './engine';
 import { getEndgameDefinition, type EndgameDefinition } from './endgames';
-import { ANCHOR_CELL, type Cell, type GameCommand, type GameState, type PieceType, type EndgameId } from './types';
+import {
+  ANCHOR_CELL,
+  PIECE_TYPES,
+  type ActivePiece,
+  type Board,
+  type Cell,
+  type EndgameId,
+  type GameCommand,
+  type GameState,
+  type PieceType,
+  type Rotation,
+} from './types';
 
 /** Public controls available to the ordinary Endgame player and recorded in route evidence. */
 export type EndgameRouteToken = 'S' | 'T' | 'L' | 'R' | 'C' | 'Q' | 'D' | 'H';
@@ -286,6 +299,293 @@ export function endgameRouteStateKey(state: GameState): string {
   ].join('~');
 }
 
+export type EndgameProofFieldStorage = 'encoded' | 'template-invariant' | 'proof-quotiented';
+
+/** @internal Compile-time tripwire: new GameState fields must receive an explicit proof policy. */
+export const ENDGAME_PROOF_FIELD_POLICY = {
+  board: 'encoded',
+  active: 'encoded',
+  queue: 'encoded',
+  score: 'proof-quotiented',
+  lines: 'proof-quotiented',
+  combo: 'proof-quotiented',
+  level: 'proof-quotiented',
+  mode: 'template-invariant',
+  classicStartingGravityTicks: 'template-invariant',
+  classicGravityFloorTicks: 'template-invariant',
+  endgameId: 'template-invariant',
+  endgameTargetLines: 'proof-quotiented',
+  endgameTargetCells: 'encoded',
+  endgameInitialTargetCount: 'template-invariant',
+  endgameAnchorSupportedCells: 'encoded',
+  endgameBoardRows: 'template-invariant',
+  endgameQueue: 'proof-quotiented',
+  endgameQueueIndex: 'proof-quotiented',
+  endgameSpawnCount: 'encoded',
+  endgameGoal: 'template-invariant',
+  endgameCompletion: 'template-invariant',
+  endgameUndoHistory: 'proof-quotiented',
+  endgameActiveSpawnCheckpoint: 'proof-quotiented',
+  completedLevelId: 'proof-quotiented',
+  nextUnlockedLevelId: 'proof-quotiented',
+  pieceCount: 'encoded',
+  survivalBedrockRows: 'template-invariant',
+  survivalPressureTicks: 'template-invariant',
+  survivalRisePending: 'template-invariant',
+  survivalRiseCount: 'template-invariant',
+  survivalDebris: 'template-invariant',
+  survivalDebrisNextId: 'template-invariant',
+  survivalDebrisPiecesRemaining: 'template-invariant',
+  survivalDebrisPieceInterval: 'template-invariant',
+  survivalDebrisSpawnCount: 'template-invariant',
+  survivalDebrisWarningColumns: 'template-invariant',
+  survivalDebrisWarningHeight: 'template-invariant',
+  survivalDebrisWarningTicks: 'template-invariant',
+  survivalDebrisFallProgress: 'template-invariant',
+  survivalDebrisRandomizer: 'template-invariant',
+  mutationActiveCarrier: 'template-invariant',
+  mutationRandomizer: 'template-invariant',
+  mutationCarriers: 'template-invariant',
+  mutationNextCarrierId: 'template-invariant',
+  mutationFreezeTicks: 'template-invariant',
+  mutationCollapsePiecesRemaining: 'template-invariant',
+  mutationCollapseLandingLatched: 'template-invariant',
+  mutationMultiplierTicks: 'template-invariant',
+  mutationMultiplierFactor: 'template-invariant',
+  mutationLastItem: 'template-invariant',
+  mutationLastItemTicks: 'template-invariant',
+  status: 'encoded',
+  phase: 'encoded',
+  phaseTicks: 'proof-quotiented',
+  pendingClearRows: 'proof-quotiented',
+  gravityTicks: 'proof-quotiented',
+  lockTicks: 'proof-quotiented',
+  lockResets: 'proof-quotiented',
+  elapsedTicks: 'proof-quotiented',
+  randomizer: 'encoded',
+  seed: 'template-invariant',
+} as const satisfies Readonly<Record<keyof GameState, EndgameProofFieldStorage>>;
+
+type EndgameProofFrontierContext = Readonly<{ template: GameState }>;
+const PIECE_TYPE_SET = new Set<string>(PIECE_TYPES);
+
+function proofKeyError(message: string): never {
+  throw new Error(`Invalid Endgame proof-frontier state: ${message}.`);
+}
+
+function isUint(value: number, maximum = Number.MAX_SAFE_INTEGER): boolean {
+  return Number.isSafeInteger(value) && value >= 0 && value <= maximum;
+}
+
+function assertPieceList(list: readonly PieceType[], label: string, expectedLength?: number): void {
+  if (!Array.isArray(list) || (expectedLength !== undefined && list.length !== expectedLength)) {
+    proofKeyError(`${label} has an invalid length`);
+  }
+  if (list.some((piece) => !PIECE_TYPE_SET.has(piece))) proofKeyError(`${label} contains an unknown piece`);
+}
+
+function assertCells(cells: readonly Cell[], label: string): void {
+  if (!Array.isArray(cells)) proofKeyError(`${label} is not an array`);
+  const seen = new Set<number>();
+  for (const cell of cells) {
+    if (!isUint(cell?.x, BOARD_WIDTH - 1) || !isUint(cell?.y, BOARD_HEIGHT - 1)) {
+      proofKeyError(`${label} contains an out-of-bounds coordinate`);
+    }
+    const coordinate = cell.y * BOARD_WIDTH + cell.x;
+    if (seen.has(coordinate)) proofKeyError(`${label} contains a duplicate coordinate`);
+    seen.add(coordinate);
+  }
+}
+
+function assertProofDecisionDomain(state: GameState): void {
+  if (state.mode !== 'endgame' || state.endgameId === null || state.seed <= 0) {
+    proofKeyError('state is not a seeded Endgame');
+  }
+  if (state.endgameGoal !== 'original-targets-cleared' || state.endgameCompletion !== 'active') {
+    proofKeyError('Endgame goal or completion is not active');
+  }
+  if (state.status !== 'playing' || state.phase !== 'active' || state.active === null) {
+    proofKeyError('state is not an active playing decision');
+  }
+  if (
+    state.phaseTicks !== 0 || state.gravityTicks !== 0 || state.lockTicks !== 0
+    || state.lockResets !== 0 || state.pendingClearRows.length !== 0
+  ) proofKeyError('decision timers or pending rows are noncanonical');
+  if (state.endgameUndoHistory.length !== 0 || state.endgameActiveSpawnCheckpoint !== null) {
+    proofKeyError('undo state must be stripped');
+  }
+  if (state.board.length !== BOARD_HEIGHT || state.board.some((row) => row.length !== BOARD_WIDTH)) {
+    proofKeyError('board dimensions are noncanonical');
+  }
+  for (const row of state.board) for (const cell of row) {
+    if (cell !== null && cell !== ANCHOR_CELL && !PIECE_TYPE_SET.has(cell)) {
+      proofKeyError('board contains Bedrock, Survival stone, or unknown material');
+    }
+  }
+  if (state.board.some((row) => row.every((cell) => cell !== null))) {
+    proofKeyError('active decision contains an unresolved full row');
+  }
+  assertCells(state.endgameTargetCells, 'target cells');
+  assertCells(state.endgameAnchorSupportedCells, 'supported cells');
+  if (state.endgameTargetCells.length === 0) proofKeyError('active decision has no remaining target');
+  for (const [label, cells] of [
+    ['target cells', state.endgameTargetCells],
+    ['supported cells', state.endgameAnchorSupportedCells],
+  ] as const) {
+    if (cells.some((cell) => !PIECE_TYPE_SET.has(state.board[cell.y]![cell.x]!))) {
+      proofKeyError(`${label} do not identify current ordinary occupied cells`);
+    }
+  }
+  assertPieceList(state.queue, 'queue', NEXT_QUEUE_SIZE);
+  assertPieceList(state.randomizer.bag, 'randomizer bag');
+  if (state.randomizer.bag.length > PIECE_TYPES.length - 1
+    || new Set(state.randomizer.bag).size !== state.randomizer.bag.length) {
+    proofKeyError('randomizer bag is not a valid remaining seven-bag');
+  }
+  if (!isUint(state.randomizer.seed, 0xffff_ffff) || state.randomizer.seed === 0
+    || !isUint(state.pieceCount) || !isUint(state.endgameSpawnCount)
+    || state.endgameSpawnCount !== state.pieceCount + 1) {
+    proofKeyError('randomizer or piece counts are noncanonical');
+  }
+  const active = state.active;
+  if (!PIECE_TYPE_SET.has(active.type) || ![0, 1, 2, 3].includes(active.rotation) || !canPlace(state.board, active)) {
+    proofKeyError('active piece is malformed, colliding, or outside the board');
+  }
+}
+
+function createProofFrontierContext(template: GameState): EndgameProofFrontierContext {
+  assertProofDecisionDomain(template);
+  return Object.freeze({ template });
+}
+
+function proofFrontierStateKey(state: GameState, context: EndgameProofFrontierContext): string {
+  assertProofDecisionDomain(state);
+  for (const field of Object.keys(ENDGAME_PROOF_FIELD_POLICY) as (keyof GameState)[]) {
+    if (ENDGAME_PROOF_FIELD_POLICY[field] === 'template-invariant'
+      && state[field] !== context.template[field]) {
+      proofKeyError(`template-invariant field ${field} changed`);
+    }
+  }
+  for (let y = 0; y < BOARD_HEIGHT; y += 1) for (let x = 0; x < BOARD_WIDTH; x += 1) {
+    if ((state.board[y]![x] === ANCHOR_CELL) !== (context.template.board[y]![x] === ANCHOR_CELL)) {
+      proofKeyError('immutable anchor coordinates changed');
+    }
+  }
+  return endgameRouteStateKey(state);
+}
+
+function parseCanonicalUint(text: string, label: string, maximum = Number.MAX_SAFE_INTEGER): number {
+  if (!/^(0|[1-9]\d*)$/.test(text)) proofKeyError(`${label} is not a canonical unsigned integer`);
+  const value = Number(text);
+  if (!isUint(value, maximum)) proofKeyError(`${label} is outside its domain`);
+  return value;
+}
+
+function parseCanonicalInt(text: string, label: string): number {
+  if (!/^-?(0|[1-9]\d*)$/.test(text)) proofKeyError(`${label} is not a canonical integer`);
+  const value = Number(text);
+  if (!Number.isSafeInteger(value) || String(value) !== text) proofKeyError(`${label} is outside its domain`);
+  return value;
+}
+
+function parseCellsKey(text: string, label: string): readonly Cell[] {
+  if (text === '') return Object.freeze([]);
+  const cells = text.split('|').map((token) => {
+    const match = /^(0|[1-9]\d*),(0|[1-9]\d*)$/.exec(token);
+    if (!match) proofKeyError(`${label} has malformed coordinates`);
+    return Object.freeze({
+      x: parseCanonicalUint(match[1]!, `${label} x`, BOARD_WIDTH - 1),
+      y: parseCanonicalUint(match[2]!, `${label} y`, BOARD_HEIGHT - 1),
+    });
+  });
+  assertCells(cells, label);
+  if (orderedCellsKey(cells) !== text) proofKeyError(`${label} is not canonically sorted`);
+  return Object.freeze(cells);
+}
+
+function parsePieceList(text: string, label: string, expectedLength?: number): PieceType[] {
+  const pieces = [...text];
+  if (pieces.some((piece) => !PIECE_TYPE_SET.has(piece))) proofKeyError(`${label} contains an unknown piece`);
+  const typed = pieces as PieceType[];
+  assertPieceList(typed, label, expectedLength);
+  return typed;
+}
+
+function decodeProofFrontierStateKey(key: string, context: EndgameProofFrontierContext): GameState {
+  const segments = key.split('~');
+  if (segments.length !== 11) proofKeyError('key must contain exactly 11 segments');
+  const rows = segments[0]!.split('/');
+  if (rows.length !== BOARD_HEIGHT || rows.some((row) => row.length !== BOARD_WIDTH || !/^[.#A]+$/.test(row))) {
+    proofKeyError('board segment is malformed');
+  }
+  const board: Board = rows.map((row) => [...row].map((cell) => (
+    cell === '.' ? null : cell === 'A' ? ANCHOR_CELL : 'I'
+  )));
+  const activeMatch = /^([IOTSZJL]):([0-3]):(-?(?:0|[1-9]\d*)):(-?(?:0|[1-9]\d*))$/.exec(segments[3]!);
+  if (!activeMatch) proofKeyError('active-piece segment is malformed');
+  const active: ActivePiece = {
+    type: activeMatch[1] as PieceType,
+    rotation: Number(activeMatch[2]) as Rotation,
+    x: parseCanonicalInt(activeMatch[3]!, 'active x'),
+    y: parseCanonicalInt(activeMatch[4]!, 'active y'),
+  };
+  const queue = parsePieceList(segments[4]!, 'queue', NEXT_QUEUE_SIZE);
+  const bag = parsePieceList(segments[6]!, 'randomizer bag');
+  if (bag.length > PIECE_TYPES.length - 1 || new Set(bag).size !== bag.length) {
+    proofKeyError('randomizer bag is not a valid remaining seven-bag');
+  }
+  if (segments[9] !== 'active' || segments[10] !== 'playing') {
+    proofKeyError('key is not an active-playing decision');
+  }
+  const decoded: GameState = {
+    ...context.template,
+    board,
+    active,
+    queue,
+    score: 0,
+    lines: 0,
+    combo: 0,
+    level: 0,
+    endgameTargetLines: null,
+    endgameTargetCells: parseCellsKey(segments[1]!, 'target cells'),
+    endgameAnchorSupportedCells: parseCellsKey(segments[2]!, 'supported cells'),
+    endgameQueue: Object.freeze([...queue]),
+    endgameQueueIndex: 0,
+    endgameSpawnCount: parseCanonicalUint(segments[8]!, 'Endgame spawn count'),
+    endgameUndoHistory: Object.freeze([]),
+    endgameActiveSpawnCheckpoint: null,
+    completedLevelId: null,
+    nextUnlockedLevelId: null,
+    pieceCount: parseCanonicalUint(segments[7]!, 'piece count'),
+    status: 'playing',
+    phase: 'active',
+    phaseTicks: 0,
+    pendingClearRows: [],
+    gravityTicks: 0,
+    lockTicks: 0,
+    lockResets: 0,
+    elapsedTicks: 0,
+    randomizer: {
+      seed: parseCanonicalUint(segments[5]!, 'randomizer seed', 0xffff_ffff),
+      bag,
+    },
+  };
+  if (decoded.randomizer.seed === 0) proofKeyError('randomizer seed cannot be zero');
+  assertProofDecisionDomain(decoded);
+  if (proofFrontierStateKey(decoded, context) !== key) proofKeyError('decoded state does not re-key byte-for-byte');
+  return decoded;
+}
+
+/** @internal Focused tests exercise the private proof codec without changing general key callers. */
+export const ENDGAME_PROOF_FRONTIER_TESTING = Object.freeze({
+  encode(state: GameState, template: GameState): string {
+    return proofFrontierStateKey(state, createProofFrontierContext(template));
+  },
+  decode(key: string, template: GameState): GameState {
+    return decodeProofFrontierStateKey(key, createProofFrontierContext(template));
+  },
+});
+
 /**
  * Every distinct surviving target row still consumes one cell from every column when
  * it clears. Credit every ordinary cell already in that column as reusable supply,
@@ -336,15 +636,17 @@ export function certifyOptimalEndgameRouteForDefinition(
   if (!isActive(canonicalStart)) return null;
   const initialStateHash = stateHash(canonicalStart);
   const started = withoutUndoHistory(canonicalStart);
-  let frontier: GameState[] = [started];
+  const proofContext = createProofFrontierContext(started);
+  let frontier = [proofFrontierStateKey(started, proofContext)];
   const exhaustedDepths: EndgameOptimalRouteDepthRecord[] = [];
 
   for (let depth = 0; depth < optimalLocks - 1 && frontier.length > 0; depth += 1) {
     const frontierStates = frontier.length;
     let transitions = 0;
     let boundPrunes = 0;
-    const nextFrontier = new Map<string, GameState>();
-    for (const parent of frontier) {
+    const nextFrontier = new Set<string>();
+    for (const parentKey of frontier) {
+      const parent = decodeProofFrontierStateKey(parentKey, proofContext);
       if (depth + endgameRouteLockLowerBound(parent) >= optimalLocks) {
         boundPrunes += 1;
         continue;
@@ -361,8 +663,7 @@ export function certifyOptimalEndgameRouteForDefinition(
           boundPrunes += 1;
           continue;
         }
-        const key = endgameRouteStateKey(landing.state);
-        if (!nextFrontier.has(key)) nextFrontier.set(key, landing.state);
+        nextFrontier.add(proofFrontierStateKey(landing.state, proofContext));
       }
     }
     exhaustedDepths.push(Object.freeze({
@@ -371,7 +672,7 @@ export function certifyOptimalEndgameRouteForDefinition(
       transitions,
       boundPrunes,
     }));
-    frontier = [...nextFrontier.values()];
+    frontier = [...nextFrontier];
   }
 
   const frozenExhaustedDepths = Object.freeze(exhaustedDepths);
