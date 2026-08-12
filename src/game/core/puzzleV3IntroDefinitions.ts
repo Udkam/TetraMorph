@@ -86,7 +86,53 @@ const INTRO_02: PuzzleDefinition = Object.freeze({
   anchorCells: Object.freeze([]),
 });
 
+const INTRO_03: PuzzleDefinition = Object.freeze({
+  id: 't3r-shaft-03',
+  name: '托台',
+  difficulty: 3,
+  targetRows: 4,
+  seed: 2900,
+  setup: Object.freeze({
+    seed: 37220,
+    placements: Object.freeze([
+      Object.freeze({ type: 'I', rotation: 0, x: 2 }),
+      Object.freeze({ type: 'T', rotation: 2, x: 5 }),
+      Object.freeze({ type: 'S', rotation: 1, x: 6 }),
+      Object.freeze({ type: 'L', rotation: 3, x: 8 }),
+      Object.freeze({ type: 'J', rotation: 3, x: 3 }),
+      Object.freeze({ type: 'Z', rotation: 1, x: 1 }),
+      Object.freeze({ type: 'O', rotation: 0, x: 5 }),
+      Object.freeze({ type: 'L', rotation: 1, x: -1 }),
+    ]),
+  }),
+  boardRows: Object.freeze([
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '...ZJOOSLL',
+    'L.ZZJOOSSL',
+    'L.ZJJTTTSL',
+    'LLIIIIT...',
+  ]),
+  hiddenCells: Object.freeze([]),
+  anchorCells: Object.freeze([]),
+});
+
 export const PUZZLE_V3_INTRO_DRAFTS: readonly PuzzleDefinition[] = Object.freeze([
   INTRO_01,
   INTRO_02,
+  INTRO_03,
 ]);
