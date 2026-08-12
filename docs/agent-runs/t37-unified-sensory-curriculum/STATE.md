@@ -1701,9 +1701,14 @@ opening sets, signatures, target counts, survivor mapping, and hashes. Primary o
 or five with uncapped no-beam proof; one early-divergent alternative is at most optimum plus
 two. Pairwise admission covers live 50 plus the three accepted drafts.
 
-Next exact action: commit only the five F4D contract documents, then obtain two fresh
-independent all-zero contract reviews. Discovery and all source/product/UI/sensory/protected/
-icon paths remain closed until that gate passes.
+Contract `de917a7e6f0be1fc26736343f7e3c43917e9d3ce` is committed. One factual review is
+all zero; a second review finds only that this STATE and the thread log still described that
+completed commit as the next action. This checkpoint correction removes the stale instruction
+without changing the contract body.
+
+Next exact action: obtain two fresh independent all-zero contract reviews of the corrected
+HEAD. If both pass, open only repository-external F4D candidate discovery. Source, product,
+UI, sensory, protected T27, and icon paths remain closed until their later gates.
 
 ## Do not repeat
 

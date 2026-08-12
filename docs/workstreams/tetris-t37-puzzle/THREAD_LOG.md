@@ -310,6 +310,8 @@ The eventual source boundary is three paths / at most 500 hand-authored changed 
 `puzzleV3Intro04Exact.test.ts`. Existing Intro tests, product definitions, progress, UI,
 sensory, protected T27 paths, and icon remain closed.
 
-- Blocker: discovery is closed pending fresh independent contract QA.
-- Next action: commit this docs-only contract and obtain two independent reports with
-  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; repair any finding before discovery.
+- Blocker: discovery is closed pending fresh independent review of committed contract
+  `de917a7e6f0be1fc26736343f7e3c43917e9d3ce` and this checkpoint correction.
+- Next action: obtain two independent reports on the corrected HEAD with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; repair any finding before opening only
+  repository-external candidate discovery.
