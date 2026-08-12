@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 7,
+  "claim": "Two non-unique public-Core routes per Phase-7 level; search is not an optimality proof.",
+  "batch": {
+    "from": 38,
+    "to": 38
+  },
+  "commandEncoding": {
+    "S": {
+      "type": "start"
+    },
+    "T": {
+      "type": "tick"
+    },
+    "L": {
+      "type": "move",
+      "dx": -1
+    },
+    "R": {
+      "type": "move",
+      "dx": 1
+    },
+    "C": {
+      "type": "rotate",
+      "direction": 1
+    },
+    "H": {
+      "type": "hard-drop"
+    }
+  },
+  "difficultyTuple": [
+    "targetRowCount",
+    "lockedPieces",
+    "rotationPlanning",
+    "horizontalPlanning",
+    "clearDistribution",
+    "maximumHeight",
+    "peakHoles",
+    "branchWidth",
+    "firstDivergenceLock",
+    "anchorCount"
+  ],
+  "campaignOrder": [
+    "tm-endgame-38"
+  ],
+  "levels": [
+    {
+      "id": "tm-endgame-38",
+      "curriculumPosition": 38,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 156544,
+        "placementCount": 10
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRRRRHTTTCLLLLHTTTTTTTTTTTTRRRHTTTCRRRRHTTTTTTTTTTTTLLLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTT",
+          "commandCount": 87,
+          "locks": 6,
+          "rotationCount": 4,
+          "moveCount": 22,
+          "clearDistribution": [
+            2,
+            1,
+            1,
+            2
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCRRHTTTCLLLLHTTTRRHTTTCRRRRHTTTTTTTTTTTTCCLHTTTCRRRRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCLLLLHTTTCCCRRRRRHTTTTTTTTTTTT",
+          "commandCount": 114,
+          "locks": 9,
+          "rotationCount": 11,
+          "moveCount": 30,
+          "clearDistribution": [
+            2,
+            1,
+            2,
+            1
+          ],
+          "maximumHeight": 10,
+          "peakHoles": 2,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.222,
+          "anchorCount": 0
+        }
+      ]
+    }
+  ],
+  "searchBounds": {
+    "maxLocks": 36,
+    "primaryBeam": 720,
+    "alternateBeam": 560
+  }
+}

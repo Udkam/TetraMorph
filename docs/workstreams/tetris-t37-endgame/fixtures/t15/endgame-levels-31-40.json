@@ -1,0 +1,1044 @@
+{
+  "schemaVersion": 7,
+  "claim": "Two non-unique public-Core routes per Phase-7 level; search is not an optimality proof.",
+  "batch": {
+    "from": 31,
+    "to": 40
+  },
+  "commandEncoding": {
+    "S": {
+      "type": "start"
+    },
+    "T": {
+      "type": "tick"
+    },
+    "L": {
+      "type": "move",
+      "dx": -1
+    },
+    "R": {
+      "type": "move",
+      "dx": 1
+    },
+    "C": {
+      "type": "rotate",
+      "direction": 1
+    },
+    "H": {
+      "type": "hard-drop"
+    }
+  },
+  "difficultyTuple": [
+    "targetRowCount",
+    "lockedPieces",
+    "rotationPlanning",
+    "horizontalPlanning",
+    "clearDistribution",
+    "maximumHeight",
+    "peakHoles",
+    "branchWidth",
+    "firstDivergenceLock",
+    "anchorCount"
+  ],
+  "campaignOrder": [
+    "tm-endgame-31",
+    "tm-endgame-32",
+    "tm-endgame-33",
+    "tm-endgame-34",
+    "tm-endgame-35",
+    "tm-endgame-36",
+    "tm-endgame-37",
+    "tm-endgame-38",
+    "tm-endgame-39",
+    "tm-endgame-40"
+  ],
+  "levels": [
+    {
+      "id": "tm-endgame-31",
+      "curriculumPosition": 31,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1732050808,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 2,
+      "shorterRouteLocks": 11,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRRHTTTTTTTTTTTTRRHTTTCCCLLLHTTTTTTTTTTTTCCCRRRRRHTTTCLLLLLHTTTTTTTTTTTTCHTTTCLLHTTTTTTTTTTTTCRRRRHTTTCCCHTTTTTTTTTTTTCCCRRRRHTTTTTTTTTTTTLLHTTTTTTTTTTTT",
+          "commandCount": 155,
+          "locks": 11,
+          "rotationCount": 16,
+          "moveCount": 31,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            2,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 7,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.364,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRRHTTTTTTTTTTTTLLLLHTTTTTTTTTTTTLHTTTRRHTTTCRRRRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTHTTTTTTTTTTTTCRRRHTTTTTTTTTTTTCLLLLHTTTCCCLHTTTHTTTCRRHTTTTTTTTTTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 165,
+          "locks": 13,
+          "rotationCount": 9,
+          "moveCount": 31,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            1
+          ],
+          "maximumHeight": 7,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.308,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-32",
+      "curriculumPosition": 32,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 2236068021,
+        "placementCount": 9
+      },
+      "anchorCells": [
+        {
+          "x": 0,
+          "y": 13
+        }
+      ],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 8,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCCCHTTTRRRRHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCCCLHTTTCCRRHTTTTTTTTTTTTCCCRRRRRHTTTTTTTTTTTT",
+          "commandCount": 120,
+          "locks": 8,
+          "rotationCount": 13,
+          "moveCount": 20,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 7,
+          "peakHoles": 6,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.25,
+          "anchorCount": 1
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCCLLLHTTTRRRRHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTLHTTTCLLHTTTCRHTTTTTTTTTTTTCCCRRRRRHTTTTTTTTTTTTRRHTTTTTTTTTTTTHTTTCRRHTTTTTTTTTTTT",
+          "commandCount": 128,
+          "locks": 10,
+          "rotationCount": 10,
+          "moveCount": 23,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 10,
+          "peakHoles": 8,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.4,
+          "anchorCount": 1
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-33",
+      "curriculumPosition": 33,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1732050845,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 15,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRRHTTTTTTTTTTTTCCLHTTTTTTTTTTTTCLHTTTCRHTTTCLLLLHTTTRRRRHTTTTTTTTTTTTCRRHTTTTTTTTTTTTCLLHTTTCLLLLHTTTTTTTTTTTTCCRRRRHTTTTTTTTTTTTCLLLLHTTTCHTTTTTTTTTTTTCCCLHTTTTTTTTTTTTLLHTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 195,
+          "locks": 15,
+          "rotationCount": 16,
+          "moveCount": 37,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.267,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SHTTTRRRRHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTCCRRRHTTTCLLLLHTTTTTTTTTTTTRRHTTTCHTTTTTTTTTTTTCRRRRHTTTCLLLLHTTTTTTTTTTTTCLHTTTTTTTTTTTTCCCRRRRRHTTTCHTTTTTTTTTTTTCCCRRHTTTRHTTTCRRRHTTTCCLHTTTCLLLLHTTTTTTTTTTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 217,
+          "locks": 18,
+          "rotationCount": 20,
+          "moveCount": 43,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            2,
+            1
+          ],
+          "maximumHeight": 8,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.222,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-34",
+      "curriculumPosition": 34,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1732050849,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 16,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLLLHTTTCCLLHTTTTTTTTTTTTCHTTTTTTTTTTTTCRRHTTTCCCRRRRRHTTTTTTTTTTTTLLHTTTTTTTTTTTTCLLLLLHTTTCRHTTTTTTTTTTTTCLLLLHTTTCRRRRHTTTTTTTTTTTTCCLHTTTTTTTTTTTTLLHTTTCHTTTCCCRRRHTTTTTTTTTTTTRHTTTCCRRRRHTTTTTTTTTTTT",
+          "commandCount": 206,
+          "locks": 16,
+          "rotationCount": 20,
+          "moveCount": 40,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            1
+          ],
+          "maximumHeight": 8,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.25,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRRHTTTLLLHTTTTTTTTTTTTCHTTTTTTTTTTTTCRRRRHTTTCRRHTTTLLHTTTTTTTTTTTTCLLLLLHTTTTTTTTTTTTCRRRHTTTCHTTTTTTTTTTTTCCLLHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTLHTTTCLLLHTTTCCCRRHTTTTTTTTTTTTLHTTTCRRRHTTTCRRRRHTTTTTTTTTTTT",
+          "commandCount": 207,
+          "locks": 17,
+          "rotationCount": 15,
+          "moveCount": 42,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            1
+          ],
+          "maximumHeight": 8,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.235,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-35",
+      "curriculumPosition": 35,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1732050832,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 18,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRRRRHTTTCCCRRRRHTTTTTTTTTTTTRRHTTTCHTTTCCLLHTTTLHTTTLLLHTTTTTTTTTTTTCLLLLLHTTTTTTTTTTTTLLLLHTTTCLLHTTTCRRRRHTTTCCRRHTTTTTTTTTTTTCCRHTTTCRRRHTTTTTTTTTTTTHTTTCCRRRHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTCLHTTTTTTTTTTTT",
+          "commandCount": 208,
+          "locks": 18,
+          "rotationCount": 19,
+          "moveCount": 44,
+          "clearDistribution": [
+            1,
+            1,
+            2,
+            2,
+            2,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.222,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SHTTTRRRRHTTTTTTTTTTTTRRRRHTTTCRRRHTTTLLLHTTTTTTTTTTTTCCCLLHTTTCLHTTTCLLLLLHTTTTTTTTTTTTLLLLHTTTCRHTTTTTTTTTTTTCRRHTTTCRHTTTCCCRRRRRHTTTCCLHTTTTTTTTTTTTCCLHTTTTTTTTTTTTCCRRRRHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTCLHTTTTTTTTTTTT",
+          "commandCount": 219,
+          "locks": 18,
+          "rotationCount": 20,
+          "moveCount": 45,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            2,
+            2,
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.222,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-36",
+      "curriculumPosition": 36,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 213511,
+        "placementCount": 9
+      },
+      "anchorCells": [
+        {
+          "x": 9,
+          "y": 13
+        }
+      ],
+      "firstDivergenceLock": 3,
+      "shorterRouteLocks": 9,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLLLHTTTTTTTTTTTTCRRHTTTLHTTTCLLLHTTTTTTTTTTTTCLLLHTTTCRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCRRHTTTCCCRRRRHTTTTTTTTTTTT",
+          "commandCount": 116,
+          "locks": 9,
+          "rotationCount": 10,
+          "moveCount": 24,
+          "clearDistribution": [
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "maximumHeight": 7,
+          "peakHoles": 6,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.222,
+          "anchorCount": 1
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLLLHTTTTTTTTTTTTCRRHTTTHTTTCLLLHTTTTTTTTTTTTCRHTTTCCCLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCLLLHTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 113,
+          "locks": 9,
+          "rotationCount": 10,
+          "moveCount": 21,
+          "clearDistribution": [
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "maximumHeight": 7,
+          "peakHoles": 6,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.222,
+          "anchorCount": 1
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-37",
+      "curriculumPosition": 37,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1732050830,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 3,
+      "shorterRouteLocks": 19,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRHTTTLLLHTTTTTTTTTTTTCCCRRRRHTTTHTTTTTTTTTTTTCRRRRHTTTCLLLLHTTTTTTTTTTTTCRRRRHTTTLHTTTTTTTTTTTTCCCRRHTTTCLLLLHTTTCCLHTTTTTTTTTTTTRRHTTTLLHTTTLLHTTTCCCRHTTTTTTTTTTTTCHTTTCLLLLLHTTTTTTTTTTTTCLHTTTCCCRRRHTTTTTTTTTTTT",
+          "commandCount": 216,
+          "locks": 19,
+          "rotationCount": 21,
+          "moveCount": 46,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            1
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 10,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.211,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRHTTTLLLHTTTTTTTTTTTTCCCLHTTTHTTTTTTTTTTTTCRRRRHTTTCLLLLHTTTTTTTTTTTTCRRRHTTTCLLLLLHTTTCHTTTTTTTTTTTTCRHTTTCLLLHTTTTTTTTTTTTRRRRHTTTCRRHTTTLLHTTTTTTTTTTTTCCCRHTTTTTTTTTTTTCHTTTRRRHTTTCCLLHTTTTTTTTTTTTCCLLLHTTTTTTTTTTTTCRRHTTTRRRRHTTTLLLLHTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 260,
+          "locks": 23,
+          "rotationCount": 21,
+          "moveCount": 56,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            2,
+            1,
+            1,
+            2,
+            1,
+            2
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 10,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.348,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-38",
+      "curriculumPosition": 38,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1732050842,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 19,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRHTTTRRRRHTTTTTTTTTTTTLLLLHTTTTTTTTTTTTCLHTTTCRRRRHTTTTTTTTTTTTCCCLHTTTCLLHTTTCLLHTTTCCCRRRRRHTTTLLLLHTTTCCCRRRRRHTTTCCCRRRHTTTTTTTTTTTTCHTTTTTTTTTTTTCHTTTCLLLLHTTTTTTTTTTTTCLLHTTTCRHTTTTTTTTTTTTRRRHTTTCCCLLLHTTTTTTTTTTTT",
+          "commandCount": 223,
+          "locks": 19,
+          "rotationCount": 25,
+          "moveCount": 49,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            2,
+            1,
+            1,
+            2,
+            2
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 10,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.316,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCRRHTTTCCCRHTTTRRRRHTTTTTTTTTTTTLLLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCCCHTTTRRRRHTTTTTTTTTTTTCLLHTTTCHTTTRRHTTTCLLLHTTTCCCRRRRRHTTTTTTTTTTTTCRRRHTTTCLLLLLHTTTTTTTTTTTTCCCLHTTTTTTTTTTTTRRRRHTTTCRHTTTTTTTTTTTTRRHTTTCCCRHTTTCRRRRHTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 245,
+          "locks": 21,
+          "rotationCount": 25,
+          "moveCount": 54,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            2,
+            1,
+            1,
+            1,
+            2
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.286,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-39",
+      "curriculumPosition": 39,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 3236068023,
+        "placementCount": 9
+      },
+      "anchorCells": [
+        {
+          "x": 9,
+          "y": 13
+        }
+      ],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 9,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRHTTTLLLHTTTTTTTTTTTTCLLLLHTTTLHTTTTTTTTTTTTCCHTTTTTTTTTTTTCCCRRRRHTTTTTTTTTTTTCCCLLHTTTCRRHTTTTTTTTTTTTCCHTTTTTTTTTTTT",
+          "commandCount": 121,
+          "locks": 9,
+          "rotationCount": 12,
+          "moveCount": 18,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 7,
+          "peakHoles": 10,
+          "branchWidths": [
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.222,
+          "anchorCount": 1
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRHTTTLLLHTTTTTTTTTTTTLHTTTCRRHTTTCLLLLHTTTTTTTTTTTTCHTTTTTTTTTTTTCCCRRRRHTTTTTTTTTTTTCRRRHTTTCCCRRHTTTCLLLHTTTTTTTTTTTTRHTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 141,
+          "locks": 12,
+          "rotationCount": 12,
+          "moveCount": 26,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 7,
+          "peakHoles": 7,
+          "branchWidths": [
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 1
+        }
+      ]
+    },
+    {
+      "id": "tm-endgame-40",
+      "curriculumPosition": 40,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1732050833,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 21,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLLLLHTTTCLHTTTRRRRHTTTTTTTTTTTTCCCLLHTTTTTTTTTTTTCRHTTTCRRRHTTTRRRRHTTTCLLLHTTTCCRRHTTTTTTTTTTTTRHTTTCLHTTTTTTTTTTTTLHTTTRRRRHTTTCLLLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCCCRRRHTTTTTTTTTTTTLHTTTCRHTTTCCCRRRRRHTTTTTTTTTTTTCLLLLHTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 244,
+          "locks": 21,
+          "rotationCount": 22,
+          "moveCount": 56,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            3,
+            1,
+            1,
+            1,
+            2,
+            1
+          ],
+          "maximumHeight": 10,
+          "peakHoles": 10,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.286,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLHTTTRRRRHTTTTTTTTTTTTCRRHTTTCCRRRRHTTTLLLHTTTTTTTTTTTTCRRHTTTHTTTCCCRHTTTCCCHTTTLLLLHTTTCLLLHTTTTTTTTTTTTCRRHTTTCRRRRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCCHTTTCCLLLHTTTRRRRHTTTTTTTTTTTTCLLHTTTTTTTTTTTTCCCRRRRRHTTTTTTTTTTTTRHTTTCRRHTTTTTTTTTTTTCRRRRHTTTCCCLLLHTTTTTTTTTTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 287,
+          "locks": 24,
+          "rotationCount": 29,
+          "moveCount": 62,
+          "clearDistribution": [
+            1,
+            1,
+            2,
+            2,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 10,
+          "peakHoles": 9,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.25,
+          "anchorCount": 0
+        }
+      ]
+    }
+  ],
+  "searchBounds": {
+    "maxLocks": 30,
+    "primaryBeam": 600,
+    "alternateBeam": 480
+  }
+}

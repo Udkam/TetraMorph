@@ -29,25 +29,25 @@
       "source": "docs/workstreams/tetris-t15-puzzle/puzzle-levels-21-30.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t15/endgame-levels-21-30.json",
       "sourceSha": "ff5849e87c2b1eb18f77f24a8d36c958350c2e950a02000e51c74992b1d01360",
-      "targetSha": null,
+      "targetSha": "d4156ae7e50ffce1385c2665e24e63b56aca41f270a31a150f43bdd3e7ea178a",
       "transformVersion": "exact-generic-id-map-v1",
-      "status": "pending-id-transform"
+      "status": "verified-id-transform"
     },
     {
       "source": "docs/workstreams/tetris-t15-puzzle/puzzle-levels-31-40.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t15/endgame-levels-31-40.json",
       "sourceSha": "bba6fb898dd49f59ab3b26f21011c4a73647b67120f9a6be0ed8e0cf76efcb3d",
-      "targetSha": null,
+      "targetSha": "8208f1e4ff58df7a64e87441c687c5508caf12932394d3ebab41b283ef9648d7",
       "transformVersion": "exact-generic-id-map-v1",
-      "status": "pending-id-transform"
+      "status": "verified-id-transform"
     },
     {
       "source": "docs/workstreams/tetris-t15-puzzle/puzzle-levels-41-50.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t15/endgame-levels-41-50.json",
       "sourceSha": "3ec1720bcd9101cd7392cab1303f89f5857840476c000e030e3169e29e646ab3",
-      "targetSha": null,
+      "targetSha": "c3166623f745b3b84bdcdbad2dd5dd07b9c696a2a60a5850b91b4be5ba1369c5",
       "transformVersion": "exact-generic-id-map-v1",
-      "status": "pending-id-transform"
+      "status": "verified-id-transform"
     },
     {
       "source": "docs/workstreams/tetris-t32-puzzle/puzzle-levels-changed-01-03.json",
@@ -93,33 +93,33 @@
       "source": "docs/workstreams/tetris-t32-puzzle/puzzle-levels-changed-36.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t32/endgame-levels-changed-36.json",
       "sourceSha": "087c3f15e4a12d6842481cf1a64dab577af7a90dd9c430235241e97a8b301f80",
-      "targetSha": null,
+      "targetSha": "59fa1cf18cc97eb6a22c79592fd6bb3c55e45afa89670445c19fd9cebd85a21a",
       "transformVersion": "exact-generic-id-map-v1",
-      "status": "pending-id-transform"
+      "status": "verified-id-transform"
     },
     {
       "source": "docs/workstreams/tetris-t32-puzzle/puzzle-levels-changed-38.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t32/endgame-levels-changed-38.json",
       "sourceSha": "5fc3ccdac267a88b925d6a7f36047c579c0f98dbf0bb49d1975bcb224c4b2366",
-      "targetSha": null,
+      "targetSha": "83be1f48121411c44c1b2c53c487454b2156b34b6f00fd1e848f9666f60c2214",
       "transformVersion": "exact-generic-id-map-v1",
-      "status": "pending-id-transform"
+      "status": "verified-id-transform"
     },
     {
       "source": "docs/workstreams/tetris-t32-puzzle/puzzle-levels-changed-47.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t32/endgame-levels-changed-47.json",
       "sourceSha": "ade43137538e86d972496e98e0d7729f0fabfa374e1ee471f77a6ed852c719c7",
-      "targetSha": null,
+      "targetSha": "e1fb843f11eed9548924857ecc3ca333efe9f7b8242036c783a652a5871f1e7e",
       "transformVersion": "exact-generic-id-map-v1",
-      "status": "pending-id-transform"
+      "status": "verified-id-transform"
     },
     {
       "source": "docs/workstreams/tetris-t32-puzzle/puzzle-levels-changed-46-50-r2.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t32/endgame-levels-changed-46-50-r2.json",
       "sourceSha": "6eacf6c5cc4f15f301fa51bed25679e24449f23cafbf3ba71f0a7d1594bc7b3b",
-      "targetSha": null,
+      "targetSha": "8a89cab4acd07630563562efc8bf0a7280e920c71bcac35bac42385066bd53de",
       "transformVersion": "exact-generic-id-map-v1",
-      "status": "pending-id-transform"
+      "status": "verified-id-transform"
     },
     {
       "source": "docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-01.json",
