@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT REVISION — DOCS QA PENDING**
+Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT R2 ACCEPTED — DISCOVERY ACTIVE**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -409,8 +409,10 @@ not claim that every conceivable index-2 construction is impossible. The seven-d
 above removes the demonstrated setup contradiction while keeping the
 lesson's unique corridor, local clear, survivor mapping, and terminal I. It already yields 25
 Core-valid setup candidates and an independent audit retains 11 fully local-qualified
-candidates over eight unique boards, but no candidate is frozen here. Fresh docs QA must
-accept this revision before discovery or any source path reopens.
+candidates over eight unique boards, but no candidate is frozen here. Independent review of
+exact range `16570db..a09b64f` reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; only
+repository-external candidate discovery reopens. No source path opens before a complete
+candidate passes every setup, route, admission, hash, and uncapped exact-proof gate.
 
 ## Frozen published roster
 

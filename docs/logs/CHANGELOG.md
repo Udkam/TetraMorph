@@ -2661,3 +2661,14 @@
 - Independent read-only QA accepts exact range `c291afb..532e636` with P0 0 / P1 0 /
   P2 0 / P3 0. The bounded browser/server batch is released, and T32 board authoring is
   admitted under its committed curriculum and exact-proof contract.
+
+## 2026-08-12 — T37 Intro-04 contract R2 accepted
+
+- Replaced the contradicted eight-drop Intro-04 authoring boundary with exactly seven legal
+  zero-clear setup drops, 28 targets, twelve gaps, a lock-1 local clear through the exact
+  two-cell floor opening, and a four-through-six-lock proof range. The sole corridor,
+  survivor mapping, terminal three-row vertical-I clear, schema-8 certificate, and all 53
+  pairwise exclusions remain mandatory.
+- Independent read-only review accepts exact docs range `16570db..a09b64f` with
+  P0 0 / P1 0 / P2 0 / P3 0 / GAP 0. Only repository-external candidate discovery is open;
+  no Intro-04 product or authoring source has been admitted.

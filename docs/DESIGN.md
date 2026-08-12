@@ -797,6 +797,10 @@ adding unrelated badges or ornamental effects.
   rows. Both stored routes first diverge at lock 2 and must prove this full sequence, not
   infer it from a name, screenshot, hole count, or final solvability. The live three-row
   definition and all prior draft bytes remain pinned until the atomic campaign switch.
+- Independent review accepts exact R2 docs range `16570db..a09b64f` with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Only repository-external candidate discovery is
+  open; the three-path draft/certificate/test source boundary remains closed until every
+  setup, route, admission, hash, and exact-proof literal is independently frozen.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

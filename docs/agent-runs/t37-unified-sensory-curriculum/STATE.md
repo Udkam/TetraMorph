@@ -1742,9 +1742,13 @@ Core local replay `789A36A7A1E2166DC4E715212555D1DD946DB041453B7581562575BCB86A7
 independent audit script/output `045D28D3279451D5628DC11B5A86F6C36BA73620BD3EF877ADA00FDB345CAE3F` /
 `9986A0CC51F16032BFEA164C8EFD10AA7342E1A9E29249904C4E70A48C3D7D85`.
 
-Next exact action: independently review only this five-path docs revision. If and only if it
-is all zero, resume repository-external search for both complete routes and the strict proof.
-Source/product/UI/sensory/protected T27/icon paths remain closed.
+Independent review of exact range `16570db..a09b64f` reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The commit is a direct child, contains exactly the
+five authorized docs paths, and leaves protected T27/follow-up/progress paths isolated.
+
+Next exact action: resume repository-external search for both complete routes and the strict
+proof. Source/product/UI/sensory/protected T27/icon paths remain closed until a fully qualified
+candidate is independently frozen.
 
 ## Do not repeat
 

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT REVISION — DOCS QA PENDING**
+Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT R2 ACCEPTED — DISCOVERY ACTIVE**
 
 ## Active objective
 
@@ -474,8 +474,9 @@ local lock 1 with an exact two-cell floor span, 20 targets after that clear, pri
 four through six, and lock-2 alternative divergence. A separate seven-drop search produced
 25 Core-valid setups and the independent contract audit retained 11 fully local-qualified
 candidates across eight unique boards. These are discovery evidence, not a frozen candidate.
-Fresh independent docs QA is required before discovery resumes; all three source paths remain
-closed.
+Independent review of exact range `16570db..a09b64f` reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Repository-external candidate discovery is open again;
+all three source paths remain closed until one complete candidate passes every frozen gate.
 
 ## Frozen product direction
 
@@ -537,7 +538,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT REVISION / DOCS QA PENDING** — the exact
+6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT R2 ACCEPTED / DISCOVERY ACTIVE** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -555,9 +556,9 @@ closed.
    Intro-03 draft, schema-8 artifact, and exact test. Focused, exact, typecheck, final full
    suite (`445 / 14 skipped`), and build gates pass; three independent reviews are all zero.
    Published curriculum content remains closed until the later atomic switch. F4D's accepted
-   contract reached an eight-drop setup contradiction inside its generated index-1 family;
-   the seven-drop revision is awaiting fresh docs QA. Both repository-external discovery and
-   source remain closed until that review is all zero.
+   contract reached an eight-drop setup contradiction inside its generated index-1 family.
+   Independent review accepts the seven-drop R2 revision with P0–P3/GAP all zero, reopening
+   only repository-external candidate discovery; source remains closed until candidate freeze.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

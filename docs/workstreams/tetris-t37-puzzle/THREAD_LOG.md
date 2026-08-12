@@ -330,7 +330,7 @@ stale-next-action P2 is closed.
 
 - Task ID: `T37-F4D-CONTRACT-R2`
 - Base SHA: `16570db8b72c3da5d907371f5ac4d1311c502f81`
-- Status: docs-only revision; fresh independent QA pending; source closed.
+- Status: contract R2 accepted; repository-external discovery active; source closed.
 
 Repository-external discovery narrowed 2,040 eight-drop masks to 16 complete-control-domain
 local-lock geometries. The setup exact-cover search naturally exhausted all seven eight-draw
@@ -353,5 +353,10 @@ one contract-shaped first lock for each. None is frozen and no source path is op
   `41F07134...8ECDB`; exhausted eight-drop tilings `2A33921A...9149A`; seven-drop
   candidates `289D6130...7AE2`; current-Core local replay `789A36A7...7892`; independent
   contract audit script/output `045D28D3...CAE3F` / `9986A0CC...D7D85`.
-- Next action: obtain fresh independent all-zero review of this five-path docs checkpoint;
-  only then resume repository-external complete-candidate discovery.
+- Independent QA of exact range `16570db..a09b64f` reports
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It verifies a direct-child five-path checkpoint,
+  internally consistent R2 counts/invariants, clean diff checks, and continued isolation of
+  protected T27/follow-up/progress paths.
+- Next action: continue repository-external complete-candidate discovery. Freeze no setup,
+  route, seed, or source until current-Core replay, both route invariants, 53 pairwise
+  exclusions, canonical hashes, and uncapped exact proof all pass.
