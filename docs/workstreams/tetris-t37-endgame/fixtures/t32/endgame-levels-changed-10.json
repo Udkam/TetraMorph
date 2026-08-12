@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 7,
+  "claim": "Two non-unique public-Core routes for the T32 timed anchor side-slip lesson; search is not an optimality proof.",
+  "batch": {
+    "from": 10,
+    "to": 10
+  },
+  "commandEncoding": {
+    "S": { "type": "start" },
+    "T": { "type": "tick" },
+    "L": { "type": "move", "dx": -1 },
+    "R": { "type": "move", "dx": 1 },
+    "C": { "type": "rotate", "direction": 1 },
+    "D": { "type": "soft-drop" },
+    "H": { "type": "hard-drop" }
+  },
+  "difficultyTuple": [
+    "targetRowCount",
+    "lockedPieces",
+    "rotationPlanning",
+    "horizontalPlanning",
+    "clearDistribution",
+    "maximumHeight",
+    "peakHoles",
+    "branchWidth",
+    "firstDivergenceLock",
+    "anchorCount"
+  ],
+  "campaignOrder": [
+    "t5r-drift-08"
+  ],
+  "levels": [
+    {
+      "id": "t5r-drift-08",
+      "curriculumPosition": 10,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 5200002,
+        "placementCount": 6
+      },
+      "anchorCells": [
+        { "x": 1, "y": 15 }
+      ],
+      "firstDivergenceLock": 2,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLDDDDDDDDDDDDDDDDLHTTTCLLHTTTCLLLLLHTTTTTTTTTTTTCLLLHTTTCCCRRRRRHTTTTTTTTTTTTCCCRRHTTTTTTTTTTTT",
+          "commandCount": 96,
+          "locks": 6,
+          "rotationCount": 9,
+          "moveCount": 19,
+          "clearDistribution": [1, 1, 1],
+          "maximumHeight": 8,
+          "peakHoles": 5,
+          "branchWidths": [34, 34, 34, 34, 34, 34],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 1
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SLDDDDDDDDDDDDDDDDLHTTTLHTTTCLLLLLHTTTTTTTTTTTTLLHTTTCCCRRRRRHTTTTTTTTTTTTCCCRRHTTTTTTTTTTTT",
+          "commandCount": 92,
+          "locks": 6,
+          "rotationCount": 7,
+          "moveCount": 17,
+          "clearDistribution": [1, 1, 1],
+          "maximumHeight": 6,
+          "peakHoles": 5,
+          "branchWidths": [34, 34, 34, 34, 34, 34],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 1
+        }
+      ]
+    }
+  ],
+  "searchBounds": {
+    "maxLocks": 14,
+    "primaryBeam": 1600,
+    "alternateBeam": 1600
+  }
+}

@@ -1,0 +1,737 @@
+{
+  "schemaVersion": 7,
+  "claim": "Two non-unique public-Core routes per Phase-7 level; search is not an optimality proof.",
+  "batch": {
+    "from": 1,
+    "to": 10
+  },
+  "commandEncoding": {
+    "S": {
+      "type": "start"
+    },
+    "T": {
+      "type": "tick"
+    },
+    "L": {
+      "type": "move",
+      "dx": -1
+    },
+    "R": {
+      "type": "move",
+      "dx": 1
+    },
+    "C": {
+      "type": "rotate",
+      "direction": 1
+    },
+    "H": {
+      "type": "hard-drop"
+    }
+  },
+  "difficultyTuple": [
+    "targetRowCount",
+    "lockedPieces",
+    "rotationPlanning",
+    "horizontalPlanning",
+    "clearDistribution",
+    "maximumHeight",
+    "peakHoles",
+    "branchWidth",
+    "firstDivergenceLock",
+    "anchorCount"
+  ],
+  "campaignOrder": [
+    "t3r-shaft-01",
+    "t3r-shaft-02",
+    "t3r-shaft-03",
+    "t3r-cascade-05",
+    "t3r-shaft-04",
+    "t3r-cascade-06",
+    "t5r-delta-07",
+    "t5r-lattice-09",
+    "t5r-drift-08",
+    "t5r-rift-10"
+  ],
+  "levels": [
+    {
+      "id": "t3r-shaft-01",
+      "curriculumPosition": 1,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 1588444805,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 4,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLLLHTTTTTTTTTTTTCCRHTTTTTTTTTTTTCLLLLLHTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 60,
+          "locks": 4,
+          "rotationCount": 4,
+          "moveCount": 12,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLHTTTLLLHTTTTTTTTTTTTCHTTTTTTTTTTTTCLLLLHTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 63,
+          "locks": 5,
+          "rotationCount": 4,
+          "moveCount": 11,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t3r-shaft-02",
+      "curriculumPosition": 2,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 1588444826,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 4,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLLLHTTTTTTTTTTTTCHTTTTTTTTTTTTCLLHTTTCCCRRRHTTTTTTTTTTTT",
+          "commandCount": 57,
+          "locks": 4,
+          "rotationCount": 5,
+          "moveCount": 8,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCRRRRHTTTCRRRRHTTTLLLHTTTTTTTTTTTTCCCRHTTTTTTTTTTTTCRRHTTTHTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 79,
+          "locks": 7,
+          "rotationCount": 7,
+          "moveCount": 16,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 9,
+          "peakHoles": 4,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.286,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t3r-shaft-03",
+      "curriculumPosition": 3,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 1588444824,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 5,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLLLHTTTTTTTTTTTTCCRRHTTTTTTTTTTTTCHTTTRRRRHTTTCLLLLLHTTTTTTTTTTTT",
+          "commandCount": 66,
+          "locks": 5,
+          "rotationCount": 4,
+          "moveCount": 14,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.4,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRRHTTTLLLHTTTTTTTTTTTTCRRHTTTTTTTTTTTTLLHTTTCLLLLLHTTTCHTTTTTTTTTTTT",
+          "commandCount": 71,
+          "locks": 6,
+          "rotationCount": 3,
+          "moveCount": 16,
+          "clearDistribution": [
+            1,
+            1,
+            2
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            36,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t3r-cascade-05",
+      "curriculumPosition": 4,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 1588444806,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 5,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRRHTTTTTTTTTTTTLLHTTTCCRHTTTTTTTTTTTTCLLLLHTTTCRRRRHTTTTTTTTTTTT",
+          "commandCount": 67,
+          "locks": 5,
+          "rotationCount": 4,
+          "moveCount": 15,
+          "clearDistribution": [
+            1,
+            1,
+            2
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            36,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.4,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCRRHTTTRRRRHTTTTTTTTTTTTLLLHTTTCCCHTTTTTTTTTTTTCRRRRHTTTCLLLLHTTTTTTTTTTTT",
+          "commandCount": 76,
+          "locks": 6,
+          "rotationCount": 7,
+          "moveCount": 17,
+          "clearDistribution": [
+            1,
+            2,
+            1
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t3r-shaft-04",
+      "curriculumPosition": 5,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 2718281711,
+        "placementCount": 5
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 5,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRRHTTTCCCRHTTTCRRHTTTTTTTTTTTTCLLHTTTCCLLLHTTTTTTTTTTTT",
+          "commandCount": 58,
+          "locks": 5,
+          "rotationCount": 7,
+          "moveCount": 12,
+          "clearDistribution": [
+            2,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 2,
+          "branchWidths": [
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.4,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRHTTTRRRRHTTTTTTTTTTTTCRRRRHTTTCRRHTTTTTTTTTTTTCCCLHTTTTTTTTTTTT",
+          "commandCount": 65,
+          "locks": 5,
+          "rotationCount": 5,
+          "moveCount": 12,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 2,
+          "branchWidths": [
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.4,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t3r-cascade-06",
+      "curriculumPosition": 6,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 2718281725,
+        "placementCount": 5
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 5,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCCCRRHTTTCCRRRRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCLHTTTCLLLLHTTTTTTTTTTTT",
+          "commandCount": 70,
+          "locks": 5,
+          "rotationCount": 7,
+          "moveCount": 15,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 4,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCRRHTTTCCRRRRHTTTTTTTTTTTTCRRRHTTTTTTTTTTTTCLLLLLHTTTCHTTTTTTTTTTTT",
+          "commandCount": 68,
+          "locks": 5,
+          "rotationCount": 6,
+          "moveCount": 14,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t5r-delta-07",
+      "curriculumPosition": 7,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 2718281722,
+        "placementCount": 5
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SHTTTRRRRHTTTCRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCLLHTTTCLLLLHTTTTTTTTTTTT",
+          "commandCount": 72,
+          "locks": 6,
+          "rotationCount": 4,
+          "moveCount": 16,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 3,
+          "branchWidths": [
+            36,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRHTTTRRHTTTCCCRRRRRHTTTTTTTTTTTTCRRRHTTTTTTTTTTTTCLLLLHTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 76,
+          "locks": 6,
+          "rotationCount": 6,
+          "moveCount": 18,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 4,
+          "branchWidths": [
+            36,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t5r-lattice-09",
+      "curriculumPosition": 8,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 1588444814,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRHTTTRRHTTTLLLHTTTTTTTTTTTTCCCRRRRRHTTTCCCHTTTTTTTTTTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 74,
+          "locks": 6,
+          "rotationCount": 7,
+          "moveCount": 15,
+          "clearDistribution": [
+            1,
+            1,
+            2
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLLLLHTTTLLLHTTTTTTTTTTTTCCRRRRHTTTCCRRRHTTTCCHTTTTTTTTTTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 78,
+          "locks": 6,
+          "rotationCount": 8,
+          "moveCount": 18,
+          "clearDistribution": [
+            1,
+            2,
+            1
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t5r-drift-08",
+      "curriculumPosition": 9,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 2718281717,
+        "placementCount": 5
+      },
+      "anchorCells": [
+        {
+          "x": 9,
+          "y": 16
+        }
+      ],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRRHTTTCCLLHTTTCLLLLLHTTTTTTTTTTTTLLHTTTTTTTTTTTTCCHTTTCRRHTTTTTTTTTTTT",
+          "commandCount": 73,
+          "locks": 6,
+          "rotationCount": 6,
+          "moveCount": 15,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 4,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 1
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCRRRHTTTCCLLHTTTCLLLLLHTTTTTTTTTTTTLLHTTTTTTTTTTTTCCCRRHTTTCHTTTTTTTTTTTT",
+          "commandCount": 74,
+          "locks": 6,
+          "rotationCount": 8,
+          "moveCount": 14,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 5,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 1
+        }
+      ]
+    },
+    {
+      "id": "t5r-rift-10",
+      "curriculumPosition": 10,
+      "targetRowCount": 3,
+      "setup": {
+        "seed": 2718281718,
+        "placementCount": 5
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRRHTTTCCCLHTTTLLLLHTTTTTTTTTTTTCCCLLHTTTTTTTTTTTTCCCRRRRRHTTTCHTTTTTTTTTTTT",
+          "commandCount": 77,
+          "locks": 6,
+          "rotationCount": 11,
+          "moveCount": 14,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.333,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRHTTTCCCLHTTTLLLLHTTTTTTTTTTTTCCCLLHTTTTTTTTTTTTCCCHTTTCLLLLHTTTCRRRRHTTTTTTTTTTTT",
+          "commandCount": 84,
+          "locks": 7,
+          "rotationCount": 11,
+          "moveCount": 17,
+          "clearDistribution": [
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 3,
+          "branchWidths": [
+            34,
+            34,
+            36,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.286,
+          "anchorCount": 0
+        }
+      ]
+    }
+  ],
+  "searchBounds": {
+    "maxLocks": 18,
+    "primaryBeam": 900,
+    "alternateBeam": 700
+  }
+}

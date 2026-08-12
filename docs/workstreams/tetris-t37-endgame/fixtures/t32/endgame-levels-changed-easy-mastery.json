@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 7,
+  "claim": "T32 Easy mastery evidence pairs each strict optimal primary certificate with a distinct successful public-Core route.",
+  "batch": {
+    "from": 12,
+    "to": 14
+  },
+  "commandEncoding": {
+    "S": {
+      "type": "start"
+    },
+    "T": {
+      "type": "tick"
+    },
+    "L": {
+      "type": "move",
+      "dx": -1
+    },
+    "R": {
+      "type": "move",
+      "dx": 1
+    },
+    "H": {
+      "type": "hard-drop"
+    },
+    "C": {
+      "type": "rotate",
+      "direction": 1
+    }
+  },
+  "difficultyTuple": [
+    "targetRowCount",
+    "lockedPieces",
+    "rotationPlanning",
+    "horizontalPlanning",
+    "clearDistribution",
+    "maximumHeight",
+    "peakHoles",
+    "branchWidth",
+    "firstDivergenceLock",
+    "anchorCount"
+  ],
+  "campaignOrder": [
+    "t5r-arc-13",
+    "t5r-current-12",
+    "t5r-prism-11"
+  ],
+  "levels": [
+    {
+      "id": "t5r-arc-13",
+      "curriculumPosition": 12,
+      "targetRowCount": 4,
+      "setup": {
+        "seed": 156544,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 5,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRRRRHTTTCCLLLHTTTCCRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTT",
+          "commandCount": 70,
+          "locks": 5,
+          "rotationCount": 6,
+          "moveCount": 16,
+          "clearDistribution": [
+            1,
+            1,
+            2
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 2,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLLLLHTTTCCCRRRRRHTTTTTTTTTTTTCRHTTTTTTTTTTTTCRRHTTTCHTTTLLLHTTTTTTTTTTTTLLHTTTCCCRRRRRHTTTTTTTTTTTT",
+          "commandCount": 102,
+          "locks": 8,
+          "rotationCount": 10,
+          "moveCount": 23,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            2
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 1,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.25,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t5r-current-12",
+      "curriculumPosition": 13,
+      "targetRowCount": 4,
+      "setup": {
+        "seed": 156544,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCHTTTCLLHTTTCRRRRHTTTRRRHTTTCLLLLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTT",
+          "commandCount": 65,
+          "locks": 6,
+          "rotationCount": 5,
+          "moveCount": 17,
+          "clearDistribution": [
+            3,
+            1
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 1,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLLHTTTCLHTTTCLLLLLHTTTCCCRRRRRHTTTTTTTTTTTTRRHTTTTTTTTTTTTCCCRRRRRHTTTTTTTTTTTT",
+          "commandCount": 82,
+          "locks": 6,
+          "rotationCount": 9,
+          "moveCount": 21,
+          "clearDistribution": [
+            2,
+            1,
+            1
+          ],
+          "maximumHeight": 6,
+          "peakHoles": 1,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        }
+      ]
+    },
+    {
+      "id": "t5r-prism-11",
+      "curriculumPosition": 14,
+      "targetRowCount": 4,
+      "setup": {
+        "seed": 156544,
+        "placementCount": 6
+      },
+      "anchorCells": [],
+      "firstDivergenceLock": 1,
+      "shorterRouteLocks": 6,
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRRRRHTTTCCLLLHTTTCCRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCHTTTTTTTTTTTT",
+          "commandCount": 84,
+          "locks": 6,
+          "rotationCount": 7,
+          "moveCount": 16,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 4,
+          "peakHoles": 2,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 34,
+          "averageBranchWidth": 34,
+          "anchorCount": 0
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLLLLHTTTCCCRRRRRHTTTTTTTTTTTTCCRHTTTTTTTTTTTTLLHTTTCCRRHTTTTTTTTTTTTCLLLHTTTRRHTTTCHTTTCLLLLHTTTCCCRRRRRHTTTTTTTTTTTT",
+          "commandCount": 120,
+          "locks": 10,
+          "rotationCount": 14,
+          "moveCount": 29,
+          "clearDistribution": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "maximumHeight": 5,
+          "peakHoles": 2,
+          "branchWidths": [
+            34,
+            34,
+            34,
+            34,
+            34,
+            34,
+            36,
+            34,
+            34,
+            34
+          ],
+          "minimumBranchWidth": 34,
+          "maximumBranchWidth": 36,
+          "averageBranchWidth": 34.2,
+          "anchorCount": 0
+        }
+      ]
+    }
+  ],
+  "searchBounds": {
+    "maxLocks": 12,
+    "primaryBeam": 900,
+    "alternateBeam": 900
+  }
+}

@@ -1,0 +1,649 @@
+{
+  "schemaVersion": 6,
+  "claim": "T13 records two Core-replayed route families per legal endgame; routes are evidence, not a budget, timer, or unique answer claim.",
+  "commandEncoding": {
+    "S": {
+      "type": "start"
+    },
+    "T": {
+      "type": "tick"
+    },
+    "L": {
+      "type": "move",
+      "dx": -1
+    },
+    "R": {
+      "type": "move",
+      "dx": 1
+    },
+    "C": {
+      "type": "rotate",
+      "direction": 1
+    },
+    "H": {
+      "type": "hard-drop"
+    }
+  },
+  "difficultyTuple": [
+    "targetRowCount",
+    "authoredPosition",
+    "routePlanning",
+    "rotationPlanning",
+    "branchTiming",
+    "recoveryRoom"
+  ],
+  "campaignOrder": [
+    "t3r-shaft-01",
+    "t3r-shaft-02",
+    "t3r-shaft-03",
+    "t3r-cascade-05",
+    "t3r-shaft-04",
+    "t3r-cascade-06",
+    "t5r-delta-07",
+    "t5r-lattice-09",
+    "t5r-drift-08",
+    "t5r-rift-10",
+    "t5r-pulse-14",
+    "t5r-arc-13",
+    "t5r-current-12",
+    "t5r-prism-11",
+    "t5r-horizon-15",
+    "t6r-cairn-17",
+    "t6r-terrace-18",
+    "t6r-keystone-20",
+    "t6r-bastion-19",
+    "t6r-veil-16"
+  ],
+  "levels": [
+    {
+      "id": "t3r-shaft-01",
+      "curriculumPosition": 1,
+      "targetRowCount": 5,
+      "setup": {
+        "seed": 1588444911,
+        "placementCount": 8
+      },
+      "anchorCells": [
+        {
+          "x": 3,
+          "y": 14
+        }
+      ],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLLLHTTTCCCRRRRRHTTTTTTTTTTTTCCRRHTTTCRRRRHTTTTTTTTTTTTCLLLHTTTRRRHTTTCHTTTTTTTTTTTT",
+          "commandCount": 86,
+          "locks": 7,
+          "rotationCount": 9,
+          "moveCount": 21
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCRRRRHTTTTTTTTTTTTCCCRRRRRHTTTTTTTTTTTTCCCRRHTTTLLLLHTTTCRRHTTTCRRRRHTTTTTTTTTTTTCHTTTCCCLLHTTTTTTTTTTTT",
+          "commandCount": 106,
+          "locks": 8,
+          "rotationCount": 14,
+          "moveCount": 23
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t3r-shaft-02",
+      "curriculumPosition": 2,
+      "targetRowCount": 5,
+      "setup": {
+        "seed": 1431655765,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLLLLHTTTTTTTTTTTTLLLHTTTTTTTTTTTTCLHTTTCCRRRHTTTTTTTTTTTTCCLLLHTTTTTTTTTTTT",
+          "commandCount": 78,
+          "locks": 5,
+          "rotationCount": 6,
+          "moveCount": 15
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCRRRRHTTTLLLLHTTTTTTTTTTTTLLLHTTTTTTTTTTTTCCRRRHTTTCCLLHTTTTTTTTTTTTCLLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTT",
+          "commandCount": 103,
+          "locks": 7,
+          "rotationCount": 7,
+          "moveCount": 22
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t3r-shaft-03",
+      "curriculumPosition": 3,
+      "targetRowCount": 5,
+      "setup": {
+        "seed": 1717986918,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCCCLHTTTLLLHTTTCCCRRRRRHTTTTTTTTTTTTCRRRHTTTCRRRRHTTTTTTTTTTTTCRRRHTTTCLHTTTTTTTTTTTTCRHTTTTTTTTTTTT",
+          "commandCount": 101,
+          "locks": 8,
+          "rotationCount": 11,
+          "moveCount": 21
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCCLLLHTTTLLHTTTCCCRRRRRHTTTTTTTTTTTTCRRRHTTTCRRRRHTTTTTTTTTTTTCRRRHTTTCLHTTTTTTTTTTTTCRHTTTTTTTTTTTT",
+          "commandCount": 102,
+          "locks": 8,
+          "rotationCount": 11,
+          "moveCount": 22
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t3r-cascade-05",
+      "curriculumPosition": 4,
+      "targetRowCount": 5,
+      "setup": {
+        "seed": 305419896,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRHTTTRRHTTTCRRRRHTTTTTTTTTTTTLHTTTTTTTTTTTTCLHTTTCRRRHTTTTTTTTTTTTLLLLHTTTCRHTTTTTTTTTTTTLLLLHTTTCCCRRRRRHTTTTTTTTTTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 138,
+          "locks": 11,
+          "rotationCount": 8,
+          "moveCount": 31
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCHTTTRRRHTTTCRRRRHTTTTTTTTTTTTCRRRRHTTTCRRHTTTCLLHTTTTTTTTTTTTLLLLHTTTCRHTTTTTTTTTTTTRRRRHTTTCCCLHTTTTTTTTTTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 128,
+          "locks": 11,
+          "rotationCount": 10,
+          "moveCount": 28
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t3r-shaft-04",
+      "curriculumPosition": 5,
+      "targetRowCount": 5,
+      "setup": {
+        "seed": 2004318071,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRHTTTCHTTTCCCRRRRRHTTTTTTTTTTTTCCCRRRRHTTTCRRRRHTTTTTTTTTTTTRRHTTTCLLLLHTTTTTTTTTTTTCRRRRHTTTCLLLLHTTTCLLHTTTCCCHTTTTTTTTTTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 143,
+          "locks": 12,
+          "rotationCount": 16,
+          "moveCount": 33
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCCRRHTTTLLLHTTTCCCRRRRRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCHTTTRRRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCRRRHTTTCLLLLHTTTCCCRRRRRHTTTCRHTTTCLLHTTTTTTTTTTTTLLHTTTCLHTTTTTTTTTTTT",
+          "commandCount": 166,
+          "locks": 14,
+          "rotationCount": 16,
+          "moveCount": 39
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t3r-cascade-06",
+      "curriculumPosition": 6,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 305419896,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCCRRRRHTTTTTTTTTTTTCCCRRRRRHTTTCRHTTTTTTTTTTTTLLHTTTRRHTTTCCRRRRHTTTTTTTTTTTTRRRHTTTCCHTTTTTTTTTTTTCLLLHTTTTTTTTTTTT",
+          "commandCount": 117,
+          "locks": 9,
+          "rotationCount": 11,
+          "moveCount": 24
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRRHTTTCCCRRRRHTTTTTTTTTTTTCRHTTTTTTTTTTTTCRRRRHTTTRRHTTTTTTTTTTTTCLHTTTHTTTCCCRRRHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTRRHTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 137,
+          "locks": 11,
+          "rotationCount": 11,
+          "moveCount": 27
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-delta-07",
+      "curriculumPosition": 7,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1588444911,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLLLLHTTTLHTTTTTTTTTTTTCCLLHTTTTTTTTTTTTCLLLLLHTTTTTTTTTTTTLLLHTTTCRRRRHTTTCCCHTTTTTTTTTTTTCRRRRHTTTCRHTTTTTTTTTTTT",
+          "commandCount": 115,
+          "locks": 9,
+          "rotationCount": 9,
+          "moveCount": 24
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRHTTTLHTTTCLLLHTTTCLLLLLHTTTTTTTTTTTTCRRRRHTTTCCLHTTTTTTTTTTTTCLLLHTTTCLLLLLHTTTHTTTCRRRRHTTTTTTTTTTTTCCHTTTCLLHTTTTTTTTTTTTCCRRRRHTTTTTTTTTTTTLLLLHTTTCCCRRHTTTTTTTTTTTT",
+          "commandCount": 171,
+          "locks": 15,
+          "rotationCount": 16,
+          "moveCount": 40
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-lattice-09",
+      "curriculumPosition": 8,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 591751049,
+        "placementCount": 8
+      },
+      "anchorCells": [
+        {
+          "x": 9,
+          "y": 13
+        }
+      ],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLLHTTTRHTTTCLLLLLHTTTTTTTTTTTTCRRRHTTTCCCLLLHTTTTTTTTTTTTLHTTTTTTTTTTTTHTTTHTTTCCCLHTTTCLLLLHTTTTTTTTTTTTCRRHTTTTTTTTTTTT",
+          "commandCount": 122,
+          "locks": 11,
+          "rotationCount": 10,
+          "moveCount": 22
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRHTTTCRRRHTTTCLLLLLHTTTTTTTTTTTTCLLLHTTTTTTTTTTTTCCHTTTCCCLLLHTTTTTTTTTTTTLLHTTTTTTTTTTTTLLHTTTCCCRRRRHTTTCCCRRHTTTTTTTTTTTTCLLLLHTTTCLHTTTTTTTTTTTT",
+          "commandCount": 151,
+          "locks": 12,
+          "rotationCount": 16,
+          "moveCount": 32
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-drift-08",
+      "curriculumPosition": 9,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 878082202,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLHTTTRRRHTTTRRHTTTCRRRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRHTTTRRRRHTTTCHTTTCCCLLHTTTTTTTTTTTTCLLLLHTTTRRRRHTTTTTTTTTTTTCLHTTTTTTTTTTTTRRHTTTTTTTTTTTTCCLLHTTTTTTTTTTTT",
+          "commandCount": 165,
+          "locks": 14,
+          "rotationCount": 11,
+          "moveCount": 34
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SHTTTRRRHTTTCLLHTTTCRRRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCLHTTTCCRRRRHTTTCRHTTTTTTTTTTTTCLLLLHTTTRRRRHTTTTTTTTTTTTLLHTTTCRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCCCRHTTTCCCLLLHTTTTTTTTTTTT",
+          "commandCount": 177,
+          "locks": 15,
+          "rotationCount": 15,
+          "moveCount": 38
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-rift-10",
+      "curriculumPosition": 10,
+      "targetRowCount": 6,
+      "setup": {
+        "seed": 1588444911,
+        "placementCount": 8
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRHTTTCLLLLHTTTTTTTTTTTTLLLLHTTTCCLHTTTTTTTTTTTTCCCLLHTTTTTTTTTTTTCLLLLHTTTCRRRHTTTHTTTTTTTTTTTTCRRRRHTTTCCCRRRHTTTTTTTTTTTTRRHTTTCLLLLHTTTCCLHTTTTTTTTTTTTHTTTTTTTTTTTTLHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTT",
+          "commandCount": 201,
+          "locks": 16,
+          "rotationCount": 16,
+          "moveCount": 39
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRRHTTTCLLLLHTTTTTTTTTTTTRHTTTCCLLHTTTTTTTTTTTTLHTTTCLLLHTTTCLLHTTTCLLLLHTTTTTTTTTTTTRHTTTTTTTTTTTTCCCRRRRRHTTTCRRHTTTCLLLLHTTTTTTTTTTTTCCCLLHTTTHTTTTTTTTTTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 177,
+          "locks": 15,
+          "rotationCount": 15,
+          "moveCount": 38
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-pulse-14",
+      "curriculumPosition": 11,
+      "targetRowCount": 7,
+      "setup": {
+        "seed": 1164413355,
+        "placementCount": 10
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRHTTTRRRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTRRRRHTTTCHTTTTTTTTTTTTCCLLHTTTTTTTTTTTTRRRHTTTTTTTTTTTTCRRHTTTTTTTTTTTTCCLLHTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 138,
+          "locks": 10,
+          "rotationCount": 9,
+          "moveCount": 25
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLLLHTTTRRRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTRRRRHTTTCCRHTTTTTTTTTTTTCLLHTTTTTTTTTTTTRRRHTTTTTTTTTTTTCCRHTTTTTTTTTTTTRRRRHTTTHTTTTTTTTTTTTCLLLHTTTCCCRRRRHTTTTTTTTTTTT",
+          "commandCount": 166,
+          "locks": 12,
+          "rotationCount": 11,
+          "moveCount": 34
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-arc-13",
+      "curriculumPosition": 12,
+      "targetRowCount": 7,
+      "setup": {
+        "seed": 591751049,
+        "placementCount": 10
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLLLHTTTTTTTTTTTTCLLHTTTLLLLHTTTTTTTTTTTTCCRRHTTTLLLHTTTCCCHTTTTTTTTTTTTCLLLLLHTTTTTTTTTTTTCCCRRRRRHTTTCCLLHTTTTTTTTTTTTCCCRRRHTTTCHTTTTTTTTTTTT",
+          "commandCount": 146,
+          "locks": 11,
+          "rotationCount": 17,
+          "moveCount": 30
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCLLLHTTTLHTTTTTTTTTTTTLLLLHTTTTTTTTTTTTCCRRHTTTCLHTTTLLLHTTTTTTTTTTTTCLLLLLHTTTTTTTTTTTTCCCLLLHTTTCCCRRRRRHTTTTTTTTTTTTCCCRRRHTTTCHTTTTTTTTTTTT",
+          "commandCount": 145,
+          "locks": 11,
+          "rotationCount": 16,
+          "moveCount": 30
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-current-12",
+      "curriculumPosition": 13,
+      "targetRowCount": 7,
+      "setup": {
+        "seed": 287454031,
+        "placementCount": 10
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLHTTTCLLLLHTTTTTTTTTTTTCCLLLHTTTTTTTTTTTTLLHTTTCLLLLLHTTTCLLLHTTTCCCRHTTTTTTTTTTTTRRRHTTTCRHTTTTTTTTTTTTCCCHTTTCRRRRHTTTTTTTTTTTTCCCRRRHTTTTTTTTTTTT",
+          "commandCount": 149,
+          "locks": 12,
+          "rotationCount": 16,
+          "moveCount": 30
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRRRHTTTCLLLLHTTTTTTTTTTTTCCLLLHTTTHTTTTTTTTTTTTLLLHTTTTTTTTTTTTCRHTTTCCLLLHTTTTTTTTTTTTLLLLHTTTCLHTTTTTTTTTTTTCLLHTTTCRRRRHTTTTTTTTTTTTCHTTTTTTTTTTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 167,
+          "locks": 13,
+          "rotationCount": 11,
+          "moveCount": 31
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-prism-11",
+      "curriculumPosition": 14,
+      "targetRowCount": 7,
+      "setup": {
+        "seed": 878082202,
+        "placementCount": 10
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SLLLHTTTCLLHTTTCCRRRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRRHTTTTTTTTTTTTRRHTTTRRRRHTTTTTTTTTTTTCCRRRHTTTTTTTTTTTTCLLLLHTTTCHTTTCCCRRRRRHTTTTTTTTTTTTRHTTTCLHTTTCRRHTTTTTTTTTTTT",
+          "commandCount": 171,
+          "locks": 14,
+          "rotationCount": 14,
+          "moveCount": 37
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLHTTTLLLHTTTCCRRRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRRHTTTTTTTTTTTTRRHTTTRRRRHTTTTTTTTTTTTCCRRRHTTTTTTTTTTTTCLLLLHTTTCHTTTCCCRRRRRHTTTTTTTTTTTTRRRRHTTTCCRRHTTTRHTTTCCLLLHTTTTTTTTTTTTRRHTTTCLLLHTTTTTTTTTTTTCLHTTTTTTTTTTTT",
+          "commandCount": 221,
+          "locks": 18,
+          "rotationCount": 18,
+          "moveCount": 49
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t5r-horizon-15",
+      "curriculumPosition": 15,
+      "targetRowCount": 7,
+      "setup": {
+        "seed": 305419896,
+        "placementCount": 10
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCCRRRRHTTTTTTTTTTTTCRRRHTTTTTTTTTTTTCCRRRRHTTTRHTTTTTTTTTTTTCRRRRHTTTCCRRRHTTTLLLLHTTTTTTTTTTTTRRHTTTCRRRRHTTTCLLLHTTTTTTTTTTTTCHTTTTTTTTTTTTCLLLLHTTTCLLHTTTTTTTTTTTT",
+          "commandCount": 167,
+          "locks": 13,
+          "rotationCount": 13,
+          "moveCount": 38
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCCRRRRRHTTTTTTTTTTTTCRRRHTTTCCCRRHTTTRRRRHTTTCRRRRHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTLLLHTTTLLLLHTTTCHTTTTTTTTTTTTCRHTTTCRRRHTTTTTTTTTTTTCLHTTTTTTTTTTTT",
+          "commandCount": 150,
+          "locks": 12,
+          "rotationCount": 13,
+          "moveCount": 34
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t6r-cairn-17",
+      "curriculumPosition": 16,
+      "targetRowCount": 8,
+      "setup": {
+        "seed": 270544960,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLHTTTCCCRRRRRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCRHTTTCRRRRHTTTCLLLLHTTTCRRRHTTTTTTTTTTTTCCCRRRRHTTTTTTTTTTTTCLLLLHTTTRRRHTTTRHTTTCLHTTTCCRRRRHTTTTTTTTTTTTCCCLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCCCRHTTTTTTTTTTTTCRRHTTTTTTTTTTTTRHTTTCLLLHTTTCRRRRHTTTTTTTTTTTT",
+          "commandCount": 252,
+          "locks": 20,
+          "rotationCount": 25,
+          "moveCount": 56
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCLLLLHTTTCCCRRRRRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCHTTTCRRRRHTTTRRRHTTTTTTTTTTTTCCCRRRRHTTTTTTTTTTTTCRRHTTTCLLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTRRRRHTTTCRRHTTTCRHTTTRRRRHTTTCLLHTTTTTTTTTTTTCCLLLHTTTCCRHTTTTTTTTTTTTLHTTTTTTTTTTTTCRHTTTTTTTTTTTTCCLLLHTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 264,
+          "locks": 21,
+          "rotationCount": 23,
+          "moveCount": 57
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t6r-terrace-18",
+      "curriculumPosition": 17,
+      "targetRowCount": 8,
+      "setup": {
+        "seed": 1164413355,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCCRHTTTCCCRRRRRHTTTTTTTTTTTTLLHTTTRHTTTRRRRHTTTTTTTTTTTTCLLLLLHTTTCLHTTTTTTTTTTTTRHTTTRRRRHTTTCRRRHTTTTTTTTTTTTCCCLLHTTTTTTTTTTTTCHTTTTTTTTTTTT",
+          "commandCount": 179,
+          "locks": 14,
+          "rotationCount": 13,
+          "moveCount": 37
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCLHTTTCRRRRHTTTTTTTTTTTTCCCRRRRRHTTTTTTTTTTTTRRRRHTTTTTTTTTTTTCRRRRHTTTCHTTTRRHTTTTTTTTTTTTCRRRHTTTCLLLLHTTTRRHTTTCLLLLHTTTCLHTTTTTTTTTTTTCCCRRRRRHTTTCLLHTTTTTTTTTTTTCHTTTTTTTTTTTTCRRHTTTTTTTTTTTTCCCHTTTTTTTTTTTT",
+          "commandCount": 214,
+          "locks": 17,
+          "rotationCount": 21,
+          "moveCount": 43
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t6r-keystone-20",
+      "curriculumPosition": 18,
+      "targetRowCount": 8,
+      "setup": {
+        "seed": 305419896,
+        "placementCount": 13
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SRRHTTTRRRRHTTTCCRRHTTTTTTTTTTTTCLHTTTTTTTTTTTTCLLHTTTRRRRHTTTRRHTTTTTTTTTTTTCLLLLHTTTCRHTTTTTTTTTTTTRRRHTTTCRRRRHTTTTTTTTTTTTCCCLHTTTTTTTTTTTTCCCLLLHTTTTTTTTTTTTCRHTTTTTTTTTTTTCHTTTTTTTTTTTTCRRRHTTTTTTTTTTTTCCCLHTTTTTTTTTTTT",
+          "commandCount": 225,
+          "locks": 17,
+          "rotationCount": 19,
+          "moveCount": 38
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SRHTTTLLHTTTCCRRRRHTTTTTTTTTTTTRRRHTTTTTTTTTTTTRRRHTTTCCCRHTTTTTTTTTTTTCLLLLHTTTCLLLLHTTTCCLHTTTRRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCCCRHTTTTTTTTTTTTCCCLLLHTTTRRRHTTTTTTTTTTTTRRHTTTCCCRRRRHTTTTTTTTTTTTCCCLHTTTTTTTTTTTT",
+          "commandCount": 215,
+          "locks": 17,
+          "rotationCount": 22,
+          "moveCount": 43
+        }
+      ],
+      "firstDivergenceLock": 2
+    },
+    {
+      "id": "t6r-bastion-19",
+      "curriculumPosition": 19,
+      "targetRowCount": 8,
+      "setup": {
+        "seed": 591751049,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCLLLLHTTTTTTTTTTTTCCCLLLHTTTLHTTTLLLLHTTTTTTTTTTTTCCLHTTTTTTTTTTTTRHTTTCRRHTTTCLLLLHTTTTTTTTTTTTCLLLLHTTTCRRRRHTTTTTTTTTTTTLLHTTTTTTTTTTTTCRRRHTTTCCCRHTTTTTTTTTTTTCRHTTTCCCHTTTTTTTTTTTTLLLHTTTRRRRHTTTCLLHTTTTTTTTTTTTCCCRHTTTCCCRRRHTTTTTTTTTTTT",
+          "commandCount": 244,
+          "locks": 20,
+          "rotationCount": 25,
+          "moveCount": 48
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCCCRHTTTCCCLLLHTTTTTTTTTTTTCLLLLLHTTTTTTTTTTTTRRHTTTLLLHTTTTTTTTTTTTCLHTTTCLLLLHTTTTTTTTTTTTCLLHTTTCLLLLHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTLHTTTCCRRRHTTTTTTTTTTTTCRHTTTCLLLLHTTTTTTTTTTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 200,
+          "locks": 15,
+          "rotationCount": 17,
+          "moveCount": 41
+        }
+      ],
+      "firstDivergenceLock": 1
+    },
+    {
+      "id": "t6r-veil-16",
+      "curriculumPosition": 20,
+      "targetRowCount": 8,
+      "setup": {
+        "seed": 1588444911,
+        "placementCount": 12
+      },
+      "anchorCells": [],
+      "routes": [
+        {
+          "id": "primary",
+          "commandStream": "SCRRRRHTTTTTTTTTTTTCCCRRRRHTTTTTTTTTTTTCCCLLHTTTCRRHTTTCRRRRHTTTHTTTCLLLLHTTTTTTTTTTTTCRRHTTTCLLHTTTTTTTTTTTTCLLLLHTTTCCCRRRRRHTTTTTTTTTTTTCLLHTTTTTTTTTTTTRRRRHTTTCLLLHTTTCLHTTTRRRRHTTTCCRRHTTTTTTTTTTTTCLLLHTTTCLLLLLHTTTCRRHTTTCCCRHTTTTTTTTTTTTCRRRHTTTTTTTTTTTT",
+          "commandCount": 261,
+          "locks": 22,
+          "rotationCount": 28,
+          "moveCount": 63
+        },
+        {
+          "id": "alternate",
+          "commandStream": "SCRHTTTCRRRRHTTTTTTTTTTTTCCRRRRHTTTLLLHTTTTTTTTTTTTCLLHTTTHTTTCRRRHTTTTTTTTTTTTCRRHTTTCRRRRHTTTTTTTTTTTTCLLLLHTTTCCCRRRRRHTTTTTTTTTTTTCCLLHTTTTTTTTTTTTRRRRHTTTCLLHTTTTTTTTTTTTCHTTTLHTTTCCRRHTTTCLLLHTTTCLLLLLHTTTTTTTTTTTTCCCRRHTTTTTTTTTTTTCCRRRRHTTTTTTTTTTTT",
+          "commandCount": 257,
+          "locks": 21,
+          "rotationCount": 25,
+          "moveCount": 57
+        }
+      ],
+      "firstDivergenceLock": 1
+    }
+  ]
+}
