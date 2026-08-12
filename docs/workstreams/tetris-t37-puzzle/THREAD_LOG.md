@@ -222,5 +222,10 @@ alternative to clear four rows in one event. The repair now requires both routes
 `[0,0]`, then use at least two positive releases summing to four, strictly reduce targets on
 each positive event, and finish at zero; the exact arrays may differ.
 
+Both final reviews of `66c567d` close P0/P1/P2/GAP and retain only a P3 because STATE still
+asked to create a commit that already existed. This checkpoint correction removes that stale
+instruction; it does not change the contract body.
+
 - Blocker: candidate discovery is closed pending two all-zero reviews of the repaired SHA.
-- Next action: independent read-only contract re-QA only.
+- Next action: commit this checkpoint-only correction, then independent read-only confirmation
+  of its SHA; open only bounded candidate discovery after two all-zero confirmations.

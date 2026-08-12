@@ -1632,10 +1632,16 @@ reports one P3 because the next action still said to commit an already committed
 follow-up text now binds both routes to the complete release invariant and updates the
 checkpoint.
 
-Next exact action: commit this minimal F4C release/state clarification, then obtain two fresh
-independent reviews of that new SHA. Discovery/source stay closed until both report
+Both final reviews of contract body `66c567d` report
+`P0 0 / P1 0 / P2 0 / GAP 0`; each retains only the same P3 because this checkpoint sentence
+still described an already completed commit. No product-rule or feasibility finding remains.
+
+Next exact action: commit only this checkpoint correction, then obtain two fresh independent
+read-only confirmations that the resulting SHA has
 `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Product, progression/UI, sensory work, protected T27
-paths, and icon remain closed.
+paths, and icon remain closed. Once both confirmations are all zero, open only bounded
+repository-external candidate discovery for F4C; source creation remains closed until a fully
+qualified candidate passes preimplementation QA.
 
 ## Do not repeat
 
