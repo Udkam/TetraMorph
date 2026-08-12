@@ -225,8 +225,10 @@ behavior `f19aecb90dbba04a1cac3e38b6714806f5ca44709a8a558cd6935f501fae23cb`, pri
 checkpoint may now open; product integration remains closed.
 
 Source `c571f54` implements exactly the four contracted paths with 340 additions and two
-deletions. The Intro-02 artifact is 621 bytes with SHA-256
-`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`; accepted Intro-01
+deletions. The serialized Intro-02 draft definition is 621 bytes with SHA-256
+`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`; its canonical
+schema-8 certificate file is 1,421 bytes with SHA-256
+`8EC555240FD12F07B7C873DC3F163356EA9B8113C58D1E944497889A2EE03B75`. Accepted Intro-01
 and both pinned live definitions remain unchanged. Normal Intro/live regression passes
 `19 passed / 2 skipped`, combined opt-in Intro exact passes `10/10`, typecheck passes, the
 complete suite passes `441 passed / 13 skipped`, and the production build transforms 767

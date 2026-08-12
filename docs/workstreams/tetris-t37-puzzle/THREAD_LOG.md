@@ -160,8 +160,10 @@ The source appends stable ID `t3r-shaft-02`, pins Intro-01 by ID/index/bytes/has
 whole-array length assertion, and changes 340 added plus two deleted lines. The six legal
 setup drops create the `[4,1,1]` floor mask and unique x=6 well. Both four-lock routes keep
 the well open through three zero-clear locks, then use the same vertical I at y36..39 to
-release all three rows. The canonical artifact is 621 bytes with SHA-256
-`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+release all three rows. The serialized draft definition is 621 bytes with SHA-256
+`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`; the canonical
+schema-8 certificate file is 1,421 bytes with SHA-256
+`8EC555240FD12F07B7C873DC3F163356EA9B8113C58D1E944497889A2EE03B75`.
 
 ### Commands and evidence
 

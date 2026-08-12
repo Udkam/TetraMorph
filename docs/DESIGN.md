@@ -766,7 +766,8 @@ adding unrelated badges or ornamental effects.
   branch immediately, fill only the three non-well gaps during their first three locks, then
   use the same vertical I to clear all three rows. Pairwise review rejects every live and
   Intro-01 structural or near match, so the lesson is distinct and mechanically explicit.
-- F4B source `c571f54` is accepted with a canonical 621-byte certificate, independent
+- F4B source `c571f54` is accepted with a 621-byte serialized draft definition and a
+  canonical 1,421-byte schema-8 certificate, independent
   P0–P3/GAP all zero, full setup/route/hash/proof reconstruction, typecheck,
   `441 passed / 13 skipped`, and a 767-module build. The live 50-level library remains
   unchanged. Intro-03 may begin only as a docs-first contract that converts “four-row

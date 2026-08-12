@@ -2,6 +2,8 @@
 
 ## 2026-08-12 — T37 Stage F4B Intro-02 accepted
 
+- Follow-up fact correction distinguishes the 621-byte serialized draft definition
+  (`1E67…A9EB`) from the 1,421-byte schema-8 certificate file (`8EC555…3B75`).
 - Source `c571f54` changes only the four frozen non-product paths (340 additions, two
   deletions) and preserves the live 50-level library plus the accepted Intro-01 artifact.
 - Normal Intro/live regression passes `19 passed / 2 skipped`, combined opt-in exact passes

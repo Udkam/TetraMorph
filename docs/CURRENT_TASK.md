@@ -282,8 +282,11 @@ Frozen SHA-256 values are authoring
 route `648350cc55b43e319d1b555984abd716102549753900c144d01a0d48a116a1d2`.
 
 Source `c571f54` appends the accepted non-published Intro-02 draft and changes only the four
-contracted paths, with 340 additions and two deletions. The canonical artifact is 621 bytes
-with SHA-256 `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+contracted paths, with 340 additions and two deletions. The serialized draft definition is
+621 bytes with SHA-256
+`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`; the canonical
+schema-8 certificate file is 1,421 bytes with SHA-256
+`8EC555240FD12F07B7C873DC3F163356EA9B8113C58D1E944497889A2EE03B75`.
 Normal Intro-01/02 plus live-roster/baseline tests pass `19 passed / 2 skipped`; the combined
 opt-in Intro exact run passes `10/10`. Post-source typecheck, the complete suite
 (`441 passed / 13 skipped`), and the 767-module build pass. Two fresh independent source

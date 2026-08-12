@@ -1570,8 +1570,11 @@ implement only the four contracted paths and run focused normal/exact tests plus
 
 F4B source base is `48275bdd2e9c069bac1a62218ee2deeef67fa68f`; source commit is
 `c571f54dfe0077b5dc88554671ed0f25c5abb335`. It changes only the four contracted paths,
-with 340 additions and two deletions. The canonical Intro-02 artifact is 621 bytes and hashes
-to `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
+with 340 additions and two deletions. `JSON.stringify` of the Intro-02 draft definition is
+621 bytes and hashes to
+`1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`; the canonical
+schema-8 certificate file including its one terminal LF is 1,421 bytes and hashes to
+`8EC555240FD12F07B7C873DC3F163356EA9B8113C58D1E944497889A2EE03B75`.
 
 Final source-bound gates pass: normal Intro-01/02 plus live roster/behavior regression is
 `19 passed / 2 skipped`; combined opt-in Intro exact is `10/10`; typecheck passes; the full
