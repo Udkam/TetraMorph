@@ -4,7 +4,7 @@
 
 - Task ID: `T37-N0-ENDGAME-NAMESPACE`
 - Base SHA: `227fc14217d836698f1a498d3959260459337a2e`
-- Status: contract accepted; BrowserPlatform capability next; other product closed.
+- Status: N0 accepted; canonical Intro-05 docs contract next.
 - Canonical names: Chinese `残局`, English `Endgame`, code `endgame` / `Endgame`.
 
 The player retired the active Chinese label and every active `puzzle` identifier. This is a
@@ -201,4 +201,21 @@ old screenshot.
 - Verification: focused independent re-review closes every prior contract finding with
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
 - Blocker: none for checkpoint 1.
-- Next action: implement only the two-path BrowserPlatform checkpoint.
+- Next action at that checkpoint was the two-path BrowserPlatform capability implementation.
+
+## N0 — canonical namespace acceptance
+
+- Final source: `1a348c29c877981d960a78ed52507eff4f8f0a4f`.
+- Browser evidence: `9a68dda`, bound to source `1a348c2`.
+- Product names: Chinese `残局`, English `Endgame`, code `endgame` / `Endgame`.
+- Active retired-literal and retired-filename gates: zero outside
+  `src/legacyEndgameMigration.ts` and its direct test.
+- Verification: typecheck; 52 passed / 2 skipped test files, 484 passed / 15 skipped tests;
+  768-module build; five explicit canonical exact-certificate files, 24/24 tests.
+- Evidence: four full 1440 x 900 Chromium frames, passing bilingual audit, canonical
+  history v2, no extra Canvas or overflow, no console/page errors, 7/7 SHA-256 manifest,
+  and released port 4217.
+- Independent QA: `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+- Protected inherited T27/follow-up and `progress.md` paths remained outside every commit.
+- Next action: create and independently review a canonical Intro-05 authoring contract.
+  The stopped pre-N0 proof shards remain abandoned and may supply discovery clues only.

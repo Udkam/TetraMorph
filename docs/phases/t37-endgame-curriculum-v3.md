@@ -1,6 +1,6 @@
 # T37 Stage F — Endgame Curriculum v3
 
-Status: **CANONICAL ENDGAME NAMESPACE MIGRATION FIRST; INTRO-05 PROOF PAUSED**
+Status: **N0 CANONICAL ENDGAME NAMESPACE ACCEPTED; INTRO-05 CONTRACT RESUME NEXT**
 
 ## Supersession boundary
 
@@ -192,7 +192,11 @@ The stopped Intro-05 proof shards are `ABANDONED_LEGACY_PUZZLE_MODE`. They canno
 merged, or cited. Intro-05 discovery restarts only after canonical Endgame Core, regenerated
 fixtures, and full N0 gates are green.
 
-## N0 checkpoint order
+That gate is now green at source `1a348c2` and evidence `9a68dda`. Final independent N0
+review reports P0–P3/GAP all zero. Intro-05 therefore resumes with a new canonical fact
+reconciliation and reviewed authoring contract; the abandoned checkpoints remain clues only.
+
+## N0 checkpoint order — accepted
 
 1. Contract and independent QA.
 2. Browser storage capability plus isolated legacy decoder and failure-injection tests.

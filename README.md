@@ -88,7 +88,7 @@ The current release-candidate notes and portfolio capture plan are available in
 
 ### Endgame campaign
 
-Canonical Endgame browser evidence will be captured from the final T37 candidate.
+![TetraMorph Endgame campaign](docs/evidence/t37/endgame-n0/endgame-library-en-1440x900.png)
 
 ### Settings
 

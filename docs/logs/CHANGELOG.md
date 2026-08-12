@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-13 — T37 canonical Endgame namespace accepted
+
+- Atomic active migration `d623ef9` changes Core, UI, routes, storage, authoring, tests,
+  tools, filenames, behavior hashes, and exact fixtures to `残局` / `Endgame` / `endgame`.
+- Final source `1a348c2` localizes the home mode name, uses neutral campaign-count
+  accessibility copy, and adds real App-boot route/storage migration coverage inside the
+  isolated compatibility test.
+- Typecheck, the complete suite (`484 passed / 15 skipped`), the 768-module build, and five
+  explicit canonical exact-certificate files (`24/24`) pass.
+- Evidence `9a68dda` provides four stable bilingual full-page Chromium frames, a passing
+  canonical route/history audit, and a verified 7/7 SHA-256 manifest bound to source
+  `1a348c2`; port 4217 is released.
+- Independent final QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Canonical Intro-05
+  contract work may resume; abandoned pre-namespace proof shards remain non-proof.
+
 ## 2026-08-12 — T37 Stage F4D Intro-04 accepted
 
 - Source `d3aafc0` adds only the non-published Intro-04 definition, schema-8 artifact, and

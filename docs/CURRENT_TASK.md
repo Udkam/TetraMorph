@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME NAMESPACE SOURCE GREEN / FINAL N0 EVIDENCE RECAPTURE PENDING / INTRO-05 PAUSED**
+Status: **ENDGAME NAMESPACE N0 ACCEPTED / CANONICAL INTRO-05 RESUME NEXT**
 
 ## Active objective
 
@@ -19,8 +19,11 @@ implementation instruction after 2026-08-12. The concise current curriculum auth
 The atomic canonical source is now green. Its final acceptance correction makes home mode
 labels follow the active language (`残局` / `Endgame`), makes the library's total-count
 accessibility copy neutral about locked Hard levels, and places real App-boot route/storage
-migration coverage inside the sole isolated compatibility test. A fresh browser capture and
-independent review must bind to the corrected source before N0 closes and Intro-05 resumes.
+migration coverage inside the sole isolated compatibility test. Source `1a348c2`, evidence
+`9a68dda`, and final independent review close N0 with P0–P3/GAP all zero. The complete suite
+passes 484 tests with 15 skipped; typecheck, the 768-module build, and all five canonical
+exact-certificate files (24/24) pass. Canonical Intro-05 may now resume docs-first; no
+abandoned pre-namespace proof shard may be restarted or cited as proof.
 
 The player temporarily interrupted the audio gate for one bounded Core correction.
 Mutation now restores its 0.1-second-per-cell fastest tier. A Supergravity-covered
@@ -729,7 +732,7 @@ curriculum remain closed until their preceding checkpoints are green.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Endgame curriculum — N0 CANONICAL NAMESPACE CONTRACT IN REVIEW; INTRO-05 PROOF PAUSED** — the exact
+6. **Endgame curriculum — N0 ACCEPTED; CANONICAL INTRO-05 CONTRACT NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -750,12 +753,11 @@ curriculum remain closed until their preceding checkpoints are green.
    contract reached an eight-drop setup contradiction inside its generated index-1 family.
    Independent review accepted the seven-drop R2 revision before discovery. R3 then froze and
    implemented the qualifying four-lock corridor-migration candidate; contract and source QA
-   are all zero. F4E now freezes causal Current/Next-1/Next-2 planning for independent
-   contract QA before any discovery or source edit. The later namespace decision invalidates
-   every old-domain hash and closes that discovery route. N0 must first preserve the live
-   50-board revision-2 campaign under canonical Endgame names, complete failure-safe save and
-   route conversion, regenerate fixtures/proofs, and pass all gates. Only then may Intro-05
-   discovery restart in the canonical Core.
+   are all zero. The namespace decision invalidated every old-domain hash and closed that
+   discovery route. N0 has now preserved the live 50-board revision-2 campaign under canonical
+   Endgame names, completed failure-safe save and route conversion, regenerated fixtures and
+   proofs, and passed all gates. Intro-05 resumes only through a fresh canonical docs contract;
+   abandoned proof shards remain non-proof.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

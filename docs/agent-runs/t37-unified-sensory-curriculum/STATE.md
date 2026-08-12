@@ -1849,6 +1849,27 @@ BrowserPlatform storage-capability checkpoint. Do not resume Intro-05, later cur
 sensory expansion, protected evidence, or icon work before canonical Endgame Core and its
 full gate are green.
 
+## 2026-08-13 canonical Endgame N0 accepted
+
+The namespace chain closes through source `1a348c2` and evidence `9a68dda`. The final source
+uses language-matched home labels (`残局` / `Endgame`), neutral total-count accessibility
+copy, canonical URLs/history/storage, and real App-boot compatibility tests confined to the
+isolated migration boundary. Active source/test/script/tool content and filenames have zero
+retired-name matches outside that boundary and its direct test.
+
+Post-source gates pass typecheck, 52 passed / 2 skipped test files, 484 passed / 15 skipped
+tests, the 768-module build, and all five explicit canonical exact-certificate files at
+24/24. Browser evidence contains four stable full-page frames bound to source `1a348c2`, a
+passing bilingual audit, a 7/7 SHA-256 manifest, and no residual listener on port 4217.
+Independent final QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Protected inherited
+T27/follow-up and `progress.md` paths remain unmodified by this workstream and unstaged.
+
+Next exact action: perform one targeted canonical F4E fact reconciliation and author a new
+docs-only Intro-05 contract for independent review. Reuse accepted causal lesson constraints
+and mechanically useful geometry only as clues. Do not resume, merge, or cite an
+`ABANDONED_LEGACY_PUZZLE_MODE` checkpoint, and do not open Intro-05 source/search until the
+canonical contract passes all-zero review.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
