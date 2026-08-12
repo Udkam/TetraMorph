@@ -325,3 +325,33 @@ stale-next-action P2 is closed.
 - Blocker: none for repository-external candidate discovery.
 - Next action: discover a qualifying F4D candidate outside the repository, then independently
   replay and freeze every literal before any source path opens.
+
+## F4D — Intro-04 contract revision after discovery
+
+- Task ID: `T37-F4D-CONTRACT-R2`
+- Base SHA: `16570db8b72c3da5d907371f5ac4d1311c502f81`
+- Status: docs-only revision; fresh independent QA pending; source closed.
+
+Repository-external discovery narrowed 2,040 eight-drop masks to 16 complete-control-domain
+local-lock geometries. The setup exact-cover search naturally exhausted all seven eight-draw
+count profiles for each of those 16 with zero legal no-same-type-touch tilings. This proves
+the accepted index-1 search family cannot satisfy its eight-drop setup boundary; it does not
+claim an unrestricted mathematical impossibility for every conceivable index-2 construction.
+
+The minimal replacement is seven legal zero-clear setup drops, 28 targets, twelve total gaps,
+and one through four gaps on each of rows 36–39. Local clear is lock 1, row 39's exact two-cell
+gap includes the unique opening, and the settled state owns 20 targets. Later non-final locks
+release zero; the terminal vertical I releases the remaining three rows. Primary optimum is
+four through six and the one stored alternative first diverges at lock 2. Schema 8, the 53
+pairwise exclusions, unique seeds, hash domains, and uncapped no-beam proof remain unchanged.
+
+Discovery validation already found 25 legal seven-drop definitions; an independent current-
+Core audit retained 11 fully local-qualified candidates across eight unique boards and found
+one contract-shaped first lock for each. None is frozen and no source path is open.
+
+- Evidence SHA-256: geometry `8D84B60A...73081`; reachable-mask set
+  `41F07134...8ECDB`; exhausted eight-drop tilings `2A33921A...9149A`; seven-drop
+  candidates `289D6130...7AE2`; current-Core local replay `789A36A7...7892`; independent
+  contract audit script/output `045D28D3...CAE3F` / `9986A0CC...D7D85`.
+- Next action: obtain fresh independent all-zero review of this five-path docs checkpoint;
+  only then resume repository-external complete-candidate discovery.

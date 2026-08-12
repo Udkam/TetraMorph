@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT ACCEPTED — DISCOVERY OPEN**
+Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT REVISION — DOCS QA PENDING**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -353,8 +353,8 @@ bytes with SHA-256
 `5200003`, gameplay seed `1717986918`, and floor rows
 `IIIILLL... / OO.TLZZJJJ / OOTTT.ZZ.J`. Product data and imports remain byte-identical.
 
-The draft uses exactly eight legal zero-clear seeded setup drops, 32 ordinary targets in world
-rows 36–39, one through four gaps per row, eight total gaps, and no hidden or anchor cells.
+The draft uses exactly seven legal zero-clear seeded setup drops, 28 ordinary targets in world
+rows 36–39, one through four gaps per row, twelve total gaps, and no hidden or anchor cells.
 Exactly one `openingX` is empty from world rows 20 through 39; every other column owns at least
 one target in the four-row band. Its gameplay seed is unique across live 50 plus Intro-01/02/03,
 and all 53 pairwise exact/topology/near comparisons are false.
@@ -365,8 +365,8 @@ start with and preserve exactly `[openingX]` after every non-final lock. This de
 recomputed after ordinary row-clear mapping; it does not confuse original target identity,
 visible coordinates, or a screenshot cavity with a traversable opening.
 
-The shared local-clear lock is lock 1 or 2 and clears world row 39. Earlier releases are zero.
-Immediately before it, that row's only gaps are exactly two or three contiguous cells supplied
+The shared local-clear lock is lock 1 and clears world row 39; there is no pre-local lock.
+Immediately before it, that row's only gaps are exactly two contiguous cells supplied
 by the local lock and the span includes `openingX`. Merging the lock yields only full row 39.
 The lock supplies exactly `(openingX,39)` in the corridor, releases one row without finishing,
 and has at least one off-row survivor; current Core clear mapping must place every survivor
@@ -379,7 +379,7 @@ exactly two positive releases, `1` then `3`. Candidate evidence freezes the open
 local index/row/signatures, every post-lock opening set, releases, remaining targets, local
 pre/post state hashes, survivor mapping, and final hashes.
 
-The strict primary optimum is four or five locks. One alternative diverges by lock 1 or 2,
+The strict primary optimum is four through six locks. One alternative diverges at lock 2,
 uses at most optimum plus two locks, and proves the same complete invariant. Schema-8 keeps
 the accepted field order, serializers, hash domains, one alternative,
 `solutionMultiplicity='multiple'`, `proof.kind='exhaustive-shorter-depths'`,
@@ -401,6 +401,16 @@ Two final independent reviews of corrected HEAD `fcfc15e` report
 repository-external heuristic candidate discovery is open; source creation still requires a
 fully qualified candidate with legal setup, both complete route invariants, seed/fingerprint
 admission, literal hashes, and uncapped current-Core exact proof.
+
+Subsequent repository-external discovery found that, within the generated index-1 family,
+all 16 local-lock masks reachable in the complete public-control domain had zero legal
+eight-draw/no-touch setup tilings after natural profile exhaustion. This bounded result does
+not claim that every conceivable index-2 construction is impossible. The seven-drop revision
+above removes the demonstrated setup contradiction while keeping the
+lesson's unique corridor, local clear, survivor mapping, and terminal I. It already yields 25
+Core-valid setup candidates and an independent audit retains 11 fully local-qualified
+candidates over eight unique boards, but no candidate is frozen here. Fresh docs QA must
+accept this revision before discovery or any source path reopens.
 
 ## Frozen published roster
 

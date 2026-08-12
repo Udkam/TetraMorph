@@ -1719,6 +1719,33 @@ upper bound until independent current-Core setup replay, both route invariants, 
 admission comparisons, seed uniqueness, canonical hashes, and uncapped shorter-depth proof
 pass. Do not create source/product/UI/sensory/protected/icon paths before that gate.
 
+F4D discovery found a bounded contradiction in the accepted setup cardinality. The generated
+index-1 family contained 2,040 unique eight-drop masks; complete current-Core landing
+enumeration retained 16 mechanically valid local locks, but an exact seven-profile cover
+search naturally exhausted all 16 with zero legal eight-draw/no-same-type-touch setup tiling.
+This closes that accepted search family, not every imaginable index-2 construction.
+
+Contract R2 changes only the minimum necessary boundary: seven zero-clear setup drops, 28
+targets, twelve total gaps with one through four per row, local clear fixed at lock 1, an exact
+two-cell row-39 gap, 20 post-local targets, primary optimum four through six, and alternative
+first divergence exactly at lock 2. Unique opening/local survivor/final vertical-I mechanics,
+schema 8, all 53 pairwise exclusions, hash domains, and uncapped no-beam proof remain intact.
+Seven-drop discovery produced 25 Core-valid candidates; independent audit retained 11 fully
+local-qualified candidates across eight unique boards, each with exactly one contract-shaped
+first lock. No setup, seed, board, route, or source is frozen yet.
+
+Evidence SHA-256 pins: geometry `8D84B60A21DC3A9351C8631644527C651A2763D04E332C5DECC1DE16D9873081`;
+reachable masks `41F071346666D70DFA58CC56A662EB1A2481ED2B717F466A2AAE54C42898ECDB`;
+eight-drop tiling exhaustion `2A33921AE398A10BAF76AD95212B05856D6A19EE8F6A94E5FFB79F34ADD9149A`;
+seven-drop candidates `289D61300D37BC680239933E2F66669C1C998A556BF513CCFF45B0B2BE497AE2`;
+Core local replay `789A36A7A1E2166DC4E715212555D1DD946DB041453B7581562575BCB86A7892`;
+independent audit script/output `045D28D3279451D5628DC11B5A86F6C36BA73620BD3EF877ADA00FDB345CAE3F` /
+`9986A0CC51F16032BFEA164C8EFD10AA7342E1A9E29249904C4E70A48C3D7D85`.
+
+Next exact action: independently review only this five-path docs revision. If and only if it
+is all zero, resume repository-external search for both complete routes and the strict proof.
+Source/product/UI/sensory/protected T27/icon paths remain closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT ACCEPTED — DISCOVERY OPEN**
+Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT REVISION — DOCS QA PENDING**
 
 ## Active objective
 
@@ -407,8 +407,8 @@ seed `1717986918`, floor rows `IIIILLL... / OO.TLZZJJJ / OOTTT.ZZ.J`, serialized
 The draft uses `targetRows=4` only through `validatePuzzleDefinition(draft, false)`; live
 product, progression, lessons, localization, and mastery registries remain unchanged.
 
-Exactly eight legal seeded setup hard drops must clear no rows and produce 32 ordinary targets
-only in world rows 36–39. Each row has one through four gaps, total gaps equal eight, and
+Exactly seven legal seeded setup hard drops must clear no rows and produce 28 ordinary targets
+only in world rows 36–39. Each row has one through four gaps, total gaps equal twelve, and
 hidden/anchor arrays are empty. There is one literal `openingX`: every board cell from world
 row 20 through 39 in that column is initially empty, while every other column contains at
 least one target in rows 36–39. The gameplay seed is unique against the live 50 and Intro-01
@@ -422,9 +422,9 @@ this set must equal exactly `[openingX]`: the route may neither seal the corrido
 second top-accessible corridor. The candidate freeze must pin `openingX`, each post-lock set,
 and state hashes; a level name, screenshot, hole count, or final solution is not evidence.
 
-Both routes share one local-clear lock index, either 1 or 2, and the same world row 39. Every
-earlier lock releases zero rows. Immediately before that lock, the empty cells of row 39 are
-exactly the local lock's row-39 cells: one contiguous span of length two or three containing
+Both routes share local-clear lock 1 and the same world row 39; there is no pre-local lock.
+Immediately before that lock, the empty cells of row 39 are exactly the local lock's row-39
+cells: one contiguous span of length two containing
 `openingX`. Merging the complete lock into the pre-lock board yields exactly one full row,
 row 39. The lock owns exactly one cell at `(openingX,39)`, releases exactly one row, strictly
 reduces original targets without finishing, and leaves at least one off-row survivor. Ordinary
@@ -432,7 +432,7 @@ clear mapping must retain every survivor outside `openingX`; after settlement th
 again the unique opening. This is the mechanical meaning of “local clear that retains the
 only opening”; it is an ordinary Puzzle row clear, not Bomb-style area removal.
 
-Every non-final, non-local lock releases zero rows and preserves `[openingX]`. Immediately
+Every later non-final lock releases zero rows and preserves `[openingX]`. Immediately
 before the final lock it is still the only opening. The final lock is one vertical I whose
 four cells occupy `openingX` from world rows 36 through 39; it releases exactly the remaining
 three target rows, reduces original targets to zero, and finishes. Thus each route has exactly
@@ -440,7 +440,7 @@ two positive release events, local `1` then terminal `3`; candidate admission fr
 signatures, releases, remaining-target arrays, local pre/post boards, survivor mapping, and
 final hashes.
 
-The primary optimum is four or five locks. One stored alternative first diverges by lock 1 or
+The primary optimum is four through six locks. One stored alternative first diverges at lock
 2, is no longer than optimum plus two, and independently proves the complete opening/local
 clear/final-I invariant. `solutionMultiplicity='multiple'` means distinct completing routes,
 not necessarily two optimal routes. Schema 8 retains the accepted key order and hash domains,
@@ -464,6 +464,18 @@ Two final independent reviews of corrected contract HEAD `fcfc15e` report
 discovery. No draft, certificate, or test may be created until a complete candidate passes
 current-Core setup replay, both route invariants, all 53 pairwise admission checks, seed
 uniqueness, and uncapped shorter-depth proof.
+
+Repository-external discovery then exposed a bounded contract contradiction rather than a
+candidate failure. Across 2,040 generated eight-drop masks, only 16 local-lock geometries were
+reachable in the complete public-control domain; all 16 naturally exhausted every eight-draw
+seven-bag count profile without a legal no-same-type-touch setup tiling. The minimal revision
+above changes only setup cardinality and consequences: seven drops / 28 targets / twelve gaps,
+local lock 1 with an exact two-cell floor span, 20 targets after that clear, primary length
+four through six, and lock-2 alternative divergence. A separate seven-drop search produced
+25 Core-valid setups and the independent contract audit retained 11 fully local-qualified
+candidates across eight unique boards. These are discovery evidence, not a frozen candidate.
+Fresh independent docs QA is required before discovery resumes; all three source paths remain
+closed.
 
 ## Frozen product direction
 
@@ -525,7 +537,7 @@ uniqueness, and uncapped shorter-depth proof.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT ACCEPTED / DISCOVERY OPEN** — the exact
+6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT REVISION / DOCS QA PENDING** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -542,10 +554,10 @@ uniqueness, and uncapped shorter-depth proof.
    support-before-bridge geometry check. Source `95f3316` adds the isolated non-product
    Intro-03 draft, schema-8 artifact, and exact test. Focused, exact, typecheck, final full
    suite (`445 / 14 skipped`), and build gates pass; three independent reviews are all zero.
-   Published curriculum content remains closed until the later atomic switch. F4D now has a
-   mechanically frozen local-clear/only-opening contract. Two final independent reviews of
-   `fcfc15e` are all zero; only repository-external discovery is open, while source remains
-   closed pending a fully qualified candidate.
+   Published curriculum content remains closed until the later atomic switch. F4D's accepted
+   contract reached an eight-drop setup contradiction inside its generated index-1 family;
+   the seven-drop revision is awaiting fresh docs QA. Both repository-external discovery and
+   source remain closed until that review is all zero.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

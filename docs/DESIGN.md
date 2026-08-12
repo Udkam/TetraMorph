@@ -789,12 +789,13 @@ adding unrelated badges or ornamental effects.
 - F4C source `95f3316` is accepted outside product after focused, exact, typecheck, full-suite,
   build, and three independent all-zero reviews. The live 50 remain unchanged.
 - F4D makes “local clear that retains the only opening” causal and coordinate-verifiable.
-  A four-row draft begins with one unique top-to-target corridor. A lock at index 1 or 2 fills
-  a contiguous two- or three-cell bottom-row gap including that corridor, clears only the
-  bottom row, leaves a non-corridor survivor, and restores the same sole corridor after Core
-  row mapping. Every intermediate lock preserves it; the final vertical I actually uses it
-  to clear the remaining three target rows. Both stored routes must prove this full sequence,
-  not infer it from a name, screenshot, hole count, or final solvability. The live three-row
+  A four-row draft begins with one unique top-to-target corridor and exactly 28 targets from
+  seven legal zero-clear setup drops. Lock 1 fills the exact contiguous two-cell bottom-row
+  gap including that corridor, clears only the bottom row, leaves a non-corridor survivor,
+  and restores the same sole corridor after Core row mapping. Every later non-final lock
+  preserves it; the final vertical I actually uses it to clear the remaining three target
+  rows. Both stored routes first diverge at lock 2 and must prove this full sequence, not
+  infer it from a name, screenshot, hole count, or final solvability. The live three-row
   definition and all prior draft bytes remain pinned until the atomic campaign switch.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
