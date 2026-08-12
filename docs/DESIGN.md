@@ -777,8 +777,10 @@ adding unrelated badges or ornamental effects.
   three-row product definition, while its isolated v3 rebuild uses four target rows through
   noncanonical validation. The first route lock creates support on cells empty in setup; the
   second owns a horizontal bridge whose complete one-cell downward displacement is blocked
-  only by that first lock, with open span on both sides of an interior support. Both routes
-  must prove that geometry before later locks clear the four rows in at least two events.
+  only by that first lock. An interior horizontal-run source cell maps to a shifted blocker
+  one row below, and source cells on both sides map to empty shifted destinations. Both routes
+  must prove that coordinate mapping before later locks clear the four rows in at least two
+  events.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

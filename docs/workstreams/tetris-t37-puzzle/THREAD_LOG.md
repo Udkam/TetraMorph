@@ -211,5 +211,11 @@ three-cell-or-longer horizontal run, with open below-cells to its left and right
 evidence freezes both routes' signatures, run cells, blockers, releases, remaining targets,
 hashes, and strict exact telemetry.
 
-- Blocker: candidate discovery is closed pending two all-zero contract reviews.
-- Next action: independent read-only contract QA only.
+First QA rejects `588e065` with `P1 2 / P3 1`: one F4B paragraph was misplaced below the F4C
+heading, and “blocker inside run” mixed source-row and shifted-destination coordinates. The
+repair restores the F4B paragraph and defines the bridge check as an interior run source
+`{x,y}` whose shifted destination `{x,y+1}` is support, with separate left/right source cells
+whose shifted destinations are empty.
+
+- Blocker: candidate discovery is closed pending two all-zero reviews of the repaired SHA.
+- Next action: independent read-only contract re-QA only.

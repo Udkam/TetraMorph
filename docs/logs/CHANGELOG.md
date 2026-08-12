@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4C contract repaired after first QA
+
+- First review rejects `588e065` with `P1 2 / P3 1`: an Intro-02 final-three-row paragraph
+  sat under the F4C heading, and source-run cells were conflated with shifted blocker cells.
+- The repair returns that paragraph to F4B and defines an interior bridge source `{x,y}` whose
+  shifted `{x,y+1}` destination is support, with empty shifted destinations on both sides.
+- Discovery remains closed until two fresh reviews of the repaired SHA are all zero.
+
 ## 2026-08-12 — T37 Stage F4C Intro-03 contract frozen
 
 - The v3 draft deliberately uses four target rows while pinning the unchanged live three-row

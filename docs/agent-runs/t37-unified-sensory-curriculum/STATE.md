@@ -1614,13 +1614,21 @@ Support-before-bridge evidence is coordinate-causal. For both primary and the so
 divergent alternative, lock 1 creates support on setup-empty cells. Lock 2 owns a same-y run
 of at least three cells. In the board immediately before lock 2, every occupied destination of
 the entire bridge shifted down one row is a lock-1 support cell; there is no floor/setup/other
-blocker. A blocker lies inside the horizontal run, and the run has an empty below-cell on each
-side. Candidate freeze must bind literal signatures, run, blockers, route hashes, state hashes,
-and exact telemetry.
+blocker. The repaired rule distinguishes source from destination coordinates: an interior run
+source `{x,y}` has shifted destination `{x,y+1}` in the support/blocker set, while source cells
+strictly on both sides have empty shifted destinations. Candidate freeze must bind literal
+signatures, source run, shifted blockers, route hashes, state hashes, and exact telemetry.
 
-Next exact action: commit the docs-only F4C contract and obtain two fresh independent reviews.
-Discovery/source stay closed until both report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Product,
-progression/UI, sensory work, protected T27 paths, and icon remain closed.
+First QA rejects contract commit `588e065` with
+`P0 0 / P1 2 / P2 0 / P3 1 / GAP 0`. It finds an old F4B final-release paragraph under the
+F4C heading and an impossible/ambiguous same-coordinate reading of “blocker inside run”. A
+second review finds no additional issue. The docs-only repair moves the F4B paragraph above
+the F4C heading and freezes the source-to-shifted-destination mapping above.
+
+Next exact action: commit this F4C contract repair and obtain two fresh independent reviews of
+the repaired SHA. Discovery/source stay closed until both report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Product, progression/UI, sensory work, protected T27
+paths, and icon remain closed.
 
 ## Do not repeat
 

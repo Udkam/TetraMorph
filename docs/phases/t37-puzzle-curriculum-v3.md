@@ -261,13 +261,17 @@ Both primary and alternative routes bind the following direct-Core teaching evid
 5. every occupied destination in that shift is a support cell from lock 1, the blocker set is
    nonempty, and no setup, floor, or unrelated blocker contributes;
 6. the bridge owns a same-y horizontal run of at least three consecutive cells;
-7. one shifted blocker is strictly inside that run, while at least one run cell on each side
-   has an empty below-cell.
+7. define `interiorRunCells` as the horizontal source run without its endpoints; at least one
+   source `{x,y}` in that set has shifted destination `{x,y+1}` in the blocker/support set;
+8. some run source cell strictly to the left and another strictly to the right of that
+   interior source each has an empty shifted destination `{x,y+1}`.
 
 Thus the complete bridge would descend without the just-authored support and visibly spans
-open space on both sides. Candidate admission freezes literal support/bridge signatures,
-horizontal-run coordinates, blocker coordinates, and the pre-bridge board evidence for each
-route. A name, screenshot, four-row count, or generic structural score is not evidence.
+open space on both sides. The horizontal run is stored in source coordinates and blockers are
+stored separately in shifted destination coordinates; they are never compared as identical
+two-dimensional cells. Candidate admission freezes literal support/bridge signatures,
+source-run coordinates, shifted blocker coordinates, and the pre-bridge board evidence for
+each route. A name, screenshot, four-row count, or generic structural score is not evidence.
 
 The primary strict optimum is four or five locks. The first two releases are `[0,0]`; at least
 two later positive release events sum to four, each lowers the remaining original-target

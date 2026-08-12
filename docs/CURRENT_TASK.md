@@ -296,6 +296,12 @@ the append-compatible Intro-01 pin, an empty index, and unchanged protected dirt
 F4B is accepted outside product. F4C must first resolve and freeze the Intro-03 four-row
 support-before-bridge contract before any new source or discovery path opens.
 
+The F4B certificate contains exactly one alternative entry. In each Intro-02 route, the only
+positive row release is the final value `3`; all preceding values are zero, remaining original
+targets are 24 before that release and zero after it, and the final locked-piece signature is
+the frozen well-column I. Its accepted normal/exact/live-baseline gates above remain the F4B
+record and impose no rule on F4C.
+
 ### Stage F4C non-published Intro-03 authoring contract (2026-08-12)
 
 F4C rebuilds stable ID `t3r-shaft-03` as the four-row lesson frozen by the v3 roster. The
@@ -316,11 +322,15 @@ all 32 original targets. Every support cell was empty in the initial setup board
 2, shift every bridge cell down by one world row. Every shifted cell remains inside the board;
 the nonempty set of occupied destinations must consist entirely of lock-1 support cells, with
 no setup, floor, or unrelated blocker. The bridge contains a same-y horizontal run of at least
-three consecutive cells. At least one blocker lies strictly inside that run, and there is a
-run cell on each side of it whose below-cell is empty. Removing the support footprint would
-therefore let the complete bridge descend, while its left and right spans cross open space.
-The test freezes literal support/bridge signatures, run coordinates, and blocker coordinates
-for each route after discovery; a generic predicate alone is insufficient.
+three consecutive source cells. Let `interiorRunCells` be that run without its two endpoints.
+At least one interior source cell `{x,y}` has the shifted destination `{x,y+1}` in both the
+blocker set and lock-1 support footprint. A run source cell strictly to its left and another
+strictly to its right each have an empty `{x,y+1}` destination in the pre-bridge board.
+Blocker evidence stores the shifted destination coordinates, not the source-run coordinates.
+Removing the support footprint would therefore let the complete bridge descend, while its
+left and right spans cross open space. The test freezes literal support/bridge signatures,
+source-run coordinates, and shifted blocker coordinates for each route after discovery; a
+generic predicate alone is insufficient.
 
 The primary optimum is four or five locks. Its first two releases are `[0,0]`; the remaining
 locks contain at least two positive release events whose sum is exactly four, each strictly
@@ -339,19 +349,13 @@ without asserting draft-array length. The schema-8 key order, serializers, hash 
 bytes / SHA-256 `0979CED2EEA842DC7722E8236229CBD4566CC6468D17E67007FD316D7740A7D2`,
 Intro-01 at 622 / `DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8`,
 and Intro-02 at 621 / `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`.
-Discovery and source remain closed until fresh independent contract QA reports all zero.
-
-The certificate contains exactly one alternative entry. In each route, the only positive row
-release is the final value `3`; all preceding values are zero, remaining original targets are
-24 before that release and zero after it, and the final locked-piece signature is the frozen
-well-column I. Normal direct tests, one
-`PUZZLE_EXACT_CERTIFICATES=1` direct run, current
-`puzzles.test.ts`, and the 38-entry behavior-baseline test are required before candidate QA.
-Any exact-proof failure stops; it does not loosen the domain or design criteria. Contract QA
-must first report all zero before discovery or implementation begins. Product publication,
-the other four Intro drafts, preserved Easy/Hard certificates, three Hard rebuilds, v6
-migration, mastery/unlock/UI, browser evidence, T27/`progress.md`, sensory, and icon remain
-closed.
+Discovery and source remain closed until two fresh independent reviews of this repaired
+contract report all zero. Later source acceptance requires normal direct tests, one
+`PUZZLE_EXACT_CERTIFICATES=1` direct run, current `puzzles.test.ts`, and the 38-entry
+behavior-baseline test. Any exact-proof failure stops; it does not loosen the domain or design
+criteria. Product publication, the other two Intro drafts, preserved Easy/Hard certificates,
+three Hard rebuilds, v6 migration, mastery/unlock/UI, browser evidence, T27/`progress.md`,
+sensory, and icon remain closed.
 
 ## Frozen product direction
 
