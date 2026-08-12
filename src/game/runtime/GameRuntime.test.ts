@@ -198,10 +198,10 @@ describe('GameRuntime public state boundary', () => {
     const gatedEntries = [
       { name: 'direct restart', run: () => runtime.restart(456, 'race') },
       { name: 'direct mode selection', run: () => runtime.selectMode('race') },
-      { name: 'direct Puzzle selection', run: () => runtime.selectPuzzle('t3r-cascade-06') },
+      { name: 'direct Endgame selection', run: () => runtime.selectEndgame('t3r-cascade-06') },
       { name: 'QA restart', run: () => qaSurface.restart() },
       { name: 'QA mode selection', run: () => qaSurface.selectMode('race') },
-      { name: 'QA Puzzle selection', run: () => qaSurface.selectPuzzle('t3r-cascade-06') },
+      { name: 'QA Endgame selection', run: () => qaSurface.selectEndgame('t3r-cascade-06') },
     ];
 
     for (const entry of gatedEntries) {
@@ -212,7 +212,7 @@ describe('GameRuntime public state boundary', () => {
       expect(current.seed, entry.name).toBe(123);
       expect(current.status, entry.name).toBe('ready');
       expect(current.mode, entry.name).toBe('marathon');
-      expect(current.puzzleId, entry.name).toBeNull();
+      expect(current.endgameId, entry.name).toBeNull();
       expect(current.active, entry.name).toBe(readyActive);
       expect(current.queue, entry.name).toBe(readyQueue);
       expect(current.board, entry.name).toBe(readyBoard);
@@ -258,21 +258,21 @@ describe('GameRuntime public state boundary', () => {
     expect(onState.mock.calls[0]?.[0].elapsedTicks).toBeGreaterThanOrEqual(5);
   });
 
-  it('selects a real authored Puzzle level only through the restart boundary', () => {
+  it('selects a real authored Endgame level only through the restart boundary', () => {
     const runtime = new GameRuntime({ seed: 123, audioEnabled: false });
-    runtime.selectPuzzle('t3r-cascade-06');
+    runtime.selectEndgame('t3r-cascade-06');
 
     const state = runtime.getState();
     expect(state.status).toBe('ready');
-    expect(state.mode).toBe('puzzle');
-    expect(state.puzzleId).toBe('t3r-cascade-06');
-    expect(state.puzzleQueue).toEqual(state.queue);
+    expect(state.mode).toBe('endgame');
+    expect(state.endgameId).toBe('t3r-cascade-06');
+    expect(state.endgameQueue).toEqual(state.queue);
     expect(state.queue).toHaveLength(5);
-    expect(state.puzzleUndoHistory).toEqual([]);
-    expect(state.puzzleCompletion).toBe('active');
+    expect(state.endgameUndoHistory).toEqual([]);
+    expect(state.endgameCompletion).toBe('active');
   });
 
-  it('refreshes ordinary run seeds while retaining a selected Puzzle sequence', () => {
+  it('refreshes ordinary run seeds while retaining a selected Endgame sequence', () => {
     vi.stubGlobal('crypto', {
       getRandomValues: (values: Uint32Array) => {
         values[0] = 0x7a11beef;
@@ -284,11 +284,11 @@ describe('GameRuntime public state boundary', () => {
     expect(runtime.getState().mode).toBe('marathon');
     expect(runtime.getState().seed).toBe(0x7a11beef);
 
-    runtime.selectPuzzle('t3r-cascade-06');
-    const puzzleSeed = runtime.getState().seed;
+    runtime.selectEndgame('t3r-cascade-06');
+    const endgameSeed = runtime.getState().seed;
     runtime.restart();
-    expect(runtime.getState().mode).toBe('puzzle');
-    expect(runtime.getState().seed).toBe(puzzleSeed);
+    expect(runtime.getState().mode).toBe('endgame');
+    expect(runtime.getState().seed).toBe(endgameSeed);
 
     runtime.selectMode('sprint');
     expect(runtime.getState().mode).toBe('sprint');

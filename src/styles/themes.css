@@ -15,7 +15,7 @@
   --classic: #31978d;
   --race: #5878c4;
   --sprint: #c77a35;
-  --puzzle: #8a63b3;
+  --endgame: #8a63b3;
   --selection: #a75e71;
   --target: #d9c187;
   --action: #315f96;
@@ -43,7 +43,7 @@
   --classic: #53b7aa;
   --race: #819ce0;
   --sprint: #da9350;
-  --puzzle: #a98ad0;
+  --endgame: #a98ad0;
   --selection: #cc7e91;
   --target: #dbc27d;
   --action: #397488;
@@ -71,7 +71,7 @@
   --classic: #4f8c81;
   --race: #687fae;
   --sprint: #b96635;
-  --puzzle: #866b9b;
+  --endgame: #866b9b;
   --selection: #a55866;
   --target: #c9a851;
   --action: #8a5b38;
@@ -290,7 +290,7 @@
 
 /* The gameplay queue is open instrument space in every environment. This final
  * theme-layer reset intentionally outranks the retired card/well rules from the
- * legacy stylesheet while preserving Puzzle's two numbered queue rows. */
+ * legacy stylesheet while preserving Endgame's two numbered queue rows. */
 .app[data-theme] .game-left-rail :is(.preview-rail, .next-slot, .next-slot__segment) {
   background: transparent !important;
   border: 0 !important;
@@ -306,100 +306,100 @@
   content: none !important;
 }
 
-/* Puzzle library consumes the same environment tokens across its shell,
+/* Endgame library consumes the same environment tokens across its shell,
  * specimen well, detail strip, paging controls, and level nodes. */
 .app[data-theme] .library-shell--gallery {
   color: var(--ink);
   background: transparent;
 }
 
-.app[data-theme] .puzzle-gallery {
+.app[data-theme] .endgame-gallery {
   background: var(--surface);
   border-color: var(--edge);
   box-shadow: 0 22px 52px color-mix(in srgb, var(--well) 30%, transparent);
 }
 
-.app[data-theme] .puzzle-gallery__hero {
+.app[data-theme] .endgame-gallery__hero {
   color: var(--action-ink);
   background:
-    radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--puzzle) 22%, transparent), transparent 38%),
+    radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--endgame) 22%, transparent), transparent 38%),
     linear-gradient(148deg, color-mix(in srgb, var(--raised) 38%, var(--well)) 0%, var(--well) 72%);
   border-color: var(--edge);
 }
 
-.app[data-theme] .puzzle-gallery__stage::before,
-.app[data-theme] .puzzle-gallery__board {
+.app[data-theme] .endgame-gallery__stage::before,
+.app[data-theme] .endgame-gallery__board {
   background: color-mix(in srgb, var(--well) 86%, transparent);
   border-color: color-mix(in srgb, var(--edge) 52%, transparent);
 }
 
-.app[data-theme] .puzzle-gallery__meta {
+.app[data-theme] .endgame-gallery__meta {
   background: color-mix(in srgb, var(--raised) 50%, var(--well));
   border-color: color-mix(in srgb, var(--edge) 42%, transparent);
 }
 
-.app[data-theme] .puzzle-gallery__title { color: var(--action-ink); }
-.app[data-theme] .puzzle-gallery__title--complete { color: color-mix(in srgb, var(--success) 62%, var(--action-ink)); }
-.app[data-theme] .puzzle-gallery__best,
-.app[data-theme] .puzzle-gallery__lesson,
-.app[data-theme] .puzzle-gallery__requirement { color: color-mix(in srgb, var(--muted) 42%, var(--action-ink)); }
-.app[data-theme] .puzzle-gallery__lesson strong { color: color-mix(in srgb, var(--classic) 72%, var(--action-ink)); }
+.app[data-theme] .endgame-gallery__title { color: var(--action-ink); }
+.app[data-theme] .endgame-gallery__title--complete { color: color-mix(in srgb, var(--success) 62%, var(--action-ink)); }
+.app[data-theme] .endgame-gallery__best,
+.app[data-theme] .endgame-gallery__lesson,
+.app[data-theme] .endgame-gallery__requirement { color: color-mix(in srgb, var(--muted) 42%, var(--action-ink)); }
+.app[data-theme] .endgame-gallery__lesson strong { color: color-mix(in srgb, var(--classic) 72%, var(--action-ink)); }
 
-.app[data-theme] .puzzle-gallery__catalog {
+.app[data-theme] .endgame-gallery__catalog {
   color: var(--ink);
   background:
-    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--puzzle) 12%, transparent), transparent 25%),
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--endgame) 12%, transparent), transparent 25%),
     var(--surface);
 }
 
-.app[data-theme] .puzzle-gallery__catalog-header h1 { color: var(--ink); }
+.app[data-theme] .endgame-gallery__catalog-header h1 { color: var(--ink); }
 
-.app[data-theme] .puzzle-gallery__pages,
-.app[data-theme] .puzzle-gallery__mastery {
+.app[data-theme] .endgame-gallery__pages,
+.app[data-theme] .endgame-gallery__mastery {
   color: var(--muted);
   background: color-mix(in srgb, var(--raised) 86%, var(--surface));
   border-color: color-mix(in srgb, var(--edge) 68%, var(--surface));
 }
 
-.app[data-theme] .puzzle-gallery__page { color: var(--muted); }
-.app[data-theme] .puzzle-gallery__page:is(:hover, :focus-visible) {
+.app[data-theme] .endgame-gallery__page { color: var(--muted); }
+.app[data-theme] .endgame-gallery__page:is(:hover, :focus-visible) {
   color: var(--ink);
-  background: color-mix(in srgb, var(--puzzle) 13%, var(--raised));
+  background: color-mix(in srgb, var(--endgame) 13%, var(--raised));
 }
-.app[data-theme] .puzzle-gallery__page--active {
+.app[data-theme] .endgame-gallery__page--active {
   color: var(--action-ink);
-  background: var(--puzzle);
-  border-color: var(--puzzle);
+  background: var(--endgame);
+  border-color: var(--endgame);
 }
 
-.app[data-theme] .puzzle-gallery__node > button {
+.app[data-theme] .endgame-gallery__node > button {
   color: var(--ink);
   background: color-mix(in srgb, var(--raised) 86%, var(--surface));
   border-color: color-mix(in srgb, var(--edge) 76%, var(--surface));
   box-shadow: 0 4px 10px color-mix(in srgb, var(--well) 12%, transparent);
 }
 
-.app[data-theme] .puzzle-gallery__node > button:hover {
+.app[data-theme] .endgame-gallery__node > button:hover {
   color: var(--ink);
-  background: color-mix(in srgb, var(--puzzle) 14%, var(--raised));
-  border-color: color-mix(in srgb, var(--puzzle) 68%, var(--edge));
+  background: color-mix(in srgb, var(--endgame) 14%, var(--raised));
+  border-color: color-mix(in srgb, var(--endgame) 68%, var(--edge));
 }
 
-.app[data-theme] .puzzle-gallery__node--complete > button {
+.app[data-theme] .endgame-gallery__node--complete > button {
   color: var(--success);
   border-color: color-mix(in srgb, var(--success) 64%, var(--edge));
 }
 
-.app[data-theme] .puzzle-gallery__node--locked > button {
+.app[data-theme] .endgame-gallery__node--locked > button {
   color: var(--muted-soft);
   background: color-mix(in srgb, var(--raised) 62%, var(--surface));
 }
 
-.app[data-theme] .puzzle-gallery__node--selected > button {
+.app[data-theme] .endgame-gallery__node--selected > button {
   color: var(--action-ink);
-  background: var(--puzzle);
-  border-color: color-mix(in srgb, var(--puzzle) 74%, var(--focus));
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--puzzle) 22%, transparent), 0 10px 20px color-mix(in srgb, var(--well) 26%, transparent);
+  background: var(--endgame);
+  border-color: color-mix(in srgb, var(--endgame) 74%, var(--focus));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--endgame) 22%, transparent), 0 10px 20px color-mix(in srgb, var(--well) 26%, transparent);
 }
 
 @media (max-width: 599px) {

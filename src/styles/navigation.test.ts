@@ -58,7 +58,7 @@ describe('Phase 9 navigation authority', () => {
     expect(legacy).toMatch(/\.mode-gate__action\s*\{[^}]*grid-column:\s*1\s*\/\s*-1;/);
     expect(legacy).toMatch(/\.console-route \.console-node > button\s*\{[^}]*min-height:\s*48px;/);
     expect(navigation).toMatch(
-      /\.mode-gates--workbench \.mode-gate,[\s\S]*?\.mode-gates--workbench \.mode-gate--puzzle\s*\{[^}]*grid-column:\s*auto;[^}]*grid-row:\s*auto;[^}]*justify-self:\s*stretch;/,
+      /\.mode-gates--workbench \.mode-gate,[\s\S]*?\.mode-gates--workbench \.mode-gate--endgame\s*\{[^}]*grid-column:\s*auto;[^}]*grid-row:\s*auto;[^}]*justify-self:\s*stretch;/,
     );
     expect(navigation).toMatch(
       /\.mode-gates--workbench \.mode-gate__action\s*\{[^}]*grid-column:\s*3;[^}]*grid-row:\s*1;[^}]*justify-self:\s*end;/,

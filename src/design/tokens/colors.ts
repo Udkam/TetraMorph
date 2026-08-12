@@ -21,7 +21,7 @@ export const COLOR_TOKENS = {
   classic: '#31978D',
   survival: '#5878C4',
   mutation: '#C77A35',
-  puzzle: '#8A63B3',
+  endgame: '#8A63B3',
   selection: '#A75E71',
   target: '#D9C187',
   action: '#315F96',

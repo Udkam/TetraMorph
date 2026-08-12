@@ -20,7 +20,7 @@ from playwright.sync_api import Browser, Page, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE_ROOT = ROOT / "docs" / "qa" / "evidence" / "tetris-t3"
-PROGRESS_KEY = "tetris:puzzle-progress:v1"
+PROGRESS_KEY = "tetris:endgame-progress:v1"
 
 
 @dataclass(frozen=True)
@@ -35,7 +35,7 @@ class Viewport:
 DESKTOP = Viewport("desktop", 1440, 900, 1)
 PORTRAIT = Viewport("portrait", 390, 844, 3, True)
 LANDSCAPE = Viewport("landscape", 844, 390, 3, True)
-LONG_PUZZLE = Viewport("puzzle-long", 360, 800, 3, True)
+LONG_ENDGAME = Viewport("endgame-long", 360, 800, 3, True)
 
 
 def sha256(path: Path) -> str:
@@ -142,10 +142,10 @@ def start_playing(page: Page) -> None:
     page.wait_for_function("window.__TETRAMORPH_QA__.getState().status === 'playing'")
 
 
-def open_puzzle_select(page: Page) -> None:
-    page.get_by_role("button", name="解谜模式", exact=True).click()
+def open_endgame_select(page: Page) -> None:
+    page.get_by_role("button", name="残局模式", exact=True).click()
     page.get_by_role("button", name="选择关卡", exact=True).click()
-    page.wait_for_selector('[data-testid="puzzle-select"]')
+    page.wait_for_selector('[data-testid="endgame-select"]')
     assert page.locator('[data-testid="level-row"]').count() == 6
     assert page.locator('[data-testid="level-row"]:not(:disabled)').count() >= 1
     level_list = page.get_by_test_id("level-list")
@@ -155,14 +155,14 @@ def open_puzzle_select(page: Page) -> None:
     level_list.evaluate("element => { element.scrollTop = 0; }")
 
 
-def start_first_puzzle(page: Page) -> None:
-    open_puzzle_select(page)
+def start_first_endgame(page: Page) -> None:
+    open_endgame_select(page)
     page.locator('[data-testid="level-row"][data-level-id="t3r-shaft-01"]').click()
     page.get_by_role("button", name="开始关卡", exact=True).click()
-    page.wait_for_function("window.__TETRAMORPH_QA__.getState().mode === 'puzzle' && window.__TETRAMORPH_QA__.getState().status === 'playing'")
+    page.wait_for_function("window.__TETRAMORPH_QA__.getState().mode === 'endgame' && window.__TETRAMORPH_QA__.getState().status === 'playing'")
 
 
-def complete_first_puzzle(page: Page) -> None:
+def complete_first_endgame(page: Page) -> None:
     sequence = [
         ("action('rotate-ccw')", 0), ("action('hard-drop')", 3),
         ("action('left')", 0), ("action('left')", 0), ("action('left')", 0), ("action('rotate-ccw')", 0), ("action('left')", 0), ("action('hard-drop')", 3),
@@ -172,19 +172,19 @@ def complete_first_puzzle(page: Page) -> None:
         runtime(page, action)
         if ticks:
             runtime(page, f"advanceTicks({ticks})")
-    page.wait_for_function("window.__TETRAMORPH_QA__.getState().puzzleCompletion === 'finished'")
+    page.wait_for_function("window.__TETRAMORPH_QA__.getState().endgameCompletion === 'finished'")
 
 
-def fail_second_puzzle(page: Page) -> None:
-    runtime(page, "selectPuzzle('t3r-shaft-02')")
+def fail_second_endgame(page: Page) -> None:
+    runtime(page, "selectEndgame('t3r-shaft-02')")
     runtime(page, "start()")
     for _ in range(4):
         if game_state(page)["status"] != "playing":
             break
         runtime(page, "action('hard-drop')")
         runtime(page, "advanceTicks(12)")
-    page.wait_for_function("window.__TETRAMORPH_QA__.getState().puzzleCompletion && window.__TETRAMORPH_QA__.getState().puzzleCompletion !== 'active'")
-    assert game_state(page)["puzzleCompletion"] in {"failed-top-out", "failed-invalid-spawn"}
+    page.wait_for_function("window.__TETRAMORPH_QA__.getState().endgameCompletion && window.__TETRAMORPH_QA__.getState().endgameCompletion !== 'active'")
+    assert game_state(page)["endgameCompletion"] in {"failed-top-out", "failed-invalid-spawn"}
 
 
 def keyboard_release_probe(page: Page) -> dict[str, int]:
@@ -218,7 +218,7 @@ def set_malformed_progress(page: Page, base_url: str) -> None:
     page.evaluate(f"localStorage.setItem('{PROGRESS_KEY}', '{{bad')")
     page.reload(wait_until="networkidle")
     page.wait_for_function("window.__TETRAMORPH_QA__ && window.__TETRAMORPH_LAYOUT_QA__")
-    page.get_by_role("button", name="解谜模式", exact=True).click()
+    page.get_by_role("button", name="残局模式", exact=True).click()
     page.get_by_role("button", name="选择关卡", exact=True).click()
     assert page.locator('[data-testid="level-row"]:not(:disabled)').count() == 1
 
@@ -254,28 +254,28 @@ def desktop_cases(browser: Browser, output: Path, base_url: str) -> tuple[list[d
     captures.append(capture(page, output, "desktop-mode-switch", errors, expect_next=False, mode_switch=True))
     page.get_by_role("button", name="返回本局", exact=True).click()
     page.get_by_role("button", name="切换模式", exact=True).click()
-    page.get_by_role("button", name="解谜模式", exact=True).click()
+    page.get_by_role("button", name="残局模式", exact=True).click()
     page.get_by_role("button", name="应用并重新开始", exact=True).click()
-    page.wait_for_selector('[data-testid="puzzle-select"]')
-    captures.append(capture(page, output, "desktop-puzzle-select", errors, expect_next=False))
+    page.wait_for_selector('[data-testid="endgame-select"]')
+    captures.append(capture(page, output, "desktop-endgame-select", errors, expect_next=False))
     page.locator('[data-testid="level-row"][data-level-id="t3r-shaft-01"]').click()
     page.get_by_role("button", name="开始关卡", exact=True).click()
-    page.wait_for_function("window.__TETRAMORPH_QA__.getState().mode === 'puzzle' && window.__TETRAMORPH_QA__.getState().status === 'playing'")
+    page.wait_for_function("window.__TETRAMORPH_QA__.getState().mode === 'endgame' && window.__TETRAMORPH_QA__.getState().status === 'playing'")
     keyboard = keyboard_release_probe(page)
-    captures.append(capture(page, output, "desktop-puzzle-playing", errors, expect_next=True))
+    captures.append(capture(page, output, "desktop-endgame-playing", errors, expect_next=True))
     runtime(page, "restart()")
-    complete_first_puzzle(page)
+    complete_first_endgame(page)
     page.wait_for_timeout(80)
     stored_progress = page.evaluate(f"JSON.parse(localStorage.getItem('{PROGRESS_KEY}'))")
     assert stored_progress["nextUnlockedLevelId"] == "t3r-shaft-02", stored_progress
-    captures.append(capture(page, output, "desktop-puzzle-success", errors, expect_next=False))
+    captures.append(capture(page, output, "desktop-endgame-success", errors, expect_next=False))
     page.get_by_role("button", name="返回关卡选择", exact=True).click()
-    page.wait_for_selector('[data-testid="puzzle-select"]')
+    page.wait_for_selector('[data-testid="endgame-select"]')
     assert page.locator('[data-testid="level-row"]:not(:disabled)').count() == 2
-    runtime(page, "selectPuzzle('t3r-shaft-02')")
+    runtime(page, "selectEndgame('t3r-shaft-02')")
     runtime(page, "start()")
-    fail_second_puzzle(page)
-    captures.append(capture(page, output, "desktop-puzzle-failure", errors, expect_next=False))
+    fail_second_endgame(page)
+    captures.append(capture(page, output, "desktop-endgame-failure", errors, expect_next=False))
     assert not errors, errors
     page.context.close()
     return captures, {"keyboardRelease": keyboard, "progress": stored_progress}
@@ -291,25 +291,25 @@ def compact_cases(browser: Browser, viewport: Viewport, output: Path, base_url: 
         captures.append(capture(page, output, "portrait-paused", errors, expect_next=True))
         page.get_by_role("button", name="继续", exact=True).click()
     page.get_by_role("button", name="切换模式", exact=True).click()
-    page.get_by_role("button", name="解谜模式", exact=True).click()
+    page.get_by_role("button", name="残局模式", exact=True).click()
     page.get_by_role("button", name="应用并重新开始", exact=True).click()
-    page.wait_for_selector('[data-testid="puzzle-select"]')
-    captures.append(capture(page, output, f"{viewport.name}-puzzle-select", errors, expect_next=False))
+    page.wait_for_selector('[data-testid="endgame-select"]')
+    captures.append(capture(page, output, f"{viewport.name}-endgame-select", errors, expect_next=False))
     if viewport is PORTRAIT:
         page.locator('[data-testid="level-row"][data-level-id="t3r-shaft-01"]').click()
         page.get_by_role("button", name="开始关卡", exact=True).click()
-        captures.append(capture(page, output, "portrait-puzzle-playing", errors, expect_next=True))
+        captures.append(capture(page, output, "portrait-endgame-playing", errors, expect_next=True))
     assert not errors, errors
     page.context.close()
     return captures
 
 
 def long_value_case(browser: Browser, output: Path, base_url: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    page, errors = new_page(browser, LONG_PUZZLE, base_url)
-    runtime(page, "selectPuzzle('t3r-cascade-06')")
+    page, errors = new_page(browser, LONG_ENDGAME, base_url)
+    runtime(page, "selectEndgame('t3r-cascade-06')")
     runtime(page, "start()")
     touch = touch_probe(page)
-    capture_result = capture(page, output, "puzzle-long-playing", errors, expect_next=True)
+    capture_result = capture(page, output, "endgame-long-playing", errors, expect_next=True)
     assert not errors, errors
     page.context.close()
     return capture_result, touch

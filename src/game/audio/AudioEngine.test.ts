@@ -469,7 +469,7 @@ describe('AudioEngine accepted production contract', () => {
       [{ type: 'survival-stones-warned', columns: [3], height: 2, leadPieces: 1 }],
       [{ type: 'survival-stones-spawned', cells: [{ x: 3, y: 0 }], intervalPieces: 8, nextIntervalPieces: 8 }],
       [{ type: 'survival-stones-landed', cells: [{ x: 3, y: 12 }] }],
-      [{ type: 'puzzle-undone' }],
+      [{ type: 'endgame-undone' }],
       [{ type: 'paused' }, { type: 'resumed' }],
     ];
     for (const batch of batches) {

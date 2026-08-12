@@ -23,7 +23,7 @@ import { canPlace, clearRows, createBoard, fullRows, lowerBedrock, setCell } fro
 import { createInitialState, dispatch, dropDistance, replay, stateHash } from './engine';
 import { BEDROCK_CELL, SURVIVAL_STONE_CELL, type Board, type GameCommand, type GameState } from './types';
 
-function start(seed: number, mode: 'marathon' | 'race' | 'puzzle' = 'marathon'): GameState {
+function start(seed: number, mode: 'marathon' | 'race' | 'endgame' = 'marathon'): GameState {
   return dispatch(createInitialState(seed, mode), { type: 'start' }).state;
 }
 
@@ -61,7 +61,7 @@ describe('progressive gravity and Survival intervals', () => {
     expect(gravityForMode('race', 0, 0, 0)).toBe(SURVIVAL_GRAVITY_TICKS);
     expect(gravityForMode('race', 0, 50_000, 10_000)).toBe(SURVIVAL_GRAVITY_TICKS);
     expect(SURVIVAL_GRAVITY_TICKS).toBe(38);
-    expect(gravityForMode('puzzle', 99, 50_000, 10_000)).toBe(STANDARD_GRAVITY_TICKS);
+    expect(gravityForMode('endgame', 99, 50_000, 10_000)).toBe(STANDARD_GRAVITY_TICKS);
   });
 
   it('starts at thirteen seconds, drops one second every three lines, and caps at six', () => {
@@ -760,10 +760,10 @@ describe('bedrock board invariants', () => {
     expect(lowerBedrock(lowered.board, 1).removed).toBe(0);
   });
 
-  it('keeps Puzzle on base scoring with no Classic combo', () => {
+  it('keeps Endgame on base scoring with no Classic combo', () => {
     const setup = singleClearBoard();
     const transition = resolveClear({
-      ...start(0x5151, 'puzzle'),
+      ...start(0x5151, 'endgame'),
       ...setup,
       score: 0,
       combo: 7,

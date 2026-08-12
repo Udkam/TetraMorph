@@ -74,7 +74,7 @@ export const COLORS = {
   edge: COLOR_NUMBERS.borderStrong,
   classic: COLOR_NUMBERS.classic,
   race: COLOR_NUMBERS.survival,
-  puzzle: COLOR_NUMBERS.puzzle,
+  endgame: COLOR_NUMBERS.endgame,
   selection: COLOR_NUMBERS.selection,
   target: COLOR_NUMBERS.target,
   action: COLOR_NUMBERS.action,
@@ -157,7 +157,7 @@ export const SURVIVAL_STONE_MATERIAL: PieceMaterial = {
   innerEdge: 0xd7e1e5,
 };
 
-/** Puzzle-only immutable cells use a pale mineral core rather than a playable hue. */
+/** Endgame-only immutable cells use a pale mineral core rather than a playable hue. */
 export const ANCHOR_MATERIAL: PieceMaterial = {
   fillStart: 0xb7aa92,
   fillEnd: 0x8f826b,

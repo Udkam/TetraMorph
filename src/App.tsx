@@ -27,9 +27,9 @@ import {
   type GameState,
   type MutationItem,
   type PieceType,
-  type PuzzleId,
+  type EndgameId,
   createInitialState,
-  getPuzzleDefinition,
+  getEndgameDefinition,
   gravityForMode,
   nextMutationPreviewItem,
   normalizeClassicGravityFloorTicks,
@@ -51,28 +51,23 @@ import {
 } from './navigation/appRoute';
 import {
   CAMPAIGN_LEVELS,
-  LEGACY_PUZZLE_PROGRESS_KEY,
-  LEGACY_V5_PUZZLE_PROGRESS_KEY,
-  PUZZLE_CATEGORIES,
-  PUZZLE_PROGRESS_KEY,
-  V4_PUZZLE_PROGRESS_KEY,
-  V3_PUZZLE_PROGRESS_KEY,
-  V2_PUZZLE_PROGRESS_KEY,
-  defaultPuzzleProgress,
-  migrateLegacyPuzzleProgress,
-  migrateV4PuzzleProgress,
-  migrateV3PuzzleProgress,
-  migrateV2PuzzleProgress,
-  parsePuzzleProgress,
-  isPuzzleUnlocked,
-  puzzleMasteryGateStatus,
-  puzzleBestPieceCount,
-  recordCanonicalPuzzleCompletion,
-  type PuzzleProgress,
-  type PuzzleCategoryId,
-} from './puzzleProgress';
-import { puzzleLessonFor } from './puzzleLessons';
-import { PUZZLE_HARD_MASTERY_GROUPS, puzzleOptimalCertificate } from './puzzleMastery';
+  ENDGAME_CATEGORIES,
+  ENDGAME_PROGRESS_KEY,
+  defaultEndgameProgress,
+  isEndgameUnlocked,
+  endgameMasteryGateStatus,
+  endgameBestPieceCount,
+  recordCanonicalEndgameCompletion,
+  type EndgameProgress,
+  type EndgameCategoryId,
+} from './endgameProgress';
+import {
+  migrateEndgameProgressStorage,
+  migrateEndgameRuleIntrosStorage,
+  normalizeEndgameRoute,
+} from './legacyEndgameMigration';
+import { endgameLessonFor } from './endgameLessons';
+import { ENDGAME_HARD_MASTERY_GROUPS, endgameOptimalCertificate } from './endgameMastery';
 import {
   DEFAULT_VISUAL_THEME,
   VISUAL_THEMES,
@@ -96,9 +91,9 @@ import {
   modeRules,
   modeRulesTitle,
   parseLanguage,
-  puzzleDisplayName,
+  endgameDisplayName,
   type AppLanguage,
-  type PuzzleCelebrationOutcome,
+  type EndgameCelebrationOutcome,
 } from './ui/localization';
 import {
   CLASSIC_DIFFICULTY_GRADES,
@@ -115,12 +110,12 @@ import {
   type ScoreRecord,
 } from './leaderboard';
 
-type ExitDestination = 'home' | 'puzzle-library';
+type ExitDestination = 'home' | 'endgame-library';
 type EntryCountdownDigit = 3 | 2 | 1;
 type SettingsTab = 'settings' | 'controls' | 'rules';
 type ReducedMotionOverride = boolean | null;
-export type PuzzleCelebration = {
-  outcome: PuzzleCelebrationOutcome;
+export type EndgameCelebration = {
+  outcome: EndgameCelebrationOutcome;
   pieces: number;
   lines: number;
   previousBest: number | null;
@@ -139,36 +134,59 @@ const ROUTE_REDUCED_MS = 32;
 const ROUTE_READY_TIMEOUT_MS = 800;
 const NOOP = () => undefined;
 
+type AppRouteResolution = Readonly<{
+  navigation: AppNavigationState;
+  replacement: Readonly<{ path: string; state: unknown }> | null;
+}>;
+
+function resolveAppNavigation(pathname: string, historyState: unknown): AppRouteResolution {
+  const legacy = normalizeEndgameRoute(pathname, historyState);
+  if (legacy.status === 'normalized') {
+    return {
+      navigation: { ...legacy.navigation },
+      replacement: { path: legacy.path, state: legacy.historyState },
+    };
+  }
+  const canonical = appNavigationFromHistory(pathname, historyState);
+  if (canonical) return { navigation: canonical, replacement: null };
+  return {
+    navigation: DEFAULT_APP_NAVIGATION,
+    replacement: {
+      path: appPathFor(DEFAULT_APP_NAVIGATION),
+      state: appHistoryStateFor(DEFAULT_APP_NAVIGATION),
+    },
+  };
+}
+
 function readAppNavigation(): AppNavigationState {
   const target = browserPlatform.windowTarget();
-  return appNavigationFromHistory(target?.location.pathname ?? '/', target?.history.state)
-    ?? DEFAULT_APP_NAVIGATION;
+  return resolveAppNavigation(target?.location.pathname ?? '/', target?.history.state).navigation;
 }
-const MODE_RULE_INTROS_KEY = 'tetramorph:mode-rule-intros:v1';
-const LEGACY_MODE_RULE_INTROS_KEY = 'tetris:mode-rule-intros:v1';
+const MODE_RULE_INTROS_KEY = 'tetramorph:mode-rule-intros:v2';
 export const REDUCED_MOTION_STORAGE_KEY = 'tetramorph:reduced-motion:v1';
 export const CLASSIC_GRAVITY_RANGE_STORAGE_KEY = 'tetramorph:classic-gravity-range:v1';
 const LEGACY_CLASSIC_STARTING_GRAVITY_STORAGE_KEY = 'tetramorph:classic-start-gravity:v1';
 
-const MODE_ORDER: readonly GameMode[] = ['marathon', 'race', 'sprint', 'puzzle'];
+const MODE_ORDER: readonly GameMode[] = ['marathon', 'race', 'sprint', 'endgame'];
 
 export function cloneQaState(state: GameState): GameState {
   return structuredClone(state);
 }
 
-function readModeRuleIntros(): readonly GameMode[] {
-  try {
-    const current = browserPlatform.readStorage(MODE_RULE_INTROS_KEY);
-    const raw = current ?? browserPlatform.readStorage(LEGACY_MODE_RULE_INTROS_KEY);
-    if (raw === null) return Object.freeze([]);
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return Object.freeze([]);
-    const modes = Object.freeze(parsed.filter((value): value is GameMode => MODE_ORDER.includes(value as GameMode)));
-    if (current === null) browserPlatform.writeStorage(MODE_RULE_INTROS_KEY, JSON.stringify(modes));
-    return modes;
-  } catch {
-    return Object.freeze([]);
+type PersistedBootstrap<T> = Readonly<{ value: T; canPersist: boolean }>;
+
+function readModeRuleIntros(): PersistedBootstrap<readonly GameMode[]> {
+  const result = migrateEndgameRuleIntrosStorage(browserPlatform);
+  if (result.status === 'available') {
+    return {
+      value: Object.freeze([...result.data]) as readonly GameMode[],
+      canPersist: result.persistence === 'verified',
+    };
   }
+  if (result.status === 'blocked') {
+    return { value: MODE_ORDER, canPersist: false };
+  }
+  return { value: Object.freeze([]), canPersist: true };
 }
 
 function readLanguage(): AppLanguage {
@@ -278,60 +296,33 @@ function writeClassicGravityRange(range: ClassicGravityRange): void {
   }
 }
 
-function writeModeRuleIntros(modes: readonly GameMode[]): void {
-  try {
-    browserPlatform.writeStorage(MODE_RULE_INTROS_KEY, JSON.stringify([...new Set(modes)]));
-  } catch {
-    // Storage is optional. A blocked browser simply shows the short rule sheet again.
-  }
+function writeModeRuleIntros(modes: readonly GameMode[], canPersist = true): void {
+  if (!canPersist) return;
+  browserPlatform.writeStorage(
+    MODE_RULE_INTROS_KEY,
+    JSON.stringify(MODE_ORDER.filter((mode) => modes.includes(mode))),
+  );
 }
 
-function writePuzzleProgress(progress: PuzzleProgress): void {
-  try {
-    browserPlatform.writeStorage(PUZZLE_PROGRESS_KEY, JSON.stringify(progress));
-  } catch {
-    // Puzzle progress remains valid for this session when persistent storage is blocked.
-  }
+function writeEndgameProgress(progress: EndgameProgress, canPersist = true): void {
+  if (!canPersist) return;
+  browserPlatform.writeStorage(ENDGAME_PROGRESS_KEY, JSON.stringify(progress));
 }
 
-function readPuzzleProgress(): PuzzleProgress {
-  try {
-    const current = browserPlatform.readStorage(PUZZLE_PROGRESS_KEY);
-    if (current !== null) return parsePuzzleProgress(current);
-    const legacyV5 = browserPlatform.readStorage(LEGACY_V5_PUZZLE_PROGRESS_KEY);
-    if (legacyV5 !== null) {
-      const migrated = parsePuzzleProgress(legacyV5);
-      writePuzzleProgress(migrated);
-      return migrated;
-    }
-    const v4 = browserPlatform.readStorage(V4_PUZZLE_PROGRESS_KEY);
-    if (v4 !== null) {
-      const migrated = migrateV4PuzzleProgress(v4);
-      writePuzzleProgress(migrated);
-      return migrated;
-    }
-    const v3 = browserPlatform.readStorage(V3_PUZZLE_PROGRESS_KEY);
-    if (v3 !== null) {
-      const migrated = migrateV3PuzzleProgress(v3);
-      writePuzzleProgress(migrated);
-      return migrated;
-    }
-    const v2 = browserPlatform.readStorage(V2_PUZZLE_PROGRESS_KEY);
-    if (v2 !== null) {
-      const migrated = migrateV2PuzzleProgress(v2);
-      writePuzzleProgress(migrated);
-      return migrated;
-    }
-    const legacy = browserPlatform.readStorage(LEGACY_PUZZLE_PROGRESS_KEY);
-    if (legacy !== null) {
-      const migrated = migrateLegacyPuzzleProgress(legacy);
-      writePuzzleProgress(migrated);
-      return migrated;
-    }
-    return defaultPuzzleProgress();
-  } catch {
-    return defaultPuzzleProgress();
+function readEndgameProgress(): PersistedBootstrap<EndgameProgress> {
+  const result = migrateEndgameProgressStorage(browserPlatform);
+  if (result.status === 'available') {
+    return {
+      value: {
+        version: result.data.version,
+        campaignRevision: result.data.campaignRevision,
+        completedLevelIds: [...result.data.completedLevelIds],
+        bestPieceCounts: { ...result.data.bestPieceCounts },
+      },
+      canPersist: result.persistence === 'verified',
+    };
   }
+  return { value: defaultEndgameProgress(), canPersist: result.status === 'missing' };
 }
 
 function readLeaderboard(): Leaderboard {
@@ -428,19 +419,19 @@ function writeReducedMotionOverride(reducedMotion: boolean): void {
   browserPlatform.writeStorage(REDUCED_MOTION_STORAGE_KEY, reducedMotion ? 'on' : 'off');
 }
 
-function campaignLevel(id: PuzzleId | null) {
+function campaignLevel(id: EndgameId | null) {
   return CAMPAIGN_LEVELS.find((level) => level.id === id) ?? CAMPAIGN_LEVELS[0]!;
 }
 
 export function terminalCopy(state: GameState, language: AppLanguage = DEFAULT_LANGUAGE): { title: string; detail: string; success: boolean } | null {
   const copy = appCopy(language);
-  if (state.mode === 'puzzle') {
-    if (state.puzzleCompletion === 'finished') {
-      return { ...copy.phrasing.terminalPuzzleSuccess(state.pieceCount, state.lines), success: true };
+  if (state.mode === 'endgame') {
+    if (state.endgameCompletion === 'finished') {
+      return { ...copy.phrasing.terminalEndgameSuccess(state.pieceCount, state.lines), success: true };
     }
-    if (state.puzzleCompletion && state.puzzleCompletion !== 'active') {
-      const remaining = state.puzzleTargetCells.length;
-      return { ...copy.phrasing.terminalPuzzleFailure(remaining, state.pieceCount), success: false };
+    if (state.endgameCompletion && state.endgameCompletion !== 'active') {
+      const remaining = state.endgameTargetCells.length;
+      return { ...copy.phrasing.terminalEndgameFailure(remaining, state.pieceCount), success: false };
     }
     return null;
   }
@@ -494,22 +485,22 @@ export function runResultMetrics(
 }
 
 /**
- * Completion copy is classified before persistence updates the puzzle record.
+ * Completion copy is classified before persistence updates the endgame record.
  * That keeps a first clear from being mislabelled as a replay on the same frame.
  */
-export function puzzleCelebrationOutcome(previousBest: number | null, pieces: number): PuzzleCelebrationOutcome {
+export function endgameCelebrationOutcome(previousBest: number | null, pieces: number): EndgameCelebrationOutcome {
   if (previousBest === null) return 'first';
   return pieces < previousBest ? 'record' : 'replay';
 }
 
-export function puzzleCelebrationCopy(
-  celebration: PuzzleCelebration,
+export function endgameCelebrationCopy(
+  celebration: EndgameCelebration,
   language: AppLanguage = DEFAULT_LANGUAGE,
 ) {
   const best = celebration.previousBest === null
     ? celebration.pieces
     : Math.min(celebration.previousBest, celebration.pieces);
-  return appCopy(language).phrasing.puzzleCelebration(
+  return appCopy(language).phrasing.endgameCelebration(
     celebration.outcome,
     best,
   );
@@ -598,17 +589,17 @@ function Brand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function PuzzleCelebrationPanel({ celebration, language }: { celebration: PuzzleCelebration; language: AppLanguage }) {
-  const presentation = puzzleCelebrationCopy(celebration, language);
+function EndgameCelebrationPanel({ celebration, language }: { celebration: EndgameCelebration; language: AppLanguage }) {
+  const presentation = endgameCelebrationCopy(celebration, language);
   return (
     <section
-      className={`puzzle-celebration puzzle-celebration--${celebration.outcome}`}
-      data-testid="puzzle-celebration"
+      className={`endgame-celebration endgame-celebration--${celebration.outcome}`}
+      data-testid="endgame-celebration"
       data-outcome={celebration.outcome}
       aria-label={presentation.best}
     >
-      <div className="puzzle-celebration__summary">
-        <div className="puzzle-celebration__value">
+      <div className="endgame-celebration__summary">
+        <div className="endgame-celebration__value">
           <strong>{presentation.bestValue}</strong>
           <small>{presentation.bestUnit}</small>
         </div>
@@ -747,8 +738,8 @@ function cssHex(color: number): string {
   return `#${color.toString(16).padStart(6, '0')}`;
 }
 
-export function puzzleSilhouettePaths(id: PuzzleId): ReadonlyMap<PieceType, string> {
-  const board = createInitialState(APP_SEED, 'puzzle', id).board.slice(-12);
+export function endgameSilhouettePaths(id: EndgameId): ReadonlyMap<PieceType, string> {
+  const board = createInitialState(APP_SEED, 'endgame', id).board.slice(-12);
   const unit = 4;
   const face = 3.8;
   const paths = new Map<PieceType, string>();
@@ -762,8 +753,8 @@ export function puzzleSilhouettePaths(id: PuzzleId): ReadonlyMap<PieceType, stri
 }
 
 /** One canonical preview keeps immutable anchors legible without adding list thumbnails. */
-export function puzzleAnchorSilhouettePath(id: PuzzleId): string {
-  const board = createInitialState(APP_SEED, 'puzzle', id).board.slice(-12);
+export function endgameAnchorSilhouettePath(id: EndgameId): string {
+  const board = createInitialState(APP_SEED, 'endgame', id).board.slice(-12);
   const unit = 4;
   const face = 3.8;
   return board.flatMap((row, y) => row.map((cell, x) => (
@@ -771,24 +762,24 @@ export function puzzleAnchorSilhouettePath(id: PuzzleId): string {
   ))).join('');
 }
 
-function puzzleSilhouetteViewBox(id: PuzzleId): string {
-  const board = createInitialState(APP_SEED, 'puzzle', id).board.slice(-12);
+function endgameSilhouetteViewBox(id: EndgameId): string {
+  const board = createInitialState(APP_SEED, 'endgame', id).board.slice(-12);
   const firstOccupiedRow = board.findIndex((row) => row.some((cell) => cell !== null));
   const startRow = Math.max(0, (firstOccupiedRow < 0 ? 0 : firstOccupiedRow) - 2);
   return `0 ${startRow * 4} 40 ${(12 - startRow) * 4}`;
 }
 
-function PuzzleSilhouette({ id, label }: { id: PuzzleId; label: string }) {
-  const anchorPath = puzzleAnchorSilhouettePath(id);
+function EndgameSilhouette({ id, label }: { id: EndgameId; label: string }) {
+  const anchorPath = endgameAnchorSilhouettePath(id);
   return (
     <svg
-      className="puzzle-silhouette"
-      viewBox={puzzleSilhouetteViewBox(id)}
+      className="endgame-silhouette"
+      viewBox={endgameSilhouetteViewBox(id)}
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label={label}
     >
-      {[...puzzleSilhouettePaths(id)].map(([type, path]) => {
+      {[...endgameSilhouettePaths(id)].map(([type, path]) => {
         const material = PIECE_MATERIALS[type];
         return (
           <path
@@ -802,7 +793,7 @@ function PuzzleSilhouette({ id, label }: { id: PuzzleId; label: string }) {
       })}
       {anchorPath && (
         <path
-          className="puzzle-silhouette__anchor"
+          className="endgame-silhouette__anchor"
           data-piece-type="anchor"
           d={anchorPath}
           fill={cssHex(ANCHOR_MATERIAL.fillStart)}
@@ -816,7 +807,7 @@ function PuzzleSilhouette({ id, label }: { id: PuzzleId; label: string }) {
 /** A centered graphic replacement for the completed level numeral; never expose literal check text. */
 function CompletionTick() {
   return (
-    <span className="puzzle-gallery__completion-tick" aria-hidden="true">
+    <span className="endgame-gallery__completion-tick" aria-hidden="true">
       <svg viewBox="0 0 24 24" focusable="false">
         <path d="m4.8 12.35 4.35 4.3L19.4 7.2" />
       </svg>
@@ -824,13 +815,13 @@ function CompletionTick() {
   );
 }
 
-const PUZZLE_CATEGORY_IDS: readonly PuzzleCategoryId[] = Object.freeze(['intro', 'easy', 'hard']);
+const ENDGAME_CATEGORY_IDS: readonly EndgameCategoryId[] = Object.freeze(['intro', 'easy', 'hard']);
 
-function puzzleCategoryForLevel(levelId: PuzzleId): PuzzleCategoryId {
-  return PUZZLE_CATEGORIES.find((category) => category.levels.some((level) => level.id === levelId))?.id ?? 'intro';
+function endgameCategoryForLevel(levelId: EndgameId): EndgameCategoryId {
+  return ENDGAME_CATEGORIES.find((category) => category.levels.some((level) => level.id === levelId))?.id ?? 'intro';
 }
 
-export function PuzzleLibrary({
+export function EndgameLibrary({
   progress,
   selectedId,
   onSelect,
@@ -838,41 +829,41 @@ export function PuzzleLibrary({
   onBack,
   language = DEFAULT_LANGUAGE,
 }: {
-  progress: PuzzleProgress;
-  selectedId: PuzzleId;
-  onSelect: (id: PuzzleId) => void;
+  progress: EndgameProgress;
+  selectedId: EndgameId;
+  onSelect: (id: EndgameId) => void;
   onStart: () => void;
   onBack: () => void;
   language?: AppLanguage;
 }) {
   const selected = campaignLevel(selectedId);
-  const selectedName = puzzleDisplayName(language, selected.id, selected.name);
+  const selectedName = endgameDisplayName(language, selected.id, selected.name);
   const copy = appCopy(language);
-  const selectedLesson = puzzleLessonFor(selected.id);
-  const selectedLessonCopy = selectedLesson ? copy.phrasing.puzzleLesson(selectedLesson.technique) : null;
+  const selectedLesson = endgameLessonFor(selected.id);
+  const selectedLessonCopy = selectedLesson ? copy.phrasing.endgameLesson(selectedLesson.technique) : null;
   const selectedComplete = progress.completedLevelIds.includes(selected.id);
-  const selectedBest = puzzleBestPieceCount(progress, selected.id);
-  const selectedUnlocked = isPuzzleUnlocked(progress, selected.id);
-  const selectedGate = puzzleMasteryGateStatus(progress, selected.id);
-  const selectedGateLesson = selectedGate ? copy.phrasing.puzzleLesson(selectedGate.group.technique) : null;
+  const selectedBest = endgameBestPieceCount(progress, selected.id);
+  const selectedUnlocked = isEndgameUnlocked(progress, selected.id);
+  const selectedGate = endgameMasteryGateStatus(progress, selected.id);
+  const selectedGateLesson = selectedGate ? copy.phrasing.endgameLesson(selectedGate.group.technique) : null;
   const selectedGatePrerequisite = selectedGate
     ? campaignLevel(selectedGate.group.prerequisiteId)
     : null;
   const selectedGatePrerequisiteName = selectedGatePrerequisite
-    ? puzzleDisplayName(language, selectedGatePrerequisite.id, selectedGatePrerequisite.name)
+    ? endgameDisplayName(language, selectedGatePrerequisite.id, selectedGatePrerequisite.name)
     : null;
-  const selectedCategory = puzzleCategoryForLevel(selected.id);
-  const [categoryId, setCategoryId] = useState<PuzzleCategoryId>(selectedCategory);
-  const levelButtonRefs = useRef(new Map<PuzzleId, HTMLButtonElement>());
+  const selectedCategory = endgameCategoryForLevel(selected.id);
+  const [categoryId, setCategoryId] = useState<EndgameCategoryId>(selectedCategory);
+  const levelButtonRefs = useRef(new Map<EndgameId, HTMLButtonElement>());
   const pageTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const pendingFocusRef = useRef<PuzzleId | null>(null);
-  const pageLastSelectedRef = useRef<Record<PuzzleCategoryId, PuzzleId>>({
-    intro: PUZZLE_CATEGORIES[0]!.levels[0]!.id,
-    easy: PUZZLE_CATEGORIES[1]!.levels[0]!.id,
-    hard: PUZZLE_CATEGORIES[2]!.levels[0]!.id,
+  const pendingFocusRef = useRef<EndgameId | null>(null);
+  const pageLastSelectedRef = useRef<Record<EndgameCategoryId, EndgameId>>({
+    intro: ENDGAME_CATEGORIES[0]!.levels[0]!.id,
+    easy: ENDGAME_CATEGORIES[1]!.levels[0]!.id,
+    hard: ENDGAME_CATEGORIES[2]!.levels[0]!.id,
   });
   pageLastSelectedRef.current[selectedCategory] = selected.id;
-  const activeCategory = PUZZLE_CATEGORIES.find((category) => category.id === categoryId)!;
+  const activeCategory = ENDGAME_CATEGORIES.find((category) => category.id === categoryId)!;
   const pageLevels = activeCategory.levels;
   const rovingLevelId = pageLevels.some((level) => level.id === selected.id)
     ? selected.id
@@ -898,7 +889,7 @@ export function PuzzleLibrary({
   const selectLevelAtIndex = (index: number, focus = false) => {
     const next = CAMPAIGN_LEVELS[index];
     if (!next) return;
-    const nextCategory = puzzleCategoryForLevel(next.id);
+    const nextCategory = endgameCategoryForLevel(next.id);
     pageLastSelectedRef.current[nextCategory] = next.id;
     if (focus && nextCategory !== categoryId) pendingFocusRef.current = next.id;
     setCategoryId(nextCategory);
@@ -913,13 +904,13 @@ export function PuzzleLibrary({
     }
   };
 
-  const switchPage = (nextCategory: PuzzleCategoryId, focusTab = false) => {
+  const switchPage = (nextCategory: EndgameCategoryId, focusTab = false) => {
     const targetId = pageLastSelectedRef.current[nextCategory];
     const targetIndex = CAMPAIGN_LEVELS.findIndex((level) => level.id === targetId);
     setCategoryId(nextCategory);
     if (targetIndex >= 0) onSelect(targetId);
     if (focusTab) {
-      const target = pageTabRefs.current[PUZZLE_CATEGORY_IDS.indexOf(nextCategory)];
+      const target = pageTabRefs.current[ENDGAME_CATEGORY_IDS.indexOf(nextCategory)];
       try {
         target?.focus({ preventScroll: true });
       } catch {
@@ -930,17 +921,17 @@ export function PuzzleLibrary({
 
   const movePageFocus = (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
     let nextIndex: number;
-    if (event.key === 'ArrowLeft') nextIndex = (index + PUZZLE_CATEGORY_IDS.length - 1) % PUZZLE_CATEGORY_IDS.length;
-    else if (event.key === 'ArrowRight') nextIndex = (index + 1) % PUZZLE_CATEGORY_IDS.length;
+    if (event.key === 'ArrowLeft') nextIndex = (index + ENDGAME_CATEGORY_IDS.length - 1) % ENDGAME_CATEGORY_IDS.length;
+    else if (event.key === 'ArrowRight') nextIndex = (index + 1) % ENDGAME_CATEGORY_IDS.length;
     else if (event.key === 'Home') nextIndex = 0;
-    else if (event.key === 'End') nextIndex = PUZZLE_CATEGORY_IDS.length - 1;
+    else if (event.key === 'End') nextIndex = ENDGAME_CATEGORY_IDS.length - 1;
     else return;
     event.preventDefault();
-    switchPage(PUZZLE_CATEGORY_IDS[nextIndex]!, true);
+    switchPage(ENDGAME_CATEGORY_IDS[nextIndex]!, true);
   };
 
   const moveLevelFocus = (event: ReactKeyboardEvent<HTMLButtonElement>, localIndex: number) => {
-    const grid = event.currentTarget.closest<HTMLOListElement>('.puzzle-gallery__grid');
+    const grid = event.currentTarget.closest<HTMLOListElement>('.endgame-gallery__grid');
     const renderedColumns = grid
       ? window.getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).filter(Boolean).length
       : 0;
@@ -959,31 +950,31 @@ export function PuzzleLibrary({
     selectLevelAtIndex(pageLevels[nextLocalIndex]!.index - 1, true);
   };
   return (
-    <main id="game" lang={language} className="library-shell library-shell--gallery app-route-surface" data-testid="puzzle-library" tabIndex={-1}>
-      <header className="library-header puzzle-gallery__header">
+    <main id="game" lang={language} className="library-shell library-shell--gallery app-route-surface" data-testid="endgame-library" tabIndex={-1}>
+      <header className="library-header endgame-gallery__header">
         <button className="library-back" type="button" aria-label={copy.labels.leaveRun} onClick={onBack}>
           <b aria-hidden="true">←</b><span>{copy.labels.modeHome}</span>
         </button>
         <Brand compact />
       </header>
-      <section className="puzzle-gallery" aria-labelledby="library-title">
-        <aside className="puzzle-gallery__hero" aria-live="polite" aria-label={copy.phrasing.selectedPuzzle(selectedName)}>
-          <div className="puzzle-gallery__stage" key={selected.id}>
-            <div className="puzzle-gallery__board">
-              <PuzzleSilhouette id={selected.id} label={copy.phrasing.puzzleBoard(selectedName)} />
+      <section className="endgame-gallery" aria-labelledby="library-title">
+        <aside className="endgame-gallery__hero" aria-live="polite" aria-label={copy.phrasing.selectedEndgame(selectedName)}>
+          <div className="endgame-gallery__stage" key={selected.id}>
+            <div className="endgame-gallery__board">
+              <EndgameSilhouette id={selected.id} label={copy.phrasing.endgameBoard(selectedName)} />
             </div>
           </div>
-          <section className="puzzle-gallery__meta">
-            <div className="puzzle-gallery__title-row">
-              <h2 className={`puzzle-gallery__title${selectedComplete ? ' puzzle-gallery__title--complete' : ''}`}>{selectedName}</h2>
-              {selectedBest !== null && <span className="puzzle-gallery__best" data-testid="selected-puzzle-start-best">{copy.phrasing.currentBest(selectedBest)}</span>}
+          <section className="endgame-gallery__meta">
+            <div className="endgame-gallery__title-row">
+              <h2 className={`endgame-gallery__title${selectedComplete ? ' endgame-gallery__title--complete' : ''}`}>{selectedName}</h2>
+              {selectedBest !== null && <span className="endgame-gallery__best" data-testid="selected-endgame-start-best">{copy.phrasing.currentBest(selectedBest)}</span>}
             </div>
-            <button className="primary-action puzzle-gallery__start" type="button" data-testid="start-selected-puzzle" aria-label={copy.phrasing.startPuzzle(selectedName)} disabled={!selectedUnlocked} onClick={onStart}>{copy.labels.start}</button>
+            <button className="primary-action endgame-gallery__start" type="button" data-testid="start-selected-endgame" aria-label={copy.phrasing.startEndgame(selectedName)} disabled={!selectedUnlocked} onClick={onStart}>{copy.labels.start}</button>
             {selectedLesson && selectedLessonCopy && (
               <section
-                className="puzzle-gallery__lesson"
-                data-testid="puzzle-lesson"
-                data-puzzle-technique={selectedLesson.technique}
+                className="endgame-gallery__lesson"
+                data-testid="endgame-lesson"
+                data-endgame-technique={selectedLesson.technique}
                 aria-label={selectedLessonCopy.title}
               >
                 <strong>{selectedLessonCopy.title}</strong>
@@ -992,8 +983,8 @@ export function PuzzleLibrary({
             )}
             {selectedGate && selectedGateLesson && selectedGatePrerequisiteName && (
               <p
-                className={`puzzle-gallery__requirement${selectedGate.unlocked ? ' puzzle-gallery__requirement--met' : ''}`}
-                data-testid="puzzle-mastery-requirement"
+                className={`endgame-gallery__requirement${selectedGate.unlocked ? ' endgame-gallery__requirement--met' : ''}`}
+                data-testid="endgame-mastery-requirement"
               >
                 {copy.phrasing.masteryThreshold(
                   selectedGateLesson.title,
@@ -1005,25 +996,25 @@ export function PuzzleLibrary({
             )}
           </section>
         </aside>
-        <nav className="puzzle-gallery__catalog" aria-label={copy.phrasing.puzzleList(CAMPAIGN_LEVELS.length)} data-testid="level-list">
-          <header className="puzzle-gallery__catalog-header">
-            <h1 id="library-title">{copy.labels.puzzle}</h1>
-            <div className="puzzle-gallery__pages" role="tablist" aria-label={copy.labels.puzzlePages}>
-              {PUZZLE_CATEGORIES.map((category, index) => {
+        <nav className="endgame-gallery__catalog" aria-label={copy.phrasing.endgameList(CAMPAIGN_LEVELS.length)} data-testid="level-list">
+          <header className="endgame-gallery__catalog-header">
+            <h1 id="library-title">{copy.labels.endgame}</h1>
+            <div className="endgame-gallery__pages" role="tablist" aria-label={copy.labels.endgamePages}>
+              {ENDGAME_CATEGORIES.map((category, index) => {
                 const active = categoryId === category.id;
                 const label = category.id === 'intro'
-                  ? copy.labels.puzzleIntro
+                  ? copy.labels.endgameIntro
                   : category.id === 'easy'
-                    ? copy.labels.puzzleEasy
-                    : copy.labels.puzzleHard;
+                    ? copy.labels.endgameEasy
+                    : copy.labels.endgameHard;
                 return (
                   <button
-                    id={`puzzle-page-tab-${category.id}`}
-                    className={`puzzle-gallery__page${active ? ' puzzle-gallery__page--active' : ''}`}
+                    id={`endgame-page-tab-${category.id}`}
+                    className={`endgame-gallery__page${active ? ' endgame-gallery__page--active' : ''}`}
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    aria-controls={`puzzle-page-panel-${category.id}`}
+                    aria-controls={`endgame-page-panel-${category.id}`}
                     tabIndex={active ? 0 : -1}
                     key={category.id}
                     ref={(node) => {
@@ -1039,19 +1030,19 @@ export function PuzzleLibrary({
             </div>
           </header>
           {categoryId === 'hard' && (
-            <section className="puzzle-gallery__mastery" aria-label={copy.labels.mastery}>
+            <section className="endgame-gallery__mastery" aria-label={copy.labels.mastery}>
               <p>{copy.labels.hardUnlockHint}</p>
               <div>
-                {PUZZLE_HARD_MASTERY_GROUPS.map((group) => {
-                  const certificate = puzzleOptimalCertificate(group.prerequisiteId)!;
+                {ENDGAME_HARD_MASTERY_GROUPS.map((group) => {
+                  const certificate = endgameOptimalCertificate(group.prerequisiteId)!;
                   const prerequisite = campaignLevel(group.prerequisiteId);
-                  const prerequisiteName = puzzleDisplayName(language, prerequisite.id, prerequisite.name);
-                  const best = puzzleBestPieceCount(progress, group.prerequisiteId);
-                  const lesson = copy.phrasing.puzzleLesson(group.technique);
+                  const prerequisiteName = endgameDisplayName(language, prerequisite.id, prerequisite.name);
+                  const best = endgameBestPieceCount(progress, group.prerequisiteId);
+                  const lesson = copy.phrasing.endgameLesson(group.technique);
                   const met = best !== null && best <= certificate.masteryOperations;
                   return (
                     <span
-                      className={met ? 'puzzle-gallery__mastery-key--met' : undefined}
+                      className={met ? 'endgame-gallery__mastery-key--met' : undefined}
                       title={copy.phrasing.masteryThreshold(lesson.title, prerequisiteName, certificate.masteryOperations, best)}
                       key={group.prerequisiteId}
                     >
@@ -1064,27 +1055,27 @@ export function PuzzleLibrary({
             </section>
           )}
           <ol
-            id={`puzzle-page-panel-${categoryId}`}
-            className="puzzle-gallery__grid"
+            id={`endgame-page-panel-${categoryId}`}
+            className="endgame-gallery__grid"
             role="tabpanel"
-            aria-labelledby={`puzzle-page-tab-${categoryId}`}
-            aria-label={copy.phrasing.puzzleCategory(
-              categoryId === 'intro' ? copy.labels.puzzleIntro : categoryId === 'easy' ? copy.labels.puzzleEasy : copy.labels.puzzleHard,
+            aria-labelledby={`endgame-page-tab-${categoryId}`}
+            aria-label={copy.phrasing.endgameCategory(
+              categoryId === 'intro' ? copy.labels.endgameIntro : categoryId === 'easy' ? copy.labels.endgameEasy : copy.labels.endgameHard,
               pageLevels.length,
             )}
-            data-puzzle-category={categoryId}
+            data-endgame-category={categoryId}
             key={categoryId}
           >
             {pageLevels.map((level, localIndex) => {
               const complete = progress.completedLevelIds.includes(level.id);
-              const unlocked = isPuzzleUnlocked(progress, level.id);
-              const gate = puzzleMasteryGateStatus(progress, level.id);
-              const hasAnchor = getPuzzleDefinition(level.id).anchorCells.length > 0;
+              const unlocked = isEndgameUnlocked(progress, level.id);
+              const gate = endgameMasteryGateStatus(progress, level.id);
+              const hasAnchor = getEndgameDefinition(level.id).anchorCells.length > 0;
               const selectedLevel = rovingLevelId === level.id;
-              const bestPieces = puzzleBestPieceCount(progress, level.id);
-              const levelName = puzzleDisplayName(language, level.id, level.name);
+              const bestPieces = endgameBestPieceCount(progress, level.id);
+              const levelName = endgameDisplayName(language, level.id, level.name);
               return (
-                <li className={`puzzle-gallery__node${selectedLevel ? ' puzzle-gallery__node--selected' : ''}${complete ? ' puzzle-gallery__node--complete' : ''}${unlocked ? '' : ' puzzle-gallery__node--locked'}`} key={level.id}>
+                <li className={`endgame-gallery__node${selectedLevel ? ' endgame-gallery__node--selected' : ''}${complete ? ' endgame-gallery__node--complete' : ''}${unlocked ? '' : ' endgame-gallery__node--locked'}`} key={level.id}>
                   <button
                     type="button"
                     data-testid="level-row"
@@ -1098,13 +1089,13 @@ export function PuzzleLibrary({
                       if (node) levelButtonRefs.current.set(level.id, node);
                       else levelButtonRefs.current.delete(level.id);
                     }}
-                    aria-label={`${copy.phrasing.levelNode(String(level.index).padStart(2, '0'), levelName, getPuzzleDefinition(level.id).targetRows, complete, unlocked, bestPieces)}${gate && !gate.unlocked ? ` — ${copy.phrasing.masteryThreshold(copy.phrasing.puzzleLesson(gate.group.technique).title, puzzleDisplayName(language, campaignLevel(gate.group.prerequisiteId).id, campaignLevel(gate.group.prerequisiteId).name), gate.requiredOperations, gate.bestOperations)}` : ''}`}
+                    aria-label={`${copy.phrasing.levelNode(String(level.index).padStart(2, '0'), levelName, getEndgameDefinition(level.id).targetRows, complete, unlocked, bestPieces)}${gate && !gate.unlocked ? ` — ${copy.phrasing.masteryThreshold(copy.phrasing.endgameLesson(gate.group.technique).title, endgameDisplayName(language, campaignLevel(gate.group.prerequisiteId).id, campaignLevel(gate.group.prerequisiteId).name), gate.requiredOperations, gate.bestOperations)}` : ''}`}
                     onKeyDown={(event) => moveLevelFocus(event, localIndex)}
                     onClick={() => onSelect(level.id)}
                   >
                     {complete
                       ? <CompletionTick />
-                      : <span className="puzzle-gallery__index">{String(level.index).padStart(2, '0')}</span>}
+                      : <span className="endgame-gallery__index">{String(level.index).padStart(2, '0')}</span>}
                   </button>
                 </li>
               );
@@ -1320,24 +1311,24 @@ function AudioControls({
 
 export function SettingsRecord({
   mode,
-  puzzleId,
+  endgameId,
   leaderboard,
   progress,
   language = DEFAULT_LANGUAGE,
   classicGrade = 'standard',
 }: {
   mode: GameMode;
-  puzzleId: PuzzleId;
+  endgameId: EndgameId;
   leaderboard: Leaderboard;
-  progress: PuzzleProgress;
+  progress: EndgameProgress;
   language?: AppLanguage;
   classicGrade?: ClassicDifficultyGrade;
 }) {
   const copy = appCopy(language);
-  if (mode === 'puzzle') {
-    const bestPieces = puzzleBestPieceCount(progress, puzzleId);
+  if (mode === 'endgame') {
+    const bestPieces = endgameBestPieceCount(progress, endgameId);
     return (
-      <section className="settings-console__record settings-console__record--puzzle" data-testid="settings-record" aria-label={copy.labels.currentRecord}>
+      <section className="settings-console__record settings-console__record--endgame" data-testid="settings-record" aria-label={copy.labels.currentRecord}>
         <span>{copy.labels.currentRecord}</span>
         <strong>{bestPieces === null ? copy.labels.notCompleted : copy.phrasing.minimumMoves(bestPieces)}</strong>
       </section>
@@ -1558,7 +1549,7 @@ function SettingsShortcutGuide({ mode, language }: { mode: GameMode; language: A
         <span><kbd>↑</kbd> {copy.labels.rotate}</span>
         <span><kbd>↓</kbd> {copy.labels.softDrop}</span>
         <span><kbd>Space</kbd> {copy.labels.hardDrop}</span>
-        {mode === 'puzzle' && <span><kbd>Z</kbd> {copy.labels.undo}</span>}
+        {mode === 'endgame' && <span><kbd>Z</kbd> {copy.labels.undo}</span>}
       </div>
       <div className="settings-console__key-group settings-console__key-group--shortcuts" data-testid="keyboard-shortcuts">
         <span className="settings-console__key-group-label">{copy.labels.shortcuts}</span>
@@ -1633,11 +1624,11 @@ export function RunStats({ state, language = DEFAULT_LANGUAGE }: { state: GameSt
       </section>
     );
   }
-  if (state.mode === 'puzzle') {
+  if (state.mode === 'endgame') {
     return (
-      <section className="run-stats run-stats--puzzle" data-testid="stats" aria-label={`${modeLabel}${language === 'en' ? ' ' : ''}${copy.labels.modeData}`}>
-        <article data-stat-role="puzzle-targets"><span>{copy.labels.originalBlocks}</span><RunStatValue>{`${state.puzzleTargetCells.length}/${state.puzzleInitialTargetCount}`}</RunStatValue></article>
-        <article data-stat-role="puzzle-placed"><span>{copy.labels.placed}</span><RunStatValue>{state.pieceCount}</RunStatValue></article>
+      <section className="run-stats run-stats--endgame" data-testid="stats" aria-label={`${modeLabel}${language === 'en' ? ' ' : ''}${copy.labels.modeData}`}>
+        <article data-stat-role="endgame-targets"><span>{copy.labels.originalBlocks}</span><RunStatValue>{`${state.endgameTargetCells.length}/${state.endgameInitialTargetCount}`}</RunStatValue></article>
+        <article data-stat-role="endgame-placed"><span>{copy.labels.placed}</span><RunStatValue>{state.pieceCount}</RunStatValue></article>
       </section>
     );
   }
@@ -1747,7 +1738,7 @@ export function eventMessage(event: GameEvent, language: AppLanguage = DEFAULT_L
   if (event.type === 'bedrock-lowered') return copy.phrasing.eventBedrockLowered(event.height);
   if (event.type === 'paused') return copy.labels.pausedMessage;
   if (event.type === 'resumed') return copy.labels.resumedMessage;
-  if (event.type === 'puzzle-undone') return copy.labels.undoMessage;
+  if (event.type === 'endgame-undone') return copy.labels.undoMessage;
   if (event.type === 'mutation-activated') {
     // The board explosion is the primary Bomb explanation; the live region stays terse.
     if (event.item === 'bomb') return itemLabel(language, 'bomb');
@@ -1791,11 +1782,11 @@ declare global {
 
 export function GameSession({
   mode,
-  puzzleId,
+  endgameId,
   onExit,
   onCanonicalCompletion,
   leaderboard = emptyLeaderboard(),
-  puzzleProgress = defaultPuzzleProgress(),
+  endgameProgress = defaultEndgameProgress(),
   onRunFinished,
   language = DEFAULT_LANGUAGE,
   onLanguageChange = () => undefined,
@@ -1812,11 +1803,11 @@ export function GameSession({
   onRouteReady = NOOP,
 }: {
   mode: GameMode;
-  puzzleId: PuzzleId;
+  endgameId: EndgameId;
   onExit: (destination: ExitDestination) => void;
   onCanonicalCompletion: (state: GameState) => void;
   leaderboard?: Leaderboard;
-  puzzleProgress?: PuzzleProgress;
+  endgameProgress?: EndgameProgress;
   onRunFinished?: (record: ScoreRecord) => void;
   language?: AppLanguage;
   onLanguageChange?: (language: AppLanguage) => void;
@@ -1830,7 +1821,7 @@ export function GameSession({
   onRouteReady?: (epoch: number, ready?: boolean) => void;
 }) {
   const copy = appCopy(language);
-  const skipsEntryCountdown = mode === 'puzzle';
+  const skipsEntryCountdown = mode === 'endgame';
   const hostRef = useRef<HTMLDivElement>(null);
   const boardGestureRef = useRef<{ id: number; x: number; y: number; at: number } | null>(null);
   const runtimeRef = useRef<GameRuntime | null>(null);
@@ -1847,14 +1838,14 @@ export function GameSession({
   const reducedMotionRef = useRef(reducedMotion);
   const initialClassicGravityRangeRef = useRef(normalizeClassicGravityRange(classicGravityRange));
   const lastRecordedRunRef = useRef<string | null>(null);
-  const puzzleCompletionKeyRef = useRef<string | null>(null);
-  const puzzleProgressRef = useRef(puzzleProgress);
-  const [runSeed] = useState(() => mode === 'puzzle' ? APP_SEED : randomRunSeed());
+  const endgameCompletionKeyRef = useRef<string | null>(null);
+  const endgameProgressRef = useRef(endgameProgress);
+  const [runSeed] = useState(() => mode === 'endgame' ? APP_SEED : randomRunSeed());
   const [runtime, setRuntime] = useState<GameRuntime | null>(null);
   const [state, setState] = useState<GameState>(() => createInitialState(
     runSeed,
     mode,
-    mode === 'puzzle' ? puzzleId : undefined,
+    mode === 'endgame' ? endgameId : undefined,
     initialClassicGravityRangeRef.current.startingTicks,
     initialClassicGravityRangeRef.current.floorTicks,
   ));
@@ -1868,8 +1859,8 @@ export function GameSession({
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [audioVolume, setAudioVolume] = useState(1);
   const [resultRecord, setResultRecord] = useState<ScoreRecord | null>(null);
-  const [puzzleCelebration, setPuzzleCelebration] = useState<PuzzleCelebration | null>(null);
-  puzzleProgressRef.current = puzzleProgress;
+  const [endgameCelebration, setEndgameCelebration] = useState<EndgameCelebration | null>(null);
+  endgameProgressRef.current = endgameProgress;
   reducedMotionRef.current = reducedMotion;
 
   const changeAudioEnabled = useCallback((enabled: boolean) => {
@@ -1941,7 +1932,7 @@ export function GameSession({
     const nextRuntime = new GameRuntime({
       seed: runSeed,
       mode,
-      puzzleId: mode === 'puzzle' ? puzzleId : undefined,
+      endgameId: mode === 'endgame' ? endgameId : undefined,
       inputEnabled: skipsEntryCountdown,
       reducedMotion: reducedMotionRef.current,
       visualTheme,
@@ -1955,9 +1946,9 @@ export function GameSession({
         setState(nextState);
         if (nextState.status === 'ready') {
           lastRecordedRunRef.current = null;
-          puzzleCompletionKeyRef.current = null;
+          endgameCompletionKeyRef.current = null;
           setResultRecord(null);
-          setPuzzleCelebration(null);
+          setEndgameCelebration(null);
         }
         const recordableRun = (nextState.mode === 'marathon' || nextState.mode === 'race' || nextState.mode === 'sprint')
           && nextState.status === 'game-over';
@@ -1974,14 +1965,14 @@ export function GameSession({
         }
         const announcement = eventMessages(events, languageRef.current);
         if (announcement) setLiveMessage(announcement);
-        if (nextState.mode === 'puzzle' && nextState.puzzleCompletion === 'finished') {
-          const completedId = nextState.completedLevelId ?? nextState.puzzleId ?? puzzleId;
+        if (nextState.mode === 'endgame' && nextState.endgameCompletion === 'finished') {
+          const completedId = nextState.completedLevelId ?? nextState.endgameId ?? endgameId;
           const completionKey = `${nextState.seed}:${completedId}:${nextState.pieceCount}:${nextState.lines}`;
-          if (puzzleCompletionKeyRef.current !== completionKey) {
-            const previousBest = puzzleBestPieceCount(puzzleProgressRef.current, completedId);
-            puzzleCompletionKeyRef.current = completionKey;
-            setPuzzleCelebration({
-              outcome: puzzleCelebrationOutcome(previousBest, nextState.pieceCount),
+          if (endgameCompletionKeyRef.current !== completionKey) {
+            const previousBest = endgameBestPieceCount(endgameProgressRef.current, completedId);
+            endgameCompletionKeyRef.current = completionKey;
+            setEndgameCelebration({
+              outcome: endgameCelebrationOutcome(previousBest, nextState.pieceCount),
               pieces: nextState.pieceCount,
               lines: nextState.lines,
               previousBest,
@@ -2019,7 +2010,7 @@ export function GameSession({
       nextRuntime.destroy();
       if (runtimeRef.current === nextRuntime) runtimeRef.current = null;
     };
-  }, [focusBoard, mode, onCanonicalCompletion, onRouteReady, onRunFinished, puzzleId, routeEpoch, runSeed, skipsEntryCountdown]);
+  }, [focusBoard, mode, onCanonicalCompletion, onRouteReady, onRunFinished, endgameId, routeEpoch, runSeed, skipsEntryCountdown]);
 
   useEffect(() => {
     runtime?.setReducedMotion(reducedMotion);
@@ -2150,11 +2141,11 @@ export function GameSession({
         status: current.status,
         countdown: countdownDigit,
         phase: current.phase,
-        puzzleId: current.puzzleId,
-        puzzleCompletion: current.puzzleCompletion,
-        puzzleTargetsRemaining: current.puzzleTargetCells.length,
-        puzzleTargetsInitial: current.puzzleInitialTargetCount,
-        puzzleUndoDepth: current.mode === 'puzzle' ? current.puzzleUndoHistory.length : 0,
+        endgameId: current.endgameId,
+        endgameCompletion: current.endgameCompletion,
+        endgameTargetsRemaining: current.endgameTargetCells.length,
+        endgameTargetsInitial: current.endgameInitialTargetCount,
+        endgameUndoDepth: current.mode === 'endgame' ? current.endgameUndoHistory.length : 0,
         mutation: current.mode === 'sprint' ? {
           activeCarrier: current.mutationActiveCarrier?.item ?? null,
           lockedCarriers: current.mutationCarriers.length,
@@ -2179,7 +2170,7 @@ export function GameSession({
         placedPieces: current.pieceCount,
         active: current.active ? { type: current.active.type, x: current.active.x, y: current.active.y, rotation: current.active.rotation } : null,
         next: current.queue[0] ?? null,
-        nextPreviews: current.mode === 'puzzle' ? current.queue.slice(0, 2) : current.queue.slice(0, 1),
+        nextPreviews: current.mode === 'endgame' ? current.queue.slice(0, 2) : current.queue.slice(0, 1),
         visibleBoard: current.board.slice(-20).map((row) => row.map((cell) => cell ?? '.').join('')),
       });
     };
@@ -2300,11 +2291,11 @@ export function GameSession({
     if (returnsToPlaying) focusBoard();
   }, [focusBoard, runtime]);
 
-  const requestPuzzleUndo = useCallback(() => {
-    if (!runtime || countdownDigit !== null || state.mode !== 'puzzle' || exitOpen || restartConfirmOpen || settingsOpen) return;
+  const requestEndgameUndo = useCallback(() => {
+    if (!runtime || countdownDigit !== null || state.mode !== 'endgame' || exitOpen || restartConfirmOpen || settingsOpen) return;
     const runtimeState = runtime.getState();
-    if (runtimeState.status !== 'playing' || runtimeState.puzzleUndoHistory.length === 0) return;
-    runtime?.undoPuzzle();
+    if (runtimeState.status !== 'playing' || runtimeState.endgameUndoHistory.length === 0) return;
+    runtime?.undoEndgame();
     focusBoard();
   }, [countdownDigit, exitOpen, focusBoard, restartConfirmOpen, runtime, settingsOpen, state.mode]);
 
@@ -2380,15 +2371,15 @@ export function GameSession({
   }, [countdownDigit, entryCoverExiting, runtime]);
 
   useEffect(() => {
-    const handlePuzzleUndoShortcut = (event: Event) => {
+    const handleEndgameUndoShortcut = (event: Event) => {
       const keyboardEvent = event as KeyboardEvent;
       if (keyboardEvent.code !== 'KeyZ' || keyboardEvent.repeat || keyboardEvent.isComposing) return;
-      if (countdownDigit !== null || state.mode !== 'puzzle' || state.status !== 'playing' || exitOpen || restartConfirmOpen || settingsOpen) return;
+      if (countdownDigit !== null || state.mode !== 'endgame' || state.status !== 'playing' || exitOpen || restartConfirmOpen || settingsOpen) return;
       keyboardEvent.preventDefault();
-      requestPuzzleUndo();
+      requestEndgameUndo();
     };
-    return browserPlatform.listenWindow('keydown', handlePuzzleUndoShortcut);
-  }, [countdownDigit, exitOpen, requestPuzzleUndo, restartConfirmOpen, settingsOpen, state.mode, state.status]);
+    return browserPlatform.listenWindow('keydown', handleEndgameUndoShortcut);
+  }, [countdownDigit, exitOpen, requestEndgameUndo, restartConfirmOpen, settingsOpen, state.mode, state.status]);
 
   useEffect(() => {
     const handleExitShortcut = (event: Event) => {
@@ -2402,21 +2393,21 @@ export function GameSession({
   }, [exitOpen, requestExit, settingsOpen, state.status]);
 
   const terminal = terminalCopy(state, language);
-  const activePuzzleCelebration = state.mode === 'puzzle' && terminal?.success ? puzzleCelebration : null;
-  const celebrationPresentation = activePuzzleCelebration
-    ? puzzleCelebrationCopy(activePuzzleCelebration, language)
+  const activeEndgameCelebration = state.mode === 'endgame' && terminal?.success ? endgameCelebration : null;
+  const celebrationPresentation = activeEndgameCelebration
+    ? endgameCelebrationCopy(activeEndgameCelebration, language)
     : null;
   const modeLabel = modeCopy(language, state.mode).label;
-  const exitDestination: ExitDestination = state.mode === 'puzzle' ? 'puzzle-library' : 'home';
+  const exitDestination: ExitDestination = state.mode === 'endgame' ? 'endgame-library' : 'home';
   const leaveResult = useCallback(() => onExit(exitDestination), [exitDestination, onExit]);
   const pauseOpen = state.status === 'paused' && !exitOpen && !restartConfirmOpen && !settingsOpen;
   const resultOpen = terminal !== null && !exitOpen && !restartConfirmOpen && !settingsOpen;
-  const storedRecords = state.mode === 'puzzle' ? [] : recordsForMode(leaderboard, state.mode);
+  const storedRecords = state.mode === 'endgame' ? [] : recordsForMode(leaderboard, state.mode);
   const leaderboardRecords = resultRecord && scoreRecordRank(storedRecords, resultRecord) === null
     ? recordsForMode(insertScoreRecord(leaderboard, resultRecord), resultRecord.mode)
     : storedRecords;
-  const resultRank = state.mode === 'puzzle' ? null : scoreRecordRank(leaderboardRecords, resultRecord);
-  const puzzleDoublePreview = state.mode === 'puzzle';
+  const resultRank = state.mode === 'endgame' ? null : scoreRecordRank(leaderboardRecords, resultRecord);
+  const endgameDoublePreview = state.mode === 'endgame';
   const previewPieces = nextPreviewPieces(state);
   const previewMutationItem = state.mode === 'sprint' && previewPieces[0]
     ? nextMutationPreviewItem(state)
@@ -2453,7 +2444,7 @@ export function GameSession({
             event.currentTarget.focus({ preventScroll: true });
             requestExit();
           }}
-          aria-label={state.mode === 'puzzle' ? copy.labels.leavePuzzle : copy.labels.leaveRun}
+          aria-label={state.mode === 'endgame' ? copy.labels.leaveEndgame : copy.labels.leaveRun}
           aria-keyshortcuts="Escape"
         >← {copy.labels.back}</button>
         <div className="play-identity">
@@ -2483,24 +2474,24 @@ export function GameSession({
             data-testid="side-rail"
             aria-label={`${copy.labels.next}${state.mode === 'sprint' ? ` · ${copy.labels.mutationStatus}` : ''}`}
           >
-            <div className={`preview-rail ${puzzleDoublePreview ? 'preview-rail--puzzle' : ''}`}>
+            <div className={`preview-rail ${endgameDoublePreview ? 'preview-rail--endgame' : ''}`}>
               <p className="rail-label"><span>{copy.labels.next}</span></p>
               <div
-                className={`next-slot ${puzzleDoublePreview ? 'next-slot--dual' : ''}`}
+                className={`next-slot ${endgameDoublePreview ? 'next-slot--dual' : ''}`}
                 data-testid="next-slot"
                 data-preview-frameless="true"
-                data-preview-count={puzzleDoublePreview ? 2 : 1}
-                role={puzzleDoublePreview ? undefined : 'img'}
-                aria-label={puzzleDoublePreview
+                data-preview-count={endgameDoublePreview ? 2 : 1}
+                role={endgameDoublePreview ? undefined : 'img'}
+                aria-label={endgameDoublePreview
                   ? `${copy.labels.twoUpcoming}${previewPieces.length ? ` (${previewPieces.join(', ')})` : ''}`
                   : firstPreviewLabel}
               >
-                {puzzleDoublePreview && (
+                {endgameDoublePreview && (
                   <>
-                    <div className="next-slot__segment" data-testid="puzzle-next-segment" data-preview-segment="1" role="img" aria-label={`1 ${firstPreviewLabel}`}>
+                    <div className="next-slot__segment" data-testid="endgame-next-segment" data-preview-segment="1" role="img" aria-label={`1 ${firstPreviewLabel}`}>
                       <span className="next-slot__segment-label" aria-hidden="true"><b>1</b></span>
                     </div>
-                    <div className="next-slot__segment" data-testid="puzzle-next-segment" data-preview-segment="2" role="img" aria-label={`2 ${secondPreviewLabel}`}>
+                    <div className="next-slot__segment" data-testid="endgame-next-segment" data-preview-segment="2" role="img" aria-label={`2 ${secondPreviewLabel}`}>
                       <span className="next-slot__segment-label" aria-hidden="true"><b>2</b></span>
                     </div>
                   </>
@@ -2678,9 +2669,9 @@ export function GameSession({
               <ModeRuleSummary mode={state.mode} language={language} testId="settings-rules" />
               <SettingsRecord
                 mode={state.mode}
-                puzzleId={state.puzzleId ?? puzzleId}
+                endgameId={state.endgameId ?? endgameId}
                 leaderboard={leaderboard}
-                progress={puzzleProgress}
+                progress={endgameProgress}
                 language={language}
                 classicGrade={classicDifficultyGrade(classicGravityRange.startingTicks, classicGravityRange.floorTicks)}
               />
@@ -2697,7 +2688,7 @@ export function GameSession({
         onCancel={cancelExit}
       >
         <button className="primary-action" data-autofocus type="button" onClick={() => onExit(exitDestination)}>
-          {exitDestination === 'puzzle-library' ? copy.labels.leavePuzzle : copy.labels.leaveRun}
+          {exitDestination === 'endgame-library' ? copy.labels.leaveEndgame : copy.labels.leaveRun}
         </button>
         <button className="secondary-action" type="button" onClick={cancelExit}>{copy.labels.stay}</button>
       </ActionSheet>
@@ -2707,15 +2698,15 @@ export function GameSession({
         title={celebrationPresentation?.title ?? terminal?.title ?? copy.labels.resultTitle}
         description={celebrationPresentation?.detail ?? terminal?.detail ?? ''}
         tone={terminal?.success ? 'success' : 'default'}
-        className={activePuzzleCelebration
-          ? 'action-sheet--puzzle-celebration'
-          : state.mode !== 'puzzle'
+        className={activeEndgameCelebration
+          ? 'action-sheet--endgame-celebration'
+          : state.mode !== 'endgame'
             ? `action-sheet--run-result action-sheet--run-result-${state.mode}`
             : undefined}
         onCancel={leaveResult}
       >
-        {activePuzzleCelebration && <PuzzleCelebrationPanel celebration={activePuzzleCelebration} language={language} />}
-        {state.mode !== 'puzzle' && <>
+        {activeEndgameCelebration && <EndgameCelebrationPanel celebration={activeEndgameCelebration} language={language} />}
+        {state.mode !== 'endgame' && <>
           <RunResultSummary state={state} rank={resultRank} hasRecord={resultRecord !== null} language={language} />
           <LeaderboardPanel
             mode={state.mode}
@@ -2725,9 +2716,9 @@ export function GameSession({
             language={language}
           />
         </>}
-        <button className="primary-action" data-autofocus type="button" onClick={restartRun}>{state.mode === 'puzzle' ? copy.labels.replay : copy.labels.playAgain}</button>
+        <button className="primary-action" data-autofocus type="button" onClick={restartRun}>{state.mode === 'endgame' ? copy.labels.replay : copy.labels.playAgain}</button>
         <button className="secondary-action" type="button" onClick={leaveResult}>
-          {exitDestination === 'puzzle-library' ? copy.labels.leavePuzzle : copy.labels.modeHome}
+          {exitDestination === 'endgame-library' ? copy.labels.leaveEndgame : copy.labels.modeHome}
         </button>
       </ActionSheet>
 
@@ -2778,6 +2769,10 @@ function skipAppViewTransition(transition: AppViewTransition | null | undefined)
 
 export default function App() {
   const [navigation, setNavigation] = useState<AppNavigationState>(readAppNavigation);
+  const progressBootstrapRef = useRef<PersistedBootstrap<EndgameProgress> | null>(null);
+  if (progressBootstrapRef.current === null) progressBootstrapRef.current = readEndgameProgress();
+  const introBootstrapRef = useRef<PersistedBootstrap<readonly GameMode[]> | null>(null);
+  if (introBootstrapRef.current === null) introBootstrapRef.current = readModeRuleIntros();
   const navigationRef = useRef(navigation);
   const [routeTransitionMode, setRouteTransitionMode] = useState<RouteTransitionMode>('idle');
   const [routeDirection, setRouteDirection] = useState<RouteTransitionDirection>('neutral');
@@ -2787,14 +2782,15 @@ export default function App() {
   const routeReadyGateRef = useRef<RouteReadyGate | null>(null);
   const routeResetTimerRef = useRef<PlatformTimeout>(null);
   const routeFocusFrameRef = useRef<PlatformFrame>(null);
+  const initialRouteReplacedRef = useRef(false);
   const [language, setLanguage] = useState<AppLanguage>(readLanguage);
   const [visualTheme, setVisualTheme] = useState<VisualThemeId>(readVisualTheme);
   const [classicGravityRange, setClassicGravityRange] = useState(readClassicGravityRange);
-  const { screen, mode, selectedPuzzleId } = navigation;
-  const [progress, setProgress] = useState<PuzzleProgress>(readPuzzleProgress);
+  const { screen, mode, selectedEndgameId } = navigation;
+  const [progress, setProgress] = useState<EndgameProgress>(progressBootstrapRef.current.value);
   const progressRef = useRef(progress);
   const [leaderboard, setLeaderboard] = useState<Leaderboard>(readLeaderboard);
-  const [introducedModes, setIntroducedModes] = useState<readonly GameMode[]>(readModeRuleIntros);
+  const [introducedModes, setIntroducedModes] = useState<readonly GameMode[]>(introBootstrapRef.current.value);
   const [ruleIntroMode, setRuleIntroMode] = useState<GameMode | null>(null);
   const [reducedMotionOverride, setReducedMotionOverride] = useState<ReducedMotionOverride>(readReducedMotionOverride);
   const [systemReducedMotion, setSystemReducedMotion] = useState(
@@ -2861,11 +2857,11 @@ export default function App() {
     routeFocusFrameRef.current = browserPlatform.defer(() => {
       if (routeEpochRef.current !== epoch) return;
       const documentTarget = browserPlatform.documentTarget();
-      const preferred = nextNavigation.screen === 'puzzle-library'
+      const preferred = nextNavigation.screen === 'endgame-library'
         ? documentTarget?.querySelector<HTMLElement>('[data-testid="level-row"][aria-pressed="true"]')
         : documentTarget?.querySelector<HTMLElement>(`[data-testid="enter-${nextNavigation.mode}"]`);
       const landmark = documentTarget?.querySelector<HTMLElement>(
-        nextNavigation.screen === 'puzzle-library' ? '[data-testid="puzzle-library"]' : '[data-testid="mode-home"]',
+        nextNavigation.screen === 'endgame-library' ? '[data-testid="endgame-library"]' : '[data-testid="mode-home"]',
       );
       try {
         (preferred ?? landmark)?.focus({ preventScroll: true });
@@ -2996,16 +2992,36 @@ export default function App() {
   useEffect(() => {
     const windowTarget = browserPlatform.windowTarget();
     if (!windowTarget) return undefined;
-    const initialRoute = appNavigationFromHistory(windowTarget.location.pathname, windowTarget.history.state);
-    if (!initialRoute) navigate(DEFAULT_APP_NAVIGATION, 'replace');
-    else windowTarget.history.replaceState(appHistoryStateFor(initialRoute), '', appPathFor(initialRoute));
+    if (!initialRouteReplacedRef.current) {
+      initialRouteReplacedRef.current = true;
+      const initialRoute = resolveAppNavigation(windowTarget.location.pathname, windowTarget.history.state);
+      if (initialRoute.replacement) {
+        windowTarget.history.replaceState(
+          initialRoute.replacement.state,
+          '',
+          initialRoute.replacement.path,
+        );
+      } else {
+        windowTarget.history.replaceState(
+          appHistoryStateFor(initialRoute.navigation),
+          '',
+          appPathFor(initialRoute.navigation),
+        );
+      }
+    }
 
     return browserPlatform.listenWindow('popstate', (event) => {
       const popEvent = event as PopStateEvent & { hasUAVisualTransition?: boolean };
-      const nextRoute = appNavigationFromHistory(windowTarget.location.pathname, popEvent.state);
+      const nextRoute = resolveAppNavigation(windowTarget.location.pathname, popEvent.state);
       setRuleIntroMode(null);
-      if (nextRoute) navigate(nextRoute, 'pop', popEvent.hasUAVisualTransition === true);
-      else navigate(DEFAULT_APP_NAVIGATION, 'replace');
+      if (nextRoute.replacement) {
+        windowTarget.history.replaceState(
+          nextRoute.replacement.state,
+          '',
+          nextRoute.replacement.path,
+        );
+      }
+      navigate(nextRoute.navigation, 'pop', popEvent.hasUAVisualTransition === true);
     });
   }, [navigate]);
 
@@ -3035,8 +3051,8 @@ export default function App() {
   }, []);
 
   const openMode = useCallback((nextMode: GameMode) => {
-    navigate(navigationForMode(nextMode, selectedPuzzleId));
-  }, [navigate, selectedPuzzleId]);
+    navigate(navigationForMode(nextMode, selectedEndgameId));
+  }, [navigate, selectedEndgameId]);
 
   const enterMode = useCallback((nextMode: GameMode) => {
     if (!introducedModes.includes(nextMode)) {
@@ -3050,27 +3066,29 @@ export default function App() {
     if (ruleIntroMode === null) return;
     const nextIntroduced = introducedModes.includes(ruleIntroMode)
       ? introducedModes
-      : Object.freeze([...introducedModes, ruleIntroMode]);
+      : Object.freeze(MODE_ORDER.filter((mode) => (
+        mode === ruleIntroMode || introducedModes.includes(mode)
+      )));
     setIntroducedModes(nextIntroduced);
-    writeModeRuleIntros(nextIntroduced);
+    writeModeRuleIntros(nextIntroduced, introBootstrapRef.current?.canPersist ?? false);
     openMode(ruleIntroMode);
     setRuleIntroMode(null);
   }, [introducedModes, openMode, ruleIntroMode]);
 
-  const startPuzzle = useCallback(() => {
-    navigate({ screen: 'game', mode: 'puzzle', selectedPuzzleId });
-  }, [navigate, selectedPuzzleId]);
+  const startEndgame = useCallback(() => {
+    navigate({ screen: 'game', mode: 'endgame', selectedEndgameId });
+  }, [navigate, selectedEndgameId]);
 
   const recordCompletion = useCallback((state: GameState) => {
     const current = progressRef.current;
-    const updated = recordCanonicalPuzzleCompletion(current, state, selectedPuzzleId);
+    const updated = recordCanonicalEndgameCompletion(current, state, selectedEndgameId);
     if (updated === current) return;
     // Storage is the first side effect so an immediate modal dismissal or unmount
     // cannot discard a success before React commits the visual update.
-    writePuzzleProgress(updated);
+    writeEndgameProgress(updated, progressBootstrapRef.current?.canPersist ?? false);
     progressRef.current = updated;
     setProgress(updated);
-  }, [selectedPuzzleId]);
+  }, [selectedEndgameId]);
 
   const recordRun = useCallback((record: ScoreRecord) => {
     setLeaderboard((current) => {
@@ -3081,13 +3099,13 @@ export default function App() {
   }, []);
 
   const exitGame = useCallback((destination: ExitDestination) => {
-    navigate(destination === 'puzzle-library'
-      ? { screen: 'puzzle-library', mode: 'puzzle', selectedPuzzleId }
+    navigate(destination === 'endgame-library'
+      ? { screen: 'endgame-library', mode: 'endgame', selectedEndgameId }
       : DEFAULT_APP_NAVIGATION);
-  }, [navigate, selectedPuzzleId]);
+  }, [navigate, selectedEndgameId]);
 
-  const selectPuzzle = useCallback((puzzleId: PuzzleId) => {
-    navigate({ ...navigationRef.current, mode: 'puzzle', selectedPuzzleId: puzzleId }, 'replace');
+  const selectEndgame = useCallback((endgameId: EndgameId) => {
+    navigate({ ...navigationRef.current, mode: 'endgame', selectedEndgameId: endgameId }, 'replace');
   }, [navigate]);
 
   return (
@@ -3101,25 +3119,25 @@ export default function App() {
     >
       <div className="app-route-viewport" data-testid="route-viewport" key={appPathFor(navigation)}>
         {screen === 'home' && <ModeHome onEnter={enterMode} language={language} />}
-        {screen === 'puzzle-library' && (
-          <PuzzleLibrary
+        {screen === 'endgame-library' && (
+          <EndgameLibrary
             progress={progress}
-            selectedId={selectedPuzzleId}
-            onSelect={selectPuzzle}
-            onStart={startPuzzle}
+            selectedId={selectedEndgameId}
+            onSelect={selectEndgame}
+            onStart={startEndgame}
             onBack={() => navigate(DEFAULT_APP_NAVIGATION)}
             language={language}
           />
         )}
         {screen === 'game' && (
           <GameSession
-            key={`${mode}:${selectedPuzzleId}`}
+            key={`${mode}:${selectedEndgameId}`}
             mode={mode}
-            puzzleId={selectedPuzzleId}
+            endgameId={selectedEndgameId}
             onExit={exitGame}
             onCanonicalCompletion={recordCompletion}
             leaderboard={leaderboard}
-            puzzleProgress={progress}
+            endgameProgress={progress}
             onRunFinished={recordRun}
             language={language}
             onLanguageChange={changeLanguage}

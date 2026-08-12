@@ -199,7 +199,7 @@ type RendererInternals = {
       material: BoardMaterial;
       rowOrder: number;
       mutationItem: MutationItem | null;
-      puzzleTarget: boolean;
+      endgameTarget: boolean;
     }[];
     elapsed: number;
     duration: number;
@@ -301,7 +301,7 @@ type RendererInternals = {
     layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
     offsetY: number,
   ) => void;
-  drawPuzzleTargetMarkers: (
+  drawEndgameTargetMarkers: (
     graphics: unknown,
     state: GameState,
     layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
@@ -437,7 +437,7 @@ type RendererInternals = {
   drawPreviewPieces: (graphics: unknown, pieces: readonly ('I' | 'O')[], x: number, y: number, width: number, height: number, labelInset?: number) => void;
 };
 
-describe('Puzzle undo presentation reset', () => {
+describe('Endgame undo presentation reset', () => {
   beforeAll(async () => {
     originalCanvasContext = Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype, 'getContext');
     Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
@@ -498,7 +498,7 @@ describe('Puzzle undo presentation reset', () => {
     internals.rotationPulse = 1;
     internals.boardShift = { direction: 'up', elapsed: 12, duration: 180 };
 
-    internals.consumeEvents([{ type: 'puzzle-undone' }]);
+    internals.consumeEvents([{ type: 'endgame-undone' }]);
 
     expect(internals.presentation).toBeNull();
     expect(internals.trail).toBeNull();
@@ -2164,7 +2164,7 @@ describe('Puzzle undo presentation reset', () => {
     });
   });
 
-  it('keeps Puzzle markers and Mutation materials until their matching cells erase', () => {
+  it('keeps Endgame markers and Mutation materials until their matching cells erase', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
@@ -2173,45 +2173,45 @@ describe('Puzzle undo presentation reset', () => {
     const board = createBoard();
     board[top]![4] = 'T';
     board[bottom]![2] = 'T';
-    const puzzle = {
-      ...createInitialState(0x1a16_401, 'puzzle'),
+    const endgame = {
+      ...createInitialState(0x1a16_401, 'endgame'),
       board,
       status: 'playing',
       phase: 'line-clear',
       phaseTicks: 0,
       pendingClearRows: [bottom, top],
-      puzzleTargetCells: [{ x: 4, y: top }, { x: 2, y: bottom }],
+      endgameTargetCells: [{ x: 4, y: top }, { x: 2, y: bottom }],
     } as GameState;
     const markers = createGraphicsRecorder();
-    internals.consumeEvents([{ type: 'clear-started', rows: puzzle.pendingClearRows }], puzzle);
-    const puzzleCue = internals.ordinaryMultiLineClearCues[0]!;
+    internals.consumeEvents([{ type: 'clear-started', rows: endgame.pendingClearRows }], endgame);
+    const endgameCue = internals.ordinaryMultiLineClearCues[0]!;
 
-    internals.drawPuzzleTargetMarkers(markers.graphics, puzzle, layout, 0);
+    internals.drawEndgameTargetMarkers(markers.graphics, endgame, layout, 0);
 
     expect(markers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(4);
-    puzzleCue.elapsed = 80;
+    endgameCue.elapsed = 80;
     const fadingMarkers = createGraphicsRecorder();
-    internals.drawPuzzleTargetMarkers(fadingMarkers.graphics, puzzle, layout, 0);
+    internals.drawEndgameTargetMarkers(fadingMarkers.graphics, endgame, layout, 0);
     expect(fadingMarkers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(4);
     const fadingMarkerAlpha = (fadingMarkers.operations.find((operation) => (
       operation.kind === 'stroke'
     ))?.options as { alpha?: number } | undefined)?.alpha;
     expect(fadingMarkerAlpha).toBeGreaterThan(0);
     expect(fadingMarkerAlpha).toBeLessThan(0.76);
-    puzzleCue.elapsed = 210;
+    endgameCue.elapsed = 210;
     const laterMarkers = createGraphicsRecorder();
-    internals.drawPuzzleTargetMarkers(laterMarkers.graphics, puzzle, layout, 0);
+    internals.drawEndgameTargetMarkers(laterMarkers.graphics, endgame, layout, 0);
     expect(laterMarkers.operations.filter((operation) => operation.kind === 'segment')).toHaveLength(2);
-    puzzleCue.elapsed = LINE_CLEAR_CORE_COMMIT_MS;
+    endgameCue.elapsed = LINE_CLEAR_CORE_COMMIT_MS;
     internals.consumeEvents([{
       type: 'lines-cleared',
-      rows: puzzle.pendingClearRows,
+      rows: endgame.pendingClearRows,
       count: 2,
       score: 200,
-    }], { ...puzzle, phase: 'active', pendingClearRows: [] });
+    }], { ...endgame, phase: 'active', pendingClearRows: [] });
     const committedMarkers = createGraphicsRecorder();
     (internals as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = committedMarkers.graphics;
-    internals.drawEffects({ ...puzzle, phase: 'active', pendingClearRows: [] }, layout);
+    internals.drawEffects({ ...endgame, phase: 'active', pendingClearRows: [] }, layout);
     const committedTargetStroke = committedMarkers.operations.find((operation) => (
       operation.kind === 'stroke'
       && (operation.options as { color?: number } | undefined)?.color === COLORS.target
@@ -2351,7 +2351,7 @@ describe('Puzzle undo presentation reset', () => {
       status: 'playing',
       phase: 'line-clear',
       pendingClearRows: [row],
-      puzzleTargetCells: [{ x: 0, y: row }],
+      endgameTargetCells: [{ x: 0, y: row }],
       mutationCarriers: [{ id: 1, item: 'freeze', cells: [{ x: 0, y: row }] }],
     } as GameState;
     Object.assign(internals as unknown as Record<string, unknown>, {
@@ -2372,7 +2372,7 @@ describe('Puzzle undo presentation reset', () => {
       committed: false,
     });
     expect(cue.cells).toHaveLength(10);
-    expect(cue.cells.find(({ cell }) => cell.x === 0)?.puzzleTarget).toBe(true);
+    expect(cue.cells.find(({ cell }) => cell.x === 0)?.endgameTarget).toBe(true);
     expect(cue.cells.find(({ cell }) => cell.x === 0)?.mutationItem).toBe('freeze');
 
     cue.elapsed = LINE_CLEAR_CORE_COMMIT_MS - 0.1;
@@ -2434,7 +2434,7 @@ describe('Puzzle undo presentation reset', () => {
       phase: 'active',
       pendingClearRows: [],
       mutationCarriers: [],
-      puzzleTargetCells: [],
+      endgameTargetCells: [],
     }, layout);
     expect(tailFaces.operations.some((operation) => (
       operation.kind === 'stroke'
@@ -2446,7 +2446,7 @@ describe('Puzzle undo presentation reset', () => {
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
   });
 
-  it('keeps reduced motion and Puzzle on the same ordered beats without chips or travel', () => {
+  it('keeps reduced motion and Endgame on the same ordered beats without chips or travel', () => {
     const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
     const board = createBoard();
     const rows = Array.from({ length: 4 }, (_, index) => BOARD_HEIGHT - 1 - index);
@@ -2481,18 +2481,18 @@ describe('Puzzle undo presentation reset', () => {
     expect(reducedStart.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
     expect(reducedLater.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
 
-    const puzzleRenderer = new TetrisRendererClass();
-    const puzzle = puzzleRenderer as unknown as RendererInternals;
-    const puzzleState = { ...base, mode: 'puzzle' } as GameState;
-    puzzle.consumeEvents([{ type: 'clear-started', rows }], puzzleState);
-    const puzzleCue = puzzle.ordinaryMultiLineClearCues[0]!;
-    puzzleCue.elapsed = 20;
-    expect(puzzleCue.restrained).toBe(true);
-    const puzzleFrame = createGraphicsRecorder();
-    (puzzle as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = puzzleFrame.graphics;
-    puzzle.drawEffects(puzzleState, layout);
-    expect(puzzleFrame.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
-    expect(puzzleFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(10);
+    const endgameRenderer = new TetrisRendererClass();
+    const endgame = endgameRenderer as unknown as RendererInternals;
+    const endgameState = { ...base, mode: 'endgame' } as GameState;
+    endgame.consumeEvents([{ type: 'clear-started', rows }], endgameState);
+    const endgameCue = endgame.ordinaryMultiLineClearCues[0]!;
+    endgameCue.elapsed = 20;
+    expect(endgameCue.restrained).toBe(true);
+    const endgameFrame = createGraphicsRecorder();
+    (endgame as unknown as { effectGraphics: RecorderGraphics }).effectGraphics = endgameFrame.graphics;
+    endgame.drawEffects(endgameState, layout);
+    expect(endgameFrame.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
+    expect(endgameFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(10);
   });
 
   it('keeps restrained feedback on one continuous track across the unchanged Core commit', () => {
@@ -2513,7 +2513,7 @@ describe('Puzzle undo presentation reset', () => {
 
       for (const variant of [
         { mode: 'marathon' as const, reducedMotion: true },
-        { mode: 'puzzle' as const, reducedMotion: false },
+        { mode: 'endgame' as const, reducedMotion: false },
       ]) {
         const renderer = new TetrisRendererClass();
         renderer.setOptions({ reducedMotion: variant.reducedMotion });
@@ -2646,7 +2646,7 @@ describe('Puzzle undo presentation reset', () => {
     internals.consumeEvents([{ type: 'restarted' }], classic);
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
     internals.consumeEvents([startEvent], classic);
-    internals.consumeEvents([{ type: 'puzzle-undone' }], classic);
+    internals.consumeEvents([{ type: 'endgame-undone' }], classic);
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
     internals.consumeEvents([startEvent], classic);
     renderer.setOptions({ reducedMotion: true });
@@ -2660,7 +2660,7 @@ describe('Puzzle undo presentation reset', () => {
     renderer.setOptions({ modeSwitch: true });
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
     renderer.setOptions({ modeSwitch: false });
-    internals.consumeEvents([startEvent], { ...classic, mode: 'puzzle' });
+    internals.consumeEvents([startEvent], { ...classic, mode: 'endgame' });
     expect(internals.ordinaryMultiLineClearCues[0]?.restrained).toBe(true);
     renderer.destroy();
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);

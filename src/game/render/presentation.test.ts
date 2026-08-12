@@ -340,15 +340,15 @@ describe('presentation interpolation', () => {
     ]);
   });
 
-  it('uses the canonical queue for a two-item Puzzle preview and one-item live previews', () => {
-    const ready = createInitialState(9, 'puzzle', 't3r-shaft-01');
+  it('uses the canonical queue for a two-item Endgame preview and one-item live previews', () => {
+    const ready = createInitialState(9, 'endgame', 't3r-shaft-01');
     const playing = dispatch(ready, { type: 'start' }).state;
-    const puzzleQueueBeforePreview = [...playing.queue];
+    const endgameQueueBeforePreview = [...playing.queue];
 
     expect(nextPreviewPieces(ready)).toEqual([]);
     expect(nextPreviewPieces(playing)).toEqual(playing.queue.slice(0, 2));
     expect(nextPreviewPiece(playing)).toBe(playing.queue[0]);
-    expect(playing.queue).toEqual(puzzleQueueBeforePreview);
+    expect(playing.queue).toEqual(endgameQueueBeforePreview);
 
     const classic = dispatch(createInitialState(9, 'marathon'), { type: 'start' }).state;
     const survival = dispatch(createInitialState(9, 'race'), { type: 'start' }).state;
@@ -358,10 +358,10 @@ describe('presentation interpolation', () => {
     expect(nextPreviewPieces({ ...survival, status: 'paused' })).toEqual(survival.queue.slice(0, 1));
 
     // Level 01's intended opening hard-drop now legitimately finishes the board.
-    // Use the deterministic rotation-teaching level here so the post-lock Puzzle
+    // Use the deterministic rotation-teaching level here so the post-lock Endgame
     // state remains live and continues to exercise the two-item queue preview.
-    const nonFinishingPuzzle = dispatch(createInitialState(5, 'puzzle', 't5r-drift-08'), { type: 'start' }).state;
-    let afterFirstLock = dispatch(nonFinishingPuzzle, { type: 'hard-drop' }).state;
+    const nonFinishingEndgame = dispatch(createInitialState(5, 'endgame', 't5r-drift-08'), { type: 'start' }).state;
+    let afterFirstLock = dispatch(nonFinishingEndgame, { type: 'hard-drop' }).state;
     for (let guard = 0; afterFirstLock.status === 'playing' && (!afterFirstLock.active || afterFirstLock.phase !== 'active') && guard < 64; guard += 1) {
       afterFirstLock = dispatch(afterFirstLock, { type: 'tick' }).state;
     }

@@ -31,7 +31,7 @@ describe('Modern Classic timing and score contract', () => {
     expect(gravityForMode('sprint', 0, 0, 60)).toBe(6);
     expect(gravityForMode('sprint', 0, 0, 10_000)).toBe(6);
     expect(gravityForMode('marathon', 29, 10_000, 10_000)).toBe(CLASSIC_STARTING_GRAVITY_MIN_TICKS);
-    expect(gravityForMode('puzzle', 29, 10_000, 10_000)).toBe(STANDARD_GRAVITY_TICKS);
+    expect(gravityForMode('endgame', 29, 10_000, 10_000)).toBe(STANDARD_GRAVITY_TICKS);
   });
 
   it('soft drop moves one row and scores exactly one point', () => {

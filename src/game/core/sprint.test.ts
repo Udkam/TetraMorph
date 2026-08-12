@@ -295,9 +295,9 @@ describe('异变 mode', () => {
 
   it('keeps the item stream outside every non-Mutation replay and hash domain', () => {
     const cases = [
-      { mode: 'marathon' as const, puzzleId: undefined },
-      { mode: 'race' as const, puzzleId: undefined },
-      { mode: 'puzzle' as const, puzzleId: 't3r-shaft-01' as const },
+      { mode: 'marathon' as const, endgameId: undefined },
+      { mode: 'race' as const, endgameId: undefined },
+      { mode: 'endgame' as const, endgameId: 't3r-shaft-01' as const },
     ];
     const commands = [
       { type: 'start' as const },
@@ -307,7 +307,7 @@ describe('异变 mode', () => {
     ];
 
     for (const fixture of cases) {
-      let baseline = createInitialState(0x6e71, fixture.mode, fixture.puzzleId);
+      let baseline = createInitialState(0x6e71, fixture.mode, fixture.endgameId);
       let isolated = {
         ...baseline,
         mutationRandomizer: createRandomizer(0xdead_beef),

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import t32Changed10File from '../../../docs/workstreams/tetris-t32-puzzle/puzzle-levels-changed-10.json';
+import t32Changed10File from '../../../docs/workstreams/tetris-t37-endgame/fixtures/t32/endgame-levels-changed-10.json';
 import { BEDROCK_CELL, BOARD_WIDTH, INITIAL_SURVIVAL_BEDROCK_ROWS, TICKS_PER_SECOND, stateHash, survivalIntervalSeconds } from '../core';
-import { encodePuzzleRoute } from '../core/puzzleRouteSearch';
-import { replayPuzzleChallenge, replaySurvivalBedrock } from './qaScenario';
+import { encodeEndgameRoute } from '../core/endgameRouteSearch';
+import { replayEndgameChallenge, replaySurvivalBedrock } from './qaScenario';
 
-const phase7PuzzleQaRoute = t32Changed10File.levels
+const phase7EndgameQaRoute = t32Changed10File.levels
   .find(({ id }) => id === 't5r-drift-08')!
   .routes.find(({ id }) => id === 'primary')!
   .commandStream;
@@ -35,21 +35,21 @@ describe('Survival bedrock browser QA replay', () => {
   }, 30_000);
 });
 
-describe('T5 puzzle browser QA replay', () => {
+describe('T5 endgame browser QA replay', () => {
   it('completes the full first challenge through public commands only', () => {
-    const first = replayPuzzleChallenge(0x51a1f00d);
-    const second = replayPuzzleChallenge(0x51a1f00d);
+    const first = replayEndgameChallenge(0x51a1f00d);
+    const second = replayEndgameChallenge(0x51a1f00d);
 
     expect(first.commands[0]).toEqual({ type: 'start' });
     expect(first.commands.some((command) => command.type === 'rotate')).toBe(true);
     expect(first.commands.filter((command) => command.type === 'hard-drop').length).toBeGreaterThan(0);
     expect(first.state.status).toBe('finished');
-    expect(first.state.puzzleId).toBe('t5r-drift-08');
-    expect(first.state.puzzleCompletion).toBe('finished');
+    expect(first.state.endgameId).toBe('t5r-drift-08');
+    expect(first.state.endgameCompletion).toBe('finished');
     expect(first.state.completedLevelId).toBe('t5r-drift-08');
     expect(first.state.nextUnlockedLevelId).toBe('t5r-pulse-14');
-    expect(first.state.puzzleTargetCells).toEqual([]);
-    expect(encodePuzzleRoute(first.commands)).toBe(phase7PuzzleQaRoute);
+    expect(first.state.endgameTargetCells).toEqual([]);
+    expect(encodeEndgameRoute(first.commands)).toBe(phase7EndgameQaRoute);
     expect(first.hash).toBe(second.hash);
     expect(first.commands).toEqual(second.commands);
   });

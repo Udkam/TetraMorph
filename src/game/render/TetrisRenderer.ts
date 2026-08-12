@@ -149,7 +149,7 @@ interface OrdinaryMultiLineClearCueCell {
   material: BoardMaterial;
   rowOrder: number;
   mutationItem: MutationItem | null;
-  puzzleTarget: boolean;
+  endgameTarget: boolean;
 }
 
 interface OrdinaryMultiLineClearCue {
@@ -1087,7 +1087,7 @@ export class TetrisRenderer {
     graphics.clear();
     const entryGraphics = this.survivalEntryGraphics;
     entryGraphics.clear();
-    const restrainedClearGeometry = this.options.reducedMotion || state.mode === 'puzzle';
+    const restrainedClearGeometry = this.options.reducedMotion || state.mode === 'endgame';
     this.survivalEntryMaskGraphics
       .clear()
       .rect(layout.x, layout.y, layout.width, layout.height)
@@ -1231,7 +1231,7 @@ export class TetrisRenderer {
         );
       }
     }
-    this.drawPuzzleTargetMarkers(graphics, state, layout, boardShiftOffsetY);
+    this.drawEndgameTargetMarkers(graphics, state, layout, boardShiftOffsetY);
     this.drawMutationCarrierMaterials(graphics, state, layout, boardShiftOffsetY);
 
     if (this.trail && !this.options.reducedMotion) {
@@ -1365,17 +1365,17 @@ export class TetrisRenderer {
     this.mutationGraphics.alpha = this.options.modeSwitch ? 0.2 : 1;
   }
 
-  private drawPuzzleTargetMarkers(
+  private drawEndgameTargetMarkers(
     graphics: Graphics,
     state: GameState,
     layout: BoardLayout,
     offsetY: number,
   ): void {
-    if (state.mode !== 'puzzle' || state.puzzleTargetCells.length === 0) return;
+    if (state.mode !== 'endgame' || state.endgameTargetCells.length === 0) return;
     const inset = Math.max(2, layout.cell * 0.19);
     const bracket = Math.max(5, layout.cell * 0.36);
     const stroke = Math.max(1, layout.cell * 0.038);
-    for (const cell of state.puzzleTargetCells) {
+    for (const cell of state.endgameTargetCells) {
       if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
       const clearSample = this.ordinaryMultiLineClearSampleForState(state, cell.x, cell.y, true);
       if (clearSample?.complete) continue;
@@ -2393,7 +2393,7 @@ export class TetrisRenderer {
           .filter((segment): segment is PreviewSlot => segment !== null)
         : [];
       const previewSlots = segmentSlots.length ? segmentSlots : [fallbackSlot];
-      // Puzzle has one ordinary Next well, divided into two numbered rows. The DOM
+      // Endgame has one ordinary Next well, divided into two numbered rows. The DOM
       // establishes those row bounds and uses the loaded data-face numerals;
       // Pixi owns the shared well and pieces.
       const segmentedQueue = segmentSlots.length > 1;
@@ -2733,7 +2733,7 @@ export class TetrisRenderer {
   /** A low, continuous highlight follows the same sample as each material body. */
   private drawOrdinaryMultiLineClearCueFaces(graphics: Graphics, layout: BoardLayout): void {
     for (const cue of this.ordinaryMultiLineClearCues) {
-      for (const { cell, material, rowOrder, mutationItem, puzzleTarget } of cue.cells) {
+      for (const { cell, material, rowOrder, mutationItem, endgameTarget } of cue.cells) {
         if (cell.y < VISIBLE_START_ROW || cell.y >= VISIBLE_START_ROW + VISIBLE_HEIGHT) continue;
         const sample = classicLineClearCellSample(
           cue.elapsed,
@@ -2781,7 +2781,7 @@ export class TetrisRenderer {
             .fill({ color: pieceMaterial.innerEdge, alpha: Math.min(0.5, alpha * 1.08) });
         }
 
-        if (cue.committed && puzzleTarget) {
+        if (cue.committed && endgameTarget) {
           const markerInset = Math.max(2, layout.cell * 0.19);
           const markerSize = Math.max(5, layout.cell * 0.36);
           const markerX = layout.x + cell.x * layout.cell + markerInset;
@@ -2835,8 +2835,8 @@ export class TetrisRenderer {
         mutationItemByCell.set(`${cell.x},${cell.y}`, carrier.item);
       }
     }
-    const puzzleTargetCells = new Set(
-      (state.puzzleTargetCells ?? []).map((cell) => `${cell.x},${cell.y}`),
+    const endgameTargetCells = new Set(
+      (state.endgameTargetCells ?? []).map((cell) => `${cell.x},${cell.y}`),
     );
     const cells: OrdinaryMultiLineClearCueCell[] = [];
     for (let rowOrder = 0; rowOrder < orderedRows.length; rowOrder += 1) {
@@ -2849,7 +2849,7 @@ export class TetrisRenderer {
           material,
           rowOrder,
           mutationItem: mutationItemByCell.get(`${x},${row}`) ?? null,
-          puzzleTarget: puzzleTargetCells.has(`${x},${row}`),
+          endgameTarget: endgameTargetCells.has(`${x},${row}`),
         });
       }
     }
@@ -2860,7 +2860,7 @@ export class TetrisRenderer {
       cells,
       elapsed: 0,
       duration: lineClearVisualDurationMs(typedCount),
-      restrained: this.options.reducedMotion || state.mode === 'puzzle',
+      restrained: this.options.reducedMotion || state.mode === 'endgame',
       committed: false,
       fresh: true,
     });
@@ -4221,7 +4221,7 @@ export class TetrisRenderer {
         this.activeMutationCarrierId = null;
         this.clearMutationVisualState();
         this.previousBoard = null;
-      } else if (event.type === 'puzzle-undone') {
+      } else if (event.type === 'endgame-undone') {
         // Undo restores a pre-lock Core snapshot. Any lock, trail, line-impact, or
         // interpolation residue belongs to the discarded timeline and must not
         // linger over the restored board for a frame.

@@ -20,7 +20,7 @@
 }
 
 .game-arena,
-.game-arena:has(.preview-rail--puzzle) {
+.game-arena:has(.preview-rail--endgame) {
   position: relative;
   display: grid;
   grid-template-columns: minmax(218px, 1fr) auto minmax(218px, 1fr);
@@ -192,7 +192,7 @@
 
 .preview-rail,
 .game-left-rail .preview-rail,
-.game-left-rail .preview-rail--puzzle {
+.game-left-rail .preview-rail--endgame {
   display: grid;
   grid-template-rows: auto 112px;
   min-width: 0;
@@ -205,8 +205,8 @@
   box-shadow: none;
 }
 
-.preview-rail--puzzle,
-.game-left-rail .preview-rail--puzzle {
+.preview-rail--endgame,
+.game-left-rail .preview-rail--endgame {
   grid-template-rows: auto 196px;
 }
 
@@ -222,7 +222,7 @@
 }
 
 .next-slot,
-.preview-rail--puzzle .next-slot--dual,
+.preview-rail--endgame .next-slot--dual,
 .game-left-rail .next-slot {
   position: relative;
   width: 100%;
@@ -238,7 +238,7 @@
 
 .next-slot[data-preview-frameless="true"],
 .game-left-rail .next-slot[data-preview-frameless="true"],
-.preview-rail--puzzle .next-slot--dual[data-preview-frameless="true"] {
+.preview-rail--endgame .next-slot--dual[data-preview-frameless="true"] {
   background: transparent !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -254,8 +254,8 @@
   content: none !important;
 }
 
-.preview-rail--puzzle .next-slot--dual,
-.game-left-rail .preview-rail--puzzle .next-slot--dual {
+.preview-rail--endgame .next-slot--dual,
+.game-left-rail .preview-rail--endgame .next-slot--dual {
   display: grid;
   grid-template-rows: repeat(2, minmax(0, 1fr));
   height: 196px;
@@ -276,7 +276,7 @@
   width: 18px;
   height: 18px;
   place-items: center;
-  color: color-mix(in srgb, var(--puzzle) 74%, var(--ink));
+  color: color-mix(in srgb, var(--endgame) 74%, var(--ink));
   transform: translateY(-50%);
 }
 
@@ -289,7 +289,7 @@
 
 .run-stats,
 .run-stats--collapse,
-.run-stats--puzzle,
+.run-stats--endgame,
 .run-stats--mutation {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -304,7 +304,7 @@
 
 .run-stats [data-stat-role],
 .run-stats--collapse [data-stat-role],
-.run-stats--puzzle [data-stat-role],
+.run-stats--endgame [data-stat-role],
 .run-stats--mutation [data-stat-role] {
   display: grid;
   grid-column: auto !important;
@@ -518,7 +518,7 @@
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden;
-  background: color-mix(in srgb, var(--mutation-primary, var(--puzzle)) 38%, transparent) !important;
+  background: color-mix(in srgb, var(--mutation-primary, var(--endgame)) 38%, transparent) !important;
   border: 0 !important;
   border-left: 0 !important;
   border-radius: 0 !important;
@@ -534,10 +534,10 @@
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
-  background: var(--mutation-primary, var(--puzzle)) !important;
+  background: var(--mutation-primary, var(--endgame)) !important;
   border: 0 !important;
   border-radius: 0 !important;
-  box-shadow: 0 0 9px color-mix(in srgb, var(--mutation-primary, var(--puzzle)) 76%, transparent) !important;
+  box-shadow: 0 0 9px color-mix(in srgb, var(--mutation-primary, var(--endgame)) 76%, transparent) !important;
 }
 
 /* Gameplay sheets interrupt the board at its visual center. Next stays rendered
@@ -572,7 +572,7 @@
   }
 
   .game-arena,
-  .game-arena:has(.preview-rail--puzzle) {
+  .game-arena:has(.preview-rail--endgame) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: clamp(118px, 20vh, 166px) minmax(0, 1fr);
     align-items: stretch;
@@ -611,15 +611,15 @@
 
   .preview-rail,
   .game-left-rail .preview-rail,
-  .game-left-rail .preview-rail--puzzle {
+  .game-left-rail .preview-rail--endgame {
     grid-template-rows: 16px minmax(0, 1fr);
     height: 100%;
   }
 
   .next-slot,
   .game-left-rail .next-slot,
-  .preview-rail--puzzle .next-slot--dual,
-  .game-left-rail .preview-rail--puzzle .next-slot--dual {
+  .preview-rail--endgame .next-slot--dual,
+  .game-left-rail .preview-rail--endgame .next-slot--dual {
     height: 100%;
   }
 
@@ -630,7 +630,7 @@
 
   .run-stats,
   .run-stats--collapse,
-  .run-stats--puzzle,
+  .run-stats--endgame,
   .run-stats--mutation {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-content: start;
@@ -659,7 +659,7 @@
   }
 
   .game-arena,
-  .game-arena:has(.preview-rail--puzzle) {
+  .game-arena:has(.preview-rail--endgame) {
     grid-template-columns: minmax(118px, 1fr) auto minmax(118px, 1fr);
     gap: 14px;
     padding: 3px 8px;
@@ -676,13 +676,13 @@
   .game-left-rail .preview-rail { grid-template-rows: auto 92px; }
   .next-slot,
   .game-left-rail .next-slot { height: 92px; }
-  .preview-rail--puzzle,
-  .game-left-rail .preview-rail--puzzle { grid-template-rows: auto 118px; }
-  .preview-rail--puzzle .next-slot--dual,
-  .game-left-rail .preview-rail--puzzle .next-slot--dual { height: 118px; }
+  .preview-rail--endgame,
+  .game-left-rail .preview-rail--endgame { grid-template-rows: auto 118px; }
+  .preview-rail--endgame .next-slot--dual,
+  .game-left-rail .preview-rail--endgame .next-slot--dual { height: 118px; }
   .run-stats,
   .run-stats--collapse,
-  .run-stats--puzzle,
+  .run-stats--endgame,
   .run-stats--mutation { gap: 8px; }
   .run-stats strong,
   .run-stats [data-stat-role="fall-cadence"] strong { font-size: 18px; }

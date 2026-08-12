@@ -10,7 +10,7 @@ import {
   type GameEvent,
   type GameMode,
   type GameState,
-  type PuzzleId,
+  type EndgameId,
 } from '../core';
 import { InputController, type InputAction } from '../input/InputController';
 import {
@@ -26,7 +26,7 @@ const MAX_STEPS_PER_FRAME = 5;
 const UI_SYNC_INTERVAL_MS = 100;
 let runtimeSeedNonce = 0;
 
-/** A non-zero presentation/runtime seed for an ordinary new run. Puzzle replaces it with its authored seed. */
+/** A non-zero presentation/runtime seed for an ordinary new run. Endgame replaces it with its authored seed. */
 export function randomRunSeed(): number {
   const cryptographic = globalThis.crypto;
   if (cryptographic?.getRandomValues) {
@@ -41,7 +41,7 @@ export function randomRunSeed(): number {
 export interface RuntimeOptions {
   seed?: number;
   mode?: GameMode;
-  puzzleId?: PuzzleId;
+  endgameId?: EndgameId;
   inputEnabled?: boolean;
   reducedMotion?: boolean;
   visualTheme?: VisualThemeId;
@@ -60,7 +60,7 @@ export interface RuntimeQaSurface {
   captureBoardPng: () => RendererBoardCapture;
   start: () => void;
   selectMode: (mode: GameMode) => void;
-  selectPuzzle: (puzzleId: PuzzleId) => void;
+  selectEndgame: (endgameId: EndgameId) => void;
   restart: () => void;
   action: (action: InputAction) => void;
   release: (action: InputAction) => void;
@@ -108,7 +108,7 @@ export class GameRuntime {
     this.state = createInitialState(
       options.seed,
       options.mode,
-      options.puzzleId,
+      options.endgameId,
       this.nextClassicStartingGravityTicks,
       this.nextClassicGravityFloorTicks,
     );
@@ -145,7 +145,7 @@ export class GameRuntime {
         captureBoardPng: () => this.renderer.captureBoardPng(),
         start: () => this.start(),
         selectMode: (mode) => this.selectMode(mode),
-        selectPuzzle: (puzzleId) => this.selectPuzzle(puzzleId),
+        selectEndgame: (endgameId) => this.selectEndgame(endgameId),
         restart: () => this.restart(),
         action: (action) => this.handleAction(action, false),
         release: (action) => this.input?.release(action),
@@ -188,22 +188,22 @@ export class GameRuntime {
     this.input?.clearHeld();
   }
 
-  /** Puzzle-only undo entrypoint for the touch-safe game control. */
-  undoPuzzle(): void {
+  /** Endgame-only undo entrypoint for the touch-safe game control. */
+  undoEndgame(): void {
     if (!this.inputEnabled) return;
     void this.audio.prime();
     this.input?.clearHeld();
     this.apply({ type: 'undo' });
   }
 
-  restart(seed?: number, mode = this.state.mode, puzzleId = this.state.puzzleId ?? undefined): void {
+  restart(seed?: number, mode = this.state.mode, endgameId = this.state.endgameId ?? undefined): void {
     if (!this.inputEnabled) return;
     void this.audio.prime();
     this.apply({
       type: 'restart',
-      seed: mode === 'puzzle' ? this.state.seed : seed ?? randomRunSeed(),
+      seed: mode === 'endgame' ? this.state.seed : seed ?? randomRunSeed(),
       mode,
-      puzzleId,
+      endgameId,
       classicStartingGravityTicks: this.nextClassicStartingGravityTicks,
       classicGravityFloorTicks: this.nextClassicGravityFloorTicks,
     });
@@ -215,7 +215,7 @@ export class GameRuntime {
     if (this.state.status !== 'ready' && this.state.status !== 'game-over' && this.state.status !== 'finished') return;
     this.apply({
       type: 'restart',
-      seed: mode === 'puzzle' ? this.state.seed : randomRunSeed(),
+      seed: mode === 'endgame' ? this.state.seed : randomRunSeed(),
       mode,
       classicStartingGravityTicks: this.nextClassicStartingGravityTicks,
       classicGravityFloorTicks: this.nextClassicGravityFloorTicks,
@@ -223,15 +223,15 @@ export class GameRuntime {
     this.input?.clearHeld();
   }
 
-  /** Selects a validated authored Puzzle level through the public restart command. */
-  selectPuzzle(puzzleId: PuzzleId): void {
+  /** Selects a validated authored Endgame level through the public restart command. */
+  selectEndgame(endgameId: EndgameId): void {
     if (!this.inputEnabled) return;
     if (this.state.status !== 'ready' && this.state.status !== 'game-over' && this.state.status !== 'finished') return;
     this.apply({
       type: 'restart',
       seed: this.state.seed,
-      mode: 'puzzle',
-      puzzleId,
+      mode: 'endgame',
+      endgameId,
       classicStartingGravityTicks: this.nextClassicStartingGravityTicks,
       classicGravityFloorTicks: this.nextClassicGravityFloorTicks,
     });
@@ -336,7 +336,7 @@ export class GameRuntime {
     this.audio.destroy();
     this.pendingEvents = [];
     this.pendingUiEvents = [];
-    this.state = { ...this.state, puzzleUndoHistory: Object.freeze([]) };
+    this.state = { ...this.state, endgameUndoHistory: Object.freeze([]) };
     const target = this.platform.windowTarget();
     if (target) delete target.__TETRAMORPH_QA__;
   }
@@ -443,7 +443,7 @@ function isImmediateUiEvent(event: GameEvent): boolean {
     || event.type === 'restarted'
     || event.type === 'paused'
     || event.type === 'resumed'
-    || event.type === 'puzzle-undone'
+    || event.type === 'endgame-undone'
     || event.type === 'clear-started'
     || event.type === 'lines-cleared'
     || event.type === 'level-up'

@@ -124,7 +124,7 @@ export function gravityForMode(
 ): number {
   void level;
   void pieceCount;
-  if (mode === 'puzzle') return STANDARD_GRAVITY_TICKS;
+  if (mode === 'endgame') return STANDARD_GRAVITY_TICKS;
   if (mode === 'race') return SURVIVAL_GRAVITY_TICKS;
   if (mode === 'sprint') return MUTATION_GRAVITY_TICKS[mutationSpeedTierForLines(lines)]!;
   return classicGravityTicks(classicStartingGravityTicks, classicGravityFloorTicks, lines);

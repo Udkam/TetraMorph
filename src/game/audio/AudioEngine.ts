@@ -160,9 +160,9 @@ export class AudioEngine {
         }
       } else if (event.type === 'piece-locked' && !includesHardDrop && !hasResolution) {
         this.playAcceptedAction('lock');
-      } else if (event.type === 'puzzle-undone') {
+      } else if (event.type === 'endgame-undone') {
         this.pendingClearCount = null;
-        this.playCandidateCue('puzzle-undo');
+        this.playCandidateCue('endgame-undo');
       } else if (event.type === 'clear-started') {
         const count = event.rows.length;
         this.pendingClearCount = Number.isInteger(count) && count >= 1 && count <= 4

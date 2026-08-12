@@ -28,7 +28,7 @@ describe('TetraMorph Design System v1.0', () => {
       classic: '#31978D',
       survival: '#5878C4',
       mutation: '#C77A35',
-      puzzle: '#8A63B3',
+      endgame: '#8A63B3',
     });
     expect(COLOR_NUMBERS.board).toBe(0x071522);
     expect(hexToColorNumber(COLOR_TOKENS.classic)).toBe(0x31978d);
@@ -83,7 +83,7 @@ describe('TetraMorph Design System v1.0', () => {
       '--classic': COLOR_TOKENS.classic,
       '--race': COLOR_TOKENS.survival,
       '--sprint': COLOR_TOKENS.mutation,
-      '--puzzle': COLOR_TOKENS.puzzle,
+      '--endgame': COLOR_TOKENS.endgame,
     } as const;
 
     for (const [token, value] of Object.entries(cssTokens)) {

@@ -1,5 +1,5 @@
 /* T16 Phase 9 navigation authority.
-   This file loads after tokens and the live-mode layers so the home and Puzzle
+   This file loads after tokens and the live-mode layers so the home and Endgame
    library have one final, removable component contract instead of another legacy
    override appended to styles.css. */
 
@@ -104,7 +104,7 @@
 .mode-gates--workbench .mode-gate--marathon,
 .mode-gates--workbench .mode-gate--race,
 .mode-gates--workbench .mode-gate--sprint,
-.mode-gates--workbench .mode-gate--puzzle {
+.mode-gates--workbench .mode-gate--endgame {
   --gate-accent: var(--classic);
   position: relative;
   display: grid;
@@ -134,7 +134,7 @@
 
 .mode-gates--workbench .mode-gate--race { --gate-accent: var(--race); }
 .mode-gates--workbench .mode-gate--sprint { --gate-accent: var(--sprint); }
-.mode-gates--workbench .mode-gate--puzzle { --gate-accent: var(--puzzle); }
+.mode-gates--workbench .mode-gate--endgame { --gate-accent: var(--endgame); }
 
 /* The historical workbench layer removed the first card's top edge. Restore
    the complete card outline with matching specificity so hover never appears
@@ -254,7 +254,7 @@
   transform: none;
 }
 
-/* Puzzle library: compact specimen bench above one complete functional matrix. */
+/* Endgame library: compact specimen bench above one complete functional matrix. */
 
 .library-shell--console {
   display: grid;
@@ -342,13 +342,13 @@
   box-shadow: inset 0 0 0 1px rgba(117, 177, 195, .12), 0 9px 18px rgba(4, 19, 31, .22);
 }
 
-.console-focus__board .puzzle-silhouette {
+.console-focus__board .endgame-silhouette {
   width: 86%;
   height: 90%;
   overflow: visible;
 }
 
-.console-focus__board .puzzle-silhouette path {
+.console-focus__board .endgame-silhouette path {
   stroke-width: .85px;
   filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .2));
 }
@@ -364,7 +364,7 @@
   padding: clamp(14px, 2vw, 24px);
   color: #17324a;
   background:
-    linear-gradient(108deg, color-mix(in srgb, var(--puzzle) 7%, transparent), transparent 42%),
+    linear-gradient(108deg, color-mix(in srgb, var(--endgame) 7%, transparent), transparent 42%),
     #f8fbfa;
   border-top: 0;
   border-left: 1px solid #bfd1d9;
@@ -646,7 +646,7 @@
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle {
+  .mode-gates--workbench .mode-gate--endgame {
     grid-template-columns: 46px minmax(0, 1fr);
     gap: 10px;
     padding: 12px;
@@ -832,7 +832,7 @@
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle {
+  .mode-gates--workbench .mode-gate--endgame {
     grid-template-columns: 50px minmax(0, 1fr) 34px;
     gap: 9px;
     padding: 10px 12px;

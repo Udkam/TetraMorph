@@ -3,7 +3,7 @@ export * from './constants';
 export * from './engine';
 export * from './mutation';
 export * from './pieces';
-export * from './puzzles';
+export * from './endgames';
 export * from './random';
 export * from './sprint';
 export * from './types';

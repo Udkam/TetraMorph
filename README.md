@@ -1,6 +1,6 @@
 # TetraMorph
 
-A modern mutation-driven falling-block puzzle game built for precise play,
+A modern mutation-driven falling-block game built for precise play,
 readable pressure, and deterministic replay.
 
 ## Features
@@ -10,7 +10,7 @@ readable pressure, and deterministic replay.
   the board.
 - **Mutation Mode** — trigger visible item carriers and adapt to five temporary or
   immediate rule mutations.
-- **Puzzle Campaign** — solve 50 authored boards with fixed queues, undo support, and
+- **Endgame Campaign** — solve 50 authored boards with fixed queues, undo support, and
   a staged learning curve.
 
 ## Technical Highlights
@@ -36,7 +36,7 @@ readable pressure, and deterministic replay.
 | Pause / resume | `P` |
 | Settings | `S` |
 | Restart confirmation | `R` |
-| Puzzle undo | `Z` |
+| Endgame undo | `Z` |
 | Back / close | `Esc` |
 | Select / activate | Arrow keys / `Enter` |
 
@@ -86,9 +86,9 @@ The current release-candidate notes and portfolio capture plan are available in
 
 ![TetraMorph Mutation Bomb impact](docs/evidence/t26/phase-f/mutation-bomb.png)
 
-### Puzzle campaign
+### Endgame campaign
 
-![TetraMorph puzzle campaign](docs/evidence/t26/phase-f/puzzle-campaign.png)
+Canonical Endgame browser evidence will be captured from the final T37 candidate.
 
 ### Settings
 

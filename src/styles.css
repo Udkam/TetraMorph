@@ -21,7 +21,7 @@
   --classic: #357f78;
   --race: #526eb0;
   --sprint: #ad6c37;
-  --puzzle: #80639d;
+  --endgame: #80639d;
   --selection: #a75e71;
   --action: #315f96;
   --hover: #3d70a8;
@@ -279,7 +279,7 @@ kbd,
   grid-row: 3;
 }
 
-.mode-gate--puzzle {
+.mode-gate--endgame {
   grid-column: 2 / 11;
   grid-row: 4;
 }
@@ -313,9 +313,9 @@ kbd,
   border-color: var(--sprint);
 }
 
-.mode-gate--puzzle .mode-gate__glyph {
-  color: var(--puzzle);
-  border-color: var(--puzzle);
+.mode-gate--endgame .mode-gate__glyph {
+  color: var(--endgame);
+  border-color: var(--endgame);
 }
 
 .mode-gate__glyph svg {
@@ -342,9 +342,9 @@ kbd,
   transform: scale(1.04);
 }
 
-.mode-gate--puzzle:hover .mode-gate__glyph svg,
-.mode-gate--puzzle:focus-visible .mode-gate__glyph svg,
-.mode-gate--puzzle.mode-gate--active .mode-gate__glyph svg {
+.mode-gate--endgame:hover .mode-gate__glyph svg,
+.mode-gate--endgame:focus-visible .mode-gate__glyph svg,
+.mode-gate--endgame.mode-gate--active .mode-gate__glyph svg {
   transform: scale(1.04);
 }
 
@@ -436,15 +436,15 @@ kbd,
 .mode-gate__motif--sprint i:nth-child(3) { grid-column: 2; grid-row: 1; }
 .mode-gate__motif--sprint i:nth-child(4) { grid-column: 3; grid-row: 1; }
 
-.mode-gate__motif--puzzle i {
-  background: var(--puzzle);
-  border-color: color-mix(in srgb, var(--puzzle) 70%, var(--ink));
+.mode-gate__motif--endgame i {
+  background: var(--endgame);
+  border-color: color-mix(in srgb, var(--endgame) 70%, var(--ink));
 }
 
-.mode-gate__motif--puzzle i:nth-child(1) { grid-column: 2; grid-row: 1; }
-.mode-gate__motif--puzzle i:nth-child(2) { grid-column: 1; grid-row: 2; }
-.mode-gate__motif--puzzle i:nth-child(3) { grid-column: 2; grid-row: 2; }
-.mode-gate__motif--puzzle i:nth-child(4) { grid-column: 3; grid-row: 2; }
+.mode-gate__motif--endgame i:nth-child(1) { grid-column: 2; grid-row: 1; }
+.mode-gate__motif--endgame i:nth-child(2) { grid-column: 1; grid-row: 2; }
+.mode-gate__motif--endgame i:nth-child(3) { grid-column: 2; grid-row: 2; }
+.mode-gate__motif--endgame i:nth-child(4) { grid-column: 3; grid-row: 2; }
 
 .mode-gate:hover .mode-gate__motif,
 .mode-gate:focus-visible .mode-gate__motif,
@@ -485,7 +485,7 @@ kbd,
   transform: translateX(2px);
 }
 
-/* Puzzle library */
+/* Endgame library */
 
 .library-shell {
   display: grid;
@@ -593,7 +593,7 @@ kbd,
 
 .library-intro__eyebrow,
 .library-catalog__header > div > span {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-size: 12px;
   font-weight: 750;
   letter-spacing: .12em;
@@ -639,9 +639,9 @@ kbd,
   display: block;
   height: 100%;
   min-width: 8px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 72%, white), var(--puzzle));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--endgame) 72%, white), var(--endgame));
   border-radius: inherit;
-  box-shadow: 3px 0 8px color-mix(in srgb, var(--puzzle) 36%, transparent);
+  box-shadow: 3px 0 8px color-mix(in srgb, var(--endgame) 36%, transparent);
   transition: width 220ms var(--ease);
 }
 
@@ -700,7 +700,7 @@ kbd,
   padding: 12px 14px 16px;
   overflow-y: auto;
   list-style: none;
-  scrollbar-color: color-mix(in srgb, var(--puzzle) 50%, var(--line)) transparent;
+  scrollbar-color: color-mix(in srgb, var(--endgame) 50%, var(--line)) transparent;
   scrollbar-gutter: stable;
   gap: 9px;
 }
@@ -719,9 +719,9 @@ kbd,
 
 .level-item--selected {
   background: linear-gradient(130deg, color-mix(in srgb, var(--selected) 78%, white), var(--selected));
-  border-color: color-mix(in srgb, var(--puzzle) 70%, var(--edge));
-  border-left-color: var(--puzzle);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--puzzle) 16%, transparent), 0 7px 16px rgba(40, 66, 92, .08);
+  border-color: color-mix(in srgb, var(--endgame) 70%, var(--edge));
+  border-left-color: var(--endgame);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--endgame) 16%, transparent), 0 7px 16px rgba(40, 66, 92, .08);
 }
 
 .level-item--selected .level-entry__copy strong {
@@ -768,7 +768,7 @@ kbd,
 }
 
 .level-entry--locked .level-entry__number {
-  color: color-mix(in srgb, var(--puzzle) 46%, var(--muted));
+  color: color-mix(in srgb, var(--endgame) 46%, var(--muted));
 }
 
 .level-entry--locked .level-entry__copy small {
@@ -783,7 +783,7 @@ kbd,
 
 .level-entry__number,
 .level-detail__count {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-family: var(--font-ui);
   font-size: 14px;
   font-variant-numeric: tabular-nums;
@@ -831,9 +831,9 @@ kbd,
 
 .level-entry__state[data-state="open"],
 .level-detail__status[data-state="open"] {
-  color: var(--puzzle);
-  background: color-mix(in srgb, var(--puzzle) 10%, var(--surface));
-  border-color: color-mix(in srgb, var(--puzzle) 32%, var(--line));
+  color: var(--endgame);
+  background: color-mix(in srgb, var(--endgame) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--endgame) 32%, var(--line));
 }
 
 .level-entry__state[data-state="complete"],
@@ -924,13 +924,13 @@ kbd,
   border-radius: 8px;
 }
 
-.puzzle-silhouette {
+.endgame-silhouette {
   width: 128px;
   height: 160px;
   overflow: visible;
 }
 
-.puzzle-silhouette path {
+.endgame-silhouette path {
   stroke-width: .34;
   vector-effect: non-scaling-stroke;
 }
@@ -1132,8 +1132,8 @@ kbd,
   letter-spacing: -.02em;
 }
 
-.settings-record--puzzle > strong {
-  color: var(--puzzle);
+.settings-record--endgame > strong {
+  color: var(--endgame);
 }
 
 .settings-shortcuts {
@@ -1295,7 +1295,7 @@ kbd,
 
 .game-side-panel {
   position: relative;
-  /* Keep the rail itself below Pixi's canvas-owned wells. The two tiny Puzzle
+  /* Keep the rail itself below Pixi's canvas-owned wells. The two tiny Endgame
      order numerals may then sit above that canvas without turning the rail into
      a competing opaque layer. */
   display: grid;
@@ -1336,29 +1336,29 @@ kbd,
   border: 0;
 }
 
-.run-stats:not(.run-stats--puzzle) [data-stat-role="score"] {
+.run-stats:not(.run-stats--endgame) [data-stat-role="score"] {
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
 
-.run-stats:not(.run-stats--puzzle) [data-stat-role="lines"],
-.run-stats--puzzle [data-stat-role="puzzle-level"],
-.run-stats--puzzle [data-stat-role="puzzle-targets"],
-.run-stats--puzzle [data-stat-role="puzzle-placed"] {
+.run-stats:not(.run-stats--endgame) [data-stat-role="lines"],
+.run-stats--endgame [data-stat-role="endgame-level"],
+.run-stats--endgame [data-stat-role="endgame-targets"],
+.run-stats--endgame [data-stat-role="endgame-placed"] {
   border-bottom: 1px solid var(--line);
 }
 
-.run-stats:not(.run-stats--puzzle) [data-stat-role="classic-combo"],
-.run-stats:not(.run-stats--puzzle) [data-stat-role="survival-bedrock"] {
+.run-stats:not(.run-stats--endgame) [data-stat-role="classic-combo"],
+.run-stats:not(.run-stats--endgame) [data-stat-role="survival-bedrock"] {
   border-right: 1px solid var(--line);
 }
 
-.run-stats--puzzle [data-stat-role="puzzle-level"],
-.run-stats--puzzle [data-stat-role="objective"] {
+.run-stats--endgame [data-stat-role="endgame-level"],
+.run-stats--endgame [data-stat-role="objective"] {
   grid-column: 1 / -1;
 }
 
-.run-stats--puzzle [data-stat-role="puzzle-targets"] {
+.run-stats--endgame [data-stat-role="endgame-targets"] {
   border-right: 1px solid var(--line);
 }
 
@@ -1412,7 +1412,7 @@ kbd,
   animation: pressure-urgent 720ms ease-in-out infinite alternate;
 }
 
-.run-stats--puzzle [data-stat-role="objective"][data-urgent="true"] strong {
+.run-stats--endgame [data-stat-role="objective"][data-urgent="true"] strong {
   color: var(--danger);
   animation: pressure-urgent 720ms ease-in-out infinite alternate;
 }
@@ -1432,10 +1432,10 @@ kbd,
   border-radius: 8px;
 }
 
-.preview-rail--puzzle .rail-label::after {
+.preview-rail--endgame .rail-label::after {
   content: "队列";
   margin-left: 7px;
-  color: var(--puzzle);
+  color: var(--endgame);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: .08em;
@@ -1763,7 +1763,7 @@ kbd,
     border-radius: 8px;
   }
 
-  .level-detail__visual .puzzle-silhouette {
+  .level-detail__visual .endgame-silhouette {
     width: 58px;
     height: 72px;
     padding: 7px;
@@ -1857,7 +1857,7 @@ kbd,
   .mode-gate--marathon { grid-column: 1; grid-row: 1; width: 92%; justify-self: start; }
   .mode-gate--race { grid-column: 1; grid-row: 2; width: 92%; justify-self: center; }
   .mode-gate--sprint { grid-column: 1; grid-row: 3; width: 92%; justify-self: start; }
-  .mode-gate--puzzle { grid-column: 1; grid-row: 4; width: 92%; justify-self: end; }
+  .mode-gate--endgame { grid-column: 1; grid-row: 4; width: 92%; justify-self: end; }
 
   .mode-gate:hover,
   .mode-gate--active {
@@ -1993,7 +1993,7 @@ kbd,
 
   .level-detail__visual,
   .level-detail__board,
-  .level-detail__visual .puzzle-silhouette {
+  .level-detail__visual .endgame-silhouette {
     width: 52px;
     height: 66px;
   }
@@ -2094,8 +2094,8 @@ kbd,
     border: 0 !important;
   }
 
-  .run-stats:not(.run-stats--puzzle) [data-stat-role="score"],
-  .run-stats:not(.run-stats--puzzle) [data-stat-role="lines"] {
+  .run-stats:not(.run-stats--endgame) [data-stat-role="score"],
+  .run-stats:not(.run-stats--endgame) [data-stat-role="lines"] {
     border-right: 1px solid var(--line) !important;
   }
 
@@ -2119,18 +2119,18 @@ kbd,
     box-shadow: none;
   }
 
-  .run-stats--puzzle {
+  .run-stats--endgame {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
   }
 
   /* The goal is a complete instruction, not a compact metric: give it the full
      mobile information width so neither language turns into an ellipsis. */
-  .run-stats--puzzle [data-stat-role="objective"] {
+  .run-stats--endgame [data-stat-role="objective"] {
     grid-column: 1 / -1 !important;
   }
 
-  .run-stats--puzzle [data-stat-role="objective"] strong {
+  .run-stats--endgame [data-stat-role="objective"] strong {
     overflow: visible;
     font-size: 14px;
     line-height: 1.15;
@@ -2138,13 +2138,13 @@ kbd,
     white-space: normal;
   }
 
-  .run-stats--puzzle [data-stat-role="puzzle-level"],
-  .run-stats--puzzle [data-stat-role="puzzle-placed"] {
+  .run-stats--endgame [data-stat-role="endgame-level"],
+  .run-stats--endgame [data-stat-role="endgame-placed"] {
     border-right: 1px solid var(--line) !important;
   }
 
-  .run-stats--puzzle [data-stat-role="puzzle-level"],
-  .run-stats--puzzle [data-stat-role="puzzle-targets"] {
+  .run-stats--endgame [data-stat-role="endgame-level"],
+  .run-stats--endgame [data-stat-role="endgame-targets"] {
     border-bottom: 1px solid var(--line) !important;
   }
 
@@ -2155,7 +2155,7 @@ kbd,
   }
 
   .run-stats strong,
-  .run-stats--puzzle strong {
+  .run-stats--endgame strong {
     font-size: 18px;
     line-height: 1.1;
   }
@@ -2242,7 +2242,7 @@ kbd,
 }
 
 @media (max-width: 365px) {
-  .run-stats--puzzle {
+  .run-stats--endgame {
     grid-template-columns: minmax(0, 40%) minmax(0, 60%);
   }
 
@@ -2389,7 +2389,7 @@ kbd,
     height: 80px;
   }
 
-  .level-detail__visual .puzzle-silhouette {
+  .level-detail__visual .endgame-silhouette {
     width: 50px;
     height: 64px;
   }
@@ -2464,12 +2464,12 @@ kbd,
   .mode-gate--marathon { grid-column: 1; grid-row: 1; }
   .mode-gate--race { grid-column: 2; grid-row: 1; }
   .mode-gate--sprint { grid-column: 3; grid-row: 1; }
-  .mode-gate--puzzle { grid-column: 4; grid-row: 1; }
+  .mode-gate--endgame { grid-column: 4; grid-row: 1; }
 
   .mode-gate--marathon { margin-bottom: 24px; }
   .mode-gate--race { margin-block: 12px; }
   .mode-gate--sprint { margin-block: 12px; }
-  .mode-gate--puzzle { margin-top: 24px; }
+  .mode-gate--endgame { margin-top: 24px; }
 
   .mode-gate__action {
     grid-column: 1 / -1;
@@ -2500,7 +2500,7 @@ kbd,
 
   .mode-gate--race .mode-gate__body span,
   .mode-gate--sprint .mode-gate__body span,
-  .mode-gate--puzzle .mode-gate__body span {
+  .mode-gate--endgame .mode-gate__body span {
     -webkit-line-clamp: 3;
   }
 
@@ -2662,7 +2662,7 @@ kbd,
   }
 }
 
-/* T12.5 — Puzzle campaign atlas. The route seam and terrain planes create a
+/* T12.5 — Endgame campaign atlas. The route seam and terrain planes create a
    navigable archive without turning the catalog into a thumbnail wall. */
 
 .library-shell--atlas {
@@ -2685,7 +2685,7 @@ kbd,
   pointer-events: none;
   opacity: .62;
   background:
-    linear-gradient(104deg, transparent 0 21%, color-mix(in srgb, var(--puzzle) 9%, transparent) 21.1% 21.35%, transparent 21.5% 46%, color-mix(in srgb, var(--action) 8%, transparent) 46.1% 46.3%, transparent 46.5% 100%),
+    linear-gradient(104deg, transparent 0 21%, color-mix(in srgb, var(--endgame) 9%, transparent) 21.1% 21.35%, transparent 21.5% 46%, color-mix(in srgb, var(--action) 8%, transparent) 46.1% 46.3%, transparent 46.5% 100%),
     repeating-linear-gradient(158deg, transparent 0 31px, color-mix(in srgb, var(--edge) 10%, transparent) 32px 33px, transparent 34px 68px);
   border: 1px solid color-mix(in srgb, var(--edge) 18%, transparent);
   border-radius: 24px;
@@ -2698,7 +2698,7 @@ kbd,
 
 .library-shell--atlas .library-header .brand {
   padding: 0 10px;
-  color: color-mix(in srgb, var(--ink) 86%, var(--puzzle));
+  color: color-mix(in srgb, var(--ink) 86%, var(--endgame));
 }
 
 .library-shell--atlas .library-back {
@@ -2712,7 +2712,7 @@ kbd,
 
 .library-shell--atlas .library-back b {
   color: var(--action-ink);
-  background: var(--puzzle);
+  background: var(--endgame);
   border-radius: 5px 9px 5px 9px;
 }
 
@@ -2732,7 +2732,7 @@ kbd,
 }
 
 .library-intro--atlas .library-intro__eyebrow {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-size: 11px;
   letter-spacing: .16em;
 }
@@ -2745,7 +2745,7 @@ kbd,
 .library-intro--atlas .library-intro__gate {
   padding-left: 12px;
   color: color-mix(in srgb, var(--ink) 74%, var(--muted));
-  border-left-color: color-mix(in srgb, var(--puzzle) 42%, var(--line));
+  border-left-color: color-mix(in srgb, var(--endgame) 42%, var(--line));
 }
 
 .library-intro--atlas .library-intro__heading {
@@ -2770,7 +2770,7 @@ kbd,
   margin: 0 0 .1em 12px;
   content: "";
   vertical-align: middle;
-  background: linear-gradient(90deg, var(--puzzle), color-mix(in srgb, var(--puzzle) 26%, transparent));
+  background: linear-gradient(90deg, var(--endgame), color-mix(in srgb, var(--endgame) 26%, transparent));
   clip-path: polygon(0 0, 100% 0, 76% 100%, 0 100%);
 }
 
@@ -2794,7 +2794,7 @@ kbd,
 
 .campaign-meter--atlas > span {
   min-width: 0;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 66%, white), var(--puzzle));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--endgame) 66%, white), var(--endgame));
   border-radius: 1px;
   box-shadow: none;
 }
@@ -2809,9 +2809,9 @@ kbd,
   min-width: 0;
   padding: 10px 12px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--puzzle) 8%, var(--surface)), var(--surface)),
-    repeating-linear-gradient(0deg, transparent 0 5px, color-mix(in srgb, var(--puzzle) 7%, transparent) 5px 6px);
-  border: 1px solid color-mix(in srgb, var(--puzzle) 36%, var(--edge));
+    linear-gradient(135deg, color-mix(in srgb, var(--endgame) 8%, var(--surface)), var(--surface)),
+    repeating-linear-gradient(0deg, transparent 0 5px, color-mix(in srgb, var(--endgame) 7%, transparent) 5px 6px);
+  border: 1px solid color-mix(in srgb, var(--endgame) 36%, var(--edge));
   border-radius: 6px 15px 6px 15px;
   box-shadow: 0 10px 22px rgba(42, 63, 88, .07);
 }
@@ -2821,11 +2821,11 @@ kbd,
   align-content: center;
   gap: 2px;
   padding-right: 10px;
-  border-right: 1px solid color-mix(in srgb, var(--puzzle) 24%, var(--line));
+  border-right: 1px solid color-mix(in srgb, var(--endgame) 24%, var(--line));
 }
 
 .campaign-rule header span {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: .13em;
@@ -2852,7 +2852,7 @@ kbd,
 }
 
 .campaign-rule dt {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-size: 11px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -2887,8 +2887,8 @@ kbd,
   position: relative;
   align-items: end;
   padding: 14px 18px 12px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 10%, transparent), transparent 58%);
-  border-bottom-color: color-mix(in srgb, var(--puzzle) 26%, var(--line));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--endgame) 10%, transparent), transparent 58%);
+  border-bottom-color: color-mix(in srgb, var(--endgame) 26%, var(--line));
 }
 
 .library-catalog--atlas .library-catalog__header::after {
@@ -2898,7 +2898,7 @@ kbd,
   width: 58px;
   height: 3px;
   content: "";
-  background: var(--puzzle);
+  background: var(--endgame);
   clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
 }
 
@@ -2915,10 +2915,10 @@ kbd,
   min-height: 0;
   padding: 14px 16px 18px;
   overflow-y: auto;
-  scrollbar-color: color-mix(in srgb, var(--puzzle) 56%, var(--line)) transparent;
+  scrollbar-color: color-mix(in srgb, var(--endgame) 56%, var(--line)) transparent;
   scrollbar-gutter: stable;
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 4%, transparent), transparent 28%),
+    linear-gradient(90deg, color-mix(in srgb, var(--endgame) 4%, transparent), transparent 28%),
     repeating-linear-gradient(0deg, transparent 0 34px, color-mix(in srgb, var(--edge) 6%, transparent) 35px 36px);
 }
 
@@ -2944,7 +2944,7 @@ kbd,
   left: 13px;
   width: 2px;
   content: "";
-  background: linear-gradient(var(--puzzle), color-mix(in srgb, var(--puzzle) 18%, transparent));
+  background: linear-gradient(var(--endgame), color-mix(in srgb, var(--endgame) 18%, transparent));
 }
 
 .campaign-tier::after {
@@ -2954,7 +2954,7 @@ kbd,
   width: 12px;
   height: 8px;
   content: "";
-  background: var(--puzzle);
+  background: var(--endgame);
   clip-path: polygon(0 0, 100% 0, 72% 100%, 0 100%);
 }
 
@@ -2977,7 +2977,7 @@ kbd,
 }
 
 .campaign-tier__serial {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .08em;
@@ -3028,7 +3028,7 @@ kbd,
   overflow: hidden;
   background: color-mix(in srgb, var(--surface) 92%, white);
   border: 1px solid color-mix(in srgb, var(--line) 72%, white);
-  border-left: 3px solid color-mix(in srgb, var(--puzzle) 42%, var(--line));
+  border-left: 3px solid color-mix(in srgb, var(--endgame) 42%, var(--line));
   border-radius: 4px 9px 4px 9px;
   transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 180ms var(--ease);
 }
@@ -3040,27 +3040,27 @@ kbd,
   left: 0;
   height: 2px;
   content: "";
-  background: linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 62%, transparent), transparent 72%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--endgame) 62%, transparent), transparent 72%);
 }
 
 .atlas-waypoint:hover:not(.atlas-waypoint--locked),
 .atlas-waypoint:focus-within:not(.atlas-waypoint--locked) {
   z-index: 1;
-  border-color: color-mix(in srgb, var(--puzzle) 70%, var(--edge));
+  border-color: color-mix(in srgb, var(--endgame) 70%, var(--edge));
   box-shadow: 0 7px 16px rgba(36, 61, 88, .1);
   transform: translateY(-2px);
 }
 
 .atlas-waypoint--selected {
   background: linear-gradient(128deg, color-mix(in srgb, var(--selected) 82%, white), color-mix(in srgb, var(--surface) 74%, var(--selected)));
-  border-color: var(--puzzle);
+  border-color: var(--endgame);
   border-left-width: 5px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--puzzle) 16%, transparent), 0 8px 17px rgba(52, 59, 102, .12);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--endgame) 16%, transparent), 0 8px 17px rgba(52, 59, 102, .12);
 }
 
 .atlas-waypoint--selected::before {
   height: 3px;
-  background: linear-gradient(90deg, var(--puzzle), color-mix(in srgb, var(--puzzle) 26%, transparent));
+  background: linear-gradient(90deg, var(--endgame), color-mix(in srgb, var(--endgame) 26%, transparent));
 }
 
 .atlas-waypoint--locked {
@@ -3091,15 +3091,15 @@ kbd,
   align-self: stretch;
   display: grid;
   place-items: center;
-  color: var(--puzzle);
+  color: var(--endgame);
   font-size: 13px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  border-right: 1px solid color-mix(in srgb, var(--puzzle) 20%, var(--line));
+  border-right: 1px solid color-mix(in srgb, var(--endgame) 20%, var(--line));
 }
 
 .atlas-waypoint--locked .atlas-level-entry__number {
-  color: color-mix(in srgb, var(--puzzle) 44%, var(--muted));
+  color: color-mix(in srgb, var(--endgame) 44%, var(--muted));
 }
 
 .atlas-level-entry__copy {
@@ -3145,9 +3145,9 @@ kbd,
 
 .atlas-level-entry__state[data-state="open"],
 .level-detail--atlas .level-detail__status[data-state="open"] {
-  color: var(--puzzle);
-  background: color-mix(in srgb, var(--puzzle) 10%, var(--surface));
-  border-color: color-mix(in srgb, var(--puzzle) 34%, var(--line));
+  color: var(--endgame);
+  background: color-mix(in srgb, var(--endgame) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--endgame) 34%, var(--line));
 }
 
 .atlas-level-entry__state[data-state="complete"],
@@ -3231,36 +3231,36 @@ kbd,
   left: calc(100% + 18px);
 }
 
-.run-stats--puzzle [data-stat-role="puzzle-placed"] {
+.run-stats--endgame [data-stat-role="endgame-placed"] {
   border-bottom: 1px solid var(--line);
 }
 
-.run-stats--puzzle [data-stat-role="puzzle-targets"] {
+.run-stats--endgame [data-stat-role="endgame-targets"] {
   border-right: 1px solid var(--line);
 }
 
-.run-stats--puzzle [data-stat-role="objective"] {
+.run-stats--endgame [data-stat-role="objective"] {
   color: var(--ink);
 }
 
-.run-stats--puzzle [data-stat-role="objective"] strong {
+.run-stats--endgame [data-stat-role="objective"] strong {
   font-size: 17px;
   letter-spacing: -.035em;
 }
 
-.touch-deck--puzzle {
+.touch-deck--endgame {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .touch-key--undo {
-  color: var(--puzzle);
-  background: color-mix(in srgb, var(--puzzle) 8%, var(--surface));
+  color: var(--endgame);
+  background: color-mix(in srgb, var(--endgame) 8%, var(--surface));
 }
 
 .touch-key--undo:hover,
 .touch-key--undo:active {
   color: var(--action-ink);
-  background: var(--puzzle);
+  background: var(--endgame);
 }
 
 @media (max-width: 1050px) {
@@ -3324,8 +3324,8 @@ kbd,
     padding: 10px 12px 12px;
     color: var(--ink);
     background:
-      linear-gradient(138deg, color-mix(in srgb, var(--puzzle) 10%, var(--raised)), var(--raised));
-    border-top: 1px solid color-mix(in srgb, var(--puzzle) 28%, var(--line));
+      linear-gradient(138deg, color-mix(in srgb, var(--endgame) 10%, var(--raised)), var(--raised));
+    border-top: 1px solid color-mix(in srgb, var(--endgame) 28%, var(--line));
   }
 
   .level-detail--atlas .level-detail__visual {
@@ -3346,7 +3346,7 @@ kbd,
   }
 
   .level-detail--atlas .level-detail__board,
-  .level-detail--atlas .level-detail__visual .puzzle-silhouette {
+  .level-detail--atlas .level-detail__visual .endgame-silhouette {
     width: 62px;
     height: 78px;
     border: 0;
@@ -3359,7 +3359,7 @@ kbd,
   }
 
   .level-detail--atlas .level-detail__count {
-    color: var(--puzzle);
+    color: var(--endgame);
   }
 
   .level-detail--atlas h2 {
@@ -3391,13 +3391,13 @@ kbd,
     display: none;
   }
 
-  .run-stats--puzzle [data-stat-role="puzzle-level"],
-  .run-stats--puzzle [data-stat-role="puzzle-placed"] {
+  .run-stats--endgame [data-stat-role="endgame-level"],
+  .run-stats--endgame [data-stat-role="endgame-placed"] {
     border-right: 1px solid var(--line) !important;
   }
 
-  .run-stats--puzzle [data-stat-role="puzzle-level"],
-  .run-stats--puzzle [data-stat-role="puzzle-targets"] {
+  .run-stats--endgame [data-stat-role="endgame-level"],
+  .run-stats--endgame [data-stat-role="endgame-targets"] {
     border-bottom: 1px solid var(--line) !important;
   }
 }
@@ -3449,7 +3449,7 @@ kbd,
     gap: 8px;
     padding: 0 0 5px;
     border-right: 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--puzzle) 24%, var(--line));
+    border-bottom: 1px solid color-mix(in srgb, var(--endgame) 24%, var(--line));
   }
 
   .campaign-rule dl {
@@ -3526,12 +3526,12 @@ kbd,
     font-size: 8px;
   }
 
-  .touch-deck--puzzle .touch-key {
+  .touch-deck--endgame .touch-key {
     gap: 1px;
     padding-inline: 1px;
   }
 
-  .touch-deck--puzzle .touch-key small {
+  .touch-deck--endgame .touch-key small {
     font-size: 11px;
   }
 }
@@ -3651,7 +3651,7 @@ kbd,
     height: 76px;
   }
 
-  .level-detail--atlas .level-detail__visual .puzzle-silhouette {
+  .level-detail--atlas .level-detail__visual .endgame-silhouette {
     width: 50px;
     height: 64px;
   }
@@ -3675,7 +3675,7 @@ kbd,
   }
 }
 
-/* T12.6 — Puzzle current observatory. The selected field is the focal object;
+/* T12.6 — Endgame current observatory. The selected field is the focal object;
    the route is sparse navigation, not a wall of repeated text. */
 
 .library-shell--observatory {
@@ -3699,9 +3699,9 @@ kbd,
   pointer-events: none;
   opacity: .62;
   background:
-    linear-gradient(111deg, transparent 0 23%, color-mix(in srgb, var(--puzzle) 8%, transparent) 23.1% 23.24%, transparent 23.38% 100%),
+    linear-gradient(111deg, transparent 0 23%, color-mix(in srgb, var(--endgame) 8%, transparent) 23.1% 23.24%, transparent 23.38% 100%),
     repeating-linear-gradient(0deg, transparent 0 42px, color-mix(in srgb, var(--edge) 7%, transparent) 43px 44px),
-    linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 5%, transparent), transparent 43%);
+    linear-gradient(90deg, color-mix(in srgb, var(--endgame) 5%, transparent), transparent 43%);
   border: 1px solid color-mix(in srgb, var(--edge) 22%, transparent);
   border-radius: 23px;
 }
@@ -3725,14 +3725,14 @@ kbd,
 
 .observatory-header .library-back b {
   color: var(--action-ink);
-  background: var(--puzzle);
+  background: var(--endgame);
   border-radius: 4px 8px 4px 8px;
 }
 
 .observatory-header .brand {
   justify-self: center;
   padding: 0 10px;
-  color: color-mix(in srgb, var(--ink) 88%, var(--puzzle));
+  color: color-mix(in srgb, var(--ink) 88%, var(--endgame));
 }
 
 .observatory-header__open {
@@ -3770,7 +3770,7 @@ kbd,
   padding: 20px 20px 18px;
   overflow: hidden;
   background:
-    linear-gradient(132deg, color-mix(in srgb, var(--puzzle) 7%, transparent), transparent 42%),
+    linear-gradient(132deg, color-mix(in srgb, var(--endgame) 7%, transparent), transparent 42%),
     linear-gradient(145deg, color-mix(in srgb, var(--raised) 87%, white), var(--raised));
   border-right: 1px solid color-mix(in srgb, var(--edge) 50%, var(--line));
 }
@@ -3782,14 +3782,14 @@ kbd,
   left: 36px;
   width: 1px;
   content: "";
-  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--puzzle) 56%, var(--line)) 6%, color-mix(in srgb, var(--puzzle) 26%, var(--line)) 94%, transparent);
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--endgame) 56%, var(--line)) 6%, color-mix(in srgb, var(--endgame) 26%, var(--line)) 94%, transparent);
 }
 
 .observatory-route__heading {
   position: relative;
   z-index: 1;
   padding-bottom: 12px;
-  border-bottom: 1px solid color-mix(in srgb, var(--puzzle) 24%, var(--line));
+  border-bottom: 1px solid color-mix(in srgb, var(--endgame) 24%, var(--line));
 }
 
 .observatory-route__heading h1 {
@@ -3833,7 +3833,7 @@ kbd,
   height: 2px;
   content: "";
   pointer-events: none;
-  background: color-mix(in srgb, var(--puzzle) 46%, var(--line));
+  background: color-mix(in srgb, var(--endgame) 46%, var(--line));
   transform: translateY(-50%);
 }
 
@@ -3877,8 +3877,8 @@ kbd,
 
 .observatory-sector--open button > i,
 .observatory-stop--open button > i {
-  color: var(--puzzle);
-  border-color: color-mix(in srgb, var(--puzzle) 52%, var(--line));
+  color: var(--endgame);
+  border-color: color-mix(in srgb, var(--endgame) 52%, var(--line));
 }
 
 .observatory-sector--complete button > i,
@@ -3889,19 +3889,19 @@ kbd,
 
 .observatory-sector--active::before {
   width: 20px;
-  background: var(--puzzle);
+  background: var(--endgame);
 }
 
 .observatory-sector--active button {
   color: var(--ink);
-  background: linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 14%, transparent), transparent 78%);
-  border-bottom-color: color-mix(in srgb, var(--puzzle) 46%, var(--line));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--endgame) 14%, transparent), transparent 78%);
+  border-bottom-color: color-mix(in srgb, var(--endgame) 46%, var(--line));
 }
 
 .observatory-sector:not(.observatory-sector--locked) button:hover,
 .observatory-sector:not(.observatory-sector--locked) button:focus-visible {
   color: var(--ink);
-  background: color-mix(in srgb, var(--puzzle) 8%, transparent);
+  background: color-mix(in srgb, var(--endgame) 8%, transparent);
   padding-left: 22px;
 }
 
@@ -3911,7 +3911,7 @@ kbd,
 
 .observatory-levels {
   padding-top: 12px;
-  border-top: 1px solid color-mix(in srgb, var(--puzzle) 25%, var(--line));
+  border-top: 1px solid color-mix(in srgb, var(--endgame) 25%, var(--line));
 }
 
 .observatory-levels ol {
@@ -3961,9 +3961,9 @@ kbd,
 
 .observatory-stop--selected button {
   color: var(--ink);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--puzzle) 20%, var(--surface)), color-mix(in srgb, var(--surface) 82%, white));
-  border-color: var(--puzzle);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--puzzle) 16%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--endgame) 20%, var(--surface)), color-mix(in srgb, var(--surface) 82%, white));
+  border-color: var(--endgame);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--endgame) 16%, transparent);
 }
 
 .observatory-stop--selected button::after {
@@ -3973,14 +3973,14 @@ kbd,
   left: 0;
   height: 2px;
   content: "";
-  background: var(--puzzle);
+  background: var(--endgame);
   animation: observatory-route-sweep 720ms var(--ease) both;
 }
 
 .observatory-stop:not(.observatory-stop--locked) button:hover,
 .observatory-stop:not(.observatory-stop--locked) button:focus-visible {
   color: var(--ink);
-  border-color: color-mix(in srgb, var(--puzzle) 60%, var(--edge));
+  border-color: color-mix(in srgb, var(--endgame) 60%, var(--edge));
   transform: translateY(-2px);
 }
 
@@ -4086,7 +4086,7 @@ kbd,
   border-radius: 5px 12px 5px 12px;
 }
 
-.observatory-focus__board .puzzle-silhouette {
+.observatory-focus__board .endgame-silhouette {
   width: min(84%, 236px);
   height: min(86%, 292px);
 }
@@ -4126,8 +4126,8 @@ kbd,
 
 .observatory-focus__status[data-state="open"] {
   color: color-mix(in srgb, var(--selection) 55%, white);
-  background: color-mix(in srgb, var(--puzzle) 24%, transparent);
-  border-color: color-mix(in srgb, var(--puzzle) 58%, transparent);
+  background: color-mix(in srgb, var(--endgame) 24%, transparent);
+  border-color: color-mix(in srgb, var(--endgame) 58%, transparent);
 }
 
 .observatory-focus__status[data-state="complete"] {
@@ -4152,7 +4152,7 @@ kbd,
   grid-column: 2;
   min-height: 52px;
   overflow: hidden;
-  background: linear-gradient(104deg, var(--action), color-mix(in srgb, var(--action) 78%, var(--puzzle)));
+  background: linear-gradient(104deg, var(--action), color-mix(in srgb, var(--action) 78%, var(--endgame)));
   box-shadow: 0 9px 19px rgba(0, 0, 0, .2);
 }
 
@@ -4194,10 +4194,10 @@ kbd,
   margin-left: auto;
   padding-left: 12px;
   text-overflow: ellipsis;
-  border-left: 1px solid color-mix(in srgb, var(--puzzle) 31%, var(--line));
+  border-left: 1px solid color-mix(in srgb, var(--endgame) 31%, var(--line));
 }
 
-.puzzle-silhouette__anchor {
+.endgame-silhouette__anchor {
   stroke-width: .45;
   stroke-dasharray: .72 .36;
 }
@@ -4280,7 +4280,7 @@ kbd,
 
   .observatory-sector button > span { font-size: 11px; }
   .observatory-sector button > i { display: none; }
-  .observatory-sector--active button { border-color: var(--puzzle); }
+  .observatory-sector--active button { border-color: var(--endgame); }
   .observatory-sector:not(.observatory-sector--locked) button:hover,
   .observatory-sector:not(.observatory-sector--locked) button:focus-visible { padding-left: 4px; }
 
@@ -4351,7 +4351,7 @@ kbd,
     height: min(76%, 230px);
   }
 
-  .observatory-focus__board .puzzle-silhouette {
+  .observatory-focus__board .endgame-silhouette {
     width: min(82%, 160px);
     height: min(85%, 204px);
   }
@@ -4423,7 +4423,7 @@ kbd,
   .observatory-focus__well::before { inset: 8px; }
   .observatory-focus__index { top: 6px; right: 10px; font-size: 24px; }
   .observatory-focus__board { width: min(71%, 166px); height: min(75%, 206px); }
-  .observatory-focus__board .puzzle-silhouette { width: min(79%, 130px); height: min(82%, 164px); }
+  .observatory-focus__board .endgame-silhouette { width: min(79%, 130px); height: min(82%, 164px); }
   .observatory-focus__copy h2 { font-size: 24px; }
   .observatory-focus__brief { margin-top: -2px; font-size: 10px; }
   .observatory-focus__start { min-height: 40px; }
@@ -4448,7 +4448,7 @@ kbd,
 .app[data-reduced-motion="true"] .observatory-focus__well::after,
 .app[data-reduced-motion="true"] .observatory-stop--selected button::after,
 .app[data-reduced-motion="true"] .run-stats [data-stat-role="survival-next"][data-urgent="true"] strong,
-.app[data-reduced-motion="true"] .run-stats--puzzle [data-stat-role="objective"][data-urgent="true"] strong {
+.app[data-reduced-motion="true"] .run-stats--endgame [data-stat-role="objective"][data-urgent="true"] strong {
   animation: none;
 }
 
@@ -4565,7 +4565,7 @@ kbd,
 .mode-gates--workbench .mode-gate--marathon,
 .mode-gates--workbench .mode-gate--race,
 .mode-gates--workbench .mode-gate--sprint,
-.mode-gates--workbench .mode-gate--puzzle {
+.mode-gates--workbench .mode-gate--endgame {
   gap: clamp(13px, 2vw, 22px);
   padding: clamp(12px, 1.65vw, 18px) clamp(14px, 2vw, 24px);
   border: 1px solid transparent;
@@ -4643,7 +4643,7 @@ kbd,
 .mode-gates--workbench .mode-gate:focus-visible .mode-gate__action b,
 .mode-gates--workbench .mode-gate--active .mode-gate__action b { transform: none; }
 
-/* A real, enlarged board preview is the only illustrative object in the Puzzle library. */
+/* A real, enlarged board preview is the only illustrative object in the Endgame library. */
 
 .library-shell--console {
   grid-template-rows: 50px minmax(0, 1fr);
@@ -4688,18 +4688,18 @@ kbd,
   box-shadow: inset 0 0 0 1px rgba(8, 26, 42, .72), 0 16px 34px rgba(0, 0, 0, .2);
 }
 
-.console-focus__board .puzzle-silhouette {
+.console-focus__board .endgame-silhouette {
   width: min(84%, 242px);
   height: min(86%, 292px);
   overflow: visible;
 }
 
-.console-focus__board .puzzle-silhouette path {
+.console-focus__board .endgame-silhouette path {
   stroke-width: .7px;
   filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .16));
 }
 
-.console-focus__board .puzzle-silhouette__anchor {
+.console-focus__board .endgame-silhouette__anchor {
   fill: #b99773 !important;
   stroke: #e6c79a !important;
 }
@@ -4848,7 +4848,7 @@ kbd,
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle { gap: 12px; padding: 10px 12px; }
+  .mode-gates--workbench .mode-gate--endgame { gap: 12px; padding: 10px 12px; }
   .mode-gates--workbench .mode-gate__glyph { flex-basis: 42px; width: 42px; height: 42px; }
   .mode-gates--workbench .mode-gate__glyph svg { width: 27px; height: 27px; }
   .mode-gates--workbench .mode-gate__body strong { font-size: 20px; }
@@ -4861,7 +4861,7 @@ kbd,
   .console-focus { grid-template-rows: minmax(0, 1fr) auto; border-right: 0; border-bottom: 1px solid rgba(180, 207, 227, .18); }
   .console-focus__well::before { inset: 14px; }
   .console-focus__board { width: min(54%, 210px); }
-  .console-focus__board .puzzle-silhouette { width: min(86%, 172px); height: min(88%, 216px); }
+  .console-focus__board .endgame-silhouette { width: min(86%, 172px); height: min(88%, 216px); }
   .console-focus__copy { grid-template-columns: minmax(0, 1fr) 112px; gap: 7px 10px; padding: 12px 14px; }
   .console-focus__heading > span { margin-bottom: 4px; font-size: 8px; }
   .console-focus__heading h2 { font-size: 23px; }
@@ -4888,7 +4888,7 @@ kbd,
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle { padding-block: 6px; }
+  .mode-gates--workbench .mode-gate--endgame { padding-block: 6px; }
   .mode-gates--workbench .mode-gate__body strong { font-size: 20px; }
   .mode-gates--workbench .mode-gate__body span { font-size: 10px; line-height: 1.28; }
 
@@ -4896,7 +4896,7 @@ kbd,
   .console-workbench { grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr); }
   .console-focus__well::before { inset: 9px; }
   .console-focus__board { width: min(56%, 164px); }
-  .console-focus__board .puzzle-silhouette { width: min(87%, 142px); height: min(88%, 170px); }
+  .console-focus__board .endgame-silhouette { width: min(87%, 142px); height: min(88%, 170px); }
   .console-focus__copy { grid-template-columns: minmax(0, 1fr) 106px; gap: 5px 9px; padding: 9px 12px; }
   .console-focus__heading h2 { font-size: 20px; }
    .console-focus__copy > p { font-size: 9px; line-height: 1.32; }
@@ -5146,7 +5146,7 @@ kbd,
   letter-spacing: .025em;
 }
 
-.settings-console__keyboard--puzzle .settings-console__key-group--gameplay > span:last-child,
+.settings-console__keyboard--endgame .settings-console__key-group--gameplay > span:last-child,
 .settings-console__key-group--shortcuts > span:last-child {
   grid-column: 1 / -1;
 }
@@ -5178,7 +5178,7 @@ kbd,
 .settings-console > .mode-rule-summary ul,
 .settings-console > .mode-rule-summary--race ul,
 .settings-console > .mode-rule-summary--sprint ul,
-.settings-console > .mode-rule-summary--puzzle ul {
+.settings-console > .mode-rule-summary--endgame ul {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px 16px;
@@ -5215,8 +5215,8 @@ kbd,
   color: var(--sprint);
 }
 
-.settings-console > .mode-rule-summary--puzzle li b {
-  color: var(--puzzle);
+.settings-console > .mode-rule-summary--endgame li b {
+  color: var(--endgame);
 }
 
 .settings-console > .settings-console__record,
@@ -5246,8 +5246,8 @@ kbd,
   text-align: right;
 }
 
-.settings-console__record--puzzle > strong {
-  color: var(--puzzle);
+.settings-console__record--endgame > strong {
+  color: var(--endgame);
 }
 
 .settings-console > .result-leaderboard > header {
@@ -5381,7 +5381,7 @@ kbd,
   .settings-console > .mode-rule-summary--marathon ul,
   .settings-console > .mode-rule-summary--race ul,
   .settings-console > .mode-rule-summary--sprint ul,
-  .settings-console > .mode-rule-summary--puzzle ul {
+  .settings-console > .mode-rule-summary--endgame ul {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -5608,7 +5608,7 @@ kbd,
 
 .app[data-reduced-motion="true"] .game-side-panel--sprint .mutation-status__effect[data-active="true"] { animation: none; }
 
-/* A best-result chip is optional, but the selected Puzzle specimen must never make
+/* A best-result chip is optional, but the selected Endgame specimen must never make
    the preview/copy boundary jump. Reserve the exact status slot in both states. */
 .console-focus__copy {
   min-block-size: 148px;
@@ -5621,7 +5621,7 @@ kbd,
 }
 
 /* T13.14 rail language: instrument labels stay calm while live values carry the
-   rhythm. Puzzle exposes its fixed queue as two named, divided forecast lanes. */
+   rhythm. Endgame exposes its fixed queue as two named, divided forecast lanes. */
 .run-stats [data-stat-role] > span {
   color: #46657a;
   font-family: var(--font-body);
@@ -5640,11 +5640,11 @@ kbd,
   text-shadow: 0 1px 0 rgba(255, 255, 255, .75);
 }
 
-.run-stats--puzzle [data-stat-role] {
+.run-stats--endgame [data-stat-role] {
   min-height: 70px;
 }
 
-.preview-rail--puzzle {
+.preview-rail--endgame {
   gap: 7px;
 }
 
@@ -5698,19 +5698,19 @@ kbd,
   white-space: nowrap;
 }
 
-.preview-rail--puzzle .next-slot {
+.preview-rail--endgame .next-slot {
   height: 112px;
 }
 
 /* T13.13 terminal cascade — one final ownership layer for the selector, settings, and rails.
    It deliberately overrides the earlier experimental selector rules instead of layering a
    second visual language on top of them. */
-.console-focus__board .puzzle-silhouette {
+.console-focus__board .endgame-silhouette {
   overflow: hidden !important;
   isolation: isolate;
 }
 
-.console-focus__board .puzzle-silhouette path {
+.console-focus__board .endgame-silhouette path {
   filter: none !important;
   vector-effect: non-scaling-stroke;
 }
@@ -5943,11 +5943,11 @@ kbd,
 .app[data-reduced-motion="true"] .console-route .console-node > button { transition: none !important; }
 
 /* T13.12 keeps one compact information grammar across the selector, settings, and play rails. */
-.console-focus__board .puzzle-silhouette {
+.console-focus__board .endgame-silhouette {
   overflow: hidden;
 }
 
-.console-focus__board .puzzle-silhouette path {
+.console-focus__board .endgame-silhouette path {
   filter: none;
   vector-effect: non-scaling-stroke;
 }
@@ -6197,7 +6197,7 @@ kbd,
 .mode-gates--workbench .mode-gate--marathon,
 .mode-gates--workbench .mode-gate--race,
 .mode-gates--workbench .mode-gate--sprint,
-.mode-gates--workbench .mode-gate--puzzle { border-top-color: #b4c6d2; }
+.mode-gates--workbench .mode-gate--endgame { border-top-color: #b4c6d2; }
 .mode-gates--workbench .mode-gate:first-child { border-top-color: transparent; }
 .mode-gates--workbench .mode-gate__glyph { flex-basis: 56px; width: 56px; height: 56px; border-radius: 10px; }
 .mode-gates--workbench .mode-gate__glyph svg { width: 38px; height: 38px; }
@@ -6208,8 +6208,8 @@ kbd,
 .console-focus__well { background: radial-gradient(circle at 50% 38%, #24465e 0, #142d43 50%, #0d2032 100%); }
 .console-focus__well::before { border-color: rgba(178, 217, 228, .42); background: rgba(8, 25, 40, .08); }
 .console-focus__board { background: #0b1e30; border-color: rgba(163, 208, 223, .5); box-shadow: inset 0 0 0 1px rgba(130, 190, 208, .14), 0 14px 28px rgba(22, 54, 72, .24); }
-.console-focus__board .puzzle-silhouette path { stroke-width: .85px; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .21)); }
-.console-focus__board .puzzle-silhouette__anchor { fill: #d0a66a !important; stroke: #f1d4a1 !important; }
+.console-focus__board .endgame-silhouette path { stroke-width: .85px; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .21)); }
+.console-focus__board .endgame-silhouette__anchor { fill: #d0a66a !important; stroke: #f1d4a1 !important; }
 .console-focus__copy { color: #17324a; background: #f7faf9; border-top-color: #bfd1d9; }
 .console-focus__heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px 11px; padding-right: 0; }
 .console-focus__heading h2 { color: #17324a; font-weight: 740; }
@@ -6231,7 +6231,7 @@ kbd,
 .console-node--selected button { color: #f8fcfd; background: #34788d; border-color: #276276; box-shadow: 0 8px 18px rgba(28, 79, 97, .22); }
 .console-node--complete button { color: #2f8067; }
 .console-node--complete.console-node--selected button { color: #f8fcfd; }
-.preview-rail--puzzle .rail-label::after { content: none; }
+.preview-rail--endgame .rail-label::after { content: none; }
 
 @media (max-width: 700px) {
   .mode-gates--workbench .mode-gate__glyph { flex-basis: 50px; width: 50px; height: 50px; }
@@ -6247,7 +6247,7 @@ kbd,
 .mode-gates--workbench .mode-gate--marathon,
 .mode-gates--workbench .mode-gate--race,
 .mode-gates--workbench .mode-gate--sprint,
-.mode-gates--workbench .mode-gate--puzzle { border-top-color: #b4c6d2; }
+.mode-gates--workbench .mode-gate--endgame { border-top-color: #b4c6d2; }
 .mode-gates--workbench .mode-gate:first-child { border-top-color: transparent; }
 .mode-gates--workbench .mode-gate__glyph { flex-basis: 56px; width: 56px; height: 56px; border-radius: 10px; }
 .mode-gates--workbench .mode-gate__glyph svg { width: 38px; height: 38px; }
@@ -6258,8 +6258,8 @@ kbd,
 .console-focus__well { background: radial-gradient(circle at 50% 38%, #24465e 0, #142d43 50%, #0d2032 100%); }
 .console-focus__well::before { border-color: rgba(178, 217, 228, .42); background: rgba(8, 25, 40, .08); }
 .console-focus__board { background: #0b1e30; border-color: rgba(163, 208, 223, .5); box-shadow: inset 0 0 0 1px rgba(130, 190, 208, .14), 0 14px 28px rgba(22, 54, 72, .24); }
-.console-focus__board .puzzle-silhouette path { stroke-width: .85px; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .21)); }
-.console-focus__board .puzzle-silhouette__anchor { fill: #d0a66a !important; stroke: #f1d4a1 !important; }
+.console-focus__board .endgame-silhouette path { stroke-width: .85px; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .21)); }
+.console-focus__board .endgame-silhouette__anchor { fill: #d0a66a !important; stroke: #f1d4a1 !important; }
 .console-focus__copy { color: #17324a; background: #f7faf9; border-top-color: #bfd1d9; }
 .console-focus__heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px 11px; padding-right: 0; }
 .console-focus__heading h2 { color: #17324a; font-weight: 740; }
@@ -6280,7 +6280,7 @@ kbd,
 .console-node--selected button { color: #f8fcfd; background: #34788d; border-color: #276276; box-shadow: 0 8px 18px rgba(28, 79, 97, .22); }
 .console-node--complete button { color: #2f8067; }
 .console-node--complete.console-node--selected button { color: #f8fcfd; }
-.preview-rail--puzzle .rail-label::after { content: none; }
+.preview-rail--endgame .rail-label::after { content: none; }
 
 @media (max-width: 700px) {
   .mode-gates--workbench .mode-gate__glyph { flex-basis: 50px; width: 50px; height: 50px; }
@@ -6291,12 +6291,12 @@ kbd,
 
 .app[data-reduced-motion="true"] .console-node--selected button { animation: none !important; }
 
-/* T13.10 — mineral interface: one clear home rhythm and a calm Puzzle workbench. */
+/* T13.10 — mineral interface: one clear home rhythm and a calm Endgame workbench. */
 .mode-gates--workbench .mode-gate,
 .mode-gates--workbench .mode-gate--marathon,
 .mode-gates--workbench .mode-gate--race,
 .mode-gates--workbench .mode-gate--sprint,
-.mode-gates--workbench .mode-gate--puzzle {
+.mode-gates--workbench .mode-gate--endgame {
   border-top-color: #b4c6d2;
 }
 
@@ -6337,12 +6337,12 @@ kbd,
   box-shadow: inset 0 0 0 1px rgba(130, 190, 208, .14), 0 14px 28px rgba(22, 54, 72, .24);
 }
 
-.console-focus__board .puzzle-silhouette path {
+.console-focus__board .endgame-silhouette path {
   stroke-width: .85px;
   filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .21));
 }
 
-.console-focus__board .puzzle-silhouette__anchor {
+.console-focus__board .endgame-silhouette__anchor {
   fill: #d0a66a !important;
   stroke: #f1d4a1 !important;
 }
@@ -6426,7 +6426,7 @@ kbd,
 
 .console-node--complete button { color: #2f8067; }
 .console-node--complete.console-node--selected button { color: #f8fcfd; }
-.preview-rail--puzzle .rail-label::after { content: none; }
+.preview-rail--endgame .rail-label::after { content: none; }
 
 @media (max-width: 700px) {
   .mode-gates--workbench .mode-gate__glyph { flex-basis: 50px; width: 50px; height: 50px; }
@@ -6500,7 +6500,7 @@ kbd,
 
   .run-stats,
   .run-stats--collapse,
-  .run-stats--puzzle {
+  .run-stats--endgame {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 4px;
@@ -6647,7 +6647,7 @@ kbd,
   }
 }
 
-/* T13 — Puzzle relay workshop. The navigation is a single illuminated circuit:
+/* T13 — Endgame relay workshop. The navigation is a single illuminated circuit:
    twenty numbered stations, no thumbnail wall, and one changing endgame field. */
 
 .library-shell--relay {
@@ -6671,9 +6671,9 @@ kbd,
   pointer-events: none;
   opacity: .64;
   background:
-    linear-gradient(115deg, transparent 0 28%, color-mix(in srgb, var(--puzzle) 10%, transparent) 28.1% 28.25%, transparent 28.4% 100%),
+    linear-gradient(115deg, transparent 0 28%, color-mix(in srgb, var(--endgame) 10%, transparent) 28.1% 28.25%, transparent 28.4% 100%),
     repeating-linear-gradient(0deg, transparent 0 56px, color-mix(in srgb, var(--edge) 7%, transparent) 57px 58px),
-    linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 6%, transparent), transparent 48%);
+    linear-gradient(90deg, color-mix(in srgb, var(--endgame) 6%, transparent), transparent 48%);
   border: 1px solid color-mix(in srgb, var(--edge) 23%, transparent);
   border-radius: 22px;
 }
@@ -6697,14 +6697,14 @@ kbd,
 
 .relay-header .library-back b {
   color: var(--action-ink);
-  background: var(--puzzle);
+  background: var(--endgame);
   border-radius: 4px 8px 4px 8px;
 }
 
 .relay-header .brand {
   justify-self: center;
   padding: 0 10px;
-  color: color-mix(in srgb, var(--ink) 88%, var(--puzzle));
+  color: color-mix(in srgb, var(--ink) 88%, var(--endgame));
 }
 
 .relay-header__count {
@@ -6721,7 +6721,7 @@ kbd,
 }
 
 .relay-header__count small {
-  color: var(--puzzle);
+  color: var(--endgame);
   font: inherit;
   font-size: 11px;
   font-weight: 800;
@@ -6755,7 +6755,7 @@ kbd,
   padding: clamp(16px, 2.2vw, 25px);
   overflow: hidden;
   background:
-    linear-gradient(138deg, color-mix(in srgb, var(--puzzle) 8%, transparent), transparent 42%),
+    linear-gradient(138deg, color-mix(in srgb, var(--endgame) 8%, transparent), transparent 42%),
     linear-gradient(145deg, color-mix(in srgb, var(--raised) 87%, white), var(--raised));
   border-right: 1px solid color-mix(in srgb, var(--edge) 50%, var(--line));
 }
@@ -6768,21 +6768,21 @@ kbd,
   justify-content: space-between;
   gap: 14px;
   padding: 0 1px 12px;
-  border-bottom: 1px solid color-mix(in srgb, var(--puzzle) 24%, var(--line));
+  border-bottom: 1px solid color-mix(in srgb, var(--endgame) 24%, var(--line));
 }
 
 .relay-route__heading::after {
   width: 50px;
   height: 3px;
   content: "";
-  background: linear-gradient(90deg, var(--puzzle), color-mix(in srgb, var(--puzzle) 16%, transparent));
+  background: linear-gradient(90deg, var(--endgame), color-mix(in srgb, var(--endgame) 16%, transparent));
   clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
 }
 
 .relay-route__heading span {
   order: 2;
   margin-bottom: 4px;
-  color: var(--puzzle);
+  color: var(--endgame);
   font-family: var(--font-data);
   font-size: 10px;
   font-weight: 800;
@@ -6842,7 +6842,7 @@ kbd,
 }
 
 .relay-band--active .relay-band__label {
-  color: var(--puzzle);
+  color: var(--endgame);
   transform: translateX(2px);
 }
 
@@ -6866,11 +6866,11 @@ kbd,
   left: 22px;
   height: 1px;
   content: "";
-  background: linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 17%, var(--line)), color-mix(in srgb, var(--puzzle) 52%, var(--line)), color-mix(in srgb, var(--puzzle) 17%, var(--line)));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--endgame) 17%, var(--line)), color-mix(in srgb, var(--endgame) 52%, var(--line)), color-mix(in srgb, var(--endgame) 17%, var(--line)));
 }
 
 .relay-band--active .relay-nodes::before {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--puzzle) 28%, var(--line)), var(--puzzle), color-mix(in srgb, var(--puzzle) 28%, var(--line)));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--endgame) 28%, var(--line)), var(--endgame), color-mix(in srgb, var(--endgame) 28%, var(--line)));
 }
 
 .relay-node {
@@ -6914,8 +6914,8 @@ kbd,
 .relay-node button:focus-visible {
   z-index: 2;
   color: var(--ink);
-  background: color-mix(in srgb, var(--puzzle) 12%, var(--surface));
-  border-color: color-mix(in srgb, var(--puzzle) 70%, var(--edge));
+  background: color-mix(in srgb, var(--endgame) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--endgame) 70%, var(--edge));
   box-shadow: 0 7px 13px rgba(51, 61, 104, .14);
   transform: translateY(-2px) scale(1.04);
 }
@@ -6935,9 +6935,9 @@ kbd,
 
 .relay-node--selected button {
   color: var(--action-ink);
-  background: var(--puzzle);
-  border-color: var(--puzzle);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--puzzle) 13%, transparent), 0 8px 18px rgba(59, 54, 96, .22);
+  background: var(--endgame);
+  border-color: var(--endgame);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--endgame) 13%, transparent), 0 8px 18px rgba(59, 54, 96, .22);
   animation: relay-node-select 460ms var(--ease) both;
 }
 
@@ -7014,7 +7014,7 @@ kbd,
   content: "";
   pointer-events: none;
   opacity: .4;
-  background: linear-gradient(115deg, transparent 43%, color-mix(in srgb, var(--puzzle) 34%, transparent) 49%, transparent 55%);
+  background: linear-gradient(115deg, transparent 43%, color-mix(in srgb, var(--endgame) 34%, transparent) 49%, transparent 55%);
   transform: translateX(-42%);
   animation: relay-well-scan 840ms 100ms var(--ease) both;
 }
@@ -7044,7 +7044,7 @@ kbd,
   box-shadow: inset 0 0 34px rgba(0, 0, 0, .2);
 }
 
-.relay-focus__board .puzzle-silhouette {
+.relay-focus__board .endgame-silhouette {
   width: min(75%, 206px);
   height: min(82%, 282px);
 }
@@ -7059,7 +7059,7 @@ kbd,
   padding: clamp(18px, 3.2vw, 42px) clamp(17px, 3.2vw, 40px);
   color: #e2edf5;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--puzzle) 14%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--endgame) 14%, transparent), transparent 42%),
     linear-gradient(160deg, #122238, #0c1a2c);
 }
 
@@ -7174,7 +7174,7 @@ kbd,
 }
 
 .relay-footer span {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-family: var(--font-data);
   font-size: 10px;
   font-weight: 750;
@@ -7192,9 +7192,9 @@ kbd,
 }
 
 @keyframes relay-node-select {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--puzzle) 32%, transparent), 0 8px 18px rgba(59, 54, 96, .22); }
-  62% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--puzzle) 0%, transparent), 0 8px 18px rgba(59, 54, 96, .22); }
-  100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--puzzle) 13%, transparent), 0 8px 18px rgba(59, 54, 96, .22); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--endgame) 32%, transparent), 0 8px 18px rgba(59, 54, 96, .22); }
+  62% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--endgame) 0%, transparent), 0 8px 18px rgba(59, 54, 96, .22); }
+  100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--endgame) 13%, transparent), 0 8px 18px rgba(59, 54, 96, .22); }
 }
 
 @keyframes relay-well-shift {
@@ -7234,7 +7234,7 @@ kbd,
 
   .relay-focus { grid-template-columns: minmax(0, 1fr) minmax(205px, .72fr); }
   .relay-focus__board { width: min(68%, 246px); height: min(74%, 294px); }
-  .relay-focus__board .puzzle-silhouette { width: min(75%, 176px); height: min(80%, 230px); }
+  .relay-focus__board .endgame-silhouette { width: min(75%, 176px); height: min(80%, 230px); }
   .relay-focus__copy { padding: 17px 20px; }
 }
 
@@ -7262,7 +7262,7 @@ kbd,
   .relay-focus__well::before { inset: 10px; }
   .relay-focus__index { top: 7px; right: 10px; font-size: 22px; }
   .relay-focus__board { width: min(78%, 174px); height: min(75%, 220px); }
-  .relay-focus__board .puzzle-silhouette { width: min(80%, 142px); height: min(82%, 184px); }
+  .relay-focus__board .endgame-silhouette { width: min(80%, 142px); height: min(82%, 184px); }
   .relay-focus__copy { gap: 8px; padding: 12px 11px; }
   .relay-focus__heading { padding-bottom: 8px; }
   .relay-focus__heading > span { margin-bottom: 5px; font-size: 8px; }
@@ -7295,7 +7295,7 @@ kbd,
   .relay-focus__well::before { inset: 8px; }
   .relay-focus__index { top: 6px; right: 10px; font-size: 24px; }
   .relay-focus__board { width: min(70%, 166px); height: min(75%, 206px); }
-  .relay-focus__board .puzzle-silhouette { width: min(78%, 132px); height: min(82%, 168px); }
+  .relay-focus__board .endgame-silhouette { width: min(78%, 132px); height: min(82%, 168px); }
   .relay-focus__copy { gap: 6px; padding: 10px 12px; }
   .relay-focus__heading { padding-bottom: 7px; }
   .relay-focus__heading > span { margin-bottom: 4px; font-size: 8px; }
@@ -7329,7 +7329,7 @@ kbd,
 
 /* T13 — Gravity Workbench.
    Two entry surfaces share one gesture: a dark falling well held inside a precise,
-   mineral-paper frame. The home uses four connected gravity lanes; Puzzle turns the
+   mineral-paper frame. The home uses four connected gravity lanes; Endgame turns the
    open campaign into a dense endgame control console rather than a route canvas. */
 
 .landing-shell--workbench {
@@ -7398,7 +7398,7 @@ kbd,
 .landing-header__signal i:nth-of-type(2),
 .landing-header__signal i:nth-of-type(3) { opacity: .68; }
 
-.landing-header__signal i:nth-of-type(4) { background: var(--puzzle); }
+.landing-header__signal i:nth-of-type(4) { background: var(--endgame); }
 
 .landing-stage--workbench {
   align-self: center;
@@ -7521,7 +7521,7 @@ kbd,
 .mode-gates--workbench .mode-gate--marathon,
 .mode-gates--workbench .mode-gate--race,
 .mode-gates--workbench .mode-gate--sprint,
-.mode-gates--workbench .mode-gate--puzzle {
+.mode-gates--workbench .mode-gate--endgame {
   --gate-accent: var(--classic);
   display: flex;
   grid-column: auto;
@@ -7548,7 +7548,7 @@ kbd,
 .mode-gates--workbench .mode-gate:first-child { border-top: 0; }
 .mode-gates--workbench .mode-gate--race { --gate-accent: var(--race); }
 .mode-gates--workbench .mode-gate--sprint { --gate-accent: var(--sprint); }
-.mode-gates--workbench .mode-gate--puzzle { --gate-accent: var(--puzzle); }
+.mode-gates--workbench .mode-gate--endgame { --gate-accent: var(--endgame); }
 
 .mode-gates--workbench .mode-gate::before {
   position: absolute;
@@ -7730,7 +7730,7 @@ kbd,
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Open Puzzle console: a single specimen well and a compact all-open control matrix. */
+/* Open Endgame console: a single specimen well and a compact all-open control matrix. */
 
 .library-shell--console {
   position: relative;
@@ -7753,7 +7753,7 @@ kbd,
   pointer-events: none;
   opacity: .66;
   background:
-    radial-gradient(circle at 78% 28%, color-mix(in srgb, var(--puzzle) 12%, transparent), transparent 27%),
+    radial-gradient(circle at 78% 28%, color-mix(in srgb, var(--endgame) 12%, transparent), transparent 27%),
     linear-gradient(111deg, transparent 0 30%, color-mix(in srgb, var(--edge) 15%, transparent) 30.15% 30.28%, transparent 30.43% 100%),
     repeating-linear-gradient(0deg, transparent 0 72px, color-mix(in srgb, var(--edge) 8%, transparent) 73px 74px);
   border: 1px solid color-mix(in srgb, var(--edge) 24%, transparent);
@@ -7779,7 +7779,7 @@ kbd,
 
 .console-header .library-back b {
   color: #eef5f8;
-  background: var(--puzzle);
+  background: var(--endgame);
   border-radius: 3px 8px 3px 8px;
 }
 
@@ -7802,7 +7802,7 @@ kbd,
 }
 
 .console-header__count small {
-  color: var(--puzzle);
+  color: var(--endgame);
   font: inherit;
   font-size: 10px;
   letter-spacing: .04em;
@@ -7865,7 +7865,7 @@ kbd,
   content: "";
   pointer-events: none;
   opacity: .4;
-  background: linear-gradient(112deg, transparent 43%, color-mix(in srgb, var(--puzzle) 38%, transparent) 49%, transparent 56%);
+  background: linear-gradient(112deg, transparent 43%, color-mix(in srgb, var(--endgame) 38%, transparent) 49%, transparent 56%);
   transform: translateX(-35%);
   animation: console-coordinate-pulse 820ms 80ms var(--ease) both;
 }
@@ -7895,7 +7895,7 @@ kbd,
   box-shadow: inset 0 0 42px rgba(0, 0, 0, .28), 0 14px 30px rgba(0, 0, 0, .14);
 }
 
-.console-focus__board .puzzle-silhouette {
+.console-focus__board .endgame-silhouette {
   width: min(73%, 196px);
   height: min(82%, 264px);
 }
@@ -7910,7 +7910,7 @@ kbd,
   padding: clamp(15px, 2.4vw, 28px);
   color: #deebf4;
   background:
-    linear-gradient(106deg, color-mix(in srgb, var(--puzzle) 17%, transparent), transparent 35%),
+    linear-gradient(106deg, color-mix(in srgb, var(--endgame) 17%, transparent), transparent 35%),
     #102237;
   border-top: 1px solid rgba(184, 211, 234, .18);
 }
@@ -8163,7 +8163,7 @@ kbd,
 
 .console-node--selected button {
   color: #f6fbfc;
-  background: var(--puzzle);
+  background: var(--endgame);
   border-color: #bca6d6;
   box-shadow: 0 0 0 4px rgba(161, 130, 192, .17), 0 9px 18px rgba(0, 0, 0, .27);
   animation: console-node-select 480ms var(--ease) both;
@@ -8234,7 +8234,7 @@ kbd,
 }
 
 .console-footer span {
-  color: var(--puzzle);
+  color: var(--endgame);
   font-family: var(--font-data);
   font-size: 10px;
   font-weight: 760;
@@ -8271,7 +8271,7 @@ kbd,
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle { grid-template-columns: 26px 46px minmax(0, 1fr) 44px auto; gap: 10px; padding-inline: 16px; }
+  .mode-gates--workbench .mode-gate--endgame { grid-template-columns: 26px 46px minmax(0, 1fr) 44px auto; gap: 10px; padding-inline: 16px; }
   .mode-gates--workbench .mode-gate__index { flex-basis: 26px; }
   .mode-gates--workbench .mode-gate__motif { display: none; }
 
@@ -8303,7 +8303,7 @@ kbd,
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle { grid-template-columns: 24px 43px minmax(0, 1fr) auto; gap: 8px; padding: 9px 15px; }
+  .mode-gates--workbench .mode-gate--endgame { grid-template-columns: 24px 43px minmax(0, 1fr) auto; gap: 8px; padding: 9px 15px; }
   .mode-gates--workbench .mode-gate__index { flex-basis: 24px; }
   .mode-gates--workbench .mode-gate__glyph { width: 40px; height: 40px; }
   .mode-gates--workbench .mode-gate__glyph svg { width: 26px; height: 26px; }
@@ -8324,7 +8324,7 @@ kbd,
   .console-focus__well::before { inset: 11px; }
   .console-focus__index { top: 9px; right: 12px; font-size: 27px; }
   .console-focus__board { width: min(50%, 164px); }
-  .console-focus__board .puzzle-silhouette { width: min(74%, 132px); height: min(82%, 174px); }
+  .console-focus__board .endgame-silhouette { width: min(74%, 132px); height: min(82%, 174px); }
   .console-focus__copy { grid-template-columns: minmax(0, 1fr) 104px; gap: 7px 10px; padding: 11px 13px; }
   .console-focus__heading > span { margin-bottom: 4px; font-size: 8px; }
   .console-focus__heading h2 { font-size: 21px; }
@@ -8360,7 +8360,7 @@ kbd,
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle { grid-template-columns: 28px 43px minmax(0, 1fr) 48px auto; gap: 9px; padding-block: 6px; }
+  .mode-gates--workbench .mode-gate--endgame { grid-template-columns: 28px 43px minmax(0, 1fr) 48px auto; gap: 9px; padding-block: 6px; }
   .mode-gates--workbench .mode-gate__index { flex-basis: 28px; }
   .mode-gates--workbench .mode-gate__glyph { width: 40px; height: 40px; }
   .mode-gates--workbench .mode-gate__body { gap: 2px; }
@@ -8375,7 +8375,7 @@ kbd,
   .console-focus__well::before { inset: 9px; }
   .console-focus__index { top: 7px; right: 12px; font-size: 26px; }
   .console-focus__board { width: min(52%, 150px); }
-  .console-focus__board .puzzle-silhouette { width: min(75%, 122px); height: min(82%, 155px); }
+  .console-focus__board .endgame-silhouette { width: min(75%, 122px); height: min(82%, 155px); }
   .console-focus__copy { grid-template-columns: minmax(0, 1fr) 112px; gap: 5px 9px; padding: 9px 12px; }
   .console-focus__heading > span { margin-bottom: 3px; font-size: 7px; }
   .console-focus__heading h2 { font-size: 20px; }
@@ -8493,7 +8493,7 @@ kbd,
 .mode-gates--workbench .mode-gate--marathon,
 .mode-gates--workbench .mode-gate--race,
 .mode-gates--workbench .mode-gate--sprint,
-.mode-gates--workbench .mode-gate--puzzle {
+.mode-gates--workbench .mode-gate--endgame {
   grid-template-columns: 56px minmax(0, 1fr) 42px;
   gap: clamp(13px, 2vw, 22px);
   padding: clamp(12px, 1.65vw, 18px) clamp(14px, 2vw, 24px);
@@ -8672,7 +8672,7 @@ kbd,
   margin-right: 2px;
 }
 
-.settings-shortcuts--puzzle [data-testid="keyboard-gameplay"] > span:last-child,
+.settings-shortcuts--endgame [data-testid="keyboard-gameplay"] > span:last-child,
 .settings-shortcuts [data-testid="keyboard-shortcuts"] > span:last-child {
   grid-column: 1 / -1;
 }
@@ -8837,7 +8837,7 @@ kbd,
 }
 
 /* T13.14 third correction: Settings is one connected console, not four stacked
-   cards or two unrelated cards. Puzzle forecast is one two-part instrument. */
+   cards or two unrelated cards. Endgame forecast is one two-part instrument. */
 .action-sheet:has(.settings-sheet) {
   width: min(842px, calc(100vw - 28px));
   padding: clamp(16px, 2vw, 22px);
@@ -8990,7 +8990,7 @@ kbd,
 }
 
 .settings-shortcuts kbd { padding: 1px 4px; margin-right: 2px; }
-.settings-shortcuts--puzzle [data-testid="keyboard-gameplay"] > span:last-child,
+.settings-shortcuts--endgame [data-testid="keyboard-gameplay"] > span:last-child,
 .settings-shortcuts [data-testid="keyboard-shortcuts"] > span:last-child { grid-column: 1 / -1; }
 
 .settings-sheet > .mode-rule-summary {
@@ -9082,9 +9082,9 @@ kbd,
   white-space: nowrap;
 }
 
-/* Puzzle reuses the ordinary Next well: its two queued pieces are simple numbered
+/* Endgame reuses the ordinary Next well: its two queued pieces are simple numbered
    rows, not a second visual system. Pixi draws one shared well and its divider. */
-.preview-rail--puzzle .next-slot--dual {
+.preview-rail--endgame .next-slot--dual {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: repeat(2, minmax(0, 1fr));
@@ -9105,7 +9105,7 @@ kbd,
   pointer-events: none;
 }
 
-.preview-rail--puzzle .next-slot__segment-label {
+.preview-rail--endgame .next-slot__segment-label {
   position: absolute;
   z-index: 7;
   top: 50%;
@@ -9116,7 +9116,7 @@ kbd,
   transform: translateY(-50%);
 }
 
-.preview-rail--puzzle .next-slot__segment-label b {
+.preview-rail--endgame .next-slot__segment-label b {
   width: auto;
   height: auto;
   color: rgba(196, 216, 232, .92);
@@ -9132,10 +9132,10 @@ kbd,
   text-shadow: 0 1px 2px rgba(3, 14, 24, .72);
 }
 
-.preview-rail--puzzle .next-slot__segment-label small { display: none; }
+.preview-rail--endgame .next-slot__segment-label small { display: none; }
 
-/* Puzzle completion is an earned result, not the generic end-of-run sheet. */
-.action-sheet--puzzle-celebration {
+/* Endgame completion is an earned result, not the generic end-of-run sheet. */
+.action-sheet--endgame-celebration {
   position: relative;
   width: min(510px, calc(100vw - 28px));
   overflow: hidden;
@@ -9147,7 +9147,7 @@ kbd,
   box-shadow: 0 26px 66px rgba(35, 24, 54, .3);
 }
 
-.action-sheet--puzzle-celebration::before {
+.action-sheet--endgame-celebration::before {
   position: absolute;
   z-index: 2;
   top: 0;
@@ -9156,19 +9156,19 @@ kbd,
   height: 4px;
   content: '';
   background: linear-gradient(90deg, #8a63b3, #9a70c9 48%, #42a49a);
-  animation: puzzle-celebration-edge 180ms ease-out both;
+  animation: endgame-celebration-edge 180ms ease-out both;
 }
 
-.action-sheet--puzzle-celebration h2 {
+.action-sheet--endgame-celebration h2 {
   color: #322442;
   letter-spacing: -.035em;
 }
 
-.action-sheet--puzzle-celebration > p {
+.action-sheet--endgame-celebration > p {
   display: none;
 }
 
-.puzzle-celebration {
+.endgame-celebration {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: 126px minmax(0, 1fr);
@@ -9182,14 +9182,14 @@ kbd,
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .92);
 }
 
-.puzzle-celebration__summary {
+.endgame-celebration__summary {
   display: grid;
   align-content: center;
   min-width: 0;
   padding: 18px 20px;
 }
 
-.puzzle-celebration__summary strong {
+.endgame-celebration__summary strong {
   color: #654684;
   font-family: var(--font-ui);
   font-size: clamp(16px, 2.6vw, 20px);
@@ -9198,17 +9198,17 @@ kbd,
   line-height: 1.35;
 }
 
-@keyframes puzzle-celebration-edge {
+@keyframes endgame-celebration-edge {
   from { opacity: .2; transform: scaleX(.25); }
   to { opacity: 1; transform: scaleX(1); }
 }
 
 @media (max-width: 560px) {
-  .puzzle-celebration { grid-template-columns: 104px minmax(0, 1fr); min-height: 92px; }
-  .puzzle-celebration__summary { padding: 14px 15px; }
+  .endgame-celebration { grid-template-columns: 104px minmax(0, 1fr); min-height: 92px; }
+  .endgame-celebration__summary { padding: 14px 15px; }
 }
 
-.app[data-reduced-motion="true"] .action-sheet--puzzle-celebration::before { animation: none !important; }
+.app[data-reduced-motion="true"] .action-sheet--endgame-celebration::before { animation: none !important; }
 
 @media (max-width: 700px) {
   .action-sheet:has(.settings-sheet) { width: min(520px, calc(100vw - 18px)); padding: 16px; }
@@ -9260,13 +9260,13 @@ kbd,
   .settings-sheet > .result-leaderboard[data-empty="true"] > header,
   .settings-sheet > .result-leaderboard[data-empty="true"] > p { padding: 11px 14px; }
 
-  .preview-rail--puzzle .next-slot--dual { height: 100px; padding: 3px; }
+  .preview-rail--endgame .next-slot--dual { height: 100px; padding: 3px; }
   .next-slot__segment-label { top: 5px; left: 6px; font-size: 9px; }
   .next-slot__segment-label b { font-size: 9px; }
 
-  /* A two-piece puzzle queue must never be squeezed into the generic narrow
+  /* A two-piece endgame queue must never be squeezed into the generic narrow
      preview column. It becomes its own full-width, connected instrument. */
-  .game-side-panel:has(.preview-rail--puzzle) {
+  .game-side-panel:has(.preview-rail--endgame) {
     display: grid;
     z-index: auto;
     grid-template-columns: minmax(0, 1fr);
@@ -9276,15 +9276,15 @@ kbd,
     height: 208px;
   }
 
-  .game-arena:has(.preview-rail--puzzle) { grid-template-rows: 208px minmax(0, 1fr); }
+  .game-arena:has(.preview-rail--endgame) { grid-template-rows: 208px minmax(0, 1fr); }
 
-  .game-side-panel:has(.preview-rail--puzzle) .info-rail {
+  .game-side-panel:has(.preview-rail--endgame) .info-rail {
     grid-column: 1;
     grid-row: 1;
     align-self: center;
   }
 
-  .game-side-panel:has(.preview-rail--puzzle) .preview-rail {
+  .game-side-panel:has(.preview-rail--endgame) .preview-rail {
     grid-column: 1;
     grid-row: 2;
     grid-template-rows: minmax(0, 1fr);
@@ -9292,9 +9292,9 @@ kbd,
     border: 0;
   }
 
-  .game-side-panel:has(.preview-rail--puzzle) .preview-rail .rail-label { display: none; }
+  .game-side-panel:has(.preview-rail--endgame) .preview-rail .rail-label { display: none; }
 
-  .game-side-panel:has(.preview-rail--puzzle) .next-slot--dual {
+  .game-side-panel:has(.preview-rail--endgame) .next-slot--dual {
     width: 100%;
     height: 94px;
   }
@@ -9324,27 +9324,27 @@ kbd,
   .settings-sheet > .settings-record { padding: 8px 12px; }
   .settings-sheet > .result-leaderboard[data-empty="true"] > header,
   .settings-sheet > .result-leaderboard[data-empty="true"] > p { padding: 8px 12px; }
-  .preview-rail--puzzle .next-slot--dual { height: 74px; padding: 3px; }
+  .preview-rail--endgame .next-slot--dual { height: 74px; padding: 3px; }
   .next-slot__segment-label { top: 4px; left: 6px; font-size: 9px; }
   .next-slot__segment-label b { font-size: 9px; }
   .next-slot__segment-label small { padding-bottom: 2px; }
 
-  /* Short landscape used a 76px generic preview rail. Give the two puzzle
+  /* Short landscape used a 76px generic preview rail. Give the two endgame
      forecasts a dedicated row instead: each half stays readable at 280px. */
-  .game-side-panel:has(.preview-rail--puzzle) {
+  .game-side-panel:has(.preview-rail--endgame) {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 84px;
     align-content: center;
     gap: 8px;
   }
 
-  .game-side-panel:has(.preview-rail--puzzle) .info-rail {
+  .game-side-panel:has(.preview-rail--endgame) .info-rail {
     grid-column: 1;
     grid-row: 1;
     align-self: center;
   }
 
-  .game-side-panel:has(.preview-rail--puzzle) .preview-rail {
+  .game-side-panel:has(.preview-rail--endgame) .preview-rail {
     grid-column: 1;
     grid-row: 2;
     grid-template-rows: minmax(0, 1fr);
@@ -9352,9 +9352,9 @@ kbd,
     border: 0;
   }
 
-  .game-side-panel:has(.preview-rail--puzzle) .preview-rail .rail-label { display: none; }
+  .game-side-panel:has(.preview-rail--endgame) .preview-rail .rail-label { display: none; }
 
-  .game-side-panel:has(.preview-rail--puzzle) .next-slot--dual {
+  .game-side-panel:has(.preview-rail--endgame) .next-slot--dual {
     width: 100%;
     height: 84px;
   }
@@ -9366,7 +9366,7 @@ kbd,
 .mode-gates--workbench .mode-gate { --gate-accent: #3f9f96; }
 .mode-gates--workbench .mode-gate--race { --gate-accent: #6687d5; }
 .mode-gates--workbench .mode-gate--sprint { --gate-accent: #c98243; }
-.mode-gates--workbench .mode-gate--puzzle { --gate-accent: #9875be; }
+.mode-gates--workbench .mode-gate--endgame { --gate-accent: #9875be; }
 
 .library-shell--console { grid-template-rows: 50px minmax(0, 1fr); gap: clamp(8px, 1.2vh, 13px); padding: clamp(10px, 2vw, 26px); }
 .console-header { grid-template-columns: 1fr auto 1fr; }
@@ -9375,9 +9375,9 @@ kbd,
 .console-focus__well { background: radial-gradient(circle at 50% 38%, #24465e 0, #142d43 50%, #0d2032 100%); animation: none; }
 .console-focus__well::before { inset: clamp(20px, 3.3vw, 38px); border-color: rgba(178, 217, 228, .42); border-radius: 10px; background: rgba(8, 25, 40, .08); }
 .console-focus__board { width: min(68%, 320px); aspect-ratio: 5 / 6; background: #0b1e30; border-color: rgba(163, 208, 223, .5); border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(130, 190, 208, .14), 0 14px 28px rgba(22, 54, 72, .24); }
-.console-focus__board .puzzle-silhouette { width: min(84%, 242px); height: min(86%, 292px); overflow: visible; }
-.console-focus__board .puzzle-silhouette path { stroke-width: .85px; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .21)); }
-.console-focus__board svg.puzzle-silhouette .puzzle-silhouette__anchor { fill: #d0a66a !important; stroke: #f1d4a1 !important; }
+.console-focus__board .endgame-silhouette { width: min(84%, 242px); height: min(86%, 292px); overflow: visible; }
+.console-focus__board .endgame-silhouette path { stroke-width: .85px; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .21)); }
+.console-focus__board svg.endgame-silhouette .endgame-silhouette__anchor { fill: #d0a66a !important; stroke: #f1d4a1 !important; }
 .console-focus__copy { grid-template-columns: minmax(0, 1fr) minmax(150px, .45fr); gap: 10px 16px; padding: clamp(16px, 2.3vw, 26px); color: #17324a; background: #f7faf9; border-top-color: #bfd1d9; }
 .console-focus__heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px 11px; padding-right: 0; }
 .console-focus__heading > span { color: #2c687c; font-size: 10px; letter-spacing: .05em; }
@@ -9420,7 +9420,7 @@ kbd,
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle { grid-template-columns: 42px minmax(0, 1fr) 38px; gap: 12px; padding: 10px 12px; }
+  .mode-gates--workbench .mode-gate--endgame { grid-template-columns: 42px minmax(0, 1fr) 38px; gap: 12px; padding: 10px 12px; }
   .mode-gates--workbench .mode-gate__action { width: 38px; height: 38px; min-height: 38px; }
   .mode-gates--workbench .mode-gate__action svg { width: 26px; height: 22px; }
   .mode-gates--workbench .mode-gate__glyph { flex-basis: 42px; width: 42px; height: 42px; }
@@ -9434,7 +9434,7 @@ kbd,
   .console-focus { grid-template-rows: minmax(0, 1fr) auto; border-right: 0; border-bottom: 1px solid rgba(180, 207, 227, .18); }
   .console-focus__well::before { inset: 14px; }
   .console-focus__board { width: min(54%, 210px); }
-  .console-focus__board .puzzle-silhouette { width: min(86%, 172px); height: min(88%, 216px); }
+  .console-focus__board .endgame-silhouette { width: min(86%, 172px); height: min(88%, 216px); }
   .console-focus__copy { grid-template-columns: minmax(0, 1fr) 112px; gap: 7px 10px; padding: 12px 14px; }
   .console-focus__heading > span { margin-bottom: 4px; font-size: 8px; }
   .console-focus__heading h2 { font-size: 23px; }
@@ -9461,14 +9461,14 @@ kbd,
   .mode-gates--workbench .mode-gate--marathon,
   .mode-gates--workbench .mode-gate--race,
   .mode-gates--workbench .mode-gate--sprint,
-  .mode-gates--workbench .mode-gate--puzzle { padding-block: 6px; }
+  .mode-gates--workbench .mode-gate--endgame { padding-block: 6px; }
   .mode-gates--workbench .mode-gate__body strong { font-size: 20px; }
   .mode-gates--workbench .mode-gate__body span { font-size: 10px; line-height: 1.28; }
   .library-shell--console { grid-template-rows: 42px minmax(0, 1fr); gap: 5px; padding: 5px 10px 7px; }
   .console-workbench { grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr); }
   .console-focus__well::before { inset: 9px; }
   .console-focus__board { width: min(56%, 164px); }
-  .console-focus__board .puzzle-silhouette { width: min(87%, 142px); height: min(88%, 170px); }
+  .console-focus__board .endgame-silhouette { width: min(87%, 142px); height: min(88%, 170px); }
   .console-focus__copy { grid-template-columns: minmax(0, 1fr) 106px; gap: 5px 9px; padding: 9px 12px; }
   .console-focus__heading h2 { font-size: 20px; }
   .console-focus__copy > p { font-size: 9px; line-height: 1.32; }

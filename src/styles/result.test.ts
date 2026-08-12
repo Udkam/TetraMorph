@@ -39,17 +39,17 @@ describe('T27 run-result scorecard authority', () => {
     expect(result).toMatch(/\.app\[data-reduced-motion="true"\] \.action-sheet--run-result[\s\S]*animation:\s*none !important/);
   });
 
-  it('gives Puzzle the same portrait rhythm without a boxed horizontal summary', () => {
-    expect(result).toMatch(/\.action-sheet--puzzle-celebration\s*\{[\s\S]*width:\s*min\(31rem, calc\(100vw - 24px\)\)/);
-    expect(result).toMatch(/\.puzzle-celebration\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*border:\s*0;[\s\S]*background:\s*transparent;/);
-    expect(result).toMatch(/\.puzzle-celebration__value strong\s*\{[\s\S]*font-size:\s*clamp\(52px, 14vw, 70px\)/);
-    expect(result).toMatch(/\.puzzle-celebration__value strong\s*\{[\s\S]*overflow:\s*visible;[\s\S]*font-weight:\s*700;[\s\S]*line-height:\s*1\.08;[\s\S]*text-overflow:\s*clip;/);
-    expect(result).toMatch(/\.puzzle-celebration__summary > span\s*\{[\s\S]*font-size:\s*12px/);
-    expect(result).not.toMatch(/\.puzzle-celebration__constellation\s*\{/);
-    expect(result).not.toMatch(/\.puzzle-celebration__prism\s*\{/);
-    expect(legacy).not.toContain('.puzzle-celebration__constellation');
-    expect(legacy).not.toContain('.puzzle-celebration__prism');
-    expect(legacy).not.toContain('puzzle-celebration-fragment');
+  it('gives Endgame the same portrait rhythm without a boxed horizontal summary', () => {
+    expect(result).toMatch(/\.action-sheet--endgame-celebration\s*\{[\s\S]*width:\s*min\(31rem, calc\(100vw - 24px\)\)/);
+    expect(result).toMatch(/\.endgame-celebration\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*border:\s*0;[\s\S]*background:\s*transparent;/);
+    expect(result).toMatch(/\.endgame-celebration__value strong\s*\{[\s\S]*font-size:\s*clamp\(52px, 14vw, 70px\)/);
+    expect(result).toMatch(/\.endgame-celebration__value strong\s*\{[\s\S]*overflow:\s*visible;[\s\S]*font-weight:\s*700;[\s\S]*line-height:\s*1\.08;[\s\S]*text-overflow:\s*clip;/);
+    expect(result).toMatch(/\.endgame-celebration__summary > span\s*\{[\s\S]*font-size:\s*12px/);
+    expect(result).not.toMatch(/\.endgame-celebration__constellation\s*\{/);
+    expect(result).not.toMatch(/\.endgame-celebration__prism\s*\{/);
+    expect(legacy).not.toContain('.endgame-celebration__constellation');
+    expect(legacy).not.toContain('.endgame-celebration__prism');
+    expect(legacy).not.toContain('endgame-celebration-fragment');
     expect(result).not.toMatch(/grid-template-rows:\s*(?:84|90)px auto/);
   });
 });

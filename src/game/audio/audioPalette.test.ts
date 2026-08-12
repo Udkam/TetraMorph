@@ -41,7 +41,7 @@ describe('T37 recovered soft support palette', () => {
         attack: 0.007, waveform: 'sine',
       }),
     ]);
-    expect(audioCue('puzzle-undo').tones).toEqual([
+    expect(audioCue('endgame-undo').tones).toEqual([
       expect.objectContaining({
         frequency: 392, endFrequency: 293.66, duration: 0.09, gain: 0.095,
         attack: 0.006,
@@ -121,9 +121,9 @@ describe('T37 recovered soft support palette', () => {
     expect(audioCue('bomb').mutationOwned).toBe(true);
   });
 
-  it('keeps all gameplay, reward, Puzzle, Survival, and UI candidates represented', () => {
+  it('keeps all gameplay, reward, Endgame, Survival, and UI candidates represented', () => {
     const expected = [
-      'soft-drop', 'puzzle-undo',
+      'soft-drop', 'endgame-undo',
       'bedrock-rise', 'bedrock-lower', 'stone-warning', 'stone-spawn', 'stone-land',
       'level-up', 'finished', 'game-over', 'pause', 'resume',
       'supergravity', 'bomb', 'multiplier-2', 'multiplier-4',

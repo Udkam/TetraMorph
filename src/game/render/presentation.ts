@@ -473,13 +473,13 @@ export function boardShiftPresentationOffset(
 }
 
 /**
- * The queue remains the canonical source in every mode. Puzzle exposes the
+ * The queue remains the canonical source in every mode. Endgame exposes the
  * first two authored inputs; Classic and Survival retain their focused single
  * preview. This presentation helper never consumes or mutates that queue.
  */
 export function nextPreviewPieces(state: GameState): PieceType[] {
   if (state.status === 'ready' || state.status === 'finished' || state.status === 'game-over') return [];
-  return state.mode === 'puzzle' ? state.queue.slice(0, 2) : state.queue.slice(0, 1);
+  return state.mode === 'endgame' ? state.queue.slice(0, 2) : state.queue.slice(0, 1);
 }
 
 /** Compatibility wrapper for integrations that only need the first preview. */

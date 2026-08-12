@@ -1,12 +1,12 @@
 import type {
   GameMode,
   MutationItem,
-  PuzzleId,
+  EndgameId,
 } from '../game/core';
-import type { PuzzleTechnique } from '../puzzleLessons';
+import type { EndgameTechnique } from '../endgameLessons';
 
 export type AppLanguage = 'zh-CN' | 'en';
-export type PuzzleCelebrationOutcome = 'first' | 'record' | 'replay';
+export type EndgameCelebrationOutcome = 'first' | 'record' | 'replay';
 export type RuleFactId =
   | 'goal'
   | 'pace'
@@ -115,16 +115,16 @@ type Translation = {
     core: string;
     combo: string;
     next: string;
-    puzzle: string;
-    selectedPuzzle: string;
-    puzzleTraits: string;
+    endgame: string;
+    selectedEndgame: string;
+    endgameTraits: string;
     fixedAnchors: string;
-    puzzleRoute: string;
-    puzzleBands: string;
-    puzzlePages: string;
-    puzzleIntro: string;
-    puzzleEasy: string;
-    puzzleHard: string;
+    endgameRoute: string;
+    endgameBands: string;
+    endgamePages: string;
+    endgameIntro: string;
+    endgameEasy: string;
+    endgameHard: string;
     mastery: string;
     hardUnlockHint: string;
     modeHome: string;
@@ -144,7 +144,7 @@ type Translation = {
     undoTitle: string;
     leaveTitle: string;
     leaveRun: string;
-    leavePuzzle: string;
+    leaveEndgame: string;
     resultTitle: string;
     gamePanel: string;
     gameArea: string;
@@ -153,7 +153,7 @@ type Translation = {
     nextPiece: string;
     followingPiece: string;
     touchControls: string;
-    puzzleTouchControls: string;
+    endgameTouchControls: string;
     touchGestureHint: string;
     motion: string;
     reducedMotionOn: string;
@@ -196,8 +196,8 @@ type Translation = {
     modeLeaderboard: (mode: string) => string;
     leaderboardCriterion: (survival: boolean) => string;
     leaderboardSummary: (score: string, pieces: number, lines: number, survival: boolean, mutation: boolean) => string;
-    terminalPuzzleSuccess: (pieces: number, lines: number) => { title: string; detail: string };
-    puzzleCelebration: (outcome: PuzzleCelebrationOutcome, best: number) => {
+    terminalEndgameSuccess: (pieces: number, lines: number) => { title: string; detail: string };
+    endgameCelebration: (outcome: EndgameCelebrationOutcome, best: number) => {
       title: string;
       detail: string;
       best: string;
@@ -205,15 +205,15 @@ type Translation = {
       bestValue: string;
       bestUnit: string;
     };
-    terminalPuzzleFailure: (remaining: number, pieces: number) => { title: string; detail: string };
+    terminalEndgameFailure: (remaining: number, pieces: number) => { title: string; detail: string };
     terminalMutation: () => { title: string; detail: string };
     terminalSurvival: () => { title: string; detail: string };
     terminalClassic: () => { title: string; detail: string };
-    selectedPuzzle: (name: string) => string;
-    puzzleBoard: (name: string) => string;
-    startPuzzle: (name: string) => string;
-    puzzleList: (count: number) => string;
-    puzzleCategory: (category: string, count: number) => string;
+    selectedEndgame: (name: string) => string;
+    endgameBoard: (name: string) => string;
+    startEndgame: (name: string) => string;
+    endgameList: (count: number) => string;
+    endgameCategory: (category: string, count: number) => string;
     masteryThreshold: (technique: string, prerequisite: string, required: number, best: number | null) => string;
     rowBand: (rows: number) => string;
     levelNode: (index: string, name: string, rows: number, complete: boolean, unlocked: boolean, best: number | null) => string;
@@ -226,11 +226,11 @@ type Translation = {
     mutationTimer: (item: string, seconds: number) => string;
     mutationPieces: (item: string, pieces: number) => string;
     mutationPreview: (piece: string, material: string, item: string) => string;
-    puzzleLesson: (technique: PuzzleTechnique) => { title: string; body: string };
+    endgameLesson: (technique: EndgameTechnique) => { title: string; body: string };
   };
 };
 
-const ENGLISH_LEVEL_NAMES: Readonly<Record<PuzzleId, string>> = {
+const ENGLISH_LEVEL_NAMES: Readonly<Record<EndgameId, string>> = {
   't3r-shaft-01': 'Gap',
   't3r-shaft-02': 'Side Well',
   't3r-shaft-03': 'Offset',
@@ -251,36 +251,36 @@ const ENGLISH_LEVEL_NAMES: Readonly<Record<PuzzleId, string>> = {
   't6r-terrace-18': 'Side Shelf',
   't6r-bastion-19': 'Narrow Gate',
   't6r-keystone-20': 'Bridge',
-  'tm-puzzle-21': 'Gatepost',
-  'tm-puzzle-22': 'Corridor',
-  'tm-puzzle-23': 'Center Post',
-  'tm-puzzle-24': 'Slope',
-  'tm-puzzle-25': 'Pinched Well',
-  'tm-puzzle-26': 'Offset Shelf',
-  'tm-puzzle-27': 'Ramp',
-  'tm-puzzle-28': 'Side Bridge',
-  'tm-puzzle-29': 'Double Layer',
-  'tm-puzzle-30': 'Split Shelf',
-  'tm-puzzle-31': 'Bent Well',
-  'tm-puzzle-32': 'Left Gate',
-  'tm-puzzle-33': 'Offset Bridge',
-  'tm-puzzle-34': 'Stepped Well',
-  'tm-puzzle-35': 'Hanging Shelf',
-  'tm-puzzle-36': 'Right Gate',
-  'tm-puzzle-37': 'Twin Channel',
-  'tm-puzzle-38': 'Loop Well',
-  'tm-puzzle-39': 'Edge Tower',
-  'tm-puzzle-40': 'Bent Bridge',
-  'tm-puzzle-41': 'Cross Trench',
-  'tm-puzzle-42': 'Center Steps',
-  'tm-puzzle-43': 'Split Gallery',
-  'tm-puzzle-44': 'Twin Towers',
-  'tm-puzzle-45': 'Sloped Gallery',
-  'tm-puzzle-46': 'Edge Well',
-  'tm-puzzle-47': 'Deep Channel',
-  'tm-puzzle-48': 'Broken Channel',
-  'tm-puzzle-49': 'Layered Well',
-  'tm-puzzle-50': 'Forked Passage',
+  'tm-endgame-21': 'Gatepost',
+  'tm-endgame-22': 'Corridor',
+  'tm-endgame-23': 'Center Post',
+  'tm-endgame-24': 'Slope',
+  'tm-endgame-25': 'Pinched Well',
+  'tm-endgame-26': 'Offset Shelf',
+  'tm-endgame-27': 'Ramp',
+  'tm-endgame-28': 'Side Bridge',
+  'tm-endgame-29': 'Double Layer',
+  'tm-endgame-30': 'Split Shelf',
+  'tm-endgame-31': 'Bent Well',
+  'tm-endgame-32': 'Left Gate',
+  'tm-endgame-33': 'Offset Bridge',
+  'tm-endgame-34': 'Stepped Well',
+  'tm-endgame-35': 'Hanging Shelf',
+  'tm-endgame-36': 'Right Gate',
+  'tm-endgame-37': 'Twin Channel',
+  'tm-endgame-38': 'Loop Well',
+  'tm-endgame-39': 'Edge Tower',
+  'tm-endgame-40': 'Bent Bridge',
+  'tm-endgame-41': 'Cross Trench',
+  'tm-endgame-42': 'Center Steps',
+  'tm-endgame-43': 'Split Gallery',
+  'tm-endgame-44': 'Twin Towers',
+  'tm-endgame-45': 'Sloped Gallery',
+  'tm-endgame-46': 'Edge Well',
+  'tm-endgame-47': 'Deep Channel',
+  'tm-endgame-48': 'Broken Channel',
+  'tm-endgame-49': 'Layered Well',
+  'tm-endgame-50': 'Forked Passage',
 };
 
 const COPY: Record<AppLanguage, Translation> = {
@@ -289,7 +289,7 @@ const COPY: Record<AppLanguage, Translation> = {
       marathon: { label: '经典', detail: '补全横行获得分数；每消 10 行下落加快。', action: '开始' },
       race: { label: '生存', detail: '在上升基岩上坚持；每消 3 行移除一层。', action: '开始' },
       sprint: { label: '异变', detail: '异变材质方块触发道具；每消 6 行下落加快。', action: '开始' },
-      puzzle: { label: '解谜', detail: '清除全部原有方块；固定序列，可直接撤回。', action: '选关' },
+      endgame: { label: '残局', detail: '清除全部原有方块；固定序列，可直接撤回。', action: '选关' },
     },
     rules: {
       marathon: [
@@ -309,7 +309,7 @@ const COPY: Record<AppLanguage, Translation> = {
         { id: 'items', label: '道具', value: '冰冻令方块以 1.0 秒/格下落 10 秒；超重令后续 5 个方块的自身各列独立下沉，已落定方块不移动；炸弹清除底部 3 行；加倍令消行得分 ×2，持续 10 秒。再次触发冰冻或加倍会刷新时长，超重则刷新后续 5 块额度；加倍叠加后升级为超级加倍 ×4。' },
         { id: 'end', label: '结束', value: '新方块无法进入棋盘时，本局结束。' },
       ],
-      puzzle: [
+      endgame: [
         { id: 'goal', label: '破解', value: '通过消行清除棋盘中全部原有方块；不可消除的锚点只会阻挡移动。' },
         { id: 'queue', label: '推演', value: '每关使用固定方块序列，Next 同时展示后续两个方块，操作数没有上限。' },
         { id: 'undo', label: '撤回', value: '按 Z 直接回到上一个方块尚未出现的状态，并重新开始它的下落。' },
@@ -332,7 +332,7 @@ const COPY: Record<AppLanguage, Translation> = {
         { id: 'mechanic', label: '机制', value: '消除异变材质方块的任意一格，即可触发整件方块对应的道具。' },
         { id: 'challenge', label: '挑战', value: '在加速堆叠中判断何时触发最有效。' },
       ],
-      puzzle: [
+      endgame: [
         { id: 'objective', label: '目标', value: '清除棋盘中的全部原有方块。' },
         { id: 'mechanic', label: '机制', value: '固定序列、双 Next 和直接撤回帮助推演。' },
         { id: 'challenge', label: '挑战', value: '绕开锚点，保留后续方块的入口与支撑。' },
@@ -341,7 +341,7 @@ const COPY: Record<AppLanguage, Translation> = {
     items: { freeze: '冰冻', collapse: '超重', bomb: '炸弹', multiplier: '加倍' },
     materials: { freeze: '冰晶', collapse: '重力紫晶', bomb: '熔岩', multiplier: '金辉' },
     labels: {
-      language: '语言', chinese: '中文', english: 'English', settings: '设置', controls: '控制', rules: '规则', keyboard: '键盘', gameplayControls: '玩法操作', shortcuts: '快捷键', selectMode: '选择游戏模式', tagline: '重新定义下落方块', skipToGame: '跳到游戏', loading: 'TetraMorph 正在加载', back: '返回', start: '开始', okay: '好的', continue: '继续游戏', returnToPause: '返回暂停', restart: '重新开始', confirm: '确认', cancel: '取消', playAgain: '再来一局', replay: '重来', settingsShortcut: '设置', pauseResume: '暂停', restartConfirm: '重开确认', undo: '撤回', move: '移动', rotate: '旋转', softDrop: '快速下落', hardDrop: '直接落底', volume: '音量', soundOn: '音效开', soundOff: '音效关', soundControls: '声音控制', theme: '画面主题', currentTheme: '当前', mineralMist: '雾昼矿物', deepTide: '深潮夜航', sunstone: '暖砂日晷', turnSoundOn: '开启音效', turnSoundOff: '关闭音效', motion: '动态效果', reducedMotionOn: '减少动效', reducedMotionOff: '完整动效', turnReducedMotionOn: '开启减少动效', turnReducedMotionOff: '关闭减少动效', score: '分数', piecesUsed: '使用方块', lines: '消行', bedrock: '基岩', nextRise: '下一层', survivalTime: '生存时间', aftershock: '余震', stonefall: '距离落石', level: '关卡', originalBlocks: '原有方块', placed: '操作数', fall: '下落速度', classicSpeedRange: '下落速度区间', startingFallSpeed: '开局速度', fastestFallSpeed: '最快速度', appliesNextRun: '下局生效', classicDifficulty: '难度', classicRelaxed: '休闲', classicStandard: '标准', classicChallenge: '挑战', core: '材质', combo: '连消', next: 'Next', puzzle: '解谜', selectedPuzzle: '已选残局', puzzleTraits: '残局特性', fixedAnchors: '固定锚点', puzzleRoute: '开放解谜残局', puzzleBands: '残局行数分段', puzzlePages: '关卡页', puzzleIntro: '入门', puzzleEasy: '简单', puzzleHard: '困难', mastery: '技巧精通', hardUnlockHint: '困难关由对应简单关的精通成绩解锁。', modeHome: '返回首页', currentRecord: '当前关纪录', notCompleted: '尚未通关', best: '最少', leaderboard: '本模式排行', resultLeaderboard: '排行榜', noRecords: '暂无记录', currentRun: '本局', currentRunMissedLeaderboard: '未进入前 5', resultSummary: '本局结果', pauseTitle: '暂停', pauseHint: '回车继续', restartTitle: '重新开始', restartHint: '回车确认，按 R 取消', undoTitle: '撤回上一步？', leaveTitle: '离开本局？', leaveRun: '返回首页', leavePuzzle: '返回关卡库', resultTitle: '本局结束', gamePanel: '游戏面板', gameArea: '游戏区', board: '游戏棋盘', twoUpcoming: '后续两个方块：1 为下一个，2 为后一个', nextPiece: '下一个方块', followingPiece: '后一个方块', touchControls: '触控操作', puzzleTouchControls: '解谜触控操作', touchGestureHint: '触控：轻点旋转；左右滑动移动；向下短滑加速，长滑直接落底。', mutationStatus: '异变状态', mutationActive: '生效中', mutationIdle: '暂无持续状态', superMultiplier: '超级加倍 ×4', waitingForCore: '等待异变材质方块', carrierCore: '异变材质', pendingRise: '待上升', pausedMessage: '本局已暂停。', resumedMessage: '继续本局。', undoMessage: '已撤回上一次落子。', targetReached: '目标已达成。', runEnded: '本局结束。', runStarted: 'TetraMorph 已开始。', modeData: '模式数据', moveLeft: '左移', moveRight: '右移', stay: '留在本局', select: '选择', switch: '切换', activate: '执行',
+      language: '语言', chinese: '中文', english: 'English', settings: '设置', controls: '控制', rules: '规则', keyboard: '键盘', gameplayControls: '玩法操作', shortcuts: '快捷键', selectMode: '选择游戏模式', tagline: '重新定义下落方块', skipToGame: '跳到游戏', loading: 'TetraMorph 正在加载', back: '返回', start: '开始', okay: '好的', continue: '继续游戏', returnToPause: '返回暂停', restart: '重新开始', confirm: '确认', cancel: '取消', playAgain: '再来一局', replay: '重来', settingsShortcut: '设置', pauseResume: '暂停', restartConfirm: '重开确认', undo: '撤回', move: '移动', rotate: '旋转', softDrop: '快速下落', hardDrop: '直接落底', volume: '音量', soundOn: '音效开', soundOff: '音效关', soundControls: '声音控制', theme: '画面主题', currentTheme: '当前', mineralMist: '雾昼矿物', deepTide: '深潮夜航', sunstone: '暖砂日晷', turnSoundOn: '开启音效', turnSoundOff: '关闭音效', motion: '动态效果', reducedMotionOn: '减少动效', reducedMotionOff: '完整动效', turnReducedMotionOn: '开启减少动效', turnReducedMotionOff: '关闭减少动效', score: '分数', piecesUsed: '使用方块', lines: '消行', bedrock: '基岩', nextRise: '下一层', survivalTime: '生存时间', aftershock: '余震', stonefall: '距离落石', level: '关卡', originalBlocks: '原有方块', placed: '操作数', fall: '下落速度', classicSpeedRange: '下落速度区间', startingFallSpeed: '开局速度', fastestFallSpeed: '最快速度', appliesNextRun: '下局生效', classicDifficulty: '难度', classicRelaxed: '休闲', classicStandard: '标准', classicChallenge: '挑战', core: '材质', combo: '连消', next: 'Next', endgame: '残局', selectedEndgame: '已选残局', endgameTraits: '残局特性', fixedAnchors: '固定锚点', endgameRoute: '开放残局', endgameBands: '残局行数分段', endgamePages: '关卡页', endgameIntro: '入门', endgameEasy: '简单', endgameHard: '困难', mastery: '技巧精通', hardUnlockHint: '困难关由对应简单关的精通成绩解锁。', modeHome: '返回首页', currentRecord: '当前关纪录', notCompleted: '尚未通关', best: '最少', leaderboard: '本模式排行', resultLeaderboard: '排行榜', noRecords: '暂无记录', currentRun: '本局', currentRunMissedLeaderboard: '未进入前 5', resultSummary: '本局结果', pauseTitle: '暂停', pauseHint: '回车继续', restartTitle: '重新开始', restartHint: '回车确认，按 R 取消', undoTitle: '撤回上一步？', leaveTitle: '离开本局？', leaveRun: '返回首页', leaveEndgame: '返回关卡库', resultTitle: '本局结束', gamePanel: '游戏面板', gameArea: '游戏区', board: '游戏棋盘', twoUpcoming: '后续两个方块：1 为下一个，2 为后一个', nextPiece: '下一个方块', followingPiece: '后一个方块', touchControls: '触控操作', endgameTouchControls: '残局触控操作', touchGestureHint: '触控：轻点旋转；左右滑动移动；向下短滑加速，长滑直接落底。', mutationStatus: '异变状态', mutationActive: '生效中', mutationIdle: '暂无持续状态', superMultiplier: '超级加倍 ×4', waitingForCore: '等待异变材质方块', carrierCore: '异变材质', pendingRise: '待上升', pausedMessage: '本局已暂停。', resumedMessage: '继续本局。', undoMessage: '已撤回上一次落子。', targetReached: '目标已达成。', runEnded: '本局结束。', runStarted: 'TetraMorph 已开始。', modeData: '模式数据', moveLeft: '左移', moveRight: '右移', stay: '留在本局', select: '选择', switch: '切换', activate: '执行',
     },
     phrasing: {
       elapsed: (minutes, seconds) => `${minutes} 分 ${seconds} 秒`,
@@ -358,8 +358,8 @@ const COPY: Record<AppLanguage, Translation> = {
       modeLeaderboard: (mode) => `${mode}排行`,
       leaderboardCriterion: () => '前 5',
       leaderboardSummary: (score, pieces, lines, survival, mutation) => mutation ? `${score} 分  ${pieces} 方块` : survival ? `${lines} 行` : `${score} 分`,
-      terminalPuzzleSuccess: (pieces, lines) => ({ title: '原有方块已清除', detail: `${pieces} 方块 · ${lines} 消行` }),
-      puzzleCelebration: (outcome, best) => {
+      terminalEndgameSuccess: (pieces, lines) => ({ title: '原有方块已清除', detail: `${pieces} 方块 · ${lines} 消行` }),
+      endgameCelebration: (outcome, best) => {
         const metric = {
           best: `当前最优步数：${best}步`,
           bestLabel: '当前最优步数',
@@ -368,7 +368,7 @@ const COPY: Record<AppLanguage, Translation> = {
         };
         if (outcome === 'first') {
           return {
-            title: '恭喜你破解谜题',
+            title: '恭喜你完成残局',
             detail: '',
             ...metric,
           };
@@ -381,20 +381,20 @@ const COPY: Record<AppLanguage, Translation> = {
           };
         }
         return {
-          title: '谜题已破解',
+          title: '残局已破解',
           detail: '',
           ...metric,
         };
       },
-      terminalPuzzleFailure: (remaining, pieces) => ({ title: '堆叠到顶', detail: `剩余 ${remaining} 原有方块 · 已落 ${pieces} 块` }),
+      terminalEndgameFailure: (remaining, pieces) => ({ title: '堆叠到顶', detail: `剩余 ${remaining} 原有方块 · 已落 ${pieces} 块` }),
       terminalMutation: () => ({ title: '得分', detail: '' }),
       terminalSurvival: () => ({ title: '生存时间', detail: '' }),
       terminalClassic: () => ({ title: '消行', detail: '' }),
-      selectedPuzzle: (name) => `已选残局：${name}`,
-      puzzleBoard: (name) => `${name}棋盘轮廓`,
-      startPuzzle: (name) => `开始 ${name}`,
-      puzzleList: (count) => `${count} 个开放解谜残局`,
-      puzzleCategory: (category, count) => `${category}，${count} 关`,
+      selectedEndgame: (name) => `已选残局：${name}`,
+      endgameBoard: (name) => `${name}棋盘轮廓`,
+      startEndgame: (name) => `开始 ${name}`,
+      endgameList: (count) => `${count} 个开放残局`,
+      endgameCategory: (category, count) => `${category}，${count} 关`,
       masteryThreshold: (technique, prerequisite, required, best) => best === null
         ? `在“${prerequisite}”中用 ${required} 步内通关，掌握“${technique}”后解锁。`
         : best <= required
@@ -411,7 +411,7 @@ const COPY: Record<AppLanguage, Translation> = {
       mutationTimer: (item, seconds) => `${item}：${seconds} 秒`,
       mutationPieces: (item, pieces) => `${item} · 剩余 ${pieces} 块`,
       mutationPreview: (piece, material, item) => `${material}材质的 ${piece} 方块，触发${item}`,
-      puzzleLesson: (technique) => ({
+      endgameLesson: (technique) => ({
         'complete-row': { title: '先完成一行', body: '先补最接近完整的目标行；消行腾出的空间会让后续更清楚。' },
         'preserve-well': { title: '保留竖井', body: '不要先封住窄槽，把直达底部的通道留给形状匹配的长边。' },
         'build-support': { title: '先铺支撑', body: '先把承接面铺稳再盖上层；悬空封顶会把空格埋成洞。' },
@@ -430,7 +430,7 @@ const COPY: Record<AppLanguage, Translation> = {
       marathon: { label: 'Classic', detail: 'Complete rows to score; speed rises every 10 lines.', action: 'Play' },
       race: { label: 'Survival', detail: 'Outlast rising bedrock; remove one layer every 3 lines.', action: 'Play' },
       sprint: { label: 'Mutation', detail: 'Material pieces trigger items; speed rises every 6 lines.', action: 'Play' },
-      puzzle: { label: 'Puzzle', detail: 'Clear every original block with a fixed queue and direct undo.', action: 'Levels' },
+      endgame: { label: 'Endgame', detail: 'Clear every original block with a fixed queue and direct undo.', action: 'Levels' },
     },
     rules: {
       marathon: [
@@ -450,7 +450,7 @@ const COPY: Record<AppLanguage, Translation> = {
         { id: 'items', label: 'Items', value: 'Freeze sets gravity to 1.0 s/cell for 10 seconds; Supergravity settles only each of the next 5 pieces by its own occupied columns, without moving locked cells; Bomb clears the bottom 3 rows; Double makes line-clear scores ×2 for 10 seconds. Repeating Freeze or Double refreshes its duration, while Supergravity refreshes its 5-piece quota; stacked Double becomes Super Double ×4.' },
         { id: 'end', label: 'End', value: 'The run ends when a new piece cannot enter the board.' },
       ],
-      puzzle: [
+      endgame: [
         { id: 'goal', label: 'Solve', value: 'Clear every original block. Permanent anchors block movement but cannot be removed.' },
         { id: 'queue', label: 'Plan', value: 'Each level has a fixed sequence. Next shows the following two pieces, with no move limit.' },
         { id: 'undo', label: 'Undo', value: 'Press Z to return to the state before the previous piece appeared, then play it again.' },
@@ -473,7 +473,7 @@ const COPY: Record<AppLanguage, Translation> = {
         { id: 'mechanic', label: 'Mechanic', value: 'Clearing any cell of a material piece triggers that whole piece\'s item.' },
         { id: 'challenge', label: 'Challenge', value: 'Trigger each item when it can change the board most.' },
       ],
-      puzzle: [
+      endgame: [
         { id: 'objective', label: 'Goal', value: 'Clear every original block from the board.' },
         { id: 'mechanic', label: 'Mechanic', value: 'A fixed queue, two previews, and direct undo support planning.' },
         { id: 'challenge', label: 'Challenge', value: 'Work around anchors while preserving entries and support.' },
@@ -482,7 +482,7 @@ const COPY: Record<AppLanguage, Translation> = {
     items: { freeze: 'Freeze', collapse: 'Supergravity', bomb: 'Bomb', multiplier: 'Double' },
     materials: { freeze: 'ice crystal', collapse: 'gravity violet', bomb: 'lava', multiplier: 'gold' },
     labels: {
-      language: 'Language', chinese: 'Chinese', english: 'English', settings: 'Settings', controls: 'Controls', rules: 'Rules', keyboard: 'Keyboard', gameplayControls: 'Gameplay', shortcuts: 'Shortcuts', selectMode: 'Choose a game mode', tagline: 'Transform the way blocks fall.', skipToGame: 'Skip to game', loading: 'TetraMorph is loading', back: 'Back', start: 'Start', okay: 'Got it', continue: 'Continue', returnToPause: 'Return to pause', restart: 'Restart', confirm: 'Confirm', cancel: 'Cancel', playAgain: 'Play again', replay: 'Replay', settingsShortcut: 'Settings', pauseResume: 'Pause', restartConfirm: 'Restart confirmation', undo: 'Undo', move: 'Move', rotate: 'Rotate', softDrop: 'Soft drop', hardDrop: 'Hard drop', volume: 'Volume', soundOn: 'SFX on', soundOff: 'SFX off', soundControls: 'Sound controls', theme: 'Visual theme', currentTheme: 'Current', mineralMist: 'Mineral Mist', deepTide: 'Deep Tide', sunstone: 'Sunstone', turnSoundOn: 'Turn sound effects on', turnSoundOff: 'Turn sound effects off', motion: 'Motion', reducedMotionOn: 'Reduced motion', reducedMotionOff: 'Full motion', turnReducedMotionOn: 'Turn reduced motion on', turnReducedMotionOff: 'Turn reduced motion off', score: 'Score', piecesUsed: 'Pieces used', lines: 'Lines', bedrock: 'Bedrock', nextRise: 'Next rise', survivalTime: 'Survival time', aftershock: 'Aftershock', stonefall: 'Until rockfall', level: 'Level', originalBlocks: 'Original blocks', placed: 'Moves', fall: 'Fall speed', classicSpeedRange: 'Fall speed range', startingFallSpeed: 'Opening speed', fastestFallSpeed: 'Fastest speed', appliesNextRun: 'Next run', classicDifficulty: 'Difficulty', classicRelaxed: 'Relaxed', classicStandard: 'Standard', classicChallenge: 'Challenge', core: 'Material', combo: 'Combo', next: 'Next', puzzle: 'Puzzle', selectedPuzzle: 'Selected puzzle', puzzleTraits: 'Puzzle traits', fixedAnchors: 'Fixed anchors', puzzleRoute: 'Open puzzle routes', puzzleBands: 'Puzzle row bands', puzzlePages: 'Level pages', puzzleIntro: 'Intro', puzzleEasy: 'Easy', puzzleHard: 'Hard', mastery: 'Technique mastery', hardUnlockHint: 'Hard puzzles unlock through mastery scores in related Easy puzzles.', modeHome: 'Back to home', currentRecord: 'Current record', notCompleted: 'Not completed', best: 'Best', leaderboard: 'This mode', resultLeaderboard: 'Leaderboard', noRecords: 'No records yet', currentRun: 'This run', currentRunMissedLeaderboard: 'Outside the top 5', resultSummary: 'Run result', pauseTitle: 'Paused', pauseHint: 'Press Enter to continue', restartTitle: 'Restart', restartHint: 'Enter to confirm; R to cancel', undoTitle: 'Undo last move?', leaveTitle: 'Leave this run?', leaveRun: 'Back to home', leavePuzzle: 'Back to puzzle library', resultTitle: 'Run complete', gamePanel: 'game panel', gameArea: 'game area', board: 'game board', twoUpcoming: 'Two upcoming pieces: 1 is next; 2 follows it', nextPiece: 'Next piece', followingPiece: 'Following piece', touchControls: 'Touch controls', puzzleTouchControls: 'Puzzle touch controls', touchGestureHint: 'Touch: tap to rotate; swipe sideways to move; swipe down to soft-drop or hard-drop.', mutationStatus: 'Mutation status', mutationActive: 'Active', mutationIdle: 'No active mutation', superMultiplier: 'Super Double ×4', waitingForCore: 'Waiting for a material piece', carrierCore: 'Mutation material', pendingRise: 'Rising next', pausedMessage: 'Run paused.', resumedMessage: 'Run resumed.', undoMessage: 'Last placement undone.', targetReached: 'Goal reached.', runEnded: 'Run ended.', runStarted: 'TetraMorph started.', modeData: 'mode data', moveLeft: 'Move left', moveRight: 'Move right', stay: 'Stay in this run', select: 'Select', switch: 'Move between controls', activate: 'Activate',
+      language: 'Language', chinese: 'Chinese', english: 'English', settings: 'Settings', controls: 'Controls', rules: 'Rules', keyboard: 'Keyboard', gameplayControls: 'Gameplay', shortcuts: 'Shortcuts', selectMode: 'Choose a game mode', tagline: 'Transform the way blocks fall.', skipToGame: 'Skip to game', loading: 'TetraMorph is loading', back: 'Back', start: 'Start', okay: 'Got it', continue: 'Continue', returnToPause: 'Return to pause', restart: 'Restart', confirm: 'Confirm', cancel: 'Cancel', playAgain: 'Play again', replay: 'Replay', settingsShortcut: 'Settings', pauseResume: 'Pause', restartConfirm: 'Restart confirmation', undo: 'Undo', move: 'Move', rotate: 'Rotate', softDrop: 'Soft drop', hardDrop: 'Hard drop', volume: 'Volume', soundOn: 'SFX on', soundOff: 'SFX off', soundControls: 'Sound controls', theme: 'Visual theme', currentTheme: 'Current', mineralMist: 'Mineral Mist', deepTide: 'Deep Tide', sunstone: 'Sunstone', turnSoundOn: 'Turn sound effects on', turnSoundOff: 'Turn sound effects off', motion: 'Motion', reducedMotionOn: 'Reduced motion', reducedMotionOff: 'Full motion', turnReducedMotionOn: 'Turn reduced motion on', turnReducedMotionOff: 'Turn reduced motion off', score: 'Score', piecesUsed: 'Pieces used', lines: 'Lines', bedrock: 'Bedrock', nextRise: 'Next rise', survivalTime: 'Survival time', aftershock: 'Aftershock', stonefall: 'Until rockfall', level: 'Level', originalBlocks: 'Original blocks', placed: 'Moves', fall: 'Fall speed', classicSpeedRange: 'Fall speed range', startingFallSpeed: 'Opening speed', fastestFallSpeed: 'Fastest speed', appliesNextRun: 'Next run', classicDifficulty: 'Difficulty', classicRelaxed: 'Relaxed', classicStandard: 'Standard', classicChallenge: 'Challenge', core: 'Material', combo: 'Combo', next: 'Next', endgame: 'Endgame', selectedEndgame: 'Selected endgame', endgameTraits: 'Endgame traits', fixedAnchors: 'Fixed anchors', endgameRoute: 'Open endgame routes', endgameBands: 'Endgame row bands', endgamePages: 'Level pages', endgameIntro: 'Intro', endgameEasy: 'Easy', endgameHard: 'Hard', mastery: 'Technique mastery', hardUnlockHint: 'Hard endgames unlock through mastery scores in related Easy endgames.', modeHome: 'Back to home', currentRecord: 'Current record', notCompleted: 'Not completed', best: 'Best', leaderboard: 'This mode', resultLeaderboard: 'Leaderboard', noRecords: 'No records yet', currentRun: 'This run', currentRunMissedLeaderboard: 'Outside the top 5', resultSummary: 'Run result', pauseTitle: 'Paused', pauseHint: 'Press Enter to continue', restartTitle: 'Restart', restartHint: 'Enter to confirm; R to cancel', undoTitle: 'Undo last move?', leaveTitle: 'Leave this run?', leaveRun: 'Back to home', leaveEndgame: 'Back to endgame library', resultTitle: 'Run complete', gamePanel: 'game panel', gameArea: 'game area', board: 'game board', twoUpcoming: 'Two upcoming pieces: 1 is next; 2 follows it', nextPiece: 'Next piece', followingPiece: 'Following piece', touchControls: 'Touch controls', endgameTouchControls: 'Endgame touch controls', touchGestureHint: 'Touch: tap to rotate; swipe sideways to move; swipe down to soft-drop or hard-drop.', mutationStatus: 'Mutation status', mutationActive: 'Active', mutationIdle: 'No active mutation', superMultiplier: 'Super Double ×4', waitingForCore: 'Waiting for a material piece', carrierCore: 'Mutation material', pendingRise: 'Rising next', pausedMessage: 'Run paused.', resumedMessage: 'Run resumed.', undoMessage: 'Last placement undone.', targetReached: 'Goal reached.', runEnded: 'Run ended.', runStarted: 'TetraMorph started.', modeData: 'mode data', moveLeft: 'Move left', moveRight: 'Move right', stay: 'Stay in this run', select: 'Select', switch: 'Move between controls', activate: 'Activate',
     },
     phrasing: {
       elapsed: (minutes, seconds) => `${minutes}m ${seconds}s`,
@@ -499,8 +499,8 @@ const COPY: Record<AppLanguage, Translation> = {
       modeLeaderboard: (mode) => `${mode} leaderboard`,
       leaderboardCriterion: () => 'Top 5',
       leaderboardSummary: (score, pieces, lines, survival, mutation) => mutation ? `${score} pts  ${pieces} pieces` : survival ? `${lines} lines` : `${score} pts`,
-      terminalPuzzleSuccess: (pieces, lines) => ({ title: 'Original blocks cleared', detail: `${pieces} pieces · ${lines} lines` }),
-      puzzleCelebration: (outcome, best) => {
+      terminalEndgameSuccess: (pieces, lines) => ({ title: 'Original blocks cleared', detail: `${pieces} pieces · ${lines} lines` }),
+      endgameCelebration: (outcome, best) => {
         const metric = {
           best: `Current best: ${best} moves`,
           bestLabel: 'Current best',
@@ -509,7 +509,7 @@ const COPY: Record<AppLanguage, Translation> = {
         };
         if (outcome === 'first') {
           return {
-            title: 'Puzzle solved',
+            title: 'Endgame solved',
             detail: '',
             ...metric,
           };
@@ -522,27 +522,27 @@ const COPY: Record<AppLanguage, Translation> = {
           };
         }
         return {
-          title: 'Puzzle solved',
+          title: 'Endgame solved',
           detail: '',
           ...metric,
         };
       },
-      terminalPuzzleFailure: (remaining, pieces) => ({ title: 'Stacked out', detail: `${remaining} original blocks left · ${pieces} pieces placed` }),
+      terminalEndgameFailure: (remaining, pieces) => ({ title: 'Stacked out', detail: `${remaining} original blocks left · ${pieces} pieces placed` }),
       terminalMutation: () => ({ title: 'Score', detail: '' }),
       terminalSurvival: () => ({ title: 'Survival time', detail: '' }),
       terminalClassic: () => ({ title: 'Lines', detail: '' }),
-      selectedPuzzle: (name) => `Selected puzzle: ${name}`,
-      puzzleBoard: (name) => `${name} board outline`,
-      startPuzzle: (name) => `Start ${name}`,
-      puzzleList: (count) => `${count} open puzzle routes`,
-      puzzleCategory: (category, count) => `${category}, ${count} levels`,
+      selectedEndgame: (name) => `Selected endgame: ${name}`,
+      endgameBoard: (name) => `${name} board outline`,
+      startEndgame: (name) => `Start ${name}`,
+      endgameList: (count) => `${count} open endgame routes`,
+      endgameCategory: (category, count) => `${category}, ${count} levels`,
       masteryThreshold: (technique, prerequisite, required, best) => best === null
         ? `Finish “${prerequisite}” in ${required} moves or fewer to master “${technique}”.`
         : best <= required
           ? `“${technique}” mastered in “${prerequisite}” with ${best} moves.`
           : `Current “${prerequisite}” best: ${best}; reach ${required} moves to master “${technique}”.`,
-      rowBand: (rows) => `${rows}-row puzzle`,
-      levelNode: (index, name, rows, complete, unlocked, best) => `${index} ${name}, ${rows}-row puzzle${complete ? ', completed' : unlocked ? ', ready' : ', locked'}${best !== null ? `, best ${best} moves` : ''}`,
+      rowBand: (rows) => `${rows}-row endgame`,
+      levelNode: (index, name, rows, complete, unlocked, best) => `${index} ${name}, ${rows}-row endgame${complete ? ', completed' : unlocked ? ', ready' : ', locked'}${best !== null ? `, best ${best} moves` : ''}`,
       boardLabel: 'TetraMorph 10 by 20 game board',
       eventLinesCleared: (count) => `${count} lines cleared.`,
       eventBedrockRaised: (height) => `Bedrock rose to ${height} rows.`,
@@ -552,7 +552,7 @@ const COPY: Record<AppLanguage, Translation> = {
       mutationTimer: (item, seconds) => `${item}: ${seconds}s`,
       mutationPieces: (item, pieces) => `${item} · ${pieces} pieces left`,
       mutationPreview: (piece, material, item) => `${piece} piece in ${material} material; triggers ${item}`,
-      puzzleLesson: (technique) => ({
+      endgameLesson: (technique) => ({
         'complete-row': { title: 'Finish one row first', body: 'Close the nearest prepared row; the clear creates room for every choice after it.' },
         'preserve-well': { title: 'Keep the well open', body: 'Do not cap a narrow channel before the matching long or vertical body arrives.' },
         'build-support': { title: 'Build support first', body: 'Level the support before capping it; an unsupported cap buries a hole.' },
@@ -596,7 +596,7 @@ export function itemLabel(language: AppLanguage, item: MutationItem): string {
   return COPY[language].items[item];
 }
 
-export function puzzleDisplayName(language: AppLanguage, id: PuzzleId, fallback: string): string {
+export function endgameDisplayName(language: AppLanguage, id: EndgameId, fallback: string): string {
   return language === 'en' ? ENGLISH_LEVEL_NAMES[id] : fallback;
 }
 

@@ -64,7 +64,7 @@ function supportedKeys(cells: readonly Cell[], removed: ReadonlySet<number>): Re
 }
 
 /**
- * Returns the coordinate after a line clear while treating Puzzle anchors as fixed
+ * Returns the coordinate after a line clear while treating Endgame anchors as fixed
  * world coordinates. A clear below an anchor cannot pull a cell through that anchor.
  */
 function destinationAfterClear(
@@ -80,7 +80,7 @@ function destinationAfterClear(
   return { x: cell.x, y: cell.y + shift };
 }
 
-/** Maps tracked canonical Puzzle cells through the exact anchor-aware line-clear rule. */
+/** Maps tracked canonical Endgame cells through the exact anchor-aware line-clear rule. */
 export function mapCellsAfterClear(
   board: Board,
   rows: readonly number[],

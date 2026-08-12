@@ -26,7 +26,7 @@
   --classic: #31978D;
   --race: #5878C4;
   --sprint: #C77A35;
-  --puzzle: #8A63B3;
+  --endgame: #8A63B3;
   --selection: #A75E71;
   --target: #D9C187;
   --action: #315F96;
@@ -96,7 +96,7 @@ h3 {
   font-family: var(--font-ui);
 }
 
-[lang="zh-CN"] :is(.action-sheet h2, .puzzle-gallery__title, .result-summary__title) {
+[lang="zh-CN"] :is(.action-sheet h2, .endgame-gallery__title, .result-summary__title) {
   font-family: var(--font-display);
 }
 
@@ -108,8 +108,8 @@ h3 {
   .result-leaderboard__run strong,
   .result-leaderboard li > time,
   [data-record-field],
-  .puzzle-gallery__index,
-  .puzzle-gallery__page,
+  .endgame-gallery__index,
+  .endgame-gallery__page,
   .level-entry__number
 ) {
   font-family: var(--font-data);
@@ -125,8 +125,8 @@ h3 {
   .result-leaderboard__run strong,
   .result-leaderboard li > time,
   [data-record-field],
-  .puzzle-gallery__index,
-  .puzzle-gallery__page,
+  .endgame-gallery__index,
+  .endgame-gallery__page,
   .level-entry__number
 ) {
   -webkit-text-stroke: 0;

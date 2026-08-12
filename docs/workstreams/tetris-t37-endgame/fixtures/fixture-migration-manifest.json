@@ -125,41 +125,41 @@
       "source": "docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-01.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-01.json",
       "sourceSha": "8755dd24a15c89a6df360d0053fe8810a986eb2f9e3f68547aa15fd32c268e49",
-      "targetSha": null,
+      "targetSha": "84646393415d248815830237c235238aaccc3cc48ecc1b9431c8b2b063b832c4",
       "transformVersion": "endgame-core-regeneration-v1",
-      "status": "pending-endgame-core"
+      "status": "verified-endgame-core-regeneration"
     },
     {
       "source": "docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-02.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-02.json",
       "sourceSha": "8ec555240fd12f07b7c873dc3f163356ea9b8113c58d1e944497889a2ee03b75",
-      "targetSha": null,
+      "targetSha": "bed8d6c1a93bf324d03ee29eac6ae79a24510c15f430ea309f3e369ede4e1064",
       "transformVersion": "endgame-core-regeneration-v1",
-      "status": "pending-endgame-core"
+      "status": "verified-endgame-core-regeneration"
     },
     {
       "source": "docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-03.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-03.json",
       "sourceSha": "f24752c4dafa95aeadaa0ca8e7c83916d367b868dd572ee38cd03ab33af44121",
-      "targetSha": null,
+      "targetSha": "c02d6e5d2ed0d6f4756da2ab439c9bd515f3658ffa536194a1a1c21a33c191e4",
       "transformVersion": "endgame-core-regeneration-v1",
-      "status": "pending-endgame-core"
+      "status": "verified-endgame-core-regeneration"
     },
     {
       "source": "docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-04.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-04.json",
       "sourceSha": "ec17469f6d7f48cbbfb8a2863d24c79d3232b10dad851204d52b8bf5d69efb1a",
-      "targetSha": null,
+      "targetSha": "db46cf1db9b206a7866f7295dfc054b27c5fc1da4855944fba2ba7c87e9d5725",
       "transformVersion": "endgame-core-regeneration-v1",
-      "status": "pending-endgame-core"
+      "status": "verified-endgame-core-regeneration"
     },
     {
       "source": "docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json",
       "target": "docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-ten-row-prototype.json",
       "sourceSha": "3af6478949da431a8bc063e1152dfd918fcee5c61e8ce67b18ade4764340e46a",
-      "targetSha": null,
+      "targetSha": "5f6bfe574d83292d5c3db2a05fff4acd408fb1fe1a657ccaddd1342f4203ba9e",
       "transformVersion": "endgame-core-regeneration-v1",
-      "status": "pending-endgame-core"
+      "status": "verified-endgame-core-regeneration"
     }
   ]
 }

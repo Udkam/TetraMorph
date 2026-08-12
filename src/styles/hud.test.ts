@@ -62,9 +62,9 @@ describe('T27-R1 centered live stage', () => {
     expect(hudCss).toMatch(/\.run-stats \[data-stat-role\],[\s\S]*background:\s*transparent !important;[\s\S]*border:\s*0 !important;[\s\S]*box-shadow:\s*none !important;/);
   });
 
-  it('keeps a legible two-row Puzzle queue without restoring a backdrop card', () => {
-    expect(hudCss).toMatch(/\.preview-rail--puzzle,[\s\S]*grid-template-rows:\s*auto 196px;/);
-    expect(hudCss).toMatch(/\.preview-rail--puzzle \.next-slot--dual,[\s\S]*grid-template-rows:\s*repeat\(2, minmax\(0, 1fr\)\);[\s\S]*height:\s*196px;/);
+  it('keeps a legible two-row Endgame queue without restoring a backdrop card', () => {
+    expect(hudCss).toMatch(/\.preview-rail--endgame,[\s\S]*grid-template-rows:\s*auto 196px;/);
+    expect(hudCss).toMatch(/\.preview-rail--endgame \.next-slot--dual,[\s\S]*grid-template-rows:\s*repeat\(2, minmax\(0, 1fr\)\);[\s\S]*height:\s*196px;/);
     expect(hudCss).toMatch(/\.next-slot__segment-label\s*\{[^}]*left:\s*0;[^}]*place-items:\s*center;/s);
     expect(hudCss).toMatch(/\.next-slot__segment-label b\s*\{[^}]*font-family:\s*var\(--font-data\);[^}]*font-size:\s*14px;/s);
   });
@@ -107,9 +107,9 @@ describe('T27-R1 centered live stage', () => {
     expect(compact).toMatch(/\.game-right-rail\s*\{[^}]*grid-column:\s*2;/s);
   });
 
-  it('does not bring retired live Puzzle diagnostics back into the rail', () => {
-    expect(hudCss).not.toContain('.puzzle-guidance');
-    expect(hudCss).not.toContain('.puzzle-guidance__metrics');
-    expect(hudCss).not.toContain('.puzzle-guidance__route');
+  it('does not bring retired live Endgame diagnostics back into the rail', () => {
+    expect(hudCss).not.toContain('.endgame-guidance');
+    expect(hudCss).not.toContain('.endgame-guidance__metrics');
+    expect(hudCss).not.toContain('.endgame-guidance__route');
   });
 });

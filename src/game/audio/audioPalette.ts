@@ -7,7 +7,7 @@ import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
  * Accepted Action A, Studio clear/countdown, and Ice 2 remain intentionally absent.
  */
 export type CandidateAudioCueId =
-  | 'soft-drop' | 'puzzle-undo'
+  | 'soft-drop' | 'endgame-undo'
   | 'bedrock-rise' | 'bedrock-lower' | 'stone-warning' | 'stone-spawn' | 'stone-land'
   | 'level-up' | 'finished' | 'game-over' | 'pause' | 'resume'
   | 'supergravity' | 'bomb' | 'multiplier-2' | 'multiplier-4';
@@ -66,7 +66,7 @@ const PALETTE: Readonly<Record<CandidateAudioCueId, CandidateAudioCue>> = {
   'soft-drop': gesture('gameplay', [
     tone(196, 0.036, 0.078, { endFrequency: 185, attack: 0.007 }),
   ]),
-  'puzzle-undo': gesture('ui', [
+  'endgame-undo': gesture('ui', [
     tone(392, 0.09, 0.095, { endFrequency: 293.66, attack: 0.006 }),
   ]),
   'bedrock-rise': gesture('gameplay', [

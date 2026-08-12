@@ -33,8 +33,8 @@ export interface RandomizerState {
 
 export type GameStatus = 'ready' | 'playing' | 'paused' | 'game-over' | 'finished';
 export type GamePhase = 'active' | 'entry' | 'line-clear';
-export type GameMode = 'marathon' | 'race' | 'sprint' | 'puzzle';
-export type PuzzleId =
+export type GameMode = 'marathon' | 'race' | 'sprint' | 'endgame';
+export type EndgameId =
   | 't3r-shaft-01'
   | 't3r-shaft-02'
   | 't3r-shaft-03'
@@ -55,43 +55,43 @@ export type PuzzleId =
   | 't6r-terrace-18'
   | 't6r-bastion-19'
   | 't6r-keystone-20'
-  | 'tm-puzzle-21'
-  | 'tm-puzzle-22'
-  | 'tm-puzzle-23'
-  | 'tm-puzzle-24'
-  | 'tm-puzzle-25'
-  | 'tm-puzzle-26'
-  | 'tm-puzzle-27'
-  | 'tm-puzzle-28'
-  | 'tm-puzzle-29'
-  | 'tm-puzzle-30'
-  | 'tm-puzzle-31'
-  | 'tm-puzzle-32'
-  | 'tm-puzzle-33'
-  | 'tm-puzzle-34'
-  | 'tm-puzzle-35'
-  | 'tm-puzzle-36'
-  | 'tm-puzzle-37'
-  | 'tm-puzzle-38'
-  | 'tm-puzzle-39'
-  | 'tm-puzzle-40'
-  | 'tm-puzzle-41'
-  | 'tm-puzzle-42'
-  | 'tm-puzzle-43'
-  | 'tm-puzzle-44'
-  | 'tm-puzzle-45'
-  | 'tm-puzzle-46'
-  | 'tm-puzzle-47'
-  | 'tm-puzzle-48'
-  | 'tm-puzzle-49'
-  | 'tm-puzzle-50';
+  | 'tm-endgame-21'
+  | 'tm-endgame-22'
+  | 'tm-endgame-23'
+  | 'tm-endgame-24'
+  | 'tm-endgame-25'
+  | 'tm-endgame-26'
+  | 'tm-endgame-27'
+  | 'tm-endgame-28'
+  | 'tm-endgame-29'
+  | 'tm-endgame-30'
+  | 'tm-endgame-31'
+  | 'tm-endgame-32'
+  | 'tm-endgame-33'
+  | 'tm-endgame-34'
+  | 'tm-endgame-35'
+  | 'tm-endgame-36'
+  | 'tm-endgame-37'
+  | 'tm-endgame-38'
+  | 'tm-endgame-39'
+  | 'tm-endgame-40'
+  | 'tm-endgame-41'
+  | 'tm-endgame-42'
+  | 'tm-endgame-43'
+  | 'tm-endgame-44'
+  | 'tm-endgame-45'
+  | 'tm-endgame-46'
+  | 'tm-endgame-47'
+  | 'tm-endgame-48'
+  | 'tm-endgame-49'
+  | 'tm-endgame-50';
 
-export type PuzzleGoal = 'original-targets-cleared';
-export type PuzzleCompletion =
+export type EndgameGoal = 'original-targets-cleared';
+export type EndgameCompletion =
   | 'active'
   | 'finished'
   | 'failed-top-out'
-  /** @deprecated Compatibility-only; the normal-play Puzzle engine never emits this. */
+  /** @deprecated Compatibility-only; the normal-play Endgame engine never emits this. */
   | 'failed-invalid-spawn';
 
 export type MutationItem = 'freeze' | 'collapse' | 'bomb' | 'multiplier';
@@ -135,42 +135,42 @@ export interface GameState {
   classicStartingGravityTicks: number;
   /** Classic-only fastest gravity captured when this run is created. */
   classicGravityFloorTicks: number;
-  puzzleId: PuzzleId | null;
+  endgameId: EndgameId | null;
   /**
-   * Temporary presentation bridge for the frozen T2 shell. Puzzle core rules
+   * Temporary presentation bridge for the frozen T2 shell. Endgame core rules
    * never read this field: T11 success is exclusively original-targets-cleared.
-   * @deprecated Remove when the presentation shell consumes puzzleGoal.
+   * @deprecated Remove when the presentation shell consumes endgameGoal.
    */
-  puzzleTargetLines: number | null;
+  endgameTargetLines: number | null;
   /** Original authored cells still awaiting an ordinary line clear. */
-  puzzleTargetCells: readonly Cell[];
+  endgameTargetCells: readonly Cell[];
   /** Stable original-target count used for the player-facing progress display. */
-  puzzleInitialTargetCount: number;
-  /** Exact settled Puzzle cells whose placements are physically supported by anchors. */
-  puzzleAnchorSupportedCells: readonly Cell[];
+  endgameInitialTargetCount: number;
+  /** Exact settled Endgame cells whose placements are physically supported by anchors. */
+  endgameAnchorSupportedCells: readonly Cell[];
   /** Immutable authored visible board source; the mutable canonical board is above. */
-  puzzleBoardRows: readonly string[] | null;
+  endgameBoardRows: readonly string[] | null;
   /**
    * @deprecated Generated-preview bridge for the blocked renderer only. It mirrors
    * the shared queue and is never read by generation or terminal rules.
    */
-  puzzleQueue: readonly PieceType[] | null;
+  endgameQueue: readonly PieceType[] | null;
   /** @deprecated Generated-preview bridge index; always zero. Use pieceCount for placed pieces. */
-  puzzleQueueIndex: number;
-  /** Number of seeded Puzzle pieces that have entered the board, including the active piece. */
-  puzzleSpawnCount: number;
-  puzzleGoal: PuzzleGoal | null;
-  puzzleCompletion: PuzzleCompletion | null;
+  endgameQueueIndex: number;
+  /** Number of seeded Endgame pieces that have entered the board, including the active piece. */
+  endgameSpawnCount: number;
+  endgameGoal: EndgameGoal | null;
+  endgameCompletion: EndgameCompletion | null;
   /**
-   * Puzzle-only, run-local pre-spawn checkpoints for pieces that have already locked.
+   * Endgame-only, run-local pre-spawn checkpoints for pieces that have already locked.
    * Snapshots intentionally omit both undo fields so history cannot recurse.
    */
-  puzzleUndoHistory: readonly PuzzleUndoSnapshot[];
-  /** Pre-spawn checkpoint for the active Puzzle piece; promoted into history on lock. */
-  puzzleActiveSpawnCheckpoint: PuzzleUndoSnapshot | null;
-  completedLevelId: PuzzleId | null;
+  endgameUndoHistory: readonly EndgameUndoSnapshot[];
+  /** Pre-spawn checkpoint for the active Endgame piece; promoted into history on lock. */
+  endgameActiveSpawnCheckpoint: EndgameUndoSnapshot | null;
+  completedLevelId: EndgameId | null;
   /** @deprecated Navigation/progress bridge only; T5 level availability is always unrestricted. */
-  nextUnlockedLevelId: PuzzleId | null;
+  nextUnlockedLevelId: EndgameId | null;
   pieceCount: number;
   survivalBedrockRows: number;
   /** Playing ticks consumed in the current Survival pressure interval. */
@@ -234,8 +234,8 @@ export interface GameState {
   seed: number;
 }
 
-/** A nonrecursive Puzzle checkpoint containing all canonical state except its own undo state. */
-export type PuzzleUndoSnapshot = Omit<GameState, 'puzzleUndoHistory' | 'puzzleActiveSpawnCheckpoint'>;
+/** A nonrecursive Endgame checkpoint containing all canonical state except its own undo state. */
+export type EndgameUndoSnapshot = Omit<GameState, 'endgameUndoHistory' | 'endgameActiveSpawnCheckpoint'>;
 
 export type GameCommand =
   | { type: 'start' }
@@ -251,7 +251,7 @@ export type GameCommand =
     type: 'restart';
     seed?: number;
     mode?: GameMode;
-    puzzleId?: PuzzleId;
+    endgameId?: EndgameId;
     classicStartingGravityTicks?: number;
     classicGravityFloorTicks?: number;
   };
@@ -265,7 +265,7 @@ export type GameEvent =
   | { type: 'piece-rotated'; piece: PieceType; direction: -1 | 1 }
   | { type: 'hard-dropped'; piece: PieceType; distance: number }
   | { type: 'piece-locked'; piece: PieceType; cells: Cell[] }
-  | { type: 'puzzle-undone' }
+  | { type: 'endgame-undone' }
   | { type: 'clear-started'; rows: number[] }
   | { type: 'lines-cleared'; rows: number[]; count: number; score: number }
   | {
@@ -298,7 +298,7 @@ export type GameEvent =
   | { type: 'survival-stones-landed'; cells: readonly Cell[] }
   | { type: 'level-up'; level: number }
   | { type: 'finished'; completionTicks: number }
-  | { type: 'game-over'; reason: 'block-out' | 'lock-out' | 'bedrock-overflow' | 'puzzle-invalid-spawn' | 'invalid-state' };
+  | { type: 'game-over'; reason: 'block-out' | 'lock-out' | 'bedrock-overflow' | 'endgame-invalid-spawn' | 'invalid-state' };
 
 export interface GameTransition {
   state: GameState;

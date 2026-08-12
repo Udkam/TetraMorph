@@ -182,12 +182,12 @@ export function replaySurvivalBedrock(seed = 5): {
   return { replay, riseState, state };
 }
 
-const QA_PUZZLE_ID = 't5r-drift-08' as const;
+const QA_ENDGAME_ID = 't5r-drift-08' as const;
 // Schema-7 T32 primary public route for the retained QA specimen. This remains a
 // normal command replay rather than a test-only state injection.
-const QA_PUZZLE_ROUTE_TOKENS = 'SLDDDDDDDDDDDDDDDDLHTTTCLLHTTTCLLLLLHTTTTTTTTTTTTCLLLHTTTCCCRRRRRHTTTTTTTTTTTTCCCRRHTTTTTTTTTTTT';
+const QA_ENDGAME_ROUTE_TOKENS = 'SLDDDDDDDDDDDDDDDDLHTTTCLLHTTTCLLLLLHTTTTTTTTTTTTCLLLHTTTCCCRRRRRHTTTTTTTTTTTTCCCRRHTTTTTTTTTTTT';
 
-function puzzleRouteCommand(token: string): GameCommand {
+function endgameRouteCommand(token: string): GameCommand {
   switch (token) {
     case 'S': return { type: 'start' };
     case 'T': return { type: 'tick' };
@@ -196,27 +196,27 @@ function puzzleRouteCommand(token: string): GameCommand {
     case 'H': return { type: 'hard-drop' };
     case 'C': return { type: 'rotate', direction: 1 };
     case 'D': return { type: 'soft-drop' };
-    default: throw new Error(`Unknown Puzzle QA route token: ${token}`);
+    default: throw new Error(`Unknown Endgame QA route token: ${token}`);
   }
 }
 
-const PUZZLE_CHALLENGE_QA_ROUTE: readonly GameCommand[] = Object.freeze(
-  [...QA_PUZZLE_ROUTE_TOKENS].map(puzzleRouteCommand),
+const ENDGAME_CHALLENGE_QA_ROUTE: readonly GameCommand[] = Object.freeze(
+  [...QA_ENDGAME_ROUTE_TOKENS].map(endgameRouteCommand),
 );
 
-/** A complete public-command-only normal-play Puzzle route with ordinary delayed resolution. */
-export function replayPuzzleChallenge(seed = 0x51a1f00d): { commands: readonly GameCommand[]; state: GameState; hash: string } {
-  let state = createInitialState(seed, 'puzzle', QA_PUZZLE_ID);
+/** A complete public-command-only normal-play Endgame route with ordinary delayed resolution. */
+export function replayEndgameChallenge(seed = 0x51a1f00d): { commands: readonly GameCommand[]; state: GameState; hash: string } {
+  let state = createInitialState(seed, 'endgame', QA_ENDGAME_ID);
   const commands: GameCommand[] = [];
   const apply = (command: GameCommand): void => {
     commands.push(command);
     state = dispatch(state, command).state;
   };
 
-  for (const command of PUZZLE_CHALLENGE_QA_ROUTE) apply(command);
+  for (const command of ENDGAME_CHALLENGE_QA_ROUTE) apply(command);
 
-  if (state.status !== 'finished' || state.puzzleTargetCells.length !== 0 || state.puzzleCompletion !== 'finished') {
-    throw new Error(`Puzzle challenge replay did not finish: ${state.status}, ${state.lines} lines, ${state.pieceCount} pieces.`);
+  if (state.status !== 'finished' || state.endgameTargetCells.length !== 0 || state.endgameCompletion !== 'finished') {
+    throw new Error(`Endgame challenge replay did not finish: ${state.status}, ${state.lines} lines, ${state.pieceCount} pieces.`);
   }
   return { commands, state, hash: stateHash(state) };
 }

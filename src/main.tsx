@@ -7,7 +7,7 @@ import './styles/tokens.css';
 import './styles/mutation-vfx.css';
 import './styles/hud.css';
 import './styles/navigation.css';
-import './styles/puzzle-library.css';
+import './styles/endgame-library.css';
 import './styles/result.css';
 import './styles/settings.css';
 import './styles/themes.css';

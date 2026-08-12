@@ -6,7 +6,7 @@ import { act, createElement, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import styles from './styles.css?raw';
-import { MUTATION_EFFECT_TICKS, MUTATION_SUPERGRAVITY_PIECES, PIECE_TYPES, createInitialState, dispatch, getPuzzleDefinition, nextMutationPreviewItem, type GameEvent, type GameMode, type GameState, type PieceType, type PuzzleId } from './game/core';
+import { MUTATION_EFFECT_TICKS, MUTATION_SUPERGRAVITY_PIECES, PIECE_TYPES, createInitialState, dispatch, getEndgameDefinition, nextMutationPreviewItem, type GameEvent, type GameMode, type GameState, type PieceType, type EndgameId } from './game/core';
 import App, {
   cloneQaState,
   countdownTimeLabel,
@@ -20,13 +20,13 @@ import App, {
   LeaderboardPanel,
   MutationStatus,
   ModeHome,
-  PuzzleLibrary,
+  EndgameLibrary,
   parseReducedMotionOverride,
   parseClassicGravityRange,
-  puzzleAnchorSilhouettePath,
-  puzzleCelebrationCopy,
-  puzzleCelebrationOutcome,
-  puzzleSilhouettePaths,
+  endgameAnchorSilhouettePath,
+  endgameCelebrationCopy,
+  endgameCelebrationOutcome,
+  endgameSilhouettePaths,
   runResultMetrics,
   RunResultSummary,
   RunStats,
@@ -41,15 +41,13 @@ import App, {
 } from './App';
 import {
   CAMPAIGN_LEVELS,
-  defaultPuzzleProgress,
-  PUZZLE_CATEGORIES,
-  PUZZLE_CAMPAIGN_REVISION,
-  PUZZLE_PROGRESS_KEY,
-  LEGACY_V5_PUZZLE_PROGRESS_KEY,
-  V4_PUZZLE_PROGRESS_KEY,
-  type PuzzleProgress,
-} from './puzzleProgress';
-import { PUZZLE_HARD_MASTERY_GROUPS, PUZZLE_OPTIMAL_CERTIFICATES } from './puzzleMastery';
+  defaultEndgameProgress,
+  ENDGAME_CATEGORIES,
+  ENDGAME_CAMPAIGN_REVISION,
+  ENDGAME_PROGRESS_KEY,
+  type EndgameProgress,
+} from './endgameProgress';
+import { ENDGAME_HARD_MASTERY_GROUPS, ENDGAME_OPTIMAL_CERTIFICATES } from './endgameMastery';
 import { LEADERBOARD_KEY, emptyLeaderboard, type ScoreRecord } from './leaderboard';
 import { appCopy, itemLabel, modeIntroRules, modeRules, modeRulesTitle } from './ui/localization';
 import type { VisualThemeId } from './design/visualThemes';
@@ -60,13 +58,13 @@ const sourceStyles = readFileSync('src/styles.css', 'utf8');
 const sourceHudStyles = readFileSync('src/styles/hud.css', 'utf8');
 const sourceSettingsStyles = readFileSync('src/styles/settings.css', 'utf8');
 const sourceResultStyles = readFileSync('src/styles/result.css', 'utf8');
-const puzzleLibraryStyles = readFileSync('src/styles/puzzle-library.css', 'utf8');
+const endgameLibraryStyles = readFileSync('src/styles/endgame-library.css', 'utf8');
 const sourceIndex = readFileSync('index.html', 'utf8');
 
 interface RuntimeTestOptions {
   seed?: number;
   mode?: GameMode;
-  puzzleId?: PuzzleId;
+  endgameId?: EndgameId;
   inputEnabled?: boolean;
   reducedMotion?: boolean;
   visualTheme?: VisualThemeId;
@@ -86,7 +84,7 @@ interface RuntimeTestInstance {
   refreshPresentation: ReturnType<typeof vi.fn>;
   start: ReturnType<typeof vi.fn>;
   restart: ReturnType<typeof vi.fn>;
-  undoPuzzle: ReturnType<typeof vi.fn>;
+  undoEndgame: ReturnType<typeof vi.fn>;
   togglePause: ReturnType<typeof vi.fn>;
   resume: ReturnType<typeof vi.fn>;
   setAudioEnabled: ReturnType<typeof vi.fn>;
@@ -140,7 +138,7 @@ vi.mock('./game/runtime/GameRuntime', async () => {
       this.state = core.createInitialState(
         options.seed,
         options.mode,
-        options.puzzleId,
+        options.endgameId,
         this.nextClassicStartingGravityTicks,
         this.nextClassicGravityFloorTicks,
       );
@@ -176,7 +174,7 @@ vi.mock('./game/runtime/GameRuntime', async () => {
       this.state = transition.state;
       this.options.onState?.(this.state, transition.events);
     });
-    readonly undoPuzzle = vi.fn(() => {
+    readonly undoEndgame = vi.fn(() => {
       const transition = core.dispatch(this.state, { type: 'undo' });
       this.state = transition.state;
       this.options.onState?.(this.state, transition.events);
@@ -286,7 +284,7 @@ describe('T37 Settled Handoff route boundary', () => {
   }
 
   function allowModes(...modes: GameMode[]) {
-    localStorage.setItem('tetramorph:mode-rule-intros:v1', JSON.stringify(modes));
+    localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(modes));
   }
 
   it('waits for the real game Canvas before completing the native update snapshot', async () => {
@@ -358,11 +356,11 @@ describe('T37 Settled Handoff route boundary', () => {
   });
 
   it('lets only the latest deferred navigation mutate History and React state', async () => {
-    allowModes('marathon', 'puzzle');
+    allowModes('marathon', 'endgame');
     const control = installControlledViewTransition();
     const view = render(createElement(App));
 
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')?.click());
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
     expect(control.transitions).toHaveLength(2);
     expect(control.transitions[0]!.skipTransition).toHaveBeenCalledTimes(1);
@@ -385,20 +383,20 @@ describe('T37 Settled Handoff route boundary', () => {
 
   it('uses a bounded continuously-visible fallback and restores library focus', async () => {
     vi.useFakeTimers();
-    allowModes('puzzle');
+    allowModes('endgame');
     const view = render(createElement(App));
 
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
-    expect(window.location.pathname).toBe('/puzzles');
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')?.click());
+    expect(window.location.pathname).toBe('/endgames');
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('fallback');
     await act(async () => vi.advanceTimersByTimeAsync(16));
     expect(document.activeElement).toBe(view.container.querySelector('[data-testid="level-row"][aria-pressed="true"]'));
     expect(view.container.querySelectorAll('[data-testid="route-viewport"]')).toHaveLength(1);
 
     const libraryViewport = view.container.querySelector('[data-testid="route-viewport"]');
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]')?.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')?.click());
     await act(async () => Promise.resolve());
-    expect(window.location.pathname).toMatch(/^\/play\/puzzle\//);
+    expect(window.location.pathname).toMatch(/^\/play\/endgame\//);
     expect(view.container.querySelector('[data-testid="route-viewport"]')).not.toBe(libraryViewport);
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('fallback');
     expect(view.container.querySelectorAll('canvas')).toHaveLength(1);
@@ -415,11 +413,11 @@ describe('T37 Settled Handoff route boundary', () => {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     })));
-    allowModes('puzzle');
+    allowModes('endgame');
     const control = installControlledViewTransition();
     const view = render(createElement(App));
 
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')?.click());
     expect(control.startViewTransition).not.toHaveBeenCalled();
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('reduced');
     expect(view.container.querySelector('.app')?.getAttribute('data-route-direction')).toBe('forward');
@@ -428,23 +426,23 @@ describe('T37 Settled Handoff route boundary', () => {
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
     expect(view.container.querySelector('.app')?.getAttribute('data-route-direction')).toBe('neutral');
 
-    const routeRoot = view.container.querySelector('[data-testid="puzzle-library"]');
+    const routeRoot = view.container.querySelector('[data-testid="endgame-library"]');
     const nextLevel = view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')[1]!;
     act(() => nextLevel.click());
-    expect(window.location.pathname).toBe('/puzzles');
-    expect(appNavigationFromHistory('/puzzles', window.history.state)?.selectedPuzzleId)
+    expect(window.location.pathname).toBe('/endgames');
+    expect(appNavigationFromHistory('/endgames', window.history.state)?.selectedEndgameId)
       .toBe(nextLevel.dataset.levelId);
-    expect(view.container.querySelector('[data-testid="puzzle-library"]')).toBe(routeRoot);
+    expect(view.container.querySelector('[data-testid="endgame-library"]')).toBe(routeRoot);
     expect(control.startViewTransition).not.toHaveBeenCalled();
     view.unmount();
   });
 
   it('routes in-page selection through the same owner and skips an active native snapshot', async () => {
-    allowModes('puzzle');
+    allowModes('endgame');
     const control = installControlledViewTransition();
     const view = render(createElement(App));
 
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')?.click());
     await act(async () => control.transitions[0]!.runUpdate());
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('native');
 
@@ -454,43 +452,43 @@ describe('T37 Settled Handoff route boundary', () => {
     expect(control.transitions).toHaveLength(1);
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
     expect(view.container.querySelector('.app')?.getAttribute('data-route-direction')).toBe('neutral');
-    expect(appNavigationFromHistory('/puzzles', window.history.state)?.selectedPuzzleId)
+    expect(appNavigationFromHistory('/endgames', window.history.state)?.selectedEndgameId)
       .toBe(nextLevel.dataset.levelId);
     view.unmount();
   });
 
-  it('restores validated Puzzle context and avoids double animation for UA history gestures', () => {
-    const secondPuzzleId = CAMPAIGN_LEVELS[1]!.id;
-    const library = { screen: 'puzzle-library', mode: 'puzzle', selectedPuzzleId: secondPuzzleId } as const;
+  it('restores validated Endgame context and avoids double animation for UA history gestures', () => {
+    const secondEndgameId = CAMPAIGN_LEVELS[1]!.id;
+    const library = { screen: 'endgame-library', mode: 'endgame', selectedEndgameId: secondEndgameId } as const;
     const control = installControlledViewTransition();
     const view = render(createElement(App));
 
     act(() => {
-      window.history.pushState(appHistoryStateFor(library), '', '/puzzles');
+      window.history.pushState(appHistoryStateFor(library), '', '/endgames');
       const event = new PopStateEvent('popstate', { state: appHistoryStateFor(library) });
       Object.defineProperty(event, 'hasUAVisualTransition', { value: true });
       window.dispatchEvent(event);
     });
 
     expect(control.startViewTransition).not.toHaveBeenCalled();
-    expect(view.container.querySelector('[data-testid="puzzle-library"]')).not.toBeNull();
-    expect(view.container.querySelector(`[data-level-id="${secondPuzzleId}"]`)?.getAttribute('aria-pressed')).toBe('true');
+    expect(view.container.querySelector('[data-testid="endgame-library"]')).not.toBeNull();
+    expect(view.container.querySelector(`[data-level-id="${secondEndgameId}"]`)?.getAttribute('aria-pressed')).toBe('true');
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
     view.unmount();
   });
 
   it('cleans a rejected native completion back to idle without changing the committed route', async () => {
-    allowModes('puzzle');
+    allowModes('endgame');
     const control = installControlledViewTransition();
     const view = render(createElement(App));
 
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')?.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')?.click());
     await act(async () => control.transitions[0]!.runUpdate());
     control.transitions[0]!.rejectFinished();
     await act(async () => Promise.resolve());
 
-    expect(window.location.pathname).toBe('/puzzles');
-    expect(view.container.querySelector('[data-testid="puzzle-library"]')).not.toBeNull();
+    expect(window.location.pathname).toBe('/endgames');
+    expect(view.container.querySelector('[data-testid="endgame-library"]')).not.toBeNull();
     expect(view.container.querySelector('.app')?.getAttribute('data-route-transition')).toBe('idle');
     view.unmount();
   });
@@ -524,7 +522,7 @@ async function advanceEntryCountdown(): Promise<void> {
 
 describe('DEV QA state snapshot isolation', () => {
   it('detaches scalar, active piece, queue, and nested board state', () => {
-    const canonical = createInitialState(0x51a1f00d, 'puzzle', 't3r-shaft-01');
+    const canonical = createInitialState(0x51a1f00d, 'endgame', 't3r-shaft-01');
     const snapshot = cloneQaState(canonical);
     const original = structuredClone(canonical);
 
@@ -543,48 +541,19 @@ describe('DEV QA state snapshot isolation', () => {
   });
 });
 
-describe('Puzzle progress boot migration', () => {
-  it('migrates v4 progress by clearing revision-two boards while preserving unchanged completions', () => {
-    const changedLevelId = CAMPAIGN_LEVELS[0]!.id;
-    const unchangedLevelId = CAMPAIGN_LEVELS[10]!.id;
-    const v4 = JSON.stringify({
-      version: 4,
-      completedLevelIds: [changedLevelId, unchangedLevelId],
-      bestPieceCounts: { [changedLevelId]: 6, [unchangedLevelId]: 8 },
-    });
-    localStorage.setItem(V4_PUZZLE_PROGRESS_KEY, v4);
-
-    const view = render(createElement(App));
-    expect(JSON.parse(localStorage.getItem(PUZZLE_PROGRESS_KEY) ?? 'null')).toEqual({
-      version: 5,
-      campaignRevision: PUZZLE_CAMPAIGN_REVISION,
-      completedLevelIds: [unchangedLevelId],
-      bestPieceCounts: {},
-    });
-    expect(localStorage.getItem(V4_PUZZLE_PROGRESS_KEY)).toBe(v4);
-    view.unmount();
-  });
-
-  it('prefers an existing valid v5 record and leaves the older key untouched', () => {
+describe('Endgame progress boot persistence', () => {
+  it('loads an existing canonical v6 record without rewriting it', () => {
     const currentId = CAMPAIGN_LEVELS[1]!.id;
-    const staleId = CAMPAIGN_LEVELS[0]!.id;
     const current = JSON.stringify({
-      version: 5,
-      campaignRevision: PUZZLE_CAMPAIGN_REVISION,
+      version: 6,
+      campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: [currentId],
       bestPieceCounts: { [currentId]: 7 },
     });
-    const stale = JSON.stringify({
-      version: 4,
-      completedLevelIds: [staleId],
-      bestPieceCounts: { [staleId]: 5 },
-    });
-    localStorage.setItem(PUZZLE_PROGRESS_KEY, current);
-    localStorage.setItem(V4_PUZZLE_PROGRESS_KEY, stale);
+    localStorage.setItem(ENDGAME_PROGRESS_KEY, current);
 
     const view = render(createElement(App));
-    expect(localStorage.getItem(PUZZLE_PROGRESS_KEY)).toBe(current);
-    expect(localStorage.getItem(V4_PUZZLE_PROGRESS_KEY)).toBe(stale);
+    expect(localStorage.getItem(ENDGAME_PROGRESS_KEY)).toBe(current);
     view.unmount();
   });
 });
@@ -595,7 +564,7 @@ describe('Survival stone timing presentation', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     const view = render(createElement(GameSession, {
       mode: 'race',
-      puzzleId: CAMPAIGN_LEVELS[0]!.id,
+      endgameId: CAMPAIGN_LEVELS[0]!.id,
       onExit: vi.fn(),
       onCanonicalCompletion: vi.fn(),
     }));
@@ -614,22 +583,6 @@ describe('Survival stone timing presentation', () => {
     expect(runtime.start).not.toHaveBeenCalled();
     await act(async () => vi.advanceTimersByTimeAsync(220));
     expect(runtime.start).toHaveBeenCalledTimes(1);
-    view.unmount();
-  });
-
-  it('copies the former branded v5 key into the TetraMorph key without deleting rollback data', () => {
-    const levelId = CAMPAIGN_LEVELS[2]!.id;
-    const legacy = JSON.stringify({
-      version: 5,
-      campaignRevision: PUZZLE_CAMPAIGN_REVISION,
-      completedLevelIds: [levelId],
-      bestPieceCounts: { [levelId]: 8 },
-    });
-    localStorage.setItem(LEGACY_V5_PUZZLE_PROGRESS_KEY, legacy);
-
-    const view = render(createElement(App));
-    expect(localStorage.getItem(PUZZLE_PROGRESS_KEY)).toBe(legacy);
-    expect(localStorage.getItem(LEGACY_V5_PUZZLE_PROGRESS_KEY)).toBe(legacy);
     view.unmount();
   });
 
@@ -658,7 +611,7 @@ describe('Survival stone timing presentation', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     const view = render(createElement(GameSession, {
       mode: 'race',
-      puzzleId: CAMPAIGN_LEVELS[0]!.id,
+      endgameId: CAMPAIGN_LEVELS[0]!.id,
       onExit: vi.fn(),
       onCanonicalCompletion: vi.fn(),
       onRunFinished: vi.fn(),
@@ -687,26 +640,26 @@ describe('Survival stone timing presentation', () => {
   });
 });
 
-describe('Puzzle completion ceremony', () => {
+describe('Endgame completion ceremony', () => {
   it('renders distinct first-clear, record, and replay results from the best that existed before persistence', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
-    const puzzleId = CAMPAIGN_LEVELS[0]!.id;
+    const endgameId = CAMPAIGN_LEVELS[0]!.id;
 
-    const renderCompletion = async (puzzleProgress = defaultPuzzleProgress(), pieces = 9) => {
+    const renderCompletion = async (endgameProgress = defaultEndgameProgress(), pieces = 9) => {
       const onCanonicalCompletion = vi.fn();
       const view = render(createElement(GameSession, {
-        mode: 'puzzle', puzzleId, onExit: vi.fn(), onCanonicalCompletion, puzzleProgress,
+        mode: 'endgame', endgameId, onExit: vi.fn(), onCanonicalCompletion, endgameProgress,
       }));
       await act(async () => Promise.resolve());
       const runtime = runtimeHarness.instances.at(-1)!;
       const finished = {
         ...runtime.getState(),
         status: 'finished' as const,
-        puzzleCompletion: 'finished' as const,
-        completedLevelId: puzzleId,
-        puzzleTargetCells: [],
+        endgameCompletion: 'finished' as const,
+        completedLevelId: endgameId,
+        endgameTargetCells: [],
         pieceCount: pieces,
         lines: 5,
       };
@@ -715,41 +668,41 @@ describe('Puzzle completion ceremony', () => {
     };
 
     const first = await renderCompletion();
-    expect(first.view.container.querySelector<HTMLElement>('[data-testid="puzzle-celebration"]')?.dataset.outcome).toBe('first');
-    expect(first.view.container.textContent).toContain('恭喜你破解谜题');
+    expect(first.view.container.querySelector<HTMLElement>('[data-testid="endgame-celebration"]')?.dataset.outcome).toBe('first');
+    expect(first.view.container.textContent).toContain('恭喜你完成残局');
     expect(first.view.container.textContent).not.toContain('首次完成 · 9 步 · 5 消行');
-    expect(first.view.container.querySelector('[data-testid="puzzle-celebration"]')?.getAttribute('aria-label')).toBe('当前最优步数：9步');
-    expect(first.view.container.querySelector('.puzzle-celebration__value strong')?.textContent).toBe('9');
-    expect(first.view.container.querySelector('.puzzle-celebration__value small')?.textContent).toBe('步');
-    expect(first.view.container.querySelector('.puzzle-celebration__summary > span')?.textContent).toBe('当前最优步数');
+    expect(first.view.container.querySelector('[data-testid="endgame-celebration"]')?.getAttribute('aria-label')).toBe('当前最优步数：9步');
+    expect(first.view.container.querySelector('.endgame-celebration__value strong')?.textContent).toBe('9');
+    expect(first.view.container.querySelector('.endgame-celebration__value small')?.textContent).toBe('步');
+    expect(first.view.container.querySelector('.endgame-celebration__summary > span')?.textContent).toBe('当前最优步数');
     expect(first.view.container.textContent).not.toContain('首次破解');
-    expect(first.view.container.querySelector('.puzzle-celebration__constellation')).toBeNull();
-    expect(first.view.container.querySelector('.puzzle-celebration__prism')).toBeNull();
-    expect(first.onCanonicalCompletion).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ completedLevelId: puzzleId, pieceCount: 9 }));
+    expect(first.view.container.querySelector('.endgame-celebration__constellation')).toBeNull();
+    expect(first.view.container.querySelector('.endgame-celebration__prism')).toBeNull();
+    expect(first.onCanonicalCompletion).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ completedLevelId: endgameId, pieceCount: 9 }));
     first.view.unmount();
 
-    const priorBest: PuzzleProgress = {
-      version: 5,
-      campaignRevision: PUZZLE_CAMPAIGN_REVISION,
-      completedLevelIds: [puzzleId],
-      bestPieceCounts: { [puzzleId]: 12 },
+    const priorBest: EndgameProgress = {
+      version: 6,
+      campaignRevision: ENDGAME_CAMPAIGN_REVISION,
+      completedLevelIds: [endgameId],
+      bestPieceCounts: { [endgameId]: 12 },
     };
     const record = await renderCompletion(priorBest, 9);
-    expect(record.view.container.querySelector<HTMLElement>('[data-testid="puzzle-celebration"]')?.dataset.outcome).toBe('record');
+    expect(record.view.container.querySelector<HTMLElement>('[data-testid="endgame-celebration"]')?.dataset.outcome).toBe('record');
     expect(record.view.container.textContent).toContain('刷新个人纪录');
     expect(record.view.container.textContent).not.toContain('从 12 步精炼至 9 步 · 5 消行');
     expect(record.view.container.textContent).not.toContain('个人最佳');
     record.view.unmount();
 
-    const replayBest: PuzzleProgress = {
-      version: 5,
-      campaignRevision: PUZZLE_CAMPAIGN_REVISION,
-      completedLevelIds: [puzzleId],
-      bestPieceCounts: { [puzzleId]: 9 },
+    const replayBest: EndgameProgress = {
+      version: 6,
+      campaignRevision: ENDGAME_CAMPAIGN_REVISION,
+      completedLevelIds: [endgameId],
+      bestPieceCounts: { [endgameId]: 9 },
     };
     const replay = await renderCompletion(replayBest, 9);
-    expect(replay.view.container.querySelector<HTMLElement>('[data-testid="puzzle-celebration"]')?.dataset.outcome).toBe('replay');
-    expect(replay.view.container.textContent).toContain('谜题已破解');
+    expect(replay.view.container.querySelector<HTMLElement>('[data-testid="endgame-celebration"]')?.dataset.outcome).toBe('replay');
+    expect(replay.view.container.textContent).toContain('残局已破解');
     expect(replay.view.container.textContent).not.toContain('刷新个人纪录');
     expect(replay.view.container.textContent).not.toContain('再次完成');
     replay.view.unmount();
@@ -760,31 +713,31 @@ describe('Puzzle completion ceremony', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     localStorage.setItem('tetramorph:language:v1', 'zh-CN');
-    localStorage.setItem('tetris:mode-rule-intros:v1', JSON.stringify(['marathon', 'race', 'sprint', 'puzzle']));
+    localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['marathon', 'race', 'sprint', 'endgame']));
     const level = CAMPAIGN_LEVELS[2]!;
     const view = render(createElement(App));
-    expect(JSON.parse(localStorage.getItem('tetramorph:mode-rule-intros:v1') ?? '[]')).toContain('puzzle');
+    expect(JSON.parse(localStorage.getItem('tetramorph:mode-rule-intros:v2') ?? '[]')).toContain('endgame');
 
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]')!.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')!.click());
     const levelButton = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')]
       .find((button) => button.dataset.levelId === level.id)!;
     act(() => levelButton.click());
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]')!.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')!.click());
     await act(async () => Promise.resolve());
 
     const runtime = runtimeHarness.instances.at(-1)!;
     act(() => runtime.setState({
       ...runtime.getState(),
       status: 'finished',
-      puzzleCompletion: 'finished',
+      endgameCompletion: 'finished',
       completedLevelId: null,
-      puzzleTargetCells: [],
+      endgameTargetCells: [],
       pieceCount: 13,
       lines: 4,
     }));
     await act(async () => Promise.resolve());
 
-    expect(JSON.parse(localStorage.getItem(PUZZLE_PROGRESS_KEY) ?? 'null')).toMatchObject({
+    expect(JSON.parse(localStorage.getItem(ENDGAME_PROGRESS_KEY) ?? 'null')).toMatchObject({
       completedLevelIds: [level.id],
       bestPieceCounts: { [level.id]: 13 },
     });
@@ -794,14 +747,14 @@ describe('Puzzle completion ceremony', () => {
     act(() => backToLibrary.click());
     const completedButton = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')]
       .find((button) => button.dataset.levelId === level.id)!;
-    expect(completedButton.querySelector('.puzzle-gallery__completion-tick')).not.toBeNull();
+    expect(completedButton.querySelector('.endgame-gallery__completion-tick')).not.toBeNull();
     expect(view.container.textContent).toContain('当前最优步数：13步');
     view.unmount();
   });
 });
 
 describe('entry countdown', () => {
-  it('starts Puzzle immediately on entry, restart confirmation, Settings restart, and replay', async () => {
+  it('starts Endgame immediately on entry, restart confirmation, Settings restart, and replay', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('matchMedia', vi.fn(() => ({
       matches: true,
@@ -812,10 +765,10 @@ describe('entry countdown', () => {
       callback(0);
       return 1;
     }));
-    const puzzleId = CAMPAIGN_LEVELS[0]!.id;
+    const endgameId = CAMPAIGN_LEVELS[0]!.id;
     const view = render(createElement(GameSession, {
-      mode: 'puzzle',
-      puzzleId,
+      mode: 'endgame',
+      endgameId,
       onExit: vi.fn(),
       onCanonicalCompletion: vi.fn(),
     }));
@@ -852,13 +805,13 @@ describe('entry countdown', () => {
     act(() => runtime.setState({
       ...runtime.getState(),
       status: 'finished',
-      puzzleCompletion: 'finished',
-      completedLevelId: puzzleId,
-      puzzleTargetCells: [],
+      endgameCompletion: 'finished',
+      completedLevelId: endgameId,
+      endgameTargetCells: [],
       pieceCount: 8,
       lines: 4,
     }));
-    act(() => view.container.querySelector<HTMLButtonElement>('.action-sheet--puzzle-celebration .primary-action')?.click());
+    act(() => view.container.querySelector<HTMLButtonElement>('.action-sheet--endgame-celebration .primary-action')?.click());
     expect(runtime.restart).toHaveBeenCalledTimes(3);
     expect(runtime.start).toHaveBeenCalledTimes(4);
     expect(runtime.getState().status).toBe('playing');
@@ -883,7 +836,7 @@ describe('entry countdown', () => {
     const onExit = vi.fn();
     const view = render(createElement(GameSession, {
       mode: 'marathon',
-      puzzleId: CAMPAIGN_LEVELS[0]!.id,
+      endgameId: CAMPAIGN_LEVELS[0]!.id,
       onExit,
       onCanonicalCompletion: vi.fn(),
       onRunFinished,
@@ -1010,7 +963,7 @@ describe('entry countdown', () => {
     })));
     const view = render(createElement(GameSession, {
       mode: 'marathon',
-      puzzleId: CAMPAIGN_LEVELS[0]!.id,
+      endgameId: CAMPAIGN_LEVELS[0]!.id,
       onExit: vi.fn(),
       onCanonicalCompletion: vi.fn(),
     }));
@@ -1085,7 +1038,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1136,14 +1089,14 @@ describe('T6 frontend mode binding', () => {
     const start = [...(view.container.querySelector('.action-sheet')?.querySelectorAll<HTMLButtonElement>('button') ?? [])]
       .find((button) => button.textContent === '好的')!;
     act(() => start.click());
-    expect(JSON.parse(localStorage.getItem('tetramorph:mode-rule-intros:v1') ?? '[]')).toContain('sprint');
+    expect(JSON.parse(localStorage.getItem('tetramorph:mode-rule-intros:v2') ?? '[]')).toContain('sprint');
     expect(view.container.querySelector('[data-testid="game-screen"]')).not.toBeNull();
     view.unmount();
   });
 
   it('keeps every first-entry briefing to Goal, Mechanic, and Challenge in both languages', () => {
     for (const language of ['zh-CN', 'en'] as const) {
-      for (const mode of ['marathon', 'race', 'sprint', 'puzzle'] as const) {
+      for (const mode of ['marathon', 'race', 'sprint', 'endgame'] as const) {
         const facts = modeIntroRules(language, mode);
         expect(facts.map((fact) => fact.id)).toEqual(['objective', 'mechanic', 'challenge']);
         expect(facts.map((fact) => fact.label)).toEqual(
@@ -1161,7 +1114,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'race', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'race', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1221,7 +1174,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1249,7 +1202,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1279,17 +1232,17 @@ describe('T6 frontend mode binding', () => {
   });
 
   it('uses localized compact rule titles and describes random same-column Survival stones', () => {
-    expect((['marathon', 'race', 'sprint', 'puzzle'] as const).map((mode) => modeRulesTitle('zh-CN', mode))).toEqual([
+    expect((['marathon', 'race', 'sprint', 'endgame'] as const).map((mode) => modeRulesTitle('zh-CN', mode))).toEqual([
       '经典规则',
       '生存规则',
       '异变规则',
-      '解谜规则',
+      '残局规则',
     ]);
-    expect((['marathon', 'race', 'sprint', 'puzzle'] as const).map((mode) => modeRulesTitle('en', mode))).toEqual([
+    expect((['marathon', 'race', 'sprint', 'endgame'] as const).map((mode) => modeRulesTitle('en', mode))).toEqual([
       'Classic Rules',
       'Survival Rules',
       'Mutation Rules',
-      'Puzzle Rules',
+      'Endgame Rules',
     ]);
     const chineseStonefall = modeRules('zh-CN', 'race').find((fact) => fact.id === 'stonefall')?.value ?? '';
     const englishStonefall = modeRules('en', 'race').find((fact) => fact.id === 'stonefall')?.value ?? '';
@@ -1309,11 +1262,11 @@ describe('T6 frontend mode binding', () => {
       marathon: ['goal', 'pace', 'end'],
       race: ['start', 'pressure', 'stonefall', 'end'],
       sprint: ['goal', 'materials', 'items', 'end'],
-      puzzle: ['goal', 'queue', 'undo', 'record'],
+      endgame: ['goal', 'queue', 'undo', 'record'],
     };
 
     for (const language of ['zh-CN', 'en'] as const) {
-      for (const mode of ['marathon', 'race', 'sprint', 'puzzle'] as const) {
+      for (const mode of ['marathon', 'race', 'sprint', 'endgame'] as const) {
         const facts = modeRules(language, mode);
         expect(facts.map((fact) => fact.id)).toEqual(expected[mode]);
         for (const fact of facts) {
@@ -1348,9 +1301,9 @@ describe('T6 frontend mode binding', () => {
       },
       { state: sprint, roles: ['score', 'lines', 'classic-combo', 'fall-cadence'], label: '异变模式数据', copy: ['消行', '9', '连消', '下落速度', '秒/格', '1.0'] },
       {
-        state: createInitialState(0x51a1f00d, 'puzzle', 't3r-shaft-01'),
-        roles: ['puzzle-targets', 'puzzle-placed'],
-        label: '解谜模式数据',
+        state: createInitialState(0x51a1f00d, 'endgame', 't3r-shaft-01'),
+        roles: ['endgame-targets', 'endgame-placed'],
+        label: '残局模式数据',
         copy: ['原有方块', '操作数'],
       },
     ];
@@ -1405,12 +1358,12 @@ describe('T6 frontend mode binding', () => {
     expect(sourceHudStyles).not.toContain('survival-countdown-urgent');
   });
 
-  it('shows Puzzle target progress and a non-limiting placed-piece count', () => {
-    const state = createInitialState(0x51a1f00d, 'puzzle', 't5r-lattice-09');
+  it('shows Endgame target progress and a non-limiting placed-piece count', () => {
+    const state = createInitialState(0x51a1f00d, 'endgame', 't5r-lattice-09');
     const view = render(createElement(RunStats, { state }));
-    const targets = view.container.querySelector<HTMLElement>('[data-stat-role="puzzle-targets"]');
-    const placed = view.container.querySelector<HTMLElement>('[data-stat-role="puzzle-placed"]');
-    expect(targets?.textContent).toContain(`${state.puzzleTargetCells.length}/${state.puzzleInitialTargetCount}`);
+    const targets = view.container.querySelector<HTMLElement>('[data-stat-role="endgame-targets"]');
+    const placed = view.container.querySelector<HTMLElement>('[data-stat-role="endgame-placed"]');
+    expect(targets?.textContent).toContain(`${state.endgameTargetCells.length}/${state.endgameInitialTargetCount}`);
     expect(placed?.textContent).toBe('操作数0');
     expect(view.container.querySelector('[data-stat-role="objective"]')).toBeNull();
     expect(view.container.textContent).not.toMatch(/剩余可用|已用方块|上限|限时|落定后/);
@@ -1444,7 +1397,7 @@ describe('T6 frontend mode binding', () => {
     const onReducedMotionChange = vi.fn();
     const view = render(createElement(GameSession, {
       mode: 'marathon',
-      puzzleId: CAMPAIGN_LEVELS[0]!.id,
+      endgameId: CAMPAIGN_LEVELS[0]!.id,
       onExit: vi.fn(),
       onCanonicalCompletion: vi.fn(),
       leaderboard,
@@ -1591,29 +1544,29 @@ describe('T6 frontend mode binding', () => {
     view.unmount();
   });
 
-  it('limits the Puzzle Settings record to the selected level minimum piece count', () => {
+  it('limits the Endgame Settings record to the selected level minimum piece count', () => {
     const level = CAMPAIGN_LEVELS[0]!;
     const completed = {
-      ...defaultPuzzleProgress(),
+      ...defaultEndgameProgress(),
       completedLevelIds: [level.id],
       bestPieceCounts: { [level.id]: 7 },
     };
     const completedView = render(createElement(SettingsRecord, {
-      mode: 'puzzle', puzzleId: level.id, leaderboard: { version: 9, marathon: [], race: [], sprint: [] }, progress: completed,
+      mode: 'endgame', endgameId: level.id, leaderboard: { version: 9, marathon: [], race: [], sprint: [] }, progress: completed,
     }));
     expect(completedView.container.textContent).toBe('当前关纪录最少 7 步');
     expect(completedView.container.textContent).not.toMatch(/消行|分|连锁|最长/);
     completedView.unmount();
 
     const freshView = render(createElement(SettingsRecord, {
-      mode: 'puzzle', puzzleId: level.id, leaderboard: { version: 9, marathon: [], race: [], sprint: [] }, progress: defaultPuzzleProgress(),
+      mode: 'endgame', endgameId: level.id, leaderboard: { version: 9, marathon: [], race: [], sprint: [] }, progress: defaultEndgameProgress(),
     }));
     expect(freshView.container.textContent).toBe('当前关纪录尚未通关');
     freshView.unmount();
   });
 
-  it('keeps live Puzzle information practical instead of exposing authored level metadata', () => {
-    const state = createInitialState(0x51a1f00d, 'puzzle', 't3r-shaft-01');
+  it('keeps live Endgame information practical instead of exposing authored level metadata', () => {
+    const state = createInitialState(0x51a1f00d, 'endgame', 't3r-shaft-01');
     const view = render(createElement(RunStats, { state }));
     expect(view.container.textContent).toContain('原有方块');
     expect(view.container.textContent).toContain('操作数');
@@ -1623,31 +1576,31 @@ describe('T6 frontend mode binding', () => {
     view.unmount();
   });
 
-  it('labels Puzzle Next as two ordered canonical inputs while live modes retain one', async () => {
+  it('labels Endgame Next as two ordered canonical inputs while live modes retain one', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
-    const puzzle = render(createElement(GameSession, {
-      mode: 'puzzle', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+    const endgame = render(createElement(GameSession, {
+      mode: 'endgame', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
-    const puzzleSlot = puzzle.container.querySelector<HTMLElement>('[data-testid="next-slot"]')!;
-    const segments = puzzle.container.querySelectorAll<HTMLElement>('[data-testid="puzzle-next-segment"]');
-    const puzzlePreview = runtimeHarness.instances.at(-1)!.getState().queue.slice(0, 2);
-    expect(puzzle.container.querySelector('.preview-sequence')).toBeNull();
-    expect(puzzleSlot.dataset.previewCount).toBe('2');
+    const endgameSlot = endgame.container.querySelector<HTMLElement>('[data-testid="next-slot"]')!;
+    const segments = endgame.container.querySelectorAll<HTMLElement>('[data-testid="endgame-next-segment"]');
+    const endgamePreview = runtimeHarness.instances.at(-1)!.getState().queue.slice(0, 2);
+    expect(endgame.container.querySelector('.preview-sequence')).toBeNull();
+    expect(endgameSlot.dataset.previewCount).toBe('2');
     expect(segments).toHaveLength(2);
     expect(segments[0]?.dataset.previewSegment).toBe('1');
-    expect(segments[0]?.getAttribute('aria-label')).toBe(`1 下一个方块: ${puzzlePreview[0]}`);
+    expect(segments[0]?.getAttribute('aria-label')).toBe(`1 下一个方块: ${endgamePreview[0]}`);
     expect(segments[0]?.textContent).toBe('1');
     expect(segments[1]?.dataset.previewSegment).toBe('2');
-    expect(segments[1]?.getAttribute('aria-label')).toBe(`2 后一个方块: ${puzzlePreview[1]}`);
+    expect(segments[1]?.getAttribute('aria-label')).toBe(`2 后一个方块: ${endgamePreview[1]}`);
     expect(segments[1]?.textContent).toBe('2');
-    expect(puzzleSlot.getAttribute('aria-label')).toContain(puzzlePreview.join(', '));
-    puzzle.unmount();
+    expect(endgameSlot.getAttribute('aria-label')).toContain(endgamePreview.join(', '));
+    endgame.unmount();
 
     const classic = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     const classicSlot = classic.container.querySelector<HTMLElement>('[data-testid="next-slot"]')!;
@@ -1659,7 +1612,7 @@ describe('T6 frontend mode binding', () => {
     classic.unmount();
 
     const mutation = render(createElement(GameSession, {
-      mode: 'sprint', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'sprint', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     const mutationSlot = mutation.container.querySelector<HTMLElement>('[data-testid="next-slot"]')!;
@@ -1695,7 +1648,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1734,38 +1687,38 @@ describe('T6 frontend mode binding', () => {
     view.unmount();
   });
 
-  it('directly restores the prior Puzzle piece from its top spawn after a lock', async () => {
+  it('directly restores the prior Endgame piece from its top spawn after a lock', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
-    const puzzle = render(createElement(GameSession, {
-      mode: 'puzzle', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+    const endgame = render(createElement(GameSession, {
+      mode: 'endgame', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
 
-    expect(puzzle.container.querySelector('[data-testid="touch-rail"]')).toBeNull();
-    expect(puzzle.container.querySelector('[data-testid="board-frame"]')?.hasAttribute('aria-label')).toBe(false);
-    expect(puzzle.container.querySelector('canvas')?.getAttribute('aria-description')).toContain('触控');
-    expect(puzzle.container.querySelector('.keyboard-map')).toBeNull();
+    expect(endgame.container.querySelector('[data-testid="touch-rail"]')).toBeNull();
+    expect(endgame.container.querySelector('[data-testid="board-frame"]')?.hasAttribute('aria-label')).toBe(false);
+    expect(endgame.container.querySelector('canvas')?.getAttribute('aria-description')).toContain('触控');
+    expect(endgame.container.querySelector('.keyboard-map')).toBeNull();
 
     const instance = runtimeHarness.instances.at(-1)!;
     const current = instance.getState();
     const locked = dispatch(current, { type: 'hard-drop' }).state;
     act(() => instance.setState(locked));
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ', key: 'z', bubbles: true })));
-    expect(instance.undoPuzzle).toHaveBeenCalledTimes(1);
+    expect(instance.undoEndgame).toHaveBeenCalledTimes(1);
     expect(instance.getState().active).toEqual(current.active);
-    expect(instance.getState().puzzleUndoHistory).toEqual([]);
-    expect(puzzle.container.querySelector('[data-testid="confirm-puzzle-undo"]')).toBeNull();
+    expect(instance.getState().endgameUndoHistory).toEqual([]);
+    expect(endgame.container.querySelector('[data-testid="confirm-endgame-undo"]')).toBeNull();
 
     act(() => instance.setState(locked));
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ', key: 'z', bubbles: true })));
-    expect(instance.undoPuzzle).toHaveBeenCalledTimes(2);
+    expect(instance.undoEndgame).toHaveBeenCalledTimes(2);
     expect(instance.getState().active).toEqual(current.active);
-    puzzle.unmount();
+    endgame.unmount();
 
     const classic = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     expect(classic.container.querySelector('[data-testid="touch-undo"]')).toBeNull();
@@ -1778,7 +1731,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1842,27 +1795,27 @@ describe('T6 frontend mode binding', () => {
     view.unmount();
   });
 
-  it('removes live Puzzle analysis and presents one authored pre-play lesson instead', () => {
-    const view = render(createElement(PuzzleLibrary, {
-      progress: defaultPuzzleProgress(),
+  it('removes live Endgame analysis and presents one authored pre-play lesson instead', () => {
+    const view = render(createElement(EndgameLibrary, {
+      progress: defaultEndgameProgress(),
       selectedId: 't3r-shaft-01',
       onSelect: vi.fn(),
       onStart: vi.fn(),
       onBack: vi.fn(),
     }));
-    expect(view.container.querySelector('[data-testid="puzzle-guidance"]')).toBeNull();
+    expect(view.container.querySelector('[data-testid="endgame-guidance"]')).toBeNull();
     expect(view.container.querySelectorAll('[data-guidance-metric], [data-queue-role]')).toHaveLength(0);
-    expect(view.container.querySelector('[data-testid="puzzle-lesson"]')?.textContent).toContain('先完成一行');
+    expect(view.container.querySelector('[data-testid="endgame-lesson"]')?.textContent).toContain('先完成一行');
     expect(view.container.textContent).not.toContain('局面分析');
-    view.rerender(createElement(PuzzleLibrary, {
-      progress: defaultPuzzleProgress(),
+    view.rerender(createElement(EndgameLibrary, {
+      progress: defaultEndgameProgress(),
       selectedId: 't3r-shaft-01',
       onSelect: vi.fn(),
       onStart: vi.fn(),
       onBack: vi.fn(),
       language: 'en',
     }));
-    expect(view.container.querySelector('[data-testid="puzzle-lesson"]')?.textContent).toContain('Finish one row first');
+    expect(view.container.querySelector('[data-testid="endgame-lesson"]')?.textContent).toContain('Finish one row first');
     view.unmount();
   });
 
@@ -1871,7 +1824,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1899,7 +1852,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
 
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1958,7 +1911,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const onExit = vi.fn();
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit, onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit, onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -1991,20 +1944,20 @@ describe('T6 frontend mode binding', () => {
     const classic = view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]');
     const survival = view.container.querySelector<HTMLButtonElement>('[data-testid="enter-race"]');
     const mutation = view.container.querySelector<HTMLButtonElement>('[data-testid="enter-sprint"]');
-    const puzzle = view.container.querySelector<HTMLButtonElement>('[data-testid="enter-puzzle"]');
+    const endgame = view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]');
 
     expect(classic).not.toBeNull();
-    expect([classic, survival, mutation, puzzle].map((button) => button?.tabIndex)).toEqual([0, -1, -1, -1]);
+    expect([classic, survival, mutation, endgame].map((button) => button?.tabIndex)).toEqual([0, -1, -1, -1]);
     expect(view.container.querySelectorAll('.mode-gate--active')).toHaveLength(0);
     expect(view.container.querySelector('[data-testid="mode-list"]')?.hasAttribute('data-selection')).toBe(false);
-    expect([classic, survival, mutation, puzzle].every((button) => (
+    expect([classic, survival, mutation, endgame].every((button) => (
       !button?.hasAttribute('data-selected') && !button?.hasAttribute('aria-pressed')
     ))).toBe(true);
-    expect([classic, survival, mutation, puzzle].map((button) => button?.querySelector('strong')?.textContent)).toEqual([
+    expect([classic, survival, mutation, endgame].map((button) => button?.querySelector('strong')?.textContent)).toEqual([
       'Classic',
       'Survival',
       'Mutation',
-      'Puzzle',
+      'Endgame',
     ]);
     expect(view.container.textContent).not.toMatch(/马拉松|竞速|等级|速度档/);
     expect(view.container.textContent).not.toContain('选择模式');
@@ -2020,7 +1973,7 @@ describe('T6 frontend mode binding', () => {
     expect(actionArrows.every((arrow) => arrow.querySelector('path')?.getAttribute('d') === 'M3 12h22m-6-6 6 6-6 6')).toBe(true);
     expect(view.container.textContent).not.toMatch(/开始|选关/);
     expect(classic?.getAttribute('aria-label')).toBe('开始 经典');
-    expect(puzzle?.getAttribute('aria-label')).toBe('选关 解谜');
+    expect(endgame?.getAttribute('aria-label')).toBe('选关 残局');
     expect(view.container.textContent).not.toContain('基岩会持续向上推进。');
     expect(view.container.textContent).not.toContain('带核心标记的方块携带道具。');
     expect(view.container.textContent).not.toContain('使用固定出现顺序的方块。');
@@ -2031,7 +1984,7 @@ describe('T6 frontend mode binding', () => {
     expect(view.container.querySelector('.landing-shell--workbench .mode-chooser--workbench')).not.toBeNull();
     expect(view.container.querySelectorAll('.mode-gate__index, .mode-gate__motif')).toHaveLength(0);
     expect(view.container.querySelector('.landing-header__signal, .landing-intro__eyebrow, .landing-intro__mark')).toBeNull();
-    for (const selector of ['enter-marathon', 'enter-race', 'enter-sprint', 'enter-puzzle']) {
+    for (const selector of ['enter-marathon', 'enter-race', 'enter-sprint', 'enter-endgame']) {
       expect(view.container.querySelectorAll(`[data-testid="${selector}"] .mode-gate__glyph rect`)).toHaveLength(4);
     }
     expect(styles).not.toContain('.phase-seam');
@@ -2043,8 +1996,8 @@ describe('T6 frontend mode binding', () => {
     expect(sourceStyles).not.toMatch(/\.mode-gates--workbench \.mode-gate__action svg \{[^}]*transform:/s);
     expect(sourceStyles).toContain('transform: translateX(-.38em)');
     expect(sourceStyles).toContain('stroke: #ffffff');
-    expect(puzzleLibraryStyles).toMatch(/data-puzzle-category="easy"[^}]*repeat\(6,/s);
-    expect(puzzleLibraryStyles).toMatch(/\[lang="en"\] \.puzzle-gallery__page\s*\{[^}]*font-family:\s*var\(--font-ui\)/s);
+    expect(endgameLibraryStyles).toMatch(/data-endgame-category="easy"[^}]*repeat\(6,/s);
+    expect(endgameLibraryStyles).toMatch(/\[lang="en"\] \.endgame-gallery__page\s*\{[^}]*font-family:\s*var\(--font-ui\)/s);
     for (const color of ['%233f9f96', '%236687d5', '%23c98243', '%239875be']) {
       expect(sourceIndex).toContain(color);
     }
@@ -2057,10 +2010,10 @@ describe('T6 frontend mode binding', () => {
     act(() => classic?.focus());
     act(() => classic?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true })));
     expect(document.activeElement).toBe(survival);
-    expect([classic, survival, mutation, puzzle].map((button) => button?.tabIndex)).toEqual([-1, 0, -1, -1]);
+    expect([classic, survival, mutation, endgame].map((button) => button?.tabIndex)).toEqual([-1, 0, -1, -1]);
     act(() => survival?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })));
-    expect(document.activeElement).toBe(puzzle);
-    act(() => puzzle?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true })));
+    expect(document.activeElement).toBe(endgame);
+    act(() => endgame?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true })));
     expect(document.activeElement).toBe(mutation);
     act(() => mutation?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true })));
     expect(document.activeElement).toBe(classic);
@@ -2090,7 +2043,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'marathon', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     await advanceEntryCountdown();
@@ -2116,7 +2069,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     localStorage.setItem('tetramorph:language:v1', 'zh-CN');
-    localStorage.setItem('tetris:mode-rule-intros:v1', JSON.stringify(['marathon']));
+    localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['marathon']));
     const view = render(createElement(App));
 
     expect(parseReducedMotionOverride(null)).toBeNull();
@@ -2165,7 +2118,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     localStorage.setItem('tetramorph:language:v1', 'zh-CN');
-    localStorage.setItem('tetris:mode-rule-intros:v1', JSON.stringify(['marathon']));
+    localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['marathon']));
 
     expect(parseClassicGravityRange(null)).toEqual({ startingTicks: 48, floorTicks: 6 });
     expect(parseClassicGravityRange('31')).toEqual({ startingTicks: 30, floorTicks: 6 });
@@ -2228,7 +2181,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
       mode: 'marathon',
-      puzzleId: CAMPAIGN_LEVELS[0]!.id,
+      endgameId: CAMPAIGN_LEVELS[0]!.id,
       onExit: vi.fn(),
       onCanonicalCompletion: vi.fn(),
       language: 'en',
@@ -2370,7 +2323,7 @@ describe('T6 frontend mode binding', () => {
       classicGravityFloorTicks: 6,
       classicGrade: 'standard',
     });
-    expect(scoreRecordForState(createInitialState(1, 'puzzle', CAMPAIGN_LEVELS[0]!.id), base.completedAt)).toBeNull();
+    expect(scoreRecordForState(createInitialState(1, 'endgame', CAMPAIGN_LEVELS[0]!.id), base.completedAt)).toBeNull();
   });
 
   it('renders at most five real rows with the exact record field matrix for each scored mode', () => {
@@ -2511,7 +2464,7 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const view = render(createElement(GameSession, {
-      mode: 'sprint', puzzleId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
+      mode: 'sprint', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(),
     }));
     await act(async () => Promise.resolve());
     const runtime = runtimeHarness.instances.at(-1)!;
@@ -2571,7 +2524,7 @@ describe('T6 frontend mode binding', () => {
     unrankedSummary.unmount();
     expect(eventMessage({ type: 'bedrock-raised', count: 1, height: 4 })).toBe('基岩升至 4 层。');
     expect(eventMessage({ type: 'bedrock-lowered', count: 1, height: 3 })).toBe('基岩降至 3 层。');
-    expect(eventMessage({ type: 'puzzle-undone' })).toBe('已撤回上一次落子。');
+    expect(eventMessage({ type: 'endgame-undone' })).toBe('已撤回上一次落子。');
     const mutationEvents: GameEvent[] = [
       { type: 'lines-cleared', rows: [39], count: 1, score: 40 },
       { type: 'mutation-activated', item: 'freeze', durationTicks: MUTATION_EFFECT_TICKS, score: 0, rowsRemoved: 0 },
@@ -2584,31 +2537,31 @@ describe('T6 frontend mode binding', () => {
       '1 lines cleared. Freeze activated for 10 seconds. Supergravity activated for the next 5 pieces.',
     );
 
-    const completedPuzzle: GameState = {
-      ...createInitialState(0x51a1f00d, 'puzzle', CAMPAIGN_LEVELS[0]!.id),
+    const completedEndgame: GameState = {
+      ...createInitialState(0x51a1f00d, 'endgame', CAMPAIGN_LEVELS[0]!.id),
       status: 'finished',
-      puzzleCompletion: 'finished',
+      endgameCompletion: 'finished',
       pieceCount: 4,
       lines: 3,
     };
-    expect(terminalCopy(completedPuzzle)).toEqual({
+    expect(terminalCopy(completedEndgame)).toEqual({
       title: '原有方块已清除',
       detail: '4 方块 · 3 消行',
       success: true,
     });
-    expect(puzzleCelebrationOutcome(null, 9)).toBe('first');
-    expect(puzzleCelebrationOutcome(12, 9)).toBe('record');
-    expect(puzzleCelebrationOutcome(9, 9)).toBe('replay');
-    expect(puzzleCelebrationOutcome(8, 9)).toBe('replay');
-    expect(puzzleCelebrationCopy({ outcome: 'first', pieces: 9, lines: 5, previousBest: null })).toEqual({
-      title: '恭喜你破解谜题',
+    expect(endgameCelebrationOutcome(null, 9)).toBe('first');
+    expect(endgameCelebrationOutcome(12, 9)).toBe('record');
+    expect(endgameCelebrationOutcome(9, 9)).toBe('replay');
+    expect(endgameCelebrationOutcome(8, 9)).toBe('replay');
+    expect(endgameCelebrationCopy({ outcome: 'first', pieces: 9, lines: 5, previousBest: null })).toEqual({
+      title: '恭喜你完成残局',
       detail: '',
       best: '当前最优步数：9步',
       bestLabel: '当前最优步数',
       bestValue: '9',
       bestUnit: '步',
     });
-    expect(puzzleCelebrationCopy({ outcome: 'record', pieces: 9, lines: 5, previousBest: 12 })).toMatchObject({
+    expect(endgameCelebrationCopy({ outcome: 'record', pieces: 9, lines: 5, previousBest: 12 })).toMatchObject({
       title: '刷新个人纪录',
       detail: '',
       best: '当前最优步数：9步',
@@ -2690,37 +2643,37 @@ describe('T6 frontend mode binding', () => {
     expect(sourceHudStyles).toMatch(/\.run-stats\s+strong\s*\{[^}]*display:\s*inline-flex[^}]*min-height:\s*1\.08em[^}]*align-items:\s*baseline/s);
   });
 
-  it('uses a three-stage Puzzle curriculum with lessons and mastery-gated Hard puzzles', () => {
+  it('uses a three-stage Endgame curriculum with lessons and mastery-gated Hard endgames', () => {
     expect(CAMPAIGN_LEVELS).toHaveLength(50);
-    expect(PUZZLE_CATEGORIES.map(({ id, levels }) => [id, levels.length])).toEqual([
+    expect(ENDGAME_CATEGORIES.map(({ id, levels }) => [id, levels.length])).toEqual([
       ['intro', 10], ['easy', 20], ['hard', 20],
     ]);
     const onSelect = vi.fn();
     const onStart = vi.fn();
     const onBack = vi.fn();
-    const props = (selectedId: PuzzleId, progress = defaultPuzzleProgress()) => ({
+    const props = (selectedId: EndgameId, progress = defaultEndgameProgress()) => ({
       progress,
       selectedId,
       onSelect,
       onStart,
       onBack,
     });
-    const view = render(createElement(PuzzleLibrary, props(CAMPAIGN_LEVELS[0]!.id)));
+    const view = render(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[0]!.id)));
 
     let rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
     expect(rows).toHaveLength(10);
     expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(0, 10).map((level) => level.id));
     expect(rows.every((row) => row.dataset.unlocked === 'true')).toBe(true);
-    expect(view.container.querySelector('[data-testid="level-list"]')?.getAttribute('aria-label')).toBe('50 个开放解谜残局');
+    expect(view.container.querySelector('[data-testid="level-list"]')?.getAttribute('aria-label')).toBe('50 个开放残局');
     expect(view.container.querySelector('[data-testid="campaign-availability"], [data-testid="campaign-rules"]')).toBeNull();
     expect(view.container.querySelectorAll('.console-band, .console-bands, .console-nodes')).toHaveLength(0);
-    expect(view.container.querySelector('[data-testid="puzzle-lesson"]')?.textContent).toContain('先完成一行');
-    expect(view.container.querySelector('[data-testid="puzzle-guidance"]')).toBeNull();
-    const pageTabs = [...view.container.querySelectorAll<HTMLButtonElement>('.puzzle-gallery__pages [role="tab"]')];
+    expect(view.container.querySelector('[data-testid="endgame-lesson"]')?.textContent).toContain('先完成一行');
+    expect(view.container.querySelector('[data-testid="endgame-guidance"]')).toBeNull();
+    const pageTabs = [...view.container.querySelectorAll<HTMLButtonElement>('.endgame-gallery__pages [role="tab"]')];
     expect(pageTabs).toHaveLength(3);
     expect(pageTabs.map((tab) => tab.textContent)).toEqual(['入门', '简单', '困难']);
     expect(pageTabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false']);
-    expect(view.container.querySelector('.puzzle-gallery__grid')?.getAttribute('aria-label')).toBe('入门，10 关');
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('入门，10 关');
     act(() => {
       pageTabs[0]!.focus();
       pageTabs[0]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
@@ -2728,25 +2681,25 @@ describe('T6 frontend mode binding', () => {
     expect(document.activeElement).toBe(pageTabs[1]);
     expect(pageTabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['false', 'true', 'false']);
     expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[10]!.id);
-    view.rerender(createElement(PuzzleLibrary, props(CAMPAIGN_LEVELS[10]!.id)));
+    view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[10]!.id)));
     rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
     expect(rows).toHaveLength(20);
     expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(10, 30).map((level) => level.id));
     expect(rows.every((row) => row.dataset.unlocked === 'true')).toBe(true);
     expect(rows.every((row) => row.getAttribute('aria-disabled') === null)).toBe(true);
     expect(rows[0]?.getAttribute('aria-label')).toContain('可进入');
-    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]')?.disabled).toBe(false);
+    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')?.disabled).toBe(false);
     act(() => {
       pageTabs[1]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
     });
     expect(document.activeElement).toBe(pageTabs[0]);
     expect(pageTabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false']);
-    expect(view.container.querySelector('.puzzle-gallery__grid')?.getAttribute('aria-label')).toBe('入门，10 关');
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('入门，10 关');
     rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
     expect(rows[0]?.textContent).toContain('01');
-    expect(view.container.querySelectorAll('.puzzle-gallery__catalog .puzzle-silhouette')).toHaveLength(0);
-    expect(view.container.querySelectorAll('.puzzle-gallery__hero .puzzle-silhouette')).toHaveLength(1);
-    expect(view.container.querySelector('.puzzle-gallery__hero .puzzle-silhouette')?.getAttribute('viewBox')).not.toBe('0 0 40 48');
+    expect(view.container.querySelectorAll('.endgame-gallery__catalog .endgame-silhouette')).toHaveLength(0);
+    expect(view.container.querySelectorAll('.endgame-gallery__hero .endgame-silhouette')).toHaveLength(1);
+    expect(view.container.querySelector('.endgame-gallery__hero .endgame-silhouette')?.getAttribute('viewBox')).not.toBe('0 0 40 48');
     expect(view.container.querySelector<HTMLButtonElement>('.library-back')?.textContent).toBe('←返回首页');
     for (const banned of ['目标：清空棋盘', '目标清空棋盘', '清空完整棋盘', '当前选择', '起始棋盘', '连续七袋方块', '不限定唯一解法']) {
       expect(view.container.textContent).not.toContain(banned);
@@ -2755,100 +2708,100 @@ describe('T6 frontend mode binding', () => {
     act(() => view.container.querySelector<HTMLButtonElement>('.library-back')?.click());
     expect(onBack).toHaveBeenCalledTimes(1);
 
-    const masteredBests = Object.fromEntries(PUZZLE_OPTIMAL_CERTIFICATES.map((certificate) => (
+    const masteredBests = Object.fromEntries(ENDGAME_OPTIMAL_CERTIFICATES.map((certificate) => (
       [certificate.levelId, certificate.masteryOperations]
-    ))) as Partial<Record<PuzzleId, number>>;
-    const mastered: PuzzleProgress = {
-      version: 5,
-      campaignRevision: PUZZLE_CAMPAIGN_REVISION,
+    ))) as Partial<Record<EndgameId, number>>;
+    const mastered: EndgameProgress = {
+      version: 6,
+      campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: CAMPAIGN_LEVELS.slice(0, 30).map((level) => level.id),
       bestPieceCounts: masteredBests,
     };
-    view.rerender(createElement(PuzzleLibrary, props(CAMPAIGN_LEVELS[0]!.id, {
+    view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[0]!.id, {
       ...mastered,
       bestPieceCounts: { ...masteredBests, [CAMPAIGN_LEVELS[0]!.id]: 7 },
     })));
-    const selectedBest = view.container.querySelector<HTMLElement>('[data-testid="selected-puzzle-start-best"]');
-    const startSelected = view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]');
+    const selectedBest = view.container.querySelector<HTMLElement>('[data-testid="selected-endgame-start-best"]');
+    const startSelected = view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]');
     expect(selectedBest?.textContent).toBe('当前最优步数：7步');
-    expect(selectedBest?.closest('.puzzle-gallery__title-row')?.querySelector('.puzzle-gallery__title')).not.toBeNull();
-    expect(startSelected?.closest('.puzzle-gallery__meta')?.contains(selectedBest ?? null)).toBe(true);
+    expect(selectedBest?.closest('.endgame-gallery__title-row')?.querySelector('.endgame-gallery__title')).not.toBeNull();
+    expect(startSelected?.closest('.endgame-gallery__meta')?.contains(selectedBest ?? null)).toBe(true);
     expect(view.container.querySelector<HTMLButtonElement>('[data-level-id="t3r-shaft-01"]')?.dataset.bestPieces).toBe('7');
-    expect(view.container.querySelectorAll('.puzzle-gallery__completion-tick')).toHaveLength(10);
-    expect(view.container.querySelectorAll('.puzzle-gallery__node--complete .puzzle-gallery__index')).toHaveLength(0);
+    expect(view.container.querySelectorAll('.endgame-gallery__completion-tick')).toHaveLength(10);
+    expect(view.container.querySelectorAll('.endgame-gallery__node--complete .endgame-gallery__index')).toHaveLength(0);
     expect(view.container.querySelector<HTMLButtonElement>('[data-level-id="t3r-shaft-01"]')?.textContent).toBe('');
     expect(view.container.textContent).not.toContain('√');
-    expect(view.container.querySelector('.puzzle-gallery__title')?.classList.contains('puzzle-gallery__title--complete')).toBe(true);
+    expect(view.container.querySelector('.endgame-gallery__title')?.classList.contains('endgame-gallery__title--complete')).toBe(true);
 
     act(() => pageTabs[2]!.click());
     rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
     expect(rows).toHaveLength(20);
     expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(30).map((level) => level.id));
     expect(rows.every((row) => row.dataset.unlocked === 'true')).toBe(true);
-    expect(view.container.querySelector('.puzzle-gallery__grid')?.getAttribute('aria-label')).toBe('困难，20 关');
-    expect(view.container.querySelectorAll('.puzzle-gallery__mastery span')).toHaveLength(3);
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('困难，20 关');
+    expect(view.container.querySelectorAll('.endgame-gallery__mastery span')).toHaveLength(3);
     expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[30]!.id);
-    view.rerender(createElement(PuzzleLibrary, props(CAMPAIGN_LEVELS[30]!.id, mastered)));
-    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]')?.disabled).toBe(false);
+    view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[30]!.id, mastered)));
+    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')?.disabled).toBe(false);
 
     for (const index of [0, 10, CAMPAIGN_LEVELS.length - 1]) {
       const level = CAMPAIGN_LEVELS[index]!;
-      view.rerender(createElement(PuzzleLibrary, props(level.id, mastered)));
+      view.rerender(createElement(EndgameLibrary, props(level.id, mastered)));
       const pressed = view.container.querySelector<HTMLButtonElement>('[data-testid="level-row"][aria-pressed="true"]');
-      const canonical = createInitialState(0x51a1f00d, 'puzzle', level.id);
+      const canonical = createInitialState(0x51a1f00d, 'endgame', level.id);
       const visibleMaterials = new Set(canonical.board.slice(-12).flat().filter((cell): cell is PieceType => PIECE_TYPES.includes(cell as PieceType)));
-      const definition = getPuzzleDefinition(level.id);
+      const definition = getEndgameDefinition(level.id);
 
       expect(pressed?.dataset.levelId).toBe(level.id);
-      expect(view.container.querySelector('.puzzle-gallery__hero h2')?.textContent).toBe(level.name);
-      expect(canonical.puzzleId).toBe(level.id);
+      expect(view.container.querySelector('.endgame-gallery__hero h2')?.textContent).toBe(level.name);
+      expect(canonical.endgameId).toBe(level.id);
       expect(canonical.active?.type).toBeTruthy();
       expect(canonical.queue[0]).toBeTruthy();
       expect(visibleMaterials.size).toBeGreaterThan(0);
-      expect(puzzleSilhouettePaths(level.id).size).toBe(visibleMaterials.size);
-      expect([...puzzleSilhouettePaths(level.id).values()].every((path) => path.includes('h3.8v3.8'))).toBe(true);
-      expect(Boolean(puzzleAnchorSilhouettePath(level.id))).toBe(definition.anchorCells.length > 0);
-      expect(view.container.querySelectorAll('.puzzle-gallery__hero .puzzle-silhouette [data-piece-type="anchor"]')).toHaveLength(
+      expect(endgameSilhouettePaths(level.id).size).toBe(visibleMaterials.size);
+      expect([...endgameSilhouettePaths(level.id).values()].every((path) => path.includes('h3.8v3.8'))).toBe(true);
+      expect(Boolean(endgameAnchorSilhouettePath(level.id))).toBe(definition.anchorCells.length > 0);
+      expect(view.container.querySelectorAll('.endgame-gallery__hero .endgame-silhouette [data-piece-type="anchor"]')).toHaveLength(
         definition.anchorCells.length > 0 ? 1 : 0,
       );
     }
 
-    const gatedGroup = PUZZLE_HARD_MASTERY_GROUPS[0]!;
-    const gatedThreshold = PUZZLE_OPTIMAL_CERTIFICATES.find(
+    const gatedGroup = ENDGAME_HARD_MASTERY_GROUPS[0]!;
+    const gatedThreshold = ENDGAME_OPTIMAL_CERTIFICATES.find(
       (certificate) => certificate.levelId === gatedGroup.prerequisiteId,
     )!.masteryOperations;
-    const blocked: PuzzleProgress = {
+    const blocked: EndgameProgress = {
       ...mastered,
       bestPieceCounts: { ...masteredBests, [gatedGroup.prerequisiteId]: gatedThreshold + 1 },
     };
-    view.rerender(createElement(PuzzleLibrary, props(gatedGroup.hardLevelIds[0]!, blocked)));
-    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]')?.disabled).toBe(true);
-    expect(view.container.querySelector('[data-testid="puzzle-mastery-requirement"]')?.textContent).toContain(`${gatedThreshold} 步内`);
+    view.rerender(createElement(EndgameLibrary, props(gatedGroup.hardLevelIds[0]!, blocked)));
+    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')?.disabled).toBe(true);
+    expect(view.container.querySelector('[data-testid="endgame-mastery-requirement"]')?.textContent).toContain(`${gatedThreshold} 步内`);
     expect(view.container.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.getAttribute('aria-label')).toContain(`${gatedThreshold} 步内`);
 
-    const historicHard: PuzzleProgress = {
-      version: 5,
-      campaignRevision: PUZZLE_CAMPAIGN_REVISION,
+    const historicHard: EndgameProgress = {
+      version: 6,
+      campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: [gatedGroup.hardLevelIds[0]!],
       bestPieceCounts: { [gatedGroup.hardLevelIds[0]!]: 12 },
     };
-    view.rerender(createElement(PuzzleLibrary, props(gatedGroup.hardLevelIds[0]!, historicHard)));
-    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]')?.disabled).toBe(false);
-    expect(view.container.querySelectorAll('.puzzle-gallery__completion-tick')).toHaveLength(1);
+    view.rerender(createElement(EndgameLibrary, props(gatedGroup.hardLevelIds[0]!, historicHard)));
+    expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')?.disabled).toBe(false);
+    expect(view.container.querySelectorAll('.endgame-gallery__completion-tick')).toHaveLength(1);
 
-    const start = view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-puzzle"]');
+    const start = view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]');
     expect(start).not.toBeNull();
-    expect(view.container.querySelectorAll('[data-testid^="start-selected-puzzle"]')).toHaveLength(1);
+    expect(view.container.querySelectorAll('[data-testid^="start-selected-endgame"]')).toHaveLength(1);
     expect(start?.textContent).toBe('开始');
     act(() => start?.click());
     expect(onStart).toHaveBeenCalledTimes(1);
     view.unmount();
   });
 
-  it('keeps roving Puzzle focus inside each category and moves category tabs separately', () => {
+  it('keeps roving Endgame focus inside each category and moves category tabs separately', () => {
     const onSelect = vi.fn();
-    const view = render(createElement(PuzzleLibrary, {
-      progress: defaultPuzzleProgress(),
+    const view = render(createElement(EndgameLibrary, {
+      progress: defaultEndgameProgress(),
       selectedId: CAMPAIGN_LEVELS[0]!.id,
       onSelect,
       onStart: vi.fn(),
@@ -2865,7 +2818,7 @@ describe('T6 frontend mode binding', () => {
     expect(document.activeElement).toBe(levels[3]);
     expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[3]!.id);
 
-    const tabs = [...view.container.querySelectorAll<HTMLButtonElement>('.puzzle-gallery__pages [role="tab"]')];
+    const tabs = [...view.container.querySelectorAll<HTMLButtonElement>('.endgame-gallery__pages [role="tab"]')];
     act(() => tabs[1]!.click());
     levels = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
     expect(levels).toHaveLength(20);
@@ -2879,12 +2832,12 @@ describe('T6 frontend mode binding', () => {
     expect(document.activeElement).toBe(levels[19]);
     press(levels[19]!, 'ArrowRight');
     expect(document.activeElement).toBe(levels[19]);
-    expect(view.container.querySelector('.puzzle-gallery__grid')?.getAttribute('data-puzzle-category')).toBe('easy');
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('data-endgame-category')).toBe('easy');
 
     act(() => tabs[1]!.focus());
     press(tabs[1]!, 'ArrowRight');
     expect(document.activeElement).toBe(tabs[2]);
-    expect(view.container.querySelector('.puzzle-gallery__grid')?.getAttribute('data-puzzle-category')).toBe('hard');
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('data-endgame-category')).toBe('hard');
     expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[30]!.id);
     view.unmount();
   });

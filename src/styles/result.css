@@ -229,27 +229,27 @@
   border-color: color-mix(in srgb, var(--result-accent) 84%, #102a43);
 }
 
-/* Puzzle resolves into the same portrait rhythm without borrowing the ranked ledger. */
-.action-sheet--puzzle-celebration {
-  --result-accent: var(--puzzle);
+/* Endgame resolves into the same portrait rhythm without borrowing the ranked ledger. */
+.action-sheet--endgame-celebration {
+  --result-accent: var(--endgame);
   box-sizing: border-box;
   width: min(31rem, calc(100vw - 24px));
   max-height: calc(100dvh - 24px);
   padding: 22px 24px 20px;
   overflow: auto;
-  border-color: color-mix(in srgb, var(--puzzle) 38%, var(--line));
+  border-color: color-mix(in srgb, var(--endgame) 38%, var(--line));
   background:
-    radial-gradient(circle at 50% -16%, color-mix(in srgb, var(--puzzle) 17%, transparent), transparent 43%),
+    radial-gradient(circle at 50% -16%, color-mix(in srgb, var(--endgame) 17%, transparent), transparent 43%),
     var(--surface);
   box-shadow: 0 24px 64px rgba(31, 24, 48, .28);
 }
 
-.action-sheet--puzzle-celebration::before {
+.action-sheet--endgame-celebration::before {
   height: 3px;
-  background: linear-gradient(90deg, var(--puzzle), color-mix(in srgb, var(--puzzle) 54%, var(--classic)));
+  background: linear-gradient(90deg, var(--endgame), color-mix(in srgb, var(--endgame) 54%, var(--classic)));
 }
 
-.action-sheet--puzzle-celebration > h2 {
+.action-sheet--endgame-celebration > h2 {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-ui);
@@ -260,9 +260,9 @@
   text-align: center;
 }
 
-.action-sheet--puzzle-celebration > p { display: none; }
+.action-sheet--endgame-celebration > p { display: none; }
 
-.puzzle-celebration {
+.endgame-celebration {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr);
@@ -274,7 +274,7 @@
   box-shadow: none;
 }
 
-.puzzle-celebration__summary {
+.endgame-celebration__summary {
   display: grid;
   min-width: 0;
   padding: 0;
@@ -282,16 +282,16 @@
   text-align: center;
 }
 
-.puzzle-celebration__value {
+.endgame-celebration__value {
   display: inline-flex;
   max-width: 100%;
   align-items: baseline;
   justify-content: center;
   gap: 7px;
-  color: color-mix(in srgb, var(--puzzle) 86%, var(--ink));
+  color: color-mix(in srgb, var(--endgame) 86%, var(--ink));
 }
 
-.puzzle-celebration__value strong {
+.endgame-celebration__value strong {
   display: inline-block;
   overflow: visible;
   padding: .04em .07em .07em;
@@ -306,15 +306,15 @@
   white-space: nowrap;
 }
 
-.puzzle-celebration__value small {
-  color: color-mix(in srgb, var(--puzzle) 76%, var(--muted));
+.endgame-celebration__value small {
+  color: color-mix(in srgb, var(--endgame) 76%, var(--muted));
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 700;
   line-height: 1;
 }
 
-.puzzle-celebration__summary > span {
+.endgame-celebration__summary > span {
   margin-top: 8px;
   color: var(--muted);
   font-family: var(--font-ui);
@@ -323,16 +323,16 @@
   letter-spacing: .04em;
 }
 
-.action-sheet--puzzle-celebration > .action-sheet__actions > .primary-action {
+.action-sheet--endgame-celebration > .action-sheet__actions > .primary-action {
   color: #f8fcfd;
-  background: var(--puzzle);
-  border-color: var(--puzzle);
+  background: var(--endgame);
+  border-color: var(--endgame);
 }
 
-.action-sheet--puzzle-celebration > .action-sheet__actions > .primary-action:hover,
-.action-sheet--puzzle-celebration > .action-sheet__actions > .primary-action:focus-visible {
-  background: color-mix(in srgb, var(--puzzle) 84%, #102a43);
-  border-color: color-mix(in srgb, var(--puzzle) 84%, #102a43);
+.action-sheet--endgame-celebration > .action-sheet__actions > .primary-action:hover,
+.action-sheet--endgame-celebration > .action-sheet__actions > .primary-action:focus-visible {
+  background: color-mix(in srgb, var(--endgame) 84%, #102a43);
+  border-color: color-mix(in srgb, var(--endgame) 84%, #102a43);
 }
 
 @media (min-width: 700px) and (max-height: 520px) {
@@ -373,7 +373,7 @@
 
 @media (max-width: 560px) {
   .action-sheet--run-result,
-  .action-sheet--puzzle-celebration { padding: 18px 16px 15px; }
+  .action-sheet--endgame-celebration { padding: 18px 16px 15px; }
 
   .action-sheet--run-result > .action-sheet__actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -382,7 +382,7 @@
   .run-result__hero { min-height: 104px; }
   .run-result__hero strong { font-size: clamp(44px, 16vw, 58px); }
 
-  .puzzle-celebration {
+  .endgame-celebration {
     grid-template-columns: minmax(0, 1fr);
     min-height: 118px;
   }
@@ -394,7 +394,7 @@
 }
 
 .app[data-reduced-motion="true"] .action-sheet--run-result,
-.app[data-reduced-motion="true"] .action-sheet--puzzle-celebration {
+.app[data-reduced-motion="true"] .action-sheet--endgame-celebration {
   animation: none !important;
   transition: none !important;
 }
