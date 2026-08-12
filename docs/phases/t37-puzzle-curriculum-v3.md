@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT FROZEN — QA NEXT**
+Status: **F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT ACCEPTED — DISCOVERY OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -296,6 +296,13 @@ and Intro-02 at 621 / `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001
 It also enforces canonical one-line UTF-8/LF schema-8 bytes, every hash and literal route,
 full setup replay, pairwise admission, exact telemetry, product isolation, and deep freezing.
 Fresh independent contract QA must be all zero before discovery or source creation.
+
+Two independent final reviews of HEAD `3e9811a` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The contract is accepted. Candidate discovery may run
+only in repository-external temporary paths and may use heuristic search solely to find an
+upper bound. Source creation remains closed until current Core independently replays the legal
+eight-drop setup, both qualifying routes and pairwise admission, then exhaustively excludes
+every shorter solution without beam, timeout, or state cap.
 
 ## Frozen published roster
 

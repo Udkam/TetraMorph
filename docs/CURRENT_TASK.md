@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CONTRACT FROZEN — QA NEXT**
+Status: **STAGE F4B INTRO-02 ACCEPTED / F4C INTRO-03 CONTRACT ACCEPTED — DISCOVERY OPEN**
 
 ## Active objective
 
@@ -359,6 +359,13 @@ criteria. Product publication, the other two Intro drafts, preserved Easy/Hard c
 three Hard rebuilds, v6 migration, mastery/unlock/UI, browser evidence, T27/`progress.md`,
 sensory, and icon remain closed.
 
+Two independent final reviews of current HEAD `3e9811a` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They accept the four-row/live-three-row isolation,
+source-to-shifted-blocker geometry, both-route release invariant, schema/baselines, and the
+three-path/500-line feasibility. Only bounded repository-external candidate discovery is open.
+No draft/source file may be created until a candidate passes legal setup replay, pairwise
+admission, unique seed, both route invariants, and strict current-Core exact proof.
+
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
@@ -419,7 +426,7 @@ sensory, and icon remain closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 CONTRACT FROZEN** — the exact
+6. **Puzzle curriculum — F4B INTRO-02 ACCEPTED; F4C INTRO-03 DISCOVERY OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -433,8 +440,9 @@ sensory, and icon remain closed.
    independently accepted three-path checkpoint at `cfbcab4`. Intro-02 is accepted in the
    isolated four-path source checkpoint `c571f54`, with all writer and independent gates
    green. The docs-first Intro-03 contract now binds four target rows and a causal
-   support-before-bridge geometry check. Discovery, source, and published curriculum content
-   remain closed until two fresh contract reviews report all zero.
+   support-before-bridge geometry check. Both final contract reviews are all zero; only
+   repository-external candidate discovery is open. Source and published curriculum content
+   remain closed until a fully qualified candidate passes preimplementation QA.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

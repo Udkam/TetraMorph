@@ -1643,6 +1643,19 @@ paths, and icon remain closed. Once both confirmations are all zero, open only b
 repository-external candidate discovery for F4C; source creation remains closed until a fully
 qualified candidate passes preimplementation QA.
 
+Two independent confirmations of current HEAD `3e9811a` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. F4C contract QA is closed. The contract body and its
+stable checkpoint are accepted; no further repair loop is open.
+
+Next exact action: run bounded repository-external F4C candidate discovery. Prefer a four-lock
+candidate to contain exact-proof cost. Search may combine legal eight-drop setup generation
+with constrained first-support/second-bridge route enumeration, but every output is only an
+upper bound. Before source creation, independently replay setup and both routes, pin literal
+geometry/releases/hashes, compare against live 50 plus Intro-01/02, verify seed uniqueness,
+and run the unbounded shorter-depth certificate. Stop and repair the design only if the frozen
+invariant proves infeasible; do not silently loosen it. Product, progression/UI, sensory,
+protected T27 paths, and icon remain closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

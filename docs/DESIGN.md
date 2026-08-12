@@ -782,6 +782,10 @@ adding unrelated badges or ornamental effects.
   must prove that coordinate mapping. In each route the first two locks clear zero, and at
   least two later positive events clear all four rows while strictly reducing original
   targets; the two routes need not share the same exact release array.
+- Final contract HEAD `3e9811a` passes two independent reviews with P0–P3/GAP all zero.
+  F4C now permits only repository-external heuristic discovery. It does not authorize a
+  draft append, certificate file, or test until a complete candidate survives current-Core
+  replay, pairwise admission, route-invariant checks, and strict shorter-depth proof.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

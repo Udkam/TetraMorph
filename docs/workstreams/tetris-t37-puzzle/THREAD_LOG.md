@@ -229,3 +229,11 @@ instruction; it does not change the contract body.
 - Blocker: candidate discovery is closed pending two all-zero reviews of the repaired SHA.
 - Next action: obtain two independent all-zero confirmations of the current HEAD containing
   this record; then open only bounded repository-external candidate discovery.
+
+Two independent confirmations of HEAD `3e9811a` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The contract is accepted. No repository source path is
+open yet.
+
+- Blocker: none for bounded external discovery.
+- Next action: search outside the repository for a qualifying four-lock candidate; require
+  independent current-Core replay, exact proof, and preimplementation QA before source.

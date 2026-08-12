@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4C contract accepted; discovery opened
+
+- Two independent reviews of `3e9811a` report P0–P3/GAP all zero after the row-height,
+  paragraph-scope, coordinate, alternative-release, and checkpoint repairs.
+- The accepted contract causally proves support then bridge for both routes and requires at
+  least two later positive releases summing to four.
+- Only bounded repository-external heuristic discovery opens. Source remains closed until a
+  candidate passes current-Core replay, pairwise admission, and strict exact proof.
+
 ## 2026-08-12 — T37 Stage F4C contract repaired after first QA
 
 - Final body review is P0/P1/P2/GAP zero; the checkpoint now stably asks for review of the
