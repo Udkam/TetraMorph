@@ -762,6 +762,10 @@ adding unrelated badges or ornamental effects.
   cells. F4B may update the accepted Intro-01 test only to tolerate later draft-array appends;
   its index-0 identity and bytes remain pinned. Certificate multiplicity continues to mean
   distinct completing routes, while strict optimality belongs to the primary route.
+- F4B selects a `[4,1,1]` board with one centre-right well at x=6. Two exact four-lock routes
+  branch immediately, fill only the three non-well gaps during their first three locks, then
+  use the same vertical I to clear all three rows. Pairwise review rejects every live and
+  Intro-01 structural or near match, so the lesson is distinct and mechanically explicit.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

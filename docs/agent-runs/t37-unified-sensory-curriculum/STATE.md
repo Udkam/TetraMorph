@@ -1552,6 +1552,22 @@ discovery. Prefer reverse construction from one unique three-row well and a fina
 do not create source until setup legality, pairwise structure, unique seed, primary/alternative
 route invariants, and exact optimum all pass. No other path opens.
 
+F4B discovery selects setup seed `3424573653`, placements
+`I0@0,L0@7,Z0@3,T0@0,J2@3,S0@7`, floor rows
+`.T.JJJ..SS / TTTZZJ.SSL / IIIIZZ.LLL`, gaps `[4,1,1]`, unique `wellX=6`, and gameplay
+seed `560`. Pairwise exact/topology/near flags are all false against live 50 plus Intro-01.
+
+Primary `SQLLLHTTTCCLHTTTCRRRHTTTCRHTTTTTTTTTTTT` and alternative
+`SCRRRHTTTCCLHTTTCLLLLHTTTCRHTTTTTTTTTTTT` both have releases `[0,0,0,3]`, targets
+`[24,24,24,0]`, three pre-final open-well states, and final I at x6/y36..39. Alternative
+diverges at lock 1. Exact proof returns optimum 4, initial `3aadbdab`, depths
+`{0,1,17,0},{1,17,589,206},{2,383,13661,0}`, totals 401 explored / 14,267 transitions /
+206 prunes, primary final `b060114c`, and alternative final `e78bd4f0`.
+
+Independent preimplementation QA reproduces every value and reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Next exact action: commit this candidate freeze, then
+implement only the four contracted paths and run focused normal/exact tests plus final gates.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

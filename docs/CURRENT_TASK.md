@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 DISCOVERY OPEN**
+Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 CANDIDATE FROZEN**
 
 ## Active objective
 
@@ -260,6 +260,27 @@ mapping, empty-well board semantics, release/target invariant, schema multiplici
 and 500-line feasibility. F4B candidate discovery is open; source editing still waits for a
 fully qualified candidate and strict proof.
 
+The selected candidate passes independent preimplementation QA with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Setup seed `3424573653` drops
+`I0@0,L0@7,Z0@3,T0@0,J2@3,S0@7`; floor rows are
+`.T.JJJ..SS / TTTZZJ.SSL / IIIIZZ.LLL`, gap vector `[4,1,1]`, and unique `wellX=6`.
+Gameplay seed `560` is unique against the live 50 and Intro-01, and all 51 pairwise exact,
+topology, and near flags are false.
+
+Primary route `SQLLLHTTTCCLHTTTCRRRHTTTCRHTTTTTTTTTTTT` and alternative
+`SCRRRHTTTCCLHTTTCLLLLHTTTCRHTTTTTTTTTTTT` each use four locks, release
+`[0,0,0,3]`, retain targets `[24,24,24,0]`, and finish with
+`I:6,36|6,37|6,38|6,39`; the alternative diverges at lock 1. State hashes are initial
+`3aadbdab`, primary final `b060114c`, alternative final `e78bd4f0`. Strict proof depths are
+`{0,1,17,0},{1,17,589,206},{2,383,13661,0}` with 401 explored states, 14,267
+transitions, and 206 prunes.
+
+Frozen SHA-256 values are authoring
+`64cb91c06eb02480e2dad8ec19e9566392d175079843c21875b0f67435348907`, behavior
+`f19aecb90dbba04a1cac3e38b6714806f5ca44709a8a558cd6935f501fae23cb`, primary route
+`17a81baa80e064389305e7dd44d9ee0c48bcb3e9713e1378a6f38ba7fdcd042a`, and alternative
+route `648350cc55b43e319d1b555984abd716102549753900c144d01a0d48a116a1d2`.
+
 The certificate contains exactly one alternative entry. In each route, the only positive row
 release is the final value `3`; all preceding values are zero, remaining original targets are
 24 before that release and zero after it, and the final locked-piece signature is the frozen
@@ -332,7 +353,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B INTRO-02 DISCOVERY OPEN** — the exact
+6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B INTRO-02 CANDIDATE FROZEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -342,11 +363,10 @@ closed.
    no-beam exact certificate with independent QA all zero. Accepted F3D source `7f31802`
    supplies schema-8 per-depth telemetry without proof drift. A current-Core probe found
    the prior whole-audit-empty fingerprint rule impossible because the live library already
-   has ten historical near pairs. Fresh pairwise draft-versus-live repair QA is all zero;
-   pairwise draft-versus-live repair QA is all zero. The non-published Intro-01 candidate is
-   now lives in an independently accepted three-path non-product checkpoint at `cfbcab4`.
-   Intro-02's repaired well-preservation contract has two independent all-zero reviews;
-   candidate discovery is open while source and published curriculum content remain closed.
+   has ten historical near pairs. The non-published Intro-01 draft now lives in an
+   independently accepted three-path checkpoint at `cfbcab4`. The Intro-02 well-preservation
+   candidate is independently replayed and exact-certified; only its frozen four-path
+   checkpoint opens next, while source and published curriculum content remain closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

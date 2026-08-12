@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4B Intro-02 candidate frozen
+
+- A legal six-drop `[4,1,1]` board exposes one unique x=6 well and passes all 51 pairwise
+  structure comparisons with unique gameplay seed `560`.
+- Two four-lock routes diverge at lock 1, preserve the well through three zero-clear locks,
+  then finish with the same vertical I and a single three-row release.
+- Strict proof exhausts 401 states and 14,267 transitions; independent preimplementation QA
+  reports P0–P3/GAP all zero. Only the frozen four-path source checkpoint opens next.
+
 ## 2026-08-12 — T37 Stage F4B repaired contract accepted; discovery opened
 
 - Two independent reviews report P0–P3/GAP all zero after the four-path, board-coordinate,

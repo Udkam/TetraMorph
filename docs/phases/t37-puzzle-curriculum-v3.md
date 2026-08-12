@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 DISCOVERY OPEN**
+Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 CANDIDATE FROZEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -197,6 +197,32 @@ verify visible rows 17–19 map to Core world rows 37–39, the final I supplies
 well gaps plus one cell above, the append-compatible Intro-01 maintenance is minimal, and all
 route/proof/schema gates are executable. Candidate discovery is open; source editing and live
 product integration remain closed.
+
+### F4B selected candidate
+
+Independent current-Core preimplementation QA reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for:
+
+- setup `3424573653`: `I0@0,L0@7,Z0@3,T0@0,J2@3,S0@7`;
+- floor rows `.T.JJJ..SS`, `TTTZZJ.SSL`, `IIIIZZ.LLL`; gaps `[4,1,1]`; unique `wellX=6`;
+- unique gameplay seed `560` and zero exact/topology/near flags across the live 50 plus
+  accepted Intro-01;
+- primary `SQLLLHTTTCCLHTTTCRRRHTTTCRHTTTTTTTTTTTT`, locks
+  `Z:1,35|0,36|1,36|0,37`, `L:2,36|3,36|4,36|2,37`,
+  `T:7,35|7,36|8,36|7,37`, `I:6,36|6,37|6,38|6,39`;
+- alternative `SCRRRHTTTCCLHTTTCLLLLHTTTCRHTTTTTTTTTTTT`, first lock
+  `Z:8,35|7,36|8,36|7,37`, same L/final I, third lock
+  `T:0,35|0,36|1,36|0,37`, and first divergence 1;
+- both route releases `[0,0,0,3]`, targets `[24,24,24,0]`, pre-final well cells null,
+  initial `3aadbdab`, primary final `b060114c`, alternative final `e78bd4f0`;
+- exact optimum 4 and depths `{0,1,17,0}`, `{1,17,589,206}`, `{2,383,13661,0}`;
+  totals 401 explored, 14,267 transitions, 206 prunes.
+
+Hashes are authoring `64cb91c06eb02480e2dad8ec19e9566392d175079843c21875b0f67435348907`,
+behavior `f19aecb90dbba04a1cac3e38b6714806f5ca44709a8a558cd6935f501fae23cb`, primary route
+`17a81baa80e064389305e7dd44d9ee0c48bcb3e9713e1378a6f38ba7fdcd042a`, and alternative
+`648350cc55b43e319d1b555984abd716102549753900c144d01a0d48a116a1d2`. The four-path source
+checkpoint may now open; product integration remains closed.
 
 ## Frozen published roster
 
