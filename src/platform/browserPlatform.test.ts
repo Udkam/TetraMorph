@@ -15,7 +15,9 @@ describe('BrowserPlatform', () => {
     let deferred = 0;
 
     expect(platform.readStorage('missing')).toBeNull();
+    expect(platform.readStorageState('missing')).toEqual({ status: 'failed' });
     expect(platform.writeStorage('missing', 'value')).toBe(false);
+    expect(platform.removeStorage('missing')).toBe(false);
     expect(platform.mediaQuery('(prefers-reduced-motion: reduce)').matches).toBe(false);
     expect(platform.scheduleTimeout(() => { deferred += 1; }, 10)).toBeNull();
     expect(platform.defer(() => { deferred += 1; })).toBeNull();
@@ -42,6 +44,7 @@ describe('BrowserPlatform', () => {
     const storage = {
       getItem: (key: string) => storageValues.get(key) ?? null,
       setItem: (key: string, value: string) => { storageValues.set(key, value); },
+      removeItem: (key: string) => { storageValues.delete(key); },
     } as unknown as Storage;
     const media = {
       matches: true,
@@ -66,6 +69,8 @@ describe('BrowserPlatform', () => {
 
     expect(platform.writeStorage('checkpoint', 'ready')).toBe(true);
     expect(platform.readStorage('checkpoint')).toBe('ready');
+    expect(platform.readStorageState('checkpoint')).toEqual({ status: 'value', value: 'ready' });
+    expect(platform.readStorageState('missing')).toEqual({ status: 'missing' });
     expect(platform.documentHidden()).toBe(true);
     const removeWindow = platform.listenWindow('keydown', () => { windowEvents += 1; });
     const removeVisibility = platform.listenVisibility(() => { visibilityEvents += 1; });
@@ -95,5 +100,81 @@ describe('BrowserPlatform', () => {
       cancelledTimer: 17,
       cancelledFrame: 19,
     });
+    expect(platform.removeStorage('checkpoint')).toBe(true);
+    expect(platform.readStorageState('checkpoint')).toEqual({ status: 'missing' });
+  });
+
+  it('keeps empty values distinct from missing keys', () => {
+    const storage = {
+      getItem: (key: string) => key === 'empty' ? '' : null,
+      setItem: () => {},
+      removeItem: () => {},
+    } as unknown as Storage;
+    const platform = createBrowserPlatform({ storage });
+
+    expect(platform.readStorageState('empty')).toEqual({ status: 'value', value: '' });
+    expect(platform.readStorageState('missing')).toEqual({ status: 'missing' });
+  });
+
+  it('reports storage operation failures without throwing', () => {
+    const storage = {
+      getItem: () => { throw new Error('read blocked'); },
+      setItem: () => { throw new Error('write blocked'); },
+      removeItem: () => { throw new Error('remove blocked'); },
+    } as unknown as Storage;
+    const platform = createBrowserPlatform({ storage });
+
+    expect(platform.readStorageState('checkpoint')).toEqual({ status: 'failed' });
+    expect(platform.readStorage('checkpoint')).toBeNull();
+    expect(platform.writeStorage('checkpoint', 'ready')).toBe(false);
+    expect(platform.removeStorage('checkpoint')).toBe(false);
+  });
+
+  it('honors explicit host write and removal failures', () => {
+    const storage = {
+      getItem: () => null,
+      setItem: () => false,
+      removeItem: () => false,
+    } as unknown as Storage;
+    const platform = createBrowserPlatform({ storage });
+
+    expect(platform.writeStorage('checkpoint', 'ready')).toBe(false);
+    expect(platform.removeStorage('checkpoint')).toBe(false);
+  });
+
+  it('resolves the storage capability once per operation', () => {
+    let storageReads = 0;
+    const storage = {
+      getItem: () => 'ready',
+      setItem: () => {},
+      removeItem: () => {},
+    } as unknown as Storage;
+    const windowTarget = {
+      get localStorage() {
+        storageReads += 1;
+        return storage;
+      },
+    } as unknown as Window;
+    const platform = createBrowserPlatform({ window: windowTarget });
+
+    expect(platform.readStorageState('checkpoint')).toEqual({ status: 'value', value: 'ready' });
+    expect(storageReads).toBe(1);
+    expect(platform.writeStorage('checkpoint', 'ready')).toBe(true);
+    expect(storageReads).toBe(2);
+    expect(platform.removeStorage('checkpoint')).toBe(true);
+    expect(storageReads).toBe(3);
+  });
+
+  it('reports a throwing localStorage getter as failed', () => {
+    const windowTarget = {
+      get localStorage(): Storage {
+        throw new Error('storage getter blocked');
+      },
+    } as unknown as Window;
+    const platform = createBrowserPlatform({ window: windowTarget });
+
+    expect(platform.readStorageState('checkpoint')).toEqual({ status: 'failed' });
+    expect(platform.writeStorage('checkpoint', 'ready')).toBe(false);
+    expect(platform.removeStorage('checkpoint')).toBe(false);
   });
 });

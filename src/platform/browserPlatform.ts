@@ -1,6 +1,10 @@
 export type PlatformTimeout = number | null;
 export type PlatformFrame = number | null;
 export type PlatformUnsubscribe = () => void;
+export type PlatformStorageRead =
+  | { readonly status: 'value'; readonly value: string }
+  | { readonly status: 'missing' }
+  | { readonly status: 'failed' };
 
 export interface PlatformMediaQuery {
   readonly matches: boolean;
@@ -51,17 +55,38 @@ export class BrowserPlatform {
   }
 
   readStorage(key: string): string | null {
+    const result = this.readStorageState(key);
+    return result.status === 'value' ? result.value : null;
+  }
+
+  readStorageState(key: string): PlatformStorageRead {
     try {
-      return this.storage()?.getItem(key) ?? null;
+      const storage = this.storage();
+      if (!storage) return { status: 'failed' };
+      const value = storage.getItem(key);
+      return value === null ? { status: 'missing' } : { status: 'value', value };
     } catch {
-      return null;
+      return { status: 'failed' };
     }
   }
 
   writeStorage(key: string, value: string): boolean {
     try {
-      this.storage()?.setItem(key, value);
-      return this.storage() !== null;
+      const storage = this.storage();
+      if (!storage) return false;
+      const result: unknown = storage.setItem(key, value);
+      return result !== false;
+    } catch {
+      return false;
+    }
+  }
+
+  removeStorage(key: string): boolean {
+    try {
+      const storage = this.storage();
+      if (!storage) return false;
+      const result: unknown = storage.removeItem(key);
+      return result !== false;
     } catch {
       return false;
     }
