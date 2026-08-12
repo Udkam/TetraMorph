@@ -216,10 +216,12 @@ fingerprints, and exact telemetry. F4A is accepted without importing the draft i
 
 F4B authors only rebuilt stable ID `t3r-shaft-02` and keeps the live 50-level library
 unchanged. One writer may modify `src/game/core/puzzleV3IntroDefinitions.ts` to append the
-second draft, create `docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-02.json`, and create
-`src/game/core/puzzleV3Intro02Exact.test.ts`. The checkpoint remains at most 500 hand-authored
-changed lines, and the module still has only type imports and the sole exported symbol
-`PUZZLE_V3_INTRO_DRAFTS`.
+second draft, create `docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-02.json`, create
+`src/game/core/puzzleV3Intro02Exact.test.ts`, and make the minimum append-compatible assertion
+repair in `src/game/core/puzzleV3Intro01Exact.test.ts`. The four-path checkpoint remains at
+most 500 hand-authored changed lines. The module still has only type imports and the sole
+exported symbol `PUZZLE_V3_INTRO_DRAFTS`; the Intro-01 test pins draft index 0 and its unique
+ID/bytes/hash without requiring the entire growing draft array to have length one.
 
 The draft keeps name `留井`, difficulty 2, targetRows 3, and no anchors/hidden cells. It uses
 exactly six legal zero-clear setup drops occupying exactly the three floor rows, with six
@@ -227,8 +229,10 @@ total empty target cells. Exactly one board column is empty in all three target 
 other column is a three-row well. Each row still has one through four gaps. The gameplay seed
 is unique across live and all v3 drafts.
 
-The strict optimum is three or four locks. Before the final lock, every settled piece clears
-zero rows and leaves all three original well-column targets empty. The final lock is a
+The strict optimum is three or four locks. Freeze the unique visible-board well column as
+`wellX`. Before the final lock, every settled piece clears zero rows and current-Core board
+cells `board[37][wellX]`, `board[38][wellX]`, and `board[39][wellX]` remain `null`; these are
+setup gaps, not `puzzleTargetCells`. The final lock is a
 vertical I whose four cells share the well column and world rows `36..39`; it releases all
 three target rows at once and finishes. This proves the route-critical lesson is preserving
 the well until it is useful, not merely containing a vertical cavity in the screenshot.
@@ -243,12 +247,17 @@ Intro-02 626 bytes / SHA-256
 `E83542E1A19A248EA26261A7504913A6A6B155DA9EA089622DF1BC04BDEC55B4`.
 
 F4B reuses the exact F4A schema-8 key order, hash preimages, proof kind, lower bound,
-`solutionMultiplicity='multiple'`, one alternative, and `techniqueEvidenceId=null`. Discovery
-may use a beam, but all stored fields require literal current-Core replay and an exhaustive
-shorter-depth certificate. Contract QA must be all zero before discovery or source editing.
+`solutionMultiplicity='multiple'`, one alternative, and `techniqueEvidenceId=null`.
+Here `multiple` means at least two distinct completing public-command routes; it does not
+claim that every stored alternative is optimal. The primary alone owns the strict optimum,
+and the alternative may use at most optimum plus two locks. Discovery may use a beam, but all
+stored fields require literal current-Core replay and an exhaustive shorter-depth certificate.
+Contract QA must be all zero before discovery or source editing.
 
-The certificate contains exactly one alternative entry. Both positive clear events must
-strictly reduce remaining original targets. Normal direct tests, one
+The certificate contains exactly one alternative entry. In each route, the only positive row
+release is the final value `3`; all preceding values are zero, remaining original targets are
+24 before that release and zero after it, and the final locked-piece signature is the frozen
+well-column I. Normal direct tests, one
 `PUZZLE_EXACT_CERTIFICATES=1` direct run, current
 `puzzles.test.ts`, and the 38-entry behavior-baseline test are required before candidate QA.
 Any exact-proof failure stops; it does not loosen the domain or design criteria. Contract QA

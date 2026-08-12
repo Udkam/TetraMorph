@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4B contract repaired before discovery
+
+- Independent review finds the three-path boundary would break Intro-01's accepted
+  one-element-array assertion; F4B now includes one minimal append-compatibility test repair.
+- The well invariant now checks empty Core board cells at world rows 37–39, and each route's
+  sole positive release is final `3` with targets 24 -> 0.
+- Schema `multiple` is clarified as distinct completing routes, not multiple optima; the
+  alternative remains bounded by optimum plus two. Discovery remains closed for fresh QA.
+
 ## 2026-08-12 — T37 Stage F4B Intro-02 contract frozen
 
 - F4B opens only the second non-published Intro draft, its schema-8 artifact, and direct exact

@@ -155,20 +155,27 @@ four with the exact case skipped; opt-in passes `5/5`. Typecheck, the complete
 
 F4B appends only a non-published `t3r-shaft-02` draft to
 `puzzleV3IntroDefinitions.ts`, plus `puzzle-v3-intro-02.json` and
-`puzzleV3Intro02Exact.test.ts`. The module retains only type imports and the one exported
-draft array; the three-path checkpoint remains at most 500 hand-authored changed lines.
+`puzzleV3Intro02Exact.test.ts`. It also minimally repairs the accepted
+`puzzleV3Intro01Exact.test.ts` so it pins index 0, its unique ID, bytes, and hash without
+requiring the growing draft array to contain only one item. The module retains only type
+imports and the one exported draft array; the four-path checkpoint remains at most 500
+hand-authored changed lines.
 
 The definition is a legal six-drop, zero-clear, anchor-free three-floor-row setup with 24
 ordinary targets and exactly six empty cells. Exactly one column is empty in all three target
 rows; all other columns contain at least one target, and every row has one through four gaps.
 The gameplay seed is distinct from all 50 live definitions and every earlier v3 draft.
 
-Its exact optimum is three or four locks. All locks before the last have zero row releases
-and keep the three original well-column target coordinates empty. The final lock is a vertical
-I at that well column with world-space cells `y=36,37,38,39`; it releases exactly three rows
-and finishes. One stored alternative diverges at lock 1 or 2, uses at most optimum plus two
-locks, and proves the same no-early-clear/final-well-I sequence. Both routes are literal
-current-Core evidence; beam output cannot prove optimum or absence.
+Its exact optimum is three or four locks. The test derives one literal `wellX` from the initial
+visible three-row mask. All locks before the last have zero row releases and retain
+`state.board[37][wellX]`, `state.board[38][wellX]`, and `state.board[39][wellX]` as `null`;
+the well is an empty setup gap and is not an original target. The final lock is a vertical I
+at that column with world-space cells `y=36,37,38,39`; it releases exactly three rows and
+finishes. Each primary/alternative release sequence therefore contains only one positive
+value, final `3`, with remaining target count 24 before it and zero after it. One stored
+alternative diverges at lock 1 or 2, uses at most optimum plus two locks, and proves the same
+no-early-clear/final-well-I sequence. Both routes are literal current-Core evidence; beam
+output cannot prove optimum or absence.
 
 Pairwise exact, normalized-topology, and near-topology flags are false against every live
 definition and accepted Intro-01 draft. The accepted Intro-01 draft stays 622 bytes with
@@ -179,8 +186,11 @@ Intro-02 stays 626 bytes with SHA-256
 The schema remains exactly certificate v8 with F4A field order and serializers,
 `proof.kind='exhaustive-shorter-depths'`,
 `proof.lowerBoundVersion='target-column-deficit-v1'`, one alternative,
-`solutionMultiplicity='multiple'`, and `techniqueEvidenceId=null`. Fresh independent contract
-QA precedes all discovery and source editing.
+`solutionMultiplicity='multiple'`, and `techniqueEvidenceId=null`. In this frozen schema,
+`multiple` means two or more distinct completing public-command routes; it does not assert
+multiple optimal routes. The primary route owns the strict optimum proof, while the stored
+alternative remains bounded by optimum plus two. Fresh independent contract QA precedes all
+discovery and source editing.
 
 ## Frozen published roster
 

@@ -1524,6 +1524,23 @@ Next exact action: commit this docs-only F4B contract and obtain fresh independe
 QA. Discovery and source editing remain closed until P0–P3/GAP are zero. No product, other
 draft, progression/UI, sensory, or icon path opens.
 
+First independent F4B contract reviews reject discovery. One review reports
+`P0 0 / P1 1 / P2 2 / P3 0 / GAP 0`: appending a second draft would fail Intro-01's literal
+array-length-one assertion outside the original three-path boundary; “well targets” are
+actually empty board gaps; and “both positive events” contradicts the one final three-row
+release. A second review questions whether `multiple` requires multiple optima. The frozen
+schema text resolves that question: `multiple` means distinct completing routes, while only
+the primary owns strict optimum; this is not a defect.
+
+The repaired F4B boundary is four paths, adding only the minimum append-compatible change to
+`puzzleV3Intro01Exact.test.ts`, with the same aggregate 500-line cap. It freezes `wellX`,
+asserts `board[37..39][wellX] === null` after every pre-final lock, requires final I cells
+`(wellX,36..39)`, and requires each route's only positive release to be final `3` with targets
+24 before and zero after.
+
+Next exact action: commit this docs-only F4B repair and obtain fresh independent QA. Discovery
+and source editing remain closed until all severity/gap counts are zero.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

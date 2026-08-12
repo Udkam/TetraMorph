@@ -758,6 +758,10 @@ adding unrelated badges or ornamental effects.
   well targets, and the final vertical I must occupy the well and release all three rows.
   A second early-divergent route must exhibit the same invariant. This makes the lesson
   mechanically testable instead of inferring “well play” from board appearance.
+- The well is tested as empty Core board cells at world rows 37–39, not as original target
+  cells. F4B may update the accepted Intro-01 test only to tolerate later draft-array appends;
+  its index-0 identity and bytes remain pinned. Certificate multiplicity continues to mean
+  distinct completing routes, while strict optimality belongs to the primary route.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
