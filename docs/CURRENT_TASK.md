@@ -8744,3 +8744,33 @@ The player additionally deferred the newest line-clear feedback to the final exp
 stage: line-clear count must eventually drive a meaningful 1–4-line reward hierarchy, and
 the current clear presentation must last longer. This is recorded now but must not interrupt
 the Endgame curriculum or enter the Intro-05 candidate.
+
+The coordinator observed that the authorized 8,192 MiB recovery passed its dynamic preflight
+and failed with a second V8 heap OOM after 819.5 seconds (`exit 134`, approximately
+8,152.1 MiB retained in an 8,160.7 MiB heap). Those historical numbers lack a separately
+readable transcript and are not an acceptance premise. Reproducible facts are that output
+and staging remain absent, the process exited, and Core is unchanged. This permanently
+closes the retired 26,059-byte validator; no larger heap or another run is authorized.
+
+Current slice `F4E-R3` is a proof-storage repair only, limited to
+`endgameRouteSearch.ts`, its existing test, and one new `endgameRouteKeyFrontier.test.ts`.
+Replace the exact certifier's
+full-`GameState` frontier/next-layer map with complete current 11-segment state keys, strictly
+decode one key at a time into a canonical proof-equivalence representative, and expand it through
+the same exhaustive landing function and target-deficit lower bound. The representative is
+not a historical score/clock replay; all final evidence still comes from the real command
+route. Prove key round-trip, lower-bound, win outcome, complete successor-set equivalence
+under deliberately varied proof-quotiented fields, ordinary-colour canonicalization,
+Bedrock/Survival and invariant rejection, exhaustive `GameState` field classification,
+strict key grammar, bounded reference-BFS, and all existing literal certificate/replay equivalence before
+freezing a new validator. Do not edit the
+Intro-05 definition/fixture/test, live roster, UI, progression, sensory code, protected T27
+paths, `progress.md`, final line-clear backlog, or icon in this repair.
+
+Two independent read-only reviews of this F4E-R3 contract now report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The first confirms the exhaustive field
+taxonomy, orthogonal modifiers, strict grammar, proof-observed lock-event projection,
+and historical-evidence wording. The second traces the contract against current Core
+reads and confirms that lower-bound, landing, completion, telemetry, and real-replay
+evidence boundaries are complete. Commit this four-document contract before opening
+only the three named Core/test paths.

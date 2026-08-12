@@ -1936,6 +1936,40 @@ Final-stage reminder from player testing: after 5/25/16 publication, make 1–4-
 award increasingly meaningful feedback and lengthen the current clear presentation. This is
 deferred deliberately and must be implemented before the final icon/overall acceptance.
 
+The coordinator observed the sole 8,192 MiB recovery pass preflight (`8.1875 GiB` heap,
+`13.6352 GiB` free physical, `9.2452 GiB` free virtual) and then fail after 819.5 seconds
+with `exit 134`; V8's tail reported about `8152.1 / 8160.7 MiB`. Those historical numbers
+are not independently recoverable and are not an acceptance premise. Reproducibly, the
+process exited, output/staging are absent, and Core tree remains
+`e86bacb4f2595b1b1d0109509c14d87429e3c0f5`. The old validator is retired and must not
+be retried or receive more heap.
+
+Current boundary: docs-only F4E-R3 contract. Static inspection identifies simultaneous
+retention of full frontier `GameState` objects and next-layer key-plus-state map entries.
+The proposed exact repair stores only complete current 11-segment keys, strictly materializes
+one canonical proof-equivalence representative at expansion time, and otherwise preserves the
+candidate upper bound, complete landing domain, lower bound, layer-local deduplication,
+shorter-win detection, and telemetry. It does not reconstruct discarded score/line/clock
+history; real-route replays remain the sole source of final evidence. A compile-time exhaustive
+`GameState` policy must give every field one primary class—encoded, template-invariant, or
+proof-quotiented—plus explicit validation/canonicalization modifiers where needed. The
+encoder rejects `B`/`R`, wrong mode/goal/completion, nondecision timers/pending rows, and
+non-Endgame subsystem state. Required gates
+are strict 11-segment grammar and round-trip; a reject-or-equivalence case for every field;
+exact successor-set/lower-bound/win and `piece-locked` type/cells equivalence under deliberately
+varied proof-quotiented fields; expected remaining-event/hash non-equivalence isolation;
+bounded full-object reference BFS;
+all existing literal exact certificates and replays; typecheck, full suite, build, and QA.
+The existing general state-key domain is unchanged; a private proof-frontier wrapper owns
+these assertions. Open source paths are exactly `endgameRouteSearch.ts`, its existing test,
+and new `endgameRouteKeyFrontier.test.ts`.
+
+Two independent read-only reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+They separately confirm the field-policy/grammar/evidence contract and its completeness
+against current Core state reads. Next exact action: commit these four documents, then
+implement only `src/game/core/endgameRouteSearch.ts`, its existing test, and the new
+focused key-frontier test. No Intro-05 candidate run or source integration is open yet.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

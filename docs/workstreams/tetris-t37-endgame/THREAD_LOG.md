@@ -266,3 +266,35 @@ old screenshot.
 - Verification: independent resource-recovery review accepts with
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including the dynamic execution preflight.
 - Next action: commit the docs-only recovery and execute exactly once if that preflight passes.
+
+## F4E-R3 — key-frontier proof recovery contract
+
+- Recovery checkpoint: `5a31411`.
+- Coordinator observation: preflight passed at heap `8.1875 GiB`, free physical
+  `13.6352 GiB`, and free virtual `9.2452 GiB`; the validator then exited `134` after
+  819.5 seconds with V8 reporting approximately `8152.1 / 8160.7 MiB`. These historical
+  numbers lack a separately readable transcript and are not an acceptance premise.
+- Postcondition: validator process count zero; final output absent; matching staging count
+  zero; Core tree `e86bacb4f2595b1b1d0109509c14d87429e3c0f5`; Core worktree clean.
+- Disposition: the 26,059-byte validator is retired. No rerun, larger heap, beam, cap,
+  route swap, or domain reduction is authorized.
+- Diagnosis: exact BFS holds full `GameState` frontiers and next-layer key-plus-state maps;
+  representative state/key payloads are approximately 4.3/0.6 KiB before object overhead.
+- Repair boundary: complete current 11-segment keys only in the frontier; strict canonical
+  proof-equivalence representative at expansion; unchanged exhaustive landings, lower bound,
+  layer dedupe, win rejection, and telemetry. Omitted score/line/clock history is explicitly
+  varied in equivalence tests; real routes remain the only final-evidence source. Focused
+  equivalence/reference tests plus existing exact fixtures are mandatory. An exhaustive
+  `GameState` field policy with one primary storage class plus orthogonal modifiers, strict
+  grammar, `B`/`R` and invariant rejection, proof-observed `piece-locked` projection, and
+  per-field reject-or-equivalence coverage close the review findings.
+- Source boundary: `endgameRouteSearch.ts`, `endgameRouteSearch.test.ts`, and one new
+  `endgameRouteKeyFrontier.test.ts`; the proof-only wrapper does not narrow the general key.
+- Verification: two independent read-only reviews both report
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. One covers field taxonomy, modifiers,
+  strict grammar, lock-event observation, and historical evidence; the other confirms
+  the contract against current Core lower-bound, landing, completion, telemetry, and
+  replay semantics.
+- Blocker: none at the contract boundary.
+- Next action: commit this docs-only contract, then open only the exact certifier and
+  its two focused test paths. No validator run or Intro-05 integration is authorized.

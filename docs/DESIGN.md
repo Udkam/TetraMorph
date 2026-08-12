@@ -5933,6 +5933,117 @@ current reproducible facts, not on the uncorroborated exact historical telemetry
 gate failure is a stop condition; it does not authorize another heap increase, a rerun, a
 beam/state cap, a different route, or broader search.
 
+### F4E-R3 key-frontier exact proof
+
+The coordinator observed that the one authorized recovery passed its immediate preflight
+with an 8.1875 GiB heap, 13.6352 GiB free physical memory, and 9.2452 GiB free virtual
+memory, then terminated after 819.5 seconds with `exit 134`; V8's terminal tail reported
+approximately 8,152.1 MiB retained inside an 8,160.7 MiB heap. Those historical telemetry
+numbers lack a separately readable transcript and are not an acceptance premise. Current
+reproducible facts are that no final output or owned staging file exists, the
+validator process is gone, and the frozen Core tree remains unchanged. The 26,059-byte
+validator is therefore retired. It must not run again with a larger heap, a state cap, a
+beam, or a narrower domain.
+
+Static inspection localizes the retained heap to the exact breadth-first proof in
+`certifyOptimalEndgameRouteForDefinition`: each layer keeps full `GameState` objects while
+the next-layer `Map` simultaneously keeps the current frozen 11-segment text key and another full state.
+A representative started Intro state serializes to about 4.3 KiB before JavaScript object
+overhead while its complete state key is about 0.6 KiB. This is a storage representation
+failure, not evidence against the route or lower bound.
+
+F4E-R3 may change only the authoring proof's frontier representation in
+`src/game/core/endgameRouteSearch.ts`, `src/game/core/endgameRouteSearch.test.ts`, and one
+new focused `src/game/core/endgameRouteKeyFrontier.test.ts`. The candidate replay
+still establishes the same seven-lock upper bound. Every shorter depth still uses
+`exhaustiveEndgameLandings`, `endgameRouteLockLowerBound`, and the exact current 11-segment
+`endgameRouteStateKey` schema. Existing general state-key calls, including terminal landing
+deduplication inside `exhaustiveEndgameLandings`, remain unchanged. A private proof-frontier
+encoder first asserts the canonical decision-state domain and then delegates to that key.
+The frontier stores only those complete keys. Before
+expansion, a key is decoded fail-closed into a canonical proof-equivalence representative
+`GameState`
+using the real started state as its invariant template; it is not claimed to reproduce the
+discarded historical score or clock. `.` becomes empty, `A` remains an anchor, and `#`
+becomes one canonical ordinary material because the existing state-key contract already
+proves ordinary piece colour is renderer-only for future collision and completion. Target
+cells, supported cells, active pose, queue, randomizer seed/bag, piece/spawn counts, phase,
+and status are all reconstructed from the key. Omitted display, score, line/level history,
+clock, undo, Survival, and Mutation fields take reviewed proof-equivalence representative values.
+Candidate/final hashes, releases, and presentation evidence remain sourced only from the
+real public-command replay, never from a decoded proof representative.
+
+The proof-frontier codec must define an exhaustive compile-time `GameState` field policy (for
+example, `satisfies Record<keyof GameState, ...>`) so a newly added field cannot silently
+enter the quotient. Every field has exactly one primary storage class plus zero or more
+domain-validation/canonicalization modifiers:
+
+1. `encoded`: board occupancy, target/support coordinates, active pose, queue, randomizer
+   seed/bag, piece/spawn counts, phase, and status come from the 11 segments;
+2. `template-invariant`: values come from the reviewed definition/start-state template rather
+   than the key;
+3. `proof-quotiented`: values may be replaced by a reviewed representative only after the
+   proof-observation equivalence below is demonstrated.
+
+Orthogonal modifiers then enforce that ordinary `I/J/L/O/S/T/Z` board materials alone may
+be canonicalized behind encoded occupancy; `B` and `R` are rejected rather than collapsed
+into `#`, while `A` stays `A`. Domain validators likewise constrain encoded fields such as
+active/phase/status and template fields: the encoder admits only a real Endgame decision state for the same
+   definition (`mode=endgame`, matching ID/seed/board source/initial target count,
+   `endgameGoal=original-targets-cleared`, `endgameCompletion=active`, active playing phase,
+   zero phase/gravity/lock counters, empty pending rows and undo state, and inert non-Endgame
+   subsystems). Score, lines, combo, level, elapsed time, display bridges, completion bridges,
+and any other enumerated proof-quotiented field may differ only after a dedicated test proves
+the exact certifier's observations—lower bound, finished/no-win, successor 11-segment keys,
+proof-observed `piece-locked` presence/type/cells, and telemetry—are unchanged. The complete
+event stream, event fields outside that lock projection, and `stateHash` are explicitly
+allowed to differ; ignored score/completion-tick payloads can never become final evidence.
+
+Decoder grammar is fail-closed: exactly 11 segments; exactly 40 rows of 10 cells; only
+`.`, `#`, and `A`; bounded unique canonically sorted coordinates; valid piece, rotation,
+queue, bag, unsigned seed, and count fields; valid non-colliding active pose; active-playing
+decision status; template invariants; and final byte-for-byte re-key equality. Unknown or
+malformed keys throw rather than fall back.
+
+The implementation is admissible only if focused tests prove all of the following:
+
+- the proof-frontier encoder rejects Bedrock/Survival material and every noncanonical
+  Endgame decision state without narrowing the existing general state-key domain;
+  decode obeys the frozen 11-segment grammar and
+  `endgameRouteStateKey(decode(key)) === key`;
+- for real started and post-lock states, original versus decoded representatives have
+  identical lower bounds, identical shorter-win outcomes, and identical sorted tuples of
+  lock signature, encoded commands, and successor key across the complete public-control
+  landing domain;
+- an exhaustive `GameState` policy makes every field review-visible; tests exercise a
+  reject-or-equivalence case for every asserted/quotiented field, including explicit `B`,
+  `R`, mode, goal, completion, timer, pending-row, and malformed-key negatives;
+- equivalence fixtures deliberately vary score, lines/level, elapsed ticks, ordinary colours,
+  and every proof-quotiented field across states sharing one key; their decoded representative
+  must still preserve the complete future successor-key set and win/no-win result, while
+  tests also show expected event/state-hash non-equivalence is never used as proof evidence;
+- ordinary board colour substitutions leave those tuples unchanged, while every field that
+  the key preserves remains mutation-sensitive;
+- a test-only full-object reference BFS and the key-frontier BFS return identical depth
+  telemetry and identical shorter-win decisions on bounded accepted definitions;
+- all existing opt-in exact certificates retain their literal frontier, transition, prune,
+  state-count, route, and hash values, while real-route replays retain their literal lines,
+  elapsed ticks, final state hashes, and events.
+
+No hash-only identity, probabilistic filter, disk failure fallback, global visited set,
+beam, state cap, altered lower bound, route-specific landing filter, or new gameplay rule is
+allowed. After source QA and full gates, a new validator must pin the new Core tree and its
+own new bytes; the retired validator/output authorization does not transfer. Only one
+independently reviewed candidate run of that new validator may open the original four-path
+Intro-05 integration slice.
+
+Two independent read-only contract reviews accept this representation boundary with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. One verifies field taxonomy, modifiers,
+grammar, event projection, and evidence wording; the other traces the specified
+observations against current Core lower-bound, landing, completion, and replay reads.
+This acceptance opens only the three named implementation/test paths after the docs
+checkpoint is committed; it does not accept an implementation or authorize a proof run.
+
 ## T37 final experience backlog
 
 After the complete 5/25/16 Endgame curriculum is published and verified, the final
