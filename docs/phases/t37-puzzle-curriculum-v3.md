@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3C EXACT PROTOTYPE ACCEPTED; F3D DEPTH TELEMETRY OPEN**
+Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 CONTRACT QA NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -34,6 +34,69 @@ inventory. Every exact search-loop depth that begins records
 transition/prune fields are derived from those records and must remain byte-equivalent to
 the accepted results. This is proof telemetry only. The live 50 definitions, mastery,
 progress, selector, and the future v3 draft roster remain unchanged.
+
+F3D is accepted at `7f31802`. Its `exhaustedDepths` array and records are frozen, every
+legacy total is derived from them, both independent and writer exact runs pass `9/9`, and
+no search result changes.
+
+## F4A Intro-01 authoring admission
+
+The first definition checkpoint is authoring-only. It creates one draft module, one
+schema-8 certificate JSON, and one direct exact test for stable ID `t3r-shaft-01`; the live
+50-level library remains byte-identical. The draft is a three-target-row, anchor-free board
+from 7–10 legal zero-clear setup drops, no more than six occupied visible rows, and 1–4
+gaps in each target row with at least one row having only 1–2 gaps. Its exact optimum is
+four or five locks. The chosen optimum has exactly two positive row releases `[1,2]`, and
+a second valid route diverges at lock 1 or 2 within optimum plus two locks.
+
+The draft module exports only frozen `PUZZLE_V3_INTRO_DRAFTS`; it is not imported by live
+product code. The certificate uses the schema-8 key order shown below and is canonical
+`JSON.stringify(entry) + "\n"` in UTF-8 without BOM or CR.
+
+`authoringDefinitionHash` is lowercase SHA-256 of one UTF-8 JSON line plus exactly one LF.
+`JSON.stringify` receives this exact insertion order:
+
+```ts
+{
+  schema: 'puzzle-authoring-definition-v1',
+  stableId: definition.id,
+  targetRows: definition.targetRows,
+  setup: {
+    seed: definition.setup.seed,
+    placements: definition.setup.placements.map(({ type, rotation, x }) => ({ type, rotation, x })),
+  },
+  boardRows: [...definition.boardRows],
+  hiddenCells,
+  anchorCells,
+  gameplaySeed: definition.seed,
+  dimensions: { width: 10, height: 40, visibleStartRow: 20 },
+  goal: 'clear-original-targets',
+  rulesetRevision: 'puzzle-v3',
+}
+```
+
+`hiddenCells` is numeric `y,x,type` sorted and serialized with coordinate key order
+`x,y,type`; it is empty in F4A. `anchorCells` is numeric `y,x` sorted and serialized with
+key order `x,y`; it is also empty in F4A. `behaviorHash` uses the already frozen
+`puzzle-behavior-v1` payload. `routeHash` and every alternative `routeHash` are lowercase
+SHA-256 of `UTF8("puzzle-route-v2\0" + commandStream)` with no trailing LF.
+
+The schema-8 entry has exact top insertion order
+`schemaVersion,campaignRevision,rulesetRevision,routeTokenVersion,searchStateKeyVersion,`
+`operationMetric,levelId,authoringDefinitionHash,behaviorHash,initialStateHash,`
+`optimalLockedPieces,optimalRoute,routeHash,lockSignatures,finalStateHash,`
+`solutionMultiplicity,proof,alternatives,techniqueEvidenceId`. `proof` exact order is
+`kind,lowerBoundVersion,exhaustedDepths,exploredStateCount,transitionCount`; each depth
+uses `lockedPieces,frontierStates,transitions,boundPrunes`. Each alternative exact order is
+`route,routeHash,lockSignatures,firstDivergenceLock`.
+
+F4A uses `proof.kind='exhaustive-shorter-depths'`,
+`proof.lowerBoundVersion='target-column-deficit-v1'`,
+`solutionMultiplicity='multiple'`, and `techniqueEvidenceId=null`. The exact test must
+independently rebuild every field from current Core, while also pinning the unchanged live
+50-level roster and canonical 625-byte `t3r-shaft-01`. Discovery may use bounded authoring
+search, but no beam/null/timeout/cap result enters the certificate. Contract QA precedes
+all discovery and source editing.
 
 ## Frozen published roster
 

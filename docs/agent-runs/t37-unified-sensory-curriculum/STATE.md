@@ -1418,9 +1418,24 @@ proof-telemetry checkpoint: `puzzleRouteSearch.ts`, `puzzleMasteryExact.test.ts`
 `lockedPieces,frontierStates,transitions,boundPrunes` entries and derives every legacy
 aggregate without changing routes, hashes, optima, or totals.
 
-Next exact action: implement only F3D, run the normal focused tests and one opt-in exact
-mastery/F3C pass, then obtain fresh independent QA. No Puzzle definition, certificate
-artifact, progress/mastery/UI, T27/`progress.md`, sensory, or icon path is open.
+F3D source commit `7f31802` adds only the three contracted paths and keeps every accepted
+route, optimum, hash, and legacy statistic. Writer and independent exact runs pass `9/9`;
+independent disposition is `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Post-source typecheck,
+the complete suite (`433 passed / 11 skipped`), and the 767-module build pass. Browser
+evidence is not applicable. The detailed writer record is in
+`docs/workstreams/tetris-t37-puzzle/THREAD_LOG.md`.
+
+F4A is now a docs-frozen, non-published `t3r-shaft-01` authoring contract. Its only source
+paths are `puzzleV3IntroDefinitions.ts`, `puzzle-v3-intro-01.json`, and
+`puzzleV3Intro01Exact.test.ts`; the live 50-level library remains unchanged. The draft uses
+three target rows, 7–10 setup drops, at most six occupied visible rows, exact optimum four
+or five, positive releases `[1,2]`, and a lock-1-or-2 divergent route within optimum plus
+two. The phase contract freezes all schema-8 key order and authoring/behavior/route hash
+preimages.
+
+Next exact action: obtain fresh independent docs-only QA of the F4A contract. Discovery and
+all source editing remain closed until P0–P3/GAP are zero. Progress/mastery/UI, other level
+drafts, T27/`progress.md`, sensory, and icon remain closed.
 
 ## Do not repeat
 

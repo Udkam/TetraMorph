@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F3D accepted and F4A Intro-01 contracted
+
+- Source `7f31802` adds immutable schema-8 `exhaustedDepths` telemetry and derives every
+  legacy exact-proof total from it without changing routes, optima, state hashes, or counts.
+- Writer and independent exact runs pass `9/9`; independent review reports P0–P3/GAP all
+  zero. Final typecheck, full `433 passed / 11 skipped` suite, and 767-module build pass.
+- F4A is frozen as one non-published `t3r-shaft-01` authoring draft plus its canonical
+  schema-8 certificate and direct exact test. The live 50-level library remains unchanged;
+  independent contract QA must pass before candidate discovery or source editing.
+
 ## 2026-08-12 — T37 Stage F3D schema-8 proof telemetry contracted
 
 - Post-F3C inventory confirms that the live product still publishes the accepted 50-level

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3C ACCEPTED / F3D SCHEMA-8 DEPTH TELEMETRY CONTRACT OPEN**
+Status: **STAGE F3D ACCEPTED / F4A INTRO-01 AUTHORING CONTRACT QA NEXT**
 
 ## Active objective
 
@@ -128,6 +128,54 @@ progress/mastery data, UI, T27/`progress.md`, audio, materials, transitions, and
 closed. Only after F3D acceptance may a docs-only F4A contract open one non-published
 `t3r-shaft-01` authoring candidate.
 
+F3D source `7f31802` is accepted. It changes only the three contracted Core/test paths,
+adds 120 lines, and preserves every accepted route, optimum, state hash, and legacy total.
+Writer and independent opt-in runs both pass all `9/9` exact tests; independent review is
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Post-source typecheck, the complete suite
+(`433 passed / 11 skipped`), and the 767-module build pass. Browser evidence does not apply.
+
+### Stage F4A non-published Intro-01 authoring contract (2026-08-12)
+
+F4A authors only the rebuilt stable ID `t3r-shaft-01`; it does not alter the live 50-level
+library. One writer may create exactly
+`src/game/core/puzzleV3IntroDefinitions.ts`,
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-01.json`, and
+`src/game/core/puzzleV3Intro01Exact.test.ts`. The source checkpoint is at most 500
+hand-authored changed lines. `docs/workstreams/tetris-t37-puzzle/THREAD_LOG.md` is a later
+docs-only feedback checkpoint, not part of the source commit.
+
+The draft module exports only `PUZZLE_V3_INTRO_DRAFTS`, a frozen readonly array containing
+one literal frozen `PuzzleDefinition`. It uses only type imports and is not imported by
+`puzzles.ts`, any product barrel, progress, UI, or renderer. The draft keeps name `补行`,
+difficulty 1, no anchors/hidden cells, and targetRows 3. Its setup uses 7–10 legal seeded
+zero-clear drops, occupies at most six visible rows, leaves 1–4 gaps in each target row with
+at least one 1–2-gap row, and uses a gameplay seed unique across live and draft definitions.
+Its behavior hash must differ from every live definition.
+
+The strict optimum is four or five locked tetrominoes. The chosen optimal replay has exactly
+two positive row-release events `[1,2]`, remains unfinished after the first, and finishes all
+three targets after the second. A separately replayed alternative diverges at lock 1 or 2
+and uses no more than `optimum + 2` locks, so `solutionMultiplicity` is literal `multiple`;
+Intro has `techniqueEvidenceId=null`. Beam search may help discovery but is never proof.
+
+The JSON is one canonical UTF-8/LF `PuzzleCertificateV8` entry with exact schema-8 field
+order from the phase contract. Hash serializers are frozen there: authoring and behavior
+hashes use their exact ordered payload plus one LF; route hashes use the domain-separated
+route-token-v2 preimage. The test reads repository files only, checks exact keys/literals,
+rebuilds all three hashes, setup, optimal and alternative replays, releases/signatures/final
+state, and the new per-depth certificate from current Core. It also proves the live library
+still has 50 definitions and canonical `t3r-shaft-01` remains the same reference and 625
+serialized bytes with SHA-256
+`7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1`.
+
+Normal direct tests, one `PUZZLE_EXACT_CERTIFICATES=1` direct run, current
+`puzzles.test.ts`, and the 38-entry behavior-baseline test are required before candidate QA.
+Any exact-proof failure stops; it does not loosen the domain or design criteria. Contract QA
+must first report all zero before discovery or implementation begins. Product publication,
+the other four Intro drafts, preserved Easy/Hard certificates, three Hard rebuilds, v6
+migration, mastery/unlock/UI, browser evidence, T27/`progress.md`, sensory, and icon remain
+closed.
+
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
@@ -188,15 +236,16 @@ closed. Only after F3D acceptance may a docs-only F4A contract open one non-publ
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3C ACCEPTED; F3D PROOF TELEMETRY NEXT** — the exact
+6. **Puzzle curriculum — F3D ACCEPTED; F4A CONTRACT QA NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
    anchor-supported state identity, definition-aware replay/proof, and exact anchor
    admission; accepted F3B source `308233c` adds four-anchor capability evidence. F3C
    final proof `b2c3bc5` supplies one canonical ten-row setup, current-Core route, and
-   no-beam exact certificate with independent QA all zero. F3D now adds only the
-   per-depth proof telemetry required by schema 8; curriculum content stays closed.
+   no-beam exact certificate with independent QA all zero. Accepted F3D source `7f31802`
+   supplies schema-8 per-depth telemetry without proof drift. F4A may author only one
+   non-published Intro-01 draft after its contract QA; curriculum content stays closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
