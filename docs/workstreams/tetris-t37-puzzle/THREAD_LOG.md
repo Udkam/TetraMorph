@@ -402,3 +402,38 @@ Protected T27/follow-up/progress paths remain unstaged and outside the commit.
 - Blocker: none for docs-only F4E contract authoring.
 - Next action: freeze and independently review the Intro-05 Current/Next-1/Next-2 planning
   contract, including the append-compatible Intro-04 test boundary.
+
+## F4E — Intro-05 Current/Next-1/Next-2 contract
+
+- Task ID: `T37-F4E-CONTRACT`
+- Base SHA: `159bfbc`
+- Status: contract accepted; repository-external discovery open; source closed.
+
+Live `t3r-shaft-04` is pinned at 625 bytes / `E973122A...D7A2`, setup `5200006`, gameplay
+seed `2309737967`, first bag `OTSIJZL`, and its exact three floor rows. The non-published
+draft uses eight zero-clear setup drops / 32 targets / four rows, gap sum eight with each row
+in `1..3`, no anchors/hidden cells, unique seed, and 54 pairwise exclusions.
+
+The teaching test is a causal two-hop support chain. Locks 1–3 follow the first three queue
+draws and clear zero. Lock 2's identical pose must be blocked from descending in `before[2]`;
+its nonempty occupied shifted set must belong entirely to lock 1; removing lock 1 must make
+every shifted cell empty and allow it to descend one row. Removing lock 2 from `before[3]`
+must do the same for lock 3, with a shifted
+cell owned by the removed lock in each original state. Both routes share lock 1, diverge at
+lock 2 or 3, prove the chain, then use at least two positive events summing to four rows.
+
+Primary optimum is 5–7 with uncapped current-Core proof; one alternative is within +2.
+Schema 8 and prior definition/hash pins remain frozen. Source is exactly four paths / <=500
+lines, including only the minimum Intro-04 prefix-assertion repair required for appendability.
+
+- Blocker: fresh independent contract QA.
+- Next action: repair findings and, only after all-zero QA, run repository-external candidate
+  discovery without editing source/product/protected paths.
+
+Formal and adversarial reviews now report P0–P3/GAP all zero. The final wording requires a
+nonempty complete set of shifted blockers owned by the immediately previous lock, with the
+original pose blocked and the remove-then-descend counterfactual open. Contract QA is closed.
+
+- Blocker: none for repository-external candidate discovery.
+- Next action: discover and independently freeze a complete F4E candidate; keep all four
+  source paths closed until setup, both support chains, admissions, hashes, and exact proof pass.

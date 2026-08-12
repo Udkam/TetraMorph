@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4D INTRO-04 ACCEPTED / F4E INTRO-05 CONTRACT NEXT**
+Status: **STAGE F4D INTRO-04 ACCEPTED / F4E INTRO-05 CONTRACT ACCEPTED — DISCOVERY NEXT**
 
 ## Active objective
 
@@ -512,6 +512,58 @@ final run. Two independent source reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GA
 Intro-04 is accepted outside product. F4E must begin docs-first and explicitly account for
 Intro-04's current fixed draft-count assertion before any Intro-05 source append.
 
+### Stage F4E non-published Intro-05 authoring contract (2026-08-12)
+
+F4E rebuilds stable ID/name/difficulty `t3r-shaft-04` / `后手` / 5 as a four-row
+Current/Next-1/Next-2 planning lesson. The current product remains pinned at `targetRows=3`,
+gameplay seed `2309737967`, setup seed `5200006`, placements
+`O2@1,T0@4,S0@7,L2@0,J1@2,Z0@5`, floor rows
+`LLLJJZZ... / LOOJ.TZZSS / .OOJTTTSS.`, 625 serialized bytes, and SHA-256
+`E973122AAA271F92CFD61D35814EB2079DA977817FF0A60F6F56DDDC0060D7A2`.
+Its first bag is `O T S I J Z L`; live product data and imports remain byte-identical.
+
+The draft uses exactly eight legal seeded setup hard drops, clears no setup row, and derives
+32 ordinary targets only in world rows 36–39. Its four exact gap counts each lie in `1..3`
+and sum to eight; hidden and anchor arrays are empty. The gap vector must differ from accepted
+Intro-03 `[3,1,1,3]`. Its gameplay seed is unique across the live 50 plus Intro-01–04, and
+all 54 pairwise exact, normalized-topology, and near-topology comparisons are false.
+
+Route-token v2 has no hold operation. In each stored route, locks 1–3 therefore use the
+gameplay seed's literal first three draws in Current/Next-1/Next-2 order and each releases
+zero rows. Define `cells[i]` as lock i's final world cells and `before[i]` as its pre-lock
+board. For lock 2, its exact settled pose cannot move down one row in `before[2]`; the nonempty
+set of occupied shifted coordinates belongs entirely to cells newly owned by lock 1. After removing all lock-1 cells from
+`before[2]`, every shifted coordinate is in bounds and empty, so the pose can move down.
+Apply the same original-blocked/removed-then-open test to lock 3 against lock 2. Thus lock 1 causally
+supports lock 2 and lock 2 causally supports lock 3; labels, queue order, overlap, or a final
+solution alone do not prove three-piece planning.
+
+Both stored routes share lock 1, first diverge at lock 2 or 3, and independently prove the
+complete two-hop support chain. After the three zero-clear planning locks, each route has at
+least two positive release events. Every positive event strictly reduces original targets;
+their release sum is exactly four, remaining targets reach zero, and the puzzle finishes.
+The strict primary optimum is five through seven locks; the alternative is no longer than
+optimum plus two. Candidate evidence freezes the first bag, literal routes/signatures, every
+support source and shifted blocker coordinate, releases, remaining-target arrays, hashes,
+and first divergence.
+
+Schema 8 retains the accepted key order, serializers and hash domains, one alternative,
+`solutionMultiplicity='multiple'`, `proof.kind='exhaustive-shorter-depths'`,
+`proof.lowerBoundVersion='target-column-deficit-v1'`, and `techniqueEvidenceId=null`.
+Discovery may use heuristics, but only uncapped current-Core shorter-depth proof may certify
+the primary. The direct test pins accepted drafts Intro-01 622 / `DFC1...FDA8`, Intro-02
+621 / `1E67...A9EB`, Intro-03 682 / `A825...EC9E`, and Intro-04 647 /
+`4D542D3A...4941A`, as well as the live baseline above.
+
+The later source boundary is exactly four paths and at most 500 hand-authored changed lines:
+append draft index 4 in `puzzleV3IntroDefinitions.ts`, create `puzzle-v3-intro-05.json`,
+create `puzzleV3Intro05Exact.test.ts`, and replace only Intro-04's fixed total-length assertion
+with a prefix identity assertion for its accepted first four drafts. No other existing test,
+product, progression, UI, sensory, protected T27, or icon path opens. Fresh independent
+contract QA is all zero; repository-external candidate discovery is open, while source remains
+closed until a complete candidate passes every setup, route, support, admission, hash, and
+uncapped-proof gate.
+
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
@@ -572,7 +624,7 @@ Intro-04's current fixed draft-count assertion before any Intro-05 source append
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4D INTRO-04 ACCEPTED; F4E INTRO-05 CONTRACT NEXT** — the exact
+6. **Puzzle curriculum — F4D INTRO-04 ACCEPTED; F4E INTRO-05 CONTRACT ACCEPTED / DISCOVERY NEXT** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -593,7 +645,9 @@ Intro-04's current fixed draft-count assertion before any Intro-05 source append
    contract reached an eight-drop setup contradiction inside its generated index-1 family.
    Independent review accepted the seven-drop R2 revision before discovery. R3 then froze and
    implemented the qualifying four-lock corridor-migration candidate; contract and source QA
-   are all zero. F4E next defines Current/Next-1/Next-2 planning before any source edit.
+   are all zero. F4E now freezes causal Current/Next-1/Next-2 planning for independent
+   contract QA before any discovery or source edit. Formal and adversarial reviews now report
+   P0–P3/GAP all zero, opening only repository-external candidate discovery.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

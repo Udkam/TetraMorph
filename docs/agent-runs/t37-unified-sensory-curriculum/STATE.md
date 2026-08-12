@@ -145,7 +145,7 @@ ordinary/Mutation pieces, and a strictly certified 5/25/16 Puzzle curriculum.
     stop at 1,000,000 probes without a candidate; independent output QA is all zero.
 38. `TEMP CLEANUP BLOCKED` — terminal safety policy rejects both exact deletion forms
     before execution. No second increment or later product work opens before cleanup.
-39. `F4D ACCEPTED; F4E CONTRACT NEXT` — setup `49`, gameplay seed `83`, and two
+39. `F4D ACCEPTED; F4E CONTRACT ACCEPTED / DISCOVERY NEXT` — setup `49`, gameplay seed `83`, and two
     exact four-lock routes replace the infeasible terminal-I route constraint while retaining
     the local clear and explicit corridor lesson. Source and independent QA are green.
 
@@ -1782,6 +1782,38 @@ the live baseline and Current/Next-1/Next-2 planning invariant, and explicitly a
 minimum append-compatible change to Intro-04's fixed four-draft test before any Intro-05
 source append. Product integration, later curriculum, sensory, protected T27, and icon remain
 closed.
+
+F4E fact reconciliation pins live `t3r-shaft-04` at 625 bytes / SHA-256
+`E973122AAA271F92CFD61D35814EB2079DA977817FF0A60F6F56DDDC0060D7A2`, targetRows 3,
+setup `5200006`, gameplay seed `2309737967`, and first bag `OTSIJZL`. A repository-external
+Vite/Core probe script hashes to `47C522752D44BECB927A3A43E03907728EF0F651E3A2351B5B53A87C8942B323`.
+
+The contract candidate admits exactly eight zero-clear setup drops / 32 four-row targets.
+Both stored routes use the first three deterministic draws with releases `[0,0,0]` and prove
+a counterfactual two-hop support chain: the next fixed pose is blocked, removing lock 1 makes
+lock 2's nonempty blocker set—owned entirely by lock 1—empty and lets it descend one, and
+removing lock 2 does the same complete-set check for lock 3. Later positive releases sum to
+four and finish in at least two events. Primary optimum is 5–7; the alternative shares lock 1 and diverges at
+lock 2 or 3. Admission covers live 50 plus four drafts, unique seed, schema-8 hashes, and an
+uncapped proof.
+
+The eventual source gate is honestly four paths / 500 lines because Intro-04 currently pins
+the total draft count to four. Its sole authorized edit replaces that total-length check with
+an exact prefix identity check; the Intro-05 test owns the new total. No discovery or source
+path is open before independent contract QA.
+
+Next exact action: obtain fresh independent F4E contract reviews. Repair every finding; only
+an all-zero contract opens repository-external candidate discovery. Product, progression/UI,
+sensory, protected T27, and icon paths remain closed.
+
+Formal and adversarial reviews of the final contract report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They independently verify the live bytes/hash/queue,
+8-drop math, no-Hold route domain, nonempty complete shifted-blocker sets, four-path append
+boundary, and protected isolation.
+
+Next exact action: run repository-external F4E candidate discovery. Freeze no setup, seed,
+route, or hash and edit no source until one candidate passes both two-hop support chains,
+all 54 comparisons, seed uniqueness, canonical hashes, and uncapped current-Core proof.
 
 ## Do not repeat
 

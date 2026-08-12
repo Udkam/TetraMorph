@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4D INTRO-04 ACCEPTED; F4E INTRO-05 CONTRACT NEXT**
+Status: **F4D INTRO-04 ACCEPTED; F4E INTRO-05 CONTRACT ACCEPTED — DISCOVERY NEXT**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -431,6 +431,39 @@ adds exactly the three frozen paths in 381 lines; focused, exact, typecheck, cle
 and build pass. Intro-04 remains outside the live 50 until the atomic switch. F4E starts with
 a docs-first contract and must not append Intro-05 while Intro-04's exact test still asserts a
 fixed total of four drafts without an authorized append-compatible repair.
+
+## F4E Intro-05 authoring admission
+
+F4E preserves `t3r-shaft-04` / `后手` / difficulty 5 but drafts a four-row lesson outside
+product. Live targetRows 3 remains 625 bytes / SHA-256 `E973122A...D7A2`, with setup seed
+`5200006`, gameplay seed `2309737967`, setup `O2@1,T0@4,S0@7,L2@0,J1@2,Z0@5`, floor
+rows `LLLJJZZ... / LOOJ.TZZSS / .OOJTTTSS.`, and first bag `OTSIJZL`.
+
+Exactly eight legal zero-clear setup drops produce 32 targets in world rows 36–39. Each row
+has one through three gaps, their sum is eight, and the vector is not Intro-03's
+`[3,1,1,3]`. Hidden/anchor arrays are empty. Gameplay seed is unique against live 50 plus
+Intro-01–04, and all 54 pairwise exact/topology/near comparisons are false.
+
+Each stored route's first three locks are the candidate seed's Current/Next-1/Next-2 draws,
+with no hold token and releases `[0,0,0]`. Lock 2 has a one-row-down collision caused by at
+least one new lock-1 cell, every occupied shifted blocker belongs to lock 1, and its exact pose
+cannot descend; deleting every lock-1 cell from
+its pre-lock board makes every shifted cell empty and the same pose movable down one row.
+Lock 3 satisfies the same blocked-then-open counterfactual against lock 2. Both
+routes share lock 1, diverge at lock 2 or 3, and independently prove both links. Thereafter
+at least two positive events each reduce targets, sum to four released rows, reach zero
+targets, and finish. Primary optimum is 5–7; alternative is at most optimum plus two.
+
+Schema 8, canonical hashes, one alternative, multiplicity, exact shorter-depth proof, and all
+accepted baseline pins remain unchanged. The eventual source gate is four paths / 500 lines:
+definition append, new certificate, new exact test, and only the Intro-04 fixed-length-to-
+prefix assertion repair. Contract QA precedes discovery; a fully qualified candidate precedes
+source. Published data, progression, UI, sensory, protected evidence, and icon remain closed.
+
+Formal and adversarial contract QA both report P0–P3/GAP all zero after the blocker-set
+wording repair. Repository-external candidate discovery may now begin. No definition,
+certificate, test, or append repair is authorized until a complete candidate passes every
+mechanical and proof gate above.
 
 ## Frozen published roster
 

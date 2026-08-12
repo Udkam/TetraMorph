@@ -811,6 +811,16 @@ adding unrelated badges or ornamental effects.
   clean full-suite, build, and two independent P0–P3/GAP-zero reviews. Intro-05 remains
   docs-first; its source boundary must include or precede the minimum append-compatible repair
   to Intro-04's fixed four-draft assertion.
+- F4E makes “Current/Next-1/Next-2 planning” causal. Both routes must place the first three
+  deterministic draws without a clear: every occupied one-row-down blocker for lock 2 belongs
+  to lock 1, with at least one blocker, and the same complete-set rule binds lock 3 to lock 2.
+  The original pose must be unable to descend; removing the immediately previous lock must
+  make every shifted cell empty and let that exact pose descend. Queue labels
+  or three correctly ordered piece types alone are insufficient. Later positive releases
+  sum to the four target rows and finish in stages. The non-published append remains closed
+  until contract QA and a complete candidate pass.
+- Formal and adversarial F4E contract reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+  Repository-external candidate discovery is open; all four source paths remain closed.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 
