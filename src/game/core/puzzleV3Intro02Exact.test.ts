@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { VISIBLE_START_ROW } from './constants';
 import { stateHash } from './engine';
 import { comparePuzzleTopologies } from './puzzleFingerprints';
-import * as introModule from './puzzleV3IntroDefinitions';
+import { PUZZLE_V3_INTRO_DRAFTS } from './puzzleV3IntroDefinitions';
 import {
   PUZZLE_DEFINITIONS,
   getPuzzleDefinition,
@@ -28,7 +28,7 @@ type Depth = Readonly<{
   boundPrunes: number;
 }>;
 
-type RouteEntry = Readonly<{
+type Alternative = Readonly<{
   route: string;
   routeHash: string;
   lockSignatures: readonly string[];
@@ -59,33 +59,29 @@ type CertificateV8 = Readonly<{
     exploredStateCount: number;
     transitionCount: number;
   }>;
-  alternatives: readonly RouteEntry[];
+  alternatives: readonly Alternative[];
   techniqueEvidenceId: string | null;
 }>;
 
 const FIXTURE_URL = new URL(
-  '../../../docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-01.json',
+  '../../../docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-02.json',
   import.meta.url,
 );
 const fixtureBytes = readFileSync(FIXTURE_URL, 'utf8');
 const artifact = JSON.parse(fixtureBytes) as CertificateV8;
-const draft = introModule.PUZZLE_V3_INTRO_DRAFTS[0]!;
-const BASE_BYTES = 625;
-const BASE_SHA256 = '7678C0321BC76CEED6971BD644AB6BBC21134540706F71BBE7FA1BAE91AC1FA1';
-const DRAFT_BYTES = 622;
-const DRAFT_SHA256 = 'DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8';
+const intro01 = PUZZLE_V3_INTRO_DRAFTS[0]!;
+const draft = PUZZLE_V3_INTRO_DRAFTS[1]!;
+const WELL_X = 6;
+const INTRO_01_BYTES = 622;
+const INTRO_01_SHA256 = 'DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223FDA8';
+const LIVE_BYTES = 626;
+const LIVE_SHA256 = 'E83542E1A19A248EA26261A7504913A6A6B155DA9EA089622DF1BC04BDEC55B4';
 
 function sha256(value: string): string {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
 
 function authoringPayload(definition: PuzzleDefinition): object {
-  const hiddenCells = [...definition.hiddenCells]
-    .sort((left, right) => left.y - right.y || left.x - right.x || left.type.localeCompare(right.type))
-    .map(({ x, y, type }) => ({ x, y, type }));
-  const anchorCells = [...definition.anchorCells]
-    .sort((left, right) => left.y - right.y || left.x - right.x)
-    .map(({ x, y }) => ({ x, y }));
   return {
     schema: 'puzzle-authoring-definition-v1',
     stableId: definition.id,
@@ -95,8 +91,8 @@ function authoringPayload(definition: PuzzleDefinition): object {
       placements: definition.setup.placements.map(({ type, rotation, x }) => ({ type, rotation, x })),
     },
     boardRows: [...definition.boardRows],
-    hiddenCells,
-    anchorCells,
+    hiddenCells: [],
+    anchorCells: [],
     gameplaySeed: definition.seed,
     dimensions: { width: 10, height: 40, visibleStartRow: 20 },
     goal: 'clear-original-targets',
@@ -109,9 +105,6 @@ function behaviorPayload(definition: PuzzleDefinition): object {
   const targetCells = initialBoardRows.flatMap((row, y) => [...row].flatMap((cell, x) => (
     cell === '#' ? [{ x, y }] : []
   )));
-  const anchorCells = [...definition.anchorCells]
-    .sort((left, right) => left.y - right.y || left.x - right.x)
-    .map(({ x, y }) => ({ x, y }));
   return {
     schema: 'puzzle-behavior-v1',
     dimensions: { width: 10, height: 40, visibleStartRow: 20 },
@@ -122,17 +115,19 @@ function behaviorPayload(definition: PuzzleDefinition): object {
     gameplaySeed: definition.seed,
     initialBoardRows,
     targetCells,
-    anchorCells,
+    anchorCells: [],
   };
 }
 
-function routeEvidence(definition: PuzzleDefinition, route: string) {
-  const replay = replayPuzzleRouteForDefinition(definition, route);
-  let current = replayPuzzleRouteForDefinition(definition, 'S').state;
+function routeEvidence(route: string) {
+  const replay = replayPuzzleRouteForDefinition(draft, route);
+  let current = replayPuzzleRouteForDefinition(draft, 'S').state;
   let reconstructed = 'S';
   const releases: number[] = [];
   const remaining: number[] = [];
-  for (const lock of replay.locks) {
+  const preFinalWellOpen: boolean[] = [];
+
+  replay.locks.forEach((lock, index) => {
     const matching = exhaustivePuzzleLandings(current).filter(({ lock: candidate }) => (
       candidate.signature === lock.signature
     ));
@@ -141,31 +136,27 @@ function routeEvidence(definition: PuzzleDefinition, route: string) {
     reconstructed += encodePuzzleRoute(landing.commands);
     releases.push(landing.state.lines - current.lines);
     remaining.push(landing.state.puzzleTargetCells.length);
+    if (index < replay.locks.length - 1) {
+      preFinalWellOpen.push([37, 38, 39].every((y) => landing.state.board[y]![WELL_X] === null));
+    }
     current = landing.state;
-  }
-  return { replay, reconstructed, releases, remaining };
+  });
+  return { replay, reconstructed, releases, remaining, preFinalWellOpen };
 }
 
-function expectBaseUnchanged(reference: PuzzleDefinition, bytes: string): void {
-  const after = getPuzzleDefinition('t3r-shaft-01');
-  expect(after).toBe(reference);
-  expect(JSON.stringify(after)).toBe(bytes);
-  expect(new TextEncoder().encode(bytes)).toHaveLength(BASE_BYTES);
-  expect(sha256(bytes).toUpperCase()).toBe(BASE_SHA256);
-}
-
-describe('Puzzle v3 non-published Intro-01 authoring entry', () => {
-  it('keeps one deeply frozen draft outside the live 50-level library', () => {
-    const base = getPuzzleDefinition('t3r-shaft-01');
-    const baseBytes = JSON.stringify(base);
-    expect(Object.keys(introModule)).toEqual(['PUZZLE_V3_INTRO_DRAFTS']);
+describe('Puzzle v3 non-published Intro-02 authoring entry', () => {
+  it('appends one deeply frozen draft while preserving both accepted baselines', () => {
+    const live = getPuzzleDefinition('t3r-shaft-02');
+    const liveBytes = JSON.stringify(live);
+    const intro01Bytes = JSON.stringify(intro01);
     expect(PUZZLE_DEFINITIONS).toHaveLength(50);
-    expect(introModule.PUZZLE_V3_INTRO_DRAFTS.filter(({ id }) => id === draft.id)).toEqual([draft]);
-    const draftBytes = JSON.stringify(draft);
-    expect(new TextEncoder().encode(draftBytes)).toHaveLength(DRAFT_BYTES);
-    expect(sha256(draftBytes).toUpperCase()).toBe(DRAFT_SHA256);
+    expect(PUZZLE_V3_INTRO_DRAFTS.filter(({ id }) => id === draft.id)).toEqual([draft]);
     expect(PUZZLE_DEFINITIONS).not.toContain(draft);
-    expect(Object.isFrozen(introModule.PUZZLE_V3_INTRO_DRAFTS)).toBe(true);
+    expect(new TextEncoder().encode(liveBytes)).toHaveLength(LIVE_BYTES);
+    expect(sha256(liveBytes).toUpperCase()).toBe(LIVE_SHA256);
+    expect(new TextEncoder().encode(intro01Bytes)).toHaveLength(INTRO_01_BYTES);
+    expect(sha256(intro01Bytes).toUpperCase()).toBe(INTRO_01_SHA256);
+    expect(Object.isFrozen(PUZZLE_V3_INTRO_DRAFTS)).toBe(true);
     expect(Object.isFrozen(draft)).toBe(true);
     expect(Object.isFrozen(draft.setup)).toBe(true);
     expect(Object.isFrozen(draft.setup.placements)).toBe(true);
@@ -173,23 +164,26 @@ describe('Puzzle v3 non-published Intro-01 authoring entry', () => {
     expect(Object.isFrozen(draft.boardRows)).toBe(true);
     expect(Object.isFrozen(draft.hiddenCells)).toBe(true);
     expect(Object.isFrozen(draft.anchorCells)).toBe(true);
-    expectBaseUnchanged(base, baseBytes);
   });
 
-  it('rebuilds the legal three-row setup and rejects every live structural match', () => {
+  it('rebuilds one unique three-row well and rejects every prior structure match', () => {
     expect(() => validatePuzzleDefinition(draft, false)).not.toThrow();
-    const boardRows = replayPuzzleSetup(draft.setup).slice(VISIBLE_START_ROW).map((row) => (
+    const rows = replayPuzzleSetup(draft.setup).slice(VISIBLE_START_ROW).map((row) => (
       row.map((cell) => cell ?? '.').join('')
     ));
-    expect(boardRows).toEqual(draft.boardRows);
-    expect(boardRows.filter((row) => row !== '..........')).toEqual([
-      'IIIITTT.S.', '.OO.JTZZSS', '.OO.JJJZZS',
+    expect(rows).toEqual(draft.boardRows);
+    expect(rows.filter((row) => row !== '..........')).toEqual([
+      '.T.JJJ..SS', 'TTTZZJ.SSL', 'IIIIZZ.LLL',
     ]);
-    expect(boardRows.slice(-3).map((row) => [...row].filter((cell) => cell === '.').length))
-      .toEqual([2, 2, 2]);
-    expect(PUZZLE_DEFINITIONS.every((definition) => definition.seed !== draft.seed)).toBe(true);
-    for (const live of PUZZLE_DEFINITIONS) {
-      expect(comparePuzzleTopologies(live, draft), live.id).toMatchObject({
+    expect(rows.slice(-3).map((row) => [...row].filter((cell) => cell === '.').length))
+      .toEqual([4, 1, 1]);
+    const wells = Array.from({ length: 10 }, (_, x) => x).filter((x) => (
+      rows.slice(-3).every((row) => row[x] === '.')
+    ));
+    expect(wells).toEqual([WELL_X]);
+    expect([...PUZZLE_DEFINITIONS, intro01].every(({ seed }) => seed !== draft.seed)).toBe(true);
+    for (const other of [...PUZZLE_DEFINITIONS, intro01]) {
+      expect(comparePuzzleTopologies(other, draft), other.id).toMatchObject({
         exactMatch: false,
         topologyMatch: false,
         nearTopology: false,
@@ -197,7 +191,7 @@ describe('Puzzle v3 non-published Intro-01 authoring entry', () => {
     }
   });
 
-  it('is one canonical schema-8 JSON line with all hashes rebuilt from literals', () => {
+  it('is canonical schema 8 and rebuilds every frozen hash', () => {
     expect(fixtureBytes.charCodeAt(0)).not.toBe(0xfeff);
     expect(fixtureBytes).not.toContain('\r');
     expect(fixtureBytes.match(/\n/g)).toHaveLength(1);
@@ -212,11 +206,9 @@ describe('Puzzle v3 non-published Intro-01 authoring entry', () => {
     expect(Object.keys(artifact.proof)).toEqual([
       'kind', 'lowerBoundVersion', 'exhaustedDepths', 'exploredStateCount', 'transitionCount',
     ]);
-    for (const depth of artifact.proof.exhaustedDepths) {
-      expect(Object.keys(depth)).toEqual([
-        'lockedPieces', 'frontierStates', 'transitions', 'boundPrunes',
-      ]);
-    }
+    expect(artifact.proof.exhaustedDepths.every((depth) => (
+      Object.keys(depth).join(',') === 'lockedPieces,frontierStates,transitions,boundPrunes'
+    ))).toBe(true);
     expect(artifact.alternatives).toHaveLength(1);
     expect(Object.keys(artifact.alternatives[0]!)).toEqual([
       'route', 'routeHash', 'lockSignatures', 'firstDivergenceLock',
@@ -231,15 +223,10 @@ describe('Puzzle v3 non-published Intro-01 authoring entry', () => {
       levelId: draft.id,
       optimalLockedPieces: 4,
       solutionMultiplicity: 'multiple',
-      proof: {
-        kind: 'exhaustive-shorter-depths',
-        lowerBoundVersion: 'target-column-deficit-v1',
-      },
+      proof: { kind: 'exhaustive-shorter-depths', lowerBoundVersion: 'target-column-deficit-v1' },
       techniqueEvidenceId: null,
     });
-    expect(artifact.authoringDefinitionHash).toBe(
-      sha256(`${JSON.stringify(authoringPayload(draft))}\n`),
-    );
+    expect(artifact.authoringDefinitionHash).toBe(sha256(`${JSON.stringify(authoringPayload(draft))}\n`));
     expect(artifact.behaviorHash).toBe(sha256(`${JSON.stringify(behaviorPayload(draft))}\n`));
     expect(artifact.routeHash).toBe(sha256(`puzzle-route-v2\0${artifact.optimalRoute}`));
     expect(artifact.alternatives[0]!.routeHash).toBe(
@@ -247,25 +234,31 @@ describe('Puzzle v3 non-published Intro-01 authoring entry', () => {
     );
   });
 
-  it('replays the optimal and early-divergent routes with readable one-then-two releases', () => {
-    const primary = routeEvidence(draft, artifact.optimalRoute);
-    const alternative = routeEvidence(draft, artifact.alternatives[0]!.route);
+  it('proves both routes preserve the well until the same final vertical I', () => {
+    const primary = routeEvidence(artifact.optimalRoute);
+    const alternative = routeEvidence(artifact.alternatives[0]!.route);
+    for (const [evidence, signatures] of [
+      [primary, artifact.lockSignatures],
+      [alternative, artifact.alternatives[0]!.lockSignatures],
+    ] as const) {
+      expect(evidence.reconstructed).toBe(encodePuzzleRoute(evidence.replay.commands));
+      expect(evidence.replay.locks.map(({ signature }) => signature)).toEqual(signatures);
+      expect(evidence.releases).toEqual([0, 0, 0, 3]);
+      expect(evidence.remaining).toEqual([24, 24, 24, 0]);
+      expect(evidence.preFinalWellOpen).toEqual([true, true, true]);
+      const final = evidence.replay.locks.at(-1)!;
+      expect(final.piece).toBe('I');
+      expect(final.cells).toEqual([36, 37, 38, 39].map((y) => ({ x: WELL_X, y })));
+      expect(evidence.replay.state.puzzleCompletion).toBe('finished');
+    }
     expect(primary.reconstructed).toBe(artifact.optimalRoute);
-    expect(primary.replay.locks.map(({ signature }) => signature)).toEqual(artifact.lockSignatures);
-    expect(primary.releases).toEqual([0, 1, 0, 2]);
-    expect(primary.remaining).toEqual([24, 16, 16, 0]);
-    expect(primary.replay.state.puzzleCompletion).toBe('finished');
     expect(stateHash(primary.replay.state)).toBe(artifact.finalStateHash);
     expect(alternative.reconstructed).toBe(artifact.alternatives[0]!.route);
-    expect(alternative.replay.locks.map(({ signature }) => signature))
-      .toEqual(artifact.alternatives[0]!.lockSignatures);
-    expect(alternative.releases).toEqual([0, 1, 0, 2]);
-    expect(alternative.remaining).toEqual([24, 16, 16, 0]);
-    expect(alternative.replay.state.puzzleCompletion).toBe('finished');
-    const firstDivergence = primary.replay.locks.findIndex((lock, index) => (
+    expect(stateHash(alternative.replay.state)).toBe('e78bd4f0');
+    const divergence = primary.replay.locks.findIndex((lock, index) => (
       lock.signature !== alternative.replay.locks[index]?.signature
     )) + 1;
-    expect(firstDivergence).toBe(artifact.alternatives[0]!.firstDivergenceLock);
+    expect(divergence).toBe(artifact.alternatives[0]!.firstDivergenceLock);
     expect(alternative.replay.locks.length).toBeLessThanOrEqual(artifact.optimalLockedPieces + 2);
   });
 });
@@ -273,7 +266,7 @@ describe('Puzzle v3 non-published Intro-01 authoring entry', () => {
 // @ts-expect-error Node environment variables are available to Vitest but not product types.
 const RUN_EXACT = process.env.PUZZLE_EXACT_CERTIFICATES === '1';
 
-describe.runIf(RUN_EXACT)('Puzzle v3 Intro-01 exact certificate', () => {
+describe.runIf(RUN_EXACT)('Puzzle v3 Intro-02 exact certificate', () => {
   it('exhausts every shorter public-control depth without beam or state caps', () => {
     const certificate = certifyOptimalPuzzleRouteForDefinition(draft, artifact.optimalRoute);
     expect(certificate).not.toBeNull();
