@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4A repaired contract accepted; Intro-01 discovery opened
+
+- Fresh independent review reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for the repaired
+  six-drop, three-floor-row authoring contract.
+- The capacity, seed-only-copy, fingerprint, schema/hash, strict-proof, and alternate-route
+  requirements are executable through current Core seams.
+- Only non-published `t3r-shaft-01` candidate discovery is open. The live 50-level library,
+  every other definition, progression/UI, sensory work, and icon remain unchanged.
+
 ## 2026-08-12 — T37 Stage F4A contract rejected and repaired before discovery
 
 - Independent review rejects the first F4A contract with P1 1 / P2 1: seven setup drops

@@ -1444,9 +1444,16 @@ topology, or near candidates from `auditPuzzleFingerprints` over the live 50 plu
 Exactly one alternative is stored; both `[1,2]` clear events reduce original targets. The
 workstream log must record the final gap vector and teaching review.
 
-Next exact action: commit this docs-only repair and obtain a fresh independent full contract
-QA. Discovery and source editing remain closed until P0–P3/GAP are zero. Progress/mastery/
-UI, other drafts, T27/`progress.md`, sensory, and icon remain closed.
+Fresh independent repair review reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It confirms
+the six-drop/24-cell geometry is satisfiable, the structural fingerprint gates cannot be
+bypassed by changing only a seed, and the current definition-level replay/search/proof seams
+cover the contract. No repository file or index entry changed during review.
+
+Next exact action: commit this docs-only acceptance, then run bounded read-only discovery for
+one non-published Intro-01 candidate. Do not create source until one candidate satisfies the
+gap vector, fingerprint, four-or-five-lock route, `[1,2]` releases, and early-divergent
+alternative gates. The eventual source checkpoint remains exactly the three frozen paths.
+Progress/mastery/UI, other drafts, T27/`progress.md`, sensory, and icon remain closed.
 
 ## Do not repeat
 

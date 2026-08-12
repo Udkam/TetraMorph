@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A CONTRACT REPAIR QA NEXT**
+Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 DISCOVERY OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -110,6 +110,13 @@ independently rebuild every field from current Core, while also pinning the unch
 50-level roster and canonical 625-byte `t3r-shaft-01`. Discovery may use bounded authoring
 search, but no beam/null/timeout/cap result enters the certificate. Contract QA precedes
 all discovery and source editing.
+
+The fresh independent repair review reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`: six drops fit the 24-cell geometry, structural and
+near-fingerprint gates cannot be bypassed by changing only a seed, and current Core exposes
+the required definition replay, strict optimum, and alternate-route seams. Candidate
+discovery is now open; live product integration and every other curriculum definition remain
+closed.
 
 ## Frozen published roster
 
