@@ -1465,6 +1465,29 @@ fingerprint, four-or-five-lock route, `[1,2]` release, and early-divergent alter
 The eventual source checkpoint remains exactly the three frozen paths. Progress/mastery/UI,
 other drafts, T27/`progress.md`, sensory, and icon remain closed.
 
+Discovery selects setup seed `2080886771` with placements
+`J0@4,Z0@6,T2@4,O0@1,I0@0,S1@7`, floor rows
+`IIIITTT.S. / .OO.JTZZSS / .OO.JJJZZS`, gaps `[2,2,2]`, and unique gameplay seed `1212`.
+The primary four-lock route is
+`SQRRRHTTTQRRRRRHTTTTTTTTTTTTQLHTTTCLLLLHTTTTTTTTTTTT`; the alternative is
+`SQRRRRRHTTTQRRRHTTTTTTTTTTTTQLHTTTCLLLLHTTTTTTTTTTTT` and diverges at lock 1.
+Both have per-lock releases `[0,1,0,2]` and targets `[24,16,16,0]`.
+
+Current-Core exact proof returns initial `ad14d5ee`, optimum 4, depths
+`{0,1,34,0},{1,34,1184,440},{2,744,13239,0}`, totals 779 explored / 14,457 transitions /
+440 prunes. Primary final is `b9fe55b0`; alternative final is `f8aef200`. The four frozen
+SHA-256 values are authoring `f3e6d4b728c52f57641315d188e09368c15b862d36cc268d378e3558e82a0aa1`,
+behavior `28f617b83044422656734990b9284cdd6a5263bb2b1de4239e0e30db2d400542`, primary route
+`a897b832ba90342d9fe8f7cd3c4bb35d6eaea14a81b28318319ab2322aff1d3f`, alternative route
+`001ae5539a0708110a8d7dfd8dcd91eab489e0059cd75fb9e7e32b378b069529`.
+Independent preimplementation QA reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+
+Next exact action: commit this candidate freeze, then create only
+`src/game/core/puzzleV3IntroDefinitions.ts`,
+`docs/workstreams/tetris-t37-puzzle/puzzle-v3-intro-01.json`, and
+`src/game/core/puzzleV3Intro01Exact.test.ts`. Run normal and opt-in direct tests, live roster/
+behavior regression, then the required final gates. No other path opens.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

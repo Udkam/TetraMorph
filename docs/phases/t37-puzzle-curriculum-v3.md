@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 DISCOVERY OPEN**
+Status: **F3D DEPTH TELEMETRY ACCEPTED; F4A INTRO-01 CANDIDATE FROZEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -119,6 +119,33 @@ on the corrected HEAD reproduces exact 0 / topology 0 / near 10 for live-only da
 comparison does not depend on stable ID, and reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
 Candidate discovery is open again; source creation, live product integration, and every other
 curriculum definition remain closed.
+
+### F4A selected candidate
+
+Independent current-Core preimplementation QA reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for the selected candidate:
+
+- setup seed `2080886771`; placements `J0@4,Z0@6,T2@4,O0@1,I0@0,S1@7`;
+- floor rows `IIIITTT.S.`, `.OO.JTZZSS`, `.OO.JJJZZS`; gap vector `[2,2,2]`;
+- unique gameplay seed `1212`, first bag `LTIJZSO`, and zero pairwise exact/topology/near
+  matches against all 50 live definitions;
+- primary route `SQRRRHTTTQRRRRRHTTTTTTTTTTTTQLHTTTCLLLLHTTTTTTTTTTTT`, locks
+  `L:6,35|7,35|7,36|7,37`, `T:9,35|8,36|9,36|9,37`,
+  `I:3,36|3,37|3,38|3,39`, `J:0,37|1,37|0,38|0,39`, per-lock releases
+  `[0,1,0,2]`, targets `[24,16,16,0]`, and state hashes `ad14d5ee -> b9fe55b0`;
+- alternative `SQRRRRRHTTTQRRRHTTTTTTTTTTTTQLHTTTCLLLLHTTTTTTTTTTTT`, first divergence
+  1, first two locks `L:8,35|9,35|9,36|9,37` and `T:7,35|6,36|7,36|7,37`, then the
+  same I/J locks, final hash `f8aef200`;
+- strict four-lock proof depths `{0,1,34,0}`, `{1,34,1184,440}`,
+  `{2,744,13239,0}` in the frozen field order; totals 779 explored states, 14,457
+  transitions, and 440 derived bound prunes.
+
+The frozen hashes are authoring
+`f3e6d4b728c52f57641315d188e09368c15b862d36cc268d378e3558e82a0aa1`, behavior
+`28f617b83044422656734990b9284cdd6a5263bb2b1de4239e0e30db2d400542`, primary route
+`a897b832ba90342d9fe8f7cd3c4bb35d6eaea14a81b28318319ab2322aff1d3f`, and alternative
+route `001ae5539a0708110a8d7dfd8dcd91eab489e0059cd75fb9e7e32b378b069529`.
+The source checkpoint may now create only the three contracted non-product paths.
 
 ## Frozen published roster
 

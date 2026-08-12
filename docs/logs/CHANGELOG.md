@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4A Intro-01 candidate frozen
+
+- A six-drop `[2,2,2]` floor board with unique gameplay seed `1212` passes validator and
+  all 50 pairwise exact/topology/near comparisons.
+- Primary and alternative routes both finish in four locks with positive releases `[1,2]`;
+  the alternative diverges at lock 1. Exact proof exhausts 779 states and 14,457 transitions
+  across three shorter depths.
+- Independent preimplementation QA reports P0–P3/GAP all zero. Only the three contracted
+  non-product source/artifact/test paths open next; the live 50 remain unchanged.
+
 ## 2026-08-12 — T37 Stage F4A pairwise fingerprint gate accepted
 
 - Fresh independent verification on the corrected HEAD reproduces the live-only baseline

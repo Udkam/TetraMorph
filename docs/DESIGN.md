@@ -743,6 +743,12 @@ adding unrelated badges or ornamental effects.
   comparison is ID-independent. Discovery is open again. A beam result remains discovery
   only; acceptance still requires literal replay, exhaustive proof, an early-divergent
   alternative, and the structural/teaching review.
+- F4A selects a `[2,2,2]` three-row board whose exact four-lock route releases rows in two
+  readable stages: one row on lock 2, then two rows on lock 4, with the puzzle still holding
+  sixteen original targets between them. A second four-lock route diverges immediately but
+  preserves the same lesson. Current-Core strict proof exhausts every shorter depth, and
+  pairwise structure review finds no exact, normalized, or near match against the live 50.
+  This is a non-published authoring candidate only.
 
 ## 2026-08-07 T36 — Kinetic harmonic audio recomposition
 

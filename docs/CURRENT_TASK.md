@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F3D ACCEPTED / F4A INTRO-01 DISCOVERY OPEN**
+Status: **STAGE F3D ACCEPTED / F4A INTRO-01 CANDIDATE FROZEN**
 
 ## Active objective
 
@@ -185,6 +185,26 @@ HEAD verification reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for the pairwise
 draft-versus-live rule above. Candidate discovery is open again; source creation still waits
 for a fully qualified candidate.
 
+The selected candidate now passes every admission and independent preimplementation QA with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Setup seed `2080886771` drops
+`J0@4,Z0@6,T2@4,O0@1,I0@0,S1@7`; its three floor rows are
+`IIIITTT.S. / .OO.JTZZSS / .OO.JJJZZS`, with gap vector `[2,2,2]`. Gameplay seed `1212`
+is unique across the live 50 and preserves the intended first bag `LTIJZSO`.
+
+The optimal route
+`SQRRRHTTTQRRRRRHTTTTTTTTTTTTQLHTTTCLLLLHTTTTTTTTTTTT` has four locks, per-lock
+releases `[0,1,0,2]`, remaining targets `[24,16,16,0]`, and hashes
+`ad14d5ee -> b9fe55b0`. The four-lock alternative
+`SQRRRRRHTTTQRRRHTTTTTTTTTTTTQLHTTTCLLLLHTTTTTTTTTTTT` diverges at lock 1 and ends
+at `f8aef200`. Exact shorter-depth telemetry is
+`[{0,1,34,0},{1,34,1184,440},{2,744,13239,0}]` in
+`lockedPieces,frontierStates,transitions,boundPrunes` order, with 779 explored states and
+14,457 transitions. Authoring, behavior, primary-route, and alternative-route SHA-256 are
+respectively `f3e6d4b728c52f57641315d188e09368c15b862d36cc268d378e3558e82a0aa1`,
+`28f617b83044422656734990b9284cdd6a5263bb2b1de4239e0e30db2d400542`,
+`a897b832ba90342d9fe8f7cd3c4bb35d6eaea14a81b28318319ab2322aff1d3f`, and
+`001ae5539a0708110a8d7dfd8dcd91eab489e0059cd75fb9e7e32b378b069529`.
+
 The certificate contains exactly one alternative entry. Both positive clear events must
 strictly reduce remaining original targets. Normal direct tests, one
 `PUZZLE_EXACT_CERTIFICATES=1` direct run, current
@@ -255,7 +275,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F3D ACCEPTED; F4A INTRO-01 DISCOVERY OPEN** — the exact
+6. **Puzzle curriculum — F3D ACCEPTED; F4A INTRO-01 CANDIDATE FROZEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -266,8 +286,9 @@ closed.
    supplies schema-8 per-depth telemetry without proof drift. A current-Core probe found
    the prior whole-audit-empty fingerprint rule impossible because the live library already
    has ten historical near pairs. Fresh pairwise draft-versus-live repair QA is all zero;
-   non-published Intro-01 discovery is open, while source authoring and published curriculum
-   content remain closed until a fully qualified candidate exists.
+   pairwise draft-versus-live repair QA is all zero. The non-published Intro-01 candidate is
+   now independently replayed and exact-certified; only its frozen three-path source
+   checkpoint opens next, while published curriculum content remains closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.
