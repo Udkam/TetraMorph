@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-12 — T37 Stage F4B repaired contract accepted; discovery opened
+
+- Two independent reviews report P0–P3/GAP all zero after the four-path, board-coordinate,
+  release-invariant, and multiplicity-semantics repairs.
+- Current Core can prove the unique three-row well, pre-final preservation, final vertical-I
+  three-line release, early-divergent completion route, and strict three/four-lock optimum.
+- Only non-published Intro-02 candidate discovery opens; source and live product stay closed.
+
 ## 2026-08-12 — T37 Stage F4B contract repaired before discovery
 
 - Independent review finds the three-path boundary would break Intro-01's accepted

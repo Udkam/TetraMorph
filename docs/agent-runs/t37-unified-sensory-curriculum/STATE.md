@@ -1541,6 +1541,17 @@ asserts `board[37..39][wellX] === null` after every pre-final lock, requires fin
 Next exact action: commit this docs-only F4B repair and obtain fresh independent QA. Discovery
 and source editing remain closed until all severity/gap counts are zero.
 
+Two fresh independent reviews of repaired HEAD `0449924` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Both verify the four-path compatibility repair, Core
+world-row mapping, empty-board well semantics, final-only release 3 / targets 24-to-0
+invariant, schema multiplicity meaning, and line budget. One focused Intro-01 regression run
+also remains green at four passed / one exact skipped.
+
+Next exact action: commit this docs-only acceptance, then run bounded Temp-only F4B candidate
+discovery. Prefer reverse construction from one unique three-row well and a final vertical I;
+do not create source until setup legality, pairwise structure, unique seed, primary/alternative
+route invariants, and exact optimum all pass. No other path opens.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

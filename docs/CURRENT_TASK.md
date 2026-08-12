@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 CONTRACT QA NEXT**
+Status: **STAGE F4A INTRO-01 ACCEPTED / F4B INTRO-02 DISCOVERY OPEN**
 
 ## Active objective
 
@@ -254,6 +254,12 @@ and the alternative may use at most optimum plus two locks. Discovery may use a 
 stored fields require literal current-Core replay and an exhaustive shorter-depth certificate.
 Contract QA must be all zero before discovery or source editing.
 
+Two fresh independent reviews of repaired HEAD `0449924` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They confirm the four-path append repair, world-row
+mapping, empty-well board semantics, release/target invariant, schema multiplicity meaning,
+and 500-line feasibility. F4B candidate discovery is open; source editing still waits for a
+fully qualified candidate and strict proof.
+
 The certificate contains exactly one alternative entry. In each route, the only positive row
 release is the final value `3`; all preceding values are zero, remaining original targets are
 24 before that release and zero after it, and the final locked-piece signature is the frozen
@@ -326,7 +332,7 @@ closed.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B CONTRACT QA NEXT** — the exact
+6. **Puzzle curriculum — F4A INTRO-01 ACCEPTED; F4B INTRO-02 DISCOVERY OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -339,8 +345,8 @@ closed.
    has ten historical near pairs. Fresh pairwise draft-versus-live repair QA is all zero;
    pairwise draft-versus-live repair QA is all zero. The non-published Intro-01 candidate is
    now lives in an independently accepted three-path non-product checkpoint at `cfbcab4`.
-   Intro-02 now has a docs-only well-preservation contract; discovery and source stay closed
-   until independent contract QA is all zero. Published curriculum content remains closed.
+   Intro-02's repaired well-preservation contract has two independent all-zero reviews;
+   candidate discovery is open while source and published curriculum content remain closed.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 CONTRACT QA NEXT**
+Status: **F4A INTRO-01 ACCEPTED; F4B INTRO-02 DISCOVERY OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -191,6 +191,12 @@ The schema remains exactly certificate v8 with F4A field order and serializers,
 multiple optimal routes. The primary route owns the strict optimum proof, while the stored
 alternative remains bounded by optimum plus two. Fresh independent contract QA precedes all
 discovery and source editing.
+
+Two fresh independent reviews of repaired HEAD `0449924` report P0–P3/GAP all zero. They
+verify visible rows 17–19 map to Core world rows 37–39, the final I supplies exactly the three
+well gaps plus one cell above, the append-compatible Intro-01 maintenance is minimal, and all
+route/proof/schema gates are executable. Candidate discovery is open; source editing and live
+product integration remain closed.
 
 ## Frozen published roster
 
