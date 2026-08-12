@@ -1710,6 +1710,15 @@ Next exact action: obtain two fresh independent all-zero contract reviews of the
 HEAD. If both pass, open only repository-external F4D candidate discovery. Source, product,
 UI, sensory, protected T27, and icon paths remain closed until their later gates.
 
+Two final independent reviews of corrected HEAD `fcfc15e` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. F4D contract QA is closed. The reviewed mechanics,
+live/prior pins, schema-8 proof contract, three-path boundary, and isolation are accepted.
+
+Next exact action: run only repository-external F4D candidate discovery. A hit remains an
+upper bound until independent current-Core setup replay, both route invariants, all 53
+admission comparisons, seed uniqueness, canonical hashes, and uncapped shorter-depth proof
+pass. Do not create source/product/UI/sensory/protected/icon paths before that gate.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

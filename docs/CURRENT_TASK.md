@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Puzzle Curriculum
 
-Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT FROZEN — DOCS QA OPEN**
+Status: **STAGE F4C INTRO-03 ACCEPTED / F4D INTRO-04 CONTRACT ACCEPTED — DISCOVERY OPEN**
 
 ## Active objective
 
@@ -459,6 +459,12 @@ test pins the live baseline above and accepted draft baselines Intro-01 622 /
 Fresh independent contract QA must be all zero before repository-external candidate discovery;
 no Intro-04 source path is open now.
 
+Two final independent reviews of corrected contract HEAD `fcfc15e` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. F4D may now run only repository-external candidate
+discovery. No draft, certificate, or test may be created until a complete candidate passes
+current-Core setup replay, both route invariants, all 53 pairwise admission checks, seed
+uniqueness, and uncapped shorter-depth proof.
+
 ## Frozen product direction
 
 - **Sound:** replace the entire audible palette. Feedback must be clear, positive,
@@ -519,7 +525,7 @@ no Intro-04 source path is open now.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
-6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT FROZEN / DOCS QA OPEN** — the exact
+6. **Puzzle curriculum — F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT ACCEPTED / DISCOVERY OPEN** — the exact
    5/25/16 roster, retirements, rebuilds, technique links, operation metric, v6
    migration, schema-8 proof, admission fixtures, and 38 rev2 behavior-hash baselines
    are frozen. Accepted F3A source `a1e37f1` covers counter-clockwise SRS,
@@ -537,8 +543,9 @@ no Intro-04 source path is open now.
    Intro-03 draft, schema-8 artifact, and exact test. Focused, exact, typecheck, final full
    suite (`445 / 14 skipped`), and build gates pass; three independent reviews are all zero.
    Published curriculum content remains closed until the later atomic switch. F4D now has a
-   mechanically frozen local-clear/only-opening contract; discovery and source remain closed
-   until independent docs QA is all zero.
+   mechanically frozen local-clear/only-opening contract. Two final independent reviews of
+   `fcfc15e` are all zero; only repository-external discovery is open, while source remains
+   closed pending a fully qualified candidate.
 7. **Integrated acceptance** — focused tests during editing, then one final typecheck,
    complete suite, build, browser evidence pass, independent read-only QA, changelog,
    bounded commits, and coordinator push.

@@ -1,6 +1,6 @@
 # T37 Stage F — Puzzle Curriculum v3
 
-Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT FROZEN — DOCS QA OPEN**
+Status: **F4C INTRO-03 ACCEPTED; F4D INTRO-04 CONTRACT ACCEPTED — DISCOVERY OPEN**
 
 Baseline: `e675389500cdae8063da4d37f4cdda47a62ffe76`
 
@@ -395,6 +395,12 @@ at Intro-01 622 / `DFC1DACDF8A8F0851C2F7BFCF41ED67C9088105D8583544E68A82A557223F
 Intro-02 621 / `1E67D9E72F64769DDF4703FF9909A3C08EA4454638662B7E76DD1E001884A9EB`, and
 Intro-03 682 / `A825A82CE4B96DDA78E2FB7A2C696F354CAC49B6C63AF5FDAA7722665F53EC9E`.
 Independent contract QA precedes all discovery and source creation.
+
+Two final independent reviews of corrected HEAD `fcfc15e` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The F4D contract is accepted. Only
+repository-external heuristic candidate discovery is open; source creation still requires a
+fully qualified candidate with legal setup, both complete route invariants, seed/fingerprint
+admission, literal hashes, and uncapped current-Core exact proof.
 
 ## Frozen published roster
 

@@ -315,3 +315,13 @@ sensory, protected T27 paths, and icon remain closed.
 - Next action: obtain two independent reports on the corrected HEAD with
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; repair any finding before opening only
   repository-external candidate discovery.
+
+Two final independent reviews of corrected HEAD `fcfc15e` report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They verify the live/prior byte pins, 53-comparison
+admission, schema-8 and exact-proof boundary, three-path feasibility, unique-opening state
+definition, local row-39 clear and survivor mapping, and final vertical-I use. The earlier
+stale-next-action P2 is closed.
+
+- Blocker: none for repository-external candidate discovery.
+- Next action: discover a qualifying F4D candidate outside the repository, then independently
+  replay and freeze every literal before any source path opens.
