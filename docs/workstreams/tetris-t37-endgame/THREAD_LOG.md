@@ -337,3 +337,19 @@ old screenshot.
 - Blocker: Intro-05 source remains closed by design.
 - Sole next action: author a docs-first successor-validator contract pinned to the new
   accepted Core tree, then obtain exact-byte independent review before one execution.
+
+## F4E-R4A — successor-validator generation contract candidate
+
+- Base: HEAD `7d81d4974ce8fb777ea105c5ef98d156cd1807cc`; Core tree
+  `96688eca803a335790d65b41db0ace4df7d2f9b5`.
+- Clue: unchanged 633 bytes / `959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`.
+- Initial state: v2 validator/output/staging absent; old real v1 output absent; Core clean.
+- Proposed sole external write after contract acceptance:
+  `t37-f4e-endgame-canonical-validate-v2.mjs` in the user Temp directory.
+- V2 preserves the reviewed v1 semantic proof and fail-closed publication gates while
+  changing only current pins, an explicit pre/post-proof `--expect-head`, the exact four
+  active-document allowlist, v2 identity, and public-seam isolation assertion.
+- Generation and execution are separate capabilities. This checkpoint authorizes neither.
+  After commit, generation may occur once; only bytes/hash plus syntax/help checks follow.
+- Blocker: independent generation-contract QA.
+- Sole next action: review this four-document contract; do not generate or run v2 yet.

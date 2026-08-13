@@ -6082,3 +6082,53 @@ key-frontier representation and all five current-namespace fingerprints are now 
 authoritative proof base. A successor Intro-05 validator must pin this accepted Core
 tree and its own newly reviewed bytes; no executable permission, heap allowance, output
 path, or byte pin from the retired validator is inherited.
+
+## T37 F4E-R4A successor-validator generation contract
+
+The successor validator is a newly generated external capability, not a patch-in-place
+or rerun of the retired v1 file. Its generation base is accepted HEAD
+`7d81d4974ce8fb777ea105c5ef98d156cd1807cc` and Core tree
+`96688eca803a335790d65b41db0ace4df7d2f9b5`. The sole data input remains the existing
+633-byte clue at
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-clue-v1.json`, SHA-256
+`959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`.
+
+Only the following not-yet-created path may be written during generation:
+
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v2.mjs`
+
+The generator/editor may read v1 solely to preserve its already reviewed semantic
+checks. V2 must:
+
+- require `--expect-head` as a full 40-hex commit, compare it to HEAD before and after
+  proof, and bind exact root, Core-base ancestry, Core tree, clue bytes/hash, validator
+  self hash, and module hashes;
+- allow committed descendants of base `7d81d4974ce8fb777ea105c5ef98d156cd1807cc`
+  only in `docs/CURRENT_TASK.md`, `docs/DESIGN.md`,
+  `docs/agent-runs/t37-unified-sensory-curriculum/STATE.md`, and
+  `docs/workstreams/tetris-t37-endgame/THREAD_LOG.md`; reject rename ambiguity and every
+  other committed path;
+- structurally parse the bounded clue and rebuild the eight-drop four-row definition,
+  live-50 plus four-draft admission, two uniquely reconstructible public-command routes,
+  Current/Next-1/Next-2 chain, two immediately-prior-lock support relations per route,
+  later multi-event four-row release, hashes, and schema-8 fixture candidate;
+- call the public complete `exhaustiveEndgameLandings` and uncapped
+  `certifyOptimalEndgameRouteForDefinition`, assert no Hold command, no beam/state cap,
+  exact route reconstruction, optimum equality, and literal certificate/replay evidence;
+- assert the proof-only testing seam is absent from the public Core index; use no private
+  testing export to compute candidate evidence;
+- load current Core through a single `configFile:false`, plugin-empty middleware Vite
+  server; close it successfully before publication; then repeat HEAD/Core/worktree/module,
+  clue, self, and output-absence checks;
+- serialize one canonical UTF-8/LF v2 payload, exclusively create a random same-directory
+  staging file, publish with a same-volume hard link that fails if the final path exists,
+  then allow only best-effort cleanup of the owned staging path; cleanup failure must be
+  swallowed and cannot change command success or final output, and no further operation
+  may run after that cleanup attempt.
+
+V2 has no resume/checkpoint, heap flag, alternate route, cap, beam, reduced proof domain,
+or old-output compatibility. Generation cannot execute it or create candidate/staging
+output. Once generated, only syntax/help checks are allowed. These documents must then
+freeze exact bytes/hash and a wholly new initially absent v2 output path; two independent
+reviews must accept both the byte-level program and semantic contract before a later
+docs checkpoint can authorize exactly one command.

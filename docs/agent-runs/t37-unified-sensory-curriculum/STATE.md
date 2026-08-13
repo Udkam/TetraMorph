@@ -2014,6 +2014,28 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
   validator contract. Do not reuse or run the retired validator, its heap grants, or
   its output authorization; do not open Intro-05 source yet.
 
+## Current checkpoint — F4E-R4A generation contract candidate
+
+- Verified base: HEAD `7d81d4974ce8fb777ea105c5ef98d156cd1807cc`; Core tree
+  `96688eca803a335790d65b41db0ace4df7d2f9b5`; Core tracked/untracked status clean.
+- Verified clue: `t37-f4e-endgame-clue-v1.json`, 633 bytes,
+  `959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`.
+- Verified external state: v2 validator, v2 output, and matching v2 staging files are
+  absent. The real old v1 candidate output is absent. V1 remains 26,059 bytes with its
+  historical hash, but is read-only reference material and has no execution authority.
+- Generation boundary after review/commit: create only external
+  `t37-f4e-endgame-canonical-validate-v2.mjs`; no repository source or other Temp file.
+- Required delta: v2 schema/path, current base/tree, active contract-document allowlist,
+  explicit pre/post-proof `--expect-head` equality, and public-index absence of the
+  private proof-testing seam. The allowlist is exactly CURRENT_TASK, DESIGN, this STATE,
+  and the T37 Endgame THREAD_LOG. Preserve all reviewed semantic and fail-closed
+  publication gates, including swallowed best-effort owned-staging cleanup as the sole
+  permitted operation after a successful no-replace hard link.
+- Allowed checks after generation: file bytes/hash, `node --check`, and `--help` only.
+  Do not execute candidate validation or create any output/staging file.
+- Next action: independent review of this generation contract. If all-zero, commit the
+  exact four active docs before generating v2.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

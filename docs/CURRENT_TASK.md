@@ -8826,3 +8826,35 @@ bytes, input pins, proof domain, publication semantics, and one-run command. The
 26,059-byte validator, both consumed heap authorizations, and every prior output path do
 not transfer. Intro-05 definition/fixture/test source remains closed until a newly
 reviewed validator produces a complete independently audited candidate.
+
+### F4E-R4A — successor-validator generation contract
+
+Status: **CONTRACT CANDIDATE; GENERATION AND EXECUTION CLOSED PENDING REVIEW**.
+
+The accepted validator base is HEAD `7d81d4974ce8fb777ea105c5ef98d156cd1807cc` with
+Core tree `96688eca803a335790d65b41db0ace4df7d2f9b5`. The unchanged clue remains
+633 UTF-8 bytes with SHA-256
+`959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42`.
+The old v1 validator and candidate path are absent or retired execution capabilities;
+neither is an input to v2.
+
+After this contract is independently accepted and committed, one writer may create only
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v2.mjs`.
+Generation starts from the reviewed v1 semantics as a read-only reference, then makes
+only the changes required by current Core: v2 schema/path names; current HEAD/Core pins;
+an explicit `--expect-head <full SHA>` checked before and after proof; an exact
+four-document descendant allowlist (`docs/CURRENT_TASK.md`, `docs/DESIGN.md`, this STATE,
+and the T37 Endgame THREAD_LOG); and a startup assertion that the private
+proof-frontier testing seam is not exported through public Core. It must retain every
+clue/schema/route/causal/admission/fixture/publication check, complete landing domain,
+uncapped exact certificate, Vite isolation/lifecycle check, repeated post-proof pins,
+exclusive owned staging, and same-volume no-replace hard-link publication.
+After a successful hard link, only one best-effort owned-staging unlink may run; its
+failure is swallowed, and nothing follows it or changes the successful final output.
+
+Generating the script is not permission to run it. After generation, record its exact
+byte count and SHA-256 in these active documents, run only `node --check` and `--help`,
+and obtain two independent byte/semantic reviews. Only a later committed command
+contract may authorize one execution against a fresh, initially absent v2 output path.
+No source, fixture, roster, UI, clue, protected T27/follow-up, `progress.md`, or old Temp
+artifact may change.
