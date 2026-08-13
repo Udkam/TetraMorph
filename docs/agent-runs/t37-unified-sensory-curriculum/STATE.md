@@ -2453,6 +2453,30 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Unique next action: commit this three-document boundary correction, then implement the
   two-file Settings safe-area fix.
 
+#### D2A accepted source and evidence
+
+- Product checkpoints `dbe5cbc`, `552d3a5`, and `92064b7` implement settled sheets,
+  pause/restart curtains, and latest-owner race repair. Mobile correction `27d3194`
+  changes only Settings CSS plus its direct regression test and retains every frozen
+  motion token.
+- After `27d3194`, typecheck, the complete suite (`532 passed / 15 skipped` in
+  `55 passed / 2 skipped` files), and build pass. No product source changes follow it.
+- Evidence `696d32d` is bound to full source SHA
+  `27d319428701708d892961de4cb5aa1fbbe522b2`. Fourteen real Chromium screenshots cover
+  first-entry, Settings/tabs, leave, pause, restart, a legal current-product Endgame
+  completion, replay/leave, and 390 x 844 reduced motion. Audit failures and browser
+  errors are zero.
+- Independent review recomputes all 17 normalized SHA-256 entries, verifies the legal
+  T32 witness with no state-replacement hook, confirms one Canvas/zero DOM cells/single
+  modal ownership and 17–18 px mobile side margins, and reports
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+- D2A is technically accepted and its browser batch must not be repeated unless product
+  source changes. The Bomb listening helper remains open independently and is not a
+  human acceptance claim.
+- Unique next action: provide a current-HEAD real-time review entry for ordinary and all
+  four whole-piece Mutation materials without freezing time or injecting gameplay
+  actions; prioritize the small settled Bomb/lava read.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

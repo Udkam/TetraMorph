@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME N0 ACCEPTED / INTRO-05 V4 CONSUMED WITHOUT CANDIDATE / SPEED + BOMB AUTOMATED GATES GREEN / BOMB LISTENING OPEN**
+Status: **D2A AUTOMATED ACCEPTED / MATERIAL NORMAL-SPEED REVIEW NEXT / BOMB LISTENING OPEN / INTRO-05 SUCCESSOR PENDING**
 
 ## Active objective
 
@@ -23,8 +23,9 @@ cues through the production `AudioEngine` and reports zero browser errors. This 
 an automatic causal/audibility comparison gate: both Bomb cues still require the
 player's listening verdict and must not be described as human accepted.
 
-The next existing implementation slice is the remaining page-inner transition and
-normal-speed material review. After that come the 5/25/16 Endgame curriculum, then the
+The settled page-inner transition slice is now source-, browser-, and independently
+verified. The next existing slice is the normal-speed material review. After that come
+the 5/25/16 Endgame curriculum, then the
 previously deferred line-clear reward/duration work and theme icon. The newly requested
 five finely calibrated Classic speed tiers are deliberately the **last product
 implementation item**: their later contract must jointly account for both opening speed
@@ -84,6 +85,28 @@ its containing grid and clipped at the right viewport edge. D2A is extended only
 upper bound, keep symmetric safe margins at 390 x 844, and retain readable controls. No
 other sheet, gameplay layout, motion timing, or Classic-speed behavior changes. Final
 source gates and browser evidence must be regenerated against the corrected source SHA.
+
+#### T37-D2A acceptance disposition
+
+Product checkpoints `dbe5cbc`, `552d3a5`, and `92064b7` implement the shared
+ActionSheet lifecycle, board-local pause/restart curtains, and latest-owner race repair.
+Mobile source `27d3194` changes only `src/styles/settings.css` and its direct test so the
+390 x 844 Settings sheet sizes against the padded containing block. After that last
+source edit, typecheck passes, the complete suite reports `532 passed / 15 skipped` in
+`55 passed / 2 skipped` files, and the production build passes with only the existing
+chunk-size advisory.
+
+Evidence `696d32d` binds fourteen real Chromium frames and its complete audit to source
+`27d319428701708d892961de4cb5aa1fbbe522b2`. It covers first entry, Settings and tab
+replacement, leave confirmation, pause/restart, a legally completed Endgame result,
+replay/leave, and 390 x 844 reduced motion. The audit reports zero failures and browser
+errors, one Canvas during play, zero DOM board cells, at most one modal owner, and a
+dialog fully inside the mobile viewport. Independent review recomputes all 17 manifest
+hashes and reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+
+D2A is technically accepted. Do not repeat its product or browser batch unless its bound
+source changes. The next exact action is a current-HEAD, real-time, non-frozen player
+review entry for ordinary multicolour and all four whole-piece Mutation materials.
 
 ### 2026-08-13 player-directed speed and Bomb correction
 

@@ -1546,6 +1546,18 @@ area. At 390 x 844 the complete dialog must remain within both horizontal viewpo
 with symmetric backdrop margins, without shrinking copy below the existing readable
 floor or altering the 120/180/150/120/32 ms presence contract.
 
+### D2A acceptance disposition
+
+Product source closes at `27d319428701708d892961de4cb5aa1fbbe522b2` after the two
+ActionSheet/curtain checkpoints, latest-owner repair, and the bounded Settings safe-area
+fix. Its post-source typecheck, complete suite (`532 passed / 15 skipped` in `55 passed /
+2 skipped` files), and production build pass. Evidence checkpoint `696d32d` binds fourteen
+real Chromium frames and the full/reduced motion audit to that source. The audit has zero
+failures or browser errors and preserves one Canvas, zero DOM board cells, at most one
+modal owner, legal result provenance, and contained 390 x 844 geometry. Independent
+review recomputes all 17 manifest hashes and reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP
+0`. Reopen D2A only if its bound source changes.
+
 ### T30 acceptance
 
 Focused renderer tests must freeze generation identity, cell staggering, ghost delay,

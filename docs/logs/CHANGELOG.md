@@ -2752,3 +2752,21 @@
 - Independent read-only review accepts exact docs range `16570db..a09b64f` with
   P0 0 / P1 0 / P2 0 / P3 0 / GAP 0. Only repository-external candidate discovery is open;
   no Intro-04 product or authoring source has been admitted.
+
+## 2026-08-14 — T37 settled in-page overlays accepted
+
+- Added an explicit latest-owned presence lifecycle for first-entry rules, Settings,
+  same-page confirmations/results, and board-local pause/restart curtains. Full motion
+  uses restrained 120/180/150 ms settles and 120 ms releases; reduced motion is
+  transform-free and at most 32 ms.
+- Closed rapid reopen, cross-sheet ownership, StrictMode cleanup, focus restoration, and
+  route-handoff races without changing gameplay Core, Runtime timing, audio, scoring, or
+  Endgame content. A final two-file responsive repair keeps the Settings sheet inside a
+  390 x 844 padded viewport.
+- Final source `27d3194` passes typecheck, the complete suite (`532 passed / 15 skipped`
+  in `55 passed / 2 skipped` files), and production build. Evidence `696d32d` contains
+  fourteen real Chromium frames, zero audit/browser errors, legal terminal-result replay,
+  one gameplay Canvas, zero DOM board cells, and full/reduced responsive coverage.
+- Independent QA recomputes all 17 evidence hashes and accepts the source/evidence chain
+  with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Normal-speed whole-piece material review is
+  the next slice; Bomb sound remains an explicit human-listening gate.
