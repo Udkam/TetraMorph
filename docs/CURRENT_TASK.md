@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME NAMESPACE N0 ACCEPTED / INTRO-05 R4I RECEIPT RECOVERY CONTRACT NEXT**
+Status: **ENDGAME NAMESPACE N0 ACCEPTED / INTRO-05 R4K LEASE-RUNNER RECOVERY CONTRACT**
 
 ## Active objective
 
@@ -9166,3 +9166,66 @@ through a hash-bound in-memory derivative and a fixture-root-only mutation capab
 A later four-document command checkpoint and its committed blobs, three-generation
 alias/null predicates, AST single spawn, v3 receipt pin, and full preflight need fresh
 all-zero review. Only then may the coordinator consume one v4 production attempt.
+
+### F4E-R4K — rejected R4J launcher and lease-runner recovery contract
+
+R4J never reached a commit or a production invocation. The frozen v4 validator and its
+hash-bound 40-case receipt matrix remain unchanged and retain their all-zero reviews.
+The rejected part is the proposed PowerShell launcher: it hashed Node and Git, then later
+started them by path, leaving an executable-path TOCTOU window. The first external
+lease-runner prototype at
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-r4k-windows-lease-runner-v1.cs`
+(33,556 UTF-8/LF bytes, SHA-256
+`4693199A84376488F66467BEACE6FCA3850C567E1F885B103EEF884876A6DE37`)
+is also retired before production use. Independent review reports
+`P0 0 / P1 1 / P2 2 / P3 0 / GAP 1`: it follows a final reparse point, does not prove
+the child-image query was untruncated, and can deadlock or leave pump handles on output
+failure. Neither the old wrapper nor runner v1 may be used.
+
+F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60
+
+The unchanged 2,948-byte canonical line in DESIGN remains the validator-argument
+manifest only. By itself it grants no launch authority. A fresh external runner v2 may
+be materialized only at
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-r4k-windows-lease-runner-v2.cs` after its
+actual bytes and SHA are frozen; placeholders are forbidden. Its committed wrapper must
+use an inline, committed native bootstrap to open every runner-source path component
+with no-follow semantics before reading it. After exact UTF-8/LF/no-BOM and hash checks,
+`Add-Type` may consume only those held-handle bytes. The bootstrap handle and the loaded
+runner's matching lease remain open through every child exit and final verification.
+
+Runner v2 must hold root-to-leaf no-follow, deny-write/delete leases for Node, Git, v2,
+v3, v4, the clue, and the consumed-v3 receipt; reject any reparse point from the same
+handle; bind opened/normalized NT paths, volume and file ID, frozen metadata, exact bytes
+and SHA; and re-witness the lexical path at every use. Git launches require an immediately
+bound lease check. The sole Node launch requires explicit absolute `lpApplicationName`,
+`CREATE_SUSPENDED`, a kill-on-close Job, a strict inherited-handle list, untruncated image
+binding, `STILL_ACTIVE`, and exactly one successful `ResumeThread` returning `1`.
+Stdout/stderr must drain concurrently into bounded capture before resume; overflow or
+pump/cleanup failure is fatal, and Console emission occurs only after deterministic join.
+
+The threat boundary covers ordinary same-user user-mode mutation of the named paths and
+file objects. Administrator/kernel compromise, volume remapping, DLL replacement, and
+Git object-database attacks are excluded; denial of service remains possible. Observable
+path, identity, byte, metadata, process-image, pipe, Job, or cleanup drift fails closed.
+Once the production runner call is entered, v4 is conservatively consumed on every return
+or exception and must not be retried.
+
+Execution remains closed. The next implementation checkpoint may materialize only the
+exact marker, unchanged manifest, inline bootstrap, frozen runner-v2 path/bytes/SHA, and
+copy-pasteable wrapper. Before that commit, runner v2 needs benign execution, reparse/
+ancestor-race, mutation, high-output, failure-cleanup, and handle-count fixtures with
+unchanged production sentinels plus fresh independent all-zero review. The committed
+four-document candidate then needs Git-blob/AST/no-spawn preflight QA, a QA-only log
+checkpoint, and a fresh final-HEAD binding before the coordinator may invoke it once.
+
+This correction checkpoint uses the normal 500-line budget. It prospectively authorizes
+one later atomic materialization exception owned by the coordinator: only
+`docs/CURRENT_TASK.md`, `docs/DESIGN.md`,
+`docs/agent-runs/t37-unified-sensory-curriculum/STATE.md`, and
+`docs/workstreams/tetris-t37-endgame/THREAD_LOG.md`, with at most 1,200 added or modified
+lines. The marker, argument manifest, inline bootstrap, runner pin, and wrapper form one
+execution authority and cannot be split without creating a partial or misleading
+command. Whole-range verification must bind exact paths, UTF-8/LF bytes, counts/hashes,
+PowerShell AST, native-runner source hash, every no-spawn preflight and fixture, and
+independent review.

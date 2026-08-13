@@ -7032,3 +7032,121 @@ exact consumed v3 receipt present are required
 before a later exact four-document marker/manifest/one-spawn checkpoint. That checkpoint
 then requires post-commit committed-byte, three-generation alias/null, AST, v3 receipt,
 full-preflight, and matrix all-zero QA. No v4 production execution is authorized now.
+
+### F4E-R4K rejected R4J launcher and Windows lease-runner recovery contract
+
+The repository-external v4 validator remains frozen at 63,777 UTF-8/LF/no-BOM bytes with
+SHA-256 `93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60`.
+The 30,392-byte hash-bound receipt matrix remains frozen at SHA-256
+`054A965DA2664C121697F3CDB1B79D5DE5735A37DA56AC3F4E65720207E20A1F`
+and passes all 40 cases with zero fixture residue and unchanged production sentinels.
+Those validator and matrix reviews remain valid.
+
+R4J's uncommitted wrapper is rejected before production use. Its path-based hash checks
+did not hold Node and Git file objects until launch, so a same-user concurrent replacement
+could change the executable opened later. The rejected wrapper was never committed and
+never ran v4 production arguments; v4 attempt/output/stage/process remain zero.
+
+The first repair prototype,
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-r4k-windows-lease-runner-v1.cs`, is
+33,556 UTF-8/LF bytes with SHA-256
+`4693199A84376488F66467BEACE6FCA3850C567E1F885B103EEF884876A6DE37`.
+It is non-authoritative and must never receive production arguments. Static QA reports
+`P0 0 / P1 1 / P2 2 / P3 0 / GAP 1`: `File.OpenHandle` follows the final reparse point;
+`GetProcessImageFileNameW` did not reject truncation; and pumps wrote directly to Console,
+permitting output backpressure deadlock and nondeterministic exceptional cleanup.
+
+F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60
+
+The following line is unchanged from R4J. Including its one trailing LF, it remains
+exactly 2,948 UTF-8 bytes with SHA-256
+`ED1E1844320882DB31EE365C9270B660329FF0AC7D42487F9F4B6BB2F8B9FA51`.
+It is only the validator-argument manifest; it does not authorize a process launch.
+
+```text
+F4E-R4I-COMMAND-MANIFEST-V1 {"schema":"t37-f4e-r4i-command-contract-v1","validatorPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-v4.mjs","validatorBytes":63777,"validatorSha256":"93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60","nodeExecPath":"E:\\Nodejs\\node.exe","nodeVersion":"v24.12.0","nodeVersionsNode":"24.12.0","nodeExecutableBytes":89935872,"nodeExecutableSha256":"2FFE3ACC0458FDDE999F50D11809BBE7C9B7EF204DCF17094E325D26ACE101D8","nodeHeapSizeLimit":4496293888,"nodeExecArgv":[],"nodeOptionsPresent":false,"nodeEnvironment":[{"name":"NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S","bytes":129,"sha256":"36816623CF40FFD5A13F444AF68A441001F99ED8B21D0CD03B221914185FCEE1"},{"name":"NODE_REPL_TRUSTED_CODE_PATHS","bytes":25,"sha256":"C99D703D69CE82B4803CEBB3E94F20CFB4D8F43A298C592018507394AD1B3A2D"}],"gitExecPath":"E:\\Git\\mingw64\\bin\\git.exe","gitVersion":"git version 2.51.0.windows.2","gitExecutableBytes":4284816,"gitExecutableSha256":"E996432581A70DF2E7AAAC5DB71E3811EC0DAA7F93A8BA73FE6DB6F9941F4BF9","inheritedGitEnvironmentKeys":[],"root":"E:\\Proj\\reproduction-tetris","inputPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-clue-v1.json","outputPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-candidate-v4.json","attemptPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-attempt-v4.json","scopedCleanPolicy":"head-blob-eol-equivalent-v1","receiptPolicy":"held-wx-plus-expanded-identity-v1","consumedV3Attempt":{"path":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-attempt-v3.json","bytes":8729,"sha256":"06E9EACE16C6665FF4220D0753F0DFD5875C742FC1F56C9767771B1CB5A53E44","schema":"t37-f4e-r4g-attempt-v1","payloadSha256":"E1B6669502DE6055157347A83116053EAF9621D74993038A3A882F9F06C5448B","identity":{"dev":"1456395446","ino":"456270937248336975","size":"8729","mode":"33206","nlink":"1","mtimeNs":"1786600246711586100","ctimeNs":"1786600246711586100"},"sourcePin":{"commandManifestSha256":"8A30A76938B8CA9E148631AAAD97DDE68CB1F762BD29F803E56876CCE6BDA3AA","validatorPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-v3.mjs","validatorBytes":57181,"validatorSha256":"25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF","head":"8911a9cf5e9356c3e8beb099f7db53aeb4944e51","repositoryBase":"4172a79620cda33e167d291d38c69f0ed64fec89","coreBase":"7d81d4974ce8fb777ea105c5ef98d156cd1807cc","coreTree":"96688eca803a335790d65b41db0ace4df7d2f9b5"}},"expectCoreBase":"7d81d4974ce8fb777ea105c5ef98d156cd1807cc","expectRepositoryBase":"4172a79620cda33e167d291d38c69f0ed64fec89","expectCoreTree":"96688eca803a335790d65b41db0ace4df7d2f9b5","expectInputBytes":633,"expectInputSha256":"959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42","id":"t3r-shaft-04","difficulty":5,"targetRows":4,"maxPrimaryLocks":7,"maxAlternativeExtra":2}
+```
+
+#### Threat boundary and required lease primitive
+
+The integrity claim covers ordinary same-user user-mode mutation of the named lexical
+paths and file objects. Administrator/kernel compromise, drive or volume remapping, DLL
+replacement, Git object-database attacks, and denial of service are outside result
+integrity. Every observable deviation inside the boundary fails closed.
+
+A fresh runner v2 uses a frozen absolute path ending in
+`t37-r4k-windows-lease-runner-v2.cs`. The materialization must record its real byte count
+and SHA-256; no placeholder is allowed. Because the runner cannot trust its own source
+path before loading, the committed PowerShell wrapper must embed a minimal native
+bootstrap. That bootstrap opens the volume-root-to-leaf components of the runner path
+with `CreateFileW`, `OPEN_EXISTING`, `FILE_FLAG_OPEN_REPARSE_POINT`, and
+`FILE_SHARE_READ`; directories additionally use `FILE_FLAG_BACKUP_SEMANTICS`, while the
+final ordinary file uses `FILE_FLAG_RANDOM_ACCESS`. Each handle queries
+`FileAttributeTagInfo` and rejects `FILE_ATTRIBUTE_REPARSE_POINT` on that same handle.
+All component handles remain open, denying write and delete/rename, before the final
+source handle is read.
+
+The bootstrap requires an absolute canonical long path; rejects relative, dot/dot-dot,
+ADS, trailing-space/dot, unexpected-volume, and alternate-name inputs; binds opened and
+normalized NT paths, volume serial and 128-bit file ID, regular/non-delete-pending state,
+size, link count and times; reads exactly to EOF from the held final handle; and checks
+strict UTF-8, no BOM, LF-only framing, exact byte count, and SHA. `Add-Type` receives only
+the decoded bytes from that handle. The loaded runner immediately creates its own
+root-to-leaf lease for the same source and must match the bootstrap file identity, paths,
+bytes, and SHA. Both lease sets stay open through all child exits and final checks.
+
+Runner v2 applies the same root-to-leaf no-follow lease algorithm to exactly seven
+production inputs: Node, Git, retired v2 and v3 validators, v4, the clue, and the consumed
+v3 receipt. The final ordinary-file handle is the content handle. Constructor and
+`AssertUsable(path)` freeze/recheck both `FILE_NAME_OPENED | VOLUME_NAME_NT` and
+`FILE_NAME_NORMALIZED | VOLUME_NAME_NT`, volume/file ID, attributes/tag, bytes/hash,
+legacy v3 receipt identity, and read-before/read-after metadata. Every lexical witness
+is opened no-follow and compared to the persistent lease; path-only `Get-Item` checks
+are never accepted as the atomic reparse gate.
+
+#### Bound process and pipe lifecycle
+
+Every Git invocation uses the exact absolute Git path and is immediately bracketed by
+`gitLease.AssertUsable(path)`; using the same native runner for Git is preferred. All
+eight lease sets remain held through every Git operation and the Node child exit.
+
+The sole Node call uses nonempty exact `lpApplicationName`, a writable fixed command
+line, `CREATE_SUSPENDED`, `EXTENDED_STARTUPINFO_PRESENT`, and a kill-on-close Job without
+breakaway. `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` contains only NUL/stdout/stderr handles;
+`bInheritHandles=true` is required specifically for that whitelist. After creation,
+assignment to the configured Job precedes any resume. The child device-form image path
+must be nonempty and demonstrably untruncated, match the Node lease's normalized NT path,
+and be followed by another lease/path witness and `STILL_ACTIVE` check. Source contains
+exactly one `ResumeThread` call; it must return previous suspend count `1`. Any failure
+terminates the child, closes the Job, waits for exit, joins pumps, and reports cleanup
+failure without releasing leases early.
+
+Stdout and stderr pumps start before resume and always continue draining. Each has a hard
+capture limit; on overflow it records failure but keeps reading and discarding until EOF.
+Pumps never write Console directly. After the child and every Job writer have exited,
+both pumps are joined deterministically, their errors/overflow are checked, and only then
+may bounded captured text be emitted. A pump error, overflow, non-join, handle leak, Job
+cleanup failure, image mismatch, or nonzero child result is fatal.
+
+Calling the runner with the v4 command conservatively consumes the one v4 authorization
+regardless of whether `CreateProcessW` succeeds, returns, or throws. The wrapper catches
+only to append the final `Do not retry.` disposition; it performs no artifact recovery.
+
+#### Gates and next checkpoint
+
+Production execution is closed. Before materialization, runner v2 must compile and pass
+benign stdout/stderr/exit, root-to-leaf reparse and replacement races, same/equal-size
+mutation, image-path length, high-output/no-deadlock, create/assign/resume failure, pump
+failure, Job cleanup, and dynamic handle-count fixtures. Fixtures may touch only their
+owned temporary roots; production sentinels must be byte/identity unchanged. Fresh
+independent exact-source QA must report P0-P3/GAP all zero.
+
+The later materialization may change only the four authorized docs and must stay within
+the prospectively approved 1,200-line exception. Static QA requires four marker
+occurrences, one unchanged manifest occurrence in DESIGN, one exact runner-v2
+path/bytes/SHA pin, zero PowerShell parse errors, exactly one Node runner call, zero bare
+`& $node`, `Start-Process`, `Process.Start`, or `Invoke-Expression`, and an allowed bound
+route for every Git call. A hash-bound no-spawn derivative must exercise the complete
+preflight without reaching the production call. After exact commit, independent Git-blob
+QA, a QA-only THREAD_LOG commit, and a fresh final-HEAD all-zero binding are mandatory
+before the coordinator repeats the immediate preflight and invokes the wrapper once.

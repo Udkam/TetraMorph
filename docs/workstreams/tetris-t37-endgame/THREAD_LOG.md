@@ -551,3 +551,26 @@ F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8B
   by a separator-aware fixture-root mutation capability; production v4 exposes no seam.
 - Next: independent review and exact commit of this four-doc R4I behavior contract only.
   External v4 syntax/help and receipt/clean/alias matrices follow; production is closed.
+
+### F4E-R4K rejected R4J launcher and lease-runner recovery contract
+
+- Base remains `50c757f7a2b53369ab9429379428fa8e039a2d63`. R4J never committed
+  and no v4 production parameters ran; v4 attempt/output/stage/process remain zero.
+- Frozen v4 and its 40-case receipt matrix retain their independent all-zero reviews.
+  The rejected wrapper left a Node/Git executable hash-to-launch TOCTOU.
+- Runner v1 is retired at 33,556 bytes /
+  `4693199A84376488F66467BEACE6FCA3850C567E1F885B103EEF884876A6DE37`.
+  Independent QA: `P0 0 / P1 1 / P2 2 / P3 0 / GAP 1` for final-component reparse
+  following, image-query truncation, and pump deadlock/cleanup. It never ran production.
+
+F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60
+
+- DESIGN keeps the unchanged validator-argument manifest but removes the rejected
+  wrapper. The manifest alone grants no execution authority.
+- Fresh runner v2 must use an inline committed bootstrap plus root-to-leaf no-follow
+  leases, held executable/input identities, suspended/image-bound Node, kill-on-close
+  Job, continuously draining bounded pumps, and deterministic failure cleanup.
+- This normal-budget correction prospectively authorizes a later coordinator-owned
+  four-doc materialization up to 1,200 added/modified lines with whole-range verification.
+- Execution is closed. Sole next action: freeze, fixture-test, and independently review
+  runner v2; do not run v4 production parameters.

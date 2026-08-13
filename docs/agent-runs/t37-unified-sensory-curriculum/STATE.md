@@ -2252,6 +2252,29 @@ F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8B
 - No v4 production command is open. Sole next action: independently review and commit
   this exact four-doc incident/successor contract, then create/static-test external v4.
 
+### F4E-R4K rejected launcher / lease-runner recovery contract
+
+- R4J was rejected before commit and before any v4 production invocation. V4 and its
+  40-case receipt matrix remain frozen/green; v4 attempt/output/stage/process stay zero.
+- The old wrapper left Node/Git hash-to-launch TOCTOU. Runner v1 is frozen only as
+  rejected evidence at 33,556 bytes /
+  `4693199A84376488F66467BEACE6FCA3850C567E1F885B103EEF884876A6DE37`;
+  QA reports `P0 0 / P1 1 / P2 2 / P3 0 / GAP 1`. Never use it for production.
+
+F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60
+
+- DESIGN retains the unchanged 2,948-byte validator-argument manifest; it grants no
+  launch authority. Fresh runner v2 needs a real frozen path/bytes/SHA and an inline
+  committed native bootstrap before its source may be read and loaded.
+- V2 must hold root-to-leaf no-follow, deny-write/delete leases for its own source plus
+  Node, Git, v2/v3/v4, clue, and consumed-v3 receipt; atomically reject reparse points;
+  bind paths/IDs/metadata/bytes; and re-witness every lexical path at use.
+- The sole Node child requires suspended creation, Job kill-on-close, inherited-handle
+  whitelist, untruncated image binding, `STILL_ACTIVE`, one `ResumeThread == 1`, bounded
+  continuously draining pumps, and deterministic cleanup/join. Every deviation is fatal.
+- Execution remains closed. Next: freeze/test/review runner v2, then materialize the exact
+  four-doc command under the prospectively approved 1,200-line atomic exception.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
