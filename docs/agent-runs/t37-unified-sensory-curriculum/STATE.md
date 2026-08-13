@@ -1970,6 +1970,30 @@ against current Core state reads. Next exact action: commit these four documents
 implement only `src/game/core/endgameRouteSearch.ts`, its existing test, and the new
 focused key-frontier test. No Intro-05 candidate run or source integration is open yet.
 
+## Current checkpoint — F4E-R3-H1 hash-sync contract candidate
+
+- Current HEAD: `a38fdbd`; F4E-R3 implementation paths are committed. Aside from this
+  four-document addendum, the inherited T27/follow-up plus `progress.md` paths are the
+  only other worktree dirt.
+- Last green ordinary evidence before this addendum: 16 focused key-frontier tests,
+  typecheck, 53 passed / 2 skipped test files with 492 passed / 15 skipped tests, and a
+  768-module build.
+- Opt-in exact evidence: 5 files passed / 1 failed; 24 tests passed / 5 failed. Every
+  failure is the `initialStateHash` assertion in `endgameMasteryExact`; all non-hash
+  certificate fields and real replay checks passed.
+- Baseline comparison: `e09526b..a38fdbd` changes only the three F4E-R3 paths and no
+  hash input, Endgame definition, engine, board, piece, or constants file. The baseline
+  already computes `initialStateHash` from the real started state before quotienting.
+- Provenance: `d623ef9` introduced the active namespace rename and both new ordinary
+  anchor hashes, but retained old mastery literals. This predates F4E-R3.
+- Proposed current values: `b9d99302`, `a5cb7240`, `845c1bd0`, `9aff892c`, and
+  `79e3ebac`, mapped exactly in `CURRENT_TASK.md` and `DESIGN.md`.
+- Open paths after read-only contract acceptance: only `src/endgameMastery.ts` and
+  `src/game/core/endgameMasteryExact.test.ts`, only five literal replacements.
+- Next action: obtain independent drift/contract review, commit this four-document
+  addendum, perform the two-path literal synchronization, and rerun focused plus complete
+  exact and ordinary gates. Do not run or edit an Intro-05 validator yet.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

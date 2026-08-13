@@ -6053,3 +6053,25 @@ and the accepted classic row-clear presentation needs a longer readable duration
 timings, reward grammar, audio alignment, reduced-motion behavior, and scoring boundaries
 remain design work for that final stage; no interim curriculum slice may silently change
 them.
+
+## T37 F4E-R3-H1 certificate fingerprint synchronization
+
+The active `endgame` namespace changes the canonical JSON field names included by
+`stateHash`; therefore fingerprints produced before the atomic namespace switch cannot
+be reused as current-state certificates. This correction is admissible only where an
+uncapped exact rerun proves that every non-hash proof and replay field remains unchanged.
+
+The post-F4E-R3 exact run satisfies that condition for five mastery cases. The current
+fingerprints are `b9d99302` (`t5r-arc-13`), `a5cb7240`
+(`t5r-current-12`), `845c1bd0` (`t5r-prism-11`), `9aff892c`
+(the canonical one-anchor `t5r-drift-08` admission), and `79e3ebac` (its test-only
+two-anchor admission). These are serialization fingerprints, not gameplay design
+changes. The corresponding routes, optimums, frontiers, transitions, prunes, and final
+states are frozen and must remain byte-for-byte equal to their existing expectations.
+
+Only `src/endgameMastery.ts` and
+`src/game/core/endgameMasteryExact.test.ts` may change, and only those five literals.
+The general hash function, proof codec, engine, definitions, test routes, fixture data,
+and historical status records remain untouched. A focused mastery exact rerun plus the
+complete six-file exact gate, ordinary project gates, and independent range review are
+required before the fingerprints become accepted current facts.

@@ -298,3 +298,25 @@ old screenshot.
 - Blocker: none at the contract boundary.
 - Next action: commit this docs-only contract, then open only the exact certifier and
   its two focused test paths. No validator run or Intro-05 integration is authorized.
+
+## F4E-R3-H1 — current-namespace certificate hash-sync contract
+
+- Base/candidate inspected: `e09526b..a38fdbd`.
+- F4E-R3 source checkpoints: `46a1efd` and `a38fdbd`.
+- Exact-gate observation: Intro-01 through Intro-04 and the ten-row prototype pass;
+  the five mastery cases retain every non-hash proof/replay literal and fail only their
+  pre-namespace `initialStateHash` values.
+- Causal check: the inspected range does not touch state-hash inputs, definitions,
+  engine, board, pieces, or constants. Baseline already hashes the real started state
+  before proof quotienting. `d623ef9` introduced the serialized `endgame*` names and
+  current ordinary anchor assertions while missing the mastery literals.
+- Proposed correction boundary: five literal replacements across only
+  `src/endgameMastery.ts` and `src/game/core/endgameMasteryExact.test.ts`.
+- Historical hashes remain provenance. Current replacements are `b9d99302`,
+  `a5cb7240`, `845c1bd0`, `9aff892c`, and `79e3ebac` in the mappings frozen by the
+  contract docs.
+- Verification required: independent contract/drift review; focused mastery exact;
+  complete six-file exact gate; typecheck; complete suite; build; exact-path diff check;
+  independent QA of `e09526b..candidate`.
+- Blocker: source remains closed until the contract review is all-zero.
+- Sole next action: review and commit this four-document contract addendum.

@@ -8774,3 +8774,38 @@ and historical-evidence wording. The second traces the contract against current 
 reads and confirms that lower-bound, landing, completion, telemetry, and real-replay
 evidence boundaries are complete. Commit this four-document contract before opening
 only the three named Core/test paths.
+
+### F4E-R3-H1 — current-namespace certificate fingerprint synchronization
+
+Status: **CONTRACT CANDIDATE; SOURCE CLOSED PENDING READ-ONLY REVIEW**.
+
+The committed key-frontier candidate is `a38fdbd` over contract `e09526b`. Focused
+equivalence tests, typecheck, the ordinary full suite, and the production build passed.
+The explicit opt-in exact gate then passed Intro-01 through Intro-04 and the ten-row
+prototype, while all five `endgameMasteryExact` cases failed only at
+`initialStateHash`: every route, optimal lock count, exhausted frontier width, explored
+state count, transition count, deficit-bound prune count, final target/support count,
+and real replay outcome remained literal-equal.
+
+This is a pre-existing namespace-migration omission, not a key-frontier algorithm
+change. Baseline `e09526b` already hashes the real started state before any proof
+quotient; `e09526b..a38fdbd` changes none of the state-hash inputs, Endgame definitions,
+or engine/board/piece/constants files. Commit `d623ef9` introduced both the active
+`puzzle*` to `endgame*` serialized-field rename and current ordinary assertions for the
+new anchor hashes, while leaving five mastery literals stale.
+
+One narrow source correction is therefore proposed:
+
+- `src/endgameMastery.ts`: `1c4d5e6a -> b9d99302`,
+  `04b7f198 -> a5cb7240`, and `3be8a7b4 -> 845c1bd0`;
+- `src/game/core/endgameMasteryExact.test.ts`: `e9b71c20 -> 9aff892c` and
+  `696f86a0 -> 79e3ebac`.
+
+No route, telemetry, rule, state-hash algorithm, proof codec, definition, roster, UI,
+fixture, validator, or historical changelog statement may change. Older documents keep
+their old fingerprints as time-bound provenance; this entry supersedes them for the
+active `endgame` namespace. Source opens only after independent contract/drift review.
+Acceptance requires the focused mastery exact gate, all six opt-in exact certificate
+files, typecheck, the complete ordinary suite, build, exact-path diff checks, and
+independent review of the complete `e09526b..candidate` range. Intro-05 validation and
+integration remain closed until this correction and F4E-R3 are accepted.
