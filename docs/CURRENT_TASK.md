@@ -1,8 +1,60 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME NAMESPACE N0 ACCEPTED / INTRO-05 R4L V4 COMMAND MATERIALIZATION CANDIDATE**
+Status: **ENDGAME N0 ACCEPTED / INTRO-05 V4 CONSUMED WITHOUT CANDIDATE / SPEED + BOMB CORE OPEN**
 
 ## Active objective
+
+### 2026-08-13 player-directed speed and Bomb correction
+
+The newest player instruction opens two implementation slices while the Endgame v4
+authoring attempt is preserved as consumed evidence. Gravity is described only as a
+**fall interval in seconds per board cell**: a smaller value is faster. Mutation starts at
+`0.60 s/cell`, advances every six cleared lines through the exact ordered ladder
+`0.60 -> 0.50 -> 0.40 -> 0.30 -> 0.20 -> 0.15 -> 0.12 -> 0.10 -> 0.09 -> 0.08`,
+and never becomes faster than `0.08 s/cell`. Ice overrides automatic gravity at exactly
+`0.80 s/cell`; natural expiry clears its frozen progress so it cannot cause a catch-up
+drop. Classic defaults to `0.60 -> 0.08 s/cell` and retains independent player-selected
+opening and fastest bounds from the ordered `1.00 / 0.90 / 0.80 / 0.70 / 0.60 / 0.50 /
+0.40 / 0.30 / 0.20 / 0.15 / 0.12 / 0.10 / 0.09 / 0.08` choices.
+
+The 60 Hz Core must not round `0.12`, `0.09`, or `0.08` upward to whole ticks. One
+deterministic integer sub-tick accumulator advances by ten units per simulation tick and
+uses exact thresholds derived from the selected seconds-per-cell value. A successful
+automatic step subtracts the threshold and retains only the bounded remainder. Manual
+drop, spawn, restart, lock, clear, pressure movement, and Ice expiry reset both components.
+The remainder participates in Classic/Mutation state identity and is proved not to change
+Endgame or Survival hash domains.
+
+A Bomb triggered by an ordinary full row uses that pre-clear row coordinate. Its blast
+band is the triggering row plus the immediately adjacent row above and below, clipped to
+the canonical board; a bottom-row trigger is therefore exactly the bottom two rows. If one
+whole-piece Bomb intersects more than one triggering full row, its bands are unioned,
+sorted, and deduplicated. All planning uses the immutable pre-clear board/carrier snapshot,
+then settles once, so row remapping cannot change causality.
+
+If a primary blast band intersects a different Bomb carrier, the outcome is one chain
+clear of the complete canonical board, including hidden rows. Two Bombs merely present in
+the same transition do not chain unless one band's cells hit the other carrier. Non-Bomb
+carriers hit by either an ordinary full row or a primary blast band retain their normal
+activation; carriers removed only by the later whole-board clear are silently discarded.
+
+`primaryIds` are Bomb carriers hit by the ordinary full rows. `directHitIds` are different
+Bomb carriers intersected by any primary band. `participantIds` is their unique union.
+Every participant earns the existing Bomb bonus exactly once under the pre-clear
+multiplier. Event `participatingBombCount` is exactly `participantIds.size`, and
+`blastRows` is always the frozen sorted union of primary bands, including for a chain.
+For a normal blast, board removal is the one-shot union of ordinary rows and `blastRows`;
+for a chain it is the complete board. In both cases, line progress is the count of unique
+pre-clear non-empty rows in that removal set, so overlap counts once and empty adjacent
+rows do not fabricate progress. Core emits one Bomb outcome with these required fields.
+The renderer and audio engine must distinguish `blast` from `chain-clear`; the latter
+needs an original full-board effect, a separate restrained but unmistakable explosion
+cue, reduced-motion coverage, and one-delivery tests.
+
+Survival remains source-frozen. The player requested only an improvement proposal, placed
+at the end of the later report; no Survival rule, number, UI, audio, or evidence path is
+authorized in these implementation slices. Line-clear reward/duration and the site icon
+remain last-stage work as previously directed.
 
 Rebuild TetraMorph around one coherent physical-material language, then restructure
 Endgame into a certified 5/25/16 learning curriculum. T37 supersedes the rejected T36

@@ -42,6 +42,72 @@ dual-field `GameState` is forbidden: object spread and independent mutation woul
 alias stale and corrupt state identity. The exact exception and final zero-retired-name gate
 are authoritative in `docs/CURRENT_TASK.md` and the Endgame workstream log.
 
+## 2026-08-13 T37 — precise gravity and causal Bomb outcomes
+
+### Gravity contract
+
+- Public speed values are fall intervals in seconds per cell; lower means faster.
+- Mutation uses one tier per six cleared lines:
+  `0.60, 0.50, 0.40, 0.30, 0.20, 0.15, 0.12, 0.10, 0.09, 0.08`.
+- Ice is exactly `0.80 s/cell`. Its final tick is still frozen; expiry resets all gravity
+  progress before ordinary Mutation gravity resumes.
+- Classic defaults to `0.60` opening and `0.08` fastest. Both endpoints remain selectable
+  for the next run from the shared slow-to-fast choices
+  `1.00, 0.90, 0.80, 0.70, 0.60, 0.50, 0.40, 0.30, 0.20, 0.15, 0.12, 0.10, 0.09, 0.08`.
+  Each ten cleared lines advances one available choice toward the selected fastest bound.
+- Core uses integer fixed-point progress, not floating elapsed time or rounded tick
+  thresholds. At 60 Hz, ten sub-ticks per simulation tick give exact thresholds
+  `360, 300, 240, 180, 120, 90, 72, 60, 54, 48` for the Mutation ladder and `480` for
+  Ice. The accumulator subtracts one threshold on an automatic fall and keeps its
+  remainder; the minimum threshold remains greater than one simulation tick.
+- Classic/Mutation hashes include the bounded remainder because it changes the next fall.
+  Survival and Endgame keep a zero remainder invariant and their existing hash domains.
+  Settings, HUD, and accessibility copy render the exact selected interval, including two
+  decimals below `0.20`, instead of rounding `0.15` to `0.2` or `0.12` to `0.1`.
+
+### Bomb contract
+
+For a Bomb carrier removed by an ordinary full-row clear, `triggerRows` are the pre-clear
+rows occupied by that carrier and present in the ordinary clear set. For every trigger row
+`r`, the blast contributes `{r - 1, r, r + 1}` clipped to `[0, BOARD_HEIGHT - 1]`; all
+contributions are sorted and deduplicated. Thus row `BOARD_HEIGHT - 1` produces exactly the
+last two rows. Normal full rows and every Bomb plan are resolved from one immutable board
+and carrier snapshot, and their union is applied once.
+
+The outcome is `chain-clear` only when a primary Bomb band intersects at least one cell of
+a different Bomb carrier. Merely triggering two distant Bombs together is not a chain.
+A chain clears every visible and hidden board cell and every carrier record. `primaryIds`
+are the Bomb carrier IDs intersected by the ordinary rows. `directHitIds` are all different
+Bomb IDs intersected by any primary band. `participantIds` is their unique union; every
+participant earns one Bomb bonus under the multiplier captured for that settlement.
+Two primary Bombs on the same row chain because each band intersects the other carrier;
+two distant primary Bombs do not.
+
+For `blast`, the one settlement removes the sorted unique union of `ordinaryRows` and
+`blastRows`; for `chain-clear`, it removes all canonical rows. In either outcome,
+`progressRows` is the subset of that removal set that was non-empty in the immutable
+pre-clear board, and `state.lines` increases by `progressRows.length`. An ordinary row that
+also belongs to a blast band counts once, while an empty adjacent row moves the board but
+adds no progress. `activationIds` contains every non-Bomb carrier hit by
+`ordinaryRows ∪ blastRows`, deduplicated by carrier ID. Unrelated carriers erased only by
+a chain whole-board clear do not activate.
+
+The single summarized Bomb activation requires immutable `bombOutcome`, `blastRows`, and
+`participatingBombCount` evidence. The count is exactly `participantIds.size`, while
+`blastRows` remains the primary-band union even when the outcome is `chain-clear`.
+`lines-cleared` continues to describe only the ordinary full rows, preventing the classic
+row-clear animation/audio from masquerading as an explosion.
+Normal Bomb presentation follows the real blast band instead of the old fixed floor rows.
+`chain-clear` receives a separate full-board material collapse and cue, remains distinct
+under reduced motion, emits only once through Runtime, and suppresses overlapping ordinary
+clear/normal-Bomb audio. Human listening remains required for the new chain cue.
+
+### Preserved boundaries
+
+Survival receives no implementation change in this slice; only a final-report proposal is
+requested. Endgame v4 may not be retried, line-clear reward/duration stays last, and icon
+work stays last.
+
 ## 2026-08-09 T37 — Historical pre-N0 material/curriculum contract
 
 > This section records the names and checkpoints that existed before the canonical Endgame

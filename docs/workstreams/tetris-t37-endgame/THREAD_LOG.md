@@ -608,3 +608,22 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - This is QA evidence only, not a production run. Production remains closed until this
   THREAD_LOG-only checkpoint is committed, its final HEAD/history/blob state receives
   fresh independent all-zero review, and one final no-spawn binding passes unchanged.
+
+### F4E-R4N v4 consumed without candidate
+
+- Final HEAD `917673c8147a2ed6dc110208e1e5c34bba57ae33` passed two independent
+  all-zero static reviews and one final no-spawn run in 49.562 seconds with the sole PASS.
+- The exact production wrapper was then invoked once. The command transport timed out with
+  exit 124 at about 64 seconds while the wrapper and sole validator child were still live;
+  later observation found both exited, candidate absent, staging absent, and no matching
+  process. No second production invocation occurred or is allowed.
+- The resulting v4 attempt receipt is 9,803 bytes / SHA-256
+  `5620C50C50859FFE6225C0D5A97D9DD43B029F30D552525A0A0CDCC250D581F1`.
+  Its canonical payload+LF hash is
+  `09E5A163A9F5CFC8928B1A5B05FFC33D7A1CF71D4C5A7EAC1AEE8C9FE4A0176D` and binds
+  schema `t37-f4e-r4i-attempt-v1`, final HEAD, inputs, runtime, Core tree, and intended
+  stage path. It has no result/error tail and cannot support an Intro-05 certificate claim.
+- V4 is permanently consumed. Preserve every v3/v4 receipt and namespace. A later Endgame
+  recovery requires a fresh successor contract; it may not reuse or replay this command.
+- The player next opens precise `0.60 -> 0.08 s/cell` Classic/Mutation gravity, `0.80`
+  Ice, row-causal Bomb bands, and Bomb-on-Bomb chain clear. Survival is design-output only.

@@ -2289,6 +2289,28 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   obtain independent committed-blob/AST/no-spawn QA, then create the QA-only THREAD_LOG
   checkpoint and bind that final HEAD before any production attempt.
 
+### F4E-R4N consumed v4 outcome and player-directed gameplay continuation
+
+- Final command HEAD was `917673c8147a2ed6dc110208e1e5c34bba57ae33`. Two independent
+  final-HEAD reviews and the final 49.562-second no-spawn binding were all-zero.
+- The sole production invocation then entered the frozen wrapper. The outer command
+  channel returned exit `124` after about 64 seconds while wrapper PID 3792 and its sole
+  validator Node PID 29504 were still observed alive. Later observation found both exited
+  without a candidate or staging path; no unobserved exit cause is claimed.
+- V4 is consumed and must never be retried. Its only artifact is the held-receipt snapshot
+  `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v4.json`:
+  9,803 bytes, SHA-256
+  `5620C50C50859FFE6225C0D5A97D9DD43B029F30D552525A0A0CDCC250D581F1`, schema
+  `t37-f4e-r4i-attempt-v1`, payload SHA-256
+  `09E5A163A9F5CFC8928B1A5B05FFC33D7A1CF71D4C5A7EAC1AEE8C9FE4A0176D`.
+  The payload binds final HEAD and the intended absent staging pathname but contains no
+  success output or error tail. This proves identity/claim only, not a search result.
+- Endgame candidate recovery is deferred behind a fresh docs-first successor generation.
+  Do not delete, replace, rename, or reuse the v4 receipt or namespaces.
+- Current authorized implementation order is: precise Classic/Mutation/Ice gravity Core
+  and settings; causal Bomb Core; chain-clear renderer/audio and browser/listening proof.
+  Survival is proposal-only at final report. Line-clear reward/duration and icon remain last.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
