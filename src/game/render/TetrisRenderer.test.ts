@@ -287,6 +287,7 @@ type RendererInternals = {
     bombOutcome: 'blast' | 'chain-clear' | null;
     blastRows: readonly number[];
     chainOriginCells: readonly Cell[];
+    chainTriggerRows: readonly number[];
   } | null;
   pendingBombClearOutcome: 'blast' | 'chain-clear' | null;
   mutationFlashQueue: Array<{ item: MutationItem }>;
@@ -305,6 +306,9 @@ type RendererInternals = {
     collapseWasActive?: boolean,
   ) => void;
   advanceEffects: (deltaMs: number) => void;
+  applyMutationCameraShake: (
+    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
+  ) => void;
   syncActiveSpawnEntry: (state: GameState) => void;
   advanceSurvivalDebrisPresentation: (state: GameState, deltaMs: number) => void;
   drawEffects: (state: GameState, layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean }) => void;
@@ -1884,49 +1888,79 @@ describe('Endgame undo presentation reset', () => {
     expect(reducedFrame.operations).toEqual([]);
   });
 
-  it('reveals the first Bomb before propagating chain-clear rows equally upward and downward', () => {
+  it('starts at the exact clear row before propagating local explosions equally upward and downward', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
     const previousBoard = createBoard();
-    previousBoard[VISIBLE_START_ROW + 5]![4] = 'T';
+    previousBoard[VISIBLE_START_ROW + 5]!.fill('T');
     previousBoard[VISIBLE_START_ROW + 4]![2] = 'J';
     previousBoard[VISIBLE_START_ROW + 6]![7] = 'L';
     internals.consumeEvents([
-      chainClearEvent([{ x: 4, y: VISIBLE_START_ROW + 5 }], [VISIBLE_START_ROW + 5]),
+      chainClearEvent([
+        { x: 4, y: VISIBLE_START_ROW + 5 },
+        { x: 4, y: VISIBLE_START_ROW + 6 },
+      ], [VISIBLE_START_ROW + 5]),
     ], undefined, previousBoard);
     const flash = internals.mutationFlash!;
     expect(flash).toMatchObject({
       bombOutcome: 'chain-clear',
       blastRows: [24, 25, 26],
-      chainOriginCells: [{ x: 4, y: VISIBLE_START_ROW + 5 }],
+      chainTriggerRows: [VISIBLE_START_ROW + 5],
     });
 
     const origin = createGraphicsRecorder();
     flash.elapsed = 0;
     internals.drawMutationChainClear(origin.graphics, flash, layout);
     expect(origin.operations.some((operation) => operation.kind === 'roundRect')).toBe(true);
-    expect(origin.operations.filter((operation) => operation.kind === 'rect')).toHaveLength(0);
+    expect(hasBroadHorizontalGeometry(origin.operations, layout.width)).toBe(false);
 
     const firstBeat = createGraphicsRecorder();
-    flash.elapsed = 140;
+    flash.elapsed = 220;
     internals.drawMutationChainClear(firstBeat.graphics, flash, layout);
-    const firstRows = firstBeat.operations.filter((operation) => (
-      operation.kind === 'rect' && operation.values[2] === layout.width && operation.values[3] === layout.cell
-    ));
-    expect(new Set(firstRows.map((operation) => operation.values[1]))).toEqual(new Set([layout.cell * 5]));
+    const blastCenters = firstBeat.operations.filter((operation) => operation.kind === 'circle');
+    expect(blastCenters).toHaveLength(6);
+    expect(new Set(blastCenters.map((operation) => operation.values[1]))).toEqual(new Set([layout.cell * 5.5]));
+    expect(hasBroadHorizontalGeometry(firstBeat.operations, layout.width)).toBe(false);
+    expect(firstBeat.operations.filter((operation) => operation.kind === 'rect')).toHaveLength(0);
+    expect(firstBeat.operations.filter((operation) => operation.kind === 'poly')).toHaveLength(3);
 
     const secondBeat = createGraphicsRecorder();
-    flash.elapsed = 174;
+    flash.elapsed = 276;
     internals.drawMutationChainClear(secondBeat.graphics, flash, layout);
-    const secondRows = secondBeat.operations.filter((operation) => (
-      operation.kind === 'rect' && operation.values[2] === layout.width && operation.values[3] === layout.cell
-    ));
-    expect(new Set(secondRows.map((operation) => operation.values[1]))).toEqual(new Set([
-      layout.cell * 4,
-      layout.cell * 5,
-      layout.cell * 6,
+    const propagatedCenters = secondBeat.operations.filter((operation) => operation.kind === 'circle');
+    expect(new Set(propagatedCenters.map((operation) => operation.values[1]))).toEqual(new Set([
+      layout.cell * 4.5,
+      layout.cell * 5.5,
+      layout.cell * 6.5,
     ]));
+    expect(hasBroadHorizontalGeometry(secondBeat.operations, layout.width)).toBe(false);
+  });
+
+  it('supports multiple exact clear-row sources without using carrier-crossing rows', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const previousBoard = createBoard();
+    for (const row of [VISIBLE_START_ROW + 3, VISIBLE_START_ROW + 9]) previousBoard[row]![4] = 'T';
+    internals.consumeEvents([chainClearEvent([
+      { x: 4, y: VISIBLE_START_ROW + 3 },
+      { x: 4, y: VISIBLE_START_ROW + 4 },
+    ], [VISIBLE_START_ROW + 9, VISIBLE_START_ROW + 3])], undefined, previousBoard);
+    const flash = internals.mutationFlash!;
+    expect(flash.chainTriggerRows).toEqual([VISIBLE_START_ROW + 9, VISIBLE_START_ROW + 3]);
+
+    flash.elapsed = 220;
+    const first = createGraphicsRecorder();
+    internals.drawMutationChainClear(first.graphics, flash, layout);
+    expect(new Set(first.operations.filter((operation) => operation.kind === 'circle')
+      .map((operation) => operation.values[1]))).toEqual(new Set([
+      layout.cell * 3.5,
+      layout.cell * 9.5,
+    ]));
+    expect(first.operations.some((operation) => (
+      operation.kind === 'circle' && operation.values[1] === layout.cell * 4.5
+    ))).toBe(false);
   });
 
   it('does not overlap the chain-clear reveal with the ordinary line-clear cue', () => {
@@ -1987,7 +2021,7 @@ describe('Endgame undo presentation reset', () => {
     expect(order.at(-1)).toBe('origin');
   });
 
-  it('starts a hidden-origin chain clear at the nearest visible boundary without hidden delay', () => {
+  it('clamps a hidden trigger to the nearest visible boundary without hidden delay', () => {
     const renderer = new TetrisRendererClass();
     renderer.setOptions({ reducedMotion: true });
     const internals = renderer as unknown as RendererInternals;
@@ -1999,10 +2033,73 @@ describe('Endgame undo presentation reset', () => {
     const firstVisibleBeat = createGraphicsRecorder();
     flash.elapsed = 50;
     internals.drawMutationChainClear(firstVisibleBeat.graphics, flash, layout);
-    const rows = firstVisibleBeat.operations.filter((operation) => (
-      operation.kind === 'rect' && operation.values[2] === layout.width && operation.values[3] === layout.cell
-    ));
-    expect(new Set(rows.map((operation) => operation.values[1]))).toEqual(new Set([0]));
+    expect(new Set(firstVisibleBeat.operations.filter((operation) => operation.kind === 'circle')
+      .map((operation) => operation.values[1]))).toEqual(new Set([layout.cell * .5]));
+    expect(firstVisibleBeat.operations.some((operation) => operation.kind === 'rect')).toBe(false);
+  });
+
+  it('keeps future rows fragment-free and clears every chain primitive at completion', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const triggerRow = VISIBLE_START_ROW + 10;
+    const previousBoard = createBoard();
+    previousBoard[triggerRow]![1] = 'T';
+    previousBoard[triggerRow + 2]![8] = 'L';
+    internals.consumeEvents([chainClearEvent([{ x: 1, y: triggerRow }], [triggerRow])], undefined, previousBoard);
+    const flash = internals.mutationFlash!;
+
+    internals.advanceEffects(220);
+    expect(internals.mutationParticles.every((particle) => !particle.active)).toBe(true);
+    flash.elapsed = 220 + 56;
+    const reached = createGraphicsRecorder();
+    internals.drawMutationChainClear(reached.graphics, flash, layout);
+    expect(reached.operations.some((operation) => (
+      operation.kind === 'circle' && operation.values[0] === layout.cell * 8.5
+    ))).toBe(false);
+    flash.elapsed = flash.duration;
+    const complete = createGraphicsRecorder();
+    internals.drawCellGroups = () => {};
+    internals.drawMutationPieceMaterial = () => {};
+    internals.drawMutationChainClear(complete.graphics, flash, layout);
+    expect(complete.operations).toEqual([]);
+  });
+
+  it('uses static directional reduced-motion blasts without particles, rings, or shake', () => {
+    const renderer = new TetrisRendererClass();
+    renderer.setOptions({ reducedMotion: true });
+    const internals = renderer as unknown as RendererInternals;
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const triggerRow = VISIBLE_START_ROW + 6;
+    const previousBoard = createBoard();
+    previousBoard[triggerRow]![4] = 'T';
+    previousBoard[triggerRow - 1]![3] = 'J';
+    previousBoard[triggerRow + 1]![5] = 'L';
+    internals.consumeEvents([chainClearEvent([{ x: 4, y: triggerRow }], [triggerRow])], undefined, previousBoard);
+    const flash = internals.mutationFlash!;
+    internals.drawCellGroups = () => {};
+
+    flash.elapsed = 50;
+    const source = createGraphicsRecorder();
+    internals.drawMutationChainClear(source.graphics, flash, layout);
+    expect(source.operations.filter((operation) => operation.kind === 'circle')).toHaveLength(1);
+    expect(source.operations.some((operation) => operation.kind === 'stroke')).toBe(false);
+    expect(source.operations.some((operation) => operation.kind === 'segment')).toBe(false);
+
+    flash.elapsed = 70;
+    const neighbours = createGraphicsRecorder();
+    internals.drawMutationChainClear(neighbours.graphics, flash, layout);
+    expect(new Set(neighbours.operations.filter((operation) => operation.kind === 'circle')
+      .map((operation) => operation.values[1]))).toEqual(new Set([
+      layout.cell * 5.5,
+      layout.cell * 6.5,
+      layout.cell * 7.5,
+    ]));
+    expect(neighbours.operations.some((operation) => operation.kind === 'stroke')).toBe(false);
+    expect(internals.mutationParticles.every((particle) => !particle.active)).toBe(true);
+    internals.impact = 0;
+    internals.applyMutationCameraShake(layout);
+    expect(internals.impact).toBe(0);
   });
 
   it('anchors multiplier feedback to Core trigger cells and preserves the 4× escalation cue', () => {

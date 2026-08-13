@@ -1,4 +1,4 @@
-import { BOARD_HEIGHT, VISIBLE_START_ROW, type Cell } from '../game/core';
+import { BOARD_HEIGHT, VISIBLE_START_ROW } from '../game/core';
 
 export interface MutationChainRowBeat {
   readonly row: number;
@@ -19,31 +19,29 @@ export interface MutationChainPresentationPlan {
 
 /** Shared causal beat plan for renderer and audio. Hidden rows never add a beat. */
 export function mutationChainPresentationPlan(
-  originCells: readonly Cell[],
+  chainTriggerRows: readonly number[],
   reducedMotion = false,
 ): Readonly<MutationChainPresentationPlan> {
-  const canonicalOrigins = [...new Set(originCells
-    .map((cell) => cell.y)
-    .filter((row) => row >= 0 && row < BOARD_HEIGHT))]
+  const canonicalTriggers = [...new Set(chainTriggerRows
+    .filter(Number.isFinite)
+    .map((row) => Math.max(VISIBLE_START_ROW, Math.min(BOARD_HEIGHT - 1, Math.trunc(row)))))]
     .sort((left, right) => left - right);
-  const visibleOrigins = canonicalOrigins.filter((row) => row >= VISIBLE_START_ROW);
-  const rawDistanceFor = canonicalOrigins.length > 0
-    ? (row: number) => Math.min(...canonicalOrigins.map((origin) => Math.abs(row - origin)))
-    : (row: number) => row - VISIBLE_START_ROW;
+  const visibleTriggers = canonicalTriggers.length > 0
+    ? canonicalTriggers
+    : [VISIBLE_START_ROW];
+  const rawDistanceFor = (row: number): number => Math.min(
+    ...visibleTriggers.map((triggerRow) => Math.abs(row - triggerRow)),
+  );
   const visibleRows = Array.from(
     { length: BOARD_HEIGHT - VISIBLE_START_ROW },
     (_, index) => VISIBLE_START_ROW + index,
   );
-  const visibleDistances = [...new Set(visibleRows.map(rawDistanceFor))]
-    .sort((left, right) => left - right);
-  const beatIndexByDistance = new Map(visibleDistances.map((distance, index) => [distance, index]));
-  const revealMs = reducedMotion ? 50 : 140;
-  const beatMs = reducedMotion ? 12 : 34;
-  const fadeMs = reducedMotion ? 70 : 150;
+  const revealMs = reducedMotion ? 50 : 220;
+  const beatMs = reducedMotion ? 20 : 56;
+  const fadeMs = reducedMotion ? 90 : 220;
   const rowBeats = Object.freeze(visibleRows.map((row) => {
     const distance = rawDistanceFor(row);
-    const beatIndex = beatIndexByDistance.get(distance) ?? 0;
-    return Object.freeze({ row, distance, startMs: revealMs + beatIndex * beatMs });
+    return Object.freeze({ row, distance, startMs: revealMs + distance * beatMs });
   }));
   const distanceBeats = Object.freeze([...new Set(rowBeats.map(({ distance }) => distance))]
     .sort((left, right) => left - right));
@@ -51,7 +49,9 @@ export function mutationChainPresentationPlan(
     .sort((left, right) => left - right));
   const lastBeatStart = beatStartsMs.at(-1) ?? revealMs;
   return Object.freeze({
-    originVisible: visibleOrigins.length > 0,
+    originVisible: chainTriggerRows.some((row) => (
+      Number.isFinite(row) && row >= VISIBLE_START_ROW && row < BOARD_HEIGHT
+    )),
     rowBeats,
     distanceBeats,
     beatStartsMs,

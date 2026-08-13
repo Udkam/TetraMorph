@@ -467,10 +467,10 @@ describe('AudioEngine accepted production contract', () => {
     expect(filters.map((filter) => filter.frequency.setValues[0]?.value)).toEqual([1_050, 460]);
     const propagation = oscillators[3]!;
     expect(propagation.starts).toEqual([0]);
-    expect(propagation.frequency.setValues[0]?.time).toBeCloseTo(.14);
-    expect(propagation.frequency.setValues[1]?.time).toBeCloseTo(.174);
+    expect(propagation.frequency.setValues[0]?.time).toBeCloseTo(.22);
+    expect(propagation.frequency.setValues[1]?.time).toBeCloseTo(.276);
     expect(propagation.frequency.setValues).toHaveLength(20);
-    expect(propagation.frequency.setValues.at(-1)?.time).toBeCloseTo(.786);
+    expect(propagation.frequency.setValues.at(-1)?.time).toBeCloseTo(1.284);
   });
 
   it('starts chained item cues only after the first Bomb propagation finishes', async () => {
@@ -479,7 +479,7 @@ describe('AudioEngine accepted production contract', () => {
     audio.play([chainClearMutation(), mutation('freeze')]);
 
     const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
-    expect(ice?.starts[0]).toEqual({ time: 0.936, offset: 0.19375, duration: 0.44 });
+    expect(ice?.starts[0]).toEqual({ time: 1.504, offset: 0.19375, duration: 0.44 });
   });
 
   it('reserves one voice for chain propagation when the global voice budget is saturated', async () => {

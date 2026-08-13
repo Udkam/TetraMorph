@@ -487,7 +487,7 @@ export class AudioEngine {
         }
       }
       const durationMs = event.item === 'bomb' && event.bombOutcome === 'chain-clear'
-        ? mutationChainPresentationPlan(event.chainOriginCells).durationMs
+        ? mutationChainPresentationPlan(event.chainTriggerRows).durationMs
         : MUTATION_VFX_TOKENS[event.item].animation.activationMs;
       startAt += durationMs / 1_000;
     }
@@ -501,7 +501,7 @@ export class AudioEngine {
     const context = this.context;
     const destination = this.buses.mutation;
     if (!context || !destination) return;
-    const plan = mutationChainPresentationPlan(event.chainOriginCells);
+    const plan = mutationChainPresentationPlan(event.chainTriggerRows);
     if (this.activeVoices.size >= MAX_EFFECT_VOICES) return;
     scheduleChainPropagationPulses(
       context,
