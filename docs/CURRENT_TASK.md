@@ -8842,7 +8842,8 @@ After this contract is independently accepted and committed, one writer may crea
 `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v2.mjs`.
 Generation starts from the reviewed v1 semantics as a read-only reference, then makes
 only the changes required by current Core: v2 schema/path names; current HEAD/Core pins;
-an explicit `--expect-head <full SHA>` checked before and after proof; an exact
+an explicit `--expect-repo-base 4172a79620cda33e167d291d38c69f0ed64fec89`
+validated as a full commit and actual-HEAD ancestor; an exact
 four-document descendant allowlist (`docs/CURRENT_TASK.md`, `docs/DESIGN.md`, this STATE,
 and the T37 Endgame THREAD_LOG); and a startup assertion that the private
 proof-frontier testing seam is not exported through public Core. It must retain every
@@ -8858,3 +8859,12 @@ and obtain two independent byte/semantic reviews. Only a later committed command
 contract may authorize one execution against a fresh, initially absent v2 output path.
 No source, fixture, roster, UI, clue, protected T27/follow-up, `progress.md`, or old Temp
 artifact may change.
+
+The first generated v2 candidate is rejected: 26,441 bytes, SHA-256
+`3741327B110C8C9BD1D5F14C566BCDF1867DFF9A9A71DDEB4ED2E60213213B9B`.
+Its `--expect-head` would have required a later command-contract commit to contain its
+own not-yet-computable SHA. Two independent byte/semantic reviews classify this as P1.
+Those bytes have no execution authority. The repair replaces only that argument and
+identity check with the fixed repository-base rule above, captures actual HEAD at
+startup, requires the same captured HEAD after proof, and records it in `sourcePin`.
+Every other v2 gate and the no-output postcondition remain unchanged.

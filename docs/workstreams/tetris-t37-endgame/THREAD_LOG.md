@@ -347,9 +347,22 @@ old screenshot.
 - Proposed sole external write after contract acceptance:
   `t37-f4e-endgame-canonical-validate-v2.mjs` in the user Temp directory.
 - V2 preserves the reviewed v1 semantic proof and fail-closed publication gates while
-  changing only current pins, an explicit pre/post-proof `--expect-head`, the exact four
-  active-document allowlist, v2 identity, and public-seam isolation assertion.
+  changing only current pins, a fixed full-SHA `--expect-repo-base`, captured actual-HEAD
+  stability, the exact four active-document allowlist, v2 identity, and public-seam
+  isolation assertion.
 - Generation and execution are separate capabilities. This checkpoint authorizes neither.
   After commit, generation may occur once; only bytes/hash plus syntax/help checks follow.
 - Blocker: independent generation-contract QA.
 - Sole next action: review this four-document contract; do not generate or run v2 yet.
+
+### F4E-R4A first v2 byte review
+
+- Rejected: 26,441 bytes / `3741327B110C8C9BD1D5F14C566BCDF1867DFF9A9A71DDEB4ED2E60213213B9B`.
+- No validator execution occurred; syntax/help passed; output/staging/process counts are zero.
+- Two independent reviews identify one P1: literal `--expect-head` in a future committed
+  command is an impossible commit-hash self-reference.
+- Repair: bind known repository base `4172a79620cda33e167d291d38c69f0ed64fec89`,
+  require ancestry plus exact four-doc descendants, capture actual HEAD pre-proof, and
+  require that captured value unchanged post-proof and in output.
+- Blocker: repaired contract/bytes require fresh all-zero review.
+- Sole next action: review and commit this four-document repair; do not run rejected bytes.

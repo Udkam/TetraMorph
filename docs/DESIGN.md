@@ -6100,10 +6100,13 @@ Only the following not-yet-created path may be written during generation:
 The generator/editor may read v1 solely to preserve its already reviewed semantic
 checks. V2 must:
 
-- require `--expect-head` as a full 40-hex commit, compare it to HEAD before and after
-  proof, and bind exact root, Core-base ancestry, Core tree, clue bytes/hash, validator
-  self hash, and module hashes;
-- allow committed descendants of base `7d81d4974ce8fb777ea105c5ef98d156cd1807cc`
+- require `--expect-repo-base` as a full lowercase 40-hex commit equal to
+  `4172a79620cda33e167d291d38c69f0ed64fec89`; resolve it as a commit and require it to
+  be an ancestor of actual HEAD; capture actual HEAD at startup, require it unchanged
+  after proof, and record it in candidate `sourcePin`;
+- bind exact root, accepted Core-base ancestry and tree, clue bytes/hash, validator self
+  hash, and module hashes;
+- allow committed descendants of repository base `4172a79620cda33e167d291d38c69f0ed64fec89`
   only in `docs/CURRENT_TASK.md`, `docs/DESIGN.md`,
   `docs/agent-runs/t37-unified-sensory-curriculum/STATE.md`, and
   `docs/workstreams/tetris-t37-endgame/THREAD_LOG.md`; reject rename ambiguity and every
@@ -6132,3 +6135,12 @@ output. Once generated, only syntax/help checks are allowed. These documents mus
 freeze exact bytes/hash and a wholly new initially absent v2 output path; two independent
 reviews must accept both the byte-level program and semantic contract before a later
 docs checkpoint can authorize exactly one command.
+
+The first generated candidate (26,441 bytes, SHA-256
+`3741327B110C8C9BD1D5F14C566BCDF1867DFF9A9A71DDEB4ED2E60213213B9B`) is rejected
+and must not run. Its pre/post `--expect-head` equality is individually strict but
+operationally impossible because the later docs commit containing that literal cannot
+know its own SHA before its content is fixed. The reviewed repair uses the known
+generation-contract commit as `--expect-repo-base`, exact descendant paths, and a
+captured stable actual HEAD. It does not relax Core, module, input, self, proof, output,
+or publication checks.

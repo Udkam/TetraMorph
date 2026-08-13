@@ -2026,7 +2026,8 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
 - Generation boundary after review/commit: create only external
   `t37-f4e-endgame-canonical-validate-v2.mjs`; no repository source or other Temp file.
 - Required delta: v2 schema/path, current base/tree, active contract-document allowlist,
-  explicit pre/post-proof `--expect-head` equality, and public-index absence of the
+  fixed `--expect-repo-base=4172a79620cda33e167d291d38c69f0ed64fec89`, captured
+  actual-HEAD pre/post equality, and public-index absence of the
   private proof-testing seam. The allowlist is exactly CURRENT_TASK, DESIGN, this STATE,
   and the T37 Endgame THREAD_LOG. Preserve all reviewed semantic and fail-closed
   publication gates, including swallowed best-effort owned-staging cleanup as the sole
@@ -2035,6 +2036,20 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
   Do not execute candidate validation or create any output/staging file.
 - Next action: independent review of this generation contract. If all-zero, commit the
   exact four active docs before generating v2.
+
+### F4E-R4A first-byte rejection and repair
+
+- Rejected external bytes: 26,441 / SHA-256
+  `3741327B110C8C9BD1D5F14C566BCDF1867DFF9A9A71DDEB4ED2E60213213B9B`.
+- Static-only gates passed: exact v1 delta inspection, `node --check`, `--help`, v2
+  output absent, staging count zero, validator Node count zero. No proof ran.
+- Finding: two independent reviews report `P1 1`; embedding `--expect-head` in the later
+  command-contract commit requires an impossible self-referential commit SHA.
+- Repair boundary: replace only `--expect-head` with the known generation-contract
+  `--expect-repo-base`, validate commit/ancestry and exact four-doc descendants, capture
+  actual HEAD, assert it unchanged after proof, and retain it in output `sourcePin`.
+- All rejected bytes remain non-executable. Next action: review and commit this docs
+  repair, then modify only the external v2 validator and repeat byte/static reviews.
 
 ## Do not repeat
 
