@@ -8967,3 +8967,50 @@ receipt, and staging for audit. Failure in step 3 or 4 is swallowed and cannot a
 otherwise successful publication. Step 4 is terminal and nothing follows it. No other
 post-link Git, Core, module, input, proof, serialization, write, mutation, or cleanup
 operation is permitted.
+
+### F4E-R4E — self-contained HEAD-blob Core loader
+
+The 46,755-byte external candidate with SHA-256
+`7FE655B13B741ABD3141FBB11B12A562BB3CE8D964CD567D444CE75026461766`
+is rejected and must not run. It still trusts ignored, unpinned `node_modules/vite` and
+its transformer environment, so validated Core source bytes do not prove which code
+executed. It also deletes its owned staging file after a post-claim pre-link failure,
+contrary to the stop-and-audit state machine. Both are P1.
+
+For repaired v2, this contract replaces every `createRequire`, `require.resolve`, Vite
+server, SSR transform, and `node_modules` dependency; all other proof, receipt, history,
+pin, and publication contracts remain frozen. Using only the pinned Node 24.12.0 built-ins
+and direct Git backend, the validator enumerates the exact 16 regular HEAD blobs under
+`src/game/core` matching `*.ts` and excluding `*.test.ts`, ordered by ascending raw ASCII
+Git-path bytes. Each URL is exactly
+`t37-f4e-core:<40-lowercase-Core-tree>/<Git-path>`, with no authority, escaping, query, or
+fragment. Before claim, each fixed-order entry is
+`{path,canonicalUrl,blobId,rawBytes,rawSha256,transformedBytes,transformedSha256}`; transform
+uses `stripTypeScriptTypes(source,{mode:'transform',sourceMap:false,sourceUrl:canonicalUrl})`.
+Manifest SHA-256 covers UTF-8 `JSON.stringify(entries)` plus LF; entries/hash enter the
+receipt/output and are reproduced from captured HEAD after proof.
+
+After claim, one synchronous `registerHooks` pair admits the four exact entry URLs only
+in order `index.ts`, `endgameRouteSearch.ts`, `endgameFingerprints.ts`, then
+`endgameV3IntroDefinitions.ts`. Other resolution requires
+`^\./[A-Za-z][A-Za-z0-9]*$`, an exact parent URL in the frozen map, and its same-directory
+`${basename}.ts` target in that map. It rejects packages, built-ins, every other URL/path,
+backslashes, percent/NUL bytes, query/fragment, extra slash/dot, tests, and JSON.
+Resolve/load never delegate or perform I/O and return only canonical URLs and the original
+preclaim transformed-memory bytes with `shortCircuit:true` and `format:'module'`.
+
+The hook remains registered through proof and all post-proof namespace use. One enclosing
+`try/finally` synchronously deregisters it before staging creation; any lifecycle/proof or
+post-proof manifest-reproduction failure aborts. Retained namespaces are the sole proof
+authority and no later project loader is permitted.
+
+Wrapper and validator reject every case-insensitive `NODE_*` key except this exact ordered
+pair: `NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S` (129 UTF-8 bytes, SHA-256
+`36816623CF40FFD5A13F444AF68A441001F99ED8B21D0CD03B221914185FCEE1`) and
+`NODE_REPL_TRUSTED_CODE_PATHS` (25 bytes,
+`C99D703D69CE82B4803CEBB3E94F20CFB4D8F43A298C592018507394AD1B3A2D`). The ordered
+`{name,bytes,sha256}` array follows `nodeOptionsPresent` in manifest/receipt/output; raw
+values are not serialized. The pinned experimental warning may appear on stderr but is
+never suppressed or proof data. Post-claim staging survives every failure; only F4E-R4D's
+terminal successful-publication unlink may remove it. Execution stays closed pending
+four-doc contract review/commit and fresh exact-byte review.

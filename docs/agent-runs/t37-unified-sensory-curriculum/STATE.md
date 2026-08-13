@@ -2129,6 +2129,28 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
 - Sole next action: obtain fresh all-zero review and commit only these four documents;
   only then resume static work on the external v2 bytes. Execution remains closed.
 
+### F4E-R4E authenticated proof-loader repair
+
+- Rejected bytes: 46,755 / SHA-256
+  `7FE655B13B741ABD3141FBB11B12A562BB3CE8D964CD567D444CE75026461766`.
+  P1: unpinned ignored Vite/node_modules can forge executed Core exports despite raw
+  source checks. P1: a post-claim pre-link failure deletes staging evidence.
+- Repair removes Vite/createRequire/node_modules. Pinned Node 24.12.0 synchronously
+  transforms the exact ordered 16 non-test Core HEAD blobs; raw and transformed
+  path/blob-id/bytes/SHA manifest is bound in receipt/output and reproduced post-proof.
+- Private URLs are `t37-f4e-core:<Core-tree>/<Git-path>`. Entries use raw-ASCII-path
+  order, fixed fields, and UTF-8 `JSON.stringify(entries)+LF` hash domain.
+- One synchronous hook accepts four fixed-order entries and only
+  `^\./[A-Za-z][A-Za-z0-9]*$` targets in the frozen map. It never delegates or performs
+  I/O, remains through proof/post-proof checks, then deregisters before staging.
+- Wrapper/runtime admit only two exact byte/hash-pinned `NODE_*` keys in manifest,
+  receipt, and output; all loader/cache/path/coverage/warning variables fail before claim.
+  The pinned experimental warning is allowed but unsuppressed and is not proof data.
+- After a post-claim stage is created, failure preserves it; only the successful R4D
+  terminal cleanup may unlink it. Execution remains closed.
+- Sole next action: independent review and exact four-doc commit, then repair/refreeze
+  only the external validator and obtain two fresh exact-byte reviews.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

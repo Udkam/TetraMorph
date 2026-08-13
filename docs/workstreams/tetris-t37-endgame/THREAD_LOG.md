@@ -443,3 +443,23 @@ old screenshot.
   failure is swallowed. No other post-link operation is admitted.
 - Sole next action: independent all-zero contract review, exact four-doc commit, then
   external-byte static repair/review only. Production execution remains closed.
+
+### F4E-R4E authenticated proof-loader repair
+
+- Rejected external candidate: 46,755 bytes /
+  `7FE655B13B741ABD3141FBB11B12A562BB3CE8D964CD567D444CE75026461766`.
+- P1: ignored/unpinned Vite and its transform environment can execute forged exports
+  despite clean Core blobs. P1: pre-link failure cleanup erases post-claim staging evidence.
+- Contract repair removes Vite/createRequire/node_modules and uses pinned Node 24.12.0
+  `stripTypeScriptTypes` over the exact 16 non-test Core HEAD blobs. Raw/transformed
+  hashes and Git ids form a receipt/output-bound manifest reproduced after proof.
+- Private Core-tree/Git-path URLs, raw-ASCII-path ordering, fixed fields, and UTF-8
+  `JSON.stringify(entries)+LF` remove URL and manifest ambiguity.
+- A no-delegation/no-I/O hook accepts four fixed-order entries and only strict
+  `^\./[A-Za-z][A-Za-z0-9]*$` map targets; it remains through proof/post-proof checks and
+  deregisters before staging. Exact two-key `NODE_*` byte/hash pins reject all other
+  loader/cache/path/coverage/warning variables.
+- Post-claim staging is never failure-cleaned; only R4D's terminal successful cleanup is
+  allowed. Execution remains closed.
+- Sole next action: independent contract review, four-doc commit, then external-byte
+  repair and two fresh static reviews.
