@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-13 — T37 F4E-R3 key-frontier proof recovery accepted
+
+- Contract `e09526b`, Core checkpoints `46a1efd` / `a38fdbd`, hash-sync contract
+  `c46e727`, and source correction `d467744` replace full-state proof frontiers with
+  strict complete 11-segment keys while preserving exhaustive landings, the target
+  lower bound, layer-local deduplication, shorter-route rejection, and telemetry order.
+- A compile-time exhaustive `GameState` policy, fail-closed codec, ordinary-material
+  quotient, Bedrock/Survival rejection, proof-observed lock projection, and independent
+  object-versus-key BFS tests establish the representative-state boundary.
+- The exact gate exposed five mastery fingerprints left stale by the earlier active
+  namespace migration. Only those five literals were synchronized to the current
+  `endgame` serializer; all routes, optimums, frontiers, transitions, prunes, target and
+  support results, and real replays remained unchanged.
+- Focused tests pass `16/16` and `4/4`; the mastery exact gate passes `5/5`; the complete
+  six-file exact gate passes `29/29`. Final typecheck, ordinary suite
+  (`492 passed / 15 skipped`), and 768-module build pass.
+- Independent final QA accepts `e09526b..d467744` with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. No browser evidence is required for this
+  renderer-independent Core slice. A newly pinned validator contract is the sole next
+  step; the retired 26,059-byte validator remains permanently unauthorized.
+
 ## 2026-08-13 — T37 canonical Endgame namespace accepted
 
 - Atomic active migration `d623ef9` changes Core, UI, routes, storage, authoring, tests,

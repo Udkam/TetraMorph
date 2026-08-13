@@ -6075,3 +6075,10 @@ The general hash function, proof codec, engine, definitions, test routes, fixtur
 and historical status records remain untouched. A focused mastery exact rerun plus the
 complete six-file exact gate, ordinary project gates, and independent range review are
 required before the fingerprints become accepted current facts.
+
+Disposition: accepted candidate `e09526b..d467744` passes all focused, exact, ordinary,
+typecheck, and build gates, and independent final QA reports P0–P3/GAP all zero. The
+key-frontier representation and all five current-namespace fingerprints are now the
+authoritative proof base. A successor Intro-05 validator must pin this accepted Core
+tree and its own newly reviewed bytes; no executable permission, heap allowance, output
+path, or byte pin from the retired validator is inherited.

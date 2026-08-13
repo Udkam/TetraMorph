@@ -320,3 +320,20 @@ old screenshot.
   independent QA of `e09526b..candidate`.
 - Blocker: source remains closed until the contract review is all-zero.
 - Sole next action: review and commit this four-document contract addendum.
+
+## F4E-R3 — accepted candidate
+
+- Accepted range: `e09526b..d467744`.
+- Ordered checkpoints: `e09526b` contract; `46a1efd` key-frontier implementation;
+  `a38fdbd` independent equivalence/reference tests; `c46e727` hash-sync contract;
+  `d467744` five current-namespace hash literals.
+- Gates: key-frontier `16/16`; registry `4/4`; mastery exact `5/5`; all six exact files
+  `29/29`; typecheck; ordinary suite `492 passed / 15 skipped`; 768-module build;
+  range diff-check clean.
+- Independent final QA: `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` with no candidate drift.
+- Browser evidence: not applicable to this renderer-independent Core/data repair.
+- Protected worktree: inherited T27, T27-R1-follow-up, and `progress.md` remain outside
+  every accepted commit.
+- Blocker: Intro-05 source remains closed by design.
+- Sole next action: author a docs-first successor-validator contract pinned to the new
+  accepted Core tree, then obtain exact-byte independent review before one execution.

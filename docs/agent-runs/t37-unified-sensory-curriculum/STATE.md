@@ -1994,6 +1994,26 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
   addendum, perform the two-path literal synchronization, and rerun focused plus complete
   exact and ordinary gates. Do not run or edit an Intro-05 validator yet.
 
+## Current checkpoint — F4E-R3 accepted
+
+- Accepted range: `e09526b..d467744`, ordered as docs contract `e09526b`, Core
+  implementation `46a1efd`, independent-equivalence tests `a38fdbd`, H1 contract
+  `c46e727`, and five-literal current-hash sync `d467744`.
+- Verification: focused key-frontier `16/16`; registry `4/4`; mastery exact `5/5` in
+  360.82 seconds; complete six-file exact `29/29` in 394.56 seconds; typecheck; ordinary
+  `492 passed / 15 skipped`; 768-module build. The build retains only the existing
+  greater-than-500-kB chunk warning.
+- Independent final QA: `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. It confirms strict codec,
+  exhaustive field policy, proof quotient, object-versus-key BFS, unchanged telemetry,
+  namespace-hash causality, and exact commit boundaries.
+- Worktree boundary: every accepted candidate path is clean. Only inherited T27,
+  T27-R1-follow-up, and `progress.md` changes remain outside the candidate.
+- Browser: not run, because this is a renderer-independent Core proof-storage and
+  certificate-data slice with no interactive or visual claim.
+- Sole next action: freeze and independently review a new current-Core Intro-05
+  validator contract. Do not reuse or run the retired validator, its heap grants, or
+  its output authorization; do not open Intro-05 source yet.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

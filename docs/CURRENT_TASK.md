@@ -8809,3 +8809,20 @@ Acceptance requires the focused mastery exact gate, all six opt-in exact certifi
 files, typecheck, the complete ordinary suite, build, exact-path diff checks, and
 independent review of the complete `e09526b..candidate` range. Intro-05 validation and
 integration remain closed until this correction and F4E-R3 are accepted.
+
+### F4E-R3 disposition — accepted; new validator contract next
+
+Contract `e09526b`, Core checkpoints `46a1efd` / `a38fdbd`, H1 contract
+`c46e727`, and hash correction `d467744` are accepted as one linear candidate. The
+focused key-frontier tests pass `16/16`, the product registry test passes `4/4`, the
+mastery exact file passes `5/5`, and the complete six-file exact gate passes `29/29`.
+Final typecheck, the complete ordinary suite (`492 passed / 15 skipped`), and the
+768-module build pass. Independent final QA reports
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for `e09526b..d467744`.
+
+F4E-R3 is complete. The next slice is documentation-only: freeze a new Intro-05
+validator against the current accepted Core tree and independently review its exact
+bytes, input pins, proof domain, publication semantics, and one-run command. The retired
+26,059-byte validator, both consumed heap authorizations, and every prior output path do
+not transfer. Intro-05 definition/fixture/test source remains closed until a newly
+reviewed validator produces a complete independently audited candidate.
