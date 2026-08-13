@@ -1,4 +1,4 @@
-import type { GameEvent, GameState, MutationItem } from '../core';
+import { BOARD_HEIGHT, VISIBLE_START_ROW, type GameEvent, type GameState, type MutationItem } from '../core';
 import { browserPlatform, type BrowserPlatform } from '../../platform/browserPlatform';
 import type { VisualThemeId } from '../../design/visualThemes';
 import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
@@ -131,6 +131,9 @@ export class AudioEngine {
     const includesHardDrop = events.some((event) => event.type === 'hard-dropped');
     const includesClearStart = events.some((event) => event.type === 'clear-started');
     const includesLineClear = events.some((event) => event.type === 'lines-cleared');
+    const startsBombClear = events.some((event) => (
+      event.type === 'clear-started' && event.mutationBombOutcome !== undefined
+    ));
     const includesCompletion = events.some((event) => event.type === 'finished');
     const includesGameOver = events.some((event) => event.type === 'game-over');
     const includesLevelUp = events.some((event) => event.type === 'level-up');
@@ -168,7 +171,7 @@ export class AudioEngine {
         this.pendingClearCount = Number.isInteger(count) && count >= 1 && count <= 4
           ? count as 1 | 2 | 3 | 4
           : null;
-        if (!hasHigherResolution) this.playClear(count);
+        if (!hasHigherResolution && !startsBombClear) this.playClear(count);
       } else if (event.type === 'lines-cleared') {
         const tier = Number.isInteger(event.count) && event.count >= 1
           ? Math.min(4, event.count) as 1 | 2 | 3 | 4
@@ -465,13 +468,57 @@ export class AudioEngine {
         const id: CandidateAudioCueId = event.item === 'collapse'
           ? 'supergravity'
           : event.item === 'bomb'
-            ? 'bomb'
+            ? event.bombOutcome === 'chain-clear' ? 'bomb-chain' : 'bomb'
             : event.multiplierFactor === 4 ? 'multiplier-4' : 'multiplier-2';
         this.playCandidateCue(id, 0, startAt);
+        if (event.item === 'bomb' && event.bombOutcome === 'chain-clear') {
+          this.playChainPropagation(event, startAt);
+        }
       }
       startAt += MUTATION_VFX_TOKENS[event.item].animation.activationMs / 1_000;
     }
     this.mutationTimelineTailAt = startAt;
+  }
+
+  private playChainPropagation(
+    event: Extract<MutationActivation, { item: 'bomb'; bombOutcome: 'chain-clear' }>,
+    startAt: number,
+  ): void {
+    const context = this.context;
+    const destination = this.buses.mutation;
+    if (!context || !destination) return;
+    const visibleOrigins = [...new Set(event.chainOriginCells
+      .map((cell) => cell.y)
+      .filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT))];
+    const distanceFor = visibleOrigins.length > 0
+      ? (row: number) => Math.min(...visibleOrigins.map((origin) => Math.abs(row - origin)))
+      : (row: number) => row - VISIBLE_START_ROW;
+    const distances = [...new Set(Array.from(
+      { length: BOARD_HEIGHT - VISIBLE_START_ROW },
+      (_, index) => distanceFor(VISIBLE_START_ROW + index),
+    ))].sort((left, right) => left - right);
+    const hooks = this.voiceHooks(true);
+    const available = Math.max(0, MAX_EFFECT_VOICES - this.activeVoices.size);
+    scheduleToneRecipe(
+      context,
+      destination,
+      distances.slice(0, available).map((distance) => ({
+        frequency: Math.max(46, 96 - distance * 2.2),
+        duration: .035,
+        gain: .036,
+        attack: .004,
+        waveform: 'triangle' as const,
+        delay: .14 + distance * .034,
+        endFrequency: Math.max(38, 76 - distance * 1.8),
+      })),
+      {
+        startAt,
+        maxVoices: available,
+        gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
+        gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
+        ...hooks,
+      },
+    );
   }
 
   private stopMutationCue(): void {

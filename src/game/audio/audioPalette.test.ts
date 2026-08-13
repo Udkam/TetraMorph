@@ -9,8 +9,8 @@ import {
 import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 
 describe('T37 recovered soft support palette', () => {
-  it('keeps all sixteen candidate cues bounded and separate from accepted playback', () => {
-    expect(AUDIO_CUE_IDS).toHaveLength(16);
+  it('keeps all seventeen candidate cues bounded and separate from accepted playback', () => {
+    expect(AUDIO_CUE_IDS).toHaveLength(17);
     expect(AUDIO_CUE_IDS).not.toEqual(expect.arrayContaining([
       'move', 'rotate', 'lock', 'hard-drop',
       'clear-1', 'clear-2', 'clear-3', 'clear-4',
@@ -119,6 +119,8 @@ describe('T37 recovered soft support palette', () => {
       expect(cueDuration(audioCue(id)), id).toBeLessThan(0.3);
     }
     expect(audioCue('bomb').mutationOwned).toBe(true);
+    expect(audioCue('bomb-chain').mutationOwned).toBe(true);
+    expect(cueDuration(audioCue('bomb-chain'))).toBeCloseTo(.49);
   });
 
   it('keeps all gameplay, reward, Endgame, Survival, and UI candidates represented', () => {
@@ -126,7 +128,7 @@ describe('T37 recovered soft support palette', () => {
       'soft-drop', 'endgame-undo',
       'bedrock-rise', 'bedrock-lower', 'stone-warning', 'stone-spawn', 'stone-land',
       'level-up', 'finished', 'game-over', 'pause', 'resume',
-      'supergravity', 'bomb', 'multiplier-2', 'multiplier-4',
+      'supergravity', 'bomb', 'bomb-chain', 'multiplier-2', 'multiplier-4',
     ] satisfies CandidateAudioCueId[];
     expect(AUDIO_CUE_IDS).toEqual(expected);
   });

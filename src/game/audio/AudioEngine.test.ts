@@ -193,6 +193,19 @@ const mutation = (
     multiplierFactor,
   };
 
+const chainClearMutation = (): GameEvent => ({
+  type: 'mutation-activated',
+  item: 'bomb',
+  durationTicks: 0,
+  score: 600,
+  rowsRemoved: 4,
+  bombOutcome: 'chain-clear',
+  blastRows: [38, 39],
+  participatingBombCount: 2,
+  chainOriginCarrierId: 1,
+  chainOriginCells: [{ x: 4, y: 39 }],
+});
+
 beforeEach(() => {
   oscillators.length = 0;
   gains.length = 0;
@@ -338,6 +351,18 @@ describe('AudioEngine accepted production contract', () => {
     ]);
   });
 
+  it('suppresses Studio row pulses when clear-started previews a Bomb outcome', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    audio.play([{
+      type: 'clear-started',
+      rows: [38, 39],
+      mutationBombOutcome: 'chain-clear',
+    }]);
+    expect(bufferSources).toHaveLength(0);
+    expect(oscillators).toHaveLength(0);
+  });
+
   it('deduplicates Mutation awards and delays each cue to its serialized visual start', async () => {
     const audio = audioFor();
     await audio.prime();
@@ -424,6 +449,25 @@ describe('AudioEngine accepted production contract', () => {
     expect(filters[0]?.frequency.setValues[0]).toEqual({ value: 880, time: 0.22 });
     expect(filters[0]?.Q.setValues[0]).toEqual({ value: 0.55, time: 0.22 });
     expect(gains.at(-1)?.gain.exponential[0]).toEqual({ value: 0.17 * 1.45, time: 0.224 });
+  });
+
+  it('uses one deeper chain-clear explosion body distinct from the normal Bomb cue', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    audio.play([chainClearMutation()]);
+
+    expect(oscillators.length).toBeGreaterThan(3);
+    expect(oscillators.slice(0, 3).map((node) => node.frequency.setValues[0])).toEqual([
+      { value: 58, time: 0 },
+      { value: 91, time: 0.11 },
+      { value: 43, time: 0.12 },
+    ]);
+    expect(bufferSources).toHaveLength(2);
+    expect(filters.map((filter) => filter.frequency.setValues[0]?.value)).toEqual([1_050, 460]);
+    const propagation = oscillators.slice(3).map((node) => node.starts[0]);
+    expect(propagation[0]).toBeCloseTo(.14);
+    expect(propagation[1]).toBeCloseTo(.174);
+    expect(new Set(propagation).size).toBe(propagation.length);
   });
 
   it('pins every layer of one clear or Bomb event to one moving AudioContext clock read', async () => {
