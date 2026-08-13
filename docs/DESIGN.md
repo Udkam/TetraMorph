@@ -58,12 +58,15 @@ first Bomb carrier spans it. `chainOriginCarrierId` and complete `chainOriginCel
 the identity and horizontal-art anchor for the first primary Bomb, but no longer determine
 vertical propagation distance.
 
-For visible presentation row `r`,
-`distance(r) = min(abs(r - chainTriggerRow))`. Every exact trigger row is distance zero;
-equal-distance rows above and below all sources share one beat. Hidden rows settle in Core
-without creating a hold. A hidden-only source starts at the nearest visible boundary. Both
-renderer and audio consume the activation's same frozen row list rather than independently
-remembering a prior event.
+Presentation first maps every `chainTriggerRow` through
+`clamp(row, VISIBLE_START_ROW, BOARD_HEIGHT - 1)`, then sorts and deduplicates the result as
+`visibleTriggerRows`. For visible presentation row `r`,
+`distance(r) = min(abs(r - visibleTriggerRow))`. Every derived visible trigger row is
+distance zero; equal-distance rows above and below all sources share one beat. Hidden rows
+settle in Core without creating a hold, so a hidden-only source starts at the nearest
+visible boundary. Core's original rows remain unclamped evidence. Renderer and audio
+consume the activation's same frozen row list through this same pure projection rather
+than independently remembering a prior event.
 
 ### Explosion visual language and timing
 
@@ -100,6 +103,16 @@ beats and a coherent rounded tail for `2.2–3.0 s`. It is not a volume boost or
 sequence of identical blasts. Automated peak, duration, dispatch, and license checks are
 necessary but cannot accept taste. The product asset catalog stays closed until the player
 explicitly accepts one isolated normal/chain A/B pair.
+
+The renderer/audio foreground queue advances after the final reached visible row finishes
+its `220 ms` local blast (`90 ms` reduced), not after the long reverberation file ends. At
+that exact visual completion, the next carrier triggered by the same clear may begin. If
+that later Ice, Supergravity, or Multiplier cue starts while the chain tail is alive, a
+dedicated chain-tail gain ramps to no more than `25%` of its then-current value within
+`40 ms`; the successor cue is not attenuated. If there is no successor, the tail keeps its
+natural envelope. Row-propagation impacts stop at the visual front and may not continue
+under the successor. This preserves the long clear identity without delaying or masking
+the feedback for carriers that the clear also activates.
 
 ## 2026-08-13 T37 — precise gravity and causal Bomb outcomes
 

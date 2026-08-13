@@ -2502,10 +2502,16 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Product audio remains closed until an isolated provenance-bound A/B pair receives the
   player's listening verdict. The material review pauses; visual/Core work may proceed
   after independent contract QA. Existing evidence is not overwritten.
+- First contract review reports `P0 0 / P1 1 / P2 0 / P3 0 / GAP 1`. Repair projects each
+  raw trigger row to the nearest visible boundary before calculating presentation distance,
+  while Core retains exact raw evidence. It also freezes queue ownership: the next carrier
+  begins after the final row's local blast life, not after the long audio file; any surviving
+  chain tail ducks to at most `25%` within `40 ms`, while propagation impacts stop and the
+  successor cue retains normal gain.
 - Protected inherited T27 paths, `docs/evidence/t27-r1-followup/**`, and `progress.md`
   remain unread/unstaged. The old 4187 helper is no longer running and no listener remains.
-- Unique next action: commit this three-document contract, obtain independent all-zero
-  review, then add Core-owned trigger-row evidence before the renderer/timeline checkpoint.
+- Unique next action: commit this three-document repair, obtain independent all-zero
+  re-review, then add Core-owned trigger-row evidence before the renderer/timeline checkpoint.
 
 ## Do not repeat
 

@@ -20,11 +20,13 @@ unchanged. The correction adds immutable `chainTriggerRows` evidence to a chain-
 activation. It is the frozen sorted copy of the exact pre-clear ordinary full rows emitted
 by `clear-started`, not every row occupied by the smallest-ID Bomb. The existing
 `chainOriginCarrierId` and complete `chainOriginCells` remain attribution and horizontal
-art anchors only. Presentation distance is
-`min(abs(row - triggerRow))`; all exact trigger rows are distance zero, equal-distance
-visible rows share one beat, and hidden source rows begin at the nearest visible boundary
-without hidden delay. Renderer and audio consume this same Core-owned row set so they
-cannot drift through separate pending state.
+art anchors only. Presentation derives `visibleTriggerRows` by clamping every exact trigger
+row to `[VISIBLE_START_ROW, BOARD_HEIGHT - 1]`, then sorting and deduplicating. Distance is
+`min(abs(row - visibleTriggerRow))`; all derived visible trigger rows are distance zero,
+equal-distance visible rows share one beat, and a hidden source therefore begins at its
+nearest visible boundary without hidden delay. Core retains the unclamped causal evidence.
+Renderer and audio consume the same Core-owned row set and the same pure projection so
+they cannot drift through separate pending state.
 
 Full motion uses a `220 ms` warning/pressure prelude, then the distance-zero Boom, then
 paired upward/downward row fronts every `56 ms`. Each reached row owns a `220 ms` local
@@ -49,6 +51,15 @@ copy or a machine-gun series. Candidate media must preserve source URL, author, 
 original/runtime hashes, download date, and processing recipe. Production catalog/source
 integration remains closed until the player listens to the new isolated A/B page and
 explicitly accepts a normal/chain pair.
+
+The visual/audio foreground queue does not wait for the long reverberation tail. The next
+carrier activated by the same clear begins only after the final reached visible row's
+`220 ms` local blast life ends (`90 ms` reduced), which is also the chain renderer's exact
+completion time. If a later Ice, Supergravity, or Multiplier cue then begins while the
+chain tail is still alive, that tail ramps to at most `25%` of its current gain within
+`40 ms`; the new cue keeps its normal gain and causal start. With no successor cue the
+tail completes its natural envelope. Propagation impacts end with the visual row fronts
+and never continue underneath the following item.
 
 The contract checkpoint owns only `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, and
 `docs/agent-runs/t37-unified-sensory-curriculum/STATE.md`. After independent contract QA,
