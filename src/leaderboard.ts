@@ -1,13 +1,12 @@
 import {
-  CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS,
-  CLASSIC_GRAVITY_STEP_TICKS,
-  CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS,
-  CLASSIC_STARTING_GRAVITY_MAX_TICKS,
-  CLASSIC_STARTING_GRAVITY_MIN_TICKS,
   TICKS_PER_SECOND,
+  isClassicGravityChoiceTicks,
   normalizeClassicGravityFloorTicks,
   normalizeClassicStartingGravityTicks,
 } from './game/core/constants';
+
+const LEGACY_CLASSIC_STARTING_GRAVITY_TICKS = 48;
+const LEGACY_CLASSIC_GRAVITY_FLOOR_TICKS = 6;
 
 export type RunMode = 'marathon' | 'race' | 'sprint';
 export type RunOutcome = 'top-out';
@@ -102,10 +101,7 @@ function hasOnlyKeys(record: Record<string, unknown>, allowed: readonly string[]
 }
 
 function isClassicGravityTicks(value: unknown): value is number {
-  return isNonNegativeInteger(value)
-    && value >= CLASSIC_STARTING_GRAVITY_MIN_TICKS
-    && value <= CLASSIC_STARTING_GRAVITY_MAX_TICKS
-    && value % CLASSIC_GRAVITY_STEP_TICKS === 0;
+  return typeof value === 'number' && isClassicGravityChoiceTicks(value);
 }
 
 function isClassicDifficultyGrade(value: unknown): value is ClassicDifficultyGrade {
@@ -502,8 +498,8 @@ function migrateStandardRecords(
       mode,
       outcome: 'top-out',
       completedAt: record.completedAt,
-      classicStartingGravityTicks: CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS,
-      classicGravityFloorTicks: CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS,
+      classicStartingGravityTicks: LEGACY_CLASSIC_STARTING_GRAVITY_TICKS,
+      classicGravityFloorTicks: LEGACY_CLASSIC_GRAVITY_FLOOR_TICKS,
       classicGrade: 'standard',
     })));
   }

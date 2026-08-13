@@ -12,10 +12,9 @@ import {
 import { flushSync } from 'react-dom';
 import {
   ANCHOR_CELL,
+  CLASSIC_GRAVITY_CHOICES_TICKS,
   CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS,
   CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS,
-  CLASSIC_STARTING_GRAVITY_MAX_TICKS,
-  CLASSIC_STARTING_GRAVITY_MIN_TICKS,
   MUTATION_EFFECT_TICKS,
   MUTATION_FREEZE_GRAVITY_TICKS,
   MUTATION_SUPERGRAVITY_PIECES,
@@ -379,7 +378,7 @@ export function fallCadenceParts(
     );
   const seconds = ticks / TICKS_PER_SECOND;
   return {
-    value: seconds.toFixed(seconds < 0.1 ? 2 : 1),
+    value: seconds.toFixed(seconds < 0.2 ? 2 : 1),
     unit: language === 'en' ? 's/cell' : '秒/格',
   };
 }
@@ -1443,8 +1442,12 @@ function ClassicGravityRangeControl({
   onChange: (range: ClassicGravityRange) => void;
 }) {
   const copy = appCopy(language);
-  const startingSeconds = (range.startingTicks / TICKS_PER_SECOND).toFixed(1);
-  const floorSeconds = (range.floorTicks / TICKS_PER_SECOND).toFixed(1);
+  const displaySeconds = (ticks: number) => {
+    const seconds = ticks / TICKS_PER_SECOND;
+    return seconds.toFixed(seconds < 0.2 ? 2 : 1);
+  };
+  const startingSeconds = displaySeconds(range.startingTicks);
+  const floorSeconds = displaySeconds(range.floorTicks);
   const unit = language === 'en' ? 's/cell' : '秒/格';
   const difficultyGrade = classicDifficultyGrade(range.startingTicks, range.floorTicks);
   const difficultyLabel = {
@@ -1452,19 +1455,25 @@ function ClassicGravityRangeControl({
     standard: copy.labels.classicStandard,
     challenge: copy.labels.classicChallenge,
   }[difficultyGrade];
-  const percentForSeconds = (seconds: number) => ((1 - seconds) / .9) * 100;
+  const choiceTicks: readonly number[] = CLASSIC_GRAVITY_CHOICES_TICKS;
+  const choiceIndex = (ticks: number) => choiceTicks.indexOf(normalizeClassicStartingGravityTicks(ticks));
+  const percentForTicks = (ticks: number) => (choiceIndex(ticks) / (choiceTicks.length - 1)) * 100;
   const controlStyle = {
-    '--classic-speed-start': `${percentForSeconds(Number(startingSeconds))}%`,
-    '--classic-speed-floor': `${percentForSeconds(Number(floorSeconds))}%`,
+    '--classic-speed-start': `${percentForTicks(range.startingTicks)}%`,
+    '--classic-speed-floor': `${percentForTicks(range.floorTicks)}%`,
   } as CSSProperties;
   const updateBoundFromRail = (event: ReactPointerEvent<HTMLDivElement>) => {
     if ((event.target as HTMLElement).closest('input')) return;
     const rect = event.currentTarget.getBoundingClientRect();
     if (rect.width <= 0) return;
     const position = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-    const seconds = Math.round((1 - position * .9) * 10) / 10;
-    const ticks = seconds * TICKS_PER_SECOND;
-    const selectStarting = Math.abs(ticks - range.startingTicks) <= Math.abs(ticks - range.floorTicks);
+    const targetIndex = Math.round(position * (choiceTicks.length - 1));
+    const ticks = choiceTicks[targetIndex]!;
+    const startingIndex = choiceIndex(range.startingTicks);
+    const floorIndex = choiceIndex(range.floorTicks);
+    const selectStarting = startingIndex === floorIndex
+      ? targetIndex <= startingIndex
+      : Math.abs(targetIndex - startingIndex) <= Math.abs(targetIndex - floorIndex);
     const testId = selectStarting ? 'classic-starting-speed' : 'classic-fastest-speed';
     event.currentTarget.querySelector<HTMLInputElement>(`[data-testid="${testId}"]`)?.focus();
     onChange(normalizeClassicGravityRange(selectStarting
@@ -1501,14 +1510,14 @@ function ClassicGravityRangeControl({
           data-arrow-nav
           data-arrow-row="3"
           data-arrow-col="1"
-          min={CLASSIC_STARTING_GRAVITY_MIN_TICKS / TICKS_PER_SECOND}
-          max={CLASSIC_STARTING_GRAVITY_MAX_TICKS / TICKS_PER_SECOND}
-          step="0.1"
-          value={startingSeconds}
+          min="0"
+          max={choiceTicks.length - 1}
+          step="1"
+          value={choiceIndex(range.startingTicks)}
           aria-label={copy.labels.startingFallSpeed}
           aria-valuetext={`${startingSeconds} ${unit}`}
           onChange={(event) => onChange(normalizeClassicGravityRange({
-            startingTicks: Math.max(Number(event.currentTarget.value) * TICKS_PER_SECOND, range.floorTicks),
+            startingTicks: Math.max(choiceTicks[Number(event.currentTarget.value)]!, range.floorTicks),
             floorTicks: range.floorTicks,
           }))}
         />
@@ -1520,19 +1529,19 @@ function ClassicGravityRangeControl({
           data-arrow-nav
           data-arrow-row="3"
           data-arrow-col="2"
-          min={CLASSIC_STARTING_GRAVITY_MIN_TICKS / TICKS_PER_SECOND}
-          max={CLASSIC_STARTING_GRAVITY_MAX_TICKS / TICKS_PER_SECOND}
-          step="0.1"
-          value={floorSeconds}
+          min="0"
+          max={choiceTicks.length - 1}
+          step="1"
+          value={choiceIndex(range.floorTicks)}
           aria-label={copy.labels.fastestFallSpeed}
           aria-valuetext={`${floorSeconds} ${unit}`}
           onChange={(event) => onChange(normalizeClassicGravityRange({
             startingTicks: range.startingTicks,
-            floorTicks: Math.min(Number(event.currentTarget.value) * TICKS_PER_SECOND, range.startingTicks),
+            floorTicks: Math.min(choiceTicks[Number(event.currentTarget.value)]!, range.startingTicks),
           }))}
         />
       </div>
-      <div className="classic-speed-control__limits" aria-hidden="true"><span>1.0</span><span>0.1</span></div>
+      <div className="classic-speed-control__limits" aria-hidden="true"><span>1.0</span><span>0.08</span></div>
     </div>
   );
 }

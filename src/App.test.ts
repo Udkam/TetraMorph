@@ -6,7 +6,7 @@ import { act, createElement, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import styles from './styles.css?raw';
-import { MUTATION_EFFECT_TICKS, MUTATION_SUPERGRAVITY_PIECES, PIECE_TYPES, createInitialState, dispatch, getEndgameDefinition, nextMutationPreviewItem, type GameEvent, type GameMode, type GameState, type PieceType, type EndgameId } from './game/core';
+import { CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS, CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS, MUTATION_EFFECT_TICKS, MUTATION_SUPERGRAVITY_PIECES, PIECE_TYPES, createInitialState, dispatch, getEndgameDefinition, nextMutationPreviewItem, type GameEvent, type GameMode, type GameState, type PieceType, type EndgameId } from './game/core';
 import App, {
   cloneQaState,
   countdownTimeLabel,
@@ -133,8 +133,8 @@ vi.mock('./game/runtime/GameRuntime', async () => {
     });
 
     constructor(readonly options: RuntimeTestOptions) {
-      this.nextClassicStartingGravityTicks = options.classicStartingGravityTicks ?? 48;
-      this.nextClassicGravityFloorTicks = options.classicGravityFloorTicks ?? 6;
+      this.nextClassicStartingGravityTicks = options.classicStartingGravityTicks ?? CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS;
+      this.nextClassicGravityFloorTicks = options.classicGravityFloorTicks ?? CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS;
       this.state = core.createInitialState(
         options.seed,
         options.mode,
@@ -852,7 +852,7 @@ describe('entry countdown', () => {
 
     expect(runtime.options.inputEnabled).toBe(false);
     expect(textState).not.toHaveProperty('level');
-    expect(textState).toMatchObject({ combo: 0, bedrockRows: 0, fallTicks: 48 });
+    expect(textState).toMatchObject({ combo: 0, bedrockRows: 0, fallTicks: 36 });
     expect(countdown()?.dataset.countdown).toBe('3');
     expect(runtime.playEntryCountdown).toHaveBeenCalledExactlyOnceWith(3);
     expect(runtime.playEntryCountdownResolve).not.toHaveBeenCalled();
@@ -1293,14 +1293,14 @@ describe('T6 frontend mode binding', () => {
       mutationCarriers: [{ id: 1, item: 'freeze' as const, cells: [] }],
     };
     const cases = [
-      { state: classic, roles: ['score', 'lines', 'classic-combo', 'fall-cadence'], label: '经典模式数据', copy: ['连消', '3', '下落速度', '秒/格', '0.8'] },
+      { state: classic, roles: ['score', 'lines', 'classic-combo', 'fall-cadence'], label: '经典模式数据', copy: ['连消', '3', '下落速度', '秒/格', '0.6'] },
       {
         state: survival,
         roles: ['survival-time', 'lines', 'survival-bedrock', 'survival-stones'],
         label: '生存模式数据',
         copy: ['生存时间', '0:00', '上升', '13 秒', '距离落石', '8块'],
       },
-      { state: sprint, roles: ['score', 'lines', 'classic-combo', 'fall-cadence'], label: '异变模式数据', copy: ['消行', '9', '连消', '下落速度', '秒/格', '1.0'] },
+      { state: sprint, roles: ['score', 'lines', 'classic-combo', 'fall-cadence'], label: '异变模式数据', copy: ['消行', '9', '连消', '下落速度', '秒/格', '0.8'] },
       {
         state: createInitialState(0x51a1f00d, 'endgame', 't3r-shaft-01'),
         roles: ['endgame-targets', 'endgame-placed'],
@@ -1387,9 +1387,9 @@ describe('T6 frontend mode binding', () => {
         elapsedTicks: 3_600,
         chain: 0,
         completedAt: '2026-07-24T00:00:00.000Z',
-        classicStartingGravityTicks: 48,
-        classicGravityFloorTicks: 6,
-        classicGrade: 'standard' as const,
+        classicStartingGravityTicks: 36,
+        classicGravityFloorTicks: 4.8,
+        classicGrade: 'challenge' as const,
       }],
       race: [],
       sprint: [],
@@ -2124,8 +2124,8 @@ describe('T6 frontend mode binding', () => {
     localStorage.setItem('tetramorph:language:v1', 'zh-CN');
     localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['marathon']));
 
-    expect(parseClassicGravityRange(null)).toEqual({ startingTicks: 48, floorTicks: 6 });
-    expect(parseClassicGravityRange('31')).toEqual({ startingTicks: 30, floorTicks: 6 });
+    expect(parseClassicGravityRange(null)).toEqual({ startingTicks: 36, floorTicks: 4.8 });
+    expect(parseClassicGravityRange('31')).toEqual({ startingTicks: 30, floorTicks: 4.8 });
     expect(parseClassicGravityRange('{"startingTicks":31,"floorTicks":17}')).toEqual({
       startingTicks: 30,
       floorTicks: 18,
@@ -2135,10 +2135,10 @@ describe('T6 frontend mode binding', () => {
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
     await act(async () => Promise.resolve());
     const runtime = runtimeHarness.instances.at(-1)!;
-    expect(runtime.options.classicStartingGravityTicks).toBe(48);
-    expect(runtime.options.classicGravityFloorTicks).toBe(6);
-    expect(runtime.getState().classicStartingGravityTicks).toBe(48);
-    expect(runtime.getState().classicGravityFloorTicks).toBe(6);
+    expect(runtime.options.classicStartingGravityTicks).toBe(36);
+    expect(runtime.options.classicGravityFloorTicks).toBe(4.8);
+    expect(runtime.getState().classicStartingGravityTicks).toBe(36);
+    expect(runtime.getState().classicGravityFloorTicks).toBe(4.8);
 
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')?.click());
     const startingRange = view.container.querySelector<HTMLInputElement>('[data-testid="classic-starting-speed"]')!;
@@ -2147,25 +2147,50 @@ describe('T6 frontend mode binding', () => {
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, value);
       input.dispatchEvent(new Event('input', { bubbles: true }));
     };
-    expect(startingRange.value).toBe('0.8');
-    expect(floorRange.value).toBe('0.1');
+    expect(startingRange.value).toBe('4');
+    expect(floorRange.value).toBe('13');
     act(() => {
-      setRangeValue(startingRange, '0.6');
+      setRangeValue(floorRange, '4');
+    });
+    const speedRail = view.container.querySelector<HTMLDivElement>('.classic-speed-control__rail')!;
+    vi.spyOn(speedRail, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      right: 140,
+      top: 0,
+      bottom: 28,
+      width: 140,
+      height: 28,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
     });
     act(() => {
-      setRangeValue(floorRange, '0.3');
+      speedRail.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: 140 }));
+    });
+    expect(localStorage.getItem(CLASSIC_GRAVITY_RANGE_STORAGE_KEY)).toBe('{"startingTicks":36,"floorTicks":4.8}');
+    expect(document.activeElement).toBe(floorRange);
+    act(() => {
+      setRangeValue(startingRange, '9');
+    });
+    act(() => {
+      setRangeValue(floorRange, '12');
     });
 
-    expect(localStorage.getItem(CLASSIC_GRAVITY_RANGE_STORAGE_KEY)).toBe('{"startingTicks":36,"floorTicks":18}');
-    expect(runtime.setClassicGravityRange).toHaveBeenLastCalledWith(36, 18);
-    expect(runtime.getState().classicStartingGravityTicks).toBe(48);
-    expect(runtime.getState().classicGravityFloorTicks).toBe(6);
+    expect(localStorage.getItem(CLASSIC_GRAVITY_RANGE_STORAGE_KEY)).toBe('{"startingTicks":9,"floorTicks":5.4}');
+    expect(runtime.setClassicGravityRange).toHaveBeenLastCalledWith(9, 5.4);
+    const selectedValues = [...view.container.querySelectorAll<HTMLOutputElement>('.classic-speed-control__value')]
+      .map((output) => output.textContent);
+    expect(selectedValues).toEqual(['开局速度0.15', '最快速度0.09']);
+    expect(startingRange.getAttribute('aria-valuetext')).toBe('0.15 秒/格');
+    expect(floorRange.getAttribute('aria-valuetext')).toBe('0.09 秒/格');
+    expect(runtime.getState().classicStartingGravityTicks).toBe(36);
+    expect(runtime.getState().classicGravityFloorTicks).toBe(4.8);
     expect(view.container.querySelectorAll('.classic-speed-control__rail')).toHaveLength(1);
     expect(view.container.querySelectorAll('.classic-speed-control__input')).toHaveLength(2);
     expect(view.container.querySelector('.classic-speed-control__heading em')?.textContent).toBe('秒/格');
-    expect(view.container.querySelector('[data-testid="classic-difficulty-grade"]')?.textContent).toBe('难度 · 标准');
+    expect(view.container.querySelector('[data-testid="classic-difficulty-grade"]')?.textContent).toBe('难度 · 挑战');
     expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__track i\s*\{[^}]*left:\s*var\(--classic-speed-start\)[^}]*width:\s*calc\(var\(--classic-speed-floor\) - var\(--classic-speed-start\)\)/s);
-    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__input\s*\{[^}]*appearance:\s*none[^}]*direction:\s*rtl[^}]*pointer-events:\s*none/s);
+    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__input\s*\{[^}]*appearance:\s*none[^}]*direction:\s*ltr[^}]*pointer-events:\s*none/s);
     expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__input::-(?:webkit-slider-thumb|moz-range-thumb)\s*\{[^}]*pointer-events:\s*auto[^}]*border:\s*4px solid var\(--settings-accent\)/s);
     expect(sourceSettingsStyles).toMatch(/\.settings-console \.classic-speed-control__input\[data-arrow-nav\]\[data-arrow-selected="true"\]\s*\{[^}]*outline:\s*0/s);
     expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__input:focus-visible::-(?:webkit-slider-thumb|moz-range-thumb)\s*\{[^}]*box-shadow:[^}]*var\(--focus\)/s);
@@ -2174,8 +2199,8 @@ describe('T6 frontend mode binding', () => {
     const resumed = render(createElement(App));
     act(() => resumed.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
     await act(async () => Promise.resolve());
-    expect(runtimeHarness.instances.at(-1)?.options.classicStartingGravityTicks).toBe(36);
-    expect(runtimeHarness.instances.at(-1)?.options.classicGravityFloorTicks).toBe(18);
+    expect(runtimeHarness.instances.at(-1)?.options.classicStartingGravityTicks).toBe(9);
+    expect(runtimeHarness.instances.at(-1)?.options.classicGravityFloorTicks).toBe(5.4);
     resumed.unmount();
   });
 
@@ -2323,9 +2348,9 @@ describe('T6 frontend mode binding', () => {
     const endedClassic = { ...createInitialState(1, 'marathon'), status: 'game-over' as const };
     expect(scoreRecordForState(endedClassic, base.completedAt)).toMatchObject({
       mode: 'marathon',
-      classicStartingGravityTicks: 48,
-      classicGravityFloorTicks: 6,
-      classicGrade: 'standard',
+      classicStartingGravityTicks: 36,
+      classicGravityFloorTicks: 4.8,
+      classicGrade: 'challenge',
     });
     expect(scoreRecordForState(createInitialState(1, 'endgame', CAMPAIGN_LEVELS[0]!.id), base.completedAt)).toBeNull();
   });
@@ -2616,28 +2641,28 @@ describe('T6 frontend mode binding', () => {
       lines: 5,
       survivalRisePending: true,
     };
-    expect(fallCadenceLabel(classic)).toBe('0.7 秒/格');
+    expect(fallCadenceLabel(classic)).toBe('0.5 秒/格');
     expect(fallCadenceLabel(customClassic)).toBe('0.9 秒/格');
-    expect(fallCadenceParts(classic, 'en')).toEqual({ value: '0.7', unit: 's/cell' });
+    expect(fallCadenceParts(classic, 'en')).toEqual({ value: '0.5', unit: 's/cell' });
     expect(fallCadenceLabel(survival)).toBe('0.6 秒/格');
-    expect(fallCadenceLabel(sprint)).toBe('0.8 秒/格');
-    expect(fallCadenceLabel(fastestSprint)).toBe('0.1 秒/格');
-    expect(fallCadenceParts(fastestSprint, 'en')).toEqual({ value: '0.1', unit: 's/cell' });
+    expect(fallCadenceLabel(sprint)).toBe('0.6 秒/格');
+    expect(fallCadenceLabel(fastestSprint)).toBe('0.08 秒/格');
+    expect(fallCadenceParts(fastestSprint, 'en')).toEqual({ value: '0.08', unit: 's/cell' });
     expect(survivalCountdownLabel(pending)).toBe('待上升');
 
     const english = render(createElement(RunStats, { state: classic, language: 'en' }));
     const cadence = english.container.querySelector('[data-stat-role="fall-cadence"] strong');
     const cadenceRow = english.container.querySelector('[data-stat-role="fall-cadence"] .run-stats__value-row');
     const cadenceUnit = english.container.querySelector('[data-stat-role="fall-cadence"] .run-stats__unit');
-    expect(cadence?.textContent).toBe('0.7');
-    expect(cadence?.getAttribute('aria-label')).toBe('0.7 s/cell');
+    expect(cadence?.textContent).toBe('0.5');
+    expect(cadence?.getAttribute('aria-label')).toBe('0.5 s/cell');
     expect(cadenceUnit?.textContent).toBe('s/cell');
     english.unmount();
 
     const mutationHud = render(createElement(RunStats, { state: fastestSprint, language: 'en' }));
     const mutationCadence = mutationHud.container.querySelector('[data-stat-role="fall-cadence"] strong');
-    expect(mutationCadence?.textContent).toBe('0.1');
-    expect(mutationCadence?.getAttribute('aria-label')).toBe('0.1 s/cell');
+    expect(mutationCadence?.textContent).toBe('0.08');
+    expect(mutationCadence?.getAttribute('aria-label')).toBe('0.08 s/cell');
     mutationHud.unmount();
 
     expect(sourceHudStyles).toMatch(/\[data-stat-role="fall-cadence"\] \.run-stats__value-row\s*\{[^}]*display:\s*flex[^}]*align-items:\s*baseline[^}]*white-space:\s*nowrap/s);

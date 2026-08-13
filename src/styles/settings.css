@@ -386,7 +386,7 @@
   height: 6px;
   overflow: hidden;
   background:
-    repeating-linear-gradient(90deg, transparent 0 calc(11.111% - 1px), color-mix(in srgb, var(--surface) 72%, transparent) calc(11.111% - 1px) 11.111%),
+    repeating-linear-gradient(90deg, transparent 0 calc(7.6923% - 1px), color-mix(in srgb, var(--surface) 72%, transparent) calc(7.6923% - 1px) 7.6923%),
     color-mix(in srgb, var(--settings-accent) 24%, var(--raised));
   border: 1px solid color-mix(in srgb, var(--settings-accent) 25%, var(--line));
   border-radius: 999px;
@@ -411,7 +411,7 @@
   height: 28px;
   margin: 0;
   appearance: none;
-  direction: rtl;
+  direction: ltr;
   pointer-events: none;
   background: transparent;
   border: 0;
