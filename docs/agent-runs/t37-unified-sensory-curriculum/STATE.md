@@ -2416,6 +2416,21 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Unique next action: obtain independent zero-finding review of this repaired contract,
   then open D2A1 only.
 
+#### D2A second contract QA correction
+
+- Re-review closes the first P1/P2/GAP set but retains `P2 1 / GAP 1`: inert may move
+  focus to body before a post-commit sample, and first-entry confirm was optional despite
+  having a mandatory evidence path. No source writer opened.
+- Final focus contract samples `focusWasInsideExitingSubtree` and closing epoch
+  synchronously before inert/aria-hidden. Next-frame fallback restoration requires that
+  owner, no successor, a connected prior target, and focus still retired or vacant on
+  body/document; any explicit external focus wins, and release completion never focuses.
+- First-entry confirm must retain its frozen App-level inert shell for `120 ms` or at most
+  `32 ms` reduced outside the D1 named viewport. D1 History, snapshot, Canvas-ready,
+  destination focus, and input never wait for or belong to it; App unmount clears it.
+- Unique next action: obtain independent all-zero review of `d0cf415` plus this correction,
+  then open D2A1 ActionSheet/CSS work only.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

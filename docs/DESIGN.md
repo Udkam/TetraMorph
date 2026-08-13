@@ -1487,9 +1487,10 @@ a later D2B slice.
   captures events before retired child callbacks. It then unmounts.
 - Leave-confirm and result-leave replace GameSession immediately and belong exclusively to
   D1: they promise no D2A DOM release, and D1 owns their snapshot and destination focus.
-  First-entry confirm is the one App-level exception: its inert shell may release outside
-  the named route viewport while D1 commits, but it never owns the route snapshot, focus,
-  or input and may not delay ready gameplay.
+  First-entry confirm is the one App-level exception: its frozen inert shell must release
+  outside the named route viewport while D1 commits (`120 ms`, or at most `32 ms` reduced),
+  but it never owns the route snapshot, focus, or input and may not delay History,
+  Canvas-ready, destination focus, or ready gameplay. App unmount removes it immediately.
 - Presence is latest-request-owned across the complete ActionSheet family. Reopening the
   same instance cancels its older release; opening a different accessible sheet terminates
   every older release shell immediately. An old timer may never unmount a newer layer.
@@ -1497,9 +1498,13 @@ a later D2B slice.
 - The release timer never owns focus restoration. Semantic close removes the sheet's
   document-key listener in the same commit. D1 owns route focus; existing Settings,
   replay, pause, and restart callbacks own board/countdown focus. Only when no explicit
-  owner has moved focus, focus is still inside the exiting subtree, no successor dialog
-  exists, and the previously focused element remains connected may ActionSheet restore it
-  on the next frame. Finishing the later `120 ms` release may never move focus.
+  owner has moved focus may ActionSheet restore its prior target on the next frame. Before
+  inert/aria-hidden is committed, the close request synchronously records whether focus
+  was inside the exiting subtree and the closing epoch. Restoration requires that epoch
+  still own presence, the sample was true, no successor dialog exists, the prior target
+  remains connected, and current focus is either still inside the retired subtree or is
+  only the document/body vacancy caused by inert. Any real focus outside the subtree wins.
+  Finishing the later `120 ms` release may never move focus.
 - Settings no longer disables the shared entrance. Its tab content changes in the same
   layer over `150 ms`, with opacity and at most `2px` vertical settling; only one panel is
   accessible and mounted as current product content. Tab motion never implies route
@@ -1520,7 +1525,8 @@ a later D2B slice.
   result/settings/theme styles. Its full-motion selectors explicitly override Settings'
   older `animation: none !important`; its final reduced selector remains authoritative.
   Tests freeze import order, phase selectors/tokens, focus non-interference, route-owned
-  close, frozen result replay, cross-sheet latest ownership, pause outcomes, both runtime
+  close, mandatory first-entry-confirm shell, frozen result replay, cross-sheet latest
+  ownership, pre-inert focus sampling/body-vacancy recovery, pause outcomes, both runtime
   motion-toggle directions, restart-confirm first frame, and unmount cleanup. Browser
   evidence covers first-entry confirm/Back, Settings and tabs, leave confirm/cancel,
   pause-to-Settings, pause resume, restart cancel/confirm, real terminal result replay and

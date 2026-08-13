@@ -45,13 +45,18 @@ Full motion uses a `120 ms` backdrop entrance, `180 ms` whole-panel settle from 
 actions happen immediately; only a frozen inert, `aria-hidden`, role-free,
 pointer-disabled shell may remain. Leave confirm and result leave instead unmount with
 GameSession immediately and transfer visual/focus ownership to D1. First-entry confirm's
-App-level shell may release in parallel but cannot own D1 focus or input.
+App-level frozen shell must release in parallel for `120 ms` (at most `32 ms` reduced),
+outside the named route viewport, but cannot delay or own D1 History, snapshot, focus,
+Canvas-ready, or input; App unmount removes it immediately.
 
 Reopening or a different sheet opening invalidates every older release owner. Semantic
 close removes keyboard capture immediately; the release timer never restores focus.
-Default focus return occurs only if focus remains inside the exiting subtree, no successor
-dialog exists, and the prior target is still connected; explicit D1/board/countdown focus
-always wins. Settings tab swaps settle over `150 ms` in the same layer. Pause resume and
+Before inert is committed, closing synchronously records whether focus was inside the
+sheet and its epoch. Default focus return occurs only while that epoch remains current,
+the sample was true, no successor dialog exists, the prior target is still connected, and
+focus is either still retired or only on body/document after inert; any real external
+focus wins. Explicit D1/board/countdown focus always wins. Settings tab swaps settle over
+`150 ms` in the same layer. Pause resume and
 restart cancel release; pause-to-Settings/leave may release below the new modal; pause to
 restart and restart confirm remove the former curtain immediately. Results freeze and
 move as one ledger, never as live or staggered child cards.
@@ -63,10 +68,10 @@ and is bounded in total to
 `src/ui/ActionSheet.tsx`, `src/App.tsx`, `src/App.test.ts`, new
 `src/styles/in-page-transitions.css`, new `src/styles/in-page-transitions.test.ts`, and
 `src/main.tsx`. Targeted tests must prove exact phase ownership, inert exiting shells,
-rapid same/cross-sheet reopen safety, focus non-interference after `120 ms`, Settings tabs,
-route-owned closes, frozen result replay, every pause/restart outcome, both motion-toggle
-directions, unmount cleanup, and stable Canvas identity before final gates and one browser
-evidence batch.
+rapid same/cross-sheet reopen safety, pre-inert/body-vacancy focus recovery without later
+interference, Settings tabs, route-owned closes, the mandatory first-entry-confirm shell,
+frozen result replay, every pause/restart outcome, both motion-toggle directions, unmount
+cleanup, and stable Canvas identity before final gates and one browser-evidence batch.
 
 ### 2026-08-13 player-directed speed and Bomb correction
 
