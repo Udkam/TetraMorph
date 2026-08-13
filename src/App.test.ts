@@ -2478,9 +2478,16 @@ describe('T6 frontend mode binding', () => {
     const bomb = render(createElement(MutationStatus, { state: bombState }));
     expect(bomb.container.textContent).not.toContain('炸弹已清除底部 3 行');
     const mutationRule = modeRules('zh-CN', 'sprint').find((fact) => fact.id === 'items')?.value ?? '';
-    expect(mutationRule).toContain('冰冻令方块以 1.0 秒/格下落');
+    expect(mutationRule).toContain('冰冻令自动下落固定为 0.80 秒/格');
     expect(mutationRule).toContain('超重令后续 5 个方块的自身各列独立下沉，已落定方块不移动');
+    expect(mutationRule).toContain('炸弹清除触发消行的该行及上下相邻行（在棋盘边缘截断）');
+    expect(mutationRule).toContain('若爆破带引爆另一炸弹，则从首个炸弹向上下逐行清空棋盘，并触发所有已锁定材质方块一次');
     expect(mutationRule).not.toContain('冻结');
+    expect(mutationRule).not.toContain('底部 3 行');
+    const englishMutationRule = modeRules('en', 'sprint').find((fact) => fact.id === 'items')?.value ?? '';
+    expect(englishMutationRule).toContain('Freeze fixes automatic gravity at 0.80 s/cell');
+    expect(englishMutationRule).toContain('Bomb clears the triggering line and its adjacent lines above and below');
+    expect(englishMutationRule).toContain('the board clears row by row in both directions from the first Bomb');
     supergravity.unmount();
     latchedSupergravity.unmount();
     derivedLatchedSupergravity.unmount();

@@ -306,7 +306,7 @@ const COPY: Record<AppLanguage, Translation> = {
       sprint: [
         { id: 'goal', label: '消行', value: '基础规则与经典相同；每累计消除 6 行，下落速度提升一级。' },
         { id: 'materials', label: '材质', value: '冰晶、熔岩、金辉或重力紫晶会覆盖整件方块；该方块任意一格被消除时，对应道具只触发一次。' },
-        { id: 'items', label: '道具', value: '冰冻令方块以 1.0 秒/格下落 10 秒；超重令后续 5 个方块的自身各列独立下沉，已落定方块不移动；炸弹清除底部 3 行；加倍令消行得分 ×2，持续 10 秒。再次触发冰冻或加倍会刷新时长，超重则刷新后续 5 块额度；加倍叠加后升级为超级加倍 ×4。' },
+        { id: 'items', label: '道具', value: '冰冻令自动下落固定为 0.80 秒/格，持续 10 秒；超重令后续 5 个方块的自身各列独立下沉，已落定方块不移动；炸弹清除触发消行的该行及上下相邻行（在棋盘边缘截断），若爆破带引爆另一炸弹，则从首个炸弹向上下逐行清空棋盘，并触发所有已锁定材质方块一次；加倍令消行得分 ×2，持续 10 秒。再次触发冰冻或加倍会刷新时长，超重则刷新后续 5 块额度；加倍叠加后升级为超级加倍 ×4。' },
         { id: 'end', label: '结束', value: '新方块无法进入棋盘时，本局结束。' },
       ],
       endgame: [
@@ -447,7 +447,7 @@ const COPY: Record<AppLanguage, Translation> = {
       sprint: [
         { id: 'goal', label: 'Clear', value: 'Classic rules apply; gravity increases one tier after every 6 cleared lines.' },
         { id: 'materials', label: 'Materials', value: 'Ice crystal, lava, gold, or gravity-violet material covers the whole piece. Clearing any cell triggers that piece\'s item once.' },
-        { id: 'items', label: 'Items', value: 'Freeze sets gravity to 1.0 s/cell for 10 seconds; Supergravity settles only each of the next 5 pieces by its own occupied columns, without moving locked cells; Bomb clears the bottom 3 rows; Double makes line-clear scores ×2 for 10 seconds. Repeating Freeze or Double refreshes its duration, while Supergravity refreshes its 5-piece quota; stacked Double becomes Super Double ×4.' },
+        { id: 'items', label: 'Items', value: 'Freeze fixes automatic gravity at 0.80 s/cell for 10 seconds; Supergravity settles only each of the next 5 pieces by its own occupied columns, without moving locked cells; Bomb clears the triggering line and its adjacent lines above and below, clipped at the board edges. If that blast hits another Bomb, the board clears row by row in both directions from the first Bomb and activates every locked material piece once; Double makes line-clear scores ×2 for 10 seconds. Repeating Freeze or Double refreshes its duration, while Supergravity refreshes its 5-piece quota; stacked Double becomes Super Double ×4.' },
         { id: 'end', label: 'End', value: 'The run ends when a new piece cannot enter the board.' },
       ],
       endgame: [
