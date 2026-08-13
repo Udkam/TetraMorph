@@ -3,6 +3,7 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type CSSProperties,
@@ -112,6 +113,7 @@ import {
 type ExitDestination = 'home' | 'endgame-library';
 type EntryCountdownDigit = 3 | 2 | 1;
 type SettingsTab = 'settings' | 'controls' | 'rules';
+type SettingsTabPresence = Readonly<{ tab: SettingsTab; epoch: number; animate: boolean; reduced: boolean }>;
 type CurtainKind = 'pause' | 'restart';
 type CurtainPresence = Readonly<{ kind: CurtainKind; phase: 'enter' | 'steady' | 'exit'; epoch: number; reduced: boolean }>;
 type ReducedMotionOverride = boolean | null;
@@ -133,6 +135,19 @@ const ENTRY_COVER_EXIT_MS = 120;
 const CURTAIN_ENTER_MS = 180;
 const CURTAIN_EXIT_MS = 120;
 const CURTAIN_REDUCED_MS = 32;
+
+function settingsTabPresenceReducer(
+  state: SettingsTabPresence,
+  action:
+    | { readonly type: 'reset'; readonly reduced: boolean }
+    | { readonly type: 'select'; readonly tab: SettingsTab; readonly reduced: boolean }
+    | { readonly type: 'reduce' },
+): SettingsTabPresence {
+  if (action.type === 'reset') return { ...state, tab: 'settings', animate: false, reduced: action.reduced };
+  if (action.type === 'reduce') return state.reduced ? state : { ...state, reduced: true };
+  if (action.tab === state.tab) return state;
+  return { tab: action.tab, epoch: state.epoch + 1, animate: true, reduced: action.reduced };
+}
 const ROUTE_FALLBACK_MS = 160;
 const ROUTE_REDUCED_MS = 32;
 const ROUTE_READY_TIMEOUT_MS = 800;
@@ -1872,7 +1887,13 @@ export function GameSession({
   const [exitOpen, setExitOpen] = useState(false);
   const [restartConfirmOpen, setRestartConfirmOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<SettingsTab>('settings');
+  const [settingsTabPresence, dispatchSettingsTabPresence] = useReducer(settingsTabPresenceReducer, {
+    tab: 'settings',
+    epoch: 0,
+    animate: false,
+    reduced: reducedMotion,
+  });
+  const settingsTab = settingsTabPresence.tab;
   const [curtainPresence, setCurtainPresenceState] = useState<CurtainPresence | null>(null);
   const [liveMessage, setLiveMessage] = useState('');
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -2253,7 +2274,7 @@ export function GameSession({
       restartWasPlayingRef.current = false;
     }
     runtime.setInputEnabled(false);
-    setSettingsTab('settings');
+    dispatchSettingsTabPresence({ type: 'reset', reduced: reducedMotionRef.current });
     setSettingsOpen(true);
   }, [exitOpen, restartConfirmOpen, runtime, settingsOpen]);
 
@@ -2427,6 +2448,10 @@ export function GameSession({
   const leaveResult = useCallback(() => onExit(exitDestination), [exitDestination, onExit]);
   const pauseOpen = state.status === 'paused' && !exitOpen && !restartConfirmOpen && !settingsOpen;
   const resultOpen = terminal !== null && !exitOpen && !restartConfirmOpen && !settingsOpen;
+  const settingsTabEpoch = settingsTabPresence.animate ? settingsTabPresence.epoch : undefined;
+  const settingsTabMotion = settingsTabPresence.animate
+    ? settingsTabPresence.reduced ? 'reduced' : 'full'
+    : undefined;
   const curtainKind: CurtainKind | null = restartConfirmOpen ? 'restart' : pauseOpen ? 'pause' : null;
 
   useLayoutEffect(() => {
@@ -2471,23 +2496,32 @@ export function GameSession({
     setCurtainPresence({ ...curtainPresence, reduced: true });
   }, [curtainPresence, reducedMotion, setCurtainPresence]);
 
+  useLayoutEffect(() => {
+    if (reducedMotion) dispatchSettingsTabPresence({ type: 'reduce' });
+  }, [reducedMotion]);
+
   useEffect(() => {
     if (!curtainPresence || curtainPresence.phase === 'steady') return undefined;
     const epoch = curtainPresence.epoch;
+    const phase = curtainPresence.phase;
     const duration = curtainShortenedDurationRef.current
       ?? (curtainPresence.reduced
         ? CURTAIN_REDUCED_MS
-        : curtainPresence.phase === 'enter' ? CURTAIN_ENTER_MS : CURTAIN_EXIT_MS);
+        : phase === 'enter' ? CURTAIN_ENTER_MS : CURTAIN_EXIT_MS);
     curtainShortenedDurationRef.current = null;
     curtainDeadlineRef.current = browserPlatform.now() + duration;
-    const timer = browserPlatform.scheduleTimeout(() => {
-      if (curtainPresenceRef.current?.epoch !== epoch) return;
+    const finish = () => {
+      if (curtainPresenceRef.current?.epoch !== epoch || curtainPresenceRef.current.phase !== phase) return;
       curtainDeadlineRef.current = null;
-      setCurtainPresence(curtainPresence.phase === 'enter' ? { ...curtainPresence, phase: 'steady' } : null);
-    }, duration);
+      setCurtainPresence(phase === 'enter' ? { ...curtainPresence, phase: 'steady' } : null);
+    };
+    const timer = browserPlatform.scheduleTimeout(finish, duration);
+    if (timer === null) finish();
     return () => {
       browserPlatform.cancelTimeout(timer);
-      if (curtainPresenceRef.current?.epoch !== epoch) curtainDeadlineRef.current = null;
+      if (curtainPresenceRef.current?.epoch !== epoch || curtainPresenceRef.current.phase !== phase) {
+        curtainDeadlineRef.current = null;
+      }
     };
   }, [curtainPresence, setCurtainPresence]);
 
@@ -2691,7 +2725,7 @@ export function GameSession({
                 aria-controls={`settings-panel-${tab}`}
                 aria-selected={settingsTab === tab}
                 tabIndex={settingsTab === tab ? 0 : -1}
-                onClick={() => setSettingsTab(tab)}
+                onClick={() => dispatchSettingsTabPresence({ type: 'select', tab, reduced: reducedMotionRef.current })}
               >{label}</button>
             ))}
           </nav>
@@ -2702,6 +2736,8 @@ export function GameSession({
               className="settings-console__panel settings-console__panel--settings"
               role="tabpanel"
               aria-labelledby="settings-tab-settings"
+              data-settings-tab-epoch={settingsTabEpoch}
+              data-settings-tab-motion={settingsTabMotion}
             >
               <section className="settings-console__controls" data-testid="settings-controls" aria-label={copy.labels.controls}>
                 <div className="settings-console__preference settings-console__preference--language">
@@ -2759,6 +2795,8 @@ export function GameSession({
               className="settings-console__panel settings-console__panel--controls"
               role="tabpanel"
               aria-labelledby="settings-tab-controls"
+              data-settings-tab-epoch={settingsTabEpoch}
+              data-settings-tab-motion={settingsTabMotion}
             >
               <SettingsShortcutGuide mode={state.mode} language={language} />
             </section>
@@ -2770,6 +2808,8 @@ export function GameSession({
               className="settings-console__panel settings-console__panel--rules"
               role="tabpanel"
               aria-labelledby="settings-tab-rules"
+              data-settings-tab-epoch={settingsTabEpoch}
+              data-settings-tab-motion={settingsTabMotion}
             >
               <ModeRuleSummary mode={state.mode} language={language} testId="settings-rules" />
               <SettingsRecord

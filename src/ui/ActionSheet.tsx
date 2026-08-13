@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { browserPlatform } from '../platform/browserPlatform';
+import { browserPlatform, type PlatformTimeout } from '../platform/browserPlatform';
 
 type SheetPhase = 'enter' | 'steady' | 'exit' | 'unmounted';
 type FocusReturn = 'auto' | 'external';
@@ -27,8 +27,7 @@ interface SheetFamily {
   release(id: string): void;
 }
 
-const EMPTY_FAMILY: SheetFamily = { activeId: null, claim: () => {}, release: () => {} };
-const ActionSheetFamilyContext = createContext<SheetFamily>(EMPTY_FAMILY);
+const ActionSheetFamilyContext = createContext<SheetFamily | null>(null);
 
 export function ActionSheetFamily({ children }: { children: ReactNode }) {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -90,22 +89,28 @@ export function ActionSheet({
   const titleId = useId();
   const descriptionId = useId();
   const familyId = useId();
-  const { activeId, claim, release } = useContext(ActionSheetFamilyContext);
+  const family = useContext(ActionSheetFamilyContext);
+  const activeId = family?.activeId ?? null;
+  const claim = family?.claim;
+  const release = family?.release;
+  const ownedOpen = open && (family === null || activeId === familyId);
   const panelRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const pendingFocusRef = useRef<{ wasInside: boolean; external: boolean } | null>(null);
   const restoreFrameRef = useRef<number | null>(null);
   const phaseDeadlineRef = useRef<number | null>(null);
+  const presenceTimerRef = useRef<PlatformTimeout>(null);
   const shortenedDurationRef = useRef<number | null>(null);
-  const wasOpenRef = useRef(open);
+  const wasOwnedOpenRef = useRef(false);
+  const keyboardActiveRef = useRef(false);
   const focusReturnRef = useRef(focusReturn);
   const reducedMotionRef = useRef(reducedMotion);
   const externalFocusSelectorRef = useRef(externalFocusSelector);
   const onCancelRef = useRef(onCancel);
   const onConfirmRef = useRef(onConfirm);
   const [presence, setPresenceState] = useState<SheetPresence>(() => ({
-    phase: open ? 'enter' : 'unmounted',
-    epoch: open ? 1 : 0,
+    phase: 'unmounted',
+    epoch: 0,
     reduced: reducedMotion,
   }));
   const presenceRef = useRef(presence);
@@ -129,16 +134,28 @@ export function ActionSheet({
     };
   }, []);
 
+  const beginSemanticClose = useCallback((external = focusReturnRef.current === 'external') => {
+    if (!keyboardActiveRef.current) return false;
+    keyboardActiveRef.current = false;
+    sampleCloseFocus(external);
+    return true;
+  }, [sampleCloseFocus]);
+
   useLayoutEffect(() => {
     if (open) presentationRef.current = { title, description, tone, className, placement, visuallyHideTitle, children };
   }, [children, className, description, open, placement, title, tone, visuallyHideTitle]);
 
   useLayoutEffect(() => {
-    const wasOpen = wasOpenRef.current;
-    wasOpenRef.current = open;
-    if (open) {
-      claim(familyId);
-      if (!wasOpen) {
+    if (!open || !claim || !release) return undefined;
+    claim(familyId);
+    return () => release(familyId);
+  }, [claim, familyId, open, release]);
+
+  useLayoutEffect(() => {
+    const wasOwnedOpen = wasOwnedOpenRef.current;
+    wasOwnedOpenRef.current = ownedOpen;
+    if (ownedOpen) {
+      if (!wasOwnedOpen) {
         browserPlatform.cancelFrame(restoreFrameRef.current);
         restoreFrameRef.current = null;
         const next = { phase: 'enter', epoch: presenceRef.current.epoch + 1, reduced: reducedMotionRef.current } as const;
@@ -148,9 +165,15 @@ export function ActionSheet({
       }
       return;
     }
-    if (!wasOpen) return;
-
-    release(familyId);
+    keyboardActiveRef.current = false;
+    if (!wasOwnedOpen) return;
+    if (open) {
+      pendingFocusRef.current = null;
+      browserPlatform.cancelFrame(restoreFrameRef.current);
+      restoreFrameRef.current = null;
+      setPresence({ phase: 'unmounted', epoch: presenceRef.current.epoch + 1, reduced: reducedMotionRef.current });
+      return;
+    }
     const next = { phase: 'exit', epoch: presenceRef.current.epoch + 1, reduced: reducedMotionRef.current } as const;
     const focusSample = pendingFocusRef.current ?? { wasInside: false, external: focusReturnRef.current === 'external' };
     pendingFocusRef.current = null;
@@ -174,7 +197,7 @@ export function ActionSheet({
             target.focus();
           }
         });
-  }, [claim, familyId, open, release, setPresence]);
+  }, [open, ownedOpen, setPresence]);
 
   useLayoutEffect(() => {
     if (!reducedMotion || presence.reduced || presence.phase === 'steady' || presence.phase === 'unmounted') return;
@@ -186,9 +209,9 @@ export function ActionSheet({
   }, [presence, reducedMotion, setPresence]);
 
   useLayoutEffect(() => {
-    if (open || presence.phase !== 'exit' || activeId === null || activeId === familyId) return;
+    if (open || presence.phase !== 'exit' || family === null || activeId === null || activeId === familyId) return;
     setPresence({ ...presence, phase: 'unmounted' });
-  }, [activeId, familyId, open, presence, setPresence]);
+  }, [activeId, family, familyId, open, presence, setPresence]);
 
   useEffect(() => {
     if (presence.phase !== 'enter' && presence.phase !== 'exit') return undefined;
@@ -203,19 +226,27 @@ export function ActionSheet({
     shortenedDurationRef.current = null;
     phaseDeadlineRef.current = browserPlatform.now() + duration;
     const timer = browserPlatform.scheduleTimeout(finish, duration);
+    presenceTimerRef.current = timer;
     if (timer === null) finish();
     return () => {
       browserPlatform.cancelTimeout(timer);
+      if (presenceTimerRef.current === timer) presenceTimerRef.current = null;
       if (presenceRef.current.epoch !== epoch || presenceRef.current.phase !== presence.phase) {
         phaseDeadlineRef.current = null;
       }
     };
   }, [presence, setPresence]);
 
-  useEffect(() => () => {
-    release(familyId);
+  useLayoutEffect(() => () => {
+    keyboardActiveRef.current = false;
     browserPlatform.cancelFrame(restoreFrameRef.current);
-  }, [familyId, release]);
+    browserPlatform.cancelTimeout(presenceTimerRef.current);
+    pendingFocusRef.current = null;
+    previousFocusRef.current = null;
+    restoreFrameRef.current = null;
+    presenceTimerRef.current = null;
+    phaseDeadlineRef.current = null;
+  }, []);
 
   const syncSelectedAction = (target: EventTarget | null) => {
     const panel = panelRef.current;
@@ -240,8 +271,9 @@ export function ActionSheet({
     });
   };
 
-  useEffect(() => {
-    if (!open) return;
+  useLayoutEffect(() => {
+    if (!ownedOpen) return;
+    keyboardActiveRef.current = true;
     const panel = panelRef.current;
     const activeBeforeOpen = browserPlatform.activeElement();
     if (panel?.contains(activeBeforeOpen) !== true) previousFocusRef.current = activeBeforeOpen;
@@ -255,11 +287,12 @@ export function ActionSheet({
     const frame = browserPlatform.defer(focusInitial);
 
     const handleKeyDown = (event: Event) => {
+      if (!keyboardActiveRef.current) return;
       const keyboardEvent = event as KeyboardEvent;
       if (keyboardEvent.key === 'Escape' && onCancelRef.current) {
+        if (!beginSemanticClose()) return;
         keyboardEvent.preventDefault();
         keyboardEvent.stopPropagation();
-        sampleCloseFocus();
         onCancelRef.current();
         return;
       }
@@ -348,9 +381,9 @@ export function ActionSheet({
         return;
       }
       if (keyboardEvent.key === 'Enter' && onConfirmRef.current && !keyboardEvent.isComposing) {
+        if (!beginSemanticClose(true)) return;
         keyboardEvent.preventDefault();
         keyboardEvent.stopPropagation();
-        sampleCloseFocus(true);
         onConfirmRef.current();
         return;
       }
@@ -377,20 +410,21 @@ export function ActionSheet({
 
     const removeKeyDown = browserPlatform.listenDocument('keydown', handleKeyDown, true);
     return () => {
+      keyboardActiveRef.current = false;
       browserPlatform.cancelFrame(frame);
       removeKeyDown();
     };
-  }, [open, sampleCloseFocus]);
+  }, [beginSemanticClose, ownedOpen]);
 
-  if (!open && presence.phase === 'unmounted') return null;
+  if (!ownedOpen && presence.phase === 'unmounted') return null;
 
-  const presentation = open
+  const presentation = ownedOpen
     ? { title, description, tone, className, placement, visuallyHideTitle, children }
     : presentationRef.current;
-  const visualPhase = open
+  const visualPhase = ownedOpen
     ? presence.phase === 'steady' ? 'steady' : 'enter'
     : 'exit';
-  const retired = !open;
+  const retired = !ownedOpen;
   const stopRetiredEvent = (event: { preventDefault(): void; stopPropagation(): void }) => {
     if (!retired) return;
     event.preventDefault();
@@ -409,8 +443,7 @@ export function ActionSheet({
       onClick={(event) => {
         if (retired) return;
         if (dismissOnBackdropClick && event.target === event.currentTarget) {
-          sampleCloseFocus();
-          onCancel?.();
+          if (beginSemanticClose()) onCancel?.();
         }
       }}
       onClickCapture={stopRetiredEvent}
@@ -432,7 +465,10 @@ export function ActionSheet({
           const target = event.target instanceof Element
             ? event.target.closest<HTMLElement>('[data-sheet-close]')
             : null;
-          if (target) sampleCloseFocus(target.dataset.sheetFocusOwner === 'external');
+          if (target && !beginSemanticClose(target.dataset.sheetFocusOwner === 'external')) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
         }}
         onFocusCapture={(event) => {
           syncSelectedAction(event.target);

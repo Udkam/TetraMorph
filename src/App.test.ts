@@ -2,7 +2,7 @@
 
 // @ts-expect-error Vitest runs this test in Node while the product tsconfig intentionally omits Node globals.
 import { readFileSync } from 'node:fs';
-import { act, createElement, type ReactNode } from 'react';
+import { act, createElement, StrictMode, useState, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import styles from './styles.css?raw';
@@ -53,6 +53,7 @@ import { appCopy, itemLabel, modeIntroRules, modeRules, modeRulesTitle } from '.
 import type { VisualThemeId } from './design/visualThemes';
 import { appHistoryStateFor, appNavigationFromHistory } from './navigation/appRoute';
 import { ActionSheet, ActionSheetFamily } from './ui/ActionSheet';
+import { browserPlatform } from './platform/browserPlatform';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 const sourceStyles = readFileSync('src/styles.css', 'utf8');
@@ -537,6 +538,18 @@ function testSheet(open: boolean, label: string, reducedMotion = false, onClose 
       createElement('button', { type: 'button', 'data-autofocus': true, 'data-sheet-close': true, onClick: onClose }, label)));
 }
 
+function CloseRaceSheet({ onClose }: { onClose: () => void }) {
+  const [open, setOpen] = useState(true);
+  const close = () => {
+    onClose();
+    setOpen(false);
+  };
+  return createElement('div', null,
+    createElement('button', { type: 'button', 'data-testid': 'reopen-sheet', onClick: () => setOpen(true) }, 'reopen'),
+    createElement(ActionSheet, { open, title: 'Race', description: '', onCancel: close, children: null },
+      createElement('button', { type: 'button', 'data-autofocus': true, 'data-sheet-close': true, onClick: close }, 'close')));
+}
+
 describe('T37 D2A ActionSheet presence', () => {
   it('freezes committed content in an inert 120ms release shell', async () => {
     vi.useFakeTimers();
@@ -573,6 +586,17 @@ describe('T37 D2A ActionSheet presence', () => {
     view.unmount();
   });
 
+  it('keeps reduced motion frozen when the preference returns to full during the same epoch', async () => {
+    vi.useFakeTimers();
+    const view = render(testSheet(true, 'one', true));
+    expect(view.container.querySelector('[data-sheet-motion="reduced"]')).not.toBeNull();
+    view.rerender(testSheet(true, 'one', false));
+    expect(view.container.querySelector('[data-sheet-motion="reduced"]')).not.toBeNull();
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    expect(view.container.querySelector('[data-sheet-phase="steady"][data-sheet-motion="reduced"]')).not.toBeNull();
+    view.unmount();
+  });
+
   it('retires an older family shell immediately and never steals explicit focus', () => {
     const pair = (first: boolean, second: boolean) => createElement(ActionSheetFamily, null,
       createElement(ActionSheet, { open: first, title: 'First', description: '', children: null }, createElement('button', null, 'old')),
@@ -588,6 +612,71 @@ describe('T37 D2A ActionSheet presence', () => {
     outside.remove();
     view.unmount();
   });
+
+  it('gives simultaneous family requests to only the latest owner without reviving a stale request', async () => {
+    vi.useFakeTimers();
+    const pair = (first: boolean, second: boolean) => createElement(ActionSheetFamily, null,
+      createElement(ActionSheet, { open: first, title: 'First', description: '', children: null }, createElement('button', null, 'old')),
+      createElement(ActionSheet, { open: second, title: 'Second', description: '', children: null }, createElement('button', null, 'new')));
+    const view = render(pair(true, true));
+    expect(view.container.querySelectorAll('[role="dialog"]')).toHaveLength(1);
+    expect(view.container.querySelector('[role="dialog"]')?.textContent).toContain('new');
+
+    view.rerender(pair(true, false));
+    expect(view.container.querySelectorAll('[role="dialog"]')).toHaveLength(0);
+    await act(async () => vi.advanceTimersByTimeAsync(120));
+    expect(view.container.querySelectorAll('[role="dialog"]')).toHaveLength(0);
+
+    view.rerender(pair(false, false));
+    view.rerender(pair(true, false));
+    expect(view.container.querySelectorAll('[role="dialog"]')).toHaveLength(1);
+    expect(view.container.querySelector('[role="dialog"]')?.textContent).toContain('old');
+    view.unmount();
+  });
+
+  it('reclaims an open family sheet after the production StrictMode effect replay', async () => {
+    const view = render(createElement(StrictMode, null,
+      createElement(ActionSheetFamily, null,
+        createElement(ActionSheet, { open: true, title: 'Layer', description: '', children: null },
+          createElement('button', null, 'action')))));
+    await act(async () => Promise.resolve());
+    expect(view.container.querySelectorAll('[role="dialog"]')).toHaveLength(1);
+    expect(view.container.querySelector('[role="dialog"]')?.textContent).toContain('action');
+    view.unmount();
+  });
+
+  it('disarms the old keyboard owner before a close commit can flush', () => {
+    const onClose = vi.fn();
+    const view = render(createElement(CloseRaceSheet, { onClose }));
+    const close = [...view.container.querySelectorAll<HTMLButtonElement>('button')]
+      .find((button) => button.textContent === 'close')!;
+    act(() => {
+      close.click();
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="reopen-sheet"]')?.click());
+    act(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    expect(onClose).toHaveBeenCalledTimes(2);
+    view.unmount();
+  });
+
+  it('cleans ActionSheet frames, timers, and document listeners on unmount', () => {
+    const cancelFrame = vi.spyOn(browserPlatform, 'cancelFrame');
+    const cancelTimeout = vi.spyOn(browserPlatform, 'cancelTimeout');
+    const removeKeyDown = vi.fn();
+    const listen = vi.spyOn(browserPlatform, 'listenDocument').mockReturnValue(removeKeyDown);
+    const view = render(testSheet(true, 'one'));
+    view.unmount();
+    expect(cancelFrame).toHaveBeenCalled();
+    expect(cancelTimeout).toHaveBeenCalled();
+    expect(removeKeyDown).toHaveBeenCalledTimes(1);
+    listen.mockRestore();
+    cancelTimeout.mockRestore();
+    cancelFrame.mockRestore();
+  });
+
 });
 
 describe('DEV QA state snapshot isolation', () => {
@@ -750,6 +839,16 @@ describe('Endgame completion ceremony', () => {
     expect(first.view.container.querySelector('.endgame-celebration__constellation')).toBeNull();
     expect(first.view.container.querySelector('.endgame-celebration__prism')).toBeNull();
     expect(first.onCanonicalCompletion).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ completedLevelId: endgameId, pieceCount: 9 }));
+    const firstReplay = first.view.container.querySelector<HTMLButtonElement>('.action-sheet--endgame-celebration .primary-action')!;
+    act(() => firstReplay.click());
+    const frozenResult = expectRetiredSheet(first.view.container, 'endgame-celebration');
+    expect(frozenResult.textContent).toContain('恭喜你完成残局');
+    expect(frozenResult.textContent).toContain('9');
+    expect(frozenResult.textContent).not.toContain('重新开始');
+    expect(runtimeHarness.instances.at(-1)?.restart).toHaveBeenCalledTimes(1);
+    expect(runtimeHarness.instances.at(-1)?.getState().status).toBe('playing');
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    expect(first.view.container.querySelector('[data-testid="endgame-celebration"]')).toBeNull();
     first.view.unmount();
 
     const priorBest: EndgameProgress = {
@@ -1136,6 +1235,7 @@ describe('T6 frontend mode binding', () => {
   });
 
   it('moves mode rules out of home, then shows and stores the first-entry introduction', () => {
+    vi.useFakeTimers();
     localStorage.setItem('tetramorph:language:v1', 'zh-CN');
     const view = render(createElement(App));
     const mutation = view.container.querySelector<HTMLButtonElement>('[data-testid="enter-sprint"]')!;
@@ -1163,6 +1263,12 @@ describe('T6 frontend mode binding', () => {
     act(() => start.click());
     expect(JSON.parse(localStorage.getItem('tetramorph:mode-rule-intros:v2') ?? '[]')).toContain('sprint');
     expect(view.container.querySelector('[data-testid="game-screen"]')).not.toBeNull();
+    const routeViewport = view.container.querySelector('[data-testid="route-viewport"]');
+    const retiredIntro = expectRetiredSheet(view.container, 'entry-mode-rules');
+    expect(routeViewport?.contains(retiredIntro)).toBe(false);
+    expect(view.container.querySelectorAll('canvas')).toHaveLength(1);
+    act(() => vi.advanceTimersByTime(120));
+    expect(view.container.querySelector('[data-testid="entry-mode-rules"]')).toBeNull();
     view.unmount();
   });
 
@@ -1299,6 +1405,95 @@ describe('T6 frontend mode binding', () => {
     expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
     expect(view.container.querySelector('[data-testid="restart-curtain"]')?.getAttribute('data-curtain-phase')).toBe('enter');
     view.unmount();
+  });
+
+  it('shortens an active curtain when motion is reduced without replaying when it returns to full', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+    const props = (reducedMotion: boolean) => ({
+      mode: 'marathon' as const,
+      endgameId: CAMPAIGN_LEVELS[0]!.id,
+      onExit: vi.fn(),
+      onCanonicalCompletion: vi.fn(),
+      reducedMotion,
+    });
+    const view = render(createElement(GameSession, props(false)));
+    await act(async () => Promise.resolve());
+    await advanceEntryCountdown();
+    const runtime = runtimeHarness.instances.at(-1)!;
+
+    act(() => runtime.setState({ ...runtime.getState(), status: 'paused' }));
+    await act(async () => vi.advanceTimersByTimeAsync(48));
+    view.rerender(createElement(GameSession, props(true)));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')?.getAttribute('data-curtain-motion')).toBe('reduced');
+    view.rerender(createElement(GameSession, props(false)));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')?.getAttribute('data-curtain-motion')).toBe('reduced');
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')?.getAttribute('data-curtain-phase')).toBe('steady');
+
+    act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true })));
+    await act(async () => vi.advanceTimersByTimeAsync(8));
+    view.rerender(createElement(GameSession, props(true)));
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
+    view.unmount();
+  });
+
+  it('finishes a curtain phase synchronously when the host cannot schedule a timer', async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+    const schedule = vi.spyOn(browserPlatform, 'scheduleTimeout').mockReturnValue(null);
+    const view = render(createElement(GameSession, {
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(), reducedMotion: false,
+    }));
+    await act(async () => Promise.resolve());
+    const runtime = runtimeHarness.instances.at(-1)!;
+    act(() => runtime.setState({ ...runtime.getState(), status: 'paused' }));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')?.getAttribute('data-curtain-phase')).toBe('steady');
+    act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true })));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
+    act(() => runtime.setState({ ...runtime.getState(), status: 'paused' }));
+    view.unmount();
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
+    schedule.mockRestore();
+  });
+
+  it('cancels active curtain enter and exit timers on unmount', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+    const cancelTimeout = vi.spyOn(browserPlatform, 'cancelTimeout');
+
+    const enterView = render(createElement(GameSession, {
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(), reducedMotion: false,
+    }));
+    await act(async () => Promise.resolve());
+    await advanceEntryCountdown();
+    const enterRuntime = runtimeHarness.instances.at(-1)!;
+    act(() => enterRuntime.setState({ ...enterRuntime.getState(), status: 'paused' }));
+    expect(enterView.container.querySelector('[data-testid="pause-curtain"]')?.getAttribute('data-curtain-phase')).toBe('enter');
+    const beforeEnterUnmount = cancelTimeout.mock.calls.length;
+    enterView.unmount();
+    const afterEnterUnmount = cancelTimeout.mock.calls.length;
+    expect(afterEnterUnmount).toBeGreaterThan(beforeEnterUnmount);
+    await act(async () => vi.advanceTimersByTimeAsync(180));
+    expect(cancelTimeout.mock.calls).toHaveLength(afterEnterUnmount);
+
+    const exitView = render(createElement(GameSession, {
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(), reducedMotion: false,
+    }));
+    await act(async () => Promise.resolve());
+    await advanceEntryCountdown();
+    const exitRuntime = runtimeHarness.instances.at(-1)!;
+    act(() => exitRuntime.setState({ ...exitRuntime.getState(), status: 'paused' }));
+    await act(async () => vi.advanceTimersByTimeAsync(180));
+    act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true })));
+    expect(exitView.container.querySelector('[data-testid="pause-curtain"]')?.getAttribute('data-curtain-phase')).toBe('exit');
+    const beforeExitUnmount = cancelTimeout.mock.calls.length;
+    exitView.unmount();
+    const afterExitUnmount = cancelTimeout.mock.calls.length;
+    expect(afterExitUnmount).toBeGreaterThan(beforeExitUnmount);
+    await act(async () => vi.advanceTimersByTimeAsync(120));
+    expect(cancelTimeout.mock.calls).toHaveLength(afterExitUnmount);
+    cancelTimeout.mockRestore();
   });
 
   it('replaces the restart curtain with Back or Settings flows without resuming the run', async () => {
@@ -2220,6 +2415,42 @@ describe('T6 frontend mode binding', () => {
     const resumed = render(createElement(App));
     expect(resumed.container.querySelector('.app')?.getAttribute('data-reduced-motion')).toBe('false');
     resumed.unmount();
+  });
+
+  it('animates only real Settings tab swaps and does not replay them when motion returns to full', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+    vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
+    const view = render(createElement(GameSession, {
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(), reducedMotion: true,
+    }));
+    await act(async () => Promise.resolve());
+    await advanceEntryCountdown();
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')?.click());
+    expect(view.container.querySelector('.settings-console__panel')?.hasAttribute('data-settings-tab-epoch')).toBe(false);
+    expect(view.container.querySelector<HTMLElement>('.action-sheet')?.dataset.sheetMotion).toBe('reduced');
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="settings-tab-controls"]')?.click());
+    expect(view.container.querySelector('.settings-console__panel')?.getAttribute('data-settings-tab-epoch')).toBe('1');
+    expect(view.container.querySelector('.settings-console__panel')?.getAttribute('data-settings-tab-motion')).toBe('reduced');
+    view.rerender(createElement(GameSession, {
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(), reducedMotion: false,
+    }));
+    expect(view.container.querySelector<HTMLElement>('.action-sheet')?.dataset.sheetMotion).toBe('reduced');
+    expect(view.container.querySelector('.settings-console__panel')?.getAttribute('data-settings-tab-epoch')).toBe('1');
+    expect(view.container.querySelector('.settings-console__panel')?.getAttribute('data-settings-tab-motion')).toBe('reduced');
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="settings-tab-controls"]')?.click());
+    expect(view.container.querySelector('.settings-console__panel')?.getAttribute('data-settings-tab-epoch')).toBe('1');
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="settings-tab-rules"]')?.click());
+    expect(view.container.querySelector('.settings-console__panel')?.getAttribute('data-settings-tab-epoch')).toBe('2');
+    expect(view.container.querySelector('.settings-console__panel')?.getAttribute('data-settings-tab-motion')).toBe('full');
+
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="action-sheet-backdrop"]')?.click());
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')?.click());
+    expect(view.container.querySelector('.settings-console__panel')?.hasAttribute('data-settings-tab-epoch')).toBe(false);
+    view.unmount();
   });
 
   it('persists a bounded Classic pace interval and applies it to the next runtime only', async () => {
