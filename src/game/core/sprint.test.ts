@@ -495,6 +495,8 @@ describe('异变 mode', () => {
       participatingBombCount: 2,
       score: MUTATION_BOMB_SCORE * 2,
     });
+    expect(bomb).not.toHaveProperty('chainOriginCarrierId');
+    expect(bomb).not.toHaveProperty('chainOriginCells');
     expect(transition.state.lines).toBe(2);
     expect(transition.state.board[33]?.[0]).toBe('S');
     expect(transition.events.filter((event) => event.type === 'lines-cleared')).toEqual([
