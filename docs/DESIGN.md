@@ -1464,6 +1464,47 @@ cut. Both effects are presentation-only and must remain safe under reduced motio
   hidden gameplay runtime, intercept controls after navigation, or start a persistent
   timer/service.
 
+## 2026-08-14 T37-D2A — settled in-page overlays
+
+D1 remains the sole owner of URL-route transitions. D2A covers only board-fixed in-page
+layers: first-entry rules, Settings, leave confirmation, run results, and the board-local
+pause/restart curtains. The gameplay board, Next, HUD, Runtime, and sole Canvas remain in
+place; this slice changes no Core timing, input result, persistence, route commit, score,
+audio, or Endgame content. Endgame-library selection and category swaps are reserved for
+a later D2B slice.
+
+- A shared ActionSheet owns an explicit `enter -> steady -> exit -> unmounted` presence
+  lifecycle. Opening fades the backdrop over `120 ms` and settles the complete panel over
+  `180 ms` from `opacity .94` and at most `translateY(4px)`, using
+  `cubic-bezier(.16, 1, .3, 1)`. Scale, blur, spring motion, wipes, and child cascades are
+  forbidden.
+- Closing commits its product action immediately, then retains only a non-interactive
+  presentational shell for `120 ms`: the panel releases toward `opacity .96` and at most
+  `translateY(-2px)` while the backdrop fades. The shell is `aria-hidden`, inert, cannot
+  receive focus or pointer input, and cannot fire cancel/confirm twice. It then unmounts.
+- Presence is latest-request-owned. A close followed by reopen must cancel the older
+  release owner; an old timer may never unmount or restore focus across the newer sheet.
+  Unmount cancels every timer/frame. At most one accessible dialog exists at any instant.
+- Settings no longer disables the shared entrance. Its tab content changes in the same
+  layer over `150 ms`, with opacity and at most `2px` vertical settling; only one panel is
+  accessible and mounted as current product content. Tab motion never implies route
+  direction and does not use the View Transition API.
+- Pause and restart keep their existing `180 ms` board-local cover entrance. Resume or
+  cancel commits immediately while a non-interactive copy releases over `120 ms`.
+  Settings superseding pause uses the same settled overlay entrance; no second pause
+  dialog or Canvas is created. Results enter as one complete ledger and release as one
+  complete sheet; metrics and leaderboard do not cascade.
+- Reduced motion uses opacity only, no transform, and completes any presence phase within
+  `32 ms`. A runtime switch to reduced motion must shorten the active phase and invalidate
+  its old timer. Presentation never delays gameplay input, countdown, Runtime restart,
+  storage, focus ownership, or route navigation.
+- `src/styles/in-page-transitions.css` is the final D2A motion authority and loads after
+  result/settings/theme styles. Tests freeze the import order, phase selectors, duration
+  tokens, reduced-motion endpoint, and absence of scale/blur. Browser evidence must cover
+  first-entry rules, Settings and all tabs, pause-to-Settings, pause resume, restart
+  cancel, a real terminal result and replay at desktop/mobile/full/reduced motion, with
+  one Canvas, zero DOM cells, zero double dialogs, zero overflow, and zero console errors.
+
 ### T30 acceptance
 
 Focused renderer tests must freeze generation identity, cell staggering, ghost delay,

@@ -32,6 +32,31 @@ and fastest bound, and no five-tier retuning is authorized before the preceding 
 Survival remains proposal-only and is output after final implementation; it is not a
 source task.
 
+#### T37-D2A settled in-page overlay contract
+
+D2A is now the sole open writer slice. It excludes URL routes (already owned by D1),
+Endgame-library selection/category swaps (later D2B), materials, levels, line-clear
+rewards, identity, Classic speed tiers, and Survival. It introduces one latest-owned
+presence lifecycle for first-entry rules, Settings, leave confirmation, results, and the
+pause/restart curtains while retaining the existing board, Runtime, HUD, Next, and Canvas.
+
+Full motion uses a `120 ms` backdrop entrance, `180 ms` whole-panel settle from at most
+`4px`, and `120 ms` non-interactive release toward at most `-2px`. Closing actions happen
+immediately; only an inert, `aria-hidden`, pointer-disabled visual shell may remain until
+release completes. Reopening cancels the older release owner, and no stale timer may
+unmount a successor or steal its focus. Settings tab swaps settle over `150 ms` within the
+same layer. Pause/restart retain their existing board-local entrance and gain the same
+bounded release; results move as one ledger, never as staggered child cards.
+
+Reduced motion is opacity-only, transform-free, and at most `32 ms`, including a runtime
+switch during an active phase. The source checkpoint is bounded to
+`src/ui/ActionSheet.tsx`, `src/App.tsx`, `src/App.test.ts`, new
+`src/styles/in-page-transitions.css`, new `src/styles/in-page-transitions.test.ts`, and
+`src/main.tsx`. Targeted tests must prove exact phase ownership, inert exiting shells,
+rapid close/reopen safety, focus cleanup, Settings tabs, pause/restart/result flows,
+reduced-motion retiming, and stable Canvas identity before the final source gates and one
+browser-evidence batch.
+
 ### 2026-08-13 player-directed speed and Bomb correction
 
 The newest player instruction opens two implementation slices while the Endgame v4

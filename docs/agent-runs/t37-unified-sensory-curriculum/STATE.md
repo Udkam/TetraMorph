@@ -2363,6 +2363,34 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   transition surfaces, then freeze that exact docs-first implementation slice while the
   Bomb human-listening gate remains open in parallel.
 
+### T37-D2A settled in-page overlay contract
+
+- Read-only audit at `5ccd865` confirms D1 URL-route native/fallback/reduced handoff is
+  complete. Ordinary ActionSheet has entrance only; Settings explicitly disables both
+  sheet/backdrop entrance; every close unmounts immediately; Settings tabs swap directly;
+  pause/restart and result flows have no release lifecycle.
+- D2A owns first-entry rules, Settings, leave confirmation, results, and board-local
+  pause/restart curtains only. Endgame-library selection/category swaps are deferred to
+  D2B. No View Transition API, Core, Runtime rule, audio, level, reward, icon, Survival,
+  or Classic-tier change belongs here.
+- Frozen full-motion phases are backdrop enter `120 ms`, panel settle `180 ms` from at
+  most `4px`, Settings tab settle `150 ms` from at most `2px`, and non-interactive release
+  `120 ms` toward at most `-2px`. Reduced motion is opacity-only and at most `32 ms`.
+- Closing semantics commit immediately while an inert/aria-hidden/pointer-disabled visual
+  shell releases. Latest phase wins; stale timers cannot unmount a reopened layer or steal
+  focus. The board, Next, HUD, Runtime, and sole Canvas remain stable.
+- Authorized product paths are exactly `src/ui/ActionSheet.tsx`, `src/App.tsx`,
+  `src/App.test.ts`, `src/styles/in-page-transitions.css`,
+  `src/styles/in-page-transitions.test.ts`, and `src/main.tsx`; keep the source checkpoint
+  within the normal ten-path/500-line budget.
+- A verified Vite helper for the parallel Bomb human-listening gate is owned by this T37
+  task at `127.0.0.1:4187`, listener PID `30520`, command
+  `npm.cmd run dev -- --host 127.0.0.1 --port 4187 --strictPort`, with logs under
+  `%TEMP%\\tetramorph-t37-bomb-listening-20260814`. Release it after the player's verdict
+  or this task's scope ends.
+- Unique next action: commit this three-document D2A contract, then implement the shared
+  ActionSheet presence owner and its focused tests before extending pause/restart curtains.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
