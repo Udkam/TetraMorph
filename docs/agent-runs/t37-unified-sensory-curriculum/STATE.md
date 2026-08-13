@@ -2431,6 +2431,28 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Unique next action: obtain independent all-zero review of `d0cf415` plus this correction,
   then open D2A1 ActionSheet/CSS work only.
 
+#### D2A final-evidence mobile correction
+
+- D2A source checkpoints `dbe5cbc`, `552d3a5`, and repair `92064b7` pass targeted review;
+  final typecheck, the complete suite (`532 passed / 15 skipped` in `55 passed / 2
+  skipped` files), and build are green before browser evidence.
+- The first evidence run stopped because the script tried to use the Settings-only
+  Continue action while Rules was selected. The second incorrectly replayed an
+  unpublished Intro-01 v3 certificate against the current product definition. Both are
+  evidence-script defects, not product findings; the script now returns through the real
+  Settings tab and uses the accepted current-product T32 route.
+- The third complete interaction run reaches every desktop, result, and reduced-motion
+  scene with zero browser errors, but correctly fails the final geometry gate: at
+  390 x 844 the Settings dialog exceeds the right viewport edge. The cause is the
+  `calc(100vw - 16px)` mobile width inside an already padded backdrop grid.
+- D2A is extended only to `src/styles/settings.css` and
+  `src/styles/settings.test.ts`. Replace that mobile viewport calculation with a
+  `100%` containing-block upper bound, add a static regression, rerun final source gates,
+  commit the source correction, update the evidence SHA, and regenerate the full evidence
+  batch. Do not change any motion timing or other product surface.
+- Unique next action: commit this three-document boundary correction, then implement the
+  two-file Settings safe-area fix.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

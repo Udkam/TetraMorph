@@ -1537,6 +1537,15 @@ a later D2B slice.
   D2A2 adds the separately tested pause/restart curtain outcomes. Each checkpoint, not
   their combined range, stays within the normal ten-path/500-line source budget.
 
+### D2A Settings mobile safe area
+
+The viewport sheet backdrop is the responsive containing block. On screens at or below
+680 px, Settings sizes against that block's `100%` content width rather than recomputing
+from `100vw`; otherwise its own viewport subtraction can exceed the already padded grid
+area. At 390 x 844 the complete dialog must remain within both horizontal viewport edges
+with symmetric backdrop margins, without shrinking copy below the existing readable
+floor or altering the 120/180/150/120/32 ms presence contract.
+
 ### T30 acceptance
 
 Focused renderer tests must freeze generation identity, cell staggering, ghost delay,

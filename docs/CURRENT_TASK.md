@@ -73,6 +73,18 @@ interference, Settings tabs, route-owned closes, the mandatory first-entry-confi
 frozen result replay, every pause/restart outcome, both motion-toggle directions, unmount
 cleanup, and stable Canvas identity before final gates and one browser-evidence batch.
 
+#### T37-D2A mobile safe-area correction
+
+The final 390 x 844 reduced-motion evidence pass exposed a real Settings geometry defect:
+the mobile dialog used `calc(100vw - 16px)` inside a backdrop whose horizontal padding
+already reduces the available grid content width to `100%`. The item therefore exceeded
+its containing grid and clipped at the right viewport edge. D2A is extended only to
+`src/styles/settings.css` and `src/styles/settings.test.ts` for this correction. At
+`max-width: 680px`, the Settings sheet must use the backdrop content width (`100%`) as its
+upper bound, keep symmetric safe margins at 390 x 844, and retain readable controls. No
+other sheet, gameplay layout, motion timing, or Classic-speed behavior changes. Final
+source gates and browser evidence must be regenerated against the corrected source SHA.
+
 ### 2026-08-13 player-directed speed and Bomb correction
 
 The newest player instruction opens two implementation slices while the Endgame v4
