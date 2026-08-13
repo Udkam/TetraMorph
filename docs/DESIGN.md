@@ -76,10 +76,15 @@ and carrier snapshot, and their union is applied once.
 
 The outcome is `chain-clear` only when a primary Bomb band intersects at least one cell of
 a different Bomb carrier. Merely triggering two distant Bombs together is not a chain.
-A chain clears every visible and hidden board cell and every carrier record. `primaryIds`
-are the Bomb carrier IDs intersected by the ordinary rows. `directHitIds` are all different
-Bomb IDs intersected by any primary band. `participantIds` is their unique union; every
-participant earns one Bomb bonus under the multiplier captured for that settlement.
+A chain clears every visible and hidden board cell and every carrier record, and activates
+every locked carrier in the immutable pre-clear snapshot exactly once. Non-Bomb carriers
+apply their normal Freeze, Collapse, or Multiplier effect even when they lie outside the
+ordinary rows and primary bands. Every pre-clear Bomb becomes a participant and earns one
+Bomb bonus under the multiplier captured before this settlement. Triggered carriers do
+not recursively produce another clear or another activation. `primaryIds` are the Bomb
+carrier IDs intersected by the ordinary rows. `directHitIds` are all different Bomb IDs
+intersected by any primary band. For `blast`, `participantIds` is their unique union; for
+`chain-clear`, it is every pre-clear Bomb ID.
 Two primary Bombs on the same row chain because each band intersects the other carrier;
 two distant primary Bombs do not.
 
@@ -88,9 +93,9 @@ For `blast`, the one settlement removes the sorted unique union of `ordinaryRows
 `progressRows` is the subset of that removal set that was non-empty in the immutable
 pre-clear board, and `state.lines` increases by `progressRows.length`. An ordinary row that
 also belongs to a blast band counts once, while an empty adjacent row moves the board but
-adds no progress. `activationIds` contains every non-Bomb carrier hit by
-`ordinaryRows ∪ blastRows`, deduplicated by carrier ID. Unrelated carriers erased only by
-a chain whole-board clear do not activate.
+adds no progress. For `blast`, `activationIds` contains every non-Bomb carrier hit by
+`ordinaryRows ∪ blastRows`; for `chain-clear`, it contains every pre-clear non-Bomb
+carrier. Both sets are deduplicated by carrier ID.
 
 The single summarized Bomb activation requires immutable `bombOutcome`, `blastRows`, and
 `participatingBombCount` evidence. The count is exactly `participantIds.size`, while

@@ -2310,6 +2310,12 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Current authorized implementation order is: precise Classic/Mutation/Ice gravity Core
   and settings; causal Bomb Core; chain-clear renderer/audio and browser/listening proof.
   Survival is proposal-only at final report. Line-clear reward/duration and icon remain last.
+- Player correction after the first Bomb contract: a chain clear activates every locked
+  pre-clear carrier exactly once. All pre-clear Bombs become scored participants; every
+  Freeze/Collapse/Multiplier carrier applies its normal effect even outside the primary
+  bands. The already-active chain cannot recursively clear or activate a carrier twice.
+- Unique next action: commit this three-document correction, then implement the precise
+  gravity Core checkpoint before opening the Bomb Core writer slice.
 
 ## Do not repeat
 

@@ -34,14 +34,17 @@ then settles once, so row remapping cannot change causality.
 
 If a primary blast band intersects a different Bomb carrier, the outcome is one chain
 clear of the complete canonical board, including hidden rows. Two Bombs merely present in
-the same transition do not chain unless one band's cells hit the other carrier. Non-Bomb
-carriers hit by either an ordinary full row or a primary blast band retain their normal
-activation; carriers removed only by the later whole-board clear are silently discarded.
+the same transition do not chain unless one band's cells hit the other carrier. A chain
+clear activates every locked carrier in the immutable pre-clear snapshot exactly once,
+including carriers outside the ordinary rows and primary bands. Every non-Bomb applies
+its normal effect; every Bomb is a participant and earns its existing Bomb bonus once.
+Those triggered effects do not recursively schedule a second clear or a second activation.
 
 `primaryIds` are Bomb carriers hit by the ordinary full rows. `directHitIds` are different
-Bomb carriers intersected by any primary band. `participantIds` is their unique union.
-Every participant earns the existing Bomb bonus exactly once under the pre-clear
-multiplier. Event `participatingBombCount` is exactly `participantIds.size`, and
+Bomb carriers intersected by any primary band. For a normal blast, `participantIds` is
+their unique union; for a chain clear, it expands to every Bomb in the immutable pre-clear
+snapshot. Every participant earns the existing Bomb bonus exactly once under the
+pre-clear multiplier. Event `participatingBombCount` is exactly `participantIds.size`, and
 `blastRows` is always the frozen sorted union of primary bands, including for a chain.
 For a normal blast, board removal is the one-shot union of ordinary rows and `blastRows`;
 for a chain it is the complete board. In both cases, line progress is the count of unique
