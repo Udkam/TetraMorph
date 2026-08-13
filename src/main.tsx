@@ -11,6 +11,7 @@ import './styles/endgame-library.css';
 import './styles/result.css';
 import './styles/settings.css';
 import './styles/themes.css';
+import './styles/in-page-transitions.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('TetraMorph root element is missing.');

@@ -1,0 +1,85 @@
+/* T37 D2A: one restrained presence language for board-fixed overlays. */
+.app .sheet-backdrop[data-sheet-phase="enter"][data-sheet-motion="full"] {
+  animation: d2a-backdrop-in 120ms cubic-bezier(.16, 1, .3, 1) both !important;
+}
+
+.app .action-sheet[data-sheet-phase="enter"][data-sheet-motion="full"] {
+  animation: d2a-sheet-in 180ms cubic-bezier(.16, 1, .3, 1) both !important;
+}
+
+.app .sheet-backdrop[data-sheet-phase="exit"][data-sheet-motion="full"] {
+  pointer-events: none;
+  animation: d2a-backdrop-out 120ms cubic-bezier(.4, 0, 1, 1) both !important;
+}
+
+.app .action-sheet[data-sheet-phase="exit"][data-sheet-motion="full"] {
+  pointer-events: none;
+  animation: d2a-sheet-out 120ms cubic-bezier(.4, 0, 1, 1) both !important;
+}
+
+.settings-console__panel {
+  animation: d2a-settings-panel-in 150ms cubic-bezier(.16, 1, .3, 1) both !important;
+}
+
+@keyframes d2a-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes d2a-sheet-in {
+  from { opacity: .94; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes d2a-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes d2a-sheet-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: .96; transform: translateY(-2px); }
+}
+
+@keyframes d2a-settings-panel-in {
+  from { opacity: .96; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.app .sheet-backdrop[data-sheet-phase="enter"][data-sheet-motion="reduced"] {
+  animation: d2a-opacity-in 32ms linear both !important;
+}
+
+.app .sheet-backdrop[data-sheet-phase="exit"][data-sheet-motion="reduced"] {
+  pointer-events: none;
+  animation: d2a-opacity-out 32ms linear both !important;
+}
+
+.app .action-sheet[data-sheet-phase="enter"][data-sheet-motion="reduced"],
+.app[data-reduced-motion="true"] .settings-console__panel {
+  transform: none !important;
+  animation: d2a-opacity-in 32ms linear both !important;
+  transition: none !important;
+}
+
+.app .action-sheet[data-sheet-phase="exit"][data-sheet-motion="reduced"] {
+  pointer-events: none;
+  transform: none !important;
+  animation: d2a-opacity-out 32ms linear both !important;
+  transition: none !important;
+}
+
+.app :is(.sheet-backdrop, .action-sheet)[data-sheet-phase="steady"] {
+  transform: none !important;
+  animation: none !important;
+}
+
+@keyframes d2a-opacity-in {
+  from { opacity: .96; }
+  to { opacity: 1; }
+}
+
+@keyframes d2a-opacity-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

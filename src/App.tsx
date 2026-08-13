@@ -76,7 +76,7 @@ import {
 } from './design/visualThemes';
 import { ANCHOR_MATERIAL, PIECE_MATERIALS } from './game/render/theme';
 import { nextPreviewPieces, survivalDebrisCells } from './game/render/presentation';
-import { ActionSheet } from './ui/ActionSheet';
+import { ActionSheet, ActionSheetFamily } from './ui/ActionSheet';
 import {
   DEFAULT_LANGUAGE,
   LANGUAGE_STORAGE_KEY,
@@ -2571,6 +2571,8 @@ export function GameSession({
         className="action-sheet--settings"
         visuallyHideTitle
         dismissOnBackdropClick
+        reducedMotion={reducedMotion}
+        focusReturn="external"
         onCancel={closeSettings}
       >
         <section className="settings-console" data-testid="settings-sheet" aria-label={copy.labels.settings}>
@@ -2647,8 +2649,8 @@ export function GameSession({
                   </div>
                 )}
                 <div className="settings-console__actions">
-                  <button className="secondary-action" type="button" data-testid="settings-restart" data-arrow-nav data-arrow-row="4" data-arrow-col="0" disabled={countdownDigit !== null || entryCoverExiting} onClick={restartRun}>{copy.labels.restart}</button>
-                  <button className="primary-action" type="button" data-arrow-nav data-arrow-row="4" data-arrow-col="1" onClick={closeSettings}>
+                  <button className="secondary-action" type="button" data-testid="settings-restart" data-arrow-nav data-arrow-row="4" data-arrow-col="0" data-sheet-close data-sheet-focus-owner="external" disabled={countdownDigit !== null || entryCoverExiting} onClick={restartRun}>{copy.labels.restart}</button>
+                  <button className="primary-action" type="button" data-arrow-nav data-arrow-row="4" data-arrow-col="1" data-sheet-close data-sheet-focus-owner="external" onClick={closeSettings}>
                     {copy.labels.continue}
                   </button>
                 </div>
@@ -2693,12 +2695,13 @@ export function GameSession({
         title={copy.labels.leaveTitle}
         description=""
         tone="danger"
+        reducedMotion={reducedMotion}
         onCancel={cancelExit}
       >
-        <button className="primary-action" data-autofocus type="button" onClick={() => onExit(exitDestination)}>
+        <button className="primary-action" data-autofocus data-sheet-close data-sheet-focus-owner="external" type="button" onClick={() => onExit(exitDestination)}>
           {exitDestination === 'endgame-library' ? copy.labels.leaveEndgame : copy.labels.leaveRun}
         </button>
-        <button className="secondary-action" type="button" onClick={cancelExit}>{copy.labels.stay}</button>
+        <button className="secondary-action" data-sheet-close type="button" onClick={cancelExit}>{copy.labels.stay}</button>
       </ActionSheet>
 
       <ActionSheet
@@ -2711,6 +2714,8 @@ export function GameSession({
           : state.mode !== 'endgame'
             ? `action-sheet--run-result action-sheet--run-result-${state.mode}`
             : undefined}
+        reducedMotion={reducedMotion}
+        focusReturn="external"
         onCancel={leaveResult}
       >
         {activeEndgameCelebration && <EndgameCelebrationPanel celebration={activeEndgameCelebration} language={language} />}
@@ -2724,8 +2729,8 @@ export function GameSession({
             language={language}
           />
         </>}
-        <button className="primary-action" data-autofocus type="button" onClick={restartRun}>{state.mode === 'endgame' ? copy.labels.replay : copy.labels.playAgain}</button>
-        <button className="secondary-action" type="button" onClick={leaveResult}>
+        <button className="primary-action" data-autofocus data-sheet-close data-sheet-focus-owner="external" type="button" onClick={restartRun}>{state.mode === 'endgame' ? copy.labels.replay : copy.labels.playAgain}</button>
+        <button className="secondary-action" data-sheet-close data-sheet-focus-owner="external" type="button" onClick={leaveResult}>
           {exitDestination === 'endgame-library' ? copy.labels.leaveEndgame : copy.labels.modeHome}
         </button>
       </ActionSheet>
@@ -3125,6 +3130,7 @@ export default function App() {
       data-route-transition={routeTransitionMode}
       data-route-direction={routeDirection}
     >
+      <ActionSheetFamily>
       <div className="app-route-viewport" data-testid="route-viewport" key={appPathFor(navigation)}>
         {screen === 'home' && <ModeHome onEnter={enterMode} language={language} />}
         {screen === 'endgame-library' && (
@@ -3164,13 +3170,15 @@ export default function App() {
         open={ruleIntroMode !== null}
         title={ruleIntroMode === null ? appCopy(language).labels.rules : modeRulesTitle(language, ruleIntroMode)}
         description=""
+        reducedMotion={reducedMotion}
         onCancel={() => setRuleIntroMode(null)}
         onConfirm={beginIntroducedMode}
       >
         {ruleIntroMode !== null && <ModeRuleSummary mode={ruleIntroMode} language={language} testId="entry-mode-rules" showHeading={false} variant="intro" />}
-        <button className="primary-action" data-autofocus type="button" onClick={beginIntroducedMode}>{appCopy(language).labels.okay}</button>
-        <button className="secondary-action" type="button" onClick={() => setRuleIntroMode(null)}>{appCopy(language).labels.back}</button>
+        <button className="primary-action" data-autofocus data-sheet-close data-sheet-focus-owner="external" type="button" onClick={beginIntroducedMode}>{appCopy(language).labels.okay}</button>
+        <button className="secondary-action" data-sheet-close type="button" onClick={() => setRuleIntroMode(null)}>{appCopy(language).labels.back}</button>
       </ActionSheet>
+      </ActionSheetFamily>
     </div>
   );
 }

@@ -52,6 +52,7 @@ import { LEADERBOARD_KEY, emptyLeaderboard, type ScoreRecord } from './leaderboa
 import { appCopy, itemLabel, modeIntroRules, modeRules, modeRulesTitle } from './ui/localization';
 import type { VisualThemeId } from './design/visualThemes';
 import { appHistoryStateFor, appNavigationFromHistory } from './navigation/appRoute';
+import { ActionSheet, ActionSheetFamily } from './ui/ActionSheet';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 const sourceStyles = readFileSync('src/styles.css', 'utf8');
@@ -519,6 +520,75 @@ async function advanceEntryCountdown(): Promise<void> {
   }
   await act(async () => vi.advanceTimersByTimeAsync(220));
 }
+
+function expectRetiredSheet(container: HTMLElement, testId: string): HTMLElement {
+  const content = container.querySelector<HTMLElement>(`[data-testid="${testId}"]`);
+  const backdrop = content?.closest<HTMLElement>('[data-testid="action-sheet-backdrop"]') ?? null;
+  expect(backdrop?.dataset.sheetPhase).toBe('exit');
+  expect(container.querySelector('[role="dialog"]')).toBeNull();
+  expect(backdrop?.hasAttribute('inert')).toBe(true);
+  expect(backdrop?.getAttribute('aria-hidden')).toBe('true');
+  return backdrop!;
+}
+
+function testSheet(open: boolean, label: string, reducedMotion = false, onClose = () => undefined) {
+  return createElement(ActionSheetFamily, null,
+    createElement(ActionSheet, { open, title: 'Layer', description: '', reducedMotion, onCancel: onClose, children: null },
+      createElement('button', { type: 'button', 'data-autofocus': true, 'data-sheet-close': true, onClick: onClose }, label)));
+}
+
+describe('T37 D2A ActionSheet presence', () => {
+  it('freezes committed content in an inert 120ms release shell', async () => {
+    vi.useFakeTimers();
+    const view = render(testSheet(true, 'committed'));
+    expect(view.container.querySelector('[data-sheet-phase="enter"]')).not.toBeNull();
+    await act(async () => vi.advanceTimersByTimeAsync(180));
+    expect(view.container.querySelector('[data-sheet-phase="steady"]')).not.toBeNull();
+    view.rerender(testSheet(false, 'new'));
+    const retired = view.container.querySelector<HTMLElement>('[data-sheet-phase="exit"]')!;
+    expect(retired.textContent).toContain('committed');
+    expect(retired.textContent).not.toContain('new');
+    expect(retired.hasAttribute('inert')).toBe(true);
+    expect(view.container.querySelector('[role="dialog"]')).toBeNull();
+    await act(async () => vi.advanceTimersByTimeAsync(119));
+    expect(view.container.querySelector('[data-sheet-phase="exit"]')).not.toBeNull();
+    await act(async () => vi.advanceTimersByTimeAsync(1));
+    expect(view.container.querySelector('[data-testid="action-sheet-backdrop"]')).toBeNull();
+    view.unmount();
+  });
+
+  it('shortens an active phase when motion is reduced and ignores a stale exit timer', async () => {
+    vi.useFakeTimers();
+    const view = render(testSheet(true, 'one'));
+    await act(async () => vi.advanceTimersByTimeAsync(48));
+    view.rerender(testSheet(true, 'one', true));
+    expect(view.container.querySelector('[data-sheet-motion="reduced"]')).not.toBeNull();
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    expect(view.container.querySelector('[data-sheet-phase="steady"]')).not.toBeNull();
+    view.rerender(testSheet(false, 'one', true));
+    view.rerender(testSheet(true, 'two', true));
+    await act(async () => vi.advanceTimersByTimeAsync(32));
+    expect(view.container.querySelector('[role="dialog"]')?.textContent).toContain('two');
+    expect(view.container.querySelector('[data-sheet-phase="steady"]')).not.toBeNull();
+    view.unmount();
+  });
+
+  it('retires an older family shell immediately and never steals explicit focus', () => {
+    const pair = (first: boolean, second: boolean) => createElement(ActionSheetFamily, null,
+      createElement(ActionSheet, { open: first, title: 'First', description: '', children: null }, createElement('button', null, 'old')),
+      createElement(ActionSheet, { open: second, title: 'Second', description: '', children: null }, createElement('button', null, 'new')));
+    const view = render(pair(true, false));
+    view.rerender(pair(false, true));
+    expect(view.container.querySelectorAll('[role="dialog"]')).toHaveLength(1);
+    expect(view.container.textContent).not.toContain('old');
+    const outside = document.createElement('button');
+    document.body.append(outside);
+    act(() => outside.focus());
+    expect(document.activeElement).toBe(outside);
+    outside.remove();
+    view.unmount();
+  });
+});
 
 describe('DEV QA state snapshot isolation', () => {
   it('detaches scalar, active piece, queue, and nested board state', () => {
@@ -1139,7 +1209,7 @@ describe('T6 frontend mode binding', () => {
 
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')?.click());
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="settings-restart"]')?.click());
-    expect(view.container.querySelector('[data-testid="settings-sheet"]')).toBeNull();
+    expectRetiredSheet(view.container, 'settings-sheet');
     expect(view.container.querySelector('[data-testid="restart-curtain"]')).toBeNull();
     expect(view.container.querySelector('[data-testid="entry-countdown"]')?.getAttribute('data-countdown')).toBe('3');
     expect(runtime.restart).toHaveBeenCalledTimes(1);
@@ -1219,7 +1289,7 @@ describe('T6 frontend mode binding', () => {
 
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="settings-restart"]')?.click());
     expect(view.container.querySelector('[data-testid="restart-curtain"]')).toBeNull();
-    expect(view.container.querySelector('[data-testid="settings-sheet"]')).toBeNull();
+    expectRetiredSheet(view.container, 'settings-sheet');
     expect(view.container.querySelector('[data-testid="entry-countdown"]')?.getAttribute('data-countdown')).toBe('3');
     expect(runtime.restart).toHaveBeenCalledTimes(1);
     await advanceEntryCountdown();
@@ -1540,7 +1610,7 @@ describe('T6 frontend mode binding', () => {
     expect(runtimeHarness.instances.at(-1)?.setAudioEnabled).toHaveBeenCalledWith(false);
     expect(resume).not.toBeNull();
     act(() => view.container.querySelector<HTMLElement>('[data-testid="action-sheet-backdrop"]')?.click());
-    expect(view.container.querySelector('[data-testid="settings-sheet"]')).toBeNull();
+    expectRetiredSheet(view.container, 'settings-sheet');
     expect(runtimeHarness.instances.at(-1)?.setInputEnabled).toHaveBeenLastCalledWith(true);
     view.unmount();
   });
@@ -1751,7 +1821,7 @@ describe('T6 frontend mode binding', () => {
     expect(view.container.querySelector('[data-testid="settings-sheet"]')?.textContent).toContain('继续游戏');
     expect(runtimeHarness.instances.at(-1)?.togglePause).toHaveBeenCalledTimes(1);
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="settings-restart"]')?.click());
-    expect(view.container.querySelector('[data-testid="settings-sheet"]')).toBeNull();
+    expectRetiredSheet(view.container, 'settings-sheet');
     expect(view.container.querySelector('[data-testid="restart-curtain"]')).toBeNull();
     expect(runtimeHarness.instances.at(-1)?.restart).toHaveBeenCalledTimes(1);
     expect(view.container.querySelector('[data-testid="entry-countdown"]')?.getAttribute('data-countdown')).toBe('3');
@@ -1841,7 +1911,7 @@ describe('T6 frontend mode binding', () => {
 
     act(() => [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="settings-sheet"] button')]
       .find((button) => button.textContent === '继续游戏')?.click());
-    expect(view.container.querySelector('[data-testid="settings-sheet"]')).toBeNull();
+    expectRetiredSheet(view.container, 'settings-sheet');
     expect(view.container.textContent).not.toContain('暂停');
     expect(runtime.togglePause).toHaveBeenCalledTimes(1);
     view.unmount();
@@ -1878,7 +1948,7 @@ describe('T6 frontend mode binding', () => {
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyS', key: 's', bubbles: true })));
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="settings-restart"]')?.click());
     expect(view.container.querySelector('[data-testid="restart-curtain"]')).toBeNull();
-    expect(view.container.querySelector('[data-testid="settings-sheet"]')).toBeNull();
+    expectRetiredSheet(view.container, 'settings-sheet');
     expect(view.container.querySelector('[data-testid="entry-countdown"]')?.getAttribute('data-countdown')).toBe('3');
     expect(runtime.restart).toHaveBeenCalledTimes(1);
     await advanceEntryCountdown();
@@ -1889,7 +1959,8 @@ describe('T6 frontend mode binding', () => {
     expect(view.container.textContent).toContain('离开本局？');
     act(() => [...view.container.querySelectorAll<HTMLButtonElement>('.action-sheet__actions > button')]
       .find((button) => button.textContent === '留在本局')?.click());
-    expect(view.container.textContent).not.toContain('离开本局？');
+    expect(view.container.querySelector('[role="dialog"]')).toBeNull();
+    expect(view.container.querySelector('[data-sheet-phase="exit"]')?.textContent).toContain('离开本局？');
     expect(view.container.querySelectorAll('canvas')).toHaveLength(1);
     expect(view.container.querySelector('canvas')).toBe(canvas);
 

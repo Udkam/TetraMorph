@@ -1,5 +1,46 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { browserPlatform } from '../platform/browserPlatform';
+
+type SheetPhase = 'enter' | 'steady' | 'exit' | 'unmounted';
+type FocusReturn = 'auto' | 'external';
+
+interface SheetPresence {
+  readonly phase: SheetPhase;
+  readonly epoch: number;
+  readonly reduced: boolean;
+}
+
+interface SheetFamily {
+  readonly activeId: string | null;
+  claim(id: string): void;
+  release(id: string): void;
+}
+
+const EMPTY_FAMILY: SheetFamily = { activeId: null, claim: () => {}, release: () => {} };
+const ActionSheetFamilyContext = createContext<SheetFamily>(EMPTY_FAMILY);
+
+export function ActionSheetFamily({ children }: { children: ReactNode }) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const claim = useCallback((id: string) => setActiveId((current) => current === id ? current : id), []);
+  const release = useCallback((id: string) => setActiveId((current) => current === id ? null : current), []);
+  const value = useMemo(() => ({ activeId, claim, release }), [activeId, claim, release]);
+  return (
+    <ActionSheetFamilyContext.Provider value={value}>
+      {children}
+    </ActionSheetFamilyContext.Provider>
+  );
+}
 
 interface ActionSheetProps {
   open: boolean;
@@ -11,6 +52,8 @@ interface ActionSheetProps {
   externalFocusSelector?: string;
   dismissOnBackdropClick?: boolean;
   visuallyHideTitle?: boolean;
+  reducedMotion?: boolean;
+  focusReturn?: FocusReturn;
   onCancel?: () => void;
   onConfirm?: () => void;
   children: ReactNode;
@@ -38,13 +81,141 @@ export function ActionSheet({
   externalFocusSelector,
   dismissOnBackdropClick = false,
   visuallyHideTitle = false,
+  reducedMotion = false,
+  focusReturn = 'auto',
   onCancel,
   onConfirm,
   children,
 }: ActionSheetProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const familyId = useId();
+  const { activeId, claim, release } = useContext(ActionSheetFamilyContext);
   const panelRef = useRef<HTMLElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const pendingFocusRef = useRef<{ wasInside: boolean; external: boolean } | null>(null);
+  const restoreFrameRef = useRef<number | null>(null);
+  const phaseDeadlineRef = useRef<number | null>(null);
+  const shortenedDurationRef = useRef<number | null>(null);
+  const wasOpenRef = useRef(open);
+  const focusReturnRef = useRef(focusReturn);
+  const reducedMotionRef = useRef(reducedMotion);
+  const externalFocusSelectorRef = useRef(externalFocusSelector);
+  const onCancelRef = useRef(onCancel);
+  const onConfirmRef = useRef(onConfirm);
+  const [presence, setPresenceState] = useState<SheetPresence>(() => ({
+    phase: open ? 'enter' : 'unmounted',
+    epoch: open ? 1 : 0,
+    reduced: reducedMotion,
+  }));
+  const presenceRef = useRef(presence);
+  const presentationRef = useRef({ title, description, tone, className, placement, visuallyHideTitle, children });
+  focusReturnRef.current = focusReturn;
+  reducedMotionRef.current = reducedMotion;
+  externalFocusSelectorRef.current = externalFocusSelector;
+  onCancelRef.current = onCancel;
+  onConfirmRef.current = onConfirm;
+
+  const setPresence = useCallback((next: SheetPresence) => {
+    presenceRef.current = next;
+    setPresenceState(next);
+  }, []);
+
+  const sampleCloseFocus = useCallback((external = focusReturnRef.current === 'external') => {
+    const active = browserPlatform.activeElement();
+    pendingFocusRef.current = {
+      wasInside: active !== null && panelRef.current?.contains(active) === true,
+      external,
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (open) presentationRef.current = { title, description, tone, className, placement, visuallyHideTitle, children };
+  }, [children, className, description, open, placement, title, tone, visuallyHideTitle]);
+
+  useLayoutEffect(() => {
+    const wasOpen = wasOpenRef.current;
+    wasOpenRef.current = open;
+    if (open) {
+      claim(familyId);
+      if (!wasOpen) {
+        browserPlatform.cancelFrame(restoreFrameRef.current);
+        restoreFrameRef.current = null;
+        const next = { phase: 'enter', epoch: presenceRef.current.epoch + 1, reduced: reducedMotionRef.current } as const;
+        setPresence(next);
+      } else {
+        pendingFocusRef.current = null;
+      }
+      return;
+    }
+    if (!wasOpen) return;
+
+    release(familyId);
+    const next = { phase: 'exit', epoch: presenceRef.current.epoch + 1, reduced: reducedMotionRef.current } as const;
+    const focusSample = pendingFocusRef.current ?? { wasInside: false, external: focusReturnRef.current === 'external' };
+    pendingFocusRef.current = null;
+    setPresence(next);
+    browserPlatform.cancelFrame(restoreFrameRef.current);
+    restoreFrameRef.current = focusSample.external || !focusSample.wasInside
+      ? null
+      : browserPlatform.defer(() => {
+          restoreFrameRef.current = null;
+          if (presenceRef.current.epoch !== next.epoch || presenceRef.current.phase !== 'exit') return;
+          const documentTarget = browserPlatform.documentTarget();
+          if (documentTarget?.querySelector('[role="dialog"][aria-modal="true"]')) return;
+          const active = browserPlatform.activeElement();
+          const vacant = active === null || active === documentTarget?.body || active === documentTarget?.documentElement;
+          if (!vacant && panelRef.current?.contains(active) !== true) return;
+          const target = previousFocusRef.current;
+          if (!target?.isConnected) return;
+          try {
+            target.focus({ preventScroll: true });
+          } catch {
+            target.focus();
+          }
+        });
+  }, [claim, familyId, open, release, setPresence]);
+
+  useLayoutEffect(() => {
+    if (!reducedMotion || presence.reduced || presence.phase === 'steady' || presence.phase === 'unmounted') return;
+    const remaining = phaseDeadlineRef.current === null
+      ? 32
+      : Math.max(0, phaseDeadlineRef.current - browserPlatform.now());
+    shortenedDurationRef.current = Math.min(32, remaining);
+    setPresence({ ...presence, reduced: true });
+  }, [presence, reducedMotion, setPresence]);
+
+  useLayoutEffect(() => {
+    if (open || presence.phase !== 'exit' || activeId === null || activeId === familyId) return;
+    setPresence({ ...presence, phase: 'unmounted' });
+  }, [activeId, familyId, open, presence, setPresence]);
+
+  useEffect(() => {
+    if (presence.phase !== 'enter' && presence.phase !== 'exit') return undefined;
+    const epoch = presence.epoch;
+    const finish = () => {
+      if (presenceRef.current.epoch !== epoch || presenceRef.current.phase !== presence.phase) return;
+      phaseDeadlineRef.current = null;
+      setPresence({ ...presenceRef.current, phase: presence.phase === 'enter' ? 'steady' : 'unmounted' });
+    };
+    const duration = shortenedDurationRef.current
+      ?? (presence.reduced ? 32 : presence.phase === 'enter' ? 180 : 120);
+    shortenedDurationRef.current = null;
+    phaseDeadlineRef.current = browserPlatform.now() + duration;
+    const timer = browserPlatform.scheduleTimeout(finish, duration);
+    if (timer === null) finish();
+    return () => {
+      browserPlatform.cancelTimeout(timer);
+      if (presenceRef.current.epoch !== epoch || presenceRef.current.phase !== presence.phase) {
+        phaseDeadlineRef.current = null;
+      }
+    };
+  }, [presence, setPresence]);
+
+  useEffect(() => () => {
+    release(familyId);
+    browserPlatform.cancelFrame(restoreFrameRef.current);
+  }, [familyId, release]);
 
   const syncSelectedAction = (target: EventTarget | null) => {
     const panel = panelRef.current;
@@ -71,8 +242,9 @@ export function ActionSheet({
 
   useEffect(() => {
     if (!open) return;
-    const previouslyFocused = browserPlatform.activeElement();
     const panel = panelRef.current;
+    const activeBeforeOpen = browserPlatform.activeElement();
+    if (panel?.contains(activeBeforeOpen) !== true) previousFocusRef.current = activeBeforeOpen;
     const focusInitial = () => {
       const preferred = panel?.querySelector<HTMLElement>('[data-autofocus]');
       const first = panel?.querySelector<HTMLElement>(FOCUSABLE);
@@ -84,10 +256,11 @@ export function ActionSheet({
 
     const handleKeyDown = (event: Event) => {
       const keyboardEvent = event as KeyboardEvent;
-      if (keyboardEvent.key === 'Escape' && onCancel) {
+      if (keyboardEvent.key === 'Escape' && onCancelRef.current) {
         keyboardEvent.preventDefault();
         keyboardEvent.stopPropagation();
-        onCancel();
+        sampleCloseFocus();
+        onCancelRef.current();
         return;
       }
       const actionButtons = [...panel?.querySelectorAll<HTMLButtonElement>(ACTION_BUTTONS) ?? []];
@@ -174,16 +347,17 @@ export function ActionSheet({
         selected.click();
         return;
       }
-      if (keyboardEvent.key === 'Enter' && onConfirm && !keyboardEvent.isComposing) {
+      if (keyboardEvent.key === 'Enter' && onConfirmRef.current && !keyboardEvent.isComposing) {
         keyboardEvent.preventDefault();
         keyboardEvent.stopPropagation();
-        onConfirm();
+        sampleCloseFocus(true);
+        onConfirmRef.current();
         return;
       }
       if (keyboardEvent.key !== 'Tab' || !panel) return;
       const panelFocusable = [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)];
-      const externalFocusable = externalFocusSelector
-        ? [...browserPlatform.documentTarget()?.querySelectorAll<HTMLElement>(externalFocusSelector) ?? []]
+      const externalFocusable = externalFocusSelectorRef.current
+        ? [...browserPlatform.documentTarget()?.querySelectorAll<HTMLElement>(externalFocusSelectorRef.current) ?? []]
         : [];
       const focusable = [...panelFocusable, ...externalFocusable]
         .filter((control, index, controls) => controls.indexOf(control) === index);
@@ -205,42 +379,69 @@ export function ActionSheet({
     return () => {
       browserPlatform.cancelFrame(frame);
       removeKeyDown();
-      browserPlatform.defer(() => {
-        const successor = browserPlatform.documentTarget()
-          ?.querySelector('[role="dialog"][aria-modal="true"]');
-        if (successor) return;
-        browserPlatform.deferFocus(previouslyFocused);
-      });
     };
-  }, [externalFocusSelector, onCancel, onConfirm, open]);
+  }, [open, sampleCloseFocus]);
 
-  if (!open) return null;
+  if (!open && presence.phase === 'unmounted') return null;
+
+  const presentation = open
+    ? { title, description, tone, className, placement, visuallyHideTitle, children }
+    : presentationRef.current;
+  const visualPhase = open
+    ? presence.phase === 'steady' ? 'steady' : 'enter'
+    : 'exit';
+  const retired = !open;
+  const stopRetiredEvent = (event: { preventDefault(): void; stopPropagation(): void }) => {
+    if (!retired) return;
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   return (
     <div
-      className={`sheet-backdrop sheet-backdrop--${placement}`}
+      className={`sheet-backdrop sheet-backdrop--${presentation.placement}`}
       data-testid="action-sheet-backdrop"
-      data-sheet-placement={placement}
+      data-sheet-placement={presentation.placement}
+      data-sheet-phase={visualPhase}
+      data-sheet-motion={presence.reduced ? 'reduced' : 'full'}
+      inert={retired || undefined}
+      aria-hidden={retired || undefined}
       onClick={(event) => {
-        if (dismissOnBackdropClick && event.target === event.currentTarget) onCancel?.();
+        if (retired) return;
+        if (dismissOnBackdropClick && event.target === event.currentTarget) {
+          sampleCloseFocus();
+          onCancel?.();
+        }
       }}
+      onClickCapture={stopRetiredEvent}
+      onPointerDownCapture={stopRetiredEvent}
+      onKeyDownCapture={stopRetiredEvent}
     >
       <section
         ref={panelRef}
-        className={`action-sheet action-sheet--${tone} action-sheet--placement-${placement}${className ? ` ${className}` : ''}`}
-        role="dialog"
-        aria-modal={externalFocusSelector ? undefined : 'true'}
-        aria-labelledby={titleId}
-        aria-describedby={description ? descriptionId : undefined}
-        tabIndex={-1}
+        className={`action-sheet action-sheet--${presentation.tone} action-sheet--placement-${presentation.placement}${presentation.className ? ` ${presentation.className}` : ''}`}
+        data-sheet-phase={visualPhase}
+        data-sheet-motion={presence.reduced ? 'reduced' : 'full'}
+        role={retired ? undefined : 'dialog'}
+        aria-modal={retired || externalFocusSelector ? undefined : 'true'}
+        aria-labelledby={retired ? undefined : titleId}
+        aria-describedby={retired || !presentation.description ? undefined : descriptionId}
+        tabIndex={retired ? undefined : -1}
+        onClickCapture={(event) => {
+          if (retired) return;
+          const target = event.target instanceof Element
+            ? event.target.closest<HTMLElement>('[data-sheet-close]')
+            : null;
+          if (target) sampleCloseFocus(target.dataset.sheetFocusOwner === 'external');
+        }}
         onFocusCapture={(event) => {
           syncSelectedAction(event.target);
           syncArrowSelection(event.target);
         }}
       >
-        <h2 id={titleId} className={visuallyHideTitle ? 'sr-only' : undefined}>{title}</h2>
-        {description && <p id={descriptionId}>{description}</p>}
-        <div className="action-sheet__actions">{children}</div>
+        <h2 id={titleId} className={presentation.visuallyHideTitle ? 'sr-only' : undefined}>{presentation.title}</h2>
+        {presentation.description && <p id={descriptionId}>{presentation.description}</p>}
+        <div className="action-sheet__actions">{presentation.children}</div>
       </section>
     </div>
   );
