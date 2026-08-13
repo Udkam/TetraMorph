@@ -2151,6 +2151,28 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
 - Sole next action: independent review and exact four-doc commit, then repair/refreeze
   only the external validator and obtain two fresh exact-byte reviews.
 
+### F4E-R4F exact command materialization candidate
+
+- Frozen external validator: 51,909 bytes / SHA-256
+  `17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A`.
+- Static UTF-8/LF/syntax/help gates pass. Three independent exact-byte/loader/publication
+  reviews report P0-P3/GAP all zero without executing it. Reproduced Core transform
+  manifest SHA-256: `812F68F7642859B5EFCA8EC8FB0062E63F7A06942A118FDE150A92E325044CD4`.
+
+F4E-R4B-COMMAND-CONTRACT-V1 validator=17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A
+
+- DESIGN alone materializes the one exact 1,824-byte line+LF command manifest and exact
+  fail-closed PowerShell wrapper. Manifest SHA-256 is
+  `29BA027DA237B62BB7AC1459053C37299BC85B76F37A2A6416E9F2F71DBDA139`.
+- Output, attempt receipt, matching stage, and validator process remain zero. Execution is
+  closed pending independent four-doc review and commit.
+- Sole next action: review this exact four-doc diff; if all-zero, commit it, repeat the
+  immediate read-only preflight, and invoke only the committed wrapper once if green.
+- Rejected wrapper P1: exact long-path regex missed slash/relative/8.3 aliases. Current
+  wrapper binds CIM short basename `T312A0~1.MJS`, rejects unreadable Node command lines,
+  and rejects either basename case-insensitively. Seven alias/null probes fail closed;
+  fresh review is required before commit.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

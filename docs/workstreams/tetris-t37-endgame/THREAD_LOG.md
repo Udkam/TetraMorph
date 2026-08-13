@@ -463,3 +463,24 @@ old screenshot.
   allowed. Execution remains closed.
 - Sole next action: independent contract review, four-doc commit, then external-byte
   repair and two fresh static reviews.
+
+### F4E-R4F exact command materialization candidate
+
+- External candidate freezes at 51,909 bytes / SHA-256
+  `17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A`.
+- UTF-8/LF, syntax, help, and zero-output checks pass. Three independent exact-byte,
+  loader, and state-machine reviews each report P0-P3/GAP all zero; no proof ran.
+- Independent Core transform manifest SHA-256 is
+  `812F68F7642859B5EFCA8EC8FB0062E63F7A06942A118FDE150A92E325044CD4`.
+
+F4E-R4B-COMMAND-CONTRACT-V1 validator=17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A
+
+- DESIGN materializes the sole exact command manifest and fail-closed PowerShell wrapper;
+  line+LF is 1,824 UTF-8 bytes / SHA-256
+  `29BA027DA237B62BB7AC1459053C37299BC85B76F37A2A6416E9F2F71DBDA139`.
+- Output/attempt/stage/process remain zero. Execution stays closed pending four-doc
+  independent review and exact commit.
+- Initial wrapper P1: a literal long-path regex missed forward-slash, relative, and 8.3
+  aliases. Repair binds the actual CIM short basename `T312A0~1.MJS`, fails closed on
+  unreadable Node command lines, and rejects either basename case-insensitively. The
+  seven-case alias/null matrix passes; final diff review remains pending.

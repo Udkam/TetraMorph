@@ -9014,3 +9014,32 @@ values are not serialized. The pinned experimental warning may appear on stderr 
 never suppressed or proof data. Post-claim staging survives every failure; only F4E-R4D's
 terminal successful-publication unlink may remove it. Execution stays closed pending
 four-doc contract review/commit and fresh exact-byte review.
+
+### F4E-R4F — exact command materialization candidate
+
+The repaired external validator is frozen at exactly 51,909 bytes with SHA-256
+`17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A`.
+UTF-8/LF/no-BOM, `node --check`, and `--help` pass. Three independent exact-byte,
+Node-loader, and publication-state reviews each report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; none executed the validator. The independently
+reproduced 16-module transform manifest hash is
+`812F68F7642859B5EFCA8EC8FB0062E63F7A06942A118FDE150A92E325044CD4`.
+
+F4E-R4B-COMMAND-CONTRACT-V1 validator=17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A
+
+The only proposed command is the exact fail-closed PowerShell block materialized in
+`docs/DESIGN.md`. Its canonical command-manifest line including LF is 1,824 UTF-8 bytes
+with SHA-256 `29BA027DA237B62BB7AC1459053C37299BC85B76F37A2A6416E9F2F71DBDA139`.
+It admits exactly the two byte/hash-pinned `NODE_*` values already present, rejects every
+`GIT_*` key, rechecks Node/Git/validator/clue files, requires output/attempt/staging and a
+matching validator process all absent, never rewrites environment, and launches absolute
+Node once without flags. Output, attempt, and staging remain absent now. Execution remains
+closed until this exact four-document materialization receives independent all-zero review
+and is committed; only then may the coordinator run its immediate preflight and, if green,
+consume the one production attempt.
+
+The first wrapper draft is rejected with P1: literal long-path command-line matching missed
+forward-slash, relative, and 8.3 aliases. The current block first binds the validator's
+unique `CIM_DataFile.EightDotThreeFileName` basename `T312A0~1.MJS`, then fails closed for
+any unreadable `node.exe` command line or any case-insensitive long/short validator basename.
+The seven-case alias matrix passes; this repaired four-doc diff still requires fresh review.
