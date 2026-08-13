@@ -8868,3 +8868,79 @@ Those bytes have no execution authority. The repair replaces only that argument 
 identity check with the fixed repository-base rule above, captures actual HEAD at
 startup, requires the same captured HEAD after proof, and records it in `sourcePin`.
 Every other v2 gate and the no-output postcondition remain unchanged.
+
+### F4E-R4B — repaired v2 byte freeze and rejected command candidate
+
+Status: **HISTORICAL STATIC BYTE ACCEPTANCE ONLY; GOVERNING COMMAND QA REJECTED;
+EXECUTION CLOSED**.
+
+The repaired external validator is exactly 26,928 bytes with SHA-256
+`9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762`.
+`node --check` and `--help` pass; v2 output/staging/process counts are zero. Two
+independent static byte/semantic reviews report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. They confirm repository-base ancestry, exact
+four-document descendants, captured actual-HEAD stability, current Core/public API,
+complete proof semantics, Vite lifecycle, and no-replace publication.
+
+The sole proposed output is the initially absent
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v2.json`.
+The command shown in `docs/DESIGN.md` is a rejected historical candidate, not an
+executable command. Its shell text uses no heap flag, but the validator does not bind
+the launcher environment and cannot machine-enforce exactly-once failure semantics.
+No successful output exists and Intro-05 source editing remains closed.
+
+The first command-contract review rejects these 26,928-byte bytes despite their earlier
+static acceptance. Adversarial QA reports `P1 1 / P2 1`: they do not prove that HEAD
+contains the exact byte/argument contract, and a net repository-base diff can hide an
+intermediate unauthorized edit that a later commit reverts. They also do not prove all
+four contract paths are committed and worktree-clean. These bytes have no execution
+authority.
+
+The successor repair must derive one canonical command-manifest JSON line
+from every resolved path/argument plus its own byte count/SHA, and require that exact
+line once in committed HEAD `DESIGN.md`. All four contract documents must contain one
+short marker binding the repaired validator SHA. From fixed repository base `4172a796...`,
+it must walk an actual single-parent chain to captured HEAD, reject merges, and inspect
+every parent/child no-rename `diff-tree`: all records must be status `M` on authorized
+contract paths, with the accumulated union exactly the four-path set. Before and after
+proof, the four paths must be clean against committed HEAD and their committed marker /
+manifest bytes unchanged. The output records the audited commit/path chain. All existing
+Core/module/clue/self/output/Vite/proof/publication gates stay frozen.
+
+A second governing adversarial review rejects that proposed repair with
+`P0 0 / P1 2 / P2 1 / P3 0 / GAP 0`. The successor must additionally:
+
+- accept one fixed absolute `--attempt` receipt path whose only admitted value is the
+  hard-coded path, include it in the committed manifest, require it `lstat`-absent
+  (including no dangling link/reparse point), then—after every cheap pin but before importing
+  project/Vite code or starting proof—create it with `open('wx')`, write canonical
+  UTF-8/LF bytes, `sync`, and keep that same handle open through proof/publication;
+  handle/path double reads and identity must match before and after proof, then only a
+  post-publication best-effort close is allowed; creation or later failure never deletes it;
+- require the exact PowerShell launcher to reject any case-insensitive `NODE_OPTIONS`
+  key before starting absolute `E:\Nodejs\node.exe`; inside Node require
+  `process.execArgv` exactly empty and no such environment key, and bind/recheck the
+  real Node path/versions, executable bytes/SHA-256, and default V8 heap limit in the
+  committed manifest, attempt receipt, and successful output;
+- obtain every edge with `diff-tree --no-commit-id --name-status -r --no-renames -z`,
+  decode the raw buffer as fatal UTF-8, require the terminal NUL and an even sequence of
+  exact `status,path` tokens, and admit only status `M` plus the four literal paths.
+
+The receipt is immutable evidence that the sole expensive attempt was consumed: a
+partial receipt caused by a crash still blocks restart; a complete receipt carries a
+payload SHA-256 and is reread byte-for-byte before and after publication, with its byte
+count/SHA-256 recorded in
+`sourcePin`. The fixed path is
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v2.json`.
+The current 26,928-byte validator lacks these gates and remains non-executable. Next:
+obtain fresh all-zero review of this contract, commit only the four docs, then modify
+only the repository-external validator and repeat exact-byte review. Git commands must
+run with a sanitized environment, `GIT_NO_REPLACE_OBJECTS=1`, exact toplevel identity,
+and absent replace/graft/alternate-object mechanisms; scoped porcelain is also parsed
+from NUL-delimited raw bytes.
+
+Two independent final contract reviews now report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`, including exact review of the direct Git backend
+pin and the unified held-receipt-handle lifecycle. This opens only the exact four-doc
+contract checkpoint and, after that commit, repository-external validator editing. It
+does not authorize proof execution.

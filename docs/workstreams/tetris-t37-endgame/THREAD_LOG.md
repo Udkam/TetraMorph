@@ -366,3 +366,58 @@ old screenshot.
   require that captured value unchanged post-proof and in output.
 - Blocker: repaired contract/bytes require fresh all-zero review.
 - Sole next action: review and commit this four-document repair; do not run rejected bytes.
+
+## F4E-R4B — repaired v2 bytes with rejected command
+
+- Accepted external bytes: 26,928 / SHA-256
+  `9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762`.
+- Static checks: UTF-8/LF/no BOM, exact v1 delta, syntax/help, output/staging/process zero.
+- Two independent exact-byte/semantic reviews: P0–P3/GAP all zero; no proof run.
+- Pins: Core base `7d81d4974ce8fb777ea105c5ef98d156cd1807cc`; repository
+  base `4172a79620cda33e167d291d38c69f0ed64fec89`; Core tree
+  `96688eca803a335790d65b41db0ace4df7d2f9b5`; clue 633 bytes / `959053...`.
+- The DESIGN command is rejected history. Absence of an explicit heap flag does not bind
+  `NODE_OPTIONS` or `process.execArgv`, and failure leaves no persistent attempt evidence.
+- Blocker: successor fail-closed contract and fresh independent review.
+- Sole next action: review the successor contract; do not execute these bytes.
+
+### F4E-R4B adversarial command rejection
+
+- Rejected validator: 26,928 bytes /
+  `9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762`.
+- Governing verdict: `P1 1 / P2 1`; no execution occurred and output/staging/process are zero.
+- Missing gates: committed exact-byte/argument manifest; per-commit rather than net history
+  audit; exact-four changed union; clean committed contract paths.
+- Repair boundary: runtime-derived committed manifest and per-doc validator marker;
+  linear single-parent per-edge M-only no-rename audit; exact-four union; pre/post HEAD,
+  committed blobs, and scoped worktree equality; audited chain in sourcePin.
+- All clue/Core/route/causal/admission/proof/Vite/publication checks remain unchanged.
+- Blocker: repaired docs/bytes need fresh dual all-zero review.
+- Sole next action: review and commit this repair contract; do not run rejected bytes.
+
+### F4E-R4B governing rejection R2 / fail-closed successor
+
+- Governing review: `P0 0 / P1 2 / P2 1 / P3 0 / GAP 0`.
+- Exact fixed receipt:
+  `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v2.json`.
+  Add required `--attempt`; require absent; after cheap pins and before project/Vite/proof,
+  create canonical bytes with `open('wx')` + write + `sync`, keep the same handle through
+  proof/publication, and require handle/path double reads plus identity before/after proof;
+  only post-publication best-effort close is allowed. Never delete/replace; partial crash
+  residue blocks restart, and successful output binds its hash/identity.
+- Launcher gate: empty `process.execArgv`, no case-insensitive `NODE_OPTIONS` key, and
+  manifest/receipt/output pins for real Node path/versions, executable bytes/SHA and
+  default heap limit, all rechecked before publication. Exact PowerShell rejects
+  `NODE_OPTIONS` before spawning absolute `E:\Nodejs\node.exe`.
+- History gate: raw `diff-tree --name-status -z`; fatal UTF-8; terminal NUL; nonempty even
+  `status,path` pairs; only literal `M` and the four authorized ASCII paths.
+- Current output/attempt are absent and no proof has run. Current 26,928 / `9EA517...`
+  bytes remain non-executable.
+- Git subprocesses use a sanitized environment and replace suppression; exact toplevel,
+  absent replace/graft/alternates, and raw NUL-safe scoped porcelain are mandatory.
+  Direct backend `E:\Git\mingw64\bin\git.exe` is path/bytes/SHA/version-pinned; the
+  `cmd\git.exe` launcher is not used.
+- Two independent final reviews report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` after the
+  Git-backend and held-handle repairs. No proof or external-byte change occurred.
+- Sole next action: exact four-doc contract commit; then modify/refreeze only the external
+  validator. Execution remains closed.

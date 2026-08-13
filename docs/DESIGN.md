@@ -6144,3 +6144,182 @@ know its own SHA before its content is fixed. The reviewed repair uses the known
 generation-contract commit as `--expect-repo-base`, exact descendant paths, and a
 captured stable actual HEAD. It does not relax Core, module, input, self, proof, output,
 or publication checks.
+
+## T37 F4E-R4B historical validator bytes and rejected command
+
+Historically static-accepted external bytes, now rejected by governing command QA:
+
+- path:
+  `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v2.mjs`;
+- bytes: `26,928`;
+- SHA-256: `9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762`;
+- static gates: UTF-8/LF/no BOM, `node --check`, `--help`, v2 output/staging/process zero;
+- independent review: two byte/semantic passes, both
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+
+The following command candidate is retained only as rejected history and must not run:
+
+```powershell
+node "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v2.mjs" `
+  --root "E:\Proj\reproduction-tetris" `
+  --input "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-clue-v1.json" `
+  --output "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v2.json" `
+  --expect-core-base 7d81d4974ce8fb777ea105c5ef98d156cd1807cc `
+  --expect-repo-base 4172a79620cda33e167d291d38c69f0ed64fec89 `
+  --expect-core-tree 96688eca803a335790d65b41db0ace4df7d2f9b5 `
+  --expect-input-bytes 633 `
+  --expect-input-sha 959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42 `
+  --expect-validator-sha 9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762 `
+  --id t3r-shaft-04 `
+  --difficulty 5 `
+  --target-rows 4 `
+  --max-primary-locks 7 `
+  --max-alternative-extra 2
+```
+
+This block has no execution authority. Its earlier proposed preflight would have
+rechecked exact validator/clue bytes, absent final/staging,
+zero matching validator Node processes, HEAD descendant paths, clean Core, and exact Core
+tree. There is no dynamic memory threshold and no heap flag: key-frontier F4E-R3 is the
+accepted memory repair. That proposed authorization condition was never met and is now
+superseded; this bare command must never run. Only a later exact PowerShell wrapper for
+newly frozen validator bytes can receive one proof-attempt claim. Independent output
+audit must still rebuild hashes, schema, routes, causal evidence, admission,
+certificate, source pins, and publication postconditions before the four-path Intro-05
+integration contract can open.
+
+### F4E-R4B command-gate rejection and second repair
+
+The 26,928-byte validator with SHA-256
+`9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762` is rejected
+and must not execute. The first adversarial command QA reports `P1 1 / P2 1`: allowed
+net paths do not prove that the byte/command contract is committed, can hide
+unauthorized intermediate changes later reverted, and omit four-document worktree
+cleanliness. A second governing review reports `P1 2 / P2 1`: the repair still lacks a
+persistent exactly-once receipt, does not bind the Node launcher environment, and does
+not require NUL-safe path parsing.
+
+The repaired validator derives this canonical line at runtime, using the shown exact
+property order and literal runtime values:
+
+```text
+<reserved-manifest-token> {"schema":"t37-f4e-r4b-command-contract-v1","validatorPath":"<resolved-v2-path>","validatorBytes":<integer>,"validatorSha256":"<uppercase-sha>","nodeExecPath":"E:\\Nodejs\\node.exe","nodeVersion":"v24.12.0","nodeVersionsNode":"24.12.0","nodeExecutableBytes":89935872,"nodeExecutableSha256":"2FFE3ACC0458FDDE999F50D11809BBE7C9B7EF204DCF17094E325D26ACE101D8","nodeHeapSizeLimit":4496293888,"nodeExecArgv":[],"nodeOptionsPresent":false,"gitExecPath":"E:\\Git\\mingw64\\bin\\git.exe","gitVersion":"git version 2.51.0.windows.2","gitExecutableBytes":4284816,"gitExecutableSha256":"E996432581A70DF2E7AAAC5DB71E3811EC0DAA7F93A8BA73FE6DB6F9941F4BF9","inheritedGitEnvironmentKeys":[],"root":"<resolved-root>","inputPath":"<resolved-clue-path>","outputPath":"<resolved-v2-output-path>","attemptPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-attempt-v2.json","expectCoreBase":"<full-sha>","expectRepositoryBase":"<full-sha>","expectCoreTree":"<tree-sha>","expectInputBytes":633,"expectInputSha256":"<uppercase-sha>","id":"t3r-shaft-04","difficulty":5,"targetRows":4,"maxPrimaryLocks":7,"maxAlternativeExtra":2}
+```
+
+After repaired bytes are frozen, committed HEAD `DESIGN.md` contains exactly one fully
+materialized literal line. Each of CURRENT_TASK, DESIGN, STATE, and the T37 Endgame
+THREAD_LOG also contains exactly one literal short marker:
+
+```text
+<reserved-marker-token> validator=<uppercase repaired validator SHA-256>
+```
+
+V2 reads committed blobs with `git show <captured-head>:<path>` and never trusts working
+text. It walks from captured HEAD back to the fixed repository base through at most 64
+single-parent commits. Every parent-to-child `diff-tree --no-renames` record must be
+status `M` on an authorized contract path, and the accumulated union must equal the exact
+four-path set. Merge commits, add/delete/type/rename statuses, missing paths, or a chain
+that does not reach the base fail closed. Before and after proof, actual HEAD and all
+committed marker/manifest bytes must match the captured values; scoped `git diff HEAD`
+and porcelain status for all four contract paths must be empty. Output `sourcePin` records
+the ordered audited commits and per-commit paths. No other proof or publication behavior
+changes.
+
+### F4E-R4B fail-closed launcher, attempt, and path-byte contract
+
+The successor adds required absolute CLI argument `--attempt` whose only admitted
+resolved value is the hard-coded path
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v2.json`.
+It must differ from validator, clue, output, and every output staging name. Both the
+coordinator preflight and validator startup require final output, staging, and attempt
+`lstat`-absent: files, directories, symlinks, dangling links, and reparse points all
+count as present. Help and syntax inspection do not create it; a production invocation
+that finds it present exits before project imports, Vite, or proof.
+
+The future exact PowerShell command is a fail-closed script block, not a bare `node`
+invocation. It first enumerates the Env provider case-insensitively and throws if any
+`NODE_OPTIONS` key exists, including an empty-valued key; verifies absolute
+`E:\Nodejs\node.exe` as exactly 89,935,872 bytes with SHA-256
+`2FFE3ACC0458FDDE999F50D11809BBE7C9B7EF204DCF17094E325D26ACE101D8`;
+then invokes that absolute executable. It never clears or rewrites launcher variables.
+
+The validator checks the launcher before any project import and again immediately
+before output publication. `process.execArgv` must equal `[]`; no case-insensitive
+`NODE_OPTIONS` key may exist. `realpath(process.execPath)` must be exactly the frozen
+Node executable, `process.version` must be `v24.12.0`, `process.versions.node` must be
+`24.12.0`, the executable bytes/hash must match, and
+`v8.getHeapStatistics().heap_size_limit` must be the default `4496293888`. The canonical
+committed manifest binds every value; the attempt receipt and successful `sourcePin`
+repeat them. This PowerShell-before-spawn check plus the heap/executable pins closes a
+preload that deletes its own `NODE_OPTIONS` evidence before the main module starts.
+
+After self, launcher, argument, repository-history, committed-doc/worktree, Core tree,
+input, and output-absence pins pass—and before dynamic project/Vite import, server
+creation, or proof—the validator constructs one canonical UTF-8/LF JSON receipt with
+schema `t37-f4e-r4b-attempt-v1`. It binds the command-manifest SHA-256, validator
+identity, all resolved validator/root/input/output/attempt paths, captured HEAD,
+repository/Core/tree/input pins, proof parameters, and launcher fields; an outer
+`payloadSha256` covers the fixed-order receipt payload. It opens the fixed receipt with
+exclusive `wx` mode `0o600`, writes the complete bytes, calls file-handle `sync`, and
+keeps that same handle open through publication. It records handle `dev`/`ino` when
+available plus the path `lstat`; before and after proof it reads through both the handle
+at position zero and the fixed path, requiring identical bytes/hash and unchanged
+identity. It never unlinks, truncates, replaces, or updates that path. If
+creation/write/sync/read/close or any later operation fails, even leaving only a partial
+receipt, the attempt remains consumed and no retry is authorized. Successful
+`sourcePin` records attempt path, byte count, uppercase SHA-256, `payloadSha256`, and
+available identity fields; independent output QA reproduces them. Receipt-handle close
+after publication is best-effort resource release and cannot reopen or replace the run.
+
+Exactly-once is a proof-attempt state machine, not a claim that malformed CLI inspection
+consumes the run. Before successful `wx`, only bounded read-only validation may occur and
+no project/Vite/proof code may execute. Receipt absent/output absent permits the one
+claim; any receipt presence (even empty/partial) consumes it forever; receipt plus output
+opens audit only; output without receipt is invalid; any output staging residue is a
+stop-and-audit condition and is never cleaned to regain a run. Receipt deletion,
+replacement, rollback, or Temp cleanup is a governance violation, not restored
+authorization. File-system snapshots/admin tampering are outside the local receipt's
+ordinary crash/concurrency guarantee.
+
+Every history edge is obtained as a raw buffer from
+`git diff-tree --no-commit-id --name-status -r --no-renames -z <parent> <child> --`.
+Fatal UTF-8 decoding must succeed, the buffer must end in NUL, dropping only that final
+empty token must leave a nonempty even token count, and each consecutive pair is exactly
+`status,path`. Status must be literal `M`; path must equal one of the four ASCII contract
+paths. Newlines, tabs, quoting, invalid UTF-8, extra fields, empty records, or any other
+status/path fail closed. A path token must match an allowed ASCII byte sequence directly,
+then also survive fatal UTF-8 decode and byte-for-byte round-trip; duplicates within an
+edge are rejected. The single-parent walk itself uses strict full-SHA parent
+records, reaches the fixed base within 64 edges, and reverses its collected edges for a
+base-to-HEAD `sourcePin` audit chain whose path union is exactly all four paths. Scoped
+porcelain is likewise `--porcelain=v1 -z` and raw-buffer parsed.
+
+Every Git subprocess invokes the frozen implementation backend directly at absolute
+`E:\Git\mingw64\bin\git.exe`, never the 46-KiB `cmd\git.exe` launcher. Its version is
+`git version 2.51.0.windows.2`, byte count is `4,284,816`, and SHA-256 is
+`E996432581A70DF2E7AAAC5DB71E3811EC0DAA7F93A8BA73FE6DB6F9941F4BF9`.
+The validator hashes that backend before every Git audit batch and again before
+publication. These pins and the inherited-Git-environment empty set enter manifest,
+receipt, and output. Each invocation also passes `-c core.fsmonitor=false`,
+`-c core.untrackedCache=false`, and `-c core.hooksPath=NUL`.
+
+Every Git subprocess receives a constructed environment that drops repository/object/
+index/config redirection variables and sets `GIT_NO_REPLACE_OBJECTS=1` and
+`GIT_OPTIONAL_LOCKS=0`; startup rejects any inherited case-insensitive `GIT_*` key not
+explicitly admitted. The validator requires `rev-parse --show-toplevel` to resolve to
+the exact root, no replace refs, no `.git/info/grafts`, and no
+`.git/objects/info/alternates`. The same checks repeat before publication. This audit
+does not claim to reconstruct transient uncommitted edits; it proves the committed
+single-parent snapshots and current scoped worktree named by the contract.
+
+Only after this four-document contract receives fresh all-zero independent review and
+is committed may the repository-external v2 bytes be changed. Those new bytes then need
+syntax/help/absence checks and two fresh exact-byte reviews. A later four-doc checkpoint
+must materialize the repaired SHA marker and exact manifest (including `--attempt` and
+launcher identity) before the one production invocation can be considered.
+
+Fresh independent final contract reviews report
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` twice. They specifically accept the direct Git
+backend identity and the same receipt handle being held through proof/publication. The
+four-doc contract checkpoint may now be committed; validator editing, not execution, is
+the only capability that commit opens.

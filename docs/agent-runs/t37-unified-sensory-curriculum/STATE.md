@@ -2051,6 +2051,67 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
 - All rejected bytes remain non-executable. Next action: review and commit this docs
   repair, then modify only the external v2 validator and repeat byte/static reviews.
 
+## Current checkpoint — F4E-R4B rejected command contract
+
+- Repaired v2: 26,928 bytes / SHA-256
+  `9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762`.
+- Static gates: exact v1 delta; UTF-8/LF/no BOM; syntax/help; output absent; staging zero;
+  matching validator Node zero. No proof execution has occurred.
+- Independent bytes QA and adversarial semantic QA both report
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` for those exact bytes.
+- Live pins before contract drafting: HEAD `5650474905ec34e05adf9093daf6851712f4fca8`;
+  repository base `4172a79620cda33e167d291d38c69f0ed64fec89` is an ancestor;
+  descendant paths are exactly the four active docs; Core base/head tree is
+  `96688eca803a335790d65b41db0ace4df7d2f9b5`; Core worktree is clean.
+- Proposed output remains absent. The command literal in `docs/DESIGN.md` is rejected
+  history even though it contains no explicit heap flag.
+- Blocker: the 26,928-byte validator has no machine-enforced attempt receipt, launcher
+  invariant, or NUL-safe history parser and must not run.
+- Sole next action: review the successor contract below; after all-zero review, commit
+  only these four docs and then edit only the external validator.
+
+### F4E-R4B first command-gate rejection
+
+- Rejected bytes: 26,928 / SHA-256
+  `9EA5177E0D589431EAC393951FD78F1F6015CB8D37EF28E27566BE8623BBA762`.
+- Governing adversarial verdict: `P0 0 / P1 1 / P2 1 / P3 0 / GAP 0`; the earlier
+  ordinary all-zero command review does not override it.
+- Missing: committed exact byte/argument manifest, per-commit history audit, exact-four
+  changed-path union, and four-contract-path worktree cleanliness.
+- Repair: runtime-derived committed manifest plus four committed SHA markers; linear
+  single-parent per-edge no-rename M-only diff-tree audit; exact-four union; pre/post
+  HEAD/committed-marker/worktree equality; audited chain in output.
+- Output/staging/process remain zero and no proof has run. All Core/input/route/causal/
+  admission/certificate/Vite/publication logic is unchanged.
+- Sole next action: review and commit this repair contract, then edit only external v2,
+  refreeze bytes/manifest, and repeat dual static review. Rejected bytes must not run.
+
+### F4E-R4B second governing command rejection and successor boundary
+
+- Governing verdict: `P0 0 / P1 2 / P2 1 / P3 0 / GAP 0`.
+- Persistent receipt: fixed absolute `--attempt` path, initially absent; after all cheap
+  pins but before project/Vite import or proof, create canonical receipt via exclusive
+  `open('wx')`, full write, and file-handle `sync`; keep that same handle open through
+  proof/publication. Require handle/path double reads plus identity before/after proof,
+  then best-effort close only after publication. Never delete it on failure or success.
+  A crash-created partial file also consumes the attempt; output records receipt pins.
+- Launcher: require `process.execArgv === []`; reject any case-insensitive
+  `NODE_OPTIONS` key; bind/recheck those facts plus resolved `process.execPath` and exact
+  Node versions, executable bytes/SHA, and default heap limit in committed manifest,
+  receipt, and output. The exact PowerShell wrapper rejects `NODE_OPTIONS` before spawn.
+- History: parse raw `diff-tree --name-status -z` buffers by fatal UTF-8, terminal NUL,
+  nonempty even `status,path` tokens, literal `M`, and exact four-path membership.
+- Live preflight at resume: output absent; fixed attempt absent; `NODE_OPTIONS` absent;
+  external bytes still 26,928 / `9EA517...`. This is state evidence, not authorization.
+- Git: sanitized subprocess environment with replace suppression; exact toplevel; no
+  replace refs/grafts/alternates; raw NUL-safe scoped porcelain. The local environment
+  currently has no `GIT_*` variables and the repository has none of those mechanisms.
+  Invoke and hash-pin direct backend `E:\Git\mingw64\bin\git.exe` (4,284,816 bytes,
+  `E9964325...`), not the replaceable `cmd\git.exe` launcher.
+- Two independent final reviews: P0–P3/GAP all zero after direct-backend and held-handle
+  repairs. No proof has run. Sole next action: commit only these four docs, then edit and
+  refreeze only the external validator; execution remains closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
