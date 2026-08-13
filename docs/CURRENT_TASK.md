@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME NAMESPACE N0 ACCEPTED / INTRO-05 R4K LEASE-RUNNER RECOVERY CONTRACT**
+Status: **ENDGAME NAMESPACE N0 ACCEPTED / INTRO-05 R4L V4 COMMAND MATERIALIZATION CANDIDATE**
 
 ## Active objective
 
@@ -9229,3 +9229,18 @@ execution authority and cannot be split without creating a partial or misleading
 command. Whole-range verification must bind exact paths, UTF-8/LF bytes, counts/hashes,
 PowerShell AST, native-runner source hash, every no-spawn preflight and fixture, and
 independent review.
+
+### F4E-R4L — exact v4 wrapper materialization candidate
+
+The external runner-v2 and final wrapper passed exact-byte static review with
+`P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. The wrapper is 64,125 UTF-8/LF/no-BOM
+bytes with SHA-256 `278563AC435C57577DC1AD7F15FE1A99AD788DF2E187CE0ACFF1148C0D3FB9F6`;
+its sole production block remains 302 bytes / `7B333E4A83C76C0CBA339FD3CCFD749FC4A9CFFD2C80B84983D939B0302DD393`.
+The hash-bound no-spawn harness is 11,018 bytes /
+`901C723726FC49322696109B9170F276F2BD06A612BD4C42CC4D65DD8811F5F9`.
+Its final 52.5-second run emitted only `T37-R4L-NO-SPAWN-PREFLIGHT-PASS`;
+all production sentinels remained zero and the consumed-v3 receipt stayed unchanged.
+
+Execution remains closed. Commit and independently review this exact four-document
+candidate, add only the required QA disposition to THREAD_LOG, then bind the resulting
+final HEAD and repeat the no-spawn preflight before the sole production invocation.

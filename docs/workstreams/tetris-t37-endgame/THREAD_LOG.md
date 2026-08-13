@@ -574,3 +574,19 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   four-doc materialization up to 1,200 added/modified lines with whole-range verification.
 - Execution is closed. Sole next action: freeze, fixture-test, and independently review
   runner v2; do not run v4 production parameters.
+
+### F4E-R4L exact v4 command materialization candidate
+
+- Base is `b5663ad0f5d1a6143eb209988ba04b6a72e77be2`. Only the four prospectively
+  authorized command-contract documents are in this atomic candidate.
+- Final wrapper: 64,125 UTF-8/LF/no-BOM bytes / SHA-256
+  `278563AC435C57577DC1AD7F15FE1A99AD788DF2E187CE0ACFF1148C0D3FB9F6`.
+  Final external static review reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+- Three earlier no-spawn runs failed closed before the sentinel and exposed only
+  PowerShell array, automatic-variable, and ScriptBlock-scope defects. Every run left
+  v4 output/attempt/stage/process zero and preserved the consumed-v3 receipt.
+- The corrected 11,018-byte harness
+  (`901C723726FC49322696109B9170F276F2BD06A612BD4C42CC4D65DD8811F5F9`)
+  completed in 52.5 seconds with the sole expected PASS and unchanged sentinels.
+- Blocker: production remains closed. Next: exact commit, independent committed-byte/
+  AST/no-spawn QA, a QA-only THREAD_LOG checkpoint, then a fresh final-HEAD binding.

@@ -7150,3 +7150,1117 @@ route for every Git call. A hash-bound no-spawn derivative must exercise the com
 preflight without reaching the production call. After exact commit, independent Git-blob
 QA, a QA-only THREAD_LOG commit, and a fresh final-HEAD all-zero binding are mandatory
 before the coordinator repeats the immediate preflight and invokes the wrapper once.
+
+### F4E-R4L exact v4 command materialization
+
+The following wrapper is the sole copy-pasteable v4 command candidate. It is exactly
+64,125 UTF-8/LF/no-BOM bytes with SHA-256
+`278563AC435C57577DC1AD7F15FE1A99AD788DF2E187CE0ACFF1148C0D3FB9F6`.
+Its inline bootstrap loads only the frozen 63,640-byte runner-v2 source pinned at
+`178584C03DC1103F29D4038FF2A69B7301EBA2DCDBE28085D2D4220F573B3003`.
+The exact argument manifest and all four existing command markers above remain
+unchanged. The production block begins only after two complete preflights; after entry,
+no verification postflight is permitted.
+
+```powershell
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
+
+$runnerSourcePath = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-r4k-windows-lease-runner-v2.cs'
+$node = 'E:\Nodejs\node.exe'
+$git = 'E:\Git\mingw64\bin\git.exe'
+$root = 'E:\Proj\reproduction-tetris'
+$validatorV2 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v2.mjs'
+$validatorV3 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v3.mjs'
+$validatorV4 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v4.mjs'
+$cluePath = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-clue-v1.json'
+$attemptV3 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v3.json'
+$outputV2 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v2.json'
+$attemptV2 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v2.json'
+$outputV3 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v3.json'
+$outputV4 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v4.json'
+$attemptV4 = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v4.json'
+
+$runnerBootstrap = $null
+$runnerLease = $null
+$nodeLease = $null
+$gitLease = $null
+$validatorV2Lease = $null
+$validatorV3Lease = $null
+$validatorV4Lease = $null
+$inputLease = $null
+$attemptV3Lease = $null
+$productionAttemptEntered = $false
+$failure = $null
+$preflightCleanupFailures = @()
+$capturedHead = $null
+$historySignature = $null
+$scopedBindings = @()
+
+function Assert-Condition([bool] $Condition, [string] $Message) {
+  if (-not $Condition) { throw $Message }
+}
+
+function Assert-ByteArrayEqual([byte[]] $Left, [byte[]] $Right, [string] $Label) {
+  Assert-Condition ($null -ne $Left -and $null -ne $Right) "$Label bytes are absent."
+  Assert-Condition ($Left.Length -eq $Right.Length) "$Label byte lengths differ."
+  $difference = 0
+  for ($index = 0; $index -lt $Left.Length; $index += 1) {
+    $difference = $difference -bor ($Left[$index] -bxor $Right[$index])
+  }
+  Assert-Condition ($difference -eq 0) "$Label bytes differ."
+}
+
+function Assert-ExactPropertyOrder($Object, [string[]] $Expected, [string] $Label) {
+  Assert-Condition ($null -ne $Object) "$Label object is absent."
+  $actual = @($Object.PSObject.Properties.Name)
+  Assert-Condition ($actual.Count -eq $Expected.Count) "$Label property count differs."
+  for ($index = 0; $index -lt $Expected.Count; $index += 1) {
+    Assert-Condition ($actual[$index] -ceq $Expected[$index]) "$Label property order differs at $index."
+  }
+}
+
+function Assert-UpperSha([string] $Value, [string] $Expected, [string] $Label) {
+  Assert-Condition ($Value -cmatch '^[0-9A-F]{64}$') "$Label is not uppercase SHA-256."
+  Assert-Condition ($Value -ceq $Expected) "$Label differs."
+}
+
+function Assert-LeasePin($Lease, [string] $Path, [long] $Bytes, [string] $Sha256, [string] $Label) {
+  Assert-Condition ($null -ne $Lease) "$Label lease is absent."
+  $Lease.AssertUsable($Path)
+  Assert-Condition (-not $Lease.Directory -and -not $Lease.DeletePending) "$Label is not a usable regular file."
+  Assert-Condition (($Lease.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0) "$Label is a reparse point."
+  Assert-Condition ($Lease.Length -eq $Bytes) "$Label byte length differs."
+  Assert-UpperSha ([string] $Lease.Sha256) $Sha256 "$Label SHA-256"
+}
+
+function Assert-BootstrapRunnerBinding {
+  $runnerBootstrap.AssertStable()
+  $runnerLease.AssertUsable($runnerSourcePath)
+  $final = $runnerBootstrap.Final
+  Assert-Condition ($final.FinalDosPath -ceq $runnerLease.FinalDosPath) 'Runner DOS paths differ.'
+  Assert-Condition ($final.FinalNtPath -ceq $runnerLease.FinalNtPath) 'Runner NT paths differ.'
+  Assert-Condition ($final.Attributes -eq $runnerLease.Attributes) 'Runner attributes differ.'
+  Assert-Condition ($final.Length -eq $runnerLease.Length) 'Runner lengths differ.'
+  Assert-Condition ($final.VolumeSerialNumber -eq $runnerLease.VolumeSerialNumber) 'Runner volumes differ.'
+  Assert-ByteArrayEqual $final.FileId $runnerLease.FileId 'Runner file ID'
+  Assert-Condition ($final.NumberOfLinks -eq $runnerLease.NumberOfLinks) 'Runner link counts differ.'
+  Assert-Condition ($final.CreationTime -eq $runnerLease.CreationTime) 'Runner creation times differ.'
+  Assert-Condition ($final.LastWriteTime -eq $runnerLease.LastWriteTime) 'Runner write times differ.'
+  Assert-Condition ($final.ChangeTime -eq $runnerLease.ChangeTime) 'Runner change times differ.'
+  Assert-Condition ($final.DeletePending -eq $runnerLease.DeletePending) 'Runner delete states differ.'
+  Assert-Condition ($final.Directory -eq $runnerLease.Directory) 'Runner file types differ.'
+  Assert-ByteArrayEqual $runnerBootstrap.Bytes $runnerLease.Bytes 'Runner source'
+  Assert-UpperSha ([string] $runnerLease.Sha256) '178584C03DC1103F29D4038FF2A69B7301EBA2DCDBE28085D2D4220F573B3003' 'Runner SHA-256'
+}
+
+function Assert-LstatAbsent([string] $Path) {
+  try {
+    $null = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+    throw "Path is present: $Path"
+  } catch [Management.Automation.ItemNotFoundException] { return }
+}
+
+function Assert-NoStages([string] $OutputPath) {
+  $directory = [IO.Path]::GetDirectoryName($OutputPath)
+  $prefix = [IO.Path]::GetFileName($OutputPath) + '.tmp-'
+  $matches = @(Get-ChildItem -LiteralPath $directory -Force -ErrorAction Stop |
+    Where-Object { $_.Name.StartsWith($prefix, [StringComparison]::Ordinal) })
+  Assert-Condition ($matches.Count -eq 0) "Output staging residue exists: $OutputPath"
+}
+
+function Assert-ExactEnvironment {
+  $expected = @(
+    @{ Name = 'NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S'; Bytes = 129; Sha256 = '36816623CF40FFD5A13F444AF68A441001F99ED8B21D0CD03B221914185FCEE1' },
+    @{ Name = 'NODE_REPL_TRUSTED_CODE_PATHS'; Bytes = 25; Sha256 = 'C99D703D69CE82B4803CEBB3E94F20CFB4D8F43A298C592018507394AD1B3A2D' }
+  )
+  $actual = @(Get-ChildItem Env: |
+    Where-Object { $_.Name.StartsWith('NODE_', [StringComparison]::OrdinalIgnoreCase) } |
+    Sort-Object Name)
+  Assert-Condition ($actual.Count -eq $expected.Count) 'NODE_* key set differs.'
+  for ($index = 0; $index -lt $expected.Count; $index += 1) {
+    Assert-Condition ($actual[$index].Name -ceq $expected[$index].Name) 'NODE_* key spelling or order differs.'
+    $bytes = [Text.UTF8Encoding]::new($false, $true).GetBytes([string] $actual[$index].Value)
+    $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+    Assert-Condition ($bytes.Length -eq $expected[$index].Bytes) "NODE_* length differs: $($actual[$index].Name)"
+    Assert-UpperSha $hash $expected[$index].Sha256 "NODE_* SHA-256: $($actual[$index].Name)"
+  }
+  Assert-Condition (@(Get-ChildItem Env: |
+    Where-Object { $_.Name.StartsWith('GIT_', [StringComparison]::OrdinalIgnoreCase) }).Count -eq 0) 'GIT_* must be absent.'
+}
+
+function Assert-AsciiProtocol([string] $Text, [string] $Label) {
+  foreach ($character in $Text.ToCharArray()) {
+    $code = [int] $character
+    $allowed = $code -eq 0 -or $code -eq 9 -or $code -eq 10 -or $code -eq 13 -or ($code -ge 32 -and $code -le 126)
+    Assert-Condition ($allowed -and $code -ne 0xFFFD) "$Label contains non-protocol text."
+  }
+}
+
+function ConvertTo-FixedWindowsArgument([string] $Argument) {
+  Assert-Condition ($null -ne $Argument) 'Git argument is null.'
+  Assert-AsciiProtocol $Argument 'Git argument'
+  Assert-Condition ($Argument.IndexOf([char] 0) -lt 0) 'Git argument contains NUL.'
+  Assert-Condition ($Argument.IndexOf('"') -lt 0) 'Git argument contains a quote.'
+  Assert-Condition (-not $Argument.EndsWith('\', [StringComparison]::Ordinal)) 'Git argument ends in a backslash.'
+  return '"' + $Argument + '"'
+}
+
+function Invoke-BoundGit(
+  [string[]] $Arguments,
+  [int[]] $AllowedExitCodes = @(0),
+  [string[]] $AllowedStderrLines = @()
+) {
+  Assert-Condition ($Arguments.Count -gt 0) 'Git invocation has no arguments.'
+  Assert-Condition (@(Get-ChildItem Env: |
+    Where-Object { $_.Name.StartsWith('GIT_', [StringComparison]::OrdinalIgnoreCase) }).Count -eq 0) 'Git environment is not empty.'
+  $gitLease.AssertUsable($git)
+  $argumentLine = [string]::Join(' ', @($Arguments | ForEach-Object { ConvertTo-FixedWindowsArgument $_ }))
+  $savedOut = [Console]::Out
+  $savedError = [Console]::Error
+  $stdoutWriter = [IO.StringWriter]::new([Globalization.CultureInfo]::InvariantCulture)
+  $stderrWriter = [IO.StringWriter]::new([Globalization.CultureInfo]::InvariantCulture)
+  try {
+    $env:GIT_NO_REPLACE_OBJECTS = '1'
+    $env:GIT_OPTIONAL_LOCKS = '0'
+    [Console]::SetOut($stdoutWriter)
+    [Console]::SetError($stderrWriter)
+    $exitCode = [T37R4KRunner]::Run($git, $argumentLine, $root, $gitLease)
+  } finally {
+    [Console]::SetOut($savedOut)
+    [Console]::SetError($savedError)
+    Remove-Item Env:GIT_NO_REPLACE_OBJECTS -ErrorAction SilentlyContinue
+    Remove-Item Env:GIT_OPTIONAL_LOCKS -ErrorAction SilentlyContinue
+  }
+  Assert-Condition (@(Get-ChildItem Env: |
+    Where-Object { $_.Name.StartsWith('GIT_', [StringComparison]::OrdinalIgnoreCase) }).Count -eq 0) 'Git environment restoration failed.'
+  $stdout = $stdoutWriter.ToString()
+  $stderr = $stderrWriter.ToString()
+  $stdoutWriter.Dispose()
+  $stderrWriter.Dispose()
+  Assert-AsciiProtocol $stdout 'Git stdout'
+  Assert-AsciiProtocol $stderr 'Git stderr'
+  if ($stderr.Length -ne 0) {
+    Assert-Condition ($AllowedStderrLines.Count -gt 0) "Git stderr was not empty: $stderr"
+    Assert-Condition ($stderr.IndexOf("`r", [StringComparison]::Ordinal) -lt 0 -and $stderr.EndsWith("`n", [StringComparison]::Ordinal)) 'Git stderr framing differs.'
+    $stderrLines = $stderr.Substring(0, $stderr.Length - 1).Split([char] 10)
+    $seenStderrLines = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($line in $stderrLines) {
+      Assert-Condition ($line.Length -gt 0 -and $seenStderrLines.Add($line)) 'Git stderr contains an empty or repeated line.'
+      Assert-Condition ($AllowedStderrLines -ccontains $line) "Git stderr contains a non-allowlisted line: $line"
+    }
+  }
+  Assert-Condition ($AllowedExitCodes -contains $exitCode) "Git exit code $exitCode is outside the allowlist."
+  $gitLease.AssertUsable($git)
+  return [pscustomobject]@{ ExitCode = $exitCode; Stdout = $stdout; Stderr = $stderr }
+}
+
+function Get-OneGitLine([string[]] $Arguments, [string] $Label) {
+  $result = Invoke-BoundGit $Arguments
+  Assert-Condition ($result.Stdout -cmatch '^[\x20-\x7E]+\n$') "$Label is not one LF-terminated ASCII line."
+  return $result.Stdout.Substring(0, $result.Stdout.Length - 1)
+}
+
+function Assert-EmptyGitOutput([string[]] $Arguments, [string] $Label) {
+  $result = Invoke-BoundGit $Arguments
+  Assert-Condition ($result.Stdout.Length -eq 0) "$Label was not empty."
+}
+
+function Assert-ValidatorAliasesAndProcesses {
+  $identities = @(
+    @{ Path = $validatorV2; LongBase = 't37-f4e-endgame-canonical-validate-v2.mjs'; ShortBase = 'T312A0~1.MJS' },
+    @{ Path = $validatorV3; LongBase = 't37-f4e-endgame-canonical-validate-v3.mjs'; ShortBase = 'T367D4~1.MJS' },
+    @{ Path = $validatorV4; LongBase = 't37-f4e-endgame-canonical-validate-v4.mjs'; ShortBase = 'T34C6C~1.MJS' }
+  )
+  $basenames = @()
+  foreach ($identity in $identities) {
+    $cimName = $identity.Path.Replace('\', '\\').Replace("'", "''")
+    $rows = @(Get-CimInstance CIM_DataFile -Filter "Name='$cimName'")
+    Assert-Condition ($rows.Count -eq 1) "Validator CIM identity count differs: $($identity.Path)"
+    Assert-Condition ([string] $rows[0].Name -ceq $identity.Path) "Validator CIM long path differs: $($identity.Path)"
+    $shortBase = [IO.Path]::GetFileName([string] $rows[0].EightDotThreeFileName)
+    Assert-Condition ($shortBase.Equals($identity.ShortBase, [StringComparison]::OrdinalIgnoreCase)) "Validator 8.3 identity differs: $($identity.Path)"
+    $basenames += $identity.LongBase
+    $basenames += $identity.ShortBase
+  }
+  foreach ($process in @(Get-CimInstance Win32_Process -Filter "Name = 'node.exe'")) {
+    $commandLine = [string] $process.CommandLine
+    Assert-Condition (-not [string]::IsNullOrEmpty($commandLine)) "Cannot prove Node process $($process.ProcessId) is unrelated."
+    foreach ($basename in $basenames) {
+      Assert-Condition ($commandLine.IndexOf($basename, [StringComparison]::OrdinalIgnoreCase) -lt 0) "Validator Node process exists: $($process.ProcessId)"
+    }
+  }
+}
+
+function Assert-Namespaces {
+  Assert-LstatAbsent $outputV2
+  Assert-LstatAbsent $attemptV2
+  Assert-LstatAbsent $outputV3
+  Assert-LstatAbsent $outputV4
+  Assert-LstatAbsent $attemptV4
+  Assert-NoStages $outputV2
+  Assert-NoStages $outputV3
+  Assert-NoStages $outputV4
+}
+
+function Assert-V3Receipt {
+  Assert-LeasePin $attemptV3Lease $attemptV3 8729 '06E9EACE16C6665FF4220D0753F0DFD5875C742FC1F56C9767771B1CB5A53E44' 'Consumed v3 receipt'
+  Assert-Condition ($attemptV3Lease.NumberOfLinks -eq 1) 'Consumed receipt link count differs.'
+  Assert-Condition ($attemptV3Lease.LegacyDev.ToString([Globalization.CultureInfo]::InvariantCulture) -ceq '1456395446') 'Consumed receipt dev differs.'
+  Assert-Condition ($attemptV3Lease.LegacyIno.ToString([Globalization.CultureInfo]::InvariantCulture) -ceq '456270937248336975') 'Consumed receipt ino differs.'
+  Assert-Condition ($attemptV3Lease.LegacySize.ToString([Globalization.CultureInfo]::InvariantCulture) -ceq '8729') 'Consumed receipt size differs.'
+  Assert-Condition ($attemptV3Lease.LegacyMode.ToString([Globalization.CultureInfo]::InvariantCulture) -ceq '33206') 'Consumed receipt mode differs.'
+  Assert-Condition ($attemptV3Lease.LegacyNlink.ToString([Globalization.CultureInfo]::InvariantCulture) -ceq '1') 'Consumed receipt nlink differs.'
+  Assert-Condition ($attemptV3Lease.LegacyMtimeNs.ToString([Globalization.CultureInfo]::InvariantCulture) -ceq '1786600246711586100') 'Consumed receipt mtime differs.'
+  Assert-Condition ($attemptV3Lease.LegacyCtimeNs.ToString([Globalization.CultureInfo]::InvariantCulture) -ceq '1786600246711586100') 'Consumed receipt ctime differs.'
+  $bytes = $attemptV3Lease.Bytes
+  Assert-Condition (-not ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)) 'Consumed receipt has a BOM.'
+  Assert-Condition (@($bytes | Where-Object { $_ -eq 13 }).Count -eq 0) 'Consumed receipt contains CR.'
+  $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+  $text = $strictUtf8.GetString($bytes)
+  Assert-ByteArrayEqual $bytes ($strictUtf8.GetBytes($text)) 'Consumed receipt UTF-8'
+  Assert-Condition ($text.EndsWith("`n", [StringComparison]::Ordinal)) 'Consumed receipt lacks terminal LF.'
+  Assert-Condition ($text.Substring(0, $text.Length - 1).IndexOf("`n", [StringComparison]::Ordinal) -lt 0) 'Consumed receipt has interior LF.'
+  $receipt = $text | ConvertFrom-Json -Depth 100 -ErrorAction Stop
+  Assert-ExactPropertyOrder $receipt @('schema', 'payload', 'payloadSha256') 'Consumed receipt'
+  Assert-Condition ($receipt.schema -ceq 't37-f4e-r4g-attempt-v1') 'Consumed receipt schema differs.'
+  Assert-Condition ($receipt.payloadSha256 -ceq 'E1B6669502DE6055157347A83116053EAF9621D74993038A3A882F9F06C5448B') 'Consumed payload hash pin differs.'
+  $jsonOptions = [Text.Json.JsonDocumentOptions]::new()
+  $jsonDocument = [Text.Json.JsonDocument]::Parse($text, $jsonOptions)
+  try {
+    $rawPayload = $jsonDocument.RootElement.GetProperty('payload').GetRawText()
+    $rawPayloadBytes = $strictUtf8.GetBytes($rawPayload + "`n")
+    $rawPayloadHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($rawPayloadBytes))
+    Assert-UpperSha $rawPayloadHash 'E1B6669502DE6055157347A83116053EAF9621D74993038A3A882F9F06C5448B' 'Consumed raw payload SHA-256'
+  } finally {
+    $jsonDocument.Dispose()
+  }
+  $payload = $receipt.payload
+  Assert-ExactPropertyOrder $payload @(
+    'commandManifestSha256', 'validatorPath', 'validatorBytes', 'validatorSha256',
+    'runtime', 'git', 'root', 'inputPath', 'outputPath', 'attemptPath', 'stagingPath',
+    'scopedCleanPolicy', 'head', 'repositoryBase', 'coreBase', 'coreTree',
+    'coreModuleManifest', 'inputBytes', 'inputSha256', 'id', 'difficulty', 'targetRows',
+    'maxPrimaryLocks', 'maxAlternativeExtra'
+  ) 'Consumed payload'
+  Assert-Condition ($payload.commandManifestSha256 -ceq '8A30A76938B8CA9E148631AAAD97DDE68CB1F762BD29F803E56876CCE6BDA3AA') 'Consumed manifest hash differs.'
+  Assert-Condition ($payload.validatorPath -ceq $validatorV3 -and [long] $payload.validatorBytes -eq 57181 -and $payload.validatorSha256 -ceq '25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF') 'Consumed validator pin differs.'
+  Assert-Condition ($payload.root -ceq $root -and $payload.inputPath -ceq $cluePath -and $payload.outputPath -ceq $outputV3 -and $payload.attemptPath -ceq $attemptV3) 'Consumed path pins differ.'
+  Assert-Condition ($payload.stagingPath.StartsWith($outputV3 + '.tmp-', [StringComparison]::Ordinal)) 'Consumed staging prefix differs.'
+  Assert-Condition ($payload.scopedCleanPolicy -ceq 'head-blob-eol-equivalent-v1') 'Consumed clean policy differs.'
+  Assert-Condition ($payload.head -ceq '8911a9cf5e9356c3e8beb099f7db53aeb4944e51') 'Consumed HEAD differs.'
+  Assert-Condition ($payload.repositoryBase -ceq '4172a79620cda33e167d291d38c69f0ed64fec89') 'Consumed repository base differs.'
+  Assert-Condition ($payload.coreBase -ceq '7d81d4974ce8fb777ea105c5ef98d156cd1807cc') 'Consumed Core base differs.'
+  Assert-Condition ($payload.coreTree -ceq '96688eca803a335790d65b41db0ace4df7d2f9b5') 'Consumed Core tree differs.'
+  Assert-Condition ([long] $payload.inputBytes -eq 633 -and $payload.inputSha256 -ceq '959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42') 'Consumed input pin differs.'
+  Assert-Condition ($payload.id -ceq 't3r-shaft-04' -and [int] $payload.difficulty -eq 5 -and [int] $payload.targetRows -eq 4 -and [int] $payload.maxPrimaryLocks -eq 7 -and [int] $payload.maxAlternativeExtra -eq 2) 'Consumed level contract differs.'
+  Assert-ExactPropertyOrder $payload.runtime @('nodeExecPath', 'nodeVersion', 'nodeVersionsNode', 'nodeExecutableBytes', 'nodeExecutableSha256', 'nodeHeapSizeLimit', 'nodeExecArgv', 'nodeOptionsPresent', 'nodeEnvironment') 'Consumed runtime'
+  Assert-Condition ($payload.runtime.nodeExecPath -ceq $node -and $payload.runtime.nodeVersion -ceq 'v24.12.0' -and $payload.runtime.nodeVersionsNode -ceq '24.12.0') 'Consumed runtime version differs.'
+  Assert-Condition ([long] $payload.runtime.nodeExecutableBytes -eq 89935872 -and $payload.runtime.nodeExecutableSha256 -ceq '2FFE3ACC0458FDDE999F50D11809BBE7C9B7EF204DCF17094E325D26ACE101D8') 'Consumed Node pin differs.'
+  Assert-Condition ([long] $payload.runtime.nodeHeapSizeLimit -eq 4496293888 -and @($payload.runtime.nodeExecArgv).Count -eq 0 -and $payload.runtime.nodeOptionsPresent -eq $false) 'Consumed runtime process contract differs.'
+  Assert-ExactPropertyOrder $payload.git @('gitExecPath', 'gitVersion', 'gitExecutableBytes', 'gitExecutableSha256', 'inheritedGitEnvironmentKeys') 'Consumed Git'
+  Assert-Condition ($payload.git.gitExecPath -ceq $git -and $payload.git.gitVersion -ceq 'git version 2.51.0.windows.2') 'Consumed Git version differs.'
+  Assert-Condition ([long] $payload.git.gitExecutableBytes -eq 4284816 -and $payload.git.gitExecutableSha256 -ceq 'E996432581A70DF2E7AAAC5DB71E3811EC0DAA7F93A8BA73FE6DB6F9941F4BF9' -and @($payload.git.inheritedGitEnvironmentKeys).Count -eq 0) 'Consumed Git contract differs.'
+}
+
+$gitPrefix = @('-C', $root, '-c', 'core.fsmonitor=false', '-c', 'core.untrackedCache=false', '-c', 'core.hooksPath=NUL')
+$repositoryBase = '4172a79620cda33e167d291d38c69f0ed64fec89'
+$coreBase = '7d81d4974ce8fb777ea105c5ef98d156cd1807cc'
+$coreTree = '96688eca803a335790d65b41db0ace4df7d2f9b5'
+$authorizedContractPaths = @(
+  'docs/CURRENT_TASK.md',
+  'docs/DESIGN.md',
+  'docs/agent-runs/t37-unified-sensory-curriculum/STATE.md',
+  'docs/workstreams/tetris-t37-endgame/THREAD_LOG.md'
+)
+$scopedPaths = @('src/game/core') + $authorizedContractPaths
+$commandMarkerPrefix = 'F4E-R4I-' + 'COMMAND-CONTRACT-V1 validator='
+$commandMarkerLine = $commandMarkerPrefix + '93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60'
+$commandManifestPrefix = 'F4E-R4I-' + 'COMMAND-MANIFEST-V1 '
+
+function Split-NulProtocol([string] $Text, [string] $Label, [bool] $AllowEmpty = $false) {
+  if ($Text.Length -eq 0) {
+    Assert-Condition $AllowEmpty "$Label is empty."
+    return @()
+  }
+  Assert-Condition ($Text[$Text.Length - 1] -eq [char] 0) "$Label lacks a terminal NUL."
+  $tokens = [Collections.Generic.List[string]]::new()
+  $start = 0
+  for ($index = 0; $index -lt $Text.Length; $index += 1) {
+    if ($Text[$index] -eq [char] 0) {
+      Assert-Condition ($index -gt $start) "$Label contains an empty token."
+      $tokens.Add($Text.Substring($start, $index - $start))
+      $start = $index + 1
+    }
+  }
+  Assert-Condition ($start -eq $Text.Length) "$Label terminal data is malformed."
+  return $tokens.ToArray()
+}
+
+function Assert-FullLowerSha([string] $Value, [string] $Label) {
+  Assert-Condition ($Value -cmatch '^[0-9a-f]{40}$') "$Label is not a full lowercase SHA."
+}
+
+function Get-GitBlobSha1([byte[]] $Bytes) {
+  $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
+  $framed = [byte[]]::new($header.Length + $Bytes.Length)
+  [Buffer]::BlockCopy($header, 0, $framed, 0, $header.Length)
+  [Buffer]::BlockCopy($Bytes, 0, $framed, $header.Length, $Bytes.Length)
+  return [Convert]::ToHexString([Security.Cryptography.SHA1]::HashData($framed)).ToLowerInvariant()
+}
+
+function ConvertTo-NormalizedCheckoutBytes([byte[]] $Bytes, [string] $Label) {
+  Assert-Condition (-not ($Bytes.Length -ge 3 -and $Bytes[0] -eq 0xEF -and $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF)) "$Label has a BOM."
+  $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+  $text = $strictUtf8.GetString($Bytes)
+  Assert-ByteArrayEqual $Bytes ($strictUtf8.GetBytes($text)) "$Label UTF-8"
+  $text = $text.Replace("`r`n", "`n")
+  Assert-Condition ($text.IndexOf("`r", [StringComparison]::Ordinal) -lt 0) "$Label contains a non-CRLF CR."
+  return ,([byte[]] $strictUtf8.GetBytes($text))
+}
+
+function Get-ScopedEntries([string] $Head) {
+  Assert-FullLowerSha $Head 'Scoped HEAD'
+  $result = Invoke-BoundGit @($gitPrefix + @('ls-tree', '-r', '-z', '--full-tree', $Head, '--') + $scopedPaths)
+  $tokens = @(Split-NulProtocol $result.Stdout 'Scoped HEAD tree')
+  Assert-Condition ($tokens.Count -gt 0) 'Scoped HEAD tree has no entries.'
+  $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  foreach ($token in $tokens) {
+    $separator = $token.IndexOf([char] 9)
+    Assert-Condition ($separator -gt 0 -and $separator -lt $token.Length - 1) 'Scoped HEAD record is malformed.'
+    $metadata = $token.Substring(0, $separator)
+    $match = [regex]::Match($metadata, '^(100644|100755) blob ([0-9a-f]{40})$', [Text.RegularExpressions.RegexOptions]::CultureInvariant)
+    Assert-Condition $match.Success 'Scoped HEAD record is not a regular blob.'
+    $gitPath = $token.Substring($separator + 1)
+    Assert-Condition ($gitPath -cmatch '^[\x20-\x7E]+$' -and $gitPath.IndexOf('\') -lt 0) "Scoped path is not canonical ASCII: $gitPath"
+    $insideScope = $false
+    foreach ($scope in $scopedPaths) {
+      if ($gitPath -ceq $scope -or $gitPath.StartsWith($scope + '/', [StringComparison]::Ordinal)) { $insideScope = $true; break }
+    }
+    Assert-Condition $insideScope "Scoped tree path escapes its scopes: $gitPath"
+    Assert-Condition $seen.Add($gitPath) "Scoped HEAD repeats $gitPath."
+    [pscustomobject]@{ GitPath = $gitPath; Mode = $match.Groups[1].Value; BlobId = $match.Groups[2].Value }
+  }
+}
+
+function ConvertTo-ScopedAbsolutePath([string] $GitPath) {
+  $absolute = [IO.Path]::GetFullPath((Join-Path $root $GitPath.Replace('/', '\')))
+  $relative = [IO.Path]::GetRelativePath($root, $absolute).Replace('\', '/')
+  Assert-Condition ($relative -ceq $GitPath -and -not [IO.Path]::IsPathRooted($relative)) "Scoped path mapping differs: $GitPath"
+  return $absolute
+}
+
+function Assert-ContractDocuments {
+  $totalManifestPrefixes = 0
+  foreach ($contractPath in $authorizedContractPaths) {
+    $binding = @($scopedBindings | Where-Object { $_.GitPath -ceq $contractPath })
+    Assert-Condition ($binding.Count -eq 1) "Contract binding count differs: $contractPath"
+    [byte[]] $normalized = ConvertTo-NormalizedCheckoutBytes $binding[0].Lease.Bytes "Contract $contractPath"
+    $text = [Text.UTF8Encoding]::new($false, $true).GetString($normalized)
+    $exactMarkerCount = 0
+    $markerPrefixCount = 0
+    $manifestPrefixCount = 0
+    $manifestLine = $null
+    foreach ($line in $text.Split([char] 10)) {
+      if ($line -ceq $commandMarkerLine) { $exactMarkerCount += 1 }
+      if ($line.StartsWith($commandMarkerPrefix, [StringComparison]::Ordinal)) { $markerPrefixCount += 1 }
+      if ($line.StartsWith($commandManifestPrefix, [StringComparison]::Ordinal)) {
+        $manifestPrefixCount += 1
+        $manifestLine = $line
+      }
+    }
+    Assert-Condition ($exactMarkerCount -eq 1 -and $markerPrefixCount -eq 1) "Contract marker differs: $contractPath"
+    $totalManifestPrefixes += $manifestPrefixCount
+    if ($contractPath -ceq 'docs/DESIGN.md') {
+      Assert-Condition ($manifestPrefixCount -eq 1) 'DESIGN manifest count differs.'
+      $manifestBytes = [Text.UTF8Encoding]::new($false, $true).GetBytes($manifestLine + "`n")
+      Assert-Condition ($manifestBytes.Length -eq 2948) 'DESIGN manifest byte count differs.'
+      Assert-UpperSha ([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($manifestBytes))) 'ED1E1844320882DB31EE365C9270B660329FF0AC7D42487F9F4B6BB2F8B9FA51' 'DESIGN manifest SHA-256'
+    } else {
+      Assert-Condition ($manifestPrefixCount -eq 0) "Unexpected manifest: $contractPath"
+    }
+  }
+  Assert-Condition ($totalManifestPrefixes -eq 1) 'Contract manifest prefix total differs.'
+}
+
+function Assert-ScopedDirectorySet {
+  $trackedCore = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  foreach ($binding in $scopedBindings) {
+    if ($binding.GitPath.StartsWith('src/game/core/', [StringComparison]::Ordinal)) { $null = $trackedCore.Add($binding.GitPath) }
+  }
+  Assert-Condition ($trackedCore.Count -gt 0) 'Tracked Core set is empty.'
+  $observed = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $pending = [Collections.Generic.Stack[string]]::new()
+  $pending.Push((ConvertTo-ScopedAbsolutePath 'src/game/core'))
+  while ($pending.Count -gt 0) {
+    $directory = $pending.Pop()
+    foreach ($item in @(Get-ChildItem -LiteralPath $directory -Force -ErrorAction Stop)) {
+      Assert-Condition (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0) "Scoped Core contains a reparse point: $($item.FullName)"
+      $relative = [IO.Path]::GetRelativePath($root, $item.FullName).Replace('\', '/')
+      if ($item.PSIsContainer) {
+        $hasTrackedDescendant = $false
+        foreach ($trackedPath in $trackedCore) {
+          if ($trackedPath.StartsWith($relative + '/', [StringComparison]::Ordinal)) { $hasTrackedDescendant = $true; break }
+        }
+        Assert-Condition $hasTrackedDescendant "Scoped Core contains an extra directory: $relative"
+        $pending.Push($item.FullName)
+      } else {
+        Assert-Condition ($item -is [IO.FileInfo] -and $trackedCore.Contains($relative)) "Scoped Core contains an untracked or non-file entry: $relative"
+        Assert-Condition $observed.Add($relative) "Scoped Core repeats a file: $relative"
+      }
+    }
+  }
+  Assert-Condition ($observed.Count -eq $trackedCore.Count) 'Scoped Core disk file set differs.'
+}
+
+function Assert-ScopedBindings([string] $Head) {
+  $entries = @(Get-ScopedEntries $Head)
+  Assert-Condition ($entries.Count -eq $scopedBindings.Count) 'Scoped tracked entry count differs.'
+  foreach ($entry in $entries) {
+    $binding = @($scopedBindings | Where-Object { $_.GitPath -ceq $entry.GitPath })
+    Assert-Condition ($binding.Count -eq 1 -and $binding[0].Mode -ceq $entry.Mode -and $binding[0].BlobId -ceq $entry.BlobId) "Scoped tracked binding differs: $($entry.GitPath)"
+  }
+  foreach ($binding in $scopedBindings) {
+    $binding.Lease.AssertUsable($binding.AbsolutePath)
+    [byte[]] $normalized = ConvertTo-NormalizedCheckoutBytes $binding.Lease.Bytes "Scoped checkout $($binding.GitPath)"
+    Assert-Condition ((Get-GitBlobSha1 $normalized) -ceq $binding.BlobId) "Scoped checkout differs from HEAD blob: $($binding.GitPath)"
+    Assert-Condition ((Get-OneGitLine @($gitPrefix + @('cat-file', '-t', $binding.BlobId)) "Scoped object type $($binding.GitPath)") -ceq 'blob') "Scoped Git object is not a blob: $($binding.GitPath)"
+    Assert-Condition ([long] (Get-OneGitLine @($gitPrefix + @('cat-file', '-s', $binding.BlobId)) "Scoped object size $($binding.GitPath)") -eq $normalized.Length) "Scoped Git blob size differs: $($binding.GitPath)"
+  }
+  $allowedWarnings = @($scopedPaths | ForEach-Object { "warning: in the working copy of '$_', LF will be replaced by CRLF the next time Git touches it" })
+  $diff = Invoke-BoundGit @($gitPrefix + @('diff', '--quiet', $Head, '--') + $scopedPaths) @(0) $allowedWarnings
+  Assert-Condition ($diff.Stdout.Length -eq 0) 'Scoped diff stdout was not empty.'
+  $status = Invoke-BoundGit @($gitPrefix + @('status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignored=matching', '--') + $scopedPaths)
+  foreach ($token in @(Split-NulProtocol $status.Stdout 'Scoped porcelain' $true)) {
+    Assert-Condition ($token.Length -gt 3 -and $token[2] -eq ' ' -and $token.Substring(0, 2) -ceq ' M') 'Scoped porcelain contains a disallowed status.'
+    $path = $token.Substring(3)
+    $insideScope = $false
+    foreach ($scope in $scopedPaths) {
+      if ($path -ceq $scope -or $path.StartsWith($scope + '/', [StringComparison]::Ordinal)) { $insideScope = $true; break }
+    }
+    Assert-Condition $insideScope "Scoped porcelain path escapes its scopes: $path"
+  }
+  Assert-ScopedDirectorySet
+  Assert-ContractDocuments
+}
+
+function Initialize-ScopedBindings([string] $Head) {
+  Assert-Condition ($scopedBindings.Count -eq 0) 'Scoped bindings were already initialized.'
+  foreach ($entry in @(Get-ScopedEntries $Head)) {
+    $absolutePath = ConvertTo-ScopedAbsolutePath $entry.GitPath
+    $binding = [pscustomobject]@{ GitPath = $entry.GitPath; AbsolutePath = $absolutePath; Mode = $entry.Mode; BlobId = $entry.BlobId; Lease = $null }
+    $script:scopedBindings += $binding
+    $binding.Lease = [T37R4KLease]::new($absolutePath)
+  }
+  Assert-ScopedBindings $Head
+}
+
+function Assert-ContractHistory([string] $Head) {
+  Assert-FullLowerSha $Head 'Contract HEAD'
+  $visited = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $union = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $signatures = [Collections.Generic.List[string]]::new()
+  $child = $Head
+  $edgeCount = 0
+  while ($child -cne $repositoryBase) {
+    Assert-Condition ($edgeCount -lt 64 -and $visited.Add($child)) 'Contract history is too deep or cyclic.'
+    $parentLine = Get-OneGitLine @($gitPrefix + @('rev-list', '--parents', '-n', '1', $child)) "Parents $child"
+    $parts = @($parentLine.Split([char] 32))
+    Assert-Condition ($parts.Count -eq 2 -and $parts[0] -ceq $child) "Commit $child is not single-parent."
+    $parent = $parts[1]
+    Assert-FullLowerSha $parent "Parent of $child"
+    $diff = Invoke-BoundGit @($gitPrefix + @('diff-tree', '--no-commit-id', '--name-status', '-r', '--no-renames', '-z', $parent, $child, '--'))
+    $tokens = @(Split-NulProtocol $diff.Stdout "Diff $parent..$child")
+    Assert-Condition ($tokens.Count -gt 0 -and $tokens.Count % 2 -eq 0) "Diff $parent..$child lacks status/path pairs."
+    $edgePaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    for ($index = 0; $index -lt $tokens.Count; $index += 2) {
+      Assert-Condition ($tokens[$index] -ceq 'M') "Diff $parent..$child contains a non-M status."
+      $path = $tokens[$index + 1]
+      Assert-Condition ($authorizedContractPaths -ccontains $path) "Diff $parent..$child contains a non-contract path."
+      Assert-Condition $edgePaths.Add($path) "Diff $parent..$child repeats $path."
+      $null = $union.Add($path)
+    }
+    $signatures.Add($parent + '>' + $child + ':' + [string]::Join(',', @($edgePaths | Sort-Object)))
+    $child = $parent
+    $edgeCount += 1
+  }
+  Assert-Condition ($edgeCount -gt 0 -and $union.Count -eq $authorizedContractPaths.Count) 'Contract history edge/path count differs.'
+  foreach ($path in $authorizedContractPaths) { Assert-Condition $union.Contains($path) "Contract history omits $path." }
+  $currentSignature = [string]::Join("`n", $signatures)
+  if ($null -eq $historySignature) { $script:historySignature = $currentSignature }
+  else { Assert-Condition ($currentSignature -ceq $historySignature) 'Contract history changed after capture.' }
+}
+
+function Assert-GitRepository {
+  Assert-Condition ((Get-OneGitLine @('--version') 'Git version') -ceq 'git version 2.51.0.windows.2') 'Git version differs.'
+  $topLevel = Get-OneGitLine @($gitPrefix + @('rev-parse', '--show-toplevel')) 'Repository root'
+  Assert-Condition ([IO.Path]::GetFullPath($topLevel).TrimEnd('\') -ceq [IO.Path]::GetFullPath($root).TrimEnd('\')) 'Repository root differs.'
+  $gitDirectory = Get-OneGitLine @($gitPrefix + @('rev-parse', '--absolute-git-dir')) 'Git directory'
+  Assert-Condition ([IO.Path]::GetFullPath($gitDirectory).TrimEnd('\') -ceq [IO.Path]::GetFullPath((Join-Path $root '.git')).TrimEnd('\')) 'Git directory differs.'
+  Assert-EmptyGitOutput @($gitPrefix + @('replace', '-l')) 'Git replace refs'
+  Assert-LstatAbsent (Join-Path $root '.git\info\grafts')
+  Assert-LstatAbsent (Join-Path $root '.git\objects\info\alternates')
+  Assert-Condition ((Get-OneGitLine @($gitPrefix + @('rev-parse', '--show-object-format')) 'Git object format') -ceq 'sha1') 'Git object format differs.'
+  Assert-Condition ((Get-OneGitLine @($gitPrefix + @('branch', '--show-current')) 'Branch') -ceq 'main') 'Branch differs.'
+  $head = Get-OneGitLine @($gitPrefix + @('rev-parse', 'HEAD')) 'HEAD'
+  Assert-Condition ($head -cmatch '^[0-9a-f]{40}$') 'HEAD is malformed.'
+  Assert-Condition ((Get-OneGitLine @($gitPrefix + @('rev-parse', "$repositoryBase^{commit}")) 'Repository base') -ceq $repositoryBase) 'Repository base differs.'
+  Assert-Condition ((Get-OneGitLine @($gitPrefix + @('rev-parse', "$coreBase^{commit}")) 'Core base') -ceq $coreBase) 'Core base differs.'
+  Assert-EmptyGitOutput @($gitPrefix + @('merge-base', '--is-ancestor', $coreBase, $head)) 'Core ancestry output'
+  Assert-Condition ((Get-OneGitLine @($gitPrefix + @('rev-parse', "$head`:src/game/core")) 'Core tree') -ceq $coreTree) 'Core tree differs.'
+  Assert-Condition ((Get-OneGitLine @($gitPrefix + @('rev-parse', "$coreBase`:src/game/core")) 'Core base tree') -ceq $coreTree) 'Core base tree differs.'
+  Assert-ContractHistory $head
+  if ($null -eq $capturedHead) {
+    $script:capturedHead = $head
+    Initialize-ScopedBindings $head
+  } else {
+    Assert-Condition ($head -ceq $capturedHead) 'HEAD changed after scoped capture.'
+    Assert-ScopedBindings $head
+  }
+}
+
+function Assert-PreflightState {
+  Assert-ExactEnvironment
+  Assert-BootstrapRunnerBinding
+  Assert-LeasePin $runnerLease $runnerSourcePath 63640 '178584C03DC1103F29D4038FF2A69B7301EBA2DCDBE28085D2D4220F573B3003' 'Runner'
+  Assert-LeasePin $nodeLease $node 89935872 '2FFE3ACC0458FDDE999F50D11809BBE7C9B7EF204DCF17094E325D26ACE101D8' 'Node'
+  Assert-LeasePin $gitLease $git 4284816 'E996432581A70DF2E7AAAC5DB71E3811EC0DAA7F93A8BA73FE6DB6F9941F4BF9' 'Git'
+  Assert-LeasePin $validatorV2Lease $validatorV2 51909 '17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A' 'Validator v2'
+  Assert-LeasePin $validatorV3Lease $validatorV3 57181 '25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF' 'Validator v3'
+  Assert-LeasePin $validatorV4Lease $validatorV4 63777 '93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60' 'Validator v4'
+  Assert-LeasePin $inputLease $cluePath 633 '959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42' 'Clue'
+  Assert-V3Receipt
+  $version = (Get-Item -LiteralPath $node -Force -ErrorAction Stop).VersionInfo
+  Assert-Condition ($version.FileVersion -ceq '24.12.0' -and $version.ProductVersion -ceq '24.12.0' -and $version.OriginalFilename -ceq 'node.exe') 'Node version resource differs.'
+  Assert-Namespaces
+  Assert-ValidatorAliasesAndProcesses
+  Assert-GitRepository
+  Assert-Namespaces
+  Assert-ValidatorAliasesAndProcesses
+  $runnerBootstrap.AssertStable()
+  $fixedBindings = @(
+    [pscustomobject]@{ Lease = $runnerLease; Path = $runnerSourcePath },
+    [pscustomobject]@{ Lease = $nodeLease; Path = $node },
+    [pscustomobject]@{ Lease = $gitLease; Path = $git },
+    [pscustomobject]@{ Lease = $validatorV2Lease; Path = $validatorV2 },
+    [pscustomobject]@{ Lease = $validatorV3Lease; Path = $validatorV3 },
+    [pscustomobject]@{ Lease = $validatorV4Lease; Path = $validatorV4 },
+    [pscustomobject]@{ Lease = $inputLease; Path = $cluePath },
+    [pscustomobject]@{ Lease = $attemptV3Lease; Path = $attemptV3 }
+  )
+  foreach ($binding in $fixedBindings) {
+    $binding.Lease.AssertUsable([string] $binding.Path)
+  }
+  foreach ($binding in $scopedBindings) { $binding.Lease.AssertUsable($binding.AbsolutePath) }
+}
+
+$bootstrapSource = @'
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.Win32.SafeHandles;
+
+public sealed class T37R4KBootstrapSnapshot
+{
+    public string InputDosPath { get; internal set; }
+    public string FinalDosPath { get; internal set; }
+    public string FinalNtPath { get; internal set; }
+    public string OpenedNtPath { get; internal set; }
+    public FileAttributes Attributes { get; internal set; }
+    public long Length { get; internal set; }
+    public ulong VolumeSerialNumber { get; internal set; }
+    public byte[] FileId { get; internal set; }
+    public uint NumberOfLinks { get; internal set; }
+    public long CreationTime { get; internal set; }
+    public long LastWriteTime { get; internal set; }
+    public long ChangeTime { get; internal set; }
+    public bool DeletePending { get; internal set; }
+    public bool Directory { get; internal set; }
+    public uint ReparseTag { get; internal set; }
+}
+
+public sealed class T37R4KBootstrapResult : IDisposable
+{
+    private readonly List<SafeFileHandle> handles;
+    private readonly List<T37R4KBootstrapSnapshot> original;
+    private bool disposed;
+
+    internal T37R4KBootstrapResult(
+        List<SafeFileHandle> handles,
+        List<T37R4KBootstrapSnapshot> snapshots,
+        byte[] bytes,
+        string text,
+        string sha256)
+    {
+        this.handles = handles;
+        this.original = snapshots;
+        Bytes = bytes;
+        Text = text;
+        Sha256 = sha256;
+        Components = snapshots.AsReadOnly();
+        Final = snapshots[snapshots.Count - 1];
+    }
+
+    public byte[] Bytes { get; private set; }
+    public string Text { get; private set; }
+    public string Sha256 { get; private set; }
+    public IReadOnlyList<T37R4KBootstrapSnapshot> Components { get; private set; }
+    public T37R4KBootstrapSnapshot Final { get; private set; }
+    public bool IsDisposed { get { return disposed; } }
+
+    public void AssertStable()
+    {
+        if (disposed) throw new ObjectDisposedException("T37R4KBootstrapResult");
+        for (int i = 0; i < handles.Count; i++)
+        {
+            T37R4KBootstrapSnapshot now = T37R4KBootstrapNative.Capture(handles[i], original[i].InputDosPath);
+            T37R4KBootstrapNative.AssertSame(original[i], now, "component[" + i + "]");
+        }
+
+        byte[] reread = T37R4KBootstrapNative.ReadExact(handles[handles.Count - 1], Bytes.LongLength);
+        if (!T37R4KBootstrapNative.BytesEqual(Bytes, reread))
+            throw new InvalidDataException("Final source bytes changed while bootstrap handles were held.");
+        string hash = T37R4KBootstrapNative.Sha256Hex(reread);
+        if (!String.Equals(hash, Sha256, StringComparison.Ordinal))
+            throw new InvalidDataException("Final source hash changed while bootstrap handles were held.");
+    }
+
+    public void Dispose()
+    {
+        if (disposed) return;
+        disposed = true;
+        for (int i = handles.Count - 1; i >= 0; i--) handles[i].Dispose();
+    }
+}
+
+public static class T37R4KBootstrap
+{
+    public static T37R4KBootstrapResult OpenAndVerify(string canonicalAbsoluteDosPath, long expectedLength, string expectedSha256)
+    {
+        if (expectedLength < 0) throw new ArgumentOutOfRangeException("expectedLength");
+        if (String.IsNullOrEmpty(expectedSha256) || expectedSha256.Length != 64)
+            throw new ArgumentException("Expected SHA-256 must be exactly 64 uppercase hexadecimal characters.", "expectedSha256");
+        for (int i = 0; i < expectedSha256.Length; i++)
+        {
+            char c = expectedSha256[i];
+            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')))
+                throw new ArgumentException("Expected SHA-256 must be uppercase hexadecimal.", "expectedSha256");
+        }
+
+        List<string> componentPaths = T37R4KBootstrapNative.ValidateAndExpandCanonicalPath(canonicalAbsoluteDosPath);
+        List<SafeFileHandle> handles = new List<SafeFileHandle>(componentPaths.Count);
+        List<T37R4KBootstrapSnapshot> snapshots = new List<T37R4KBootstrapSnapshot>(componentPaths.Count);
+        try
+        {
+            for (int i = 0; i < componentPaths.Count; i++)
+            {
+                bool directoryExpected = i != componentPaths.Count - 1;
+                SafeFileHandle handle = T37R4KBootstrapNative.OpenComponent(componentPaths[i], directoryExpected);
+                handles.Add(handle);
+                T37R4KBootstrapSnapshot snapshot = T37R4KBootstrapNative.Capture(handle, componentPaths[i]);
+                if (snapshot.Directory != directoryExpected)
+                    throw new InvalidDataException("Component directory/file type mismatch: " + componentPaths[i]);
+                if ((snapshot.Attributes & FileAttributes.ReparsePoint) != 0 || snapshot.ReparseTag != 0)
+                    throw new InvalidDataException("Reparse points are forbidden: " + componentPaths[i]);
+                string expectedFinalDos = "\\\\?\\" + componentPaths[i];
+                if (!String.Equals(snapshot.FinalDosPath, expectedFinalDos, StringComparison.Ordinal))
+                    throw new InvalidDataException("Opened path is not the exact canonical DOS path: " + componentPaths[i]);
+                if (String.IsNullOrEmpty(snapshot.FinalNtPath) || !snapshot.FinalNtPath.StartsWith("\\Device\\", StringComparison.Ordinal))
+                    throw new InvalidDataException("Opened path has no normalized NT device binding: " + componentPaths[i]);
+                if (String.IsNullOrEmpty(snapshot.OpenedNtPath) || !snapshot.OpenedNtPath.StartsWith("\\Device\\", StringComparison.Ordinal))
+                    throw new InvalidDataException("Opened path has no opened-name NT device binding: " + componentPaths[i]);
+                if (!String.Equals(snapshot.OpenedNtPath, snapshot.FinalNtPath, StringComparison.Ordinal))
+                    throw new InvalidDataException("Opened and normalized NT paths differ; alternate path syntax is forbidden: " + componentPaths[i]);
+                snapshots.Add(snapshot);
+            }
+
+            T37R4KBootstrapSnapshot final = snapshots[snapshots.Count - 1];
+            if (final.Length != expectedLength)
+                throw new InvalidDataException("Source byte length mismatch.");
+            if (final.NumberOfLinks != 1)
+                throw new InvalidDataException("Alternate hard-link paths are forbidden for runner source.");
+
+            byte[] bytes = T37R4KBootstrapNative.ReadExact(handles[handles.Count - 1], expectedLength);
+            string sha256 = T37R4KBootstrapNative.Sha256Hex(bytes);
+            if (!String.Equals(sha256, expectedSha256, StringComparison.Ordinal))
+                throw new InvalidDataException("Source SHA-256 mismatch.");
+            string text = T37R4KBootstrapNative.DecodeStrictUtf8LfOnly(bytes);
+
+            T37R4KBootstrapResult result = new T37R4KBootstrapResult(handles, snapshots, bytes, text, sha256);
+            result.AssertStable();
+            return result;
+        }
+        catch
+        {
+            for (int i = handles.Count - 1; i >= 0; i--) handles[i].Dispose();
+            throw;
+        }
+    }
+}
+
+internal static class T37R4KBootstrapNative
+{
+    private const uint GENERIC_READ = 0x80000000;
+    private const uint FILE_READ_ATTRIBUTES = 0x00000080;
+    private const uint FILE_SHARE_READ = 0x00000001;
+    private const uint OPEN_EXISTING = 3;
+    private const uint FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
+    private const uint FILE_FLAG_OPEN_REPARSE_POINT = 0x00200000;
+    private const uint FILE_FLAG_RANDOM_ACCESS = 0x10000000;
+    private const uint VOLUME_NAME_DOS = 0x0;
+    private const uint VOLUME_NAME_NT = 0x2;
+    private const uint FILE_NAME_OPENED = 0x8;
+    private const int FileBasicInfo = 0;
+    private const int FileStandardInfo = 1;
+    private const int FileAttributeTagInfo = 9;
+    private const int FileIdInfo = 18;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct FILETIME_RAW { public uint Low; public uint High; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct BY_HANDLE_FILE_INFORMATION
+    {
+        public uint FileAttributes;
+        public FILETIME_RAW CreationTime;
+        public FILETIME_RAW LastAccessTime;
+        public FILETIME_RAW LastWriteTime;
+        public uint VolumeSerialNumber;
+        public uint FileSizeHigh;
+        public uint FileSizeLow;
+        public uint NumberOfLinks;
+        public uint FileIndexHigh;
+        public uint FileIndexLow;
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern SafeFileHandle CreateFileW(
+        string fileName, uint desiredAccess, uint shareMode, IntPtr securityAttributes,
+        uint creationDisposition, uint flagsAndAttributes, IntPtr templateFile);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetFileInformationByHandle(
+        SafeFileHandle file, out BY_HANDLE_FILE_INFORMATION information);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetFileInformationByHandleEx(
+        SafeFileHandle file, int informationClass, IntPtr information, uint bufferSize);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern uint GetFinalPathNameByHandleW(
+        SafeFileHandle file, StringBuilder path, uint pathLength, uint flags);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ReadFile(
+        SafeFileHandle file, IntPtr buffer, uint bytesToRead, out uint bytesRead, IntPtr overlapped);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetFilePointerEx(
+        SafeFileHandle file, long distanceToMove, out long newFilePointer, uint moveMethod);
+
+    internal static List<string> ValidateAndExpandCanonicalPath(string path)
+    {
+        if (String.IsNullOrEmpty(path)) throw new ArgumentException("Path is required.", "path");
+        if (path.IndexOf('\0') >= 0) throw new ArgumentException("NUL is forbidden in paths.", "path");
+        if (path.IndexOf('/') >= 0) throw new ArgumentException("Forward slashes are noncanonical.", "path");
+        if (path.Length < 4 || path[0] < 'A' || path[0] > 'Z' || path[1] != ':' || path[2] != '\\')
+            throw new ArgumentException("Path must be an uppercase-drive absolute DOS path.", "path");
+        if (path.StartsWith("\\\\", StringComparison.Ordinal) || path.StartsWith("\\?\\", StringComparison.Ordinal) ||
+            path.StartsWith("\\.\\", StringComparison.Ordinal) || path.EndsWith("\\", StringComparison.Ordinal))
+            throw new ArgumentException("Device, UNC, or trailing-separator paths are forbidden.", "path");
+        if (!String.Equals(Path.GetFullPath(path), path, StringComparison.Ordinal))
+            throw new ArgumentException("Path is not lexically canonical.", "path");
+
+        string[] parts = path.Substring(3).Split('\\');
+        if (parts.Length == 0) throw new ArgumentException("Path must name a file.", "path");
+        string[] reserved = new string[] { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
+        foreach (string part in parts)
+        {
+            if (String.IsNullOrEmpty(part) || part == "." || part == "..")
+                throw new ArgumentException("Empty, dot, and dot-dot components are forbidden.", "path");
+            if (part.EndsWith(".", StringComparison.Ordinal) || part.EndsWith(" ", StringComparison.Ordinal))
+                throw new ArgumentException("Trailing dot or space is forbidden.", "path");
+            if (!String.Equals(part.Normalize(NormalizationForm.FormC), part, StringComparison.Ordinal))
+                throw new ArgumentException("Path components must use Unicode NFC.", "path");
+            for (int i = 0; i < part.Length; i++)
+            {
+                char c = part[i];
+                if (c < 32 || c == ':' || c == '<' || c == '>' || c == '"' || c == '|' || c == '?' || c == '*')
+                    throw new ArgumentException("Forbidden character or alternate data stream syntax in path.", "path");
+            }
+            string stem = part.Split('.')[0].ToUpperInvariant();
+            foreach (string device in reserved)
+                if (stem == device) throw new ArgumentException("Reserved DOS device name is forbidden.", "path");
+        }
+
+        List<string> expanded = new List<string>();
+        string current = path.Substring(0, 3);
+        expanded.Add(current);
+        foreach (string part in parts)
+        {
+            current = current.EndsWith("\\", StringComparison.Ordinal) ? current + part : current + "\\" + part;
+            expanded.Add(current);
+        }
+        return expanded;
+    }
+
+    internal static SafeFileHandle OpenComponent(string canonicalDosPath, bool directoryExpected)
+    {
+        uint access = directoryExpected ? FILE_READ_ATTRIBUTES : (GENERIC_READ | FILE_READ_ATTRIBUTES);
+        uint flags = FILE_FLAG_OPEN_REPARSE_POINT | (directoryExpected ? FILE_FLAG_BACKUP_SEMANTICS : FILE_FLAG_RANDOM_ACCESS);
+        SafeFileHandle handle = CreateFileW("\\\\?\\" + canonicalDosPath, access, FILE_SHARE_READ, IntPtr.Zero, OPEN_EXISTING, flags, IntPtr.Zero);
+        if (handle.IsInvalid)
+        {
+            int error = Marshal.GetLastWin32Error();
+            handle.Dispose();
+            throw new Win32Exception(error, "CreateFileW failed for exact component: " + canonicalDosPath);
+        }
+        return handle;
+    }
+
+    internal static T37R4KBootstrapSnapshot Capture(SafeFileHandle handle, string inputDosPath)
+    {
+        BY_HANDLE_FILE_INFORMATION legacy;
+        if (!GetFileInformationByHandle(handle, out legacy))
+            throw new Win32Exception(Marshal.GetLastWin32Error(), "GetFileInformationByHandle failed.");
+
+        IntPtr tagBuffer = Marshal.AllocHGlobal(8);
+        IntPtr idBuffer = Marshal.AllocHGlobal(24);
+        IntPtr standardBuffer = Marshal.AllocHGlobal(24);
+        IntPtr basicBuffer = Marshal.AllocHGlobal(40);
+        try
+        {
+            if (!GetFileInformationByHandleEx(handle, FileAttributeTagInfo, tagBuffer, 8))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "FileAttributeTagInfo failed.");
+            if (!GetFileInformationByHandleEx(handle, FileIdInfo, idBuffer, 24))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "FileIdInfo failed.");
+            if (!GetFileInformationByHandleEx(handle, FileStandardInfo, standardBuffer, 24))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "FileStandardInfo failed.");
+            if (!GetFileInformationByHandleEx(handle, FileBasicInfo, basicBuffer, 40))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "FileBasicInfo failed.");
+
+            byte[] fileId = new byte[16];
+            Marshal.Copy(IntPtr.Add(idBuffer, 8), fileId, 0, 16);
+            return new T37R4KBootstrapSnapshot
+            {
+                InputDosPath = inputDosPath,
+                FinalDosPath = FinalPath(handle, VOLUME_NAME_DOS),
+                FinalNtPath = FinalPath(handle, VOLUME_NAME_NT),
+                OpenedNtPath = FinalPath(handle, VOLUME_NAME_NT | FILE_NAME_OPENED),
+                Attributes = (FileAttributes)(uint)Marshal.ReadInt32(tagBuffer, 0),
+                ReparseTag = (uint)Marshal.ReadInt32(tagBuffer, 4),
+                Length = Marshal.ReadInt64(standardBuffer, 8),
+                VolumeSerialNumber = unchecked((ulong)Marshal.ReadInt64(idBuffer, 0)),
+                FileId = fileId,
+                NumberOfLinks = unchecked((uint)Marshal.ReadInt32(standardBuffer, 16)),
+                CreationTime = Marshal.ReadInt64(basicBuffer, 0),
+                LastWriteTime = Marshal.ReadInt64(basicBuffer, 16),
+                ChangeTime = Marshal.ReadInt64(basicBuffer, 24),
+                DeletePending = Marshal.ReadByte(standardBuffer, 20) != 0,
+                Directory = Marshal.ReadByte(standardBuffer, 21) != 0
+            };
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(tagBuffer);
+            Marshal.FreeHGlobal(idBuffer);
+            Marshal.FreeHGlobal(standardBuffer);
+            Marshal.FreeHGlobal(basicBuffer);
+        }
+    }
+
+    private static string FinalPath(SafeFileHandle handle, uint volumeFlag)
+    {
+        StringBuilder builder = new StringBuilder(512);
+        uint length = GetFinalPathNameByHandleW(handle, builder, (uint)builder.Capacity, volumeFlag);
+        if (length == 0) throw new Win32Exception(Marshal.GetLastWin32Error(), "GetFinalPathNameByHandleW failed.");
+        if (length >= builder.Capacity)
+        {
+            builder = new StringBuilder(checked((int)length + 1));
+            length = GetFinalPathNameByHandleW(handle, builder, (uint)builder.Capacity, volumeFlag);
+            if (length == 0 || length >= builder.Capacity)
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "GetFinalPathNameByHandleW retry failed.");
+        }
+        return builder.ToString();
+    }
+
+    internal static byte[] ReadExact(SafeFileHandle handle, long expectedLength)
+    {
+        if (expectedLength < 0 || expectedLength > Int32.MaxValue)
+            throw new InvalidDataException("Bootstrap source length is outside the bounded range.");
+        byte[] bytes = new byte[(int)expectedLength];
+        long position;
+        if (!SetFilePointerEx(handle, 0, out position, 0) || position != 0)
+            throw new Win32Exception(Marshal.GetLastWin32Error(), "SetFilePointerEx failed before exact read.");
+        GCHandle pin = default(GCHandle);
+        try
+        {
+            if (bytes.Length > 0) pin = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+            int offset = 0;
+            while (offset < bytes.Length)
+            {
+                uint request = (uint)Math.Min(1024 * 1024, bytes.Length - offset);
+                uint read;
+                IntPtr pointer = IntPtr.Add(pin.AddrOfPinnedObject(), offset);
+                if (!ReadFile(handle, pointer, request, out read, IntPtr.Zero))
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "ReadFile failed.");
+                if (read == 0) throw new EndOfStreamException("Unexpected EOF while reading bootstrap source.");
+                offset = checked(offset + (int)read);
+            }
+
+            byte[] sentinel = new byte[1];
+            GCHandle sentinelPin = GCHandle.Alloc(sentinel, GCHandleType.Pinned);
+            try
+            {
+                uint extra;
+                if (!ReadFile(handle, sentinelPin.AddrOfPinnedObject(), 1, out extra, IntPtr.Zero))
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "ReadFile EOF check failed.");
+                if (extra != 0) throw new InvalidDataException("Source grew beyond the expected exact length.");
+            }
+            finally { sentinelPin.Free(); }
+            return bytes;
+        }
+        finally { if (pin.IsAllocated) pin.Free(); }
+    }
+
+    internal static string DecodeStrictUtf8LfOnly(byte[] bytes)
+    {
+        if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+            throw new InvalidDataException("UTF-8 BOM is forbidden.");
+        for (int i = 0; i < bytes.Length; i++)
+            if (bytes[i] == 0x0D) throw new InvalidDataException("CR bytes are forbidden; source must be LF-only.");
+        UTF8Encoding strict = new UTF8Encoding(false, true);
+        string text = strict.GetString(bytes);
+        byte[] roundTrip = strict.GetBytes(text);
+        if (!BytesEqual(bytes, roundTrip)) throw new InvalidDataException("UTF-8 round-trip mismatch.");
+        return text;
+    }
+
+    internal static string Sha256Hex(byte[] bytes)
+    {
+        using (SHA256 sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "");
+    }
+
+    internal static bool BytesEqual(byte[] left, byte[] right)
+    {
+        if (Object.ReferenceEquals(left, right)) return true;
+        if (left == null || right == null || left.Length != right.Length) return false;
+        int difference = 0;
+        for (int i = 0; i < left.Length; i++) difference |= left[i] ^ right[i];
+        return difference == 0;
+    }
+
+    internal static void AssertSame(T37R4KBootstrapSnapshot expected, T37R4KBootstrapSnapshot actual, string label)
+    {
+        bool identityChanged =
+            !String.Equals(expected.InputDosPath, actual.InputDosPath, StringComparison.Ordinal) ||
+            !String.Equals(expected.FinalDosPath, actual.FinalDosPath, StringComparison.Ordinal) ||
+            !String.Equals(expected.FinalNtPath, actual.FinalNtPath, StringComparison.Ordinal) ||
+            !String.Equals(expected.OpenedNtPath, actual.OpenedNtPath, StringComparison.Ordinal) ||
+            expected.Attributes != actual.Attributes ||
+            expected.VolumeSerialNumber != actual.VolumeSerialNumber || !BytesEqual(expected.FileId, actual.FileId) ||
+            expected.DeletePending != actual.DeletePending || expected.Directory != actual.Directory ||
+            expected.ReparseTag != actual.ReparseTag;
+        bool immutableFileMetadataChanged = !expected.Directory &&
+            (expected.Length != actual.Length || expected.NumberOfLinks != actual.NumberOfLinks ||
+             expected.CreationTime != actual.CreationTime || expected.LastWriteTime != actual.LastWriteTime ||
+             expected.ChangeTime != actual.ChangeTime);
+        if (identityChanged || immutableFileMetadataChanged)
+            throw new InvalidDataException("Bootstrap identity/metadata changed: " + label);
+    }
+}
+'@
+$bootstrapBytes = [Text.UTF8Encoding]::new($false, $true).GetBytes($bootstrapSource)
+Assert-Condition ($bootstrapBytes.Length -eq 21999) 'Inline bootstrap byte count differs.'
+Assert-UpperSha ([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bootstrapBytes))) '26C7080AC5AD22AA5BB7F68A15C9D81F3B2E7FD935693CFA222D7DBD02FC1A52' 'Inline bootstrap SHA-256'
+
+$nodeArguments = @'
+"C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v4.mjs" --root "E:\Proj\reproduction-tetris" --input "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-clue-v1.json" --output "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v4.json" --attempt "C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v4.json" --expect-core-base "7d81d4974ce8fb777ea105c5ef98d156cd1807cc" --expect-repo-base "4172a79620cda33e167d291d38c69f0ed64fec89" --expect-core-tree "96688eca803a335790d65b41db0ace4df7d2f9b5" --expect-input-bytes "633" --expect-input-sha "959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42" --expect-validator-sha "93952536898D055B793E52A7957C821A51C26C78B0A87B5379D35B551349EC60" --id "t3r-shaft-04" --difficulty "5" --target-rows "4" --max-primary-locks "7" --max-alternative-extra "2"
+'@
+Assert-Condition (-not ('T37R4KBootstrap' -as [type])) 'Bootstrap types are loaded.'
+Assert-Condition (-not ('T37R4KLease' -as [type])) 'Runner types are loaded.'
+Assert-Condition ($nodeArguments.IndexOf("`r", [StringComparison]::Ordinal) -lt 0 -and $nodeArguments.IndexOf("`n", [StringComparison]::Ordinal) -lt 0 -and $nodeArguments.IndexOf([char] 0) -lt 0) 'Node arguments are not one safe line.'
+$nodeArgumentBytes = [Text.UTF8Encoding]::new($false, $true).GetBytes($nodeArguments)
+Assert-Condition ($nodeArgumentBytes.Length -eq 876) 'Node argument byte count differs.'
+Assert-UpperSha ([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($nodeArgumentBytes))) 'C3D76AEC1DEC4A675FA141BB8BF330AAE53AA658A0407A8EA09BBB497E36433E' 'Node argument SHA-256'
+
+try {
+  Add-Type -TypeDefinition $bootstrapSource -Language CSharp
+  $runnerBootstrap = [T37R4KBootstrap]::OpenAndVerify($runnerSourcePath, 63640, '178584C03DC1103F29D4038FF2A69B7301EBA2DCDBE28085D2D4220F573B3003')
+  Assert-Condition (-not ('T37R4KLease' -as [type])) 'Runner types preexisted verified source.'
+  Add-Type -TypeDefinition $runnerBootstrap.Text -Language CSharp
+  $runnerLease = [T37R4KLease]::new($runnerSourcePath)
+  Assert-BootstrapRunnerBinding
+  $nodeLease = [T37R4KLease]::new($node)
+  $gitLease = [T37R4KLease]::new($git)
+  $validatorV2Lease = [T37R4KLease]::new($validatorV2)
+  $validatorV3Lease = [T37R4KLease]::new($validatorV3)
+  $validatorV4Lease = [T37R4KLease]::new($validatorV4)
+  $inputLease = [T37R4KLease]::new($cluePath)
+  $attemptV3Lease = [T37R4KLease]::new($attemptV3)
+  Assert-PreflightState
+  Assert-PreflightState
+
+# T37-R4L-PRODUCTION-CALL-BEGIN
+  $productionAttemptEntered = $true
+  $productionExitCode = [T37R4KRunner]::Run($node, $nodeArguments, $root, $nodeLease)
+  if ($productionExitCode -ne 0) { throw "The sole v4 validator attempt failed with exit code $productionExitCode." }
+# T37-R4L-PRODUCTION-CALL-END
+} catch {
+  $failure = $_.Exception
+} finally {
+  for ($index = $scopedBindings.Count - 1; $index -ge 0; $index -= 1) {
+    $scopedLease = $scopedBindings[$index].Lease
+    if ($null -ne $scopedLease) {
+      if ($productionAttemptEntered) {
+        try { $scopedLease.Dispose() } catch { }
+      } else {
+        try { $scopedLease.Dispose() } catch { $preflightCleanupFailures += $_.Exception.Message }
+      }
+    }
+  }
+  foreach ($lease in @($attemptV3Lease, $inputLease, $validatorV4Lease, $validatorV3Lease, $validatorV2Lease, $gitLease, $nodeLease, $runnerLease)) {
+    if ($null -ne $lease) {
+      if ($productionAttemptEntered) {
+        try { $lease.Dispose() } catch { }
+      } else {
+        try { $lease.Dispose() } catch { $preflightCleanupFailures += $_.Exception.Message }
+      }
+    }
+  }
+  if ($null -ne $runnerBootstrap) {
+    if ($productionAttemptEntered) {
+      try { $runnerBootstrap.Dispose() } catch { }
+    } else {
+      try { $runnerBootstrap.Dispose() } catch { $preflightCleanupFailures += $_.Exception.Message }
+    }
+  }
+}
+
+$failureMessages = @()
+if ($null -ne $failure) { $failureMessages += $failure.Message }
+if (-not $productionAttemptEntered -and $preflightCleanupFailures.Count -gt 0) {
+  $failureMessages += ('Preflight cleanup failures: ' + [string]::Join(' | ', $preflightCleanupFailures))
+}
+if ($failureMessages.Count -gt 0) {
+  $message = [string]::Join(' | ', $failureMessages)
+  if ($productionAttemptEntered) { $message += ' Do not retry.' }
+  throw $message
+}
+```
+
+The hash-bound no-spawn derivative replaces only the delimited 302-byte production
+block in memory. Its 63,933 derived bytes hash to
+`5E9D2DEF71E1A3ED01537415CB554F6382E7FE430CB3F45AF8F91FF2829617C2`
+and retain only the bound Git runner call. The reviewed harness completed the full
+preflight in 52.5 seconds with the sole output
+`T37-R4L-NO-SPAWN-PREFLIGHT-PASS`; it created no v4 receipt, output, stage, or process.
+This materialization alone does not open production execution.
