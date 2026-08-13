@@ -42,6 +42,65 @@ dual-field `GameState` is forbidden: object spread and independent mutation woul
 alias stale and corrupt state identity. The exact exception and final zero-retired-name gate
 are authoritative in `docs/CURRENT_TASK.md` and the Endgame workstream log.
 
+## 2026-08-14 T37 — Bomb R2 causal Boom correction
+
+This section supersedes only the Bomb audio and chain-clear presentation paragraphs in the
+2026-08-13 contract below. Mechanical removal, scoring, carrier activation, settlement,
+and deterministic state remain accepted and unchanged. The previous procedural Bomb cues
+and scan-bar/full-board-outline chain visual are human rejected.
+
+### One causal origin shared by Core, picture, and sound
+
+A `chain-clear` activation carries immutable `chainTriggerRows`: the sorted exact
+pre-clear ordinary full rows that caused the Bomb resolution. These rows come from the
+same Core plan as `clear-started.rows`; they do not include an extra row merely because the
+first Bomb carrier spans it. `chainOriginCarrierId` and complete `chainOriginCells` remain
+the identity and horizontal-art anchor for the first primary Bomb, but no longer determine
+vertical propagation distance.
+
+For visible presentation row `r`,
+`distance(r) = min(abs(r - chainTriggerRow))`. Every exact trigger row is distance zero;
+equal-distance rows above and below all sources share one beat. Hidden rows settle in Core
+without creating a hold. A hidden-only source starts at the nearest visible boundary. Both
+renderer and audio consume the activation's same frozen row list rather than independently
+remembering a prior event.
+
+### Explosion visual language and timing
+
+The normal Bomb and every reached chain row share one local explosion motif: an irregular
+heat ridge, a contained hot core, short broken ember fragments, and a local impact ring.
+Full motion warns and compresses for `220 ms`, explodes distance zero, then advances one
+distance group every `56 ms`; each reached row lives for `220 ms`. Unreached rows retain
+their immutable pre-clear cells and emit no fragments. The first impact may create one
+bounded board impulse; later rows do not repeatedly shake the camera.
+
+Reduced motion keeps causality with a `50 ms` static prelude, `20 ms` distance beats, and
+`90 ms` static row blasts. It has no moving fragments, expanding ring, camera shake, or
+full-screen flash. A motion preference change preserves normalized progress and never
+replays an already reached distance group.
+
+The former full-width row rectangles, horizontal scan strips, permanent alpha floor,
+whole-board tail border, and first-impact emission from every occupied board cell are
+prohibited. No chain frame may degrade into a full-board color wash. Completion leaves no
+blast primitive or stale cell behind.
+
+### Boom audio identity and human gate
+
+Bomb audio is sample-based and audition-first. Candidate sources must be verified for
+redistribution and archived with provenance; commercial-game sounds and imitated trade
+dress are prohibited. The preferred verified CC0 sources are Kodack's recorded/edited
+`Deep Explosion` for a low physical Boom body and NenadSimic's low log-drum/reflection
+`Muffled Distant Explosion` for the rounded chain tail.
+
+The normal cue is one compact and clearly audible Boom, aligned to the normal visual impact.
+It has a firm transient and low-mid body without a laser rise, stable musical pitch,
+chiptune grain, or piercing upper-mid crack. The chain cue begins with that same Boom at
+the distance-zero visual impact, then adds restrained low impacts on the shared distance
+beats and a coherent rounded tail for `2.2–3.0 s`. It is not a volume boost or a rapid
+sequence of identical blasts. Automated peak, duration, dispatch, and license checks are
+necessary but cannot accept taste. The product asset catalog stays closed until the player
+explicitly accepts one isolated normal/chain A/B pair.
+
 ## 2026-08-13 T37 — precise gravity and causal Bomb outcomes
 
 ### Gravity contract

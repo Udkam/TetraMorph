@@ -2477,6 +2477,36 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   four whole-piece Mutation materials without freezing time or injecting gameplay
   actions; prioritize the small settled Bomb/lava read.
 
+### 2026-08-14 Bomb R2 human rejection and replacement boundary
+
+- The player explicitly rejects both current Bomb sounds and the chain-clear visual.
+  Listening `968ab43` and presentation `0b97cdf` are now rejected historical baselines;
+  their automatic checks do not constitute human acceptance.
+- Read-only code/evidence audit identifies the causal defect: Core's exact
+  `clear-started.rows=[30]` was discarded, while the smallest-ID carrier spanned rows 29
+  and 30, so both became distance-zero. The current chain also uses permanent full-row
+  fills, scan strips, a whole-board border, and one-shot particles from all occupied cells.
+- The R2 contract adds frozen `chainTriggerRows` to the chain activation from the exact
+  ordinary full rows. `chainOriginCells` remains an identity/x anchor only. Renderer and
+  audio use the same row evidence and no independent pending-row reconstruction.
+- Full motion is `220 ms` prelude, `56 ms` symmetric distance beats, `220 ms` local blast
+  life. Reduced motion is `50 / 20 / 90 ms`, static but still directional. Chain rows
+  reuse the normal Bomb's localized irregular heat/core/fragment/ring grammar; full-row
+  bars, permanent wash, board border, premature remote fragments, and repeated shake are
+  forbidden.
+- Network and license verification prefers CC0 `Deep Explosion` by Kodack for the physical
+  Boom body and CC0 `Muffled Distant Explosion` by NenadSimic for the rounded long tail.
+  Normal is one compact Boom; chain is the same impact plus beat-aligned low propagation
+  and a coherent `2.2–3.0 s` tail. Commercial-game, laser, 8-bit, and piercing material is
+  excluded.
+- Product audio remains closed until an isolated provenance-bound A/B pair receives the
+  player's listening verdict. The material review pauses; visual/Core work may proceed
+  after independent contract QA. Existing evidence is not overwritten.
+- Protected inherited T27 paths, `docs/evidence/t27-r1-followup/**`, and `progress.md`
+  remain unread/unstaged. The old 4187 helper is no longer running and no listener remains.
+- Unique next action: commit this three-document contract, obtain independent all-zero
+  review, then add Core-owned trigger-row evidence before the renderer/timeline checkpoint.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

@@ -1,8 +1,65 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **D2A AUTOMATED ACCEPTED / MATERIAL NORMAL-SPEED REVIEW NEXT / BOMB LISTENING OPEN / INTRO-05 SUCCESSOR PENDING**
+Status: **BOMB R2 HUMAN REJECTION / CAUSAL BOOM CONTRACT OPEN / MATERIAL REVIEW PAUSED / INTRO-05 SUCCESSOR PENDING**
 
 ## Active objective
+
+### 2026-08-14 Bomb R2 human rejection and causal Boom correction
+
+The player rejects both currently exposed Bomb sounds and the current chain-clear visual.
+The normal cue is not close enough to a physical **Boom**, the chain cue is too short and
+does not read as the longer form of the same event, and the row bars / whole-board outline
+do not read as explosions spreading from the line clear. Listening evidence `968ab43` and
+presentation evidence `0b97cdf` remain reproducible historical baselines only; their
+automatic audits do not override this human rejection and neither candidate may be called
+accepted. The normal-speed material review is paused while this correction owns the sole
+product writer boundary.
+
+Bomb scoring, removal, carrier activation, settlement, and deterministic state stay
+unchanged. The correction adds immutable `chainTriggerRows` evidence to a chain-clear
+activation. It is the frozen sorted copy of the exact pre-clear ordinary full rows emitted
+by `clear-started`, not every row occupied by the smallest-ID Bomb. The existing
+`chainOriginCarrierId` and complete `chainOriginCells` remain attribution and horizontal
+art anchors only. Presentation distance is
+`min(abs(row - triggerRow))`; all exact trigger rows are distance zero, equal-distance
+visible rows share one beat, and hidden source rows begin at the nearest visible boundary
+without hidden delay. Renderer and audio consume this same Core-owned row set so they
+cannot drift through separate pending state.
+
+Full motion uses a `220 ms` warning/pressure prelude, then the distance-zero Boom, then
+paired upward/downward row fronts every `56 ms`. Each reached row owns a `220 ms` local
+explosion life; unreached rows retain their pre-clear cells. Reduced motion uses a `50 ms`
+static prelude, `20 ms` causal row beats, and a `90 ms` static local blast, with no moving
+fragments, expanding ring, camera shake, or full-screen flash. Runtime motion switching
+retimes current progress without replaying a completed beat. The chain renderer must reuse
+the normal Bomb's irregular heat ridge, hot core, broken ember fragments, and local impact
+ring. It must delete the current permanent full-row fill, horizontal scan strip,
+whole-board tail border, and one-shot all-board particle emission. Only the first impact
+may shake the board.
+
+The audio direction is audition-first and sample-based. Network verification selects
+CC0 acoustic/recorded sources rather than commercial-game samples: Kodack's `Deep
+Explosion` is the preferred low, physical Boom body; NenadSimic's `Muffled Distant
+Explosion` is the preferred rounded reflection/tail. A normal Bomb must be one compact,
+clearly audible Boom with a firm transient and low-mid body, no laser rise, pitched beep,
+chiptune texture, or piercing 2–6 kHz crack. A chain clear must begin with the same Boom at
+the first visual impact and continue as one coherent `2.2–3.0 s` event: a longer rounded
+tail plus restrained low propagation impacts aligned to the shared row beats, not a louder
+copy or a machine-gun series. Candidate media must preserve source URL, author, license,
+original/runtime hashes, download date, and processing recipe. Production catalog/source
+integration remains closed until the player listens to the new isolated A/B page and
+explicitly accepts a normal/chain pair.
+
+The contract checkpoint owns only `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, and
+`docs/agent-runs/t37-unified-sensory-curriculum/STATE.md`. After independent contract QA,
+the Core evidence checkpoint is bounded to `src/game/core/types.ts`,
+`src/game/core/mutation.ts`, `src/game/core/engine.ts`, and direct Mutation tests. The
+visual checkpoint is bounded to `src/animation/mutationChainTimeline.ts` and its test plus
+`src/game/render/TetrisRenderer.ts` and its direct test. Isolated audition artifacts live
+only under `docs/evidence/t37/bomb-boom-audition-r2/`; they may not change product audio.
+New full/reduced dense-board evidence must prove trigger-row-only first impact, symmetric
+fronts, no unreached-row fragments, no permanent wash/border, normal-Bomb motif reuse,
+one Canvas, and zero browser errors. Existing rejected evidence is never overwritten.
 
 ### 2026-08-14 precise gravity and causal Bomb checkpoint
 
