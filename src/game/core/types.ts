@@ -280,6 +280,7 @@ export type MutationActivationEvent =
     participatingBombCount?: never;
     chainOriginCarrierId?: never;
     chainOriginCells?: never;
+    chainTriggerRows?: never;
   })
   | (MutationActivationEventBase & {
     item: 'bomb';
@@ -288,6 +289,7 @@ export type MutationActivationEvent =
     participatingBombCount: number;
     chainOriginCarrierId?: never;
     chainOriginCells?: never;
+    chainTriggerRows?: never;
   })
   | (MutationActivationEventBase & {
     item: 'bomb';
@@ -296,6 +298,8 @@ export type MutationActivationEvent =
     participatingBombCount: number;
     chainOriginCarrierId: number;
     chainOriginCells: readonly Cell[];
+    /** Frozen, sorted pre-clear ordinary full rows that caused this chain. */
+    readonly chainTriggerRows: readonly number[];
   });
 
 export type GameEvent =

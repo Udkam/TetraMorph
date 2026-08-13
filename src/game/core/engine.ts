@@ -998,14 +998,17 @@ function activateMutationCarriers(
       blastRows: bomb.plan.blastRows,
       participatingBombCount: bomb.plan.participantBombs.length,
     };
-    events.push(bomb.plan.outcome === 'chain-clear'
-      ? {
+    if (bomb.plan.outcome === 'chain-clear') {
+      events.push({
         ...common,
         bombOutcome: 'chain-clear',
-        chainOriginCarrierId: bomb.plan.chainOriginCarrierId!,
-        chainOriginCells: bomb.plan.chainOriginCells!,
-      }
-      : { ...common, bombOutcome: 'blast' });
+        chainOriginCarrierId: bomb.plan.chainOriginCarrierId,
+        chainOriginCells: bomb.plan.chainOriginCells,
+        chainTriggerRows: bomb.plan.chainTriggerRows,
+      });
+    } else {
+      events.push({ ...common, bombOutcome: 'blast' });
+    }
     next = {
       ...next,
       mutationLastItem: 'bomb',

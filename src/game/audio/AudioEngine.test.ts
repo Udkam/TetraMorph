@@ -204,6 +204,7 @@ const chainClearMutation = (): GameEvent => ({
   participatingBombCount: 2,
   chainOriginCarrierId: 1,
   chainOriginCells: [{ x: 4, y: 39 }],
+  chainTriggerRows: [39],
 });
 
 beforeEach(() => {

@@ -2,16 +2,28 @@ import { BOARD_HEIGHT } from './constants';
 import { mapCellsAfterClear } from './board';
 import type { Board, Cell, GameState, MutationCarrier } from './types';
 
-export interface MutationBombPlan {
+interface MutationBombPlanBase {
   outcome: 'blast' | 'chain-clear';
   blastRows: readonly number[];
   removalRows: readonly number[];
   progressRows: readonly number[];
   participantBombs: readonly MutationCarrier[];
   activatedNonBombs: readonly MutationCarrier[];
-  chainOriginCarrierId?: number;
-  chainOriginCells?: readonly Cell[];
 }
+
+export type MutationBombPlan =
+  | (MutationBombPlanBase & {
+    outcome: 'blast';
+    chainOriginCarrierId?: never;
+    chainOriginCells?: never;
+    chainTriggerRows?: never;
+  })
+  | (MutationBombPlanBase & {
+    outcome: 'chain-clear';
+    chainOriginCarrierId: number;
+    chainOriginCells: readonly Cell[];
+    readonly chainTriggerRows: readonly number[];
+  });
 
 /**
  * Supergravity is granted to a piece exactly once when that piece spawns.
@@ -116,20 +128,24 @@ export function planMutationBombClear(
     );
   const origin = primary[0]!;
 
-  return Object.freeze({
+  const common = {
     outcome,
     blastRows,
     removalRows,
     progressRows,
     participantBombs: Object.freeze(participantBombs),
     activatedNonBombs: Object.freeze(activatedNonBombs),
-    ...(outcome === 'chain-clear'
-      ? {
-        chainOriginCarrierId: origin.id,
-        chainOriginCells: snapshotCarrier(origin).cells,
-      }
-      : {}),
-  });
+  };
+  if (outcome === 'chain-clear') {
+    return Object.freeze({
+      ...common,
+      outcome,
+      chainOriginCarrierId: origin.id,
+      chainOriginCells: snapshotCarrier(origin).cells,
+      chainTriggerRows: sortedRows(ordinaryRows),
+    });
+  }
+  return Object.freeze({ ...common, outcome });
 }
 
 /** Returns every carrier touched by an actually removed row, at most once each. */

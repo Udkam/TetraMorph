@@ -12,6 +12,7 @@ import {
 } from './constants';
 import { createBoard, setCell } from './board';
 import { createInitialState, dispatch, nextMutationPreviewItem, stateHash } from './engine';
+import { planMutationBombClear } from './mutation';
 import { cellsForPiece } from './pieces';
 import { createRandomizer } from './random';
 import { settleSupergravityPiece } from './sprint';
@@ -435,11 +436,13 @@ describe('异变 mode', () => {
     expect(transition.state.mutationCollapseLandingLatched).toBe(true);
   });
 
-  it('chains same-row Bombs once and preserves the smallest primary as immutable origin evidence', () => {
+  it('chains same-row Bombs once and separates immutable trigger rows from origin geometry', () => {
+    const base = carrierClearState('freeze');
     const state: GameState = {
-      ...carrierClearState('freeze'),
+      ...base,
+      board: setCell(base.board, 0, 38, 'L'),
       mutationCarriers: [
-        { id: 1, item: 'bomb', cells: [{ x: 0, y: 39 }] },
+        { id: 1, item: 'bomb', cells: [{ x: 0, y: 38 }, { x: 0, y: 39 }] },
         { id: 2, item: 'bomb', cells: [{ x: 1, y: 39 }] },
       ],
     };
@@ -467,16 +470,34 @@ describe('异变 mode', () => {
       durationTicks: 0,
       score: MUTATION_BOMB_SCORE * 2,
       rowsRemoved: 2,
-      triggerCells: [{ x: 0, y: 39 }, { x: 1, y: 39 }],
+      triggerCells: [{ x: 0, y: 38 }, { x: 0, y: 39 }, { x: 1, y: 39 }],
       bombOutcome: 'chain-clear',
       blastRows: [38, 39],
       participatingBombCount: 2,
       chainOriginCarrierId: 1,
-      chainOriginCells: [{ x: 0, y: 39 }],
+      chainOriginCells: [{ x: 0, y: 38 }, { x: 0, y: 39 }],
+      chainTriggerRows: [39],
     });
     expect(Object.isFrozen(bomb?.blastRows)).toBe(true);
     expect(Object.isFrozen(bomb?.chainOriginCells)).toBe(true);
     expect(bomb?.chainOriginCells?.every((cell) => Object.isFrozen(cell))).toBe(true);
+    expect(Object.isFrozen(bomb?.chainTriggerRows)).toBe(true);
+  });
+
+  it('sorts, deduplicates, and freezes every ordinary full row in a chain plan', () => {
+    let board = createBoard();
+    for (const row of [30, 39]) for (let x = 0; x < 10; x += 1) board = setCell(board, x, row, 'J');
+    board = setCell(board, 0, 29, 'L');
+
+    const plan = planMutationBombClear(board, [
+      { id: 1, item: 'bomb', cells: [{ x: 1, y: 30 }] },
+      { id: 2, item: 'bomb', cells: [{ x: 0, y: 29 }] },
+    ], [39, 30, 39]);
+
+    expect(plan?.outcome).toBe('chain-clear');
+    if (plan?.outcome !== 'chain-clear') throw new Error('expected a Bomb chain-clear plan');
+    expect(plan.chainTriggerRows).toEqual([30, 39]);
+    expect(Object.isFrozen(plan.chainTriggerRows)).toBe(true);
   });
 
   it('keeps distant simultaneous primary Bombs as one normal blast with a deduplicated band union', () => {
@@ -507,6 +528,7 @@ describe('异变 mode', () => {
     });
     expect(bomb).not.toHaveProperty('chainOriginCarrierId');
     expect(bomb).not.toHaveProperty('chainOriginCells');
+    expect(bomb).not.toHaveProperty('chainTriggerRows');
     expect(transition.state.lines).toBe(2);
     expect(transition.state.board[33]?.[0]).toBe('S');
     expect(transition.events.filter((event) => event.type === 'lines-cleared')).toEqual([

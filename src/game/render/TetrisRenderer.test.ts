@@ -150,7 +150,10 @@ function mutationEvent(
   };
 }
 
-function chainClearEvent(cells: readonly Cell[]): Extract<GameEvent, { type: 'mutation-activated' }> {
+function chainClearEvent(
+  cells: readonly Cell[],
+  chainTriggerRows: readonly number[],
+): Extract<GameEvent, { type: 'mutation-activated' }> {
   return {
     type: 'mutation-activated',
     item: 'bomb',
@@ -163,6 +166,7 @@ function chainClearEvent(cells: readonly Cell[]): Extract<GameEvent, { type: 'mu
     participatingBombCount: 2,
     chainOriginCarrierId: 3,
     chainOriginCells: cells,
+    chainTriggerRows,
   };
 }
 
@@ -644,7 +648,7 @@ describe('Endgame undo presentation reset', () => {
     const internals = renderer as unknown as RendererInternals;
     const origin = [{ x: 4, y: VISIBLE_START_ROW + 5 }];
     internals.consumeEvents([
-      chainClearEvent(origin),
+      chainClearEvent(origin, [VISIBLE_START_ROW + 5]),
       { type: 'mutation-activated', item: 'freeze', durationTicks: 600, score: 0, rowsRemoved: 0 },
     ]);
     internals.advanceEffects(349);
@@ -665,7 +669,10 @@ describe('Endgame undo presentation reset', () => {
     const renderer = new TetrisRendererClass();
     renderer.setOptions({ reducedMotion: true });
     const internals = renderer as unknown as RendererInternals;
-    internals.consumeEvents([chainClearEvent([{ x: 4, y: VISIBLE_START_ROW + 5 }])]);
+    internals.consumeEvents([chainClearEvent(
+      [{ x: 4, y: VISIBLE_START_ROW + 5 }],
+      [VISIBLE_START_ROW + 5],
+    )]);
     const reducedDuration = internals.mutationFlash!.duration;
     internals.advanceEffects(reducedDuration * 0.4);
 
@@ -1886,7 +1893,7 @@ describe('Endgame undo presentation reset', () => {
     previousBoard[VISIBLE_START_ROW + 4]![2] = 'J';
     previousBoard[VISIBLE_START_ROW + 6]![7] = 'L';
     internals.consumeEvents([
-      chainClearEvent([{ x: 4, y: VISIBLE_START_ROW + 5 }]),
+      chainClearEvent([{ x: 4, y: VISIBLE_START_ROW + 5 }], [VISIBLE_START_ROW + 5]),
     ], undefined, previousBoard);
     const flash = internals.mutationFlash!;
     expect(flash).toMatchObject({
@@ -1973,7 +1980,7 @@ describe('Endgame undo presentation reset', () => {
     const order: string[] = [];
     internals.drawCellGroups = () => { order.push('board'); };
     internals.drawMutationPieceMaterial = () => { order.push('origin'); };
-    internals.consumeEvents([chainClearEvent([{ x: 4, y: row }])], undefined, board);
+    internals.consumeEvents([chainClearEvent([{ x: 4, y: row }], [row])], undefined, board);
     internals.drawMutationChainClear(createGraphicsRecorder().graphics, internals.mutationFlash!, {
       x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false,
     });
@@ -1987,7 +1994,7 @@ describe('Endgame undo presentation reset', () => {
     const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
     const previousBoard = createBoard();
     previousBoard[VISIBLE_START_ROW]![4] = 'T';
-    internals.consumeEvents([chainClearEvent([{ x: 4, y: 3 }])], undefined, previousBoard);
+    internals.consumeEvents([chainClearEvent([{ x: 4, y: 3 }], [3])], undefined, previousBoard);
     const flash = internals.mutationFlash!;
     const firstVisibleBeat = createGraphicsRecorder();
     flash.elapsed = 50;
