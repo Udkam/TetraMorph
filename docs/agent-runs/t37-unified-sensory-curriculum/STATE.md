@@ -2512,10 +2512,16 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   makes the existing AudioEngine and Renderer test event literals incomplete. The Core
   checkpoint is extended only to schema-compatible values in those two fixtures; no
   downstream expectation or implementation change is admitted before the later slices.
+- Core candidate `ddd6587` emits frozen/sorted/deduplicated exact ordinary full rows only
+  on a chain-clear event. Cross-row origin geometry retains rows 38/39 while its sole
+  trigger evidence remains `[39]`; multirow `[39,30,39]` becomes `[30,39]`; blast omits the
+  field. Focused Core passes 29/29 and typecheck passes. Independent read-only review of
+  `bd2a46f..ddd6587` reports `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0` and confirms no gameplay,
+  scoring, settlement, GameState, or hash change.
 - Protected inherited T27 paths, `docs/evidence/t27-r1-followup/**`, and `progress.md`
   remain unread/unstaged. The old 4187 helper is no longer running and no listener remains.
-- Unique next action: commit this three-document repair, obtain independent all-zero
-  re-review, then add Core-owned trigger-row evidence before the renderer/timeline checkpoint.
+- Unique next action: implement the renderer/timeline checkpoint against `chainTriggerRows`
+  while the isolated Boom A/B evidence finishes independently.
 
 ## Do not repeat
 
