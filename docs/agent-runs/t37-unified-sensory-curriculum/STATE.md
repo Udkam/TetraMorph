@@ -2522,6 +2522,11 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   remain unread/unstaged. The old 4187 helper is no longer running and no listener remains.
 - Unique next action: implement the renderer/timeline checkpoint against `chainTriggerRows`
   while the isolated Boom A/B evidence finishes independently.
+- Implementation exposed one bounded ownership omission: the shared pure presentation
+  plan is also called twice by `src/game/audio/AudioEngine.ts`. A docs-first extension
+  authorizes only replacing those two old `chainOriginCells` arguments with the same
+  event's `chainTriggerRows` inside the visual/timeline checkpoint. Audio assets, recipes,
+  gains, palette, queue policy, expectations, and human acceptance remain closed.
 
 ## Do not repeat
 

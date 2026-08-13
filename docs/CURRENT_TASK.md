@@ -66,7 +66,12 @@ The contract checkpoint owns only `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, and
 the Core evidence checkpoint is bounded to `src/game/core/types.ts`,
 `src/game/core/mutation.ts`, `src/game/core/engine.ts`, and direct Mutation tests. The
 visual checkpoint is bounded to `src/animation/mutationChainTimeline.ts` and its test plus
-`src/game/render/TetrisRenderer.ts` and its direct test. Isolated audition artifacts live
+`src/game/render/TetrisRenderer.ts` and its direct test. Because the shared pure timeline is
+also the existing production-audio scheduler, that same checkpoint additionally owns only
+the two `mutationChainPresentationPlan(...)` call sites in
+`src/game/audio/AudioEngine.ts`: both must pass `event.chainTriggerRows`. This narrow
+compile/causality repair may not change a cue recipe, gain, asset, palette, voice limit,
+queue rule, or audio expectation; the unaccepted Boom candidates remain isolated. Isolated audition artifacts live
 only under `docs/evidence/t37/bomb-boom-audition-r2/`; they may not change product audio.
 New full/reduced dense-board evidence must prove trigger-row-only first impact, symmetric
 fronts, no unreached-row fragments, no permanent wash/border, normal-Bomb motif reuse,

@@ -68,6 +68,12 @@ visible boundary. Core's original rows remain unclamped evidence. Renderer and a
 consume the activation's same frozen row list through this same pure projection rather
 than independently remembering a prior event.
 
+The pure projection is already imported by the production audio scheduler. Its two
+existing duration/propagation call sites therefore pass `chainTriggerRows` in the same
+source checkpoint as the renderer migration. This is a compile and causal-origin repair
+only: it does not authorize a new sample, synthesis recipe, gain, palette entry, voice
+policy, queue policy, or listening-acceptance claim.
+
 ### Explosion visual language and timing
 
 The normal Bomb and every reached chain row share one local explosion motif: an irregular
