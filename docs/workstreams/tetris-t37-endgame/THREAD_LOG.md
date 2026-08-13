@@ -590,3 +590,21 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   completed in 52.5 seconds with the sole expected PASS and unchanged sentinels.
 - Blocker: production remains closed. Next: exact commit, independent committed-byte/
   AST/no-spawn QA, a QA-only THREAD_LOG checkpoint, then a fresh final-HEAD binding.
+
+### F4E-R4M committed-command QA disposition
+
+- Candidate `8416e9f6f094d70567f3a335dd534d4556f86563` is the sole child of
+  `b5663ad0f5d1a6143eb209988ba04b6a72e77be2` and changes only the four authorized
+  command-contract documents. Its 1,161 added-or-modified lines, exact path set, Core
+  tree, strict UTF-8/LF Git blobs, four markers, unique 2,948-byte manifest, embedded
+  wrapper bytes, PowerShell AST, two preflights, two lease-bound runner calls, and sole
+  302-byte production block all passed two independent read-only reviews with
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`.
+- After those approvals, the hash-bound no-spawn harness ran once against candidate
+  HEAD and completed in 48.937 seconds with the sole output
+  `T37-R4L-NO-SPAWN-PREFLIGHT-PASS`. V4 output, attempt, stage, and matching process
+  remained zero; the consumed-v3 receipt remained 8,729 bytes with SHA-256
+  `06E9EACE16C6665FF4220D0753F0DFD5875C742FC1F56C9767771B1CB5A53E44`.
+- This is QA evidence only, not a production run. Production remains closed until this
+  THREAD_LOG-only checkpoint is committed, its final HEAD/history/blob state receives
+  fresh independent all-zero review, and one final no-spawn binding passes unchanged.
