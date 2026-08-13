@@ -1,0 +1,25 @@
+{
+  "sourceSha": "27d319428701708d892961de4cb5aa1fbbe522b2",
+  "capturedAt": "2026-08-13T21:51:23.735Z",
+  "algorithm": "sha256",
+  "textNormalization": "UTF-8 with CRLF and CR normalized to LF for text files",
+  "files": {
+    "README.md": "0fa67dd47cdb7f9e9c3670a01974a23fb7dc63922021e98a49875cc1c1129f59",
+    "capture-in-page-overlays.mjs": "2a4f221dc3d50aa0e21a8aac340a27a024c1d8ba4fda009d612fb6f833d7ddd8",
+    "audit.json": "8fd2e2c4bb252e6c47ee1e28b9ad82cd3cdc01da1d333298c2d9a32da514c22b",
+    "01-first-entry-steady.png": "da83619d2d0a18ad2ddbcfa9505cae9f25165076de3a095ece89367721547eff",
+    "02-game-after-first-entry.png": "37cbaf2e2a6fbaeb804e71b5784739025784f18e22624e3ceac288f9288559e2",
+    "03-settings-initial.png": "b55fa581ac07be73157884b9e2f673d67b79bba65339cc9bf5ba4c4a71202e96",
+    "04-settings-rules.png": "0d29f55bb6f673f394b5c43efec707fcbe9e081ee61aaa6d528da9c8f026430e",
+    "05-pause-steady.png": "4532d7a3c590cdbcc2ed9910a889c89d61c1f7ca88fff84ebb918c152421c374",
+    "06-settings-from-pause.png": "7385af6c93c42a10d8a31baba8ae9be9ee7ae0d63d1fc07ef6699105212391fb",
+    "07-restart-steady.png": "4ee1f6d15e65eb52f8f1d1cb0a8e42a8a009d9dbf0ea1b3dfe6632cd10b97fc2",
+    "08-restart-countdown-3.png": "c076b658518c401842aa6e5a7a6ef639dca7857256d52a451ff822b20093e769",
+    "09-leave-confirm.png": "8e7f2aeb2acd53f1fcc4d96513b64931aff019e424e32ef95ce9be4d7944c3fe",
+    "10-leave-home.png": "bb73f7e85e3dc65397303f90bd4a50d13c36c4d517fc36cf4f538f32599f0e39",
+    "11-real-result-steady.png": "b25fd9b7ea90d70127ad504a3e2ae7d602f7bb728636ab320300ddf5086b736f",
+    "12-result-leave-library.png": "eb38385dadf9ccf6730b3c13ecc1b6737110778ff739d7646de70548b98b1659",
+    "13-mobile-reduced-settings.png": "5fe622d1e5d15c1c92e55062efafb79cec407136d38a95dc991c65b0ae669b1a",
+    "14-mobile-reduced-pause.png": "56dc5532ad082648c07813e5121ed25cb6f34979c6995ed867b9f51e4dceda47"
+  }
+}
