@@ -2488,6 +2488,7 @@ describe('T6 frontend mode binding', () => {
     expect(englishMutationRule).toContain('Freeze fixes automatic gravity at 0.80 s/cell');
     expect(englishMutationRule).toContain('Bomb clears the triggering line and its adjacent lines above and below');
     expect(englishMutationRule).toContain('the board clears row by row in both directions from the first Bomb');
+    expect(englishMutationRule).not.toContain('bottom 3 rows');
     supergravity.unmount();
     latchedSupergravity.unmount();
     derivedLatchedSupergravity.unmount();
