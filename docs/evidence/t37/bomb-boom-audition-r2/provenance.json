@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "status": "isolated-audition-default-rejected",
+  "productionIntegration": "closed",
+  "contractSourceSha": "3ead80b7e1668a51debefaf12868eed71947c94a",
+  "downloadedAtUtc": "2026-08-13T23:23:18Z",
+  "downloadedAtAsiaShanghai": "2026-08-14T07:23:18+08:00",
+  "license": {
+    "id": "CC0-1.0",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "localPath": "sources/CC0-1.0.txt",
+    "bytes": 7048,
+    "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+  },
+  "sources": [
+    {
+      "id": "deep",
+      "title": "Deep Explosion",
+      "author": "Kodack",
+      "license": "CC0-1.0",
+      "pageUrl": "https://freesound.org/people/Kodack/sounds/258195/",
+      "mediaUrl": "https://cdn.freesound.org/previews/258/258195_2276808-hq.ogg",
+      "mediaRole": "official-hq-preview-not-original-wav",
+      "mediaPath": "sources/assets/kodack-deep-explosion-hq-preview.ogg",
+      "mediaBytes": 71650,
+      "mediaSha256": "ae9e9f32a85678fdaddfea9159288c822a294566fe880df84bbca7bd7266716f",
+      "mediaMetadata": {
+        "container": "Ogg",
+        "codec": "Vorbis",
+        "channels": 2,
+        "sampleRateHz": 44100,
+        "durationSeconds": 2.629819,
+        "derivation": "parsed identification header and final Ogg granule position"
+      },
+      "pagePath": "sources/pages/freesound-kodack-deep-explosion.html",
+      "pageBytes": 43507,
+      "pageSha256": "0c29ca88bc532fbd141a957e050f948f094c517473e896d45652eeb3dc5a96b0",
+      "http": {
+        "status": 200,
+        "contentType": "audio/ogg",
+        "contentLength": 71650,
+        "lastModified": "Thu, 18 Dec 2014 02:50:59 GMT",
+        "etag": "\"54924113-117e2\""
+      }
+    },
+    {
+      "id": "muffled",
+      "title": "Muffled Distant Explosion",
+      "author": "NenadSimic",
+      "license": "CC0-1.0",
+      "pageUrl": "https://opengameart.org/content/muffled-distant-explosion",
+      "mediaUrl": "https://opengameart.org/sites/default/files/NenadSimic%20-%20Muffled%20Distant%20Explosion.wav",
+      "mediaRole": "source-page-direct-original-wav",
+      "mediaPath": "sources/assets/nenadsimic-muffled-distant-explosion.wav",
+      "mediaBytes": 907518,
+      "mediaSha256": "13a0bf75af94ec6d332bc71cba489b573466e05c4b17288158b3d683b41de39f",
+      "mediaMetadata": {
+        "container": "WAV",
+        "codec": "PCM",
+        "channels": 2,
+        "sampleRateHz": 44100,
+        "bitsPerSample": 16,
+        "dataBytes": 907200,
+        "durationSeconds": 5.142857,
+        "derivation": "parsed RIFF fmt and data chunks"
+      },
+      "pagePath": "sources/pages/opengameart-nenadsimic-muffled-distant-explosion.html",
+      "pageBytes": 36461,
+      "pageSha256": "d6082eac9305ec0e8ab0dd379217f9283570a824285425f24e293343b79ec468",
+      "http": {
+        "status": 200,
+        "contentLength": 907518,
+        "lastModified": "Sat, 19 Apr 2014 16:57:07 GMT",
+        "etag": "\"5352aae3-dd8fe\""
+      }
+    }
+  ],
+  "recipes": [
+    { "candidate": "A", "normalSeconds": 0.92, "chainSeconds": 2.74, "label": "direct-impact" },
+    { "candidate": "B", "normalSeconds": 1.08, "chainSeconds": 2.96, "label": "rounded-body" },
+    { "candidate": "C", "normalSeconds": 1.16, "chainSeconds": 2.86, "label": "low-distant-pressure" }
+  ],
+  "processingBoundary": {
+    "sourceBytesChanged": false,
+    "transcodedMedia": false,
+    "runtimeNodes": ["AudioBufferSourceNode", "BiquadFilterNode", "GainNode", "DynamicsCompressorNode"],
+    "forbiddenNodes": ["OscillatorNode"],
+    "humanGate": "player-explicit-acceptance-required"
+  }
+}

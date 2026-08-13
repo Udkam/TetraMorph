@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-08-13T23:46:46.760Z",
+  "url": "file:///E:/Proj/reproduction-tetris/docs/evidence/t37/bomb-boom-audition-r2/index.html",
+  "passed": true,
+  "initial": {
+    "candidateCount": 3,
+    "listeningButtons": 6,
+    "active": false,
+    "status": "等待试听",
+    "gate": "未通过 — 尚未形成玩家明确接受结论，生产接入保持关闭。",
+    "sourceIds": [
+      "deep",
+      "muffled"
+    ]
+  },
+  "normalDefaults": "none",
+  "chainDefaults": "none",
+  "playingNormal": {
+    "candidateCount": 3,
+    "listeningButtons": 6,
+    "active": true,
+    "status": "正在播放：方案 A · 单炸弹 Boom · 0.92 s",
+    "gate": "未通过 — 尚未形成玩家明确接受结论，生产接入保持关闭。",
+    "sourceIds": [
+      "deep",
+      "muffled"
+    ],
+    "decoded": {
+      "deep": {
+        "duration": 2.6398125,
+        "channels": 2,
+        "sampleRate": 48000
+      },
+      "muffled": {
+        "duration": 5.142854166666667,
+        "channels": 2,
+        "sampleRate": 48000
+      }
+    }
+  },
+  "playingChain": {
+    "candidateCount": 3,
+    "listeningButtons": 6,
+    "active": true,
+    "status": "正在播放：方案 B · 双炸弹清屏 · 2.96 s",
+    "gate": "未通过 — 尚未形成玩家明确接受结论，生产接入保持关闭。",
+    "sourceIds": [
+      "deep",
+      "muffled"
+    ],
+    "decoded": {
+      "deep": {
+        "duration": 2.6398125,
+        "channels": 2,
+        "sampleRate": 48000
+      },
+      "muffled": {
+        "duration": 5.142854166666667,
+        "channels": 2,
+        "sampleRate": 48000
+      }
+    }
+  },
+  "compared": {
+    "candidateCount": 3,
+    "listeningButtons": 6,
+    "active": false,
+    "status": "已停止",
+    "gate": "仅记录比较 — 单炸弹：方案 B；清屏：方案 B；检查项：2/2。生产接入仍关闭，需在任务中由玩家明确接受。",
+    "sourceIds": [
+      "deep",
+      "muffled"
+    ],
+    "decoded": {
+      "deep": {
+        "duration": 2.6398125,
+        "channels": 2,
+        "sampleRate": 48000
+      },
+      "muffled": {
+        "duration": 5.142854166666667,
+        "channels": 2,
+        "sampleRate": 48000
+      }
+    }
+  },
+  "screenshotDefaults": {
+    "normal": "none",
+    "chain": "none",
+    "gate": "未通过 — 尚未形成玩家明确接受结论，生产接入保持关闭。"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "screenshot": {
+    "path": "audition-page-file.png",
+    "bytes": 625053,
+    "sha256": "3d253656cb7c741cbf025cfc10022d5a1cb8d655339563e001556677e8bcd448"
+  }
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>TetraMorph Bomb Boom R2 试听</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <div class="eyebrow"><span aria-hidden="true"></span>T37 / Bomb Boom R2</div>
+        <h1>炸弹音效隔离试听</h1>
+        <p class="lead">
+          三组配对都只使用两份已归档的 CC0 录音。请先听单炸弹，再听同字色的长清屏；当前页面不连接产品音频。
+        </p>
+        <div class="boundary" role="note">
+          <strong>生产接入关闭</strong>
+          <span>默认结论是不通过。只有玩家在任务中明确接受具体的单炸弹与清屏方案后，才可进入产品。</span>
+        </div>
+      </header>
+
+      <section class="transport" aria-label="试听控制">
+        <label for="master-volume">
+          <span>试听音量</span>
+          <output id="volume-output" for="master-volume">78%</output>
+        </label>
+        <input id="master-volume" type="range" min="0" max="100" value="78" />
+        <button id="stop-all" class="stop" type="button">停止全部</button>
+        <p id="play-status" class="play-status" role="status" aria-live="polite">等待试听</p>
+      </section>
+
+      <section aria-labelledby="pairs-title">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">A / B / C</p>
+            <h2 id="pairs-title">同源配对比较</h2>
+          </div>
+          <p>每组左侧是紧凑 Boom，右侧是相同起爆字色加长尾与克制传播触点。</p>
+        </div>
+        <div id="candidate-grid" class="candidate-grid"></div>
+      </section>
+
+      <section class="gate" aria-labelledby="gate-title">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">HUMAN GATE</p>
+            <h2 id="gate-title">人工试听门槛</h2>
+          </div>
+          <p>这里的记录只帮助比较，不等同于接受，也不会写入产品配置。</p>
+        </div>
+        <div class="gate-grid">
+          <fieldset>
+            <legend>单炸弹结论</legend>
+            <div id="normal-verdicts" class="verdict-options"></div>
+          </fieldset>
+          <fieldset>
+            <legend>双炸弹清屏结论</legend>
+            <div id="chain-verdicts" class="verdict-options"></div>
+          </fieldset>
+        </div>
+        <div class="checks">
+          <label><input id="boom-check" type="checkbox" /> 单炸弹接近 Boom，清楚、有力但不刺耳</label>
+          <label><input id="chain-check" type="checkbox" /> 清屏明显更长，并与单炸弹属于同一种声音</label>
+        </div>
+        <button id="record-verdict" class="record" type="button">记录本页比较结果</button>
+        <p id="gate-status" class="gate-status" role="status">
+          <strong>未通过</strong> — 尚未形成玩家明确接受结论，生产接入保持关闭。
+        </p>
+      </section>
+
+      <section class="sources" aria-labelledby="sources-title">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">SOURCE RECORD</p>
+            <h2 id="sources-title">来源与边界</h2>
+          </div>
+        </div>
+        <div class="source-grid">
+          <article>
+            <h3>Deep Explosion / Kodack</h3>
+            <p>CC0，深沉爆炸录音。此页嵌入的是 Freesound 官方 HQ OGG 预览，不是登录后提供的原始 WAV。</p>
+            <a href="https://freesound.org/people/Kodack/sounds/258195/">查看原条目</a>
+          </article>
+          <article>
+            <h3>Muffled Distant Explosion / NenadSimic</h3>
+            <p>CC0，低音原木鼓冲击与延迟反射。此页嵌入 OpenGameArt 条目直接提供的原始 WAV。</p>
+            <a href="https://opengameart.org/content/muffled-distant-explosion">查看原条目</a>
+          </article>
+        </div>
+        <p class="fineprint">
+          完整 URL、下载时间、响应头、SHA-256、媒体元数据与处理配方见 <a href="PROVENANCE.md">PROVENANCE.md</a>。
+          页面没有振荡器、合成音高、激光上升音或商业游戏采样。
+        </p>
+      </section>
+    </main>
+    <script src="embedded-audio.js"></script>
+    <script src="audition.js"></script>
+  </body>
+</html>

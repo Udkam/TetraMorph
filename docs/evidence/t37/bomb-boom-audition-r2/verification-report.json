@@ -1,0 +1,284 @@
+{
+  "generatedAt": "2026-08-13T23:48:02.339Z",
+  "root": "docs/evidence/t37/bomb-boom-audition-r2",
+  "passed": true,
+  "summary": {
+    "checks": 23,
+    "failures": 0
+  },
+  "checks": [
+    {
+      "name": "schema-version",
+      "passed": true,
+      "details": 1
+    },
+    {
+      "name": "integration-fail-closed",
+      "passed": true,
+      "details": "closed"
+    },
+    {
+      "name": "default-rejection-normal",
+      "passed": true,
+      "details": "normal radio group renders none checked"
+    },
+    {
+      "name": "default-rejection-chain",
+      "passed": true,
+      "details": "chain radio group renders none checked"
+    },
+    {
+      "name": "record-does-not-accept",
+      "passed": true,
+      "details": "local record remains comparison only"
+    },
+    {
+      "name": "candidate-count",
+      "passed": true,
+      "details": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "name": "paired-cues",
+      "passed": true,
+      "details": [
+        {
+          "candidate": "A",
+          "normalSeconds": 0.92,
+          "chainSeconds": 2.74,
+          "label": "direct-impact"
+        },
+        {
+          "candidate": "B",
+          "normalSeconds": 1.08,
+          "chainSeconds": 2.96,
+          "label": "rounded-body"
+        },
+        {
+          "candidate": "C",
+          "normalSeconds": 1.16,
+          "chainSeconds": 2.86,
+          "label": "low-distant-pressure"
+        }
+      ]
+    },
+    {
+      "name": "no-oscillator",
+      "passed": true,
+      "details": "no procedural pitched source"
+    },
+    {
+      "name": "controls-present",
+      "passed": true,
+      "details": "volume, stop, result, status"
+    },
+    {
+      "name": "hq-preview-distinction",
+      "passed": true,
+      "details": "official-hq-preview-not-original-wav"
+    },
+    {
+      "name": "cc0-sources",
+      "passed": true,
+      "details": [
+        "CC0-1.0",
+        "CC0-1.0"
+      ]
+    },
+    {
+      "name": "deep-media-bytes",
+      "passed": true,
+      "details": {
+        "bytes": 71650,
+        "sha256": "ae9e9f32a85678fdaddfea9159288c822a294566fe880df84bbca7bd7266716f"
+      }
+    },
+    {
+      "name": "deep-media-sha256",
+      "passed": true,
+      "details": "ae9e9f32a85678fdaddfea9159288c822a294566fe880df84bbca7bd7266716f"
+    },
+    {
+      "name": "deep-page-bytes",
+      "passed": true,
+      "details": {
+        "bytes": 43507,
+        "sha256": "0c29ca88bc532fbd141a957e050f948f094c517473e896d45652eeb3dc5a96b0"
+      }
+    },
+    {
+      "name": "deep-page-sha256",
+      "passed": true,
+      "details": "0c29ca88bc532fbd141a957e050f948f094c517473e896d45652eeb3dc5a96b0"
+    },
+    {
+      "name": "deep-embedded-hash",
+      "passed": true,
+      "details": "ae9e9f32a85678fdaddfea9159288c822a294566fe880df84bbca7bd7266716f"
+    },
+    {
+      "name": "muffled-media-bytes",
+      "passed": true,
+      "details": {
+        "bytes": 907518,
+        "sha256": "13a0bf75af94ec6d332bc71cba489b573466e05c4b17288158b3d683b41de39f"
+      }
+    },
+    {
+      "name": "muffled-media-sha256",
+      "passed": true,
+      "details": "13a0bf75af94ec6d332bc71cba489b573466e05c4b17288158b3d683b41de39f"
+    },
+    {
+      "name": "muffled-page-bytes",
+      "passed": true,
+      "details": {
+        "bytes": 36461,
+        "sha256": "d6082eac9305ec0e8ab0dd379217f9283570a824285425f24e293343b79ec468"
+      }
+    },
+    {
+      "name": "muffled-page-sha256",
+      "passed": true,
+      "details": "d6082eac9305ec0e8ab0dd379217f9283570a824285425f24e293343b79ec468"
+    },
+    {
+      "name": "muffled-embedded-hash",
+      "passed": true,
+      "details": "13a0bf75af94ec6d332bc71cba489b573466e05c4b17288158b3d683b41de39f"
+    },
+    {
+      "name": "license-bytes",
+      "passed": true,
+      "details": {
+        "bytes": 7048,
+        "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+      }
+    },
+    {
+      "name": "license-sha256",
+      "passed": true,
+      "details": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 28,
+      "sha256": "b496ff5d1ab9a6f5af5268a35da7f464b628209e9a793ccedb652b3140623d90"
+    },
+    {
+      "path": "index.html",
+      "bytes": 4506,
+      "sha256": "2e486190cc48487b3a2aff59d23e22f4f52b5ad926ead71ef3acd5d117dc5dca"
+    },
+    {
+      "path": "styles.css",
+      "bytes": 7290,
+      "sha256": "8e6770aaabaa828ddb667d8a417ba37d5c3a6d73209bb494a172373a99a7d950"
+    },
+    {
+      "path": "audition.js",
+      "bytes": 12800,
+      "sha256": "183503efc8760e7dea5d1189fe2534ef0f839463b9e599f5b72e994ce00fe724"
+    },
+    {
+      "path": "embedded-audio.js",
+      "bytes": 1306119,
+      "sha256": "7d0261577000cc8de6ccfd0b81588a4e7e9834647385524a8bfccb10a6cd662d"
+    },
+    {
+      "path": "generate-embedded-audio.mjs",
+      "bytes": 1008,
+      "sha256": "257fd653b1cc16889bf0ce6aff51c278bab2d7c305893de2c8ff51ba48f2234c"
+    },
+    {
+      "path": "PROVENANCE.md",
+      "bytes": 4908,
+      "sha256": "d35bd8b644e76ba8427ecdd1c9121346fe4e53963f555d0721e29d55bb05a87f"
+    },
+    {
+      "path": "provenance.json",
+      "bytes": 3590,
+      "sha256": "3db108423512b562cd0d7b1144fb28a21e1d2594ac6a3ee9dbfb782f2da0d7dc"
+    },
+    {
+      "path": "verify.mjs",
+      "bytes": 4688,
+      "sha256": "cbd850122784557e8f355faee7b30a03120e8056a126c4a1f896d2f5cb71e180"
+    },
+    {
+      "path": "browser-smoke.mjs",
+      "bytes": 4125,
+      "sha256": "14701200fd325b1be024467c5207448edfc5c4750abc472cf1d8bd7b77545d76"
+    },
+    {
+      "path": "http-smoke.mjs",
+      "bytes": 1506,
+      "sha256": "94c93ae4204e3a30dbb17b46f64df2270de0f50cffd938fede0722091f2c4dfd"
+    },
+    {
+      "path": "vite-smoke.mjs",
+      "bytes": 725,
+      "sha256": "34053d8e12996e5599676749849688810ed6184c8ef0c58e00e105368f166b2a"
+    },
+    {
+      "path": "browser-report-file.json",
+      "bytes": 2585,
+      "sha256": "8781804e59bf533d30bdbf92ba72aec5893726aec3ec087cdb4d7b58a21aac40"
+    },
+    {
+      "path": "browser-report-http.json",
+      "bytes": 2521,
+      "sha256": "ea779d2d3c9991f5e80dbde33d885c564633a2d4c90c6fee5b22aa483f68e53a"
+    },
+    {
+      "path": "audition-page-file.png",
+      "bytes": 625053,
+      "sha256": "3d253656cb7c741cbf025cfc10022d5a1cb8d655339563e001556677e8bcd448"
+    },
+    {
+      "path": "audition-page-http.png",
+      "bytes": 625053,
+      "sha256": "3d253656cb7c741cbf025cfc10022d5a1cb8d655339563e001556677e8bcd448"
+    },
+    {
+      "path": "browser-report-vite.json",
+      "bytes": 2521,
+      "sha256": "a2e4333c7b7ba5f37210259666c1c27081f2899c447bba918392473711d9090a"
+    },
+    {
+      "path": "audition-page-vite.png",
+      "bytes": 625051,
+      "sha256": "dbe4a34a73bcbd50a802b0b5fc8502945dedee3f543a7c4bdea5f8fe1e96b78e"
+    },
+    {
+      "path": "sources/assets/kodack-deep-explosion-hq-preview.ogg",
+      "bytes": 71650,
+      "sha256": "ae9e9f32a85678fdaddfea9159288c822a294566fe880df84bbca7bd7266716f"
+    },
+    {
+      "path": "sources/pages/freesound-kodack-deep-explosion.html",
+      "bytes": 43507,
+      "sha256": "0c29ca88bc532fbd141a957e050f948f094c517473e896d45652eeb3dc5a96b0"
+    },
+    {
+      "path": "sources/assets/nenadsimic-muffled-distant-explosion.wav",
+      "bytes": 907518,
+      "sha256": "13a0bf75af94ec6d332bc71cba489b573466e05c4b17288158b3d683b41de39f"
+    },
+    {
+      "path": "sources/pages/opengameart-nenadsimic-muffled-distant-explosion.html",
+      "bytes": 36461,
+      "sha256": "d6082eac9305ec0e8ab0dd379217f9283570a824285425f24e293343b79ec468"
+    },
+    {
+      "path": "sources/CC0-1.0.txt",
+      "bytes": 7048,
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+  ]
+}
