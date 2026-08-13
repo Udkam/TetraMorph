@@ -484,3 +484,25 @@ F4E-R4B-COMMAND-CONTRACT-V1 validator=17E6354BCE70EE051B5143BB031D36CB70A1115CAB
   aliases. Repair binds the actual CIM short basename `T312A0~1.MJS`, fails closed on
   unreadable Node command lines, and rejects either basename case-insensitively. The
   seven-case alias/null matrix passes; final diff review remains pending.
+
+### F4E-R4G v2 consumed before claim; v3 contract candidate
+
+- Committed R4F gate `4d297149fab5b4e4c1f510a96b8b4b7e464155ce` spawned v2 once.
+  It rejected legal mixed-CRLF checkout bytes against LF HEAD at the pre-receipt scoped
+  check. Git scoped diff/status was clean; no certificate search ran.
+- Output/receipt/stage/process are zero, but v2 authorization is consumed. The exact v2
+  file stays intact for audit and must never run again.
+- v3 uses new validator/output/attempt/stage, marker/manifest, schemas, hashes, aliases,
+  command schema `t37-f4e-r4g-command-contract-v1`, and one-spawn authority.
+  `head-blob-eol-equivalent-v1` keeps Git clean gates, requires one-handle pre/post identity,
+  separator-aware realpath containment, regular non-link files, strict UTF-8/no BOM, only
+  CRLF-to-LF normalization, normalized equality to captured HEAD, and recursive Core
+  extra/link/path-escape rejection.
+- Proof continues to execute only transformed captured HEAD blobs. The new clean policy
+  runs before receipt and publication and is bound in manifest/receipt/output.
+- V3 inherits every other R4A–R4E loader/receipt/stage/hard-link/verification/tail/pin
+  invariant. R4G changes only identity, one-shot authority, and the EOL-safe clean policy.
+- Next: independent R4G contract QA and four-doc commit, then external v3 static repair
+  and exact-byte review only. Its later exact wrapper checkpoint needs post-commit
+  independent byte/hash, alias/null, AST single-spawn, and preflight all-zero QA before
+  one production spawn. Production execution remains closed.

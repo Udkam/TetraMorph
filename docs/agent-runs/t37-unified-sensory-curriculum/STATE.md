@@ -2173,6 +2173,31 @@ F4E-R4B-COMMAND-CONTRACT-V1 validator=17E6354BCE70EE051B5143BB031D36CB70A1115CAB
   and rejects either basename case-insensitively. Seven alias/null probes fail closed;
   fresh review is required before commit.
 
+### F4E-R4G consumed v2 / successor boundary
+
+- R4F command contract committed: `4d297149fab5b4e4c1f510a96b8b4b7e464155ce`.
+- Its sole v2 spawn failed before receipt creation because raw mixed-CRLF checkout bytes
+  were compared to LF HEAD blobs. Fixed Git diff/status remained clean; this is not a
+  proof-search or Core failure.
+- v2 is consumed and permanently retired. Frozen v2 remains 51,909 bytes /
+  `17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A`;
+  v2 output/attempt/stage/process are zero and must not be reused.
+- v3 requires wholly new validator/output/attempt/stage, marker/manifest, receipt/output
+  schemas, command JSON schema `t37-f4e-r4g-command-contract-v1`, and a new one-spawn
+  authorization. Scoped-clean policy is `head-blob-eol-equivalent-v1`: one-handle
+  pre/post identity, separator-aware realpath containment, regular non-link files, strict
+  UTF-8/no BOM, CRLF-only normalization, no residual CR, normalized equality to captured
+  HEAD blobs, Git diff/NUL status, and recursive Core extra/link/path-escape rejection.
+- Proof remains captured-HEAD-only. The check runs before receipt and before publication
+  and its policy id is bound in manifest, receipt, and output.
+- R4G supersedes only v2 identity/authority and raw-byte clean logic. V3 inherits the full
+  R4A–R4E loader, receipt, staging-preservation, hard-link, verification, tail-order, and
+  environment/history invariants.
+- Sole next action: independent all-zero review and exact four-doc R4G contract commit;
+  only then create and statically review external v3. The later exact wrapper checkpoint
+  itself needs post-commit independent hash/alias/AST/preflight all-zero review before its
+  one spawn. No production execution is open.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

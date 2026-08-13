@@ -9043,3 +9043,46 @@ forward-slash, relative, and 8.3 aliases. The current block first binds the vali
 unique `CIM_DataFile.EightDotThreeFileName` basename `T312A0~1.MJS`, then fails closed for
 any unreadable `node.exe` command line or any case-insensitive long/short validator basename.
 The seven-case alias matrix passes; this repaired four-doc diff still requires fresh review.
+
+### F4E-R4G — consumed v2 attempt and EOL-safe successor contract
+
+Commit `4d297149fab5b4e4c1f510a96b8b4b7e464155ce` admitted the reviewed R4F wrapper.
+Its sole v2 production spawn exited before receipt creation at
+`assertScopedWorktreeClean`: raw checkout bytes for `docs/CURRENT_TASK.md` did not hash
+to the LF HEAD blob. Git reported the full scoped set clean; `core.autocrlf=true` and
+`git ls-files --eol` prove this was a legal mixed-CRLF checkout representation, not a
+Core, contract, clue, or proof failure. No v2 output, receipt, stage, or process exists.
+The spawn nevertheless consumed the one governance authorization. Validator v2 and its
+command are permanently retired and must never run again; its frozen file remains intact
+at 51,909 bytes / `17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A`.
+
+Any successor uses only the new `validate-v3.mjs`, `candidate-v3.json`,
+`attempt-v3.json`, candidate-v3 stage prefix, `t37-f4e-r4g-attempt-v1`,
+`t37-f4e-endgame-canonical-candidate-v3`, `F4E-R4G-COMMAND-CONTRACT-V1`, and
+`F4E-R4G-COMMAND-MANIFEST-V1` identities. The command-manifest JSON schema is fixed as
+`t37-f4e-r4g-command-contract-v1`; no R4B schema is reusable. It must retain Git
+diff/NUL-porcelain gates, inspect every captured-HEAD scoped path through one open handle,
+bind pre/post-read handle identity to the same path identity, and require a regular
+non-symbolic-link file at its exact real repository path. Repository containment uses a
+separator-aware relative-path test, never string-prefix comparison. It decodes strict
+UTF-8 without BOM, permits only `CRLF -> LF`, rejects every remaining CR, and requires
+the normalized bytes to equal that captured HEAD blob. Core recursion rejects every extra,
+ignored, symbolic-link/junction, path-escape, directory-in-place-of-file, or non-file
+entry. Proof imports and contract audit continue to use only captured HEAD blobs, never
+checkout source. This complete check runs before receipt and again before publication and
+is identified as `head-blob-eol-equivalent-v1` in the new manifest, receipt, and output.
+
+R4G supersedes only v2 execution identity/authority and the flawed raw-checkout-byte clean
+test. Every other R4A–R4E invariant is inherited unchanged by v3: self-contained captured-
+HEAD loader, no delegation/I/O/retransform during hooks, full immutable receipt lifecycle,
+post-claim staging preservation, hard-link publication, final-path/receipt verification,
+close-then-terminal-unlink tail order, and every runtime/environment/history pin.
+
+Execution remains closed. First commit and independently review this four-document R4G
+behavior contract. Then create/freeze only the external v3 bytes, run syntax/help and
+EOL/link/alias/state-machine matrices without production proof, and obtain two fresh
+exact-byte all-zero reviews. A later four-document checkpoint must materialize the exact
+v3 marker, manifest, and one-spawn wrapper. That exact checkpoint and its bytes, alias/
+8.3/null matrix, AST single-spawn shape, and all preflights require independent all-zero
+review after commit. Only then may its clean, immediate-green preflight authorize one v3
+production spawn; any spawned v3 failure is also final.

@@ -6614,3 +6614,67 @@ currently absent. This block has no execution authority until the exact four-doc
 materialization receives independent all-zero review and is committed. After that commit,
 the coordinator may repeat the same read-only preflight immediately and invoke this block
 once only if every check is green.
+
+### F4E-R4G consumed-v2 disposition and EOL-safe worktree authority
+
+The exact R4F command was committed at
+`4d297149fab5b4e4c1f510a96b8b4b7e464155ce` and spawned once. It failed before the
+exclusive receipt open because v2 directly hashed checkout bytes and compared them with
+the LF HEAD blob. `docs/CURRENT_TASK.md` and `docs/DESIGN.md` are legal mixed-CRLF
+representations under the machine's `core.autocrlf=true`; fixed Git reports the scoped
+tree clean, and filtered `git hash-object --path` reproduces all four HEAD blobs. This
+diagnostic does not become proof authority. Output, attempt receipt, stage, and matching
+process remain absent, but the v2 authorization is consumed. The exact v2 file is retained
+unchanged for audit and its validator, marker, manifest, and wrapper are permanently
+non-executable.
+
+The successor namespace is disjoint:
+
+- validator: `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v3.mjs`;
+- output: `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v3.json`;
+- receipt: `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v3.json`;
+- stage prefix: `t37-f4e-endgame-canonical-candidate-v3.json.tmp-`;
+- marker/manifest prefixes: `F4E-R4G-COMMAND-CONTRACT-V1 validator=` and
+  `F4E-R4G-COMMAND-MANIFEST-V1 `;
+- command-manifest JSON schema: `t37-f4e-r4g-command-contract-v1`;
+- receipt/output schemas: `t37-f4e-r4g-attempt-v1` and
+  `t37-f4e-endgame-canonical-candidate-v3`;
+- scoped-clean policy: `head-blob-eol-equivalent-v1`.
+
+For each path in the captured HEAD scoped tree, v3 obtains the expected blob bytes through
+the already pinned raw Git backend. For the worktree observation it opens each expected
+path once, compares the path `lstat` and handle `fstat` identity before reading, reads from
+that handle, repeats handle/path identity after reading, and requires a regular
+non-symbolic-link entity throughout. `realpath(root)` and `realpath(file)` must map through
+`relative(root,file)` to the exact expected Git path with no absolute result or `..`
+segment; string-prefix containment is forbidden. The check rejects UTF-8 BOM and malformed
+UTF-8, changes only byte sequence CRLF to LF, rejects every residual CR, and compares those
+normalized bytes byte-for-byte with the captured HEAD blob. It never invokes attributes,
+clean filters, `hash-object --path`, or worktree TypeScript. Existing `diff --quiet HEAD`
+and NUL-safe porcelain checks remain. Recursive Core enumeration rejects extra/ignored
+items, symbolic links, junction/path escapes, directories in place of tracked files, and
+non-files. It does not claim to detect an otherwise ordinary same-content NTFS hard link
+or every vendor-specific in-place reparse tag; neither can become proof input because the
+loader reads captured HEAD only. This policy runs before receipt claim and again before
+publication; the policy identifier is present in command manifest, immutable receipt, and
+candidate output.
+
+R4G changes only the one-shot execution namespace and scoped worktree-equivalence policy.
+V3 inherits every other R4A–R4E rule without weakening: exact captured-HEAD module set and
+transform manifest, no-delegation/no-I/O hooks through all post-proof namespace use,
+exclusive synced immutable receipt before hooks/proof, post-claim staging preservation,
+hard-link publication, final-path and held-receipt revalidation, best-effort receipt close,
+then the sole terminal best-effort owned-stage unlink, plus all Node/Git/environment/
+history/input/runtime pins.
+
+All proof modules, contract markers, and transformed-module hashes remain sourced only
+from captured HEAD blobs. The initial failure is therefore classified as a preclaim EOL
+representation bug, not a failed certificate search or dirty Core. Before v3 exists, this
+behavior contract requires independent all-zero review and an exact four-document commit.
+The external v3 then requires syntax/help, deterministic CRLF/LF/mixed/BOM/isolated-CR/
+malformed-UTF-8/link/extra-file probes and two fresh exact-byte semantic reviews. Only a
+subsequent committed exact marker/manifest/wrapper checkpoint can grant one production
+spawn only after an independent all-zero review binds that committed checkpoint's exact
+bytes, manifest/hash, 8.3/alias/null-command-line matrix, PowerShell AST single-spawn shape,
+and every preflight. The coordinator then repeats only the immediate read-only preflight
+and, if green, uses the one spawn. There is no v2 retry or identity reuse.
