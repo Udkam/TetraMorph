@@ -95,6 +95,7 @@ export type EndgameCompletion =
   | 'failed-invalid-spawn';
 
 export type MutationItem = 'freeze' | 'collapse' | 'bomb' | 'multiplier';
+export type MutationBombOutcome = 'blast' | 'chain-clear';
 
 /** One incoming carrier is represented once, even though all four locked cells carry it. */
 export interface MutationCarrier {
@@ -258,6 +259,45 @@ export type GameCommand =
     classicGravityFloorTicks?: number;
   };
 
+interface MutationActivationEventBase {
+  type: 'mutation-activated';
+  durationTicks: number;
+  score: number;
+  rowsRemoved: number;
+  /** Immutable pre-clear carrier geometry for bounded renderer/audio anchoring. */
+  triggerCells?: readonly Cell[];
+  /** Present for a Multiplier trigger: 2 for Double, 4 for Super Double. */
+  multiplierFactor?: 2 | 4;
+  /** Present for Supergravity: number of future tetrominoes covered by this award. */
+  coveredPieces?: number;
+}
+
+export type MutationActivationEvent =
+  | (MutationActivationEventBase & {
+    item: Exclude<MutationItem, 'bomb'>;
+    bombOutcome?: never;
+    blastRows?: never;
+    participatingBombCount?: never;
+    chainOriginCarrierId?: never;
+    chainOriginCells?: never;
+  })
+  | (MutationActivationEventBase & {
+    item: 'bomb';
+    bombOutcome: 'blast';
+    blastRows: readonly number[];
+    participatingBombCount: number;
+    chainOriginCarrierId?: never;
+    chainOriginCells?: never;
+  })
+  | (MutationActivationEventBase & {
+    item: 'bomb';
+    bombOutcome: 'chain-clear';
+    blastRows: readonly number[];
+    participatingBombCount: number;
+    chainOriginCarrierId: number;
+    chainOriginCells: readonly Cell[];
+  });
+
 export type GameEvent =
   | { type: 'started' }
   | { type: 'restarted' }
@@ -270,19 +310,7 @@ export type GameEvent =
   | { type: 'endgame-undone' }
   | { type: 'clear-started'; rows: number[] }
   | { type: 'lines-cleared'; rows: number[]; count: number; score: number }
-  | {
-    type: 'mutation-activated';
-    item: MutationItem;
-    durationTicks: number;
-    score: number;
-    rowsRemoved: number;
-    /** Immutable pre-clear carrier geometry for bounded renderer/audio anchoring. */
-    triggerCells?: readonly Cell[];
-    /** Present for a Multiplier trigger: 2 for Double, 4 for Super Double. */
-    multiplierFactor?: 2 | 4;
-    /** Present for Supergravity: number of future tetrominoes covered by this award. */
-    coveredPieces?: number;
-  }
+  | MutationActivationEvent
   | { type: 'bedrock-raised'; count: number; height: number }
   | { type: 'bedrock-lowered'; count: number; height: number }
   | {

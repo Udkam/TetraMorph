@@ -8,7 +8,6 @@ import {
   LINE_CLEAR_BASE_SCORE,
   LINE_CLEAR_DELAY_TICKS,
   LOCK_DELAY_TICKS,
-  MUTATION_BOMB_ROWS,
   MUTATION_BOMB_SCORE,
   MUTATION_CARRIER_CHANCE,
   MUTATION_EFFECT_TICKS,
@@ -46,6 +45,8 @@ import {
   activeUsesSupergravityLanding,
   mapMutationCarriersAfterClear,
   mutationCarriersClearedByRows,
+  planMutationBombClear,
+  type MutationBombPlan,
   withoutMutationCarriers,
 } from './mutation';
 import {
@@ -932,17 +933,13 @@ function mutationScoreMultiplier(state: GameState): number {
   return state.mutationMultiplierFactor === 4 ? 4 : 2;
 }
 
-function bottomBombRows(): number[] {
-  return Array.from({ length: MUTATION_BOMB_ROWS }, (_, index) => BOARD_HEIGHT - MUTATION_BOMB_ROWS + index);
-}
-
 interface MutationActivation {
   state: GameState;
   events: GameEvent[];
 }
 
 interface MutationActivationSummary {
-  item: MutationItem;
+  item: Exclude<MutationItem, 'bomb'>;
   durationTicks: number;
   score: number;
   rowsRemoved: number;
@@ -952,39 +949,69 @@ interface MutationActivationSummary {
   coveredPieces?: number;
 }
 
-/**
- * Applies every carrier triggered by one resolved clear. Bombs may remove another
- * carrier, so the deterministic queue handles that finite chain without a second
- * render or browser-timing pass.
- */
-function activateMutationCarriers(state: GameState, triggered: readonly MutationCarrier[]): MutationActivation {
-  if (state.mode !== 'sprint' || triggered.length === 0) return { state, events: [] };
+interface MutationBombActivation {
+  plan: MutationBombPlan;
+  score: number;
+}
+
+function immutableUniqueCells(carriers: readonly MutationCarrier[]): readonly Cell[] {
+  const keys = new Set<string>();
+  const cells: Cell[] = [];
+  for (const carrier of carriers) for (const cell of carrier.cells) {
+    const key = cellKey(cell);
+    if (keys.has(key)) continue;
+    keys.add(key);
+    cells.push(Object.freeze({ ...cell }));
+  }
+  return Object.freeze(cells);
+}
+
+/** Applies the already-planned carrier effects without scheduling recursive clears. */
+function activateMutationCarriers(
+  state: GameState,
+  triggered: readonly MutationCarrier[],
+  bomb?: MutationBombActivation,
+): MutationActivation {
+  if (state.mode !== 'sprint' || (triggered.length === 0 && !bomb)) return { state, events: [] };
 
   let next = state;
   const events: GameEvent[] = [];
-  // Bomb owns the first causal beat. Keep the original scan order within each
-  // priority so seeded replays remain stable while blast-driven settlement can
-  // never appear after a timed-state activation.
-  const pending = [...triggered].sort((left, right) => (
-    Number(right.item === 'bomb') - Number(left.item === 'bomb')
-  ));
-  const queued = new Set(triggered.map((carrier) => carrier.id));
-  const activated = new Set<number>();
-  const activationOrder: MutationItem[] = [];
-  const summaries = new Map<MutationItem, MutationActivationSummary>();
-
-  while (pending.length > 0) {
-    const carrier = pending.shift();
-    if (!carrier || activated.has(carrier.id)) continue;
-    activated.add(carrier.id);
+  if (bomb) {
+    const common = {
+      type: 'mutation-activated' as const,
+      item: 'bomb' as const,
+      durationTicks: 0,
+      score: bomb.score,
+      rowsRemoved: bomb.plan.progressRows.length,
+      triggerCells: immutableUniqueCells(bomb.plan.participantBombs),
+      blastRows: bomb.plan.blastRows,
+      participatingBombCount: bomb.plan.participantBombs.length,
+    };
+    events.push(bomb.plan.outcome === 'chain-clear'
+      ? {
+        ...common,
+        bombOutcome: 'chain-clear',
+        chainOriginCarrierId: bomb.plan.chainOriginCarrierId!,
+        chainOriginCells: bomb.plan.chainOriginCells!,
+      }
+      : { ...common, bombOutcome: 'blast' });
     next = {
       ...next,
-      mutationCarriers: withoutMutationCarriers(next.mutationCarriers, [carrier]),
+      mutationLastItem: 'bomb',
+      mutationLastItemTicks: MUTATION_RESULT_TICKS,
     };
+  }
+
+  const pending = [...triggered]
+    .filter((carrier) => carrier.item !== 'bomb')
+    .sort((left, right) => left.id - right.id);
+  const activationOrder: Exclude<MutationItem, 'bomb'>[] = [];
+  const summaries = new Map<Exclude<MutationItem, 'bomb'>, MutationActivationSummary>();
+
+  for (const carrier of pending) {
+    if (carrier.item === 'bomb') continue;
 
     let durationTicks = 0;
-    let score = 0;
-    let rowsRemoved = 0;
     if (carrier.item === 'freeze') {
       // A fresh carrier never stacks latent play time. The player gets a clear,
       // repeatable ten-second window from the instant this effect resolves.
@@ -1000,34 +1027,6 @@ function activateMutationCarriers(state: GameState, triggered: readonly Mutation
         mutationMultiplierTicks: durationTicks,
         mutationMultiplierFactor: wasActive ? 4 : 2,
       };
-    } else {
-      const rows = bottomBombRows();
-      const bombTriggered = mutationCarriersClearedByRows(next.mutationCarriers, rows);
-      score = MUTATION_BOMB_SCORE * mutationScoreMultiplier(next);
-      rowsRemoved = rows.length;
-      next = {
-        ...next,
-        board: clearRows(next.board, rows),
-        mutationCarriers: mapMutationCarriersAfterClear(
-          next.board,
-          rows,
-          withoutMutationCarriers(next.mutationCarriers, bombTriggered),
-        ),
-        score: next.score + score,
-        lines: next.lines + rowsRemoved,
-      };
-      events.push({ type: 'lines-cleared', rows, count: rowsRemoved, score });
-      for (const candidate of bombTriggered) {
-        if (!activated.has(candidate.id) && !queued.has(candidate.id)) {
-          queued.add(candidate.id);
-          if (candidate.item === 'bomb') {
-            const firstNonBomb = pending.findIndex((queuedCarrier) => queuedCarrier.item !== 'bomb');
-            pending.splice(firstNonBomb < 0 ? pending.length : firstNonBomb, 0, candidate);
-          } else {
-            pending.push(candidate);
-          }
-        }
-      }
     }
 
     next = {
@@ -1035,7 +1034,7 @@ function activateMutationCarriers(state: GameState, triggered: readonly Mutation
       mutationLastItem: carrier.item,
       mutationLastItemTicks: durationTicks > 0 ? durationTicks : MUTATION_RESULT_TICKS,
     };
-    const multiplierFactor = carrier.item === 'multiplier'
+    const multiplierFactor: 2 | 4 | undefined = carrier.item === 'multiplier'
       ? (next.mutationMultiplierFactor === 4 ? 4 : 2)
       : undefined;
     let summary = summaries.get(carrier.item);
@@ -1053,8 +1052,6 @@ function activateMutationCarriers(state: GameState, triggered: readonly Mutation
     }
     if (carrier.item === 'collapse') summary.coveredPieces = MUTATION_SUPERGRAVITY_PIECES;
     summary.durationTicks = Math.max(summary.durationTicks, durationTicks);
-    summary.score += score;
-    summary.rowsRemoved += rowsRemoved;
     if (multiplierFactor !== undefined) summary.multiplierFactor = multiplierFactor;
     for (const cell of carrier.cells) {
       const key = cellKey(cell);
@@ -1319,7 +1316,12 @@ function rotate(state: GameState, direction: -1 | 1): GameTransition {
 function finishLineClear(state: GameState): GameTransition {
   const rows = [...state.pendingClearRows];
   const count = rows.length;
-  const lines = state.lines + count;
+  const bombPlan = state.mode === 'sprint'
+    ? planMutationBombClear(state.board, state.mutationCarriers, rows)
+    : null;
+  const removalRows = bombPlan?.removalRows ?? rows;
+  const progressRows = bombPlan?.progressRows ?? rows;
+  const lines = state.lines + progressRows.length;
   const combo = state.mode === 'marathon' ? state.combo + 1 : 0;
   const comboBonus = state.mode === 'marathon' ? 50 * Math.max(0, combo - 1) : 0;
   const level = state.mode === 'endgame' ? Math.floor(lines / 10) : 0;
@@ -1330,8 +1332,16 @@ function finishLineClear(state: GameState): GameTransition {
       ? baseScore * mutationScoreMultiplier(state)
       : baseScore + comboBonus;
   const triggeredCarriers = state.mode === 'sprint'
-    ? mutationCarriersClearedByRows(state.mutationCarriers, rows)
+    ? (bombPlan?.activatedNonBombs
+      ?? mutationCarriersClearedByRows(state.mutationCarriers, rows)
+        .filter((carrier) => carrier.item !== 'bomb'))
     : Object.freeze([]);
+  const removedCarriers = bombPlan
+    ? [...bombPlan.participantBombs, ...bombPlan.activatedNonBombs]
+    : triggeredCarriers;
+  const bombScore = bombPlan
+    ? MUTATION_BOMB_SCORE * bombPlan.participantBombs.length * mutationScoreMultiplier(state)
+    : 0;
   const activeAfterClear = state.mode === 'race'
     ? mapActiveAfterClear(state.board, rows, state.active)
     : state.active;
@@ -1340,7 +1350,9 @@ function finishLineClear(state: GameState): GameTransition {
     : state.survivalDebris;
   let cleared: GameState = {
     ...state,
-    board: clearRows(state.board, rows, state.endgameAnchorSupportedCells),
+    board: bombPlan?.outcome === 'chain-clear'
+      ? createBoard()
+      : clearRows(state.board, removalRows, state.endgameAnchorSupportedCells),
     active: activeAfterClear,
     survivalDebris: debrisAfterClear,
     endgameTargetCells: state.mode === 'endgame'
@@ -1355,13 +1367,15 @@ function finishLineClear(state: GameState): GameTransition {
       )
       : state.endgameAnchorSupportedCells,
     mutationCarriers: state.mode === 'sprint'
-      ? mapMutationCarriersAfterClear(
-        state.board,
-        rows,
-        withoutMutationCarriers(state.mutationCarriers, triggeredCarriers),
-      )
+      ? (bombPlan?.outcome === 'chain-clear'
+        ? Object.freeze([])
+        : mapMutationCarriersAfterClear(
+          state.board,
+          removalRows,
+          withoutMutationCarriers(state.mutationCarriers, removedCarriers),
+        ))
       : state.mutationCarriers,
-    score: state.score + clearScore,
+    score: state.score + clearScore + bombScore,
     lines,
     combo,
     level,
@@ -1375,7 +1389,11 @@ function finishLineClear(state: GameState): GameTransition {
     return { state: resolved.state, events: [...events, ...resolved.events] };
   }
   if (cleared.mode === 'sprint') {
-    const activated = activateMutationCarriers(cleared, triggeredCarriers);
+    const activated = activateMutationCarriers(
+      cleared,
+      triggeredCarriers,
+      bombPlan ? { plan: bombPlan, score: bombScore } : undefined,
+    );
     const spawned = spawnPiece(activated.state);
     return { state: spawned.state, events: [...events, ...activated.events, ...spawned.events] };
   }

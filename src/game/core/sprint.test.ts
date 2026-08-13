@@ -429,13 +429,13 @@ describe('异变 mode', () => {
       'collapse',
     ]);
     expect(transition.events.find((event) => event.type === 'mutation-activated')).toMatchObject({ item: 'bomb' });
-    expect(transition.state.lines).toBe(4);
+    expect(transition.state.lines).toBe(2);
     expect(transition.state.mutationFreezeTicks).toBe(MUTATION_EFFECT_TICKS);
     expect(transition.state.mutationCollapsePiecesRemaining).toBe(MUTATION_SUPERGRAVITY_PIECES - 1);
     expect(transition.state.mutationCollapseLandingLatched).toBe(true);
   });
 
-  it('executes every repeated Bomb mechanically but emits one combined Bomb presentation cue', () => {
+  it('chains same-row Bombs once and preserves the smallest primary as immutable origin evidence', () => {
     const transition = resolveLineClear({
       ...carrierClearState('freeze'),
       mutationCarriers: [
@@ -445,22 +445,110 @@ describe('异变 mode', () => {
     });
     const activations = mutationActivations(transition);
     const bomb = activations.find((event) => event.item === 'bomb');
-    const bombClears = transition.events.filter((event) => (
-      event.type === 'lines-cleared'
-      && event.rows.length === 3
-      && event.rows[0] === 37
-    ));
+    const ordinaryClears = transition.events.filter((event) => event.type === 'lines-cleared');
 
-    expect(bombClears).toHaveLength(2);
-    expect(transition.state.lines).toBe(7);
+    expect(ordinaryClears).toEqual([{ type: 'lines-cleared', rows: [39], count: 1, score: 40 }]);
+    expect(transition.state.lines).toBe(2);
     expect(transition.state.score).toBe(40 + MUTATION_BOMB_SCORE * 2);
+    expect(transition.state.board.flat().every((cell) => cell === null)).toBe(true);
+    expect(transition.state.mutationFreezeTicks).toBe(MUTATION_EFFECT_TICKS);
     expect(activations.filter((event) => event.item === 'bomb')).toHaveLength(1);
     expect(bomb).toMatchObject({
       durationTicks: 0,
       score: MUTATION_BOMB_SCORE * 2,
-      rowsRemoved: 6,
+      rowsRemoved: 2,
       triggerCells: [{ x: 0, y: 39 }, { x: 1, y: 39 }],
+      bombOutcome: 'chain-clear',
+      blastRows: [38, 39],
+      participatingBombCount: 2,
+      chainOriginCarrierId: 1,
+      chainOriginCells: [{ x: 0, y: 39 }],
     });
+    expect(Object.isFrozen(bomb?.blastRows)).toBe(true);
+    expect(Object.isFrozen(bomb?.chainOriginCells)).toBe(true);
+    expect(bomb?.chainOriginCells?.every((cell) => Object.isFrozen(cell))).toBe(true);
+  });
+
+  it('keeps distant simultaneous primary Bombs as one normal blast with a deduplicated band union', () => {
+    let board = createBoard();
+    for (const row of [30, 39]) for (let x = 0; x < 10; x += 1) board = setCell(board, x, row, 'J');
+    board = setCell(board, 0, 28, 'S');
+    const transition = dispatch({
+      ...playingMutation(),
+      board,
+      active: null,
+      phase: 'line-clear',
+      phaseTicks: LINE_CLEAR_DELAY_TICKS - 1,
+      pendingClearRows: [30, 39],
+      mutationCarriers: [
+        { id: 8, item: 'bomb', cells: [{ x: 8, y: 39 }] },
+        { id: 3, item: 'bomb', cells: [{ x: 3, y: 30 }] },
+      ],
+      score: 0,
+      lines: 0,
+    }, { type: 'tick' });
+    const bomb = mutationActivations(transition).find((event) => event.item === 'bomb');
+
+    expect(bomb).toMatchObject({
+      bombOutcome: 'blast',
+      blastRows: [29, 30, 31, 38, 39],
+      participatingBombCount: 2,
+      score: MUTATION_BOMB_SCORE * 2,
+    });
+    expect(transition.state.lines).toBe(2);
+    expect(transition.state.board[33]?.[0]).toBe('S');
+    expect(transition.events.filter((event) => event.type === 'lines-cleared')).toEqual([
+      { type: 'lines-cleared', rows: [30, 39], count: 2, score: 100 },
+    ]);
+  });
+
+  it('clears hidden rows and activates every pre-clear item once when one blast hits another Bomb', () => {
+    let board = createBoard();
+    for (let x = 0; x < 10; x += 1) board = setCell(board, x, 1, 'T');
+    board = setCell(board, 0, 0, 'J');
+    board = setCell(board, 5, 20, 'L');
+    board = setCell(board, 6, 35, 'S');
+    board = setCell(board, 7, 37, 'O');
+    const transition = dispatch({
+      ...playingMutation(),
+      board,
+      active: null,
+      phase: 'line-clear',
+      phaseTicks: LINE_CLEAR_DELAY_TICKS - 1,
+      pendingClearRows: [1],
+      mutationMultiplierTicks: MUTATION_EFFECT_TICKS,
+      mutationMultiplierFactor: 2,
+      mutationCarriers: [
+        { id: 12, item: 'bomb', cells: [{ x: 8, y: 1 }] },
+        { id: 2, item: 'freeze', cells: [{ x: 5, y: 20 }] },
+        { id: 9, item: 'bomb', cells: [{ x: 0, y: 0 }] },
+        { id: 4, item: 'multiplier', cells: [{ x: 6, y: 35 }] },
+        { id: 1, item: 'collapse', cells: [{ x: 7, y: 37 }] },
+      ],
+      score: 0,
+      lines: 0,
+    }, { type: 'tick' });
+    const activations = mutationActivations(transition);
+    const bomb = activations[0];
+
+    expect(activations.map((event) => event.item)).toEqual(['bomb', 'collapse', 'freeze', 'multiplier']);
+    expect(bomb).toMatchObject({
+      bombOutcome: 'chain-clear',
+      blastRows: [0, 1, 2],
+      participatingBombCount: 2,
+      chainOriginCarrierId: 12,
+      chainOriginCells: [{ x: 8, y: 1 }],
+      score: MUTATION_BOMB_SCORE * 2 * 2,
+      rowsRemoved: 5,
+    });
+    expect(transition.state.score).toBe((40 + MUTATION_BOMB_SCORE * 2) * 2);
+    expect(transition.state.lines).toBe(5);
+    expect(transition.state.board).toEqual(createBoard());
+    expect(transition.state.mutationCarriers).toEqual([]);
+    expect(transition.state.mutationCollapsePiecesRemaining).toBe(MUTATION_SUPERGRAVITY_PIECES - 1);
+    expect(transition.state.mutationFreezeTicks).toBe(MUTATION_EFFECT_TICKS);
+    expect(transition.state.mutationMultiplierFactor).toBe(4);
+    expect(transition.state.mutationLastItem).toBe('multiplier');
   });
 
   it('retains a pre-clear carrier snapshot when every marked cell disappears', () => {
@@ -601,7 +689,7 @@ describe('异变 mode', () => {
     }));
   });
 
-  it('uses a bomb to remove the bottom three rows, award points, and advance speed progress', () => {
+  it('uses a bottom-row Bomb band once and excludes empty blast rows from speed progress', () => {
     let state = carrierClearState('bomb');
     let board = state.board;
     board = setCell(board, 0, 37, 'L');
@@ -609,16 +697,21 @@ describe('异变 mode', () => {
     state = { ...state, board };
     const transition = resolveLineClear(state);
 
-    expect(transition.state.lines).toBe(4);
+    expect(transition.state.lines).toBe(2);
     expect(transition.state.score).toBe(40 + MUTATION_BOMB_SCORE);
-    expect(transition.state.board.flat().every((cell) => cell === null)).toBe(true);
-    expect(transition.events).toContainEqual({ type: 'lines-cleared', rows: [37, 38, 39], count: 3, score: MUTATION_BOMB_SCORE });
+    expect(transition.state.board[39]?.[0]).toBe('L');
+    expect(transition.events.filter((event) => event.type === 'lines-cleared')).toEqual([
+      { type: 'lines-cleared', rows: [39], count: 1, score: 40 },
+    ]);
     expect(mutationActivations(transition).find((event) => event.item === 'bomb')).toMatchObject({
       type: 'mutation-activated',
       item: 'bomb',
       durationTicks: 0,
       score: MUTATION_BOMB_SCORE,
-      rowsRemoved: 3,
+      rowsRemoved: 2,
+      bombOutcome: 'blast',
+      blastRows: [38, 39],
+      participatingBombCount: 1,
     });
   });
 

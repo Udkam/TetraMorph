@@ -122,6 +122,34 @@ function hasBroadHorizontalGeometry(operations: readonly DrawOperation[], boardW
 
 const MUTATION_ITEMS = ['freeze', 'collapse', 'bomb', 'multiplier'] as const satisfies readonly MutationItem[];
 
+function mutationEvent(
+  item: MutationItem,
+  cells: readonly Cell[] = [],
+): Extract<GameEvent, { type: 'mutation-activated' }> {
+  if (item === 'bomb') {
+    return {
+      type: 'mutation-activated',
+      item,
+      durationTicks: 0,
+      score: 300,
+      rowsRemoved: 3,
+      triggerCells: cells,
+      bombOutcome: 'blast',
+      blastRows: [37, 38, 39],
+      participatingBombCount: 1,
+    };
+  }
+  return {
+    type: 'mutation-activated',
+    item,
+    durationTicks: 600,
+    score: 0,
+    rowsRemoved: 0,
+    triggerCells: cells,
+    ...(item === 'multiplier' ? { multiplierFactor: 2 as const } : {}),
+  };
+}
+
 type RendererInternals = {
   host: HTMLElement | null;
   previewGraphics: unknown;
@@ -517,7 +545,7 @@ describe('Endgame undo presentation reset', () => {
     expect(internals.mutationMaterial('bomb')).toBe(MUTATION_MATERIALS.bomb);
     expect(internals.mutationMaterial('multiplier')).toBe(MUTATION_MATERIALS.multiplier);
 
-    internals.consumeEvents([{ type: 'mutation-activated', item: 'bomb', durationTicks: 0, score: 300, rowsRemoved: 3 }]);
+    internals.consumeEvents([mutationEvent('bomb')]);
     expect(internals.mutationFlash).toMatchObject({
       item: 'bomb',
       elapsed: 0,
@@ -557,7 +585,7 @@ describe('Endgame undo presentation reset', () => {
       { type: 'mutation-activated', item: 'freeze', durationTicks: 600, score: 0, rowsRemoved: 0 },
       { type: 'mutation-activated', item: 'freeze', durationTicks: 600, score: 0, rowsRemoved: 0 },
       { type: 'mutation-activated', item: 'collapse', durationTicks: 600, score: 0, rowsRemoved: 0 },
-      { type: 'mutation-activated', item: 'bomb', durationTicks: 0, score: 300, rowsRemoved: 3 },
+      mutationEvent('bomb'),
     ]);
 
     expect(internals.mutationFlash).toMatchObject({ item: 'bomb' });
@@ -568,7 +596,7 @@ describe('Endgame undo presentation reset', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     internals.consumeEvents([
-      { type: 'mutation-activated', item: 'bomb', durationTicks: 0, score: 300, rowsRemoved: 3 },
+      mutationEvent('bomb'),
       { type: 'mutation-activated', item: 'freeze', durationTicks: 600, score: 0, rowsRemoved: 0 },
     ]);
     internals.mutationFields.set('collapse', { item: 'collapse', stage: 'active', elapsed: 0 });
@@ -1312,15 +1340,11 @@ describe('Endgame undo presentation reset', () => {
     const previousBoard = createBoard();
     internals.consumeEvents([
       {
-        type: 'mutation-activated',
-        item: 'bomb',
-        durationTicks: 0,
-        score: 120,
-        rowsRemoved: 3,
-        triggerCells: [
+        ...mutationEvent('bomb', [
           { x: 1, y: VISIBLE_START_ROW + 5 },
           { x: 7, y: VISIBLE_START_ROW + 5 },
-        ],
+        ]),
+        score: 120,
       },
       {
         type: 'mutation-activated',
@@ -1723,15 +1747,7 @@ describe('Endgame undo presentation reset', () => {
       (internals as unknown as { drawMutationMaterialRim: () => void }).drawMutationMaterialRim = () => {
         carrierRimCalls += 1;
       };
-      internals.consumeEvents([{
-        type: 'mutation-activated',
-        item,
-        durationTicks: item === 'bomb' ? 0 : 600,
-        score: item === 'bomb' ? 300 : 0,
-        rowsRemoved: item === 'bomb' ? 3 : 0,
-        triggerCells: [{ x: 4, y: VISIBLE_START_ROW + 6 }],
-        ...(item === 'multiplier' ? { multiplierFactor: 2 as const } : {}),
-      }]);
+      internals.consumeEvents([mutationEvent(item, [{ x: 4, y: VISIBLE_START_ROW + 6 }])]);
       internals.drawMutationActivationEffect(
         createGraphicsRecorder().graphics,
         internals.mutationFlash!,
@@ -1745,14 +1761,7 @@ describe('Endgame undo presentation reset', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
-    internals.consumeEvents([{
-      type: 'mutation-activated',
-      item: 'bomb',
-      durationTicks: 0,
-      score: 300,
-      rowsRemoved: 3,
-      triggerCells: [{ x: 4, y: VISIBLE_START_ROW + 8 }],
-    }]);
+    internals.consumeEvents([mutationEvent('bomb', [{ x: 4, y: VISIBLE_START_ROW + 8 }])]);
 
     const warning = createGraphicsRecorder();
     internals.drawMutationActivationEffect(warning.graphics, internals.mutationFlash!, layout);

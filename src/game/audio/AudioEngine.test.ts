@@ -173,14 +173,25 @@ const sourceCount = (): number => oscillators.length + bufferSources.length;
 const mutation = (
   item: 'freeze' | 'collapse' | 'bomb' | 'multiplier',
   multiplierFactor?: 2 | 4,
-): GameEvent => ({
-  type: 'mutation-activated',
-  item,
-  durationTicks: item === 'bomb' ? 0 : 600,
-  score: item === 'bomb' ? 300 : 0,
-  rowsRemoved: item === 'bomb' ? 3 : 0,
-  multiplierFactor,
-});
+): GameEvent => item === 'bomb'
+  ? {
+    type: 'mutation-activated',
+    item,
+    durationTicks: 0,
+    score: 300,
+    rowsRemoved: 3,
+    bombOutcome: 'blast',
+    blastRows: [37, 38, 39],
+    participatingBombCount: 1,
+  }
+  : {
+    type: 'mutation-activated',
+    item,
+    durationTicks: 600,
+    score: 0,
+    rowsRemoved: 0,
+    multiplierFactor,
+  };
 
 beforeEach(() => {
   oscillators.length = 0;

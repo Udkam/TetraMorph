@@ -53,7 +53,6 @@ export const MUTATION_SUPERGRAVITY_PIECES = 5;
 export const MUTATION_RESULT_TICKS = 2 * TICKS_PER_SECOND;
 export const MUTATION_CARRIER_CHANCE = 0.32;
 export const MUTATION_BOMB_SCORE = 300;
-export const MUTATION_BOMB_ROWS = 3;
 /** Keeps item attachments deterministic without perturbing the ordinary seven-bag. */
 export const MUTATION_RANDOM_SALT = 0x4d55_5441;
 /** Ice slows automatic gravity to exactly 0.8 seconds per board cell. */
