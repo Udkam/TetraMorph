@@ -1474,36 +1474,62 @@ audio, or Endgame content. Endgame-library selection and category swaps are rese
 a later D2B slice.
 
 - A shared ActionSheet owns an explicit `enter -> steady -> exit -> unmounted` presence
-  lifecycle. Opening fades the backdrop over `120 ms` and settles the complete panel over
-  `180 ms` from `opacity .94` and at most `translateY(4px)`, using
+  lifecycle for same-page dismissal: Settings close, leave cancel, result replay, and
+  first-entry Back. Opening fades the backdrop over `120 ms` and settles the complete
+  panel over `180 ms` from `opacity .94` and at most `translateY(4px)`, using
   `cubic-bezier(.16, 1, .3, 1)`. Scale, blur, spring motion, wipes, and child cascades are
   forbidden.
-- Closing commits its product action immediately, then retains only a non-interactive
-  presentational shell for `120 ms`: the panel releases toward `opacity .96` and at most
-  `translateY(-2px)` while the backdrop fades. The shell is `aria-hidden`, inert, cannot
-  receive focus or pointer input, and cannot fire cancel/confirm twice. It then unmounts.
-- Presence is latest-request-owned. A close followed by reopen must cancel the older
-  release owner; an old timer may never unmount or restore focus across the newer sheet.
-  Unmount cancels every timer/frame. At most one accessible dialog exists at any instant.
+- Same-page closing commits its product action immediately, then freezes the last complete
+  React presentation as a non-interactive shell for `120 ms`: the panel releases toward
+  `opacity .96` and at most `translateY(-2px)` while the backdrop fades. Live Runtime,
+  record, celebration, form, or callback values may not replace that snapshot. The shell
+  is `aria-hidden`, inert, has no dialog role, cannot receive focus/pointer input, and
+  captures events before retired child callbacks. It then unmounts.
+- Leave-confirm and result-leave replace GameSession immediately and belong exclusively to
+  D1: they promise no D2A DOM release, and D1 owns their snapshot and destination focus.
+  First-entry confirm is the one App-level exception: its inert shell may release outside
+  the named route viewport while D1 commits, but it never owns the route snapshot, focus,
+  or input and may not delay ready gameplay.
+- Presence is latest-request-owned across the complete ActionSheet family. Reopening the
+  same instance cancels its older release; opening a different accessible sheet terminates
+  every older release shell immediately. An old timer may never unmount a newer layer.
+  Unmount cancels every timer/frame, and at most one accessible dialog exists at any time.
+- The release timer never owns focus restoration. Semantic close removes the sheet's
+  document-key listener in the same commit. D1 owns route focus; existing Settings,
+  replay, pause, and restart callbacks own board/countdown focus. Only when no explicit
+  owner has moved focus, focus is still inside the exiting subtree, no successor dialog
+  exists, and the previously focused element remains connected may ActionSheet restore it
+  on the next frame. Finishing the later `120 ms` release may never move focus.
 - Settings no longer disables the shared entrance. Its tab content changes in the same
   layer over `150 ms`, with opacity and at most `2px` vertical settling; only one panel is
   accessible and mounted as current product content. Tab motion never implies route
   direction and does not use the View Transition API.
-- Pause and restart keep their existing `180 ms` board-local cover entrance. Resume or
-  cancel commits immediately while a non-interactive copy releases over `120 ms`.
-  Settings superseding pause uses the same settled overlay entrance; no second pause
-  dialog or Canvas is created. Results enter as one complete ledger and release as one
-  complete sheet; metrics and leaderboard do not cascade.
+- Pause and restart keep their existing `180 ms` board-local cover entrance. Pause resume
+  and restart cancel commit immediately while an inert copy releases over `120 ms`.
+  Pause to Settings/leave may release below the new z-100 modal backdrop; pause to restart
+  terminates the old curtain before the new curtain enters. Restart confirm never retains
+  the old curtain: a new 3-2-1 cover, or Endgame's immediate run endpoint, owns the first
+  post-confirm frame. Route/unmount removes every curtain immediately. No second dialog or
+  Canvas is created. Results enter/release as one ledger; metrics never cascade.
 - Reduced motion uses opacity only, no transform, and completes any presence phase within
-  `32 ms`. A runtime switch to reduced motion must shorten the active phase and invalidate
-  its old timer. Presentation never delays gameplay input, countdown, Runtime restart,
-  storage, focus ownership, or route navigation.
+  `32 ms`. A runtime full-to-reduced switch shortens the active phase and invalidates its
+  old timer. Reduced-to-full never restarts or lengthens an active phase and affects only
+  the next presence epoch. Presentation never delays gameplay input, countdown, Runtime
+  restart, storage, focus ownership, or route navigation.
 - `src/styles/in-page-transitions.css` is the final D2A motion authority and loads after
-  result/settings/theme styles. Tests freeze the import order, phase selectors, duration
-  tokens, reduced-motion endpoint, and absence of scale/blur. Browser evidence must cover
-  first-entry rules, Settings and all tabs, pause-to-Settings, pause resume, restart
-  cancel, a real terminal result and replay at desktop/mobile/full/reduced motion, with
-  one Canvas, zero DOM cells, zero double dialogs, zero overflow, and zero console errors.
+  result/settings/theme styles. Its full-motion selectors explicitly override Settings'
+  older `animation: none !important`; its final reduced selector remains authoritative.
+  Tests freeze import order, phase selectors/tokens, focus non-interference, route-owned
+  close, frozen result replay, cross-sheet latest ownership, pause outcomes, both runtime
+  motion-toggle directions, restart-confirm first frame, and unmount cleanup. Browser
+  evidence covers first-entry confirm/Back, Settings and tabs, leave confirm/cancel,
+  pause-to-Settings, pause resume, restart cancel/confirm, real terminal result replay and
+  leave at desktop/mobile/full/reduced motion, with one Canvas, zero DOM cells, zero double
+  dialogs, zero overflow, and zero console errors.
+- D2A may use two ordinary source checkpoints within the same six authorized paths: D2A1
+  establishes ActionSheet presence, final CSS authority/import, and focused integration;
+  D2A2 adds the separately tested pause/restart curtain outcomes. Each checkpoint, not
+  their combined range, stays within the normal ten-path/500-line source budget.
 
 ### T30 acceptance
 

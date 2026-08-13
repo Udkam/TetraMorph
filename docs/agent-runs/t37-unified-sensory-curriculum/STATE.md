@@ -2391,6 +2391,31 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Unique next action: commit this three-document D2A contract, then implement the shared
   ActionSheet presence owner and its focused tests before extending pause/restart curtains.
 
+#### D2A first contract QA rejection and repair
+
+- Independent review of `be7044d` rejects the first wording at
+  `P0 0 / P1 2 / P2 1 / P3 0 / GAP 4`: GameSession route unmount cannot retain a D2A
+  shell; exit-timer focus ownership was ambiguous; pause/restart outcomes, cross-instance
+  latest ownership, reverse motion toggling, result snapshotting, and highest-risk tests
+  were underspecified. No source writer opened under that wording.
+- Repaired route split: leave-confirm and result-leave unmount immediately under D1; the
+  App-level first-entry confirm may release inertly outside the named viewport while D1
+  owns focus/input. Same-page closes alone promise a D2A DOM release.
+- Repaired focus split: semantic close removes key capture immediately, explicit D1 or
+  board/countdown focus wins, and release completion never moves focus. Conditional
+  default restoration occurs only while focus remains inside the exiting subtree with a
+  connected prior target and no successor dialog.
+- Repaired board-curtain outcomes: pause resume/restart cancel release; pause-to-modal may
+  release underneath; pause-to-restart, restart confirm, route and unmount remove the old
+  curtain immediately. Result replay freezes its pre-reset presentation.
+- Latest ownership is family-wide; a new accessible sheet terminates all older release
+  shells. Full-to-reduced shortens the current epoch; reduced-to-full never restarts or
+  lengthens it. Final CSS explicitly overrides the legacy Settings no-animation rule.
+- D2A is split into D2A1 ActionSheet and D2A2 curtain source checkpoints, each within the
+  normal 500-line budget and together limited to the same six authorized paths.
+- Unique next action: obtain independent zero-finding review of this repaired contract,
+  then open D2A1 only.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

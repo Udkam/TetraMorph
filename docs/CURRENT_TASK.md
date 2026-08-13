@@ -41,21 +41,32 @@ presence lifecycle for first-entry rules, Settings, leave confirmation, results,
 pause/restart curtains while retaining the existing board, Runtime, HUD, Next, and Canvas.
 
 Full motion uses a `120 ms` backdrop entrance, `180 ms` whole-panel settle from at most
-`4px`, and `120 ms` non-interactive release toward at most `-2px`. Closing actions happen
-immediately; only an inert, `aria-hidden`, pointer-disabled visual shell may remain until
-release completes. Reopening cancels the older release owner, and no stale timer may
-unmount a successor or steal its focus. Settings tab swaps settle over `150 ms` within the
-same layer. Pause/restart retain their existing board-local entrance and gain the same
-bounded release; results move as one ledger, never as staggered child cards.
+`4px`, and `120 ms` non-interactive release toward at most `-2px`. Same-page closing
+actions happen immediately; only a frozen inert, `aria-hidden`, role-free,
+pointer-disabled shell may remain. Leave confirm and result leave instead unmount with
+GameSession immediately and transfer visual/focus ownership to D1. First-entry confirm's
+App-level shell may release in parallel but cannot own D1 focus or input.
 
-Reduced motion is opacity-only, transform-free, and at most `32 ms`, including a runtime
-switch during an active phase. The source checkpoint is bounded to
+Reopening or a different sheet opening invalidates every older release owner. Semantic
+close removes keyboard capture immediately; the release timer never restores focus.
+Default focus return occurs only if focus remains inside the exiting subtree, no successor
+dialog exists, and the prior target is still connected; explicit D1/board/countdown focus
+always wins. Settings tab swaps settle over `150 ms` in the same layer. Pause resume and
+restart cancel release; pause-to-Settings/leave may release below the new modal; pause to
+restart and restart confirm remove the former curtain immediately. Results freeze and
+move as one ledger, never as live or staggered child cards.
+
+Reduced motion is opacity-only, transform-free, and at most `32 ms`; full-to-reduced
+shortens an active phase, while reduced-to-full never replays or lengthens it. The source
+work may use D2A1 ActionSheet and D2A2 curtain checkpoints, each within the normal budget,
+and is bounded in total to
 `src/ui/ActionSheet.tsx`, `src/App.tsx`, `src/App.test.ts`, new
 `src/styles/in-page-transitions.css`, new `src/styles/in-page-transitions.test.ts`, and
 `src/main.tsx`. Targeted tests must prove exact phase ownership, inert exiting shells,
-rapid close/reopen safety, focus cleanup, Settings tabs, pause/restart/result flows,
-reduced-motion retiming, and stable Canvas identity before the final source gates and one
-browser-evidence batch.
+rapid same/cross-sheet reopen safety, focus non-interference after `120 ms`, Settings tabs,
+route-owned closes, frozen result replay, every pause/restart outcome, both motion-toggle
+directions, unmount cleanup, and stable Canvas identity before final gates and one browser
+evidence batch.
 
 ### 2026-08-13 player-directed speed and Bomb correction
 
