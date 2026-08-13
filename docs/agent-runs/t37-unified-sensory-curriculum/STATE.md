@@ -2329,6 +2329,40 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Unique next action: commit this three-document correction, then implement the precise
   gravity Core checkpoint before opening the Bomb Core writer slice.
 
+### 2026-08-14 precise gravity and Bomb causal-presentation checkpoint
+
+- Precise-gravity source is accepted at `9a5977a` plus settings exposure `4aac3c3`.
+  Mutation follows the exact `0.60 -> 0.50 -> 0.40 -> 0.30 -> 0.20 -> 0.15 -> 0.12 ->
+  0.10 -> 0.09 -> 0.08` seconds-per-cell ladder, exact fractional timing is retained,
+  and Ice overrides gravity at `0.80 s/cell` without catch-up debt.
+- Bomb product source is the ordered checkpoint chain `f5bc3c5`, `f71abc8`, `84af9a4`,
+  `07a56c5`, `3c3454b`, `84918dc`, `0ae8f0a`, `beea49a`, and final candidate
+  `4d39951`. It now binds Core outcome, origin geometry, renderer and audio to one shared
+  bidirectional beat plan; normal split bands and hidden-only origins do not fabricate a
+  merged or centre-screen blast.
+- Targeted source verification passes `92/92` plus App `60/60`. After the final source
+  change, typecheck, the complete suite (`514 passed / 15 skipped` in `54 passed / 2
+  skipped` files), and build pass. Independent source/rules/visual reviews close their
+  automatic P0-P3 findings.
+- Listening evidence `968ab43` binds real production `AudioEngine` dispatches for
+  `bomb-normal` and `bomb-chain` to source `4d39951`. Its verifier passes with 29 controls,
+  zero browser errors, and an explicit `human=required` result. Do not call either sound
+  accepted until the player listens and says so.
+- Presentation evidence `0b97cdf` binds 32 images and 27 audited captures to source
+  `4d39951`. It covers real App input/lifecycle, normal disjoint and hidden-only Core
+  outcomes, full/reduced chain propagation, runtime motion toggling, one Canvas, zero DOM
+  cells, zero browser errors, and independent image/hash review.
+- Inherited dirty T27 evidence, `docs/evidence/t27-r1-followup/**`, and `progress.md`
+  remain protected and were neither read nor staged. No product or evidence browser pass
+  should be repeated unless its bound source changes.
+- Remaining order is frozen: page-inner transitions and normal-speed material review;
+  Endgame 5/25/16 curriculum; deferred line-clear reward/duration and theme icon; then the
+  newly requested five finely calibrated Classic speed tiers as the final product
+  implementation item. Survival remains a final-report proposal only.
+- Unique next action: perform a bounded read-only audit of the remaining page-inner
+  transition surfaces, then freeze that exact docs-first implementation slice while the
+  Bomb human-listening gate remains open in parallel.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-08-14 — T37 precise gravity and causal Bomb automated gates accepted
+
+- Precise-gravity checkpoints `9a5977a` and `4aac3c3` implement the exact fractional
+  Classic/Mutation ladder and `0.80 s/cell` Ice override without whole-tick rounding or
+  expiry catch-up.
+- Bomb source `f5bc3c5..4d39951` replaces the legacy bottom-band behavior with clipped
+  triggering-row bands and one immutable settlement. A direct Bomb hit activates every
+  locked carrier once, emits the complete primary carrier origin, and drives one shared
+  bidirectional renderer/audio beat plan with reduced-motion and hidden-row handling.
+- Final typecheck, complete suite (`514 passed / 15 skipped` in `54 passed / 2 skipped`
+  files), and production build pass after the last source change; independent source,
+  rules, and presentation reviews close their automatic findings.
+- Listening evidence `968ab43` exposes distinct production normal-Bomb and chain-clear
+  comparisons, 29 verified controls, and zero browser errors. Its provenance deliberately
+  keeps both sounds unaccepted and `human=required`; automatic checks do not replace the
+  player's listening verdict.
+- Presentation evidence `0b97cdf` binds 32 images and 27 audited captures to source
+  `4d39951`: real App keyboard/lifecycle smoke, full/reduced bidirectional propagation,
+  runtime motion switching, normal disjoint blast bands, hidden-only suppression, exactly
+  one Canvas, zero DOM cells, zero browser errors, and matching image hashes all pass.
+- Work now resumes at the remaining page-inner transition audit. The newly requested
+  five-tier Classic calibration is held as the last product implementation item, after
+  transitions/material review, the 5/25/16 curriculum, line-clear rewards/duration, and
+  the theme icon. Survival remains proposal-only for the final report.
+
 ## 2026-08-13 — T37 F4E-R3 key-frontier proof recovery accepted
 
 - Contract `e09526b`, Core checkpoints `46a1efd` / `a38fdbd`, hash-sync contract

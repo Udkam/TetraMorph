@@ -1,8 +1,36 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME N0 ACCEPTED / INTRO-05 V4 CONSUMED WITHOUT CANDIDATE / SPEED + BOMB CORE OPEN**
+Status: **ENDGAME N0 ACCEPTED / INTRO-05 V4 CONSUMED WITHOUT CANDIDATE / SPEED + BOMB AUTOMATED GATES GREEN / BOMB LISTENING OPEN**
 
 ## Active objective
+
+### 2026-08-14 precise gravity and causal Bomb checkpoint
+
+Precise Classic/Mutation/Ice gravity and the corrected Bomb rules are implemented. The
+current product-source candidate is `4d39951`; its final typecheck, complete suite
+(`514 passed / 15 skipped` across `54 passed / 2 skipped` files), and production build
+pass. Source checkpoints `f5bc3c5` through `4d39951` implement the clipped triggering-row
+blast, immutable one-settlement planning, all-carrier chain activation, complete-carrier
+origin evidence, bidirectional visible-row propagation, hidden-row suppression, shared
+renderer/audio beats, reduced-motion retiming, and current bilingual rules copy.
+
+Presentation evidence `0b97cdf` is source-bound to `4d39951` and passes its independent
+review: real App keyboard/lifecycle smoke, Core-derived normal and chain fixtures, full
+and reduced motion, mid-animation motion switching, disjoint normal blast bands,
+hidden-only suppression, exactly one gameplay canvas, zero browser errors, and matching
+image hashes. Listening evidence `968ab43` exposes separate normal-Bomb and chain-clear
+cues through the production `AudioEngine` and reports zero browser errors. This is only
+an automatic causal/audibility comparison gate: both Bomb cues still require the
+player's listening verdict and must not be described as human accepted.
+
+The next existing implementation slice is the remaining page-inner transition and
+normal-speed material review. After that come the 5/25/16 Endgame curriculum, then the
+previously deferred line-clear reward/duration work and theme icon. The newly requested
+five finely calibrated Classic speed tiers are deliberately the **last product
+implementation item**: their later contract must jointly account for both opening speed
+and fastest bound, and no five-tier retuning is authorized before the preceding work.
+Survival remains proposal-only and is output after final implementation; it is not a
+source task.
 
 ### 2026-08-13 player-directed speed and Bomb correction
 
