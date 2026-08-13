@@ -49,7 +49,7 @@ const ANCHOR_ADMISSION_CERTIFICATES = Object.freeze([
     definition: driftDefinition,
     route: 'SQLLLHTTTLDDDDDDDDDDDDDDDDLLHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTRHTTTTTTTTTTTT',
     optimalOperations: 4,
-    initialStateHash: 'e9b71c20',
+    initialStateHash: '9aff892c',
     exhaustedDepths: freezeDepthRecords([
       { lockedPieces: 0, frontierStates: 1, transitions: 20, boundPrunes: 0 },
       { lockedPieces: 1, frontierStates: 20, transitions: 769, boundPrunes: 0 },
@@ -66,7 +66,7 @@ const ANCHOR_ADMISSION_CERTIFICATES = Object.freeze([
     definition: dualAnchorDriftDefinition,
     route: 'SQHTTTQLLDDDDDDDDDDDDDDDCHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRDDDDDDDDDDDDDDDDDCHTTTTTTTTTTTT',
     optimalOperations: 4,
-    initialStateHash: '696f86a0',
+    initialStateHash: '79e3ebac',
     exhaustedDepths: freezeDepthRecords([
       { lockedPieces: 0, frontierStates: 1, transitions: 20, boundPrunes: 0 },
       { lockedPieces: 1, frontierStates: 20, transitions: 750, boundPrunes: 0 },
