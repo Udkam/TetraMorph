@@ -2508,6 +2508,10 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   begins after the final row's local blast life, not after the long audio file; any surviving
   chain tail ducks to at most `25%` within `40 ms`, while propagation impacts stop and the
   successor cue retains normal gain.
+- Core implementation exposes the expected compile boundary: required `chainTriggerRows`
+  makes the existing AudioEngine and Renderer test event literals incomplete. The Core
+  checkpoint is extended only to schema-compatible values in those two fixtures; no
+  downstream expectation or implementation change is admitted before the later slices.
 - Protected inherited T27 paths, `docs/evidence/t27-r1-followup/**`, and `progress.md`
   remain unread/unstaged. The old 4187 helper is no longer running and no listener remains.
 - Unique next action: commit this three-document repair, obtain independent all-zero

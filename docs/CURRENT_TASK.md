@@ -72,6 +72,14 @@ New full/reduced dense-board evidence must prove trigger-row-only first impact, 
 fronts, no unreached-row fragments, no permanent wash/border, normal-Bomb motif reuse,
 one Canvas, and zero browser errors. Existing rejected evidence is never overwritten.
 
+Because `chainTriggerRows` is a required discriminated-union field, the Core checkpoint
+also owns schema-only fixture compatibility in `src/game/audio/AudioEngine.test.ts` and
+`src/game/render/TetrisRenderer.test.ts`. Those two files may add only exact trigger-row
+values to existing chain-clear event literals; they may not change audio expectations,
+renderer expectations, timing, implementation, or product behavior in this checkpoint.
+This six-path atomic schema claim stays within the normal commit budget and must typecheck
+independently before either downstream subsystem opens.
+
 ### 2026-08-14 precise gravity and causal Bomb checkpoint
 
 Precise Classic/Mutation/Ice gravity and the corrected Bomb rules are implemented. The
