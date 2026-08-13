@@ -9086,3 +9086,31 @@ v3 marker, manifest, and one-spawn wrapper. That exact checkpoint and its bytes,
 8.3/null matrix, AST single-spawn shape, and all preflights require independent all-zero
 review after commit. Only then may its clean, immediate-green preflight authorize one v3
 production spawn; any spawned v3 failure is also final.
+
+### F4E-R4H — v3 exact command materialization candidate
+
+The external v3 validator is frozen at 57,181 UTF-8/LF/no-BOM bytes with SHA-256
+`25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF`.
+`node --check` and `--help` pass. The hash-bound 8,038-byte matrix
+`t37-f4e-r4g-scoped-clean-matrix-v1.mjs` has SHA-256
+`F4D04565D1CB4407C7D151B3ED191ADFAACEE86063B5311DE17F4C3EEE7CFCFB`;
+all 18 allowed/rejected LF, CRLF, mixed-EOL, UTF-8, dirt, extra-entry, junction,
+and escape cases pass with zero fixture residue. Three independent reviews of the final
+v3 bytes report `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`; none ran production arguments.
+
+F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF
+
+The sole proposed v3 command is the exact PowerShell block in `docs/DESIGN.md`. Its
+canonical command-manifest line including LF is 1,874 UTF-8 bytes with SHA-256
+`8A30A76938B8CA9E148631AAAD97DDE68CB1F762BD29F803E56876CCE6BDA3AA`.
+The preflight pins both the intact retired v2 and candidate v3 files, verifies their actual
+8.3 basenames `T312A0~1.MJS` and `T367D4~1.MJS`, rejects unreadable Node command lines or
+either generation's long/short basename, and requires both generations' output, receipt,
+and stage sets absent. It then rechecks environment, runtime, Git, clue, branch, Core tree,
+and exact scoped cleanliness before one absolute-Node v3 spawn with no Node flags.
+
+Execution is closed now. This exact four-document materialization must be independently
+reviewed and committed. After commit, independent QA must bind the committed bytes,
+manifest/hash, both-generation alias/8.3/null matrix, PowerShell AST single-spawn shape,
+and all preflights with an all-zero verdict. Only the coordinator may then repeat the
+immediate read-only preflight and, if fully green, consume the sole v3 production spawn.

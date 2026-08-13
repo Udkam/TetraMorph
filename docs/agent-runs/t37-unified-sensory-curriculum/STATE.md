@@ -2198,6 +2198,25 @@ F4E-R4B-COMMAND-CONTRACT-V1 validator=17E6354BCE70EE051B5143BB031D36CB70A1115CAB
   itself needs post-commit independent hash/alias/AST/preflight all-zero review before its
   one spawn. No production execution is open.
 
+### F4E-R4H v3 exact command materialization candidate
+
+- Frozen v3: 57,181 bytes /
+  `25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF`;
+  UTF-8/LF/no-BOM, syntax/help, 18-case hash-bound scoped-clean matrix, and three final
+  exact-byte reviews are green without production execution.
+
+F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF
+
+- DESIGN alone materializes the 1,874-byte line+LF manifest, SHA-256
+  `8A30A76938B8CA9E148631AAAD97DDE68CB1F762BD29F803E56876CCE6BDA3AA`,
+  and sole fail-closed PowerShell wrapper.
+- Preflight pins intact retired v2 plus v3, both actual 8.3 basenames, both generations'
+  absent output/attempt/stage namespaces, all matching Node aliases, environment/runtime/
+  Git/clue/branch/Core/scoped-clean gates, then contains one absolute-Node v3 spawn.
+- Execution is closed pending exact four-doc review/commit, followed by independent
+  post-commit bytes/manifest, both-generation alias/null, AST single-spawn, and full
+  preflight all-zero review. Only then may the coordinator run the immediate preflight.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

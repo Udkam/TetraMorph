@@ -6678,3 +6678,211 @@ spawn only after an independent all-zero review binds that committed checkpoint'
 bytes, manifest/hash, 8.3/alias/null-command-line matrix, PowerShell AST single-spawn shape,
 and every preflight. The coordinator then repeats only the immediate read-only preflight
 and, if green, uses the one spawn. There is no v2 retry or identity reuse.
+
+### F4E-R4H exact v3 command materialization candidate
+
+The external v3 validator is frozen at 57,181 UTF-8/LF/no-BOM bytes with SHA-256
+`25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF`.
+Syntax and help gates pass. A hash-bound 8,038-byte / SHA-256
+`F4D04565D1CB4407C7D151B3ED191ADFAACEE86063B5311DE17F4C3EEE7CFCFB`
+isolated matrix imports the same bytes without `main` and passes all 18 EOL, UTF-8,
+scope-dirt, extra-entry, directory, junction, and path-escape cases. Three independent
+exact-byte reviews report P0-P3/GAP all zero without production execution.
+
+F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF
+
+The following is the sole canonical command-manifest line. Including its one trailing LF,
+it is exactly 1,874 UTF-8 bytes with SHA-256
+`8A30A76938B8CA9E148631AAAD97DDE68CB1F762BD29F803E56876CCE6BDA3AA`.
+
+```text
+F4E-R4G-COMMAND-MANIFEST-V1 {"schema":"t37-f4e-r4g-command-contract-v1","validatorPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-v3.mjs","validatorBytes":57181,"validatorSha256":"25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF","nodeExecPath":"E:\\Nodejs\\node.exe","nodeVersion":"v24.12.0","nodeVersionsNode":"24.12.0","nodeExecutableBytes":89935872,"nodeExecutableSha256":"2FFE3ACC0458FDDE999F50D11809BBE7C9B7EF204DCF17094E325D26ACE101D8","nodeHeapSizeLimit":4496293888,"nodeExecArgv":[],"nodeOptionsPresent":false,"nodeEnvironment":[{"name":"NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S","bytes":129,"sha256":"36816623CF40FFD5A13F444AF68A441001F99ED8B21D0CD03B221914185FCEE1"},{"name":"NODE_REPL_TRUSTED_CODE_PATHS","bytes":25,"sha256":"C99D703D69CE82B4803CEBB3E94F20CFB4D8F43A298C592018507394AD1B3A2D"}],"gitExecPath":"E:\\Git\\mingw64\\bin\\git.exe","gitVersion":"git version 2.51.0.windows.2","gitExecutableBytes":4284816,"gitExecutableSha256":"E996432581A70DF2E7AAAC5DB71E3811EC0DAA7F93A8BA73FE6DB6F9941F4BF9","inheritedGitEnvironmentKeys":[],"root":"E:\\Proj\\reproduction-tetris","inputPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-clue-v1.json","outputPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-candidate-v3.json","attemptPath":"C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-attempt-v3.json","scopedCleanPolicy":"head-blob-eol-equivalent-v1","expectCoreBase":"7d81d4974ce8fb777ea105c5ef98d156cd1807cc","expectRepositoryBase":"4172a79620cda33e167d291d38c69f0ed64fec89","expectCoreTree":"96688eca803a335790d65b41db0ace4df7d2f9b5","expectInputBytes":633,"expectInputSha256":"959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42","id":"t3r-shaft-04","difficulty":5,"targetRows":4,"maxPrimaryLocks":7,"maxAlternativeExtra":2}
+```
+
+The sole proposed production invocation is this exact fail-closed PowerShell block. It
+does not clear or rewrite environment values. It pins the retired v2 bytes as audit
+evidence as well as the v3 candidate, binds both actual 8.3 names, rejects any matching
+Node process alias, and requires both generations' output/receipt/stage namespaces absent.
+It then pins runtime, Git, clue, repository, Core tree, branch, and scoped cleanliness and
+spawns only absolute Node with the v3 arguments once. Any spawned nonzero result consumes
+v3 and the block must not be rerun.
+
+```powershell
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
+
+$node = 'E:\Nodejs\node.exe'
+$git = 'E:\Git\mingw64\bin\git.exe'
+$root = 'E:\Proj\reproduction-tetris'
+$retiredValidator = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v2.mjs'
+$validator = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v3.mjs'
+$input = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-clue-v1.json'
+$retiredOutput = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v2.json'
+$retiredAttempt = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v2.json'
+$output = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v3.json'
+$attempt = 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v3.json'
+$expectedNodeEnvironment = @(
+  @{ Name = 'NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S'; Bytes = 129; Sha256 = '36816623CF40FFD5A13F444AF68A441001F99ED8B21D0CD03B221914185FCEE1' },
+  @{ Name = 'NODE_REPL_TRUSTED_CODE_PATHS'; Bytes = 25; Sha256 = 'C99D703D69CE82B4803CEBB3E94F20CFB4D8F43A298C592018507394AD1B3A2D' }
+)
+
+function Assert-RegularFilePin([string] $Path, [long] $Bytes, [string] $Sha256) {
+  $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+  if ($item.PSIsContainer -or (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) -or $item.Length -ne $Bytes) {
+    throw "File identity differs: $Path"
+  }
+  if ((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash -cne $Sha256) {
+    throw "File SHA-256 differs: $Path"
+  }
+}
+
+function Assert-LstatAbsent([string] $Path) {
+  try {
+    $null = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+    throw "Path is present: $Path"
+  } catch [System.Management.Automation.ItemNotFoundException] {
+    return
+  }
+}
+
+function Assert-NoStages([string] $OutputPath) {
+  $directory = [System.IO.Path]::GetDirectoryName($OutputPath)
+  $prefix = [System.IO.Path]::GetFileName($OutputPath) + '.tmp-'
+  if (@(Get-ChildItem -LiteralPath $directory -Force -ErrorAction Stop | Where-Object {
+    $_.Name.StartsWith($prefix, [System.StringComparison]::Ordinal)
+  }).Count -ne 0) {
+    throw "Output staging residue exists: $OutputPath"
+  }
+}
+
+$actualNodeEnvironment = @(
+  Get-ChildItem Env: | Where-Object {
+    $_.Name.StartsWith('NODE_', [System.StringComparison]::OrdinalIgnoreCase)
+  } | Sort-Object Name
+)
+if ($actualNodeEnvironment.Count -ne $expectedNodeEnvironment.Count) {
+  throw 'NODE_* key set differs.'
+}
+for ($index = 0; $index -lt $expectedNodeEnvironment.Count; $index += 1) {
+  $actual = $actualNodeEnvironment[$index]
+  $expected = $expectedNodeEnvironment[$index]
+  if ($actual.Name -cne $expected.Name) {
+    throw 'NODE_* key spelling or order differs.'
+  }
+  $valueBytes = [System.Text.Encoding]::UTF8.GetBytes([string] $actual.Value)
+  $valueSha256 = [Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($valueBytes))
+  if ($valueBytes.Length -ne $expected.Bytes -or $valueSha256 -cne $expected.Sha256) {
+    throw "NODE_* value pin differs: $($actual.Name)"
+  }
+}
+if (@(Get-ChildItem Env: | Where-Object {
+  $_.Name.StartsWith('GIT_', [System.StringComparison]::OrdinalIgnoreCase)
+}).Count -ne 0) {
+  throw 'Inherited GIT_* variables must be absent.'
+}
+
+Assert-RegularFilePin $node 89935872 '2FFE3ACC0458FDDE999F50D11809BBE7C9B7EF204DCF17094E325D26ACE101D8'
+Assert-RegularFilePin $git 4284816 'E996432581A70DF2E7AAAC5DB71E3811EC0DAA7F93A8BA73FE6DB6F9941F4BF9'
+Assert-RegularFilePin $retiredValidator 51909 '17E6354BCE70EE051B5143BB031D36CB70A1115CAB70B9E50A841A291B8C3F8A'
+Assert-RegularFilePin $validator 57181 '25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF'
+Assert-RegularFilePin $input 633 '959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42'
+Assert-LstatAbsent $retiredOutput
+Assert-LstatAbsent $retiredAttempt
+Assert-LstatAbsent $output
+Assert-LstatAbsent $attempt
+Assert-NoStages $retiredOutput
+Assert-NoStages $output
+
+$validatorIdentities = @(
+  @{ Path = $retiredValidator; LongBase = 't37-f4e-endgame-canonical-validate-v2.mjs'; ShortBase = 'T312A0~1.MJS' },
+  @{ Path = $validator; LongBase = 't37-f4e-endgame-canonical-validate-v3.mjs'; ShortBase = 'T367D4~1.MJS' }
+)
+$validatorBasenames = @()
+foreach ($identity in $validatorIdentities) {
+  $cimName = $identity.Path.Replace('\', '\\').Replace("'", "''")
+  $rows = @(Get-CimInstance CIM_DataFile -Filter "Name='$cimName'")
+  if ($rows.Count -ne 1 -or
+      -not [System.IO.Path]::GetFileName([string] $rows[0].EightDotThreeFileName).Equals(
+        $identity.ShortBase,
+        [System.StringComparison]::OrdinalIgnoreCase
+      )) {
+    throw "Validator short-path identity differs: $($identity.Path)"
+  }
+  $validatorBasenames += $identity.LongBase
+  $validatorBasenames += $identity.ShortBase
+}
+foreach ($nodeProcess in @(Get-CimInstance Win32_Process -Filter "Name = 'node.exe'")) {
+  if ([string]::IsNullOrEmpty([string] $nodeProcess.CommandLine)) {
+    throw "Cannot prove Node process $($nodeProcess.ProcessId) is unrelated."
+  }
+  if (@($validatorBasenames | Where-Object {
+    $nodeProcess.CommandLine.IndexOf($_, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+  }).Count -ne 0) {
+    throw "A validator-named Node process already exists: $($nodeProcess.ProcessId)"
+  }
+}
+
+$gitPrefix = @('-C', $root, '-c', 'core.fsmonitor=false', '-c', 'core.untrackedCache=false', '-c', 'core.hooksPath=NUL')
+$topLevel = & $git @gitPrefix rev-parse --show-toplevel
+$normalizedTopLevel = [System.IO.Path]::GetFullPath([string] $topLevel).TrimEnd(
+  [System.IO.Path]::DirectorySeparatorChar,
+  [System.IO.Path]::AltDirectorySeparatorChar
+)
+$normalizedRoot = [System.IO.Path]::GetFullPath($root).TrimEnd(
+  [System.IO.Path]::DirectorySeparatorChar,
+  [System.IO.Path]::AltDirectorySeparatorChar
+)
+if ($LASTEXITCODE -ne 0 -or @($topLevel).Count -ne 1 -or $normalizedTopLevel -cne $normalizedRoot) {
+  throw 'Repository root differs.'
+}
+$branch = & $git @gitPrefix branch --show-current
+if ($LASTEXITCODE -ne 0 -or @($branch).Count -ne 1 -or $branch -cne 'main') {
+  throw 'Repository branch differs.'
+}
+$coreTree = & $git @gitPrefix rev-parse HEAD:src/game/core
+if ($LASTEXITCODE -ne 0 -or @($coreTree).Count -ne 1 -or $coreTree -cne '96688eca803a335790d65b41db0ace4df7d2f9b5') {
+  throw 'Core tree differs.'
+}
+$scopedPaths = @(
+  'src/game/core',
+  'docs/CURRENT_TASK.md',
+  'docs/DESIGN.md',
+  'docs/agent-runs/t37-unified-sensory-curriculum/STATE.md',
+  'docs/workstreams/tetris-t37-endgame/THREAD_LOG.md'
+)
+& $git @gitPrefix diff --quiet HEAD -- @scopedPaths
+if ($LASTEXITCODE -ne 0) {
+  throw 'Core or command-contract tracked worktree is not clean.'
+}
+$scopedStatus = @(& $git @gitPrefix status --porcelain=v1 --untracked-files=all --ignored=matching -- @scopedPaths)
+if ($LASTEXITCODE -ne 0 -or $scopedStatus.Count -ne 0) {
+  throw 'Core or command-contract scoped status is not clean.'
+}
+
+$validatorArguments = @(
+  $validator,
+  '--root', $root,
+  '--input', $input,
+  '--output', $output,
+  '--attempt', $attempt,
+  '--expect-core-base', '7d81d4974ce8fb777ea105c5ef98d156cd1807cc',
+  '--expect-repo-base', '4172a79620cda33e167d291d38c69f0ed64fec89',
+  '--expect-core-tree', '96688eca803a335790d65b41db0ace4df7d2f9b5',
+  '--expect-input-bytes', '633',
+  '--expect-input-sha', '959053671BC2D2E745EC5816851615CE94CBB1E2D9A510DF329665899C387F42',
+  '--expect-validator-sha', '25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF',
+  '--id', 't3r-shaft-04',
+  '--difficulty', '5',
+  '--target-rows', '4',
+  '--max-primary-locks', '7',
+  '--max-alternative-extra', '2'
+)
+& $node @validatorArguments
+if ($LASTEXITCODE -ne 0) {
+  throw "The sole v3 validator attempt failed with exit code $LASTEXITCODE. Do not retry."
+}
+```
+
+V2 and v3 output, attempt, stage, and matching-process sets are currently zero. This block
+has no execution authority before exact four-document review/commit and the required
+post-commit independent bytes/manifest/alias/AST/preflight all-zero review.

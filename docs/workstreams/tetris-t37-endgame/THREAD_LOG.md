@@ -506,3 +506,19 @@ F4E-R4B-COMMAND-CONTRACT-V1 validator=17E6354BCE70EE051B5143BB031D36CB70A1115CAB
   and exact-byte review only. Its later exact wrapper checkpoint needs post-commit
   independent byte/hash, alias/null, AST single-spawn, and preflight all-zero QA before
   one production spawn. Production execution remains closed.
+
+### F4E-R4H exact v3 command candidate
+
+- V3 freezes at 57,181 bytes /
+  `25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF`.
+  Syntax/help, final 18-case 8,038-byte matrix, and three exact-byte reviews are green;
+  no production arguments ran.
+
+F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8BA6270F76F7178D3AA06DFF
+
+- DESIGN contains the sole 1,874-byte manifest line+LF, SHA-256
+  `8A30A76938B8CA9E148631AAAD97DDE68CB1F762BD29F803E56876CCE6BDA3AA`,
+  and one-spawn wrapper. It pins intact v2/v3 and their 8.3 aliases, rejects either
+  process namespace, requires both artifact namespaces absent, and rechecks all gates.
+- Next: exact four-doc QA/commit, then post-commit bytes/manifest/alias/null/AST/preflight
+  all-zero QA. Production remains closed until that successor review is green.
