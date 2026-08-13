@@ -421,3 +421,12 @@ old screenshot.
   Git-backend and held-handle repairs. No proof or external-byte change occurred.
 - Sole next action: exact four-doc contract commit; then modify/refreeze only the external
   validator. Execution remains closed.
+
+### F4E-R4C implementation-domain clarification
+
+- Receipt stays immutable: post-create dev/ino is retained for handle/path checks and
+  successful output only, never written back into receipt.
+- Random same-directory stage has exact enumerable `<output basename>.tmp-` prefix;
+  prefix is empty before claim and the chosen path is bound in receipt/output.
+- Manifest hash domain is exact line+LF; receipt payload hash domain is exact JSON+LF.
+- Sole next action: commit this four-doc clarification, then resume external bytes only.

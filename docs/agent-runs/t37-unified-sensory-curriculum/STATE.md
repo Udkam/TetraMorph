@@ -2111,6 +2111,10 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
 - Two independent final reviews: P0–P3/GAP all zero after direct-backend and held-handle
   repairs. No proof has run. Sole next action: commit only these four docs, then edit and
   refreeze only the external validator; execution remains closed.
+- Implementation domains: post-`wx` dev/ino remain runtime/output identity, never
+  receipt fields; random stage uses enumerable `<output basename>.tmp-` prefix and is
+  bound in receipt/output; manifest hash is exact line+LF and receipt payload hash is
+  exact JSON+LF. Docs clarification must commit before external editing continues.
 
 ## Do not repeat
 

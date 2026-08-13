@@ -8944,3 +8944,12 @@ Two independent final contract reviews now report
 pin and the unified held-receipt-handle lifecycle. This opens only the exact four-doc
 contract checkpoint and, after that commit, repository-external validator editing. It
 does not authorize proof execution.
+
+Implementation clarification: the immutable receipt payload cannot contain its own
+post-creation `dev`/`ino`; those values are captured from the held handle/path after
+`wx`, used for all later identity checks, and appear only in successful `sourcePin`.
+The one random output staging path must match exact prefix
+`<output basename>.tmp-`, be generated before claim, be `lstat`-absent, and be bound in
+the receipt/output; any pre-existing prefix match stops before claim. Manifest SHA-256
+covers the exact materialized manifest line plus LF; receipt `payloadSha256` covers
+`JSON.stringify(receiptPayload)` plus LF.

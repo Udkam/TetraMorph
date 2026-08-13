@@ -6323,3 +6323,24 @@ Fresh independent final contract reviews report
 backend identity and the same receipt handle being held through proof/publication. The
 four-doc contract checkpoint may now be committed; validator editing, not execution, is
 the only capability that commit opens.
+
+### F4E-R4B implementation-domain clarification
+
+Receipt identity has no circular self-write. The immutable pre-claim `receiptPayload`
+contains no `dev` or `ino`; after exclusive creation, the validator captures identity
+from the held file handle and fixed path, retains it in memory for double-read checks,
+and records it only in a successful candidate `sourcePin`. The receipt bytes are never
+updated to add identity.
+
+Output staging remains random and same-directory, with the exact enumerable basename
+prefix `${basename(outputPath)}.tmp-` followed by process id and one UUID. Before claim,
+`readdir(outputDirectory)` must contain zero names with that prefix; the generated one
+path must also be `lstat`-absent. That exact staging path is included in the immutable
+receipt payload and successful `sourcePin`. Once claimed, any unexpected matching name,
+collision, or residual stage fails closed and cannot regain execution authority.
+
+Hash domains are byte-exact: `commandManifestSha256` hashes the complete materialized
+manifest line followed by one LF byte; receipt `payloadSha256` hashes
+`JSON.stringify(receiptPayload)` followed by one LF byte. The complete receipt is
+`JSON.stringify({schema, payload, payloadSha256})` plus one LF. All use UTF-8 and
+uppercase SHA-256 when recorded in manifest/receipt/output pins.
