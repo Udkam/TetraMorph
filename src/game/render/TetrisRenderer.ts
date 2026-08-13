@@ -217,6 +217,9 @@ interface MutationFlash {
   particlePreviousBoard: GameState['board'] | null;
   /** Stable board columns touched by the carrier that activated this item. */
   triggerColumns: readonly number[];
+  bombOutcome: 'blast' | 'chain-clear' | null;
+  blastRows: readonly number[];
+  chainOriginCells: readonly Cell[];
 }
 
 /** Renderer-only request retained until every same-tick item receives its own burst. */
@@ -226,6 +229,9 @@ interface MutationFlashRequest {
   multiplierFactor: 2 | 4;
   score: number;
   previousBoard: GameState['board'] | null;
+  bombOutcome: 'blast' | 'chain-clear' | null;
+  blastRows: readonly number[];
+  chainOriginCells: readonly Cell[];
 }
 
 interface MutationArrival {
@@ -3473,6 +3479,11 @@ export class TetrisRenderer {
     const anchorY = layout.y + (minY + maxY + 1) * layout.cell / 2;
     const strokeWidth = Math.max(1, layout.cell * 0.06);
 
+    if (flash.item === 'bomb' && flash.bombOutcome === 'chain-clear') {
+      this.drawMutationChainClear(graphics, flash, layout);
+      return;
+    }
+
     if (this.options.reducedMotion) {
       if (flash.item === 'freeze') {
         const sourceCells = [...cells]
@@ -3599,10 +3610,13 @@ export class TetrisRenderer {
       const pulse = flash.timeline.sample('pulse');
       const impact = flash.timeline.sample('impact');
       const shockwave = flash.timeline.sample('shockwave');
-      const rows = Math.min(3, VISIBLE_HEIGHT);
-      const y = layout.y + layout.height - layout.cell * rows;
+      const visibleRows = flash.blastRows.filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT);
+      const firstRow = visibleRows.length ? Math.min(...visibleRows) : BOARD_HEIGHT - 1;
+      const lastRow = visibleRows.length ? Math.max(...visibleRows) : BOARD_HEIGHT - 1;
+      const y = layout.y + (firstRow - VISIBLE_START_ROW) * layout.cell;
+      const fieldBottom = layout.y + (lastRow - VISIBLE_START_ROW + 1) * layout.cell;
       const floorField = (alpha: number, lift: number, color: number): void => {
-        const points: number[] = [layout.x, layout.y + layout.height, layout.x, y + layout.cell * .82];
+        const points: number[] = [layout.x, fieldBottom, layout.x, y + layout.cell * .82];
         const ridge = [.72, .3, .58, .18, .5, .26, .68, .16, .44, .34, .7] as const;
         for (let index = 0; index < ridge.length; index += 1) {
           points.push(
@@ -3610,7 +3624,7 @@ export class TetrisRenderer {
             y + layout.cell * (ridge[index]! - lift),
           );
         }
-        points.push(layout.x + layout.width, layout.y + layout.height);
+        points.push(layout.x + layout.width, fieldBottom);
         graphics.poly(points).fill({ color, alpha });
       };
       if (warning.active) {
@@ -3852,7 +3866,10 @@ export class TetrisRenderer {
       this.mutationFlash = null;
       return;
     }
-    const timeline = createMutationActivationTimeline(request.item);
+    const chainDuration = request.bombOutcome === 'chain-clear'
+      ? this.chainClearDuration(request.chainOriginCells)
+      : 0;
+    const timeline = createMutationActivationTimeline(request.item, chainDuration);
     this.mutationFlash = {
       item: request.item,
       elapsed: 0,
@@ -3866,6 +3883,9 @@ export class TetrisRenderer {
       particlesEmitted: this.options.reducedMotion || request.item !== 'bomb',
       particlePreviousBoard: request.previousBoard,
       triggerColumns: this.mutationColumnsFor(request.triggerCells),
+      bombOutcome: request.bombOutcome,
+      blastRows: request.blastRows,
+      chainOriginCells: request.chainOriginCells,
     };
     // Bomb owns a warning and pulse before impact, so its fragments cannot exist
     // until the impact phase begins. Only the multiplier keeps a local sparkle
@@ -4016,7 +4036,11 @@ export class TetrisRenderer {
     const token = MUTATION_VFX_TOKENS[item];
     const sources: Cell[] = [];
     if (item === 'bomb' && previousBoard) {
-      for (let y = Math.max(VISIBLE_START_ROW, BOARD_HEIGHT - 3); y < BOARD_HEIGHT; y += 1) {
+      const rows = this.mutationFlash?.bombOutcome === 'chain-clear'
+        ? Array.from({ length: VISIBLE_HEIGHT }, (_, index) => VISIBLE_START_ROW + index)
+        : this.mutationFlash?.blastRows ?? [];
+      for (const y of rows) {
+        if (y < VISIBLE_START_ROW || y >= BOARD_HEIGHT) continue;
         for (let x = 0; x < BOARD_WIDTH; x += 1) {
           if (previousBoard[y]?.[x]) sources.push({ x, y });
         }
@@ -4312,7 +4336,100 @@ export class TetrisRenderer {
         multiplierFactor: event.multiplierFactor ?? 2,
         score: event.score,
         previousBoard,
+        bombOutcome: event.item === 'bomb' ? event.bombOutcome : null,
+        blastRows: event.item === 'bomb' ? event.blastRows : [],
+        chainOriginCells: event.item === 'bomb' && event.bombOutcome === 'chain-clear'
+          ? event.chainOriginCells
+          : [],
       });
+    }
+  }
+
+  private chainClearDuration(originCells: readonly Cell[]): number {
+    const visibleOriginRows = [...new Set(originCells
+      .map((cell) => cell.y)
+      .filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT))];
+    const distanceFor = visibleOriginRows.length > 0
+      ? (row: number) => Math.min(...visibleOriginRows.map((origin) => Math.abs(row - origin)))
+      : (row: number) => row - VISIBLE_START_ROW;
+    const farthest = Math.max(...Array.from(
+      { length: VISIBLE_HEIGHT },
+      (_, index) => distanceFor(VISIBLE_START_ROW + index),
+    ));
+    return (this.options.reducedMotion ? 50 : 140)
+      + farthest * (this.options.reducedMotion ? 12 : 34)
+      + (this.options.reducedMotion ? 70 : 150);
+  }
+
+  private drawMutationChainClear(
+    graphics: Graphics,
+    flash: MutationFlash,
+    layout: BoardLayout,
+  ): void {
+    const board = flash.particlePreviousBoard;
+    if (!board) return;
+    const token = MUTATION_VFX_TOKENS.bomb;
+    const originRows = [...new Set(flash.chainOriginCells.map((cell) => cell.y))];
+    const visibleOrigins = originRows.filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT);
+    const distanceFor = visibleOrigins.length > 0
+      ? (row: number) => Math.min(...visibleOrigins.map((origin) => Math.abs(row - origin)))
+      : (row: number) => row - VISIBLE_START_ROW;
+    const revealMs = this.options.reducedMotion ? 50 : 140;
+    const beatMs = this.options.reducedMotion ? 12 : 34;
+    const fadeMs = this.options.reducedMotion ? 70 : 150;
+    const visibleOriginCells = flash.chainOriginCells
+      .filter((cell) => cell.y >= VISIBLE_START_ROW && cell.y < BOARD_HEIGHT)
+      .map((cell) => ({ x: cell.x, y: cell.y - VISIBLE_START_ROW }));
+
+    if (flash.elapsed < revealMs && visibleOriginCells.length > 0) {
+      this.drawMutationPieceMaterial(
+        graphics,
+        visibleOriginCells,
+        'T',
+        'bomb',
+        1,
+        'settled',
+        {
+          originX: layout.x,
+          originY: layout.y,
+          unit: layout.cell,
+          scale: 1 + (1 - flash.elapsed / revealMs) * .06,
+        },
+      );
+    }
+
+    let lastDistance = 0;
+    for (let row = VISIBLE_START_ROW; row < BOARD_HEIGHT; row += 1) {
+      const distance = distanceFor(row);
+      lastDistance = Math.max(lastDistance, distance);
+      const rowStart = revealMs + distance * beatMs;
+      if (flash.elapsed < rowStart) continue;
+      const progress = Math.min(1, (flash.elapsed - rowStart) / fadeMs);
+      const alpha = Math.max(0, 1 - progress);
+      const rowY = layout.y + (row - VISIBLE_START_ROW) * layout.cell;
+      graphics
+        .rect(layout.x, rowY, layout.width, layout.cell)
+        .fill({
+          color: distance === 0 ? token.palette.highlight : token.palette.primary,
+          alpha: .16 + alpha * .34,
+        });
+      if (!this.options.reducedMotion) {
+        graphics
+          .rect(layout.x, rowY + layout.cell * .45, layout.width, Math.max(1, layout.cell * .1))
+          .fill({ color: token.palette.glow, alpha: alpha * .58 });
+      }
+    }
+
+    const tailStart = revealMs + lastDistance * beatMs;
+    if (flash.elapsed >= tailStart) {
+      const tail = Math.min(1, (flash.elapsed - tailStart) / fadeMs);
+      graphics
+        .rect(layout.x, layout.y, layout.width, layout.height)
+        .stroke({
+          color: token.palette.highlight,
+          alpha: (1 - tail) * .72,
+          width: Math.max(1, layout.cell * .08),
+        });
     }
   }
 

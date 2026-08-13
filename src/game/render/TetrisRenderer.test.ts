@@ -150,6 +150,22 @@ function mutationEvent(
   };
 }
 
+function chainClearEvent(cells: readonly Cell[]): Extract<GameEvent, { type: 'mutation-activated' }> {
+  return {
+    type: 'mutation-activated',
+    item: 'bomb',
+    durationTicks: 0,
+    score: 600,
+    rowsRemoved: 4,
+    triggerCells: cells,
+    bombOutcome: 'chain-clear',
+    blastRows: [24, 25, 26],
+    participatingBombCount: 2,
+    chainOriginCarrierId: 3,
+    chainOriginCells: cells,
+  };
+}
+
 type RendererInternals = {
   host: HTMLElement | null;
   previewGraphics: unknown;
@@ -264,6 +280,9 @@ type RendererInternals = {
     score: number;
     particlesEmitted: boolean;
     triggerColumns: readonly number[];
+    bombOutcome: 'blast' | 'chain-clear' | null;
+    blastRows: readonly number[];
+    chainOriginCells: readonly Cell[];
   } | null;
   mutationFlashQueue: Array<{ item: MutationItem }>;
   mutationParticles: Array<{ active: boolean; item: MutationItem; rotation: number; rotationVelocity: number }>;
@@ -350,6 +369,11 @@ type RendererInternals = {
     options: { originX: number; originY: number; unit: number; offsetX?: number; offsetY?: number; scale?: number },
     alpha?: number,
     width?: number,
+  ) => void;
+  drawMutationChainClear: (
+    graphics: unknown,
+    flash: NonNullable<RendererInternals['mutationFlash']>,
+    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
   ) => void;
   drawReducedMutationEndpoint: (
     graphics: unknown,
@@ -1776,6 +1800,69 @@ describe('Endgame undo presentation reset', () => {
     internals.drawMutationActivationEffect(impact.graphics, internals.mutationFlash!, layout);
     expect(impact.operations.filter((operation) => operation.kind === 'poly').length).toBeGreaterThanOrEqual(2);
     expect(impact.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(0);
+  });
+
+  it('reveals the first Bomb before propagating chain-clear rows equally upward and downward', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const previousBoard = createBoard();
+    previousBoard[VISIBLE_START_ROW + 5]![4] = 'T';
+    previousBoard[VISIBLE_START_ROW + 4]![2] = 'J';
+    previousBoard[VISIBLE_START_ROW + 6]![7] = 'L';
+    internals.consumeEvents([
+      chainClearEvent([{ x: 4, y: VISIBLE_START_ROW + 5 }]),
+    ], undefined, previousBoard);
+    const flash = internals.mutationFlash!;
+    expect(flash).toMatchObject({
+      bombOutcome: 'chain-clear',
+      blastRows: [24, 25, 26],
+      chainOriginCells: [{ x: 4, y: VISIBLE_START_ROW + 5 }],
+    });
+
+    const origin = createGraphicsRecorder();
+    flash.elapsed = 0;
+    internals.drawMutationChainClear(origin.graphics, flash, layout);
+    expect(origin.operations.some((operation) => operation.kind === 'roundRect')).toBe(true);
+    expect(origin.operations.filter((operation) => operation.kind === 'rect')).toHaveLength(0);
+
+    const firstBeat = createGraphicsRecorder();
+    flash.elapsed = 140;
+    internals.drawMutationChainClear(firstBeat.graphics, flash, layout);
+    const firstRows = firstBeat.operations.filter((operation) => (
+      operation.kind === 'rect' && operation.values[2] === layout.width && operation.values[3] === layout.cell
+    ));
+    expect(new Set(firstRows.map((operation) => operation.values[1]))).toEqual(new Set([layout.cell * 5]));
+
+    const secondBeat = createGraphicsRecorder();
+    flash.elapsed = 174;
+    internals.drawMutationChainClear(secondBeat.graphics, flash, layout);
+    const secondRows = secondBeat.operations.filter((operation) => (
+      operation.kind === 'rect' && operation.values[2] === layout.width && operation.values[3] === layout.cell
+    ));
+    expect(new Set(secondRows.map((operation) => operation.values[1]))).toEqual(new Set([
+      layout.cell * 4,
+      layout.cell * 5,
+      layout.cell * 6,
+    ]));
+  });
+
+  it('starts a hidden-origin chain clear at the nearest visible boundary without hidden delay', () => {
+    const renderer = new TetrisRendererClass();
+    renderer.setOptions({ reducedMotion: true });
+    const internals = renderer as unknown as RendererInternals;
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const previousBoard = createBoard();
+    previousBoard[VISIBLE_START_ROW]![4] = 'T';
+    internals.consumeEvents([chainClearEvent([{ x: 4, y: 3 }])], undefined, previousBoard);
+    const flash = internals.mutationFlash!;
+    const firstVisibleBeat = createGraphicsRecorder();
+    flash.elapsed = 50;
+    internals.drawMutationChainClear(firstVisibleBeat.graphics, flash, layout);
+    const rows = firstVisibleBeat.operations.filter((operation) => (
+      operation.kind === 'rect' && operation.values[2] === layout.width && operation.values[3] === layout.cell
+    ));
+    expect(new Set(rows.map((operation) => operation.values[1]))).toEqual(new Set([0]));
   });
 
   it('anchors multiplier feedback to Core trigger cells and preserves the 4× escalation cue', () => {

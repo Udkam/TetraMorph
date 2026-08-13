@@ -115,15 +115,21 @@ export class MutationTimeline {
 }
 
 /** Item-specific visual-only activation beats. Core duration remains independently owned. */
-export function createMutationActivationTimeline(item: MutationItem): MutationTimeline {
+export function createMutationActivationTimeline(
+  item: MutationItem,
+  minimumDurationMs = 0,
+): MutationTimeline {
   const timing = MUTATION_VFX_TOKENS[item].animation;
   if (item === 'bomb') {
-    return new MutationTimeline(sequence(
+    const normal = sequence(
       phase('warning', timing.enterMs, 'cubicOut'),
       phase('pulse', timing.pulseMs, 'backOut'),
       phase('impact', 140, 'cubicIn'),
       phase('shockwave', 260, 'cubicOut'),
-    ));
+    );
+    return new MutationTimeline(minimumDurationMs > normal.durationMs
+      ? parallel(normal, phase('chain-propagation', minimumDurationMs, 'linear'))
+      : normal);
   }
   if (item === 'collapse') {
     return new MutationTimeline(sequence(
