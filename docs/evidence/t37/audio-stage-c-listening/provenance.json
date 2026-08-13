@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "candidateSourceCommit": "95978eb8ad5fe66eb77faf05d010df9eb1a66cfa",
+  "candidateSourceCommit": "4d39951421234c8465960c4b81c6a7df7e0a804d",
   "humanStatus": {
     "accepted": ["Action A", "Studio clear/countdown", "Ice 2"],
-    "listeningRequired": ["utility/UI", "Survival", "outcomes", "Bomb", "Multiplier", "Supergravity"]
+    "listeningRequired": ["utility/UI", "Survival", "outcomes", "Bomb normal", "Bomb chain-clear", "Multiplier", "Supergravity"]
   },
   "softRecovery": {
     "audioCommit": "35509a70c35cebf16b942387229ca880756a61cd",

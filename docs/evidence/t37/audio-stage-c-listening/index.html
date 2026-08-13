@@ -13,7 +13,7 @@
         <div>
           <p class="eyebrow">T37 · PRODUCTION AUDIO</p>
           <h1>正式运行链试听</h1>
-          <p class="lede">所有按钮直接触发生产 <code>AudioEngine</code>。动作 A、Studio 与冰冻 2 是冻结参照；其余是待听感确认的柔和恢复候选。</p>
+          <p class="lede" data-listening-gate="automatic">所有按钮直接触发生产 <code>AudioEngine</code>。动作 A、Studio 与冰冻 2 是冻结参照；普通炸弹与连锁清屏在本页独立对比。自动 PASS 只能证明映射和页面正确，不代表听感通过。</p>
         </div>
         <aside class="mix-panel" aria-label="试听输出控制">
           <div class="status-row"><span class="status-dot" aria-hidden="true"></span><strong id="audio-status">等待首次交互</strong></div>
@@ -100,17 +100,19 @@
           <div><p class="section-index">03</p><h2 id="mutation-title">材质异变候选</h2></div>
           <span class="badge candidate">SYNCED</span>
         </div>
-        <p class="section-note">炸弹优先；同帧多异变按 620 / 320 / 220 / 320ms 视觉占用串行起音。</p>
+        <p class="section-note">两枚炸弹每次都从独立的生产事件链启动，不与其他道具混播。请交替快速试听：普通炸弹应有与三行破坏匹配的体积；连锁清屏应明显更强，并能听出由首枚炸弹向上、向下扩散。</p>
+        <p class="section-note" data-listening-gate="human">同时判断声音是否刺耳、疲劳，以及每个声音是否与实际功能有直接因果关系；这些只能由人工听感确认。</p>
         <div class="mutation-grid">
-          <button class="material-button lava" data-cue="bomb" type="button"><small>熔岩压力</small><strong>炸弹 Bomb</strong><span>低频体积 + 低通裂压</span></button>
+          <button class="material-button lava" data-cue="bomb-normal" type="button"><small>熔岩带状破坏</small><strong>普通炸弹 · 三行带走</strong><span>生产 Bomb 主体</span></button>
+          <button class="material-button lava" data-cue="bomb-chain" type="button"><small>首枚炸弹双向扩散</small><strong>炸弹连锁 · 清屏</strong><span>更深主体 + 生产传播节拍</span></button>
           <button class="material-button violet" data-cue="supergravity" type="button"><small>亮紫重量</small><strong>超重 Supergravity</strong><span>两段向下质量</span></button>
           <button class="material-button bullion" data-cue="multiplier-2" type="button"><small>金色抬升</small><strong>加倍 ×2</strong><span>短双音敲击</span></button>
           <button class="material-button bullion-strong" data-cue="multiplier-4" type="button"><small>金色强化</small><strong>加倍 ×4</strong><span>追加一层高八度</span></button>
-          <button class="material-button sequence" data-cue="mutation-sequence" type="button"><small>音画队列</small><strong>同帧完整序列</strong><span>Bomb → Ice → Supergravity → ×2</span></button>
+          <button class="material-button sequence" data-cue="mutation-sequence" type="button"><small>非炸弹音画队列</small><strong>其他道具序列</strong><span>Ice → Supergravity → ×2</span></button>
         </div>
       </section>
 
-      <footer><span>Source <code>95978eb</code></span><span id="last-cue">尚未播放</span></footer>
+      <footer><span>Source <code>4d39951</code></span><span id="last-cue">尚未播放</span></footer>
     </main>
     <script type="module" src="./audition.ts"></script>
   </body>

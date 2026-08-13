@@ -1,9 +1,75 @@
 {
-  "schemaVersion": 1,
-  "candidateSourceCommit": "95978eb8ad5fe66eb77faf05d010df9eb1a66cfa",
+  "schemaVersion": 2,
+  "candidateSourceCommit": "4d39951421234c8465960c4b81c6a7df7e0a804d",
   "productionEngineImported": true,
-  "controlCount": 28,
-  "dispatchedControls": 29,
+  "productionSourcePathsVerified": [
+    "src/animation/mutationChainTimeline.ts",
+    "src/design/mutationTokens.ts",
+    "src/game/audio/AudioEngine.ts",
+    "src/game/audio/acceptedPlayback.ts",
+    "src/game/audio/audioGesture.ts",
+    "src/game/audio/candidatePlayback.ts",
+    "src/game/audio/audioPalette.ts",
+    "src/game/audio/audioAssetCatalog.ts",
+    "src/assets/audio/t37"
+  ],
+  "controlCount": 29,
+  "dispatchedControls": 30,
+  "bombControls": [
+    "bomb-normal",
+    "bomb-chain"
+  ],
+  "bombOutcomesDispatched": {
+    "bomb-normal": {
+      "outcome": "blast",
+      "eventTypes": [
+        "clear-started",
+        "mutation-activated"
+      ],
+      "dispatchSequence": [
+        "restarted",
+        "clear-started",
+        "mutation-activated"
+      ],
+      "chainOriginCells": []
+    },
+    "bomb-chain": {
+      "outcome": "chain-clear",
+      "eventTypes": [
+        "clear-started",
+        "mutation-activated"
+      ],
+      "dispatchSequence": [
+        "restarted",
+        "clear-started",
+        "mutation-activated"
+      ],
+      "chainOriginCells": [
+        {
+          "x": 4,
+          "y": 29
+        },
+        {
+          "x": 5,
+          "y": 29
+        },
+        {
+          "x": 4,
+          "y": 30
+        },
+        {
+          "x": 5,
+          "y": 30
+        }
+      ]
+    }
+  },
+  "chainPlanBinding": {
+    "audioEngineImportVerified": true,
+    "productionCallVerified": "mutationChainPresentationPlan(event.chainOriginCells)",
+    "beatStartsConsumerVerified": "plan.beatStartsMs.map",
+    "durationConsumerVerified": "mutationChainPresentationPlan(event.chainOriginCells).durationMs"
+  },
   "desktop": {
     "scrollWidth": 1440,
     "clientWidth": 1440,
@@ -36,6 +102,7 @@
       152,
       152,
       152,
+      152,
       112
     ]
   },
@@ -46,5 +113,12 @@
   "reducedTransitionDuration": "1e-06s",
   "consoleErrors": [],
   "pageErrors": [],
-  "humanListeningStatus": "required-for-candidates"
+  "humanListeningStatus": {
+    "value": "required",
+    "derivedFromProvenance": [
+      "Bomb normal",
+      "Bomb chain-clear"
+    ],
+    "visibleWarningVerified": true
+  }
 }
