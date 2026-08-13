@@ -415,11 +415,16 @@ export class AudioEngine {
     }
   }
 
-  private playCandidateCue(id: CandidateAudioCueId, delay = 0, absoluteStartAt?: number): void {
+  private playCandidateCue(
+    id: CandidateAudioCueId,
+    delay = 0,
+    absoluteStartAt?: number,
+    reservedVoices = 0,
+  ): void {
     const context = this.context;
     const cue = audioCue(id);
     const destination = this.buses[cue.bus];
-    const available = MAX_EFFECT_VOICES - this.activeVoices.size;
+    const available = MAX_EFFECT_VOICES - this.activeVoices.size - Math.max(0, reservedVoices);
     if (!context || !destination || available <= 0 || !this.enabled || this.destroyed) return;
     const hooks = this.voiceHooks(Boolean(cue.mutationOwned));
     const eventStart = absoluteStartAt ?? context.currentTime + delay;
@@ -430,7 +435,7 @@ export class AudioEngine {
       gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
       ...hooks,
     });
-    const remaining = MAX_EFFECT_VOICES - this.activeVoices.size;
+    const remaining = MAX_EFFECT_VOICES - this.activeVoices.size - Math.max(0, reservedVoices);
     if (remaining <= 0 || !cue.air?.length) return;
     for (const layer of cue.air.slice(0, remaining)) {
       scheduleRecoveredNoisePuff(context, destination, {
@@ -471,12 +476,20 @@ export class AudioEngine {
           : event.item === 'bomb'
             ? event.bombOutcome === 'chain-clear' ? 'bomb-chain' : 'bomb'
             : event.multiplierFactor === 4 ? 'multiplier-4' : 'multiplier-2';
-        this.playCandidateCue(id, 0, startAt);
+        this.playCandidateCue(
+          id,
+          0,
+          startAt,
+          event.item === 'bomb' && event.bombOutcome === 'chain-clear' ? 1 : 0,
+        );
         if (event.item === 'bomb' && event.bombOutcome === 'chain-clear') {
           this.playChainPropagation(event, startAt);
         }
       }
-      startAt += MUTATION_VFX_TOKENS[event.item].animation.activationMs / 1_000;
+      const durationMs = event.item === 'bomb' && event.bombOutcome === 'chain-clear'
+        ? mutationChainPresentationPlan(event.chainOriginCells).durationMs
+        : MUTATION_VFX_TOKENS[event.item].animation.activationMs;
+      startAt += durationMs / 1_000;
     }
     this.mutationTimelineTailAt = startAt;
   }
@@ -495,9 +508,7 @@ export class AudioEngine {
       destination,
       {
         startAt,
-        beatOffsetsSeconds: plan.distanceBeats.map((distance) => (
-          plan.revealMs / 1_000 + distance * plan.beatMs / 1_000
-        )),
+        beatOffsetsSeconds: plan.beatStartsMs.map((startMs) => startMs / 1_000),
         gain: .036,
         gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
         gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,

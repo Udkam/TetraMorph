@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   MutationTimeline,
   createMutationActivationTimeline,
+  createMutationChainTimeline,
   delay,
   parallel,
   phase,
@@ -43,6 +44,18 @@ describe('MutationTimeline', () => {
     timeline.advance(140);
     expect(timeline.sample('shockwave')).toMatchObject({ active: true, progress: 0 });
     timeline.advance(260);
+    expect(timeline.complete).toBe(true);
+  });
+
+  it('keeps the chain-clear clock exact while exposing impact at the reveal beat', () => {
+    const timeline = createMutationChainTimeline(288, 50);
+    expect(timeline.duration).toBe(288);
+    expect(timeline.sample('impact')).toMatchObject({ active: false, complete: false });
+    timeline.advance(50);
+    expect(timeline.sample('impact')).toMatchObject({ active: true, complete: false });
+    timeline.advance(1);
+    expect(timeline.sample('impact')).toMatchObject({ active: false, complete: true });
+    timeline.advance(237);
     expect(timeline.complete).toBe(true);
   });
 

@@ -148,3 +148,13 @@ export function createMutationActivationTimeline(
     delay(Math.round(timing.enterMs * 0.28), phase('spark-tail', timing.activationMs - Math.round(timing.enterMs * 0.28), 'cubicOut')),
   ));
 }
+
+/** Exact shared chain-clear clock; normal Bomb phases must not extend a reduced wave. */
+export function createMutationChainTimeline(durationMs: number, impactAtMs: number): MutationTimeline {
+  const duration = Math.max(1, durationMs);
+  const impactAt = Math.max(0, Math.min(duration - 1, impactAtMs));
+  return new MutationTimeline(parallel(
+    phase('chain-propagation', duration, 'linear'),
+    delay(impactAt, phase('impact', 1, 'cubicOut')),
+  ));
+}

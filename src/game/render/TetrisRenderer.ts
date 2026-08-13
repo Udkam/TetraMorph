@@ -53,6 +53,7 @@ import {
 } from '../../design/visualThemes';
 import {
   createMutationActivationTimeline,
+  createMutationChainTimeline,
   mutationEase,
   type MutationTimeline,
   type TimelineSample,
@@ -648,6 +649,7 @@ export class TetrisRenderer {
   private survivalEntryBedrockRise: SurvivalEntryBedrockRise | null = null;
   private mutationFlash: MutationFlash | null = null;
   private readonly mutationFlashQueue: MutationFlashRequest[] = [];
+  private pendingBombClearOutcome: 'blast' | 'chain-clear' | null = null;
   private mutationArrival: MutationArrival | null = null;
   private activeMutationCarrierId: number | null = null;
   private readonly mutationFields = new Map<TimedMutationItem, MutationField>();
@@ -796,6 +798,7 @@ export class TetrisRenderer {
     }
     if (this.options.reducedMotion !== previousReducedMotion) {
       this.ordinaryMultiLineClearCues.length = 0;
+      this.retimeActiveMutationChain(previousReducedMotion);
     }
     if (this.options.reducedMotion && !previousReducedMotion) {
       this.presentation = null;
@@ -1079,6 +1082,7 @@ export class TetrisRenderer {
     row: number,
     restrainedGeometry: boolean,
   ): Readonly<ClassicLineClearCellSample> | null {
+    if (this.pendingBombClearOutcome === 'chain-clear') return null;
     const cue = this.ordinaryMultiLineClearCueForState(state);
     return ordinaryLineClearCellSampleForState(
       state,
@@ -3472,10 +3476,21 @@ export class TetrisRenderer {
     const cells = flash.triggerCells
       .filter((cell) => cell.y >= VISIBLE_START_ROW && cell.y < VISIBLE_START_ROW + VISIBLE_HEIGHT)
       .map((cell) => ({ x: cell.x, y: cell.y - VISIBLE_START_ROW }));
+    const visibleBombBlastRows = flash.item === 'bomb' && flash.bombOutcome === 'blast'
+      ? [...new Set(flash.blastRows
+        .filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT))]
+        .sort((left, right) => left - right)
+      : [];
+    if (flash.item === 'bomb' && flash.bombOutcome === 'blast' && visibleBombBlastRows.length === 0) {
+      return;
+    }
+    const bombBlastFallbackRow = visibleBombBlastRows.length > 0
+      ? visibleBombBlastRows.reduce((sum, row) => sum + row - VISIBLE_START_ROW, 0) / visibleBombBlastRows.length
+      : VISIBLE_HEIGHT * 0.42;
     const minX = cells.length ? Math.min(...cells.map((cell) => cell.x)) : BOARD_WIDTH / 2 - 0.5;
     const maxX = cells.length ? Math.max(...cells.map((cell) => cell.x)) : BOARD_WIDTH / 2 - 0.5;
-    const minY = cells.length ? Math.min(...cells.map((cell) => cell.y)) : VISIBLE_HEIGHT * 0.42;
-    const maxY = cells.length ? Math.max(...cells.map((cell) => cell.y)) : VISIBLE_HEIGHT * 0.42;
+    const minY = cells.length ? Math.min(...cells.map((cell) => cell.y)) : bombBlastFallbackRow;
+    const maxY = cells.length ? Math.max(...cells.map((cell) => cell.y)) : bombBlastFallbackRow;
     const anchorX = layout.x + (minX + maxX + 1) * layout.cell / 2;
     const anchorY = layout.y + (minY + maxY + 1) * layout.cell / 2;
     const strokeWidth = Math.max(1, layout.cell * 0.06);
@@ -3611,12 +3626,15 @@ export class TetrisRenderer {
       const pulse = flash.timeline.sample('pulse');
       const impact = flash.timeline.sample('impact');
       const shockwave = flash.timeline.sample('shockwave');
-      const visibleRows = flash.blastRows.filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT);
-      const firstRow = visibleRows.length ? Math.min(...visibleRows) : BOARD_HEIGHT - 1;
-      const lastRow = visibleRows.length ? Math.max(...visibleRows) : BOARD_HEIGHT - 1;
-      const y = layout.y + (firstRow - VISIBLE_START_ROW) * layout.cell;
-      const fieldBottom = layout.y + (lastRow - VISIBLE_START_ROW + 1) * layout.cell;
-      const floorField = (alpha: number, lift: number, color: number): void => {
+      const rowRuns: Array<{ first: number; last: number }> = [];
+      for (const row of visibleBombBlastRows) {
+        const current = rowRuns.at(-1);
+        if (current && row === current.last + 1) current.last = row;
+        else rowRuns.push({ first: row, last: row });
+      }
+      const floorField = (run: { first: number; last: number }, alpha: number, lift: number, color: number): void => {
+        const y = layout.y + (run.first - VISIBLE_START_ROW) * layout.cell;
+        const fieldBottom = layout.y + (run.last - VISIBLE_START_ROW + 1) * layout.cell;
         const points: number[] = [layout.x, fieldBottom, layout.x, y + layout.cell * .82];
         const ridge = [.72, .3, .58, .18, .5, .26, .68, .16, .44, .34, .7] as const;
         for (let index = 0; index < ridge.length; index += 1) {
@@ -3630,17 +3648,20 @@ export class TetrisRenderer {
       };
       if (warning.active) {
         const alpha = .55 + Math.sin(warning.progress * Math.PI * 3) * .28;
-        floorField(.27 * alpha, 0, token.palette.deep);
-        for (const [xFactor, yFactor, scale] of [[.08, .6, .4], [.24, .3, .32], [.48, .52, .46], [.69, .18, .3], [.9, .42, .38]] as const) {
-          this.drawMutationDiamond(
-            graphics,
-            layout.x + layout.width * xFactor,
-            y + layout.cell * yFactor,
-            layout.cell * scale * .18,
-            layout.cell * scale * .46,
-            token.palette.primary,
-            .62 * alpha,
-          );
+        for (const run of rowRuns) {
+          const y = layout.y + (run.first - VISIBLE_START_ROW) * layout.cell;
+          floorField(run, .27 * alpha, 0, token.palette.deep);
+          for (const [xFactor, yFactor, scale] of [[.08, .6, .4], [.24, .3, .32], [.48, .52, .46], [.69, .18, .3], [.9, .42, .38]] as const) {
+            this.drawMutationDiamond(
+              graphics,
+              layout.x + layout.width * xFactor,
+              y + layout.cell * yFactor,
+              layout.cell * scale * .18,
+              layout.cell * scale * .46,
+              token.palette.primary,
+              .62 * alpha,
+            );
+          }
         }
       }
       if (pulse.active) {
@@ -3654,8 +3675,10 @@ export class TetrisRenderer {
       }
       if (impact.active) {
         const alpha = 1 - impact.progress;
-        floorField(.42 * alpha, .18, token.palette.primary);
-        floorField(.18 * alpha, .42, token.palette.highlight);
+        for (const run of rowRuns) {
+          floorField(run, .42 * alpha, .18, token.palette.primary);
+          floorField(run, .18 * alpha, .42, token.palette.highlight);
+        }
       }
       if (shockwave.active) {
         const alpha = 1 - shockwave.progress;
@@ -3831,6 +3854,7 @@ export class TetrisRenderer {
   private clearMutationVisualState(): void {
     this.mutationFields.clear();
     this.mutationFlashQueue.length = 0;
+    this.pendingBombClearOutcome = null;
     this.clearMutationParticles();
     this.resetMutationFilters();
     this.particleCursor = 0;
@@ -3867,10 +3891,12 @@ export class TetrisRenderer {
       this.mutationFlash = null;
       return;
     }
-    const chainDuration = request.bombOutcome === 'chain-clear'
-      ? mutationChainPresentationPlan(request.chainOriginCells, this.options.reducedMotion).durationMs
-      : 0;
-    const timeline = createMutationActivationTimeline(request.item, chainDuration);
+    const chainPlan = request.bombOutcome === 'chain-clear'
+      ? mutationChainPresentationPlan(request.chainOriginCells, this.options.reducedMotion)
+      : null;
+    const timeline = chainPlan
+      ? createMutationChainTimeline(chainPlan.durationMs, chainPlan.revealMs)
+      : createMutationActivationTimeline(request.item);
     this.mutationFlash = {
       item: request.item,
       elapsed: 0,
@@ -3888,6 +3914,7 @@ export class TetrisRenderer {
       blastRows: request.blastRows,
       chainOriginCells: request.chainOriginCells,
     };
+    if (request.bombOutcome) this.pendingBombClearOutcome = null;
     // Bomb owns a warning and pulse before impact, so its fragments cannot exist
     // until the impact phase begins. Only the multiplier keeps a local sparkle
     // burst; Ice and Supergravity activation geometry remains carrier-bound.
@@ -3895,6 +3922,19 @@ export class TetrisRenderer {
       this.emitMutationParticles(request.item, request.triggerCells, request.previousBoard);
     }
     this.impact = this.options.reducedMotion ? 0.24 : request.item === 'bomb' ? 0 : 0.72;
+  }
+
+  private retimeActiveMutationChain(previousReducedMotion: boolean): void {
+    const flash = this.mutationFlash;
+    if (!flash || flash.bombOutcome !== 'chain-clear') return;
+    const previousPlan = mutationChainPresentationPlan(flash.chainOriginCells, previousReducedMotion);
+    const nextPlan = mutationChainPresentationPlan(flash.chainOriginCells, this.options.reducedMotion);
+    const progress = previousPlan.durationMs <= 0 ? 1 : Math.min(1, flash.elapsed / previousPlan.durationMs);
+    const timeline = createMutationChainTimeline(nextPlan.durationMs, nextPlan.revealMs);
+    timeline.advance(progress * timeline.duration);
+    flash.timeline = timeline;
+    flash.elapsed = timeline.elapsed;
+    flash.duration = timeline.duration;
   }
 
   private emitDeferredBombImpact(flash: MutationFlash): void {
@@ -4287,7 +4327,10 @@ export class TetrisRenderer {
           };
         }
       } else if (event.type === 'clear-started') {
-        this.enqueueOrdinaryMultiLineClearCue(event.rows, state);
+        this.pendingBombClearOutcome = event.mutationBombOutcome ?? null;
+        if (event.mutationBombOutcome !== 'chain-clear') {
+          this.enqueueOrdinaryMultiLineClearCue(event.rows, state);
+        }
       } else if (event.type === 'lines-cleared') {
         this.impact = this.options.reducedMotion ? 0.3 : Math.min(1.4, 0.55 + event.count * 0.2);
         this.commitOrdinaryMultiLineClearCue(event.rows);
@@ -4359,23 +4402,6 @@ export class TetrisRenderer {
       .filter((cell) => cell.y >= VISIBLE_START_ROW && cell.y < BOARD_HEIGHT)
       .map((cell) => ({ x: cell.x, y: cell.y - VISIBLE_START_ROW }));
 
-    if (flash.elapsed < plan.revealMs && visibleOriginCells.length > 0) {
-      this.drawMutationPieceMaterial(
-        graphics,
-        visibleOriginCells,
-        'T',
-        'bomb',
-        1,
-        'settled',
-        {
-          originX: layout.x,
-          originY: layout.y,
-          unit: layout.cell,
-          scale: 1 + (1 - flash.elapsed / plan.revealMs) * .06,
-        },
-      );
-    }
-
     for (const { row, distance, startMs } of plan.rowBeats) {
       const progress = flash.elapsed < startMs
         ? 0
@@ -4406,6 +4432,23 @@ export class TetrisRenderer {
           .rect(layout.x, rowY + layout.cell * .45, layout.width, Math.max(1, layout.cell * .1))
           .fill({ color: token.palette.glow, alpha: alpha * .58 });
       }
+    }
+
+    if (flash.elapsed < plan.revealMs && visibleOriginCells.length > 0) {
+      this.drawMutationPieceMaterial(
+        graphics,
+        visibleOriginCells,
+        'T',
+        'bomb',
+        1,
+        'settled',
+        {
+          originX: layout.x,
+          originY: layout.y,
+          unit: layout.cell,
+          scale: 1 + (1 - flash.elapsed / plan.revealMs) * .06,
+        },
+      );
     }
 
     const tailStart = plan.durationMs - plan.fadeMs;

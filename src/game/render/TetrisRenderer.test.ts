@@ -284,6 +284,7 @@ type RendererInternals = {
     blastRows: readonly number[];
     chainOriginCells: readonly Cell[];
   } | null;
+  pendingBombClearOutcome: 'blast' | 'chain-clear' | null;
   mutationFlashQueue: Array<{ item: MutationItem }>;
   mutationParticles: Array<{ active: boolean; item: MutationItem; rotation: number; rotationVelocity: number }>;
   mutationFields: Map<
@@ -635,6 +636,46 @@ describe('Endgame undo presentation reset', () => {
     internals.advanceEffects(620);
     expect(internals.mutationFlash).toMatchObject({ item: 'freeze', elapsed: 0 });
     internals.advanceEffects(320);
+    expect(internals.mutationFlash).toBeNull();
+  });
+
+  it('retimes an active chain clear without truncating or stalling its FIFO', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const origin = [{ x: 4, y: VISIBLE_START_ROW + 5 }];
+    internals.consumeEvents([
+      chainClearEvent(origin),
+      { type: 'mutation-activated', item: 'freeze', durationTicks: 600, score: 0, rowsRemoved: 0 },
+    ]);
+    internals.advanceEffects(349);
+    expect(internals.mutationFlash).toMatchObject({ item: 'bomb', elapsed: 349 });
+    const fullDuration = internals.mutationFlash!.duration;
+
+    renderer.setOptions({ reducedMotion: true });
+    const reducedDuration = internals.mutationFlash!.duration;
+    expect(reducedDuration).toBeLessThan(fullDuration);
+    expect(internals.mutationFlash!.elapsed / reducedDuration).toBeCloseTo(349 / fullDuration, 2);
+    internals.advanceEffects(reducedDuration - internals.mutationFlash!.elapsed - 1);
+    expect(internals.mutationFlash).toMatchObject({ item: 'bomb' });
+    internals.advanceEffects(1);
+    expect(internals.mutationFlash).toMatchObject({ item: 'freeze', elapsed: 0 });
+  });
+
+  it('preserves normalized chain-clear progress when reduced motion is disabled mid-wave', () => {
+    const renderer = new TetrisRendererClass();
+    renderer.setOptions({ reducedMotion: true });
+    const internals = renderer as unknown as RendererInternals;
+    internals.consumeEvents([chainClearEvent([{ x: 4, y: VISIBLE_START_ROW + 5 }])]);
+    const reducedDuration = internals.mutationFlash!.duration;
+    internals.advanceEffects(reducedDuration * 0.4);
+
+    renderer.setOptions({ reducedMotion: false });
+    const fullDuration = internals.mutationFlash!.duration;
+    expect(fullDuration).toBeGreaterThan(reducedDuration);
+    expect(internals.mutationFlash!.elapsed / fullDuration).toBeCloseTo(0.4, 5);
+    internals.advanceEffects(fullDuration * 0.6 - 1);
+    expect(internals.mutationFlash).toMatchObject({ item: 'bomb' });
+    internals.advanceEffects(1);
     expect(internals.mutationFlash).toBeNull();
   });
 
@@ -1802,6 +1843,40 @@ describe('Endgame undo presentation reset', () => {
     expect(impact.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(0);
   });
 
+  it('renders only real visible Bomb row runs and no hidden-only fallback explosion', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const disjoint = mutationEvent('bomb') as Extract<GameEvent, { type: 'mutation-activated'; item: 'bomb' }>;
+    internals.consumeEvents([{ ...disjoint, blastRows: [29, 30, 31, 38, 39] }]);
+    const visible = createGraphicsRecorder();
+    internals.drawMutationActivationEffect(visible.graphics, internals.mutationFlash!, layout);
+    expect(visible.operations.filter((operation) => operation.kind === 'poly')).toHaveLength(2);
+
+    const hiddenRenderer = new TetrisRendererClass();
+    const hidden = hiddenRenderer as unknown as RendererInternals;
+    hidden.consumeEvents([{ ...disjoint, blastRows: [2, 3, 4] }]);
+    const hiddenFrame = createGraphicsRecorder();
+    hidden.drawMutationActivationEffect(hiddenFrame.graphics, hidden.mutationFlash!, layout);
+    expect(hiddenFrame.operations).toEqual([]);
+    hidden.advanceEffects(160);
+    const hiddenPulse = createGraphicsRecorder();
+    hidden.drawMutationActivationEffect(hiddenPulse.graphics, hidden.mutationFlash!, layout);
+    expect(hiddenPulse.operations).toEqual([]);
+    hidden.advanceEffects(240);
+    const hiddenShockwave = createGraphicsRecorder();
+    hidden.drawMutationActivationEffect(hiddenShockwave.graphics, hidden.mutationFlash!, layout);
+    expect(hiddenShockwave.operations).toEqual([]);
+
+    const reducedRenderer = new TetrisRendererClass();
+    reducedRenderer.setOptions({ reducedMotion: true });
+    const reduced = reducedRenderer as unknown as RendererInternals;
+    reduced.consumeEvents([{ ...disjoint, blastRows: [2, 3, 4] }]);
+    const reducedFrame = createGraphicsRecorder();
+    reduced.drawMutationActivationEffect(reducedFrame.graphics, reduced.mutationFlash!, layout);
+    expect(reducedFrame.operations).toEqual([]);
+  });
+
   it('reveals the first Bomb before propagating chain-clear rows equally upward and downward', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
@@ -1845,6 +1920,64 @@ describe('Endgame undo presentation reset', () => {
       layout.cell * 5,
       layout.cell * 6,
     ]));
+  });
+
+  it('does not overlap the chain-clear reveal with the ordinary line-clear cue', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const row = BOARD_HEIGHT - 1;
+    const state = {
+      ...createInitialState(0x1a16_43a, 'sprint'),
+      phase: 'line-clear',
+      pendingClearRows: [row],
+    } as GameState;
+
+    internals.consumeEvents([{
+      type: 'clear-started',
+      rows: [row],
+      mutationBombOutcome: 'chain-clear',
+    }], state);
+
+    expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
+  });
+
+  it('keeps the trigger row stable before chain commit and layers the first Bomb last', () => {
+    const renderer = new TetrisRendererClass();
+    const internals = renderer as unknown as RendererInternals;
+    const row = BOARD_HEIGHT - 1;
+    const board = createBoard();
+    board[row]!.fill('I');
+    const state = {
+      ...createInitialState(0x1a16_43b, 'sprint'),
+      board,
+      phase: 'line-clear',
+      phaseTicks: 11,
+      pendingClearRows: [row],
+    } as GameState;
+    Object.assign(internals as unknown as Record<string, unknown>, {
+      pieceGraphics: createGraphicsRecorder().graphics,
+      survivalEntryGraphics: createGraphicsRecorder().graphics,
+      survivalEntryMaskGraphics: createGraphicsRecorder().graphics,
+      pieceMaskGraphics: createGraphicsRecorder().graphics,
+    });
+    const groups = vi.spyOn(internals, 'drawCellGroups');
+    internals.consumeEvents([{
+      type: 'clear-started',
+      rows: [row],
+      mutationBombOutcome: 'chain-clear',
+    }], state);
+    internals.drawPieces(state, { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false });
+    expect(groups.mock.calls.some((call) => call[1].length === 10 && call[3] === 1)).toBe(true);
+    expect(internals.pendingBombClearOutcome).toBe('chain-clear');
+
+    const order: string[] = [];
+    internals.drawCellGroups = () => { order.push('board'); };
+    internals.drawMutationPieceMaterial = () => { order.push('origin'); };
+    internals.consumeEvents([chainClearEvent([{ x: 4, y: row }])], undefined, board);
+    internals.drawMutationChainClear(createGraphicsRecorder().graphics, internals.mutationFlash!, {
+      x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false,
+    });
+    expect(order.at(-1)).toBe('origin');
   });
 
   it('starts a hidden-origin chain clear at the nearest visible boundary without hidden delay', () => {

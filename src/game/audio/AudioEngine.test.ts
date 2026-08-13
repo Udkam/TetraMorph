@@ -472,6 +472,28 @@ describe('AudioEngine accepted production contract', () => {
     expect(propagation.frequency.setValues.at(-1)?.time).toBeCloseTo(.786);
   });
 
+  it('starts chained item cues only after the first Bomb propagation finishes', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    audio.play([chainClearMutation(), mutation('freeze')]);
+
+    const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
+    expect(ice?.starts[0]).toEqual({ time: 0.936, offset: 0.19375, duration: 0.44 });
+  });
+
+  it('reserves one voice for chain propagation when the global voice budget is saturated', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    for (let index = 0; index < 11; index += 1) {
+      audio.play([{ type: 'clear-started', rows: [39] }]);
+    }
+    const beforeChain = oscillators.length;
+    audio.play([chainClearMutation()]);
+    expect(oscillators.length - beforeChain).toBe(4);
+    expect(oscillators.at(-1)?.frequency.setValues).toHaveLength(20);
+    expect(sourceCount()).toBeLessThanOrEqual(16);
+  });
+
   it('pins every layer of one clear or Bomb event to one moving AudioContext clock read', async () => {
     const context = new FakeAudioContext();
     let clock = 0;
