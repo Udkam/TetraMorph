@@ -29,4 +29,12 @@ describe('T37 D2A in-page transition authority', () => {
     expect(css).toMatch(/data-sheet-motion="reduced"[\s\S]*transform: none !important/);
     expect(css).toMatch(/data-sheet-phase="steady"[\s\S]*animation: none !important/);
   });
+
+  it('gives pause and restart the same bounded board-curtain lifecycle', () => {
+    expect(css).toMatch(/data-curtain-phase="enter"[\s\S]*d2a-curtain-in 180ms/);
+    expect(css).toMatch(/data-curtain-phase="exit"[\s\S]*d2a-curtain-out 120ms/);
+    expect(css).toMatch(/data-curtain-motion="reduced"[\s\S]*d2a-opacity-in 32ms/);
+    expect(css).toMatch(/@keyframes d2a-curtain-in[\s\S]*translateY\(4px\)/);
+    expect(css).toMatch(/@keyframes d2a-curtain-out[\s\S]*translateY\(-2px\)/);
+  });
 });

@@ -112,6 +112,8 @@ import {
 type ExitDestination = 'home' | 'endgame-library';
 type EntryCountdownDigit = 3 | 2 | 1;
 type SettingsTab = 'settings' | 'controls' | 'rules';
+type CurtainKind = 'pause' | 'restart';
+type CurtainPresence = Readonly<{ kind: CurtainKind; phase: 'enter' | 'steady' | 'exit'; epoch: number; reduced: boolean }>;
 type ReducedMotionOverride = boolean | null;
 export type EndgameCelebration = {
   outcome: EndgameCelebrationOutcome;
@@ -128,6 +130,9 @@ const APP_SEED = 0x51a1f00d;
 const PRODUCT_NAME = 'TetraMorph';
 const ENTRY_COUNTDOWN_STEP_MS = 500;
 const ENTRY_COVER_EXIT_MS = 120;
+const CURTAIN_ENTER_MS = 180;
+const CURTAIN_EXIT_MS = 120;
+const CURTAIN_REDUCED_MS = 32;
 const ROUTE_FALLBACK_MS = 160;
 const ROUTE_REDUCED_MS = 32;
 const ROUTE_READY_TIMEOUT_MS = 800;
@@ -1839,6 +1844,11 @@ export function GameSession({
   const countdownTimerDeadlineRef = useRef<number | null>(null);
   const entryCoverRemainingMsRef = useRef(ENTRY_COVER_EXIT_MS);
   const entryCoverDeadlineRef = useRef<number | null>(null);
+  const curtainPresenceRef = useRef<CurtainPresence | null>(null);
+  const curtainDeadlineRef = useRef<number | null>(null);
+  const curtainShortenedDurationRef = useRef<number | null>(null);
+  const curtainWasOpenRef = useRef<CurtainKind | null>(null);
+  const curtainImmediateDismissRef = useRef(false);
   const exitWasPlayingRef = useRef(false);
   const restartWasPlayingRef = useRef(false);
   const settingsWasPlayingRef = useRef(false);
@@ -1863,6 +1873,7 @@ export function GameSession({
   const [restartConfirmOpen, setRestartConfirmOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('settings');
+  const [curtainPresence, setCurtainPresenceState] = useState<CurtainPresence | null>(null);
   const [liveMessage, setLiveMessage] = useState('');
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [audioVolume, setAudioVolume] = useState(1);
@@ -1870,6 +1881,11 @@ export function GameSession({
   const [endgameCelebration, setEndgameCelebration] = useState<EndgameCelebration | null>(null);
   endgameProgressRef.current = endgameProgress;
   reducedMotionRef.current = reducedMotion;
+
+  const setCurtainPresence = useCallback((next: CurtainPresence | null) => {
+    curtainPresenceRef.current = next;
+    setCurtainPresenceState(next);
+  }, []);
 
   const changeAudioEnabled = useCallback((enabled: boolean) => {
     runtime?.setAudioEnabled(enabled);
@@ -2252,6 +2268,7 @@ export function GameSession({
   }, [countdownDigit, entryCoverExiting, focusBoard, runtime]);
 
   const restartRun = useCallback(() => {
+    curtainImmediateDismissRef.current = restartConfirmOpen;
     setExitOpen(false);
     setSettingsOpen(false);
     setRestartConfirmOpen(false);
@@ -2275,7 +2292,7 @@ export function GameSession({
     }
     runtime?.setInputEnabled(false);
     setCountdownDigit(3);
-  }, [focusBoard, runtime, skipsEntryCountdown]);
+  }, [focusBoard, restartConfirmOpen, runtime, skipsEntryCountdown]);
 
   const requestRestart = useCallback(() => {
     if (!runtime || restartConfirmOpen) return;
@@ -2410,6 +2427,76 @@ export function GameSession({
   const leaveResult = useCallback(() => onExit(exitDestination), [exitDestination, onExit]);
   const pauseOpen = state.status === 'paused' && !exitOpen && !restartConfirmOpen && !settingsOpen;
   const resultOpen = terminal !== null && !exitOpen && !restartConfirmOpen && !settingsOpen;
+  const curtainKind: CurtainKind | null = restartConfirmOpen ? 'restart' : pauseOpen ? 'pause' : null;
+
+  useLayoutEffect(() => {
+    const previousKind = curtainWasOpenRef.current;
+    curtainWasOpenRef.current = curtainKind;
+    if (curtainKind === previousKind) return;
+    if (curtainKind !== null) {
+      if (previousKind !== null && previousKind !== curtainKind) setCurtainPresence(null);
+      const next = {
+        kind: curtainKind,
+        phase: 'enter',
+        epoch: (curtainPresenceRef.current?.epoch ?? 0) + 1,
+        reduced: reducedMotionRef.current,
+      } as const;
+      curtainShortenedDurationRef.current = null;
+      setCurtainPresence(next);
+      return;
+    }
+    if (previousKind === null) return;
+    const immediate = curtainImmediateDismissRef.current || exitOpen || settingsOpen || countdownDigit !== null
+      || state.status === 'finished' || state.status === 'game-over';
+    curtainImmediateDismissRef.current = false;
+    if (immediate) {
+      setCurtainPresence(null);
+      return;
+    }
+    const next = {
+      kind: previousKind,
+      phase: 'exit',
+      epoch: (curtainPresenceRef.current?.epoch ?? 0) + 1,
+      reduced: reducedMotionRef.current,
+    } as const;
+    setCurtainPresence(next);
+  }, [countdownDigit, curtainKind, exitOpen, setCurtainPresence, settingsOpen, state.status]);
+
+  useLayoutEffect(() => {
+    if (!curtainPresence || !reducedMotion || curtainPresence.reduced || curtainPresence.phase === 'steady') return;
+    const remaining = curtainDeadlineRef.current === null
+      ? CURTAIN_REDUCED_MS
+      : Math.max(0, curtainDeadlineRef.current - browserPlatform.now());
+    curtainShortenedDurationRef.current = Math.min(CURTAIN_REDUCED_MS, remaining);
+    setCurtainPresence({ ...curtainPresence, reduced: true });
+  }, [curtainPresence, reducedMotion, setCurtainPresence]);
+
+  useEffect(() => {
+    if (!curtainPresence || curtainPresence.phase === 'steady') return undefined;
+    const epoch = curtainPresence.epoch;
+    const duration = curtainShortenedDurationRef.current
+      ?? (curtainPresence.reduced
+        ? CURTAIN_REDUCED_MS
+        : curtainPresence.phase === 'enter' ? CURTAIN_ENTER_MS : CURTAIN_EXIT_MS);
+    curtainShortenedDurationRef.current = null;
+    curtainDeadlineRef.current = browserPlatform.now() + duration;
+    const timer = browserPlatform.scheduleTimeout(() => {
+      if (curtainPresenceRef.current?.epoch !== epoch) return;
+      curtainDeadlineRef.current = null;
+      setCurtainPresence(curtainPresence.phase === 'enter' ? { ...curtainPresence, phase: 'steady' } : null);
+    }, duration);
+    return () => {
+      browserPlatform.cancelTimeout(timer);
+      if (curtainPresenceRef.current?.epoch !== epoch) curtainDeadlineRef.current = null;
+    };
+  }, [curtainPresence, setCurtainPresence]);
+
+  useEffect(() => () => {
+    curtainPresenceRef.current = null;
+    curtainDeadlineRef.current = null;
+    curtainShortenedDurationRef.current = null;
+    curtainImmediateDismissRef.current = false;
+  }, []);
   const storedRecords = state.mode === 'endgame' ? [] : recordsForMode(leaderboard, state.mode);
   const leaderboardRecords = resultRecord && scoreRecordRank(storedRecords, resultRecord) === null
     ? recordsForMode(insertScoreRecord(leaderboard, resultRecord), resultRecord.mode)
@@ -2529,24 +2616,32 @@ export function GameSession({
                 )}
               </div>
             )}
-            {pauseOpen && (
+            {curtainPresence?.kind === 'pause' && (
               <div
                 className="entry-countdown entry-countdown--pause"
                 data-testid="pause-curtain"
-                role="status"
-                aria-label={`${copy.labels.pauseTitle}。${copy.labels.pauseHint}`}
+                data-curtain-phase={curtainPresence.phase}
+                data-curtain-motion={curtainPresence.reduced ? 'reduced' : 'full'}
+                role={curtainPresence.phase === 'exit' ? undefined : 'status'}
+                inert={curtainPresence.phase === 'exit' || undefined}
+                aria-hidden={curtainPresence.phase === 'exit' || undefined}
+                aria-label={curtainPresence.phase === 'exit' ? undefined : `${copy.labels.pauseTitle}。${copy.labels.pauseHint}`}
               >
                 <span className="entry-countdown__digit entry-countdown__digit--pause">{copy.labels.pauseTitle}</span>
                 <small className="entry-countdown__hint">{copy.labels.pauseHint}</small>
               </div>
             )}
-            {restartConfirmOpen && (
+            {curtainPresence?.kind === 'restart' && (
               <div
                 className="entry-countdown entry-countdown--restart"
                 data-testid="restart-curtain"
-                role="alertdialog"
-                aria-modal="true"
-                aria-label={`${copy.labels.restartTitle}。${copy.labels.restartHint}`}
+                data-curtain-phase={curtainPresence.phase}
+                data-curtain-motion={curtainPresence.reduced ? 'reduced' : 'full'}
+                role={curtainPresence.phase === 'exit' ? undefined : 'alertdialog'}
+                aria-modal={curtainPresence.phase === 'exit' ? undefined : 'true'}
+                inert={curtainPresence.phase === 'exit' || undefined}
+                aria-hidden={curtainPresence.phase === 'exit' || undefined}
+                aria-label={curtainPresence.phase === 'exit' ? undefined : `${copy.labels.restartTitle}。${copy.labels.restartHint}`}
               >
                 <span className="entry-countdown__digit entry-countdown__digit--restart">{copy.labels.restartTitle}</span>
                 <small className="entry-countdown__hint">{copy.labels.restartHint}</small>

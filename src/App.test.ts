@@ -866,6 +866,7 @@ describe('entry countdown', () => {
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', key: 'r', bubbles: true })));
     expect(view.container.querySelector('[data-testid="restart-curtain"]')).not.toBeNull();
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true })));
+    expect(view.container.querySelector('[data-testid="restart-curtain"]')).toBeNull();
     expect(runtime.restart).toHaveBeenCalledTimes(2);
     expect(runtime.start).toHaveBeenCalledTimes(3);
     expect(runtime.getState().status).toBe('playing');
@@ -1234,6 +1235,9 @@ describe('T6 frontend mode binding', () => {
     expect(sourceStyles).toMatch(/\.play-shell\s*\{[\s\S]*?--play-topbar-height:\s*64px/);
     expect(sourceHudStyles).toMatch(/\.run-stats strong\s*\{[^}]*font-size:\s*clamp\(34px,\s*3vw,\s*44px\)/s);
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', key: 'r', bubbles: true })));
+    expect(view.container.querySelector('[data-testid="restart-curtain"]')?.getAttribute('data-curtain-phase')).toBe('exit');
+    expect(view.container.querySelector('[data-testid="restart-curtain"]')?.hasAttribute('inert')).toBe(true);
+    await act(async () => vi.advanceTimersByTimeAsync(32));
     expect(view.container.querySelector('[data-testid="restart-curtain"]')).toBeNull();
     expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
     expect(runtime.getState().status).toBe('playing');
@@ -1265,6 +1269,35 @@ describe('T6 frontend mode binding', () => {
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')?.click());
     expect(view.container.querySelector('[data-testid="settings-sheet"]')).not.toBeNull();
     expect(view.container.querySelector('[data-testid="game-screen"]')?.classList.contains('play-shell--interrupted')).toBe(false);
+    view.unmount();
+  });
+
+  it('releases pause on resume, but removes it immediately when restart replaces it', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+    const view = render(createElement(GameSession, {
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id, onExit: vi.fn(), onCanonicalCompletion: vi.fn(), reducedMotion: false,
+    }));
+    await act(async () => Promise.resolve());
+    await advanceEntryCountdown();
+    const runtime = runtimeHarness.instances.at(-1)!;
+
+    act(() => runtime.setState({ ...runtime.getState(), status: 'paused' }));
+    await act(async () => vi.advanceTimersByTimeAsync(180));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')?.getAttribute('data-curtain-phase')).toBe('steady');
+    act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true })));
+    const release = view.container.querySelector<HTMLElement>('[data-testid="pause-curtain"]')!;
+    expect(release.dataset.curtainPhase).toBe('exit');
+    expect(release.hasAttribute('inert')).toBe(true);
+    await act(async () => vi.advanceTimersByTimeAsync(119));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')).not.toBeNull();
+    await act(async () => vi.advanceTimersByTimeAsync(1));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
+
+    act(() => runtime.setState({ ...runtime.getState(), status: 'paused' }));
+    act(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', key: 'r', bubbles: true })));
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
+    expect(view.container.querySelector('[data-testid="restart-curtain"]')?.getAttribute('data-curtain-phase')).toBe('enter');
     view.unmount();
   });
 
@@ -1912,7 +1945,7 @@ describe('T6 frontend mode binding', () => {
     act(() => [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="settings-sheet"] button')]
       .find((button) => button.textContent === '继续游戏')?.click());
     expectRetiredSheet(view.container, 'settings-sheet');
-    expect(view.container.textContent).not.toContain('暂停');
+    expect(view.container.querySelector('[data-testid="pause-curtain"]')).toBeNull();
     expect(runtime.togglePause).toHaveBeenCalledTimes(1);
     view.unmount();
   });

@@ -83,3 +83,37 @@
   from { opacity: 1; }
   to { opacity: 0; }
 }
+
+.app .entry-countdown[data-curtain-phase="enter"][data-curtain-motion="full"] {
+  animation: d2a-curtain-in 180ms cubic-bezier(.16, 1, .3, 1) both !important;
+}
+
+.app .entry-countdown[data-curtain-phase="exit"][data-curtain-motion="full"] {
+  pointer-events: none;
+  animation: d2a-curtain-out 120ms cubic-bezier(.4, 0, 1, 1) both !important;
+}
+
+.app .entry-countdown[data-curtain-motion="reduced"] {
+  transform: none !important;
+  animation: d2a-opacity-in 32ms linear both !important;
+}
+
+.app .entry-countdown[data-curtain-phase="exit"][data-curtain-motion="reduced"] {
+  pointer-events: none;
+  animation-name: d2a-opacity-out !important;
+}
+
+.app .entry-countdown[data-curtain-phase="steady"] {
+  transform: none !important;
+  animation: none !important;
+}
+
+@keyframes d2a-curtain-in {
+  from { opacity: .94; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes d2a-curtain-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: .96; transform: translateY(-2px); }
+}
