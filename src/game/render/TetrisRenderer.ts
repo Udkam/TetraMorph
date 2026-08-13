@@ -64,6 +64,7 @@ import {
   lineClearVisualDurationMs,
   orderedLineClearRows,
 } from '../../animation/lineClearTimeline';
+import { mutationChainPresentationPlan } from '../../animation/mutationChainTimeline';
 import {
   activeCellsInsideVisibleRows,
   activePresentationScaleFitsVisibleWell,
@@ -3867,7 +3868,7 @@ export class TetrisRenderer {
       return;
     }
     const chainDuration = request.bombOutcome === 'chain-clear'
-      ? this.chainClearDuration(request.chainOriginCells)
+      ? mutationChainPresentationPlan(request.chainOriginCells, this.options.reducedMotion).durationMs
       : 0;
     const timeline = createMutationActivationTimeline(request.item, chainDuration);
     this.mutationFlash = {
@@ -4345,22 +4346,6 @@ export class TetrisRenderer {
     }
   }
 
-  private chainClearDuration(originCells: readonly Cell[]): number {
-    const visibleOriginRows = [...new Set(originCells
-      .map((cell) => cell.y)
-      .filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT))];
-    const distanceFor = visibleOriginRows.length > 0
-      ? (row: number) => Math.min(...visibleOriginRows.map((origin) => Math.abs(row - origin)))
-      : (row: number) => row - VISIBLE_START_ROW;
-    const farthest = Math.max(...Array.from(
-      { length: VISIBLE_HEIGHT },
-      (_, index) => distanceFor(VISIBLE_START_ROW + index),
-    ));
-    return (this.options.reducedMotion ? 50 : 140)
-      + farthest * (this.options.reducedMotion ? 12 : 34)
-      + (this.options.reducedMotion ? 70 : 150);
-  }
-
   private drawMutationChainClear(
     graphics: Graphics,
     flash: MutationFlash,
@@ -4369,19 +4354,12 @@ export class TetrisRenderer {
     const board = flash.particlePreviousBoard;
     if (!board) return;
     const token = MUTATION_VFX_TOKENS.bomb;
-    const originRows = [...new Set(flash.chainOriginCells.map((cell) => cell.y))];
-    const visibleOrigins = originRows.filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT);
-    const distanceFor = visibleOrigins.length > 0
-      ? (row: number) => Math.min(...visibleOrigins.map((origin) => Math.abs(row - origin)))
-      : (row: number) => row - VISIBLE_START_ROW;
-    const revealMs = this.options.reducedMotion ? 50 : 140;
-    const beatMs = this.options.reducedMotion ? 12 : 34;
-    const fadeMs = this.options.reducedMotion ? 70 : 150;
+    const plan = mutationChainPresentationPlan(flash.chainOriginCells, this.options.reducedMotion);
     const visibleOriginCells = flash.chainOriginCells
       .filter((cell) => cell.y >= VISIBLE_START_ROW && cell.y < BOARD_HEIGHT)
       .map((cell) => ({ x: cell.x, y: cell.y - VISIBLE_START_ROW }));
 
-    if (flash.elapsed < revealMs && visibleOriginCells.length > 0) {
+    if (flash.elapsed < plan.revealMs && visibleOriginCells.length > 0) {
       this.drawMutationPieceMaterial(
         graphics,
         visibleOriginCells,
@@ -4393,18 +4371,28 @@ export class TetrisRenderer {
           originX: layout.x,
           originY: layout.y,
           unit: layout.cell,
-          scale: 1 + (1 - flash.elapsed / revealMs) * .06,
+          scale: 1 + (1 - flash.elapsed / plan.revealMs) * .06,
         },
       );
     }
 
-    let lastDistance = 0;
-    for (let row = VISIBLE_START_ROW; row < BOARD_HEIGHT; row += 1) {
-      const distance = distanceFor(row);
-      lastDistance = Math.max(lastDistance, distance);
-      const rowStart = revealMs + distance * beatMs;
-      if (flash.elapsed < rowStart) continue;
-      const progress = Math.min(1, (flash.elapsed - rowStart) / fadeMs);
+    for (const { row, distance, startMs } of plan.rowBeats) {
+      const progress = flash.elapsed < startMs
+        ? 0
+        : Math.min(1, (flash.elapsed - startMs) / plan.fadeMs);
+      const cellAlpha = flash.elapsed < startMs ? 1 : Math.max(0, 1 - progress);
+      for (let x = 0; x < BOARD_WIDTH; x += 1) {
+        const material = board[row]?.[x];
+        if (!material || cellAlpha <= 0) continue;
+        this.drawCellGroups(
+          graphics,
+          [{ x, y: row - VISIBLE_START_ROW }],
+          material,
+          cellAlpha,
+          { originX: layout.x, originY: layout.y, unit: layout.cell },
+        );
+      }
+      if (flash.elapsed < startMs) continue;
       const alpha = Math.max(0, 1 - progress);
       const rowY = layout.y + (row - VISIBLE_START_ROW) * layout.cell;
       graphics
@@ -4420,9 +4408,9 @@ export class TetrisRenderer {
       }
     }
 
-    const tailStart = revealMs + lastDistance * beatMs;
+    const tailStart = plan.durationMs - plan.fadeMs;
     if (flash.elapsed >= tailStart) {
-      const tail = Math.min(1, (flash.elapsed - tailStart) / fadeMs);
+      const tail = Math.min(1, (flash.elapsed - tailStart) / plan.fadeMs);
       graphics
         .rect(layout.x, layout.y, layout.width, layout.height)
         .stroke({

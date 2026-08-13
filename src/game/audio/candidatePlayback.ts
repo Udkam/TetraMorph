@@ -14,6 +14,14 @@ export interface RecoveredNoisePuffOptions extends AcceptedVoiceHooks {
   readonly gainCeiling: number;
 }
 
+export interface ChainPropagationPulseOptions extends AcceptedVoiceHooks {
+  readonly startAt?: number;
+  readonly beatOffsetsSeconds: readonly number[];
+  readonly gain: number;
+  readonly gainBoost: number;
+  readonly gainCeiling: number;
+}
+
 /** Deterministic low-passed pressure texture for bounded material transients. */
 export function scheduleRecoveredNoisePuff(
   context: AudioContext,
@@ -73,5 +81,51 @@ export function scheduleRecoveredNoisePuff(
   options.onVoiceStart?.(voice);
   source.start(start);
   source.stop(end + 0.01);
+  return voice;
+}
+
+/** One cancellable oscillator/gain voice carries every visible chain distance beat. */
+export function scheduleChainPropagationPulses(
+  context: AudioContext,
+  destination: AudioNode,
+  options: ChainPropagationPulseOptions,
+): GestureVoice | null {
+  if (options.beatOffsetsSeconds.length === 0) return null;
+  const baseStart = options.startAt ?? context.currentTime;
+  const pulseDuration = .024;
+  const end = baseStart + options.beatOffsetsSeconds.at(-1)! + pulseDuration;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  const peak = Math.max(SILENCE, Math.min(options.gainCeiling, options.gain * options.gainBoost));
+  oscillator.type = 'triangle';
+  gain.gain.setValueAtTime(SILENCE, baseStart);
+  for (let index = 0; index < options.beatOffsetsSeconds.length; index += 1) {
+    const start = baseStart + options.beatOffsetsSeconds[index]!;
+    oscillator.frequency.setValueAtTime(Math.max(46, 96 - index * 2.2), start);
+    gain.gain.setValueAtTime(SILENCE, start);
+    gain.gain.exponentialRampToValueAtTime(peak, start + .004);
+    gain.gain.exponentialRampToValueAtTime(SILENCE, start + pulseDuration);
+  }
+  oscillator.connect(gain);
+  gain.connect(destination);
+  let disconnected = false;
+  const voice: GestureVoice = {
+    source: oscillator,
+    gain,
+    stop(at = 0): void { try { oscillator.stop(at); } catch { /* Already ended. */ } },
+    disconnect(): void {
+      if (disconnected) return;
+      disconnected = true;
+      oscillator.disconnect();
+      gain.disconnect();
+    },
+  };
+  oscillator.onended = () => {
+    voice.disconnect();
+    options.onVoiceEnd?.(voice);
+  };
+  options.onVoiceStart?.(voice);
+  oscillator.start(baseStart);
+  oscillator.stop(end + .008);
   return voice;
 }

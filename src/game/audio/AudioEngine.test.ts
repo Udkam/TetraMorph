@@ -456,7 +456,7 @@ describe('AudioEngine accepted production contract', () => {
     await audio.prime();
     audio.play([chainClearMutation()]);
 
-    expect(oscillators.length).toBeGreaterThan(3);
+    expect(oscillators).toHaveLength(4);
     expect(oscillators.slice(0, 3).map((node) => node.frequency.setValues[0])).toEqual([
       { value: 58, time: 0 },
       { value: 91, time: 0.11 },
@@ -464,10 +464,12 @@ describe('AudioEngine accepted production contract', () => {
     ]);
     expect(bufferSources).toHaveLength(2);
     expect(filters.map((filter) => filter.frequency.setValues[0]?.value)).toEqual([1_050, 460]);
-    const propagation = oscillators.slice(3).map((node) => node.starts[0]);
-    expect(propagation[0]).toBeCloseTo(.14);
-    expect(propagation[1]).toBeCloseTo(.174);
-    expect(new Set(propagation).size).toBe(propagation.length);
+    const propagation = oscillators[3]!;
+    expect(propagation.starts).toEqual([0]);
+    expect(propagation.frequency.setValues[0]?.time).toBeCloseTo(.14);
+    expect(propagation.frequency.setValues[1]?.time).toBeCloseTo(.174);
+    expect(propagation.frequency.setValues).toHaveLength(20);
+    expect(propagation.frequency.setValues.at(-1)?.time).toBeCloseTo(.786);
   });
 
   it('pins every layer of one clear or Bomb event to one moving AudioContext clock read', async () => {

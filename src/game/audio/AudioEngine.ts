@@ -1,13 +1,14 @@
-import { BOARD_HEIGHT, VISIBLE_START_ROW, type GameEvent, type GameState, type MutationItem } from '../core';
+import type { GameEvent, GameState, MutationItem } from '../core';
 import { browserPlatform, type BrowserPlatform } from '../../platform/browserPlatform';
 import type { VisualThemeId } from '../../design/visualThemes';
 import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
+import { mutationChainPresentationPlan } from '../../animation/mutationChainTimeline';
 import {
   type AudioBus,
   type GestureVoice,
 } from './audioGesture';
 import { audioCue, type CandidateAudioCueId } from './audioPalette';
-import { scheduleRecoveredNoisePuff } from './candidatePlayback';
+import { scheduleChainPropagationPulses, scheduleRecoveredNoisePuff } from './candidatePlayback';
 import { T37_AUDIO_ASSETS, type T37AudioAssetId } from './audioAssetCatalog';
 import {
   ACCEPTED_OUTPUT_GAIN,
@@ -487,36 +488,20 @@ export class AudioEngine {
     const context = this.context;
     const destination = this.buses.mutation;
     if (!context || !destination) return;
-    const visibleOrigins = [...new Set(event.chainOriginCells
-      .map((cell) => cell.y)
-      .filter((row) => row >= VISIBLE_START_ROW && row < BOARD_HEIGHT))];
-    const distanceFor = visibleOrigins.length > 0
-      ? (row: number) => Math.min(...visibleOrigins.map((origin) => Math.abs(row - origin)))
-      : (row: number) => row - VISIBLE_START_ROW;
-    const distances = [...new Set(Array.from(
-      { length: BOARD_HEIGHT - VISIBLE_START_ROW },
-      (_, index) => distanceFor(VISIBLE_START_ROW + index),
-    ))].sort((left, right) => left - right);
-    const hooks = this.voiceHooks(true);
-    const available = Math.max(0, MAX_EFFECT_VOICES - this.activeVoices.size);
-    scheduleToneRecipe(
+    const plan = mutationChainPresentationPlan(event.chainOriginCells);
+    if (this.activeVoices.size >= MAX_EFFECT_VOICES) return;
+    scheduleChainPropagationPulses(
       context,
       destination,
-      distances.slice(0, available).map((distance) => ({
-        frequency: Math.max(46, 96 - distance * 2.2),
-        duration: .035,
-        gain: .036,
-        attack: .004,
-        waveform: 'triangle' as const,
-        delay: .14 + distance * .034,
-        endFrequency: Math.max(38, 76 - distance * 1.8),
-      })),
       {
         startAt,
-        maxVoices: available,
+        beatOffsetsSeconds: plan.distanceBeats.map((distance) => (
+          plan.revealMs / 1_000 + distance * plan.beatMs / 1_000
+        )),
+        gain: .036,
         gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
         gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
-        ...hooks,
+        ...this.voiceHooks(true),
       },
     );
   }
