@@ -2116,6 +2116,19 @@ focused key-frontier test. No Intro-05 candidate run or source integration is op
   bound in receipt/output; manifest hash is exact line+LF and receipt payload hash is
   exact JSON+LF. Docs clarification must commit before external editing continues.
 
+### F4E-R4D post-publication tail precedence
+
+- For receipt-bearing v2 only, the post-hard-link tail supersedes the conflicting R4A
+  tail while every other R4A invariant remains frozen. Its sole order is: verify the
+  final-path canonical bytes; repeat held-handle/fixed-path receipt byte/hash/identity
+  equality; best-effort close the held handle; then make exactly one best-effort owned
+  staging unlink attempt as the terminal operation.
+- Failure in either verification fails closed and preserves output, receipt, and staging
+  for audit. Close/unlink failure is swallowed. No other post-link Git, Core, module,
+  input, proof, serialization, write, mutation, or cleanup operation is permitted.
+- Sole next action: obtain fresh all-zero review and commit only these four documents;
+  only then resume static work on the external v2 bytes. Execution remains closed.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

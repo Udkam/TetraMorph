@@ -6344,3 +6344,17 @@ manifest line followed by one LF byte; receipt `payloadSha256` hashes
 `JSON.stringify(receiptPayload)` followed by one LF byte. The complete receipt is
 `JSON.stringify({schema, payload, payloadSha256})` plus one LF. All use UTF-8 and
 uppercase SHA-256 when recorded in manifest/receipt/output pins.
+
+### F4E-R4D post-publication tail precedence
+
+For the repaired receipt-bearing v2 only, this paragraph supersedes F4E-R4A solely for
+operations after a successful no-replace hard link; every other R4A proof and
+publication invariant remains frozen. The exact permitted tail is: (1) require final-path
+bytes to equal the already-frozen canonical output; (2) through the still-held receipt
+handle and fixed receipt path, repeat receipt byte/hash/identity equality; (3)
+best-effort close that held handle; and (4) make exactly one best-effort unlink attempt
+for the owned staging path. Failure in step 1 or 2 fails closed and leaves output,
+receipt, and staging for audit. Failure in step 3 or 4 is swallowed and cannot alter an
+otherwise successful publication. Step 4 is terminal and nothing follows it. No other
+post-link Git, Core, module, input, proof, serialization, write, mutation, or cleanup
+operation is permitted.

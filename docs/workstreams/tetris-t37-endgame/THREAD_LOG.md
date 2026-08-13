@@ -430,3 +430,16 @@ old screenshot.
   prefix is empty before claim and the chosen path is bound in receipt/output.
 - Manifest hash domain is exact line+LF; receipt payload hash domain is exact JSON+LF.
 - Sole next action: commit this four-doc clarification, then resume external bytes only.
+
+### F4E-R4D post-publication tail precedence
+
+- P1/GAP found: R4A's post-link unlink-only tail conflicts with R4B's required
+  post-publication receipt check/close and does not authorize final-path byte validation.
+- Receipt-bearing v2 supersedes only that R4A tail. Exact order: verify final-path
+  canonical bytes; repeat held-handle/fixed-path receipt byte/hash/identity equality;
+  best-effort close the held handle; then exactly one best-effort owned-staging unlink
+  attempt, which is terminal.
+- Verification failure preserves output, receipt, and staging for audit; close/unlink
+  failure is swallowed. No other post-link operation is admitted.
+- Sole next action: independent all-zero contract review, exact four-doc commit, then
+  external-byte static repair/review only. Production execution remains closed.
