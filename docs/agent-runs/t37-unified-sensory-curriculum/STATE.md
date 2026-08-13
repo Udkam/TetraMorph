@@ -2217,6 +2217,41 @@ F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8B
   post-commit bytes/manifest, both-generation alias/null, AST single-spawn, and full
   preflight all-zero review. Only then may the coordinator run the immediate preflight.
 
+### F4E-R4I consumed v3 / v4 receipt recovery contract
+
+- R4I supersedes every R4H present-tense zero-state, execution, and next-action line;
+  retained R4H material is historical evidence only.
+- R4H command contract committed at
+  `8911a9cf5e9356c3e8beb099f7db53aeb4944e51`; all pre/post-commit reviews and the
+  committed-prefix preflight were green. The exact wrapper then spawned v3 once.
+- V3 created/synced its receipt and failed pre-proof with `EBADF` because line 870 opened
+  `wx` write-only while line 697 read the same handle. V3 must never run again.
+- Frozen v3 receipt: 8,729 bytes /
+  `06E9EACE16C6665FF4220D0753F0DFD5875C742FC1F56C9767771B1CB5A53E44`;
+  payload SHA `E1B6669502DE6055157347A83116053EAF9621D74993038A3A882F9F06C5448B`.
+  V3 output/stage/process are zero. Preserve the receipt at its fixed path without write,
+  rename, link, replacement, cleanup, or deletion.
+- Frozen receipt identity excludes atime and includes `dev=1456395446`,
+  `ino=456270937248336975`, `size=8729`, `mode=33206`, `nlink=1`, and
+  `mtimeNs=ctimeNs=1786600246711586100`.
+- V4 uses wholly new validator/output/attempt/stage, R4I marker/manifest and command,
+  receipt, and output schemas. It changes the attempt handle to `wx+` and expands held-
+  handle/path identity to dev/ino/size/mode/nlink/mtimeNs/ctimeNs at three boundaries.
+- Consumed v3 receipt is checked at wrapper preflight, v4 preclaim, post-proof/pre-stage,
+  and immediate pre-link, never post-link. Windows wrapper rejects `ReparsePoint`; Node
+  claims only regular/non-symlink, exact-realpath, and identity checks.
+- Any post-v4-claim failure performs no recovery/tail action; process exit releases the
+  OS handle while receipt/output/stage remain. Success alone uses the inherited
+  verify/close/terminal-unlink tail, so R4D failure precedence remains intact.
+- Current Node/Windows pure probe passes held-handle/path reads and `EEXIST`; successor
+  receipt matrix must also cover replacement, equal-size mutation, size/time/mode/nlink
+  drift, partial I/O/sync faults, original-handle continuity, and zero residue.
+- Production v4 has no fault seam. A hash-bound in-memory derivative may expose receipt
+  lifecycle only to a fixture-root capability whose every mutation is containment-checked;
+  absolute/escape/prefix-sibling/production/8.3 paths fail before mutation.
+- No v4 production command is open. Sole next action: independently review and commit
+  this exact four-doc incident/successor contract, then create/static-test external v4.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

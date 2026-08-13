@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **ENDGAME NAMESPACE N0 ACCEPTED / CANONICAL INTRO-05 RESUME NEXT**
+Status: **ENDGAME NAMESPACE N0 ACCEPTED / INTRO-05 R4I RECEIPT RECOVERY CONTRACT NEXT**
 
 ## Active objective
 
@@ -9114,3 +9114,55 @@ reviewed and committed. After commit, independent QA must bind the committed byt
 manifest/hash, both-generation alias/8.3/null matrix, PowerShell AST single-spawn shape,
 and all preflights with an all-zero verdict. Only the coordinator may then repeat the
 immediate read-only preflight and, if fully green, consume the sole v3 production spawn.
+
+### F4E-R4I — consumed v3 receipt-reader incident and v4 successor contract
+
+R4I supersedes every R4H present-tense artifact-zero, execution-authority, and next-action
+statement; the retained R4H text is historical evidence only.
+
+Commit `8911a9cf5e9356c3e8beb099f7db53aeb4944e51` materialized the v3 command.
+Three independent pre-commit and three independent post-commit reviews were all zero;
+the committed preflight and 18-case clean-policy matrix also passed. The coordinator then
+ran that exact wrapper once. Its immediate preflight passed, after which v3 created and
+synced its attempt receipt and failed with `EBADF: bad file descriptor, read` at
+`readReceiptFromHandle` line 697, through `verifyReceipt` line 723 and `main` line 873.
+The wrapper returned the required final error: `Do not retry.`
+
+V3 is therefore permanently consumed. Its receipt remains at
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v3.json`:
+8,729 bytes, SHA-256
+`06E9EACE16C6665FF4220D0753F0DFD5875C742FC1F56C9767771B1CB5A53E44`, schema
+`t37-f4e-r4g-attempt-v1`, and payload SHA-256
+`E1B6669502DE6055157347A83116053EAF9621D74993038A3A882F9F06C5448B`.
+It binds HEAD `8911a9c`, v3, the R4G manifest, clue, Core tree, and the never-created
+stage name. V3 output, stage, and process are zero. The receipt must remain at that path
+without write, truncate, replacement, rename, hard-link, cleanup, or deletion.
+
+The failure is pre-proof, not a Core loader, search, certificate, or candidate failure.
+V3 opened the receipt with `wx`, which is exclusive but write-only, then attempted a
+positional read from the same handle. V4 changes that flag to `wx+`: read/write plus the
+same exclusive-create behavior. The current Node/Windows lifecycle probe proves write,
+sync, positioned handle read, and path read all agree while a second `wx+` open returns
+`EEXIST`. V4 also expands receipt identity from `dev/ino/size` to
+`dev/ino/size/mode/nlink/mtimeNs/ctimeNs`; atime is deliberately excluded.
+
+V4 uses only new `validate-v4.mjs`, `candidate-v4.json`, `attempt-v4.json`, v4 stage,
+`F4E-R4I-COMMAND-CONTRACT-V1`, `F4E-R4I-COMMAND-MANIFEST-V1`,
+`t37-f4e-r4i-command-contract-v1`, `t37-f4e-r4i-attempt-v1`, and
+`t37-f4e-endgame-canonical-candidate-v4` identities. The v4 manifest, receipt, output,
+wrapper, and validator must all pin the consumed v3 receipt's bytes, hashes, schema,
+payload hash, regular-file/path status, and frozen physical identity from DESIGN. The
+Windows wrapper additionally rejects `FileAttributes.ReparsePoint`; Node itself claims
+only regular/non-symlink, exact-realpath, and identity checks, not arbitrary vendor tags.
+Both v2 and v3 validators remain retired; neither identity is a v4 alias.
+
+Before any v4 production command can be materialized, independently review and commit
+this exact four-document incident/successor contract. Then freeze an external v4 which
+otherwise inherits every R4A-R4G captured-HEAD loader, clean, runtime, history, receipt,
+stage-preservation, hard-link publication, and terminal-tail invariant. Run only syntax,
+help, exact-byte review, and hash-bound pure receipt/clean/alias/state-machine matrices.
+Production v4 contains no fault-injection seam; the receipt matrix may inject faults only
+through a hash-bound in-memory derivative and a fixture-root-only mutation capability.
+A later four-document command checkpoint and its committed blobs, three-generation
+alias/null predicates, AST single spawn, v3 receipt pin, and full preflight need fresh
+all-zero review. Only then may the coordinator consume one v4 production attempt.

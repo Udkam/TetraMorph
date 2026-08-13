@@ -6886,3 +6886,149 @@ if ($LASTEXITCODE -ne 0) {
 V2 and v3 output, attempt, stage, and matching-process sets are currently zero. This block
 has no execution authority before exact four-document review/commit and the required
 post-commit independent bytes/manifest/alias/AST/preflight all-zero review.
+
+### F4E-R4I consumed v3 incident and v4 receipt recovery
+
+R4I supersedes every R4H present-tense artifact-zero, execution-authority, and next-action
+statement; the retained R4H block records the state before its sole run only.
+
+The exact R4H contract commit is
+`8911a9cf5e9356c3e8beb099f7db53aeb4944e51`. After three all-zero pre-commit reviews,
+three all-zero post-commit reviews, an actual committed-prefix preflight pass, and an
+18/18 clean-policy matrix pass, the coordinator invoked its committed wrapper once.
+The v3 process created, wrote, and synced its receipt, then exited before Core loader
+creation or proof with this exact chain:
+
+```text
+Error: EBADF: bad file descriptor, read
+readReceiptFromHandle (validate-v3.mjs:697:27)
+verifyReceipt (validate-v3.mjs:723:23)
+main (validate-v3.mjs:873:30)
+```
+
+The code opened `attemptPath` with `open(..., 'wx', 0o600)` at line 870. In Node 24,
+`wx` means write-only plus create/exclusive/truncate; the subsequent positional
+`FileHandle.read` is invalid. `wx+` changes only access to read/write while retaining
+exclusive create. On Windows both use `CREATE_NEW`, so an existing file still fails.
+A current-runtime isolated probe passed all four required facts: 14 bytes written and
+synced, 14 bytes read from the same handle, independent path bytes equal, and a second
+`wx+` open failed with `EEXIST`; its temporary namespace residue was zero.
+
+#### Frozen consumed-v3 evidence
+
+V3 is terminally consumed and may never run again. Its only artifact is the immutable
+attempt receipt at the exact path below. V3 output, matching stage, and process are absent.
+
+```text
+path=C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v3.json
+bytes=8729
+sha256=06E9EACE16C6665FF4220D0753F0DFD5875C742FC1F56C9767771B1CB5A53E44
+schema=t37-f4e-r4g-attempt-v1
+payloadSha256=E1B6669502DE6055157347A83116053EAF9621D74993038A3A882F9F06C5448B
+dev=1456395446
+ino=456270937248336975
+size=8729
+mode=33206
+nlink=1
+mtimeNs=1786600246711586100
+ctimeNs=1786600246711586100
+```
+
+Those physical values were equal through fixed-path `lstat` and an independent read-only
+handle. Atime is not an identity field because verification reads may update it. Every v4
+preflight and validator boundary must use strict UTF-8/no-BOM receipt bytes, recompute the
+outer SHA and JSON payload hash, require the exact schema and bound source pins, and bind
+the exact regular non-symbolic-link path and realpath to all seven frozen identity fields.
+The Windows PowerShell wrapper also requires the `ReparsePoint` file attribute to be
+absent. Node's `lstat`/`realpath` checks do not claim detection of every vendor-defined
+reparse tag; the wrapper's Windows attribute gate owns that broader platform check.
+The v3 receipt may not be opened for write, truncated, renamed, unlinked, replaced, linked,
+or cleaned. Any mismatch closes the current boundary without cleanup.
+
+#### V4 namespace and receipt state machine
+
+V4 is a wholly new generation, not a v3 retry or alias:
+
+- validator: `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v4.mjs`;
+- output: `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v4.json`;
+- attempt: `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v4.json`;
+- stage prefix: `t37-f4e-endgame-canonical-candidate-v4.json.tmp-`;
+- marker prefix: `F4E-R4I-COMMAND-CONTRACT-V1 validator=`;
+- manifest prefix: `F4E-R4I-COMMAND-MANIFEST-V1 `;
+- command schema: `t37-f4e-r4i-command-contract-v1`;
+- receipt schema: `t37-f4e-r4i-attempt-v1`;
+- output schema: `t37-f4e-endgame-canonical-candidate-v4`;
+- receipt policy: `held-wx-plus-expanded-identity-v1`.
+
+The v4 attempt handle is created exactly once with `open(attemptPath, 'wx+', 0o600)`.
+V4 writes canonical receipt bytes once, syncs, and never writes through that handle again.
+It pins `dev`, `ino`, `size`, `mode`, `nlink`, `mtimeNs`, and `ctimeNs` immediately after
+sync. Each verification reads from position zero through the original held handle and
+also reads the fixed path, requiring exact expected bytes/hash plus equality between held
+handle stats, fixed-path `lstat`, and the original identity pin. Verification occurs
+immediately after claim, after proof before stage creation, and after the final hard link.
+The successful terminal tail then best-effort closes the held handle and performs its one
+best-effort owned-stage unlink. On any failure after the v4 receipt is claimed, validator
+code performs no recovery or terminal-tail operation and lets the process exit release its
+OS handle; v4 receipt, output, and any stage are preserved, with no explicit close, unlink,
+truncate, rename, replacement, cleanup, or retry. R4I does not supersede R4D failure-tail
+precedence.
+
+V4 otherwise changes no proof or publication semantics. It inherits the exact clue,
+repository/Core bases, captured-HEAD-only Core loader and contract audit, EOL-equivalent
+scoped-clean policy, environment/runtime/Git/history pins, stage `wx`, hard-link output,
+final-path validation, and close-then-single-terminal-unlink ordering. Its manifest,
+receipt, and output additionally include one `consumedV3Attempt` object containing every
+frozen v3 evidence value above. The consumed v3 receipt is revalidated at exactly four
+pre-link boundaries: wrapper preflight, v4 preclaim, post-proof before v4 stage creation,
+and immediately before the output hard link after the owned-stage/runtime/Git gates. Any
+mismatch closes that boundary. No code reads or stats the consumed v3 receipt after the
+hard link; R4D's v4-own receipt/final-output/close/unlink tail remains terminal. Preflight
+rejects all v2/v3/v4 long, slash, relative,
+case, actual 8.3, and unreadable/null Node process identities, pins both retired validator
+files, and requires v2 output/attempt/stage absent, the exact v3 receipt present with v3
+output/stage absent, and every v4 artifact/stage absent before claim.
+
+#### Required non-production matrices and authorization order
+
+The hash-bound receipt matrix must use only fresh external temporary fixtures and leave
+zero residue. Its mutation capability is a closure over one freshly created, canonical
+fixture realpath beneath the canonical OS temp realpath. It accepts only normalized
+relative fixture names, uses separator-aware `relative()` containment for every source,
+target, parent, rename, link, open, chmod, and timestamp operation, and rejects absolute,
+empty, dot/dot-dot, prefix-sibling, production-path, production-basename, and actual-8.3
+aliases before mutation. Production v2/v3/v4 paths are read-only forbidden sentinels;
+pre/post hashes and namespace inventories are defense in depth, not the path firewall.
+The matrix must prove:
+
+1. the frozen `wx` negative reproduces `EBADF` after write/sync;
+2. `wx+` supports claim, sync, and all three held-handle/path verifications;
+3. pre-existing empty and non-empty paths both return `EEXIST` without byte changes;
+4. path replacement/rebinding is either denied by the OS or rejected by identity;
+5. equal-length overwrite, truncate, append, timestamp/mode drift, and hard-link creation
+   are rejected by bytes/hash/size or expanded identity;
+6. partial/short write, short read, and sync failure stop before proof with no production
+   recovery/tail action and preserve claimed receipt/stage evidence without cleanup;
+7. every successful verification uses the original `wx+` handle, never a reopened proxy;
+8. real v3 receipt and all production v2/v3/v4 namespaces remain untouched.
+
+Production v4 imports the native filesystem operations into module-lexical bindings and
+contains no injection parameter, CLI/environment switch, global hook, mutable operation
+table, or test export. Static QA proves those absences. Fault cases are permitted only in
+the matrix: it first pins the exact v4 bytes/hash, validates one-occurrence source anchors,
+removes production `main` in memory, applies an allowlisted exact in-memory substitution
+to fixture-only native-operation wrappers, records the derivative hash, and exports only
+the receipt lifecycle to the matrix. It writes no derived source file and cannot import or
+invoke production `main`. Every mutation wrapper is still gated by the fixture capability.
+After each failure assertion, matrix-harness teardown may close only its own fixture handle
+and remove only its capability-bound fixture root; that teardown is outside the derived
+production lifecycle and must not make a failed production branch appear to close/clean.
+
+First independently review and commit this four-document R4I behavior contract. Only then
+may a writer derive external v4 from the frozen v3, change generation identities, repair
+the receipt state machine above, and build the isolated matrices. Syntax/help, matrix,
+two independent exact-byte/semantic reviews, v4 output/attempt/stage/process zero, and the
+exact consumed v3 receipt present are required
+before a later exact four-document marker/manifest/one-spawn checkpoint. That checkpoint
+then requires post-commit committed-byte, three-generation alias/null, AST, v3 receipt,
+full-preflight, and matrix all-zero QA. No v4 production execution is authorized now.

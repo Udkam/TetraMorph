@@ -522,3 +522,32 @@ F4E-R4G-COMMAND-CONTRACT-V1 validator=25CCD003CBC8E779F3CFBD770A67E16408ED25FB8B
   process namespace, requires both artifact namespaces absent, and rechecks all gates.
 - Next: exact four-doc QA/commit, then post-commit bytes/manifest/alias/null/AST/preflight
   all-zero QA. Production remains closed until that successor review is green.
+
+### F4E-R4I v3 receipt failure and v4 successor boundary
+
+- R4I supersedes every R4H present-tense zero-state, execution, and next-action line;
+  the earlier block is retained only as the pre-run log.
+- R4H committed at `8911a9cf5e9356c3e8beb099f7db53aeb4944e51`; three pre-commit
+  and three post-commit reviews, committed preflight, alias/AST gates, and the 18-case
+  clean matrix were green. The coordinator then invoked the exact wrapper once.
+- V3 wrote/synced an 8,729-byte receipt and failed before Core loader/proof because `wx`
+  created a write-only handle which `verifyReceipt` immediately read (`EBADF`). V3 is
+  consumed and may never run again.
+- Receipt SHA is `06E9EACE16C6665FF4220D0753F0DFD5875C742FC1F56C9767771B1CB5A53E44`;
+  payload SHA is `E1B6669502DE6055157347A83116053EAF9621D74993038A3A882F9F06C5448B`.
+  Output/stage/process are zero. Preserve the receipt path and exact physical identity.
+- Independent root-cause reviews report the expected P1 and agree on a new v4 generation.
+  `wx+` retains exclusive create while adding held-handle read; the current runtime probe
+  confirms same-handle/path equality and second-open `EEXIST` with zero residue.
+- V4 must use fresh validator/output/attempt/stage, R4I marker/manifest and schemas, pin
+  the consumed v3 receipt, expand identity through mode/nlink/times, and inherit every
+  other R4A-R4G loader/clean/receipt/stage/link/tail invariant.
+- V3 receipt checks occur at wrapper, v4 preclaim, post-proof/pre-stage, and immediate
+  pre-link only. Windows wrapper owns the explicit `ReparsePoint` gate; Node does not
+  overclaim arbitrary vendor-tag detection.
+- Failure after a v4 claim performs no recovery/tail action; process exit owns OS-handle
+  release and receipt/output/stage remain. Fault injection exists only in a hash-bound
+  in-memory matrix derivative guarded
+  by a separator-aware fixture-root mutation capability; production v4 exposes no seam.
+- Next: independent review and exact commit of this four-doc R4I behavior contract only.
+  External v4 syntax/help and receipt/clean/alias matrices follow; production is closed.
