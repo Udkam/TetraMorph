@@ -359,6 +359,7 @@ const ENDGAME_PROOF_FIELD_POLICY = Object.freeze({
   phaseTicks: 'proof-quotiented',
   pendingClearRows: 'proof-quotiented',
   gravityTicks: 'proof-quotiented',
+  gravitySubtickRemainder: 'proof-quotiented',
   lockTicks: 'proof-quotiented',
   lockResets: 'proof-quotiented',
   elapsedTicks: 'proof-quotiented',
@@ -409,7 +410,8 @@ function assertProofDecisionDomain(state: GameState): void {
     proofKeyError('state is not an active playing decision');
   }
   if (
-    state.phaseTicks !== 0 || state.gravityTicks !== 0 || state.lockTicks !== 0
+    state.phaseTicks !== 0 || state.gravityTicks !== 0 || state.gravitySubtickRemainder !== 0
+    || state.lockTicks !== 0
     || state.lockResets !== 0 || state.pendingClearRows.length !== 0
   ) proofKeyError('decision timers or pending rows are noncanonical');
   if (state.endgameUndoHistory.length !== 0 || state.endgameActiveSpawnCheckpoint !== null) {
@@ -567,6 +569,7 @@ function decodeProofFrontierStateKey(key: string, context: EndgameProofFrontierC
     phaseTicks: 0,
     pendingClearRows: [],
     gravityTicks: 0,
+    gravitySubtickRemainder: 0,
     lockTicks: 0,
     lockResets: 0,
     elapsedTicks: 0,

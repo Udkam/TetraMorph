@@ -57,7 +57,7 @@ describe('progressive gravity and Survival intervals', () => {
     PROGRESSIVE_GRAVITY_TICKS.forEach((ticks, tier) => {
       expect(gravityForMode('marathon', 0, 0, tier * 10)).toBe(ticks);
     });
-    expect(gravityForMode('marathon', 0, 0, 10_000)).toBe(6);
+    expect(gravityForMode('marathon', 0, 0, 10_000)).toBe(4.8);
     expect(gravityForMode('race', 0, 0, 0)).toBe(SURVIVAL_GRAVITY_TICKS);
     expect(gravityForMode('race', 0, 50_000, 10_000)).toBe(SURVIVAL_GRAVITY_TICKS);
     expect(SURVIVAL_GRAVITY_TICKS).toBe(38);

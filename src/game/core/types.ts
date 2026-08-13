@@ -227,6 +227,8 @@ export interface GameState {
   phaseTicks: number;
   pendingClearRows: number[];
   gravityTicks: number;
+  /** Fixed-point remainder in [0, 9], active only for Classic and Mutation gravity. */
+  gravitySubtickRemainder: number;
   lockTicks: number;
   lockResets: number;
   elapsedTicks: number;

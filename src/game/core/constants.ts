@@ -14,16 +14,19 @@ export const LINE_CLEAR_DELAY_TICKS = 12;
 export const NEXT_QUEUE_SIZE = 5;
 
 export const STANDARD_GRAVITY_TICKS = 48;
-/** Player-selectable Classic opening gravity, expressed at the canonical 60 Hz. */
-export const CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS = 48;
-/** Default fastest Classic gravity: 0.1 seconds per cell. */
-export const CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS = 6;
-export const CLASSIC_STARTING_GRAVITY_MIN_TICKS = 6;
+/** Default Classic opening gravity: 0.6 seconds per cell at the canonical 60 Hz. */
+export const CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS = 36;
+/** Default fastest Classic gravity: 0.08 seconds per cell. */
+export const CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS = 4.8;
+export const CLASSIC_STARTING_GRAVITY_MIN_TICKS = 4.8;
 export const CLASSIC_STARTING_GRAVITY_MAX_TICKS = 60;
+/** @deprecated The selectable cadence is no longer uniformly spaced. */
 export const CLASSIC_GRAVITY_STEP_TICKS = 6;
 export const INITIAL_SURVIVAL_BEDROCK_ROWS = 3;
 export const SURVIVAL_LINES_PER_BEDROCK = 3;
 export const TICKS_PER_SECOND = 60;
+/** Fixed-point precision used only by Classic and Mutation automatic gravity. */
+export const GRAVITY_SUBTICKS_PER_TICK = 10;
 export const SURVIVAL_INITIAL_INTERVAL_SECONDS = 13;
 export const SURVIVAL_INTERVAL_STEP_SECONDS = 1;
 export const SURVIVAL_MIN_INTERVAL_SECONDS = 6;
@@ -53,13 +56,17 @@ export const MUTATION_BOMB_SCORE = 300;
 export const MUTATION_BOMB_ROWS = 3;
 /** Keeps item attachments deterministic without perturbing the ordinary seven-bag. */
 export const MUTATION_RANDOM_SALT = 0x4d55_5441;
-/** Ice slows automatic gravity to exactly one board cell per playing second. */
-export const MUTATION_FREEZE_GRAVITY_TICKS = TICKS_PER_SECOND;
+/** Ice slows automatic gravity to exactly 0.8 seconds per board cell. */
+export const MUTATION_FREEZE_GRAVITY_TICKS = 0.8 * TICKS_PER_SECOND;
 
-/** Default 0.8-second Classic opening pace, accelerating by 0.1 seconds every ten lines. */
-export const PROGRESSIVE_GRAVITY_TICKS = [48, 42, 36, 30, 24, 18, 12, 6] as const;
-/** Mutation alone caps at 0.1 seconds per cell so late-game item play stays responsive. */
-export const MUTATION_GRAVITY_TICKS = [48, 43, 38, 33, 28, 23, 18, 13, 10, 8, 6] as const;
+/** Shared slow-to-fast player choices; fractional ticks are resolved by fixed point. */
+export const CLASSIC_GRAVITY_CHOICES_TICKS = [
+  60, 54, 48, 42, 36, 30, 24, 18, 12, 9, 7.2, 6, 5.4, 4.8,
+] as const;
+/** Default 0.6-to-0.08-second Classic progression, one choice every ten lines. */
+export const PROGRESSIVE_GRAVITY_TICKS = [36, 30, 24, 18, 12, 9, 7.2, 6, 5.4, 4.8] as const;
+/** Mutation follows the exact player-directed 0.6-to-0.08-second ladder. */
+export const MUTATION_GRAVITY_TICKS = [36, 30, 24, 18, 12, 9, 7.2, 6, 5.4, 4.8] as const;
 
 export function speedTierForLines(lines: number): number {
   return Math.min(PROGRESSIVE_GRAVITY_TICKS.length - 1, Math.max(0, Math.floor(lines / 10)));
@@ -67,8 +74,13 @@ export function speedTierForLines(lines: number): number {
 
 export function normalizeClassicStartingGravityTicks(ticks: number): number {
   if (!Number.isFinite(ticks)) return CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS;
-  const stepped = Math.round(ticks / CLASSIC_GRAVITY_STEP_TICKS) * CLASSIC_GRAVITY_STEP_TICKS;
-  return Math.min(CLASSIC_STARTING_GRAVITY_MAX_TICKS, Math.max(CLASSIC_STARTING_GRAVITY_MIN_TICKS, stepped));
+  return CLASSIC_GRAVITY_CHOICES_TICKS.reduce((nearest, choice) => (
+    Math.abs(choice - ticks) < Math.abs(nearest - ticks) ? choice : nearest
+  ));
+}
+
+export function isClassicGravityChoiceTicks(ticks: number): boolean {
+  return CLASSIC_GRAVITY_CHOICES_TICKS.some((choice) => choice === ticks);
 }
 
 export function normalizeClassicGravityFloorTicks(
@@ -86,10 +98,14 @@ export function classicGravityTicks(startingTicks: number, floorTicks: number, l
   const tiers = Math.max(0, Math.floor(lines / 10));
   const normalizedStart = normalizeClassicStartingGravityTicks(startingTicks);
   const normalizedFloor = normalizeClassicGravityFloorTicks(floorTicks, normalizedStart);
-  return Math.max(
-    normalizedFloor,
-    normalizedStart - tiers * CLASSIC_GRAVITY_STEP_TICKS,
-  );
+  const choices: readonly number[] = CLASSIC_GRAVITY_CHOICES_TICKS;
+  const startIndex = choices.indexOf(normalizedStart);
+  const floorIndex = choices.indexOf(normalizedFloor);
+  return choices[Math.min(floorIndex, startIndex + tiers)]!;
+}
+
+export function gravityIntervalSubticks(gravityTicks: number): number {
+  return Math.max(1, Math.round(gravityTicks * GRAVITY_SUBTICKS_PER_TICK));
 }
 
 export function mutationSpeedTierForLines(lines: number): number {

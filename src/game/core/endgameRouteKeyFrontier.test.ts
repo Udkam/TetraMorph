@@ -76,6 +76,7 @@ const FIELD_EXPECTATIONS = {
   phaseTicks: 'canonical-decision',
   pendingClearRows: 'canonical-decision',
   gravityTicks: 'canonical-decision',
+  gravitySubtickRemainder: 'canonical-decision',
   lockTicks: 'canonical-decision',
   lockResets: 'canonical-decision',
   elapsedTicks: 'quotient',
@@ -274,6 +275,7 @@ describe('Endgame exact key-frontier proof codec', () => {
       phaseTicks: 1,
       pendingClearRows: [BOARD_HEIGHT - 1],
       gravityTicks: 1,
+      gravitySubtickRemainder: 1,
       lockTicks: 1,
       lockResets: 1,
     } as const;

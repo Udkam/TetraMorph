@@ -356,10 +356,10 @@ describe('异变 mode', () => {
     expect(observed).toEqual(expected);
   });
 
-  it('caps Mutation gravity at 0.1 seconds per cell without slowing Classic', () => {
+  it('caps Mutation and default Classic gravity at 0.08 seconds per cell', () => {
     expect(gravityForMode('sprint', 0, 0, Number.MAX_SAFE_INTEGER)).toBe(MUTATION_GRAVITY_TICKS.at(-1));
-    expect(MUTATION_GRAVITY_TICKS.at(-1)).toBe(TICKS_PER_SECOND / 10);
-    expect(gravityForMode('marathon', 0, 0, Number.MAX_SAFE_INTEGER)).toBe(6);
+    expect(MUTATION_GRAVITY_TICKS.at(-1)).toBe(TICKS_PER_SECOND * 0.08);
+    expect(gravityForMode('marathon', 0, 0, Number.MAX_SAFE_INTEGER)).toBe(TICKS_PER_SECOND * 0.08);
   });
 
   it('lets any of four marked cells activate one shared carrier identity exactly once', () => {
@@ -513,6 +513,7 @@ describe('异变 mode', () => {
       ...playingMutation(),
       mutationFreezeTicks: MUTATION_EFFECT_TICKS,
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
     };
     const initialY = state.active?.y;
     let frozen = state;
@@ -521,10 +522,12 @@ describe('异变 mode', () => {
     }
     expect(frozen.active?.y).toBe(initialY);
     expect(frozen.gravityTicks).toBe(MUTATION_FREEZE_GRAVITY_TICKS - 1);
+    expect(frozen.gravitySubtickRemainder).toBe(0);
 
     const gravityStep = dispatch(frozen, { type: 'tick' });
     expect(gravityStep.state.active?.y).toBe((initialY ?? 0) + 1);
     expect(gravityStep.state.gravityTicks).toBe(0);
+    expect(gravityStep.state.gravitySubtickRemainder).toBe(0);
     expect(gravityStep.events).toContainEqual({
       type: 'piece-moved',
       piece: state.active?.type,
@@ -545,19 +548,22 @@ describe('异变 mode', () => {
       lines: Number.MAX_SAFE_INTEGER,
       mutationFreezeTicks: 1,
       gravityTicks: MUTATION_FREEZE_GRAVITY_TICKS - 1,
+      gravitySubtickRemainder: 0,
     };
     const finalIceTick = dispatch(start, { type: 'tick' }).state;
     expect(finalIceTick.active?.y).toBe((start.active?.y ?? 0) + 1);
     expect(finalIceTick.mutationFreezeTicks).toBe(0);
     expect(finalIceTick.gravityTicks).toBe(0);
+    expect(finalIceTick.gravitySubtickRemainder).toBe(0);
 
     let restored = finalIceTick;
-    for (let tick = 1; tick < MUTATION_GRAVITY_TICKS.at(-1)!; tick += 1) {
+    for (let tick = 1; tick < 5; tick += 1) {
       restored = dispatch(restored, { type: 'tick' }).state;
     }
     expect(restored.active?.y).toBe(finalIceTick.active?.y);
     restored = dispatch(restored, { type: 'tick' }).state;
     expect(restored.active?.y).toBe((finalIceTick.active?.y ?? 0) + 1);
+    expect(restored.gravitySubtickRemainder).toBe(2);
   });
 
   it('refreshes Ice while the next post-clear spawn claims one existing Supergravity slot', () => {

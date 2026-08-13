@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOARD_HEIGHT, BOARD_WIDTH, CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS, CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS, CLASSIC_STARTING_GRAVITY_MAX_TICKS, CLASSIC_STARTING_GRAVITY_MIN_TICKS, LINE_CLEAR_DELAY_TICKS, LOCK_DELAY_TICKS, MAX_LOCK_RESETS, MUTATION_GRAVITY_TICKS, MUTATION_LINES_PER_SPEED, PROGRESSIVE_GRAVITY_TICKS, STANDARD_GRAVITY_TICKS, SURVIVAL_GRAVITY_TICKS, gravityForMode, normalizeClassicGravityFloorTicks, normalizeClassicStartingGravityTicks } from './constants';
+import { BOARD_HEIGHT, BOARD_WIDTH, CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS, CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS, CLASSIC_STARTING_GRAVITY_MAX_TICKS, CLASSIC_STARTING_GRAVITY_MIN_TICKS, LINE_CLEAR_DELAY_TICKS, LOCK_DELAY_TICKS, MAX_LOCK_RESETS, MUTATION_GRAVITY_TICKS, MUTATION_LINES_PER_SPEED, PROGRESSIVE_GRAVITY_TICKS, STANDARD_GRAVITY_TICKS, SURVIVAL_GRAVITY_TICKS, gravityForMode, gravityIntervalSubticks, normalizeClassicGravityFloorTicks, normalizeClassicStartingGravityTicks } from './constants';
 import { canPlace, createBoard, setCell } from './board';
 import { createInitialState, dispatch, stateHash } from './engine';
 import { cellsForPiece } from './pieces';
@@ -25,11 +25,12 @@ describe('Modern Classic timing and score contract', () => {
     MUTATION_GRAVITY_TICKS.forEach((expected, tier) => {
       expect(gravityForMode('sprint', 0, 0, tier * MUTATION_LINES_PER_SPEED)).toBe(expected);
     });
-    expect(MUTATION_GRAVITY_TICKS).toEqual([48, 43, 38, 33, 28, 23, 18, 13, 10, 8, 6]);
-    expect(gravityForMode('sprint', 0, 0, 48)).toBe(10);
-    expect(gravityForMode('sprint', 0, 0, 54)).toBe(8);
-    expect(gravityForMode('sprint', 0, 0, 60)).toBe(6);
-    expect(gravityForMode('sprint', 0, 0, 10_000)).toBe(6);
+    expect(MUTATION_GRAVITY_TICKS).toEqual([36, 30, 24, 18, 12, 9, 7.2, 6, 5.4, 4.8]);
+    expect(MUTATION_GRAVITY_TICKS.map(gravityIntervalSubticks)).toEqual([360, 300, 240, 180, 120, 90, 72, 60, 54, 48]);
+    expect(gravityForMode('sprint', 0, 0, 42)).toBe(6);
+    expect(gravityForMode('sprint', 0, 0, 48)).toBe(5.4);
+    expect(gravityForMode('sprint', 0, 0, 54)).toBe(4.8);
+    expect(gravityForMode('sprint', 0, 0, 10_000)).toBe(4.8);
     expect(gravityForMode('marathon', 29, 10_000, 10_000)).toBe(CLASSIC_STARTING_GRAVITY_MIN_TICKS);
     expect(gravityForMode('endgame', 29, 10_000, 10_000)).toBe(STANDARD_GRAVITY_TICKS);
   });
@@ -68,7 +69,7 @@ describe('Modern Classic timing and score contract', () => {
     expect(transition.state.level).toBe(0);
     expect(transition.state.combo).toBe(1);
     expect(transition.state.score).toBe(40);
-    expect(gravityForMode('marathon', transition.state.level, transition.state.pieceCount, transition.state.lines)).toBe(42);
+    expect(gravityForMode('marathon', transition.state.level, transition.state.pieceCount, transition.state.lines)).toBe(30);
     expect(transition.events.some((event) => event.type === 'level-up')).toBe(false);
   });
 
@@ -77,6 +78,7 @@ describe('Modern Classic timing and score contract', () => {
     expect(normalizeClassicStartingGravityTicks(1)).toBe(CLASSIC_STARTING_GRAVITY_MIN_TICKS);
     expect(normalizeClassicStartingGravityTicks(999)).toBe(CLASSIC_STARTING_GRAVITY_MAX_TICKS);
     expect(normalizeClassicStartingGravityTicks(47)).toBe(48);
+    expect(normalizeClassicStartingGravityTicks(7.1)).toBe(7.2);
     expect(normalizeClassicGravityFloorTicks(Number.NaN, 48)).toBe(CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS);
     expect(normalizeClassicGravityFloorTicks(54, 48)).toBe(48);
     expect(normalizeClassicGravityFloorTicks(29, 60)).toBe(30);
@@ -96,6 +98,44 @@ describe('Modern Classic timing and score contract', () => {
     }).state;
     expect(restarted.classicStartingGravityTicks).toBe(18);
     expect(restarted.classicGravityFloorTicks).toBe(12);
+  });
+
+  it('retains fixed-point Classic progress across automatic falls and resets it on manual descent', () => {
+    const started = dispatch(createInitialState(321, 'marathon', undefined, 7.2, 4.8), { type: 'start' }).state;
+    const initialY = started.active!.y;
+    const beforeFirstFall = ticks(started, 7);
+    expect(beforeFirstFall.active?.y).toBe(initialY);
+    expect(beforeFirstFall.gravityTicks).toBe(7);
+    expect(beforeFirstFall.gravitySubtickRemainder).toBe(0);
+
+    const firstFall = dispatch(beforeFirstFall, { type: 'tick' }).state;
+    expect(firstFall.active?.y).toBe(initialY + 1);
+    expect(firstFall.gravityTicks).toBe(0);
+    expect(firstFall.gravitySubtickRemainder).toBe(8);
+
+    const secondFall = ticks(firstFall, 7);
+    expect(secondFall.active?.y).toBe(initialY + 2);
+    expect(secondFall.gravityTicks).toBe(0);
+    expect(secondFall.gravitySubtickRemainder).toBe(6);
+
+    const manuallyDropped = dispatch(secondFall, { type: 'soft-drop' }).state;
+    expect(manuallyDropped.gravityTicks).toBe(0);
+    expect(manuallyDropped.gravitySubtickRemainder).toBe(0);
+  });
+
+  it('keeps bounded remainder when a fast automatic step is blocked by the floor', () => {
+    const state: GameState = {
+      ...dispatch(createInitialState(322, 'marathon', undefined, 4.8, 4.8), { type: 'start' }).state,
+      board: createBoard(),
+      active: { type: 'O', rotation: 0, x: 4, y: 38 },
+      gravityTicks: 4,
+      gravitySubtickRemainder: 0,
+    };
+    const transition = dispatch(state, { type: 'tick' });
+    expect(transition.state.active).toEqual(state.active);
+    expect(transition.state.gravityTicks).toBe(0);
+    expect(transition.state.gravitySubtickRemainder).toBe(2);
+    expect(transition.events).toEqual([]);
   });
 
   it('adds a Classic chain bonus and breaks the chain on a non-clearing lock', () => {
@@ -179,6 +219,18 @@ describe('restart and serializable invariants', () => {
     changed = dispatch(changed, { type: 'hard-drop' }).state;
     const restarted = dispatch(changed, { type: 'restart', seed: 541 }).state;
     expect(stateHash(restarted)).toBe(stateHash(initial));
+  });
+
+  it('hashes fixed-point progress only in Classic and Mutation domains', () => {
+    const classic = createInitialState(610, 'marathon');
+    const mutation = createInitialState(610, 'sprint');
+    const survival = createInitialState(610, 'race');
+    const endgame = createInitialState(610, 'endgame');
+
+    expect(stateHash({ ...classic, gravitySubtickRemainder: 1 })).not.toBe(stateHash(classic));
+    expect(stateHash({ ...mutation, gravitySubtickRemainder: 1 })).not.toBe(stateHash(mutation));
+    expect(stateHash({ ...survival, gravitySubtickRemainder: 1 })).toBe(stateHash(survival));
+    expect(stateHash({ ...endgame, gravitySubtickRemainder: 1 })).toBe(stateHash(endgame));
   });
 
   it('preserves board and active-piece invariants over a deterministic command stress run', () => {

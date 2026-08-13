@@ -4,6 +4,7 @@ import {
   CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS,
   CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS,
   ENTRY_DELAY_TICKS,
+  GRAVITY_SUBTICKS_PER_TICK,
   LINE_CLEAR_BASE_SCORE,
   LINE_CLEAR_DELAY_TICKS,
   LOCK_DELAY_TICKS,
@@ -30,6 +31,7 @@ import {
   TICKS_PER_SECOND,
   VISIBLE_START_ROW,
   gravityForMode,
+  gravityIntervalSubticks,
   normalizeClassicGravityFloorTicks,
   normalizeClassicStartingGravityTicks,
   survivalIntervalTicks,
@@ -141,6 +143,7 @@ function endgameFailure(
       phaseTicks: 0,
       pendingClearRows: [],
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
       lockResets: 0,
       endgameCompletion: completion,
@@ -190,6 +193,7 @@ function spawnPiece(state: GameState, type?: PieceType): GameTransition {
       phaseTicks: 0,
       pendingClearRows: [],
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
       lockResets: 0,
   };
@@ -336,6 +340,7 @@ export function createInitialState(
     phaseTicks: 0,
     pendingClearRows: [],
     gravityTicks: 0,
+    gravitySubtickRemainder: 0,
     lockTicks: 0,
     lockResets: 0,
     elapsedTicks: 0,
@@ -366,6 +371,7 @@ function finishEndgameSuccess(state: GameState): GameTransition {
       phaseTicks: 0,
       pendingClearRows: [],
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
       lockResets: 0,
       endgameCompletion: 'finished',
@@ -388,6 +394,7 @@ function resolveEndgameAfterLock(state: GameState, spawnImmediately: boolean): G
       phase: 'entry',
       phaseTicks: 0,
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
       lockResets: 0,
     },
@@ -701,6 +708,7 @@ function settleSurvivalDebris(state: GameState): {
       active: resolved.active,
       survivalDebris: resolved.survivalDebris,
       gravityTicks: resolved.pushedActive ? 0 : state.gravityTicks,
+      gravitySubtickRemainder: resolved.pushedActive ? 0 : state.gravitySubtickRemainder,
       lockTicks: resolved.pushedActive ? 0 : state.lockTicks,
     },
     landed: resolved.landed,
@@ -755,6 +763,7 @@ function advanceSurvivalDebris(state: GameState): SurvivalDebrisAdvance {
       phaseTicks: 0,
       pendingClearRows,
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
     },
     events: [...events, { type: 'clear-started', rows: newlyFull }],
@@ -908,7 +917,8 @@ function moveActive(state: GameState, dx: number, dy: number, cause: 'move' | 'g
     state: {
       ...state,
       active: candidate,
-      gravityTicks: dy > 0 ? 0 : state.gravityTicks,
+      gravityTicks: dy > 0 && cause !== 'gravity' ? 0 : state.gravityTicks,
+      gravitySubtickRemainder: dy > 0 && cause !== 'gravity' ? 0 : state.gravitySubtickRemainder,
       lockTicks: remainsGrounded ? (canReset ? 0 : state.lockTicks) : 0,
       lockResets: canReset ? state.lockResets + 1 : state.lockResets,
       score: cause === 'soft-drop' ? state.score + 1 : state.score,
@@ -1146,6 +1156,8 @@ function lockActive(
     ...state,
     board,
     active: null,
+    gravityTicks: 0,
+    gravitySubtickRemainder: 0,
     pieceCount,
     survivalDebrisPiecesRemaining: state.mode === 'race'
       ? Math.max(0, state.survivalDebrisPiecesRemaining - 1)
@@ -1180,6 +1192,7 @@ function lockActive(
       phaseTicks: 0,
       pendingClearRows: rows,
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
     };
     return {
@@ -1195,6 +1208,7 @@ function lockActive(
         phase: 'entry',
         phaseTicks: 0,
         gravityTicks: 0,
+        gravitySubtickRemainder: 0,
         lockTicks: 0,
         lockResets: 0,
         combo: 0,
@@ -1210,6 +1224,7 @@ function lockActive(
       phaseTicks: 0,
       pendingClearRows: [],
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
       lockResets: 0,
       combo: 0,
@@ -1227,6 +1242,7 @@ function lockActive(
       phaseTicks: 0,
       pendingClearRows: [],
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
       lockResets: 0,
       combo: 0,
@@ -1246,6 +1262,7 @@ function lockActive(
       phase: 'entry',
       phaseTicks: 0,
       gravityTicks: 0,
+      gravitySubtickRemainder: 0,
       lockTicks: 0,
       combo: 0,
     },
@@ -1265,7 +1282,7 @@ function hardDrop(state: GameState): GameTransition {
   const next = { ...state, active: candidate, score: state.score + distance * 2 };
   if (hasFallingSurvivalContact(next, candidate)) {
     return {
-      state: { ...next, gravityTicks: 0, lockTicks: 0 },
+      state: { ...next, gravityTicks: 0, gravitySubtickRemainder: 0, lockTicks: 0 },
       events: [{ type: 'piece-moved', piece: candidate.type, dx: 0, dy: distance, cause: 'hard-drop' }],
     };
   }
@@ -1393,6 +1410,7 @@ function finishLineClear(state: GameState): GameTransition {
           phase: 'active',
           phaseTicks: 0,
           gravityTicks: 0,
+          gravitySubtickRemainder: 0,
           lockTicks: 0,
           lockResets: 0,
         },
@@ -1468,7 +1486,6 @@ function tick(state: GameState): GameTransition {
     next = { ...next, lockTicks: 0 };
   }
 
-  const gravityTicks = next.gravityTicks + 1;
   const gravityInterval = freezeGravityActive
     ? MUTATION_FREEZE_GRAVITY_TICKS
     : gravityForMode(
@@ -1479,8 +1496,37 @@ function tick(state: GameState): GameTransition {
       next.classicStartingGravityTicks,
       next.classicGravityFloorTicks,
     );
+  if (next.mode === 'marathon' || next.mode === 'sprint') {
+    const gravityIntervalSubtickCount = gravityIntervalSubticks(gravityInterval);
+    const accumulated = next.gravityTicks * GRAVITY_SUBTICKS_PER_TICK
+      + next.gravitySubtickRemainder
+      + GRAVITY_SUBTICKS_PER_TICK;
+    const freezeExpiredThisTick = freezeGravityActive && next.mutationFreezeTicks === 0;
+    if (accumulated >= gravityIntervalSubtickCount) {
+      const remainder = accumulated - gravityIntervalSubtickCount;
+      const moved = moveActive({
+        ...next,
+        gravityTicks: Math.floor(remainder / GRAVITY_SUBTICKS_PER_TICK),
+        gravitySubtickRemainder: remainder % GRAVITY_SUBTICKS_PER_TICK,
+      }, 0, 1, 'gravity');
+      const movedState = freezeExpiredThisTick
+        ? { ...moved.state, gravityTicks: 0, gravitySubtickRemainder: 0 }
+        : moved.state;
+      return { state: movedState, events: [...timedEvents, ...moved.events] };
+    }
+    const progressedState = freezeExpiredThisTick
+      ? { ...next, gravityTicks: 0, gravitySubtickRemainder: 0 }
+      : {
+          ...next,
+          gravityTicks: Math.floor(accumulated / GRAVITY_SUBTICKS_PER_TICK),
+          gravitySubtickRemainder: accumulated % GRAVITY_SUBTICKS_PER_TICK,
+        };
+    return { state: progressedState, events: timedEvents };
+  }
+
+  const gravityTicks = next.gravityTicks + 1;
   if (gravityTicks >= gravityInterval) {
-    const moved = moveActive({ ...next, gravityTicks: 0 }, 0, 1, 'gravity');
+    const moved = moveActive({ ...next, gravityTicks: 0, gravitySubtickRemainder: 0 }, 0, 1, 'gravity');
     return { state: moved.state, events: [...timedEvents, ...moved.events] };
   }
   return { state: { ...next, gravityTicks }, events: timedEvents };
@@ -1548,13 +1594,14 @@ export function replay(
 }
 
 export function stateHash(state: GameState): string {
-  // Mode-private fields stay out of unrelated replays so the established Classic,
-  // Survival, and Endgame hash domains remain stable. 异变 keeps its item/timer state
-  // in its own canonical payload because that state changes legal future play.
+  // Mode-private fields stay out of unrelated replays. Classic and Mutation include
+  // fixed-point gravity progress because it changes the next automatic fall; Survival
+  // and Endgame exclude its invariant-zero remainder to preserve their hash domains.
   const canonicalState = state.mode === 'endgame'
     ? (() => {
       const {
         combo: _combo,
+        gravitySubtickRemainder: _gravitySubtickRemainder,
         classicStartingGravityTicks: _classicStartingGravityTicks,
         classicGravityFloorTicks: _classicGravityFloorTicks,
         survivalBedrockRows: _survivalBedrockRows,
@@ -1661,6 +1708,7 @@ export function stateHash(state: GameState): string {
       }
       const {
         combo: _combo,
+        gravitySubtickRemainder: _gravitySubtickRemainder,
         classicStartingGravityTicks: _classicStartingGravityTicks,
         classicGravityFloorTicks: _classicGravityFloorTicks,
         mutationActiveCarrier: _mutationActiveCarrier,
