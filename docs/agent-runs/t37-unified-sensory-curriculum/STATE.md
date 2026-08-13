@@ -2527,6 +2527,10 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   authorizes only replacing those two old `chainOriginCells` arguments with the same
   event's `chainTriggerRows` inside the visual/timeline checkpoint. Audio assets, recipes,
   gains, palette, queue policy, expectations, and human acceptance remain closed.
+- Targeted `AudioEngine.test.ts` then proves two assertions are numerically stale: the
+  first plan beats still demand `0.14 / 0.174 s`, and the chained successor still demands
+  `0.936 s`. The same source checkpoint now owns only these R2-plan numeric expectations
+  (including their unchanged beat cardinality); qualitative audio assertions stay frozen.
 
 ## Do not repeat
 

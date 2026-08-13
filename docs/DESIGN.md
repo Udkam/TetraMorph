@@ -73,6 +73,9 @@ existing duration/propagation call sites therefore pass `chainTriggerRows` in th
 source checkpoint as the renderer migration. This is a compile and causal-origin repair
 only: it does not authorize a new sample, synthesis recipe, gain, palette entry, voice
 policy, queue policy, or listening-acceptance claim.
+Its direct audio test may update only the numeric beat/start assertions invalidated by
+those two call-site arguments and the already-frozen `220 / 56 / 220 ms` plan. The test
+must remain a behavioral gate and may not relax any qualitative sound distinction.
 
 ### Explosion visual language and timing
 

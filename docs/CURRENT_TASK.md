@@ -71,7 +71,11 @@ also the existing production-audio scheduler, that same checkpoint additionally 
 the two `mutationChainPresentationPlan(...)` call sites in
 `src/game/audio/AudioEngine.ts`: both must pass `event.chainTriggerRows`. This narrow
 compile/causality repair may not change a cue recipe, gain, asset, palette, voice limit,
-queue rule, or audio expectation; the unaccepted Boom candidates remain isolated. Isolated audition artifacts live
+queue rule, or cue-behavior expectation; the unaccepted Boom candidates remain isolated.
+The checkpoint also owns only the directly stale numeric assertions in
+`src/game/audio/AudioEngine.test.ts`: the first two shared-plan beat starts and chained
+successor start must be updated from the rejected timeline to the exact R2 plan values.
+No qualitative cue expectation or unrelated fixture may change. Isolated audition artifacts live
 only under `docs/evidence/t37/bomb-boom-audition-r2/`; they may not change product audio.
 New full/reduced dense-board evidence must prove trigger-row-only first impact, symmetric
 fronts, no unreached-row fragments, no permanent wash/border, normal-Bomb motif reuse,
