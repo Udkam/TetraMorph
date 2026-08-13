@@ -1,0 +1,1783 @@
+{
+  "schemaVersion": 1,
+  "result": "PASS",
+  "sourceSha": "4d39951421234c8465960c4b81c6a7df7e0a804d",
+  "origin": "http://127.0.0.1:5173",
+  "evidenceBoundary": {
+    "liveApp": "integration, one Canvas, real controls, zero errors, restart/exit cleanup",
+    "sourceBoundRenderer": "supplemental deterministic Core-to-renderer Bomb frames; not a natural-play App claim"
+  },
+  "productBindingPaths": [
+    "src",
+    "index.html",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "tsconfig.app.json",
+    "tsconfig.node.json",
+    "vite.config.ts"
+  ],
+  "live": {
+    "input": {
+      "before": {
+        "active": {
+          "type": "T",
+          "rotation": 0,
+          "x": 3,
+          "y": 19
+        },
+        "score": 0,
+        "lockedCells": 0
+      },
+      "afterLeft": {
+        "type": "T",
+        "rotation": 0,
+        "x": 2,
+        "y": 19
+      },
+      "afterRotate": {
+        "type": "T",
+        "rotation": 1,
+        "x": 2,
+        "y": 19
+      },
+      "afterHardDrop": {
+        "score": 36,
+        "lockedCells": 4
+      }
+    },
+    "before": {
+      "canvasCount": 1,
+      "domCellCount": 0,
+      "qa": true,
+      "status": "playing",
+      "renderText": "function",
+      "viewportOverflow": 0
+    },
+    "restart": {
+      "sameCanvas": true,
+      "canvasCount": 1,
+      "queueItems": []
+    },
+    "exit": {
+      "canvasCount": 0,
+      "qa": false,
+      "renderText": "undefined"
+    }
+  },
+  "renderer": {
+    "captures": [
+      {
+        "scenario": "chain-full",
+        "label": "precommit-start",
+        "elapsedMs": 0,
+        "file": "chain-full-precommit-start.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 63
+        },
+        "visibleLockedCells": 15,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 15
+      },
+      {
+        "scenario": "chain-full",
+        "label": "precommit-tail",
+        "elapsedMs": 199.9,
+        "file": "chain-full-precommit-tail.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 62
+        },
+        "visibleLockedCells": 15,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 15
+      },
+      {
+        "scenario": "chain-full",
+        "label": "origin",
+        "elapsedMs": 0,
+        "file": "chain-full-origin.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 88
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 596,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-full",
+        "label": "before-first-beat",
+        "elapsedMs": 139,
+        "file": "chain-full-before-first-beat.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 91
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 139,
+          "durationMs": 596,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.2332214765100671,
+              "value": 0.2332214765100671
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-full",
+        "label": "first-beat",
+        "elapsedMs": 140,
+        "file": "chain-full-first-beat.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 114
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 140,
+          "durationMs": 596,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.2348993288590604,
+              "value": 0.2348993288590604
+            },
+            {
+              "id": "impact",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-full",
+        "label": "second-beat",
+        "elapsedMs": 174,
+        "file": "chain-full-second-beat.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 135
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 174,
+          "durationMs": 596,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.29194630872483224,
+              "value": 0.29194630872483224
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-full",
+        "label": "mid-wave",
+        "elapsedMs": 259,
+        "file": "chain-full-mid-wave.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 127
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 259,
+          "durationMs": 596,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.43456375838926176,
+              "value": 0.43456375838926176
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-full",
+        "label": "tail",
+        "elapsedMs": 595,
+        "file": "chain-full-tail.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 51
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 595,
+          "durationMs": 596,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.9983221476510067,
+              "value": 0.9983221476510067
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-full",
+        "label": "complete",
+        "elapsedMs": 596,
+        "file": "chain-full-complete.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 52
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "precommit-start",
+        "elapsedMs": 0,
+        "file": "chain-reduced-precommit-start.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 64
+        },
+        "visibleLockedCells": 15,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 15
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "precommit-tail",
+        "elapsedMs": 199.9,
+        "file": "chain-reduced-precommit-tail.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 62
+        },
+        "visibleLockedCells": 15,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 15
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "origin",
+        "elapsedMs": 0,
+        "file": "chain-reduced-origin.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 88
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 228,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "before-first-beat",
+        "elapsedMs": 49,
+        "file": "chain-reduced-before-first-beat.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 92
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 49,
+          "durationMs": 228,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.2149122807017544,
+              "value": 0.2149122807017544
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "first-beat",
+        "elapsedMs": 50,
+        "file": "chain-reduced-first-beat.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 74
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 50,
+          "durationMs": 228,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.21929824561403508,
+              "value": 0.21929824561403508
+            },
+            {
+              "id": "impact",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "second-beat",
+        "elapsedMs": 62,
+        "file": "chain-reduced-second-beat.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 80
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 62,
+          "durationMs": 228,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.2719298245614035,
+              "value": 0.2719298245614035
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "mid-wave",
+        "elapsedMs": 92,
+        "file": "chain-reduced-mid-wave.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 72
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 92,
+          "durationMs": 228,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.40350877192982454,
+              "value": 0.40350877192982454
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "tail",
+        "elapsedMs": 227,
+        "file": "chain-reduced-tail.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 29
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 227,
+          "durationMs": 228,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.9956140350877193,
+              "value": 0.9956140350877193
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4,
+            8,
+            9
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "chain-reduced",
+        "label": "complete",
+        "elapsedMs": 228,
+        "file": "chain-reduced-complete.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 27
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "normal-disjoint",
+        "label": "baseline",
+        "elapsedMs": 0,
+        "file": "normal-disjoint-baseline.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 38
+        },
+        "visibleLockedCells": 1,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 1
+      },
+      {
+        "scenario": "normal-disjoint",
+        "label": "warning",
+        "elapsedMs": 0,
+        "file": "normal-disjoint-warning.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 49
+        },
+        "visibleLockedCells": 1,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 2.220446049250313e-16
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            3,
+            8
+          ]
+        },
+        "stateLockedCells": 1
+      },
+      {
+        "scenario": "normal-disjoint",
+        "label": "impact",
+        "elapsedMs": 220,
+        "file": "normal-disjoint-impact.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 65
+        },
+        "visibleLockedCells": 1,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 220,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "impact",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            3,
+            8
+          ]
+        },
+        "stateLockedCells": 1
+      },
+      {
+        "scenario": "normal-hidden",
+        "label": "baseline",
+        "elapsedMs": 0,
+        "file": "normal-hidden-baseline.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 26
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "normal-hidden",
+        "label": "warning",
+        "elapsedMs": 0,
+        "file": "normal-hidden-warning.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 26
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 2.220446049250313e-16
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            4
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "normal-hidden",
+        "label": "pulse",
+        "elapsedMs": 160,
+        "file": "normal-hidden-pulse.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 25
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 160,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "pulse",
+              "active": true,
+              "complete": false,
+              "progress": 0.4,
+              "value": 1.02902752
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            4
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "normal-hidden",
+        "label": "shockwave",
+        "elapsedMs": 400,
+        "file": "normal-hidden-shockwave.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 24
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 400,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "shockwave",
+              "active": true,
+              "complete": false,
+              "progress": 0.15384615384615385,
+              "value": 0.3941738734638143
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4
+          ]
+        },
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "normal-hidden-reduced",
+        "label": "baseline",
+        "elapsedMs": 0,
+        "file": "normal-hidden-reduced-baseline.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 26
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": null,
+        "stateLockedCells": 0
+      },
+      {
+        "scenario": "normal-hidden-reduced",
+        "label": "endpoint",
+        "elapsedMs": 0,
+        "file": "normal-hidden-reduced-endpoint.png",
+        "pixelProbe": {
+          "samples": 8192,
+          "nonTransparentSamples": 8192,
+          "distinctBuckets": 26
+        },
+        "visibleLockedCells": 0,
+        "ordinaryCueCount": 0,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 2.220446049250313e-16
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            4
+          ]
+        },
+        "stateLockedCells": 0
+      }
+    ],
+    "fullChain": {
+      "startEvent": {
+        "type": "clear-started",
+        "rows": [
+          30
+        ],
+        "mutationBombOutcome": "chain-clear"
+      },
+      "bombEvent": {
+        "type": "mutation-activated",
+        "item": "bomb",
+        "durationTicks": 0,
+        "score": 600,
+        "rowsRemoved": 3,
+        "triggerCells": [
+          {
+            "x": 8,
+            "y": 29
+          },
+          {
+            "x": 9,
+            "y": 29
+          },
+          {
+            "x": 8,
+            "y": 30
+          },
+          {
+            "x": 9,
+            "y": 30
+          },
+          {
+            "x": 4,
+            "y": 29
+          }
+        ],
+        "blastRows": [
+          29,
+          30,
+          31
+        ],
+        "participatingBombCount": 2,
+        "bombOutcome": "chain-clear",
+        "chainOriginCarrierId": 1,
+        "chainOriginCells": [
+          {
+            "x": 8,
+            "y": 29
+          },
+          {
+            "x": 9,
+            "y": 29
+          },
+          {
+            "x": 8,
+            "y": 30
+          },
+          {
+            "x": 9,
+            "y": 30
+          }
+        ]
+      },
+      "plan": {
+        "originVisible": true,
+        "rowBeats": [
+          {
+            "row": 20,
+            "distance": 9,
+            "startMs": 446
+          },
+          {
+            "row": 21,
+            "distance": 8,
+            "startMs": 412
+          },
+          {
+            "row": 22,
+            "distance": 7,
+            "startMs": 378
+          },
+          {
+            "row": 23,
+            "distance": 6,
+            "startMs": 344
+          },
+          {
+            "row": 24,
+            "distance": 5,
+            "startMs": 310
+          },
+          {
+            "row": 25,
+            "distance": 4,
+            "startMs": 276
+          },
+          {
+            "row": 26,
+            "distance": 3,
+            "startMs": 242
+          },
+          {
+            "row": 27,
+            "distance": 2,
+            "startMs": 208
+          },
+          {
+            "row": 28,
+            "distance": 1,
+            "startMs": 174
+          },
+          {
+            "row": 29,
+            "distance": 0,
+            "startMs": 140
+          },
+          {
+            "row": 30,
+            "distance": 0,
+            "startMs": 140
+          },
+          {
+            "row": 31,
+            "distance": 1,
+            "startMs": 174
+          },
+          {
+            "row": 32,
+            "distance": 2,
+            "startMs": 208
+          },
+          {
+            "row": 33,
+            "distance": 3,
+            "startMs": 242
+          },
+          {
+            "row": 34,
+            "distance": 4,
+            "startMs": 276
+          },
+          {
+            "row": 35,
+            "distance": 5,
+            "startMs": 310
+          },
+          {
+            "row": 36,
+            "distance": 6,
+            "startMs": 344
+          },
+          {
+            "row": 37,
+            "distance": 7,
+            "startMs": 378
+          },
+          {
+            "row": 38,
+            "distance": 8,
+            "startMs": 412
+          },
+          {
+            "row": 39,
+            "distance": 9,
+            "startMs": 446
+          }
+        ],
+        "distanceBeats": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "beatStartsMs": [
+          140,
+          174,
+          208,
+          242,
+          276,
+          310,
+          344,
+          378,
+          412,
+          446
+        ],
+        "revealMs": 140,
+        "beatMs": 34,
+        "fadeMs": 150,
+        "durationMs": 596
+      },
+      "boardEmptyAfterCommit": true
+    },
+    "reducedChain": {
+      "startEvent": {
+        "type": "clear-started",
+        "rows": [
+          30
+        ],
+        "mutationBombOutcome": "chain-clear"
+      },
+      "bombEvent": {
+        "type": "mutation-activated",
+        "item": "bomb",
+        "durationTicks": 0,
+        "score": 600,
+        "rowsRemoved": 3,
+        "triggerCells": [
+          {
+            "x": 8,
+            "y": 29
+          },
+          {
+            "x": 9,
+            "y": 29
+          },
+          {
+            "x": 8,
+            "y": 30
+          },
+          {
+            "x": 9,
+            "y": 30
+          },
+          {
+            "x": 4,
+            "y": 29
+          }
+        ],
+        "blastRows": [
+          29,
+          30,
+          31
+        ],
+        "participatingBombCount": 2,
+        "bombOutcome": "chain-clear",
+        "chainOriginCarrierId": 1,
+        "chainOriginCells": [
+          {
+            "x": 8,
+            "y": 29
+          },
+          {
+            "x": 9,
+            "y": 29
+          },
+          {
+            "x": 8,
+            "y": 30
+          },
+          {
+            "x": 9,
+            "y": 30
+          }
+        ]
+      },
+      "plan": {
+        "originVisible": true,
+        "rowBeats": [
+          {
+            "row": 20,
+            "distance": 9,
+            "startMs": 158
+          },
+          {
+            "row": 21,
+            "distance": 8,
+            "startMs": 146
+          },
+          {
+            "row": 22,
+            "distance": 7,
+            "startMs": 134
+          },
+          {
+            "row": 23,
+            "distance": 6,
+            "startMs": 122
+          },
+          {
+            "row": 24,
+            "distance": 5,
+            "startMs": 110
+          },
+          {
+            "row": 25,
+            "distance": 4,
+            "startMs": 98
+          },
+          {
+            "row": 26,
+            "distance": 3,
+            "startMs": 86
+          },
+          {
+            "row": 27,
+            "distance": 2,
+            "startMs": 74
+          },
+          {
+            "row": 28,
+            "distance": 1,
+            "startMs": 62
+          },
+          {
+            "row": 29,
+            "distance": 0,
+            "startMs": 50
+          },
+          {
+            "row": 30,
+            "distance": 0,
+            "startMs": 50
+          },
+          {
+            "row": 31,
+            "distance": 1,
+            "startMs": 62
+          },
+          {
+            "row": 32,
+            "distance": 2,
+            "startMs": 74
+          },
+          {
+            "row": 33,
+            "distance": 3,
+            "startMs": 86
+          },
+          {
+            "row": 34,
+            "distance": 4,
+            "startMs": 98
+          },
+          {
+            "row": 35,
+            "distance": 5,
+            "startMs": 110
+          },
+          {
+            "row": 36,
+            "distance": 6,
+            "startMs": 122
+          },
+          {
+            "row": 37,
+            "distance": 7,
+            "startMs": 134
+          },
+          {
+            "row": 38,
+            "distance": 8,
+            "startMs": 146
+          },
+          {
+            "row": 39,
+            "distance": 9,
+            "startMs": 158
+          }
+        ],
+        "distanceBeats": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "beatStartsMs": [
+          50,
+          62,
+          74,
+          86,
+          98,
+          110,
+          122,
+          134,
+          146,
+          158
+        ],
+        "revealMs": 50,
+        "beatMs": 12,
+        "fadeMs": 70,
+        "durationMs": 228
+      },
+      "boardEmptyAfterCommit": true
+    },
+    "normalDisjoint": {
+      "bombEvent": {
+        "type": "mutation-activated",
+        "item": "bomb",
+        "durationTicks": 0,
+        "score": 600,
+        "rowsRemoved": 2,
+        "triggerCells": [
+          {
+            "x": 3,
+            "y": 30
+          },
+          {
+            "x": 8,
+            "y": 39
+          }
+        ],
+        "blastRows": [
+          29,
+          30,
+          31,
+          38,
+          39
+        ],
+        "participatingBombCount": 2,
+        "bombOutcome": "blast"
+      }
+    },
+    "normalHidden": {
+      "bombEvent": {
+        "type": "mutation-activated",
+        "item": "bomb",
+        "durationTicks": 0,
+        "score": 300,
+        "rowsRemoved": 1,
+        "triggerCells": [
+          {
+            "x": 4,
+            "y": 3
+          }
+        ],
+        "blastRows": [
+          2,
+          3,
+          4
+        ],
+        "participatingBombCount": 1,
+        "bombOutcome": "blast"
+      }
+    },
+    "toggle": {
+      "beforeToggle": {
+        "item": "bomb",
+        "elapsedMs": 238.4,
+        "durationMs": 596,
+        "phases": [
+          {
+            "id": "chain-propagation",
+            "active": true,
+            "complete": false,
+            "progress": 0.4,
+            "value": 0.4
+          },
+          {
+            "id": "impact",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          }
+        ],
+        "particlesEmitted": true,
+        "triggerColumns": [
+          4,
+          8,
+          9
+        ]
+      },
+      "afterReduced": {
+        "item": "bomb",
+        "elapsedMs": 91.2,
+        "durationMs": 228,
+        "phases": [
+          {
+            "id": "chain-propagation",
+            "active": true,
+            "complete": false,
+            "progress": 0.4,
+            "value": 0.4
+          },
+          {
+            "id": "impact",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          }
+        ],
+        "particlesEmitted": true,
+        "triggerColumns": [
+          4,
+          8,
+          9
+        ]
+      },
+      "afterFull": {
+        "item": "bomb",
+        "elapsedMs": 238.4,
+        "durationMs": 596,
+        "phases": [
+          {
+            "id": "chain-propagation",
+            "active": true,
+            "complete": false,
+            "progress": 0.4,
+            "value": 0.4
+          },
+          {
+            "id": "impact",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          }
+        ],
+        "particlesEmitted": true,
+        "triggerColumns": [
+          4,
+          8,
+          9
+        ]
+      }
+    },
+    "geometryProof": {
+      "originCarrierDifferences": [
+        7.377173091458806,
+        10.44973544973545,
+        1.6326530612244898,
+        7.54572940287226
+      ],
+      "firstBeatRows": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1.4799586921515089,
+        91.4737162283056,
+        52.448810162819825,
+        1.5194812014282715,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "secondBeatRows": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.9927536231884058,
+        59.202005881117415,
+        12.736482376095903,
+        15.055788155305063,
+        57.7372050689631,
+        0.6666666666666666,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "midWaveRows": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.32592592592592595,
+        56.01449275362319,
+        49.98550724637681,
+        43.202863544073374,
+        55.35305063517624,
+        41.12954016818751,
+        44.822813834628576,
+        50.05072463768116,
+        56.05072463768116,
+        0.32592592592592595,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "disjointRows": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3.1119878332438717,
+        4.333333333333333,
+        4.2898550724637685,
+        0.050724637681159424,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3.1266890709234754,
+        4.480246913580247
+      ],
+      "hiddenDifferences": {
+        "warning": 0,
+        "pulse": 0,
+        "shockwave": 0,
+        "reducedEndpoint": 0
+      }
+    },
+    "canvasCountAfterDestroy": 0
+  },
+  "screenshots": [
+    {
+      "name": "chain-full-before-first-beat.png",
+      "sha256": "e5330fc0f7dfb15680cd475f57c02789ee0767f55f34305fae2df4299b4b7c9b"
+    },
+    {
+      "name": "chain-full-complete.png",
+      "sha256": "47d34ac7e38f0ef0d9c9c547ed67788f23a36b9c2d14014a2bb33db0a7a0df2e"
+    },
+    {
+      "name": "chain-full-contact-sheet.png",
+      "sha256": "f0e3ed77e2cf9e08c8713f2fe735ea87b999917246f1f86480c95e16fc82211d"
+    },
+    {
+      "name": "chain-full-first-beat.png",
+      "sha256": "140d94b3226fa820ae6c1ddf33ede64d4ab279eb8ccfa3522dbd663a41c35073"
+    },
+    {
+      "name": "chain-full-mid-wave.png",
+      "sha256": "33e82fc037d78e3be1efbbe483c8b4b1988ab96fcad7b18c64a2e7e567c2dd89"
+    },
+    {
+      "name": "chain-full-origin.png",
+      "sha256": "c6c5489a7fdeacd183950ba46f8a3b46f367d782dcc398a1eed91f2f8cbfb502"
+    },
+    {
+      "name": "chain-full-precommit-start.png",
+      "sha256": "6f74c6448367b580d2b26b9cd0df8b00b4b4690e935a22e92beebe6903b63402"
+    },
+    {
+      "name": "chain-full-precommit-tail.png",
+      "sha256": "d7ed834f45bb78273bed632a90ba67aed998551fcc1fa95e4d57653097e24b16"
+    },
+    {
+      "name": "chain-full-second-beat.png",
+      "sha256": "a93306613fc34c64c9c663626feb3528efded5bd4441f18affc9e67ffc3d6283"
+    },
+    {
+      "name": "chain-full-tail.png",
+      "sha256": "36df97c16b2ddf89f74591dc6c2942af168ca8ba10a01377066d8e94ed5affcf"
+    },
+    {
+      "name": "chain-reduced-before-first-beat.png",
+      "sha256": "b23e96527062086849ef96ce01d76078602442f6fd998029dcd759d402215ce1"
+    },
+    {
+      "name": "chain-reduced-complete.png",
+      "sha256": "310a87c44de73fe34d13ef5ed331a0b0be50632eb273395c94ef481646aa36c1"
+    },
+    {
+      "name": "chain-reduced-contact-sheet.png",
+      "sha256": "a389791f4fb78a79e905c237369330f4ba4a677d09990d4daa9fd15da821558a"
+    },
+    {
+      "name": "chain-reduced-first-beat.png",
+      "sha256": "2b27ac25eff2eb2dfdf1acaa79b0eba7e0ecf7631297ed2e6c90747b53aed528"
+    },
+    {
+      "name": "chain-reduced-mid-wave.png",
+      "sha256": "5df980672ac7cde23e5c3e6dc88c0dcd9488d2d643e8733b6788a216c2d593f3"
+    },
+    {
+      "name": "chain-reduced-origin.png",
+      "sha256": "c6c5489a7fdeacd183950ba46f8a3b46f367d782dcc398a1eed91f2f8cbfb502"
+    },
+    {
+      "name": "chain-reduced-precommit-start.png",
+      "sha256": "29699c40e654fa42bf05b4df373d8dd1122f0365c43b7998eb5ffddd8f0eef6c"
+    },
+    {
+      "name": "chain-reduced-precommit-tail.png",
+      "sha256": "d7ed834f45bb78273bed632a90ba67aed998551fcc1fa95e4d57653097e24b16"
+    },
+    {
+      "name": "chain-reduced-second-beat.png",
+      "sha256": "292ac650d0841a9990f6a1a20b6df8a86328c3a0dd3e8f8668df9f6062bea223"
+    },
+    {
+      "name": "chain-reduced-tail.png",
+      "sha256": "9e068d8b07f62cba9f89129193572288f0875988a3cbd214c8dc1c2b3e02538a"
+    },
+    {
+      "name": "live-mutation-zh.png",
+      "sha256": "e724cff40875b9aaa386c7585f6bd390b133877c9c81dac21fabc78de09dd87b"
+    },
+    {
+      "name": "normal-disjoint-baseline.png",
+      "sha256": "5e0c5cf5691ae3947d5cf706f521b52a1bc91f6ec821939424c0d2e85334b6dd"
+    },
+    {
+      "name": "normal-disjoint-contact-sheet.png",
+      "sha256": "9757b76cc939ca15c520fae53b90d8913328577cf95b9eae91d1cb21ce7f1f94"
+    },
+    {
+      "name": "normal-disjoint-impact.png",
+      "sha256": "82b4066395dd9395fb059fcb51a1412e1f2ee6d6f92dacba9926bcd4524e1080"
+    },
+    {
+      "name": "normal-disjoint-warning.png",
+      "sha256": "fa48620358783f5dfe015238a3f0e0b97375ec6d7cf9393b8c60469f9f6d30df"
+    },
+    {
+      "name": "normal-hidden-baseline.png",
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031"
+    },
+    {
+      "name": "normal-hidden-contact-sheet.png",
+      "sha256": "29a4b06b4d1eb05f83e5034ca797c0f21234eac2b9a577855d6ca029529c93c4"
+    },
+    {
+      "name": "normal-hidden-pulse.png",
+      "sha256": "5c095d38b485ae43c8bbc5dd65b646cb5603f979f0b6bff2c4008acf48576fdf"
+    },
+    {
+      "name": "normal-hidden-reduced-baseline.png",
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031"
+    },
+    {
+      "name": "normal-hidden-reduced-endpoint.png",
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031"
+    },
+    {
+      "name": "normal-hidden-shockwave.png",
+      "sha256": "9241e007a99ec67e1d01ec072e9be55ceac0c742db151f718464518722e6adcf"
+    },
+    {
+      "name": "normal-hidden-warning.png",
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031"
+    }
+  ],
+  "browserErrors": [],
+  "failures": []
+}
