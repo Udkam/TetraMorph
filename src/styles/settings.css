@@ -732,7 +732,7 @@
 
 @media (max-width: 680px) {
   .action-sheet--settings {
-    width: min(620px, calc(100vw - 16px));
+    width: min(620px, 100%);
     padding: 14px;
   }
 

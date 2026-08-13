@@ -29,7 +29,14 @@ describe('RC1 Settings composition', () => {
   });
 
   it('collapses columns without shrinking English or Chinese copy below the readable floor', () => {
+    const mobileStart = settingsCss.indexOf('@media (max-width: 680px)');
+    const mobileEnd = settingsCss.indexOf('@media (max-width: 460px)', mobileStart);
+    const mobileCss = settingsCss.slice(mobileStart, mobileEnd);
+    expect(mobileStart).toBeGreaterThanOrEqual(0);
+    expect(mobileEnd).toBeGreaterThan(mobileStart);
     expect(settingsCss).toMatch(/@media \(max-width:\s*680px\)[\s\S]*?\.settings-console__controls,[\s\S]*?\.settings-console__keyboard\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s);
+    expect(mobileCss).toMatch(/\.action-sheet--settings\s*\{[^}]*width:\s*min\(620px,\s*100%\)/s);
+    expect(mobileCss).not.toContain('100vw');
     expect(settingsCss).toMatch(/@media \(max-height:\s*520px\)[\s\S]*?\.settings-console__key-group > span,[\s\S]*?font-size:\s*11\.5px/s);
   });
 
