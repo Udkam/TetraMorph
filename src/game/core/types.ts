@@ -308,7 +308,12 @@ export type GameEvent =
   | { type: 'hard-dropped'; piece: PieceType; distance: number }
   | { type: 'piece-locked'; piece: PieceType; cells: Cell[] }
   | { type: 'endgame-undone' }
-  | { type: 'clear-started'; rows: number[] }
+  | {
+    type: 'clear-started';
+    rows: number[];
+    /** Pre-clear Bomb plan so presentation can suppress feedback that cannot be recalled. */
+    mutationBombOutcome?: MutationBombOutcome;
+  }
   | { type: 'lines-cleared'; rows: number[]; count: number; score: number }
   | MutationActivationEvent
   | { type: 'bedrock-raised'; count: number; height: number }

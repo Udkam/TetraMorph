@@ -436,13 +436,23 @@ describe('异变 mode', () => {
   });
 
   it('chains same-row Bombs once and preserves the smallest primary as immutable origin evidence', () => {
-    const transition = resolveLineClear({
+    const state: GameState = {
       ...carrierClearState('freeze'),
       mutationCarriers: [
         { id: 1, item: 'bomb', cells: [{ x: 0, y: 39 }] },
         { id: 2, item: 'bomb', cells: [{ x: 1, y: 39 }] },
       ],
+    };
+    const started = dispatch(state, { type: 'hard-drop' });
+    expect(started.events).toContainEqual({
+      type: 'clear-started',
+      rows: [39],
+      mutationBombOutcome: 'chain-clear',
     });
+    let transition = started;
+    for (let tick = 0; tick < LINE_CLEAR_DELAY_TICKS; tick += 1) {
+      transition = dispatch(transition.state, { type: 'tick' });
+    }
     const activations = mutationActivations(transition);
     const bomb = activations.find((event) => event.item === 'bomb');
     const ordinaryClears = transition.events.filter((event) => event.type === 'lines-cleared');

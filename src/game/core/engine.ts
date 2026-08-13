@@ -933,6 +933,17 @@ function mutationScoreMultiplier(state: GameState): number {
   return state.mutationMultiplierFactor === 4 ? 4 : 2;
 }
 
+function clearStartedEvent(state: GameState, rows: number[]): GameEvent {
+  const bombOutcome = state.mode === 'sprint'
+    ? planMutationBombClear(state.board, state.mutationCarriers, rows)?.outcome
+    : undefined;
+  return {
+    type: 'clear-started',
+    rows,
+    ...(bombOutcome === undefined ? {} : { mutationBombOutcome: bombOutcome }),
+  };
+}
+
 interface MutationActivation {
   state: GameState;
   events: GameEvent[];
@@ -1194,7 +1205,7 @@ function lockActive(
     };
     return {
       state: appendEndgameUndoCheckpoint(clearing, undoCheckpoint),
-      events: [...extraEvents, lockedEvent, { type: 'clear-started', rows }],
+      events: [...extraEvents, lockedEvent, clearStartedEvent(lockedState, rows)],
     };
   }
 
