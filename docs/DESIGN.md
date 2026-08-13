@@ -88,6 +88,13 @@ intersected by any primary band. For `blast`, `participantIds` is their unique u
 Two primary Bombs on the same row chain because each band intersects the other carrier;
 two distant primary Bombs do not.
 
+Bomb score, removal, and its summarized activation resolve first from the captured
+pre-clear multiplier. Activated non-Bombs then apply in ascending carrier ID. Repeated Ice
+and Supergravity carriers refresh their normal windows; repeated Multiplier carriers fold
+deterministically through `1x -> 2x -> 4x` and remain capped at `4x`. Non-Bomb summarized
+events follow the first appearance of each item type in that ID order. The final processed
+carrier supplies `mutationLastItem`; Bomb supplies it only when no non-Bomb activates.
+
 For `blast`, the one settlement removes the sorted unique union of `ordinaryRows` and
 `blastRows`; for `chain-clear`, it removes all canonical rows. In either outcome,
 `progressRows` is the subset of that removal set that was non-empty in the immutable
@@ -98,14 +105,33 @@ adds no progress. For `blast`, `activationIds` contains every non-Bomb carrier h
 carrier. Both sets are deduplicated by carrier ID.
 
 The single summarized Bomb activation requires immutable `bombOutcome`, `blastRows`, and
-`participatingBombCount` evidence. The count is exactly `participantIds.size`, while
-`blastRows` remains the primary-band union even when the outcome is `chain-clear`.
+`participatingBombCount` evidence. A `chain-clear` additionally requires immutable
+`chainOriginCarrierId` and `chainOriginCells`, copied from the smallest-ID primary Bomb's
+complete pre-clear carrier record. Those fields are absent for `blast`. The count is
+exactly `participantIds.size`, while `blastRows` remains the primary-band union even when
+the outcome is `chain-clear`.
 `lines-cleared` continues to describe only the ordinary full rows, preventing the classic
 row-clear animation/audio from masquerading as an explosion.
 Normal Bomb presentation follows the real blast band instead of the old fixed floor rows.
 `chain-clear` receives a separate full-board material collapse and cue, remains distinct
 under reduced motion, emits only once through Runtime, and suppresses overlapping ordinary
-clear/normal-Bomb audio. Human listening remains required for the new chain cue.
+clear/normal-Bomb audio. Its Bomb summary is delivered before the triggered non-Bomb
+summaries, so the causal full-board beat remains legible. Human listening remains required
+for the new chain cue.
+
+The chain-clear wave originates at the primary Bomb with the smallest carrier ID. Its
+entire carrier geometry illuminates first; clearing then spreads in two deterministic
+fronts, one row at a time upward and downward from the carrier's origin rows until each
+front reaches its board edge. Rows equidistant from the origin share one beat. If the
+carrier occupies more than one row, every unique row in its complete pre-clear geometry is
+an origin row, including rows that were not ordinary full rows. For any canonical row
+`r`, `distance(r) = min(abs(r - originRow))`; this also resolves split/non-contiguous
+origin geometry. Core removes all 40 canonical rows atomically, while presentation groups
+only rows `[VISIBLE_START_ROW, BOARD_HEIGHT - 1]` by that distance. Hidden rows and
+hidden-only distance groups consume no animation hold and no wave-audio beat. If every
+origin cell is hidden, the closest visible boundary row becomes the first visible group.
+The reduced-motion path keeps the same visible origin and row order with shorter holds and
+opacity changes, never an originless simultaneous whole-board flash.
 
 ### Preserved boundaries
 

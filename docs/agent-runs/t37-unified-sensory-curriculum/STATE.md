@@ -2314,6 +2314,18 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   pre-clear carrier exactly once. All pre-clear Bombs become scored participants; every
   Freeze/Collapse/Multiplier carrier applies its normal effect even outside the primary
   bands. The already-active chain cannot recursively clear or activate a carrier twice.
+- Independent contract QA was `P0 0 / P1 0 / P2 0 / P3 0 / GAP 1`: simultaneous
+  non-Bomb execution order was underspecified. The correction freezes Bomb score/removal
+  first, then non-Bombs by ascending carrier ID, with Multiplier folding `1x -> 2x -> 4x`,
+  first-type summary order, and the final processed carrier owning `mutationLastItem`.
+- Player presentation correction: the chain-clear effect starts from the smallest-ID
+  primary Bomb's whole carrier geometry, then advances row by row in simultaneous upward
+  and downward fronts. Equal-distance rows share a beat; reduced motion preserves that
+  causal origin/order instead of replacing it with a full-screen flash.
+- Presentation QA found one P2 and three combined gaps: renderer evidence, multirow/split
+  distance, and hidden-row timing. The contract now requires immutable
+  `chainOriginCarrierId`/`chainOriginCells`, defines minimum row distance from all complete
+  carrier rows, schedules visible rows only, and gives hidden rows no hold or audio beat.
 - Unique next action: commit this three-document correction, then implement the precise
   gravity Core checkpoint before opening the Bomb Core writer slice.
 

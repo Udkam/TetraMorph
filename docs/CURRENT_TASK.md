@@ -46,13 +46,28 @@ their unique union; for a chain clear, it expands to every Bomb in the immutable
 snapshot. Every participant earns the existing Bomb bonus exactly once under the
 pre-clear multiplier. Event `participatingBombCount` is exactly `participantIds.size`, and
 `blastRows` is always the frozen sorted union of primary bands, including for a chain.
+Bomb score/removal and its summarized activation resolve first. Activated non-Bombs then
+apply in ascending carrier ID; repeated Freeze and Collapse refresh their normal windows,
+while repeated Multiplier folds through `1x -> 2x -> 4x` and remains capped at `4x`.
+Non-Bomb summary events follow the order in which each item type first appears in that ID
+sequence. The final processed carrier supplies `mutationLastItem`; Bomb supplies it only
+when no non-Bomb was activated.
 For a normal blast, board removal is the one-shot union of ordinary rows and `blastRows`;
 for a chain it is the complete board. In both cases, line progress is the count of unique
 pre-clear non-empty rows in that removal set, so overlap counts once and empty adjacent
 rows do not fabricate progress. Core emits one Bomb outcome with these required fields.
 The renderer and audio engine must distinguish `blast` from `chain-clear`; the latter
 needs an original full-board effect, a separate restrained but unmistakable explosion
-cue, reduced-motion coverage, and one-delivery tests.
+cue, reduced-motion coverage, and one-delivery tests. Its visual origin is the primary
+Bomb with the smallest carrier ID: first reveal that whole-piece Bomb, then propagate the
+clear row by row upward and downward from its complete pre-clear carrier geometry until
+both visible board edges are reached. Core must emit immutable `chainOriginCarrierId` and
+`chainOriginCells` evidence for a chain outcome. Origin rows are every unique `y` in those
+cells; a presentation row's distance is the minimum absolute distance to any origin row.
+Equal-distance visible rows share one beat. Hidden rows clear in the same Core settlement
+but consume no animation delay or audio beat; hidden-only distance groups are skipped. If
+the complete origin is hidden, the nearest visible boundary row supplies the first visible
+beat. The effect must not present as an originless simultaneous full-screen wipe.
 
 Survival remains source-frozen. The player requested only an improvement proposal, placed
 at the end of the later report; no Survival rule, number, UI, audio, or evidence path is
