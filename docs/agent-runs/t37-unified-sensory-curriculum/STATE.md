@@ -2726,3 +2726,45 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   `docs/evidence/t37/bomb-block-burst-audition-r3/**`, then return the generated media,
   deterministic/signal report, browser matrix, screenshots, and exact path list for
   independent QA. Product audio remains closed.
+
+### 2026-08-14 Bomb R3 audition candidate and human gate
+
+- Evidence commits `65cb18c`, `a447dd8`, `037c458`, `8dd51a5`, `681b5f4`, and
+  `af97328` stay entirely under
+  `docs/evidence/t37/bomb-block-burst-audition-r3/**`; no `src/game/audio/**`, Bomb
+  mechanics/visual, navigation, inherited T27, `t27-r1-followup`, `progress.md`, or
+  handoff path entered the candidate.
+- The six original deterministic 48 kHz mono PCM16 WAVs are unchanged from the initial
+  candidate. Normal A/B/C are `0.32/0.34/0.30 s` with peaks `0.50/0.52/0.48`; paired
+  chains are `0.92/0.98/0.88 s` with the same initial peak and only a low-gain continuous
+  row-beat texture. Normal RMS is `0.1099–0.1232`; chain RMS is `0.0649–0.0729`; paired
+  250 ms onset RMS differs by only `0.013–0.038 dB`. No recorded or R2 explosion media
+  is present.
+- Generator, recipe, audition, verifier, and browser-smoke hashes are bound in the
+  manifest to generator commit `681b5f4`. Verification passes `99/99`, including
+  deterministic bytes, signal bounds, relative hard-drop/Studio levels, exact chain
+  onset, hashes, format, and no-real-explosion checks. Human listening remains explicitly
+  required.
+- The live reference graph now exactly retains zero-pan StereoPanner creation and
+  `source -> panner -> gain -> Studio compressor -> 0.78 output`. Current Chromium
+  OfflineAudioContext measures the one-line reference peak at `0.195565` and four-line
+  peak at `0.586676`; candidate peaks are `+5.641–+6.336 dB` relative to the one-line
+  reference and remain inside the declared `0–7 dB` bound.
+- Final `file://` and live HTTP browser reports both pass with matching/cross/stopped
+  play counts `12/12/24`, reject-all defaults, same-letter/cross-letter gate behavior,
+  zero console/page errors, zero post-stop sources/timers, a closed disposed context,
+  44 px minimum controls, and no 1440x1000 or 390x844 overflow. Screenshots are
+  byte-identical because the correction changed audio/reference behavior only.
+- Independent UI QA reports `P0/P1/P2/P3/GAP = 0/0/0/0/0`. Independent audio QA's
+  initial nonblocking P2 about zero-pan graph identity and post-compressor Studio
+  measurement is closed at `af97328`; its final disposition is
+  `P0/P1/P2/P3/GAP = 0/0/0/0/1`, with only human listening intentionally open.
+- Review-helper ownership: project root `E:\Proj\reproduction-tetris`; command
+  `"C:\Python\Python312\python.exe" -m http.server 4192 --bind 127.0.0.1 --directory
+  E:\Proj\reproduction-tetris`; listener PID `17072`, parent `8388`, started
+  `2026-08-14 12:15:16 +08:00`, bound only to `127.0.0.1:4192`; candidate URL returns
+  HTTP `200`. Keep this exact helper only through the verdict, then release it.
+- Blocker/unique next action: player listens to normal A/B/C and chain A/B/C and returns
+  two explicit choices or rejects all. Only an accepted same-letter pair may enter the
+  later product-audio checkpoint; a cross-letter choice requires one exact recomposition
+  and another isolated listening pass. Material/Ice, D2B, and Endgame remain paused.

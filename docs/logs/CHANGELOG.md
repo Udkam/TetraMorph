@@ -2829,3 +2829,21 @@
 - Independent QA recomputes all 17 evidence hashes and accepts the source/evidence chain
   with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Normal-speed whole-piece material review is
   the next slice; Bomb sound remains an explicit human-listening gate.
+
+## 2026-08-14 — T37 Bomb R3 stylized audition ready for player listening
+
+- Recorded the player's rejection of every realistic/loud R2 normal and chain sound while
+  preserving the accepted full-motion Bomb visual and D1 page transition. R3 uses only
+  original deterministic synthesis: three short dry block-break motifs and three paired
+  low-gain chain-collapse extensions; no recorded explosion media or product audio path
+  is involved.
+- Final evidence `af97328` binds generator/recipe/page/verifier/browser hashes, preserves
+  all six initial WAV hashes, and passes `99/99` automatic checks. File and live browser
+  matrices pass with `12/12/24` playback counts, exact accepted hard-drop/Studio graph,
+  measured post-compressor references, no overflow, 44 px controls, zero browser errors,
+  and complete audio/timer disposal.
+- Independent UI QA is all-zero. Independent audio QA's initial nonblocking P2 is closed
+  by exact zero-pan node routing and OfflineAudioContext measurement; final technical
+  disposition is `P0 0 / P1 0 / P2 0 / P3 0`. The remaining `GAP 1` is deliberately the
+  player's sound-quality verdict, so this is a listening candidate—not product acceptance
+  or integration.

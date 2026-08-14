@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **BOMB R3 AUDIO AUDITION ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
+Status: **BOMB R3 HUMAN LISTENING ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
 
 ## Active objective
 
@@ -47,6 +47,25 @@ contract QA, implement and verify only the isolated R3 audition, then expose a n
 review helper. Material review/Ice provenance, D2B, and Endgame remain paused until an
 accepted R3 pair is integrated into product source and that integration passes its own
 targeted/final/browser/independent gates.
+
+The isolated R3 candidate is now frozen at `af97328` over contract base `10dad00` and
+initial evidence `65cb18c`. Its six deterministic WAVs remain byte-identical while the
+audition graph now matches the accepted hard-drop/Studio path, including the `0.78`
+output gain, zero-pan StereoPanner, exact envelope/pan/compressor ordering, and direct
+Chromium measurement after the Studio compressor. Verification passes `99/99`; both
+`file://` and the live static HTTP page pass with `12/12/24` matching/cross/stopped play
+counts, zero console/page errors, 44 px controls, no desktop/mobile overflow, and no
+audio/timer residue. Independent final QA reports `P0/P1/P2/P3 = 0/0/0/0`; its sole
+`GAP 1` is the intended player listening gate, not an implementation defect. No product
+audio path changed.
+
+The active task-owned review helper is Python PID `17072`, started
+`2026-08-14 12:15:16 +08:00`, serving repository root read-only on
+`127.0.0.1:4192`. The unique next action is the player's explicit
+`normal A/B/C/reject all` and `chain A/B/C/reject all` verdict at
+`http://127.0.0.1:4192/docs/evidence/t37/bomb-block-burst-audition-r3/`. Only one
+same-letter pair can open direct product integration; a cross-letter preference must be
+recomposed and re-auditioned first.
 
 ### 2026-08-14 Bomb R2 human rejection and causal Boom correction
 
