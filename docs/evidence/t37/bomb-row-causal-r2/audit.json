@@ -1,0 +1,4046 @@
+{
+  "result": "PASS",
+  "sourceSha": "8de0cb732adfe6337605013fd67bcfe2ba63ca86",
+  "evidenceBaseHead": "7443f0461457bea029cc461fd7ef265baac28bd1",
+  "sourceCommitPaths": [
+    "src/animation/mutationChainTimeline.test.ts",
+    "src/animation/mutationChainTimeline.ts",
+    "src/game/audio/AudioEngine.test.ts",
+    "src/game/audio/AudioEngine.ts",
+    "src/game/render/TetrisRenderer.test.ts",
+    "src/game/render/TetrisRenderer.ts"
+  ],
+  "evidenceKind": "supplemental deterministic Core-to-production-renderer; not a natural App reach or human acceptance claim",
+  "frameTimes": {
+    "full": [
+      0,
+      219,
+      220,
+      276,
+      332,
+      500,
+      780,
+      999,
+      1000,
+      2000
+    ],
+    "reduced": [
+      0,
+      49,
+      50,
+      70,
+      90,
+      150,
+      250,
+      339,
+      340,
+      1340
+    ]
+  },
+  "core": {
+    "clearStarted": {
+      "type": "clear-started",
+      "rows": [
+        30
+      ],
+      "mutationBombOutcome": "chain-clear"
+    },
+    "lineCleared": {
+      "type": "lines-cleared",
+      "rows": [
+        30
+      ],
+      "count": 1,
+      "score": 40
+    },
+    "activation": {
+      "type": "mutation-activated",
+      "item": "bomb",
+      "durationTicks": 0,
+      "score": 600,
+      "rowsRemoved": 20,
+      "triggerCells": [
+        {
+          "x": 0,
+          "y": 29
+        },
+        {
+          "x": 0,
+          "y": 30
+        },
+        {
+          "x": 1,
+          "y": 30
+        }
+      ],
+      "blastRows": [
+        29,
+        30,
+        31
+      ],
+      "participatingBombCount": 2,
+      "bombOutcome": "chain-clear",
+      "chainOriginCarrierId": 1,
+      "chainOriginCells": [
+        {
+          "x": 0,
+          "y": 29
+        },
+        {
+          "x": 0,
+          "y": 30
+        }
+      ],
+      "chainTriggerRows": [
+        30
+      ]
+    },
+    "preCommitBoardStable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "lockedBoardOccupied": 39,
+    "committedBoardOccupied": 0,
+    "carrierRows": [
+      29,
+      30
+    ]
+  },
+  "plans": {
+    "full": {
+      "originVisible": true,
+      "rowBeats": [
+        {
+          "row": 20,
+          "distance": 10,
+          "startMs": 780
+        },
+        {
+          "row": 21,
+          "distance": 9,
+          "startMs": 724
+        },
+        {
+          "row": 22,
+          "distance": 8,
+          "startMs": 668
+        },
+        {
+          "row": 23,
+          "distance": 7,
+          "startMs": 612
+        },
+        {
+          "row": 24,
+          "distance": 6,
+          "startMs": 556
+        },
+        {
+          "row": 25,
+          "distance": 5,
+          "startMs": 500
+        },
+        {
+          "row": 26,
+          "distance": 4,
+          "startMs": 444
+        },
+        {
+          "row": 27,
+          "distance": 3,
+          "startMs": 388
+        },
+        {
+          "row": 28,
+          "distance": 2,
+          "startMs": 332
+        },
+        {
+          "row": 29,
+          "distance": 1,
+          "startMs": 276
+        },
+        {
+          "row": 30,
+          "distance": 0,
+          "startMs": 220
+        },
+        {
+          "row": 31,
+          "distance": 1,
+          "startMs": 276
+        },
+        {
+          "row": 32,
+          "distance": 2,
+          "startMs": 332
+        },
+        {
+          "row": 33,
+          "distance": 3,
+          "startMs": 388
+        },
+        {
+          "row": 34,
+          "distance": 4,
+          "startMs": 444
+        },
+        {
+          "row": 35,
+          "distance": 5,
+          "startMs": 500
+        },
+        {
+          "row": 36,
+          "distance": 6,
+          "startMs": 556
+        },
+        {
+          "row": 37,
+          "distance": 7,
+          "startMs": 612
+        },
+        {
+          "row": 38,
+          "distance": 8,
+          "startMs": 668
+        },
+        {
+          "row": 39,
+          "distance": 9,
+          "startMs": 724
+        }
+      ],
+      "distanceBeats": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "beatStartsMs": [
+        220,
+        276,
+        332,
+        388,
+        444,
+        500,
+        556,
+        612,
+        668,
+        724,
+        780
+      ],
+      "revealMs": 220,
+      "beatMs": 56,
+      "fadeMs": 220,
+      "durationMs": 1000
+    },
+    "reduced": {
+      "originVisible": true,
+      "rowBeats": [
+        {
+          "row": 20,
+          "distance": 10,
+          "startMs": 250
+        },
+        {
+          "row": 21,
+          "distance": 9,
+          "startMs": 230
+        },
+        {
+          "row": 22,
+          "distance": 8,
+          "startMs": 210
+        },
+        {
+          "row": 23,
+          "distance": 7,
+          "startMs": 190
+        },
+        {
+          "row": 24,
+          "distance": 6,
+          "startMs": 170
+        },
+        {
+          "row": 25,
+          "distance": 5,
+          "startMs": 150
+        },
+        {
+          "row": 26,
+          "distance": 4,
+          "startMs": 130
+        },
+        {
+          "row": 27,
+          "distance": 3,
+          "startMs": 110
+        },
+        {
+          "row": 28,
+          "distance": 2,
+          "startMs": 90
+        },
+        {
+          "row": 29,
+          "distance": 1,
+          "startMs": 70
+        },
+        {
+          "row": 30,
+          "distance": 0,
+          "startMs": 50
+        },
+        {
+          "row": 31,
+          "distance": 1,
+          "startMs": 70
+        },
+        {
+          "row": 32,
+          "distance": 2,
+          "startMs": 90
+        },
+        {
+          "row": 33,
+          "distance": 3,
+          "startMs": 110
+        },
+        {
+          "row": 34,
+          "distance": 4,
+          "startMs": 130
+        },
+        {
+          "row": 35,
+          "distance": 5,
+          "startMs": 150
+        },
+        {
+          "row": 36,
+          "distance": 6,
+          "startMs": 170
+        },
+        {
+          "row": 37,
+          "distance": 7,
+          "startMs": 190
+        },
+        {
+          "row": 38,
+          "distance": 8,
+          "startMs": 210
+        },
+        {
+          "row": 39,
+          "distance": 9,
+          "startMs": 230
+        }
+      ],
+      "distanceBeats": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "beatStartsMs": [
+        50,
+        70,
+        90,
+        110,
+        130,
+        150,
+        170,
+        190,
+        210,
+        230,
+        250
+      ],
+      "revealMs": 50,
+      "beatMs": 20,
+      "fadeMs": 90,
+      "durationMs": 340
+    }
+  },
+  "topology": {
+    "mountedCanvasCounts": [
+      1,
+      1
+    ],
+    "postDestroyCanvasCounts": [
+      0,
+      0
+    ],
+    "finalCanvasCount": 0,
+    "domCellCount": 0,
+    "hostCount": 1
+  },
+  "captures": [
+    {
+      "scenario": "full",
+      "timeMs": 0,
+      "file": "full-0000ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 201
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "cf6b43fdac7d6186fc0ad21a8ece12ff909497a406d55b5057eb2140933055d5",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 219,
+      "file": "full-0219ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 205
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 219,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.219,
+              "value": 0.219
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": false,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "2ceb103ce6db5f6b6cffcaa6f2c98caeae8358e6f8829506769a5597b232fcec",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 220,
+      "file": "full-0220ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 198
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 220,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.22,
+              "value": 0.22
+            },
+            {
+              "id": "impact",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "b1bc884b8110106d06e118366189af9f14a69ad392bddbaa66a2fd9a657a49a2",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 276,
+      "file": "full-0276ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 293
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 276,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.276,
+              "value": 0.276
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "c78ceafe503d57ebc24433d97a20c27e27cce7159d3251148620e100e5f8f925",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 332,
+      "file": "full-0332ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 297
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 332,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.332,
+              "value": 0.332
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "82fd6d5036f62797304b99bdc6cf304966eec7fbbd117d610e3351d31c81a8bc",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 500,
+      "file": "full-0500ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 218
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 500,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.5,
+              "value": 0.5
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "dffc026547ac74591fd2a5de1411ac4c68793f00a2589d2fd98c17c5f02be9f4",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 780,
+      "file": "full-0780ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 147
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 780,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.78,
+              "value": 0.78
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "dab59673311658f3607e7b966bc499f1ca495c17da6efe74de2c7a53a565cc63",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 999,
+      "file": "full-0999ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 26
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 999,
+          "durationMs": 1000,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.999,
+              "value": 0.999
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "c6326831d0d43c8acd6f335a170aeed806628af26e2ae40c3cb315200a52eb2a",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 1000,
+      "file": "full-1000ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 26
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "full",
+      "timeMs": 2000,
+      "file": "full-2000ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 26
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 0,
+      "file": "reduced-0000ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 201
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "cf6b43fdac7d6186fc0ad21a8ece12ff909497a406d55b5057eb2140933055d5",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 49,
+      "file": "reduced-0049ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 205
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 49,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.14411764705882352,
+              "value": 0.14411764705882352
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "936c95426a1582871fa5bad270bbddff31380be9189b874e8cfe77b76b57c42b",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 50,
+      "file": "reduced-0050ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 200
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 50,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.14705882352941177,
+              "value": 0.14705882352941177
+            },
+            {
+              "id": "impact",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "a2cf8d967dc4196290b6d3e136671a3e6f4d787476543e9acffe4455ddfe1c39",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 70,
+      "file": "reduced-0070ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 253
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 70,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.20588235294117646,
+              "value": 0.20588235294117646
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "beb9370d57480712b829047a7909f4006a5164901bcbddcf13b05b01707c6d29",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 90,
+      "file": "reduced-0090ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 266
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 90,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.2647058823529412,
+              "value": 0.2647058823529412
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "8c72baf3d4aa31320ca7cf3bef46da17b755deeb9d6fadedb661697d868818de",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 150,
+      "file": "reduced-0150ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 205
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 150,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.4411764705882353,
+              "value": 0.4411764705882353
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "5f7e9747a2cb185a6b476614a0d403d3fd34c917eb52dd9e5b3c0373ca7ee9e7",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 250,
+      "file": "reduced-0250ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 136
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 250,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.7352941176470589,
+              "value": 0.7352941176470589
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "0a281a896c6b2a6d7c803f3870890bd06450086e1d649253cc604b98142c9278",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 339,
+      "file": "reduced-0339ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 26
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 339,
+          "durationMs": 340,
+          "phases": [
+            {
+              "id": "chain-propagation",
+              "active": true,
+              "complete": false,
+              "progress": 0.9970588235294118,
+              "value": 0.9970588235294118
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            0,
+            1
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "7441ea3e1fef24f691e1f5f30193c0108c4a3915830c47891da252fa9b5c405d",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 340,
+      "file": "reduced-0340ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 26
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    },
+    {
+      "scenario": "reduced",
+      "timeMs": 1340,
+      "file": "reduced-1340ms.png",
+      "frame": {
+        "x": 136,
+        "y": 12,
+        "width": 448,
+        "height": 896
+      },
+      "outputPixels": {
+        "width": 448,
+        "height": 896
+      },
+      "pixelProbe": {
+        "samples": 8192,
+        "nonTransparentSamples": 8192,
+        "distinctBuckets": 26
+      },
+      "snapshot": {
+        "canvas": {
+          "width": 720,
+          "height": 920,
+          "resolution": 1
+        },
+        "board": {
+          "x": 136,
+          "y": 12,
+          "width": 448,
+          "height": 896,
+          "cell": 44.8
+        },
+        "preview": {
+          "x": 12,
+          "y": 12,
+          "width": 114,
+          "height": 179.2
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "I",
+        "previewPieces": [
+          "I"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "1:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      },
+      "sha256": "d02f5d1238b406a69fe2be496a0ed80d09680f863d9bda7bc3ae4afa3bdca031",
+      "pngSize": {
+        "width": 448,
+        "height": 896
+      }
+    }
+  ],
+  "rowInteriorDiffs": {
+    "full": {
+      "219": {
+        "30": {
+          "row": 30,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 160,
+          "samples": 6760,
+          "ratio": 0.023668639053254437,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "220": {
+        "29": {
+          "row": 29,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 676,
+          "samples": 6760,
+          "ratio": 0.1,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "30": {
+          "row": 30,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 1679,
+          "samples": 6760,
+          "ratio": 0.24837278106508875,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "31": {
+          "row": 31,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 52,
+          "samples": 6760,
+          "ratio": 0.007692307692307693,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "276": {
+        "28": {
+          "row": 28,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "29": {
+          "row": 29,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 1636,
+          "samples": 6760,
+          "ratio": 0.24201183431952664,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "31": {
+          "row": 31,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 1470,
+          "samples": 6760,
+          "ratio": 0.21745562130177515,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "32": {
+          "row": 32,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "332": {
+        "27": {
+          "row": 27,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "28": {
+          "row": 28,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 949,
+          "samples": 6760,
+          "ratio": 0.14038461538461539,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "32": {
+          "row": 32,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 472,
+          "samples": 6760,
+          "ratio": 0.06982248520710059,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "33": {
+          "row": 33,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "500": {
+        "25": {
+          "row": 25,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 461,
+          "samples": 6760,
+          "ratio": 0.06819526627218934,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "35": {
+          "row": 35,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 958,
+          "samples": 6760,
+          "ratio": 0.14171597633136096,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "780": {
+        "20": {
+          "row": 20,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 471,
+          "samples": 6760,
+          "ratio": 0.06967455621301775,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      }
+    },
+    "reduced": {
+      "49": {
+        "30": {
+          "row": 30,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 157,
+          "samples": 6760,
+          "ratio": 0.023224852071005917,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "50": {
+        "29": {
+          "row": 29,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 676,
+          "samples": 6760,
+          "ratio": 0.1,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "30": {
+          "row": 30,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 1525,
+          "samples": 6760,
+          "ratio": 0.22559171597633135,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "31": {
+          "row": 31,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "70": {
+        "28": {
+          "row": 28,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "29": {
+          "row": 29,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 1552,
+          "samples": 6760,
+          "ratio": 0.22958579881656804,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "31": {
+          "row": 31,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 1362,
+          "samples": 6760,
+          "ratio": 0.2014792899408284,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "32": {
+          "row": 32,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "90": {
+        "27": {
+          "row": 27,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "28": {
+          "row": 28,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 794,
+          "samples": 6760,
+          "ratio": 0.11745562130177514,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "32": {
+          "row": 32,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 411,
+          "samples": 6760,
+          "ratio": 0.06079881656804734,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "33": {
+          "row": 33,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 0,
+          "samples": 6760,
+          "ratio": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "150": {
+        "25": {
+          "row": 25,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 432,
+          "samples": 6760,
+          "ratio": 0.06390532544378698,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        "35": {
+          "row": 35,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 842,
+          "samples": 6760,
+          "ratio": 0.12455621301775148,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      },
+      "250": {
+        "20": {
+          "row": 20,
+          "columns": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "changed": 408,
+          "samples": 6760,
+          "ratio": 0.06035502958579882,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      }
+    }
+  },
+  "completionNoReplayDiffs": {
+    "full": {
+      "changed": 0,
+      "samples": 401408,
+      "ratio": 0,
+      "meanRgbDelta": 0
+    },
+    "reduced": {
+      "changed": 0,
+      "samples": 401408,
+      "ratio": 0,
+      "meanRgbDelta": 0
+    }
+  },
+  "evidenceLayers": {
+    "machineCausality": "PASS",
+    "staticGeometry": "PASS",
+    "visualContactSheets": "REVIEWED_AT_ORIGINAL_RESOLUTION",
+    "playerAcceptance": "OPEN"
+  },
+  "forbiddenGeometry": {
+    "observationalPixelProbes": {
+      "full": {
+        "219": {
+          "maximumRun": 44,
+          "maximumRunRatio": 0.09821428571428571,
+          "changedRowsAboveEightyPercent": 0,
+          "changedPixelRatio": 0.0022695113201530613
+        },
+        "220": {
+          "maximumRun": 436,
+          "maximumRunRatio": 0.9732142857142857,
+          "changedRowsAboveEightyPercent": 6,
+          "changedPixelRatio": 0.07768156090561225
+        },
+        "276": {
+          "maximumRun": 87,
+          "maximumRunRatio": 0.19419642857142858,
+          "changedRowsAboveEightyPercent": 39,
+          "changedPixelRatio": 0.05238560267857143
+        },
+        "332": {
+          "maximumRun": 88,
+          "maximumRunRatio": 0.19642857142857142,
+          "changedRowsAboveEightyPercent": 41,
+          "changedPixelRatio": 0.07392229352678571
+        },
+        "500": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.12273796237244898
+        },
+        "780": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.17963269292091838
+        },
+        "999": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.18804059709821427
+        },
+        "1000": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.18804059709821427
+        },
+        "2000": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.18804059709821427
+        }
+      },
+      "reduced": {
+        "49": {
+          "maximumRun": 44,
+          "maximumRunRatio": 0.09821428571428571,
+          "changedRowsAboveEightyPercent": 0,
+          "changedPixelRatio": 0.0022695113201530613
+        },
+        "50": {
+          "maximumRun": 44,
+          "maximumRunRatio": 0.09821428571428571,
+          "changedRowsAboveEightyPercent": 0,
+          "changedPixelRatio": 0.011823381696428572
+        },
+        "70": {
+          "maximumRun": 44,
+          "maximumRunRatio": 0.09821428571428571,
+          "changedRowsAboveEightyPercent": 36,
+          "changedPixelRatio": 0.04700205277423469
+        },
+        "90": {
+          "maximumRun": 44,
+          "maximumRunRatio": 0.09821428571428571,
+          "changedRowsAboveEightyPercent": 40,
+          "changedPixelRatio": 0.06723832110969388
+        },
+        "150": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.11617606026785714
+        },
+        "250": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.1754997409119898
+        },
+        "339": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.18804059709821427
+        },
+        "340": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.18804059709821427
+        },
+        "1340": {
+          "maximumRun": 133,
+          "maximumRunRatio": 0.296875,
+          "changedRowsAboveEightyPercent": 44,
+          "changedPixelRatio": 0.18804059709821427
+        }
+      }
+    },
+    "staticSourceGate": {
+      "sourceSha": "8de0cb732adfe6337605013fd67bcfe2ba63ca86",
+      "chainMethodSha256": "29abb77020dae5cf1428c1e07dd479db8278e40294d0d2fe0d98296c80cb81a3",
+      "noRectPrimitive": true,
+      "hasLocalHeatPolygon": true,
+      "hasLocalCoreAndRingCircle": true,
+      "hasLocalFragments": true,
+      "chainParticleEmissionGuarded": true
+    },
+    "visualGate": "contact sheets visually inspected at original resolution; human player acceptance remains open",
+    "allBoardParticleSignature": 0,
+    "reducedMovingParticles": 0
+  },
+  "browserErrors": [],
+  "failures": []
+}
