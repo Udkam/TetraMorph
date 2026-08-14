@@ -1,10 +1,67 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **BOMB R3 HUMAN LISTENING ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
+Status: **BOMB R4A NORMAL-CUE CALIBRATION ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
 
 ## Active objective
 
-### 2026-08-14 Bomb R3 stylized block-burst audition
+### 2026-08-15 Bomb R4A normal-cue calibration
+
+The player rejects all six R3 cues: normal A/B/C and chain A/B/C are now **HUMAN
+REJECTED**. Candidate `af97328`, its `99/99` automatic report, browser evidence, and
+R3 directory remain immutable technical history only. No R3 WAV, recipe, fixed ten-beat
+texture, label, low downward sweep, or continuous noise band may enter R4, including a
+gain/filter-only disguise. Product audio was never changed by R3.
+
+The R3 contract itself permitted the wrong scale: final-output peaks `0.374–0.406` were
+about twice accepted hard-drop/one-line clear, maximum 50 ms RMS was approximately
+`11.5–12.5 dB` above hard-drop, and total energy was `13.1–14.0 dB` above it. This is a
+technical explanation for replacing the objective gates, not a claim about the player's
+unstated subjective reason. R4 must feel like several game blocks simultaneously release
+and collapse in one short **崩**, not a softened explosion, low drum, wind/noise wash,
+laser, melody, or long falling body.
+
+R4 is deliberately split. R4A produces only three neutral normal-cue choices `X/Y/Z` in
+`docs/evidence/t37/bomb-soft-block-audition-r4a/**`; it does not generate any chain cue.
+All three use original synthesis anchored to accepted Action-family pitches, at most three
+rounded contact voices, `110–160 ms` of activity, and a `0.14–0.22 s` file. X is a
+rounded two-contact release with an optional very quiet midrange microtexture; Y is three
+short decaying block detents; Z is a single inharmonic modal cluster with no noise bed.
+They differ structurally, not by gain, and visible labels remain neutral to avoid priming.
+
+The page must import the accepted production Bomb renderer, run the complete normal
+full-motion `1x` warning/impact animation, and schedule the candidate exactly at the
+`220 ms` impact—not at event time zero. Playback reproduces the future product graph
+`mutation 0.96 -> master 1.85 -> compressor -> output 0.78` and the exact accepted
+hard-drop/one-line Studio reference graphs. It provides explicit `reference -> candidate`
+comparisons, no autoplay, reject-all default, optional failure-reason tags, one Canvas,
+and deterministic cleanup.
+
+After that full graph, each candidate must have peak `0.205–0.250` (absolute `<=0.260`),
+full RMS `0.035–0.055`, 10 ms max RMS `0.080–0.130`, 50 ms max RMS `0.050–0.075`,
+energy only `+1.5–+6 dB` above hard-drop, peak spread `<=0.5 dB`, crest `12–17 dB`,
+and peak time `8–22 ms` after impact. Spectral centroid is `190–420 Hz`; sub-70 energy
+is `<=0.5%`, 70–120 is `<=20%`, 250 Hz–1 kHz contributes `12–35%`, and energy above
+4 kHz is `<=1%`. Automated gates also prove deterministic bytes, exact graph/timing,
+hashes, zero residue/errors, responsive 44 px controls, and no overflow. They cannot
+accept the sound.
+
+Only an explicit player `X/Y/Z` normal-cue acceptance opens a separate R4B chain contract
+and new evidence directory. R4B will keep the selected normal atom at the first real
+chain impact and derive two or three progressively quieter macro-collapse clusters from
+the real `chainTriggerRows` plan; it may not use R3's fixed pulses or noise bed. R4A does
+not authorize R4B or `src/game/audio/**`. Bomb Core/visual source `8de0cb7`, evidence
+`7eb1d44`, visual helper `70ce61f`, D1 `aa2c9fd`, Action A, Studio, Ice 2, and reduced
+motion remain frozen. Material/Ice provenance, D2B, and Endgame stay paused until an
+R4 normal/chain pair is later integrated and product-QA accepted.
+
+The R3 task-owned Python helper PID `17072` was stopped after this verdict on
+`2026-08-15`; `127.0.0.1:4192` is verified released. The docs-first R4A contract owns
+only `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, the T37 phase document, and T37
+`STATE.md`. Because `progress.md` is inherited dirty, the web-game skill's iteration notes
+remain in `STATE.md`. Unique next action: independent QA of this contract, then one writer
+implements only the R4A evidence directory and returns it for technical QA/player review.
+
+### 2026-08-14 Bomb R3 stylized block-burst audition (human rejected 2026-08-15)
 
 The player has closed the preceding human gates. Normal Bomb A/B/C and chain-clear A/B/C
 are all **REJECTED BY HUMAN LISTENING** because they sound too much like real, loud,
@@ -59,13 +116,10 @@ audio/timer residue. Independent final QA reports `P0/P1/P2/P3 = 0/0/0/0`; its s
 `GAP 1` is the intended player listening gate, not an implementation defect. No product
 audio path changed.
 
-The active task-owned review helper is Python PID `17072`, started
-`2026-08-14 12:15:16 +08:00`, serving repository root read-only on
-`127.0.0.1:4192`. The unique next action is the player's explicit
-`normal A/B/C/reject all` and `chain A/B/C/reject all` verdict at
-`http://127.0.0.1:4192/docs/evidence/t37/bomb-block-burst-audition-r3/`. Only one
-same-letter pair can open direct product integration; a cross-letter preference must be
-recomposed and re-auditioned first.
+The player subsequently rejects normal A/B/C and chain A/B/C in full. The task-owned
+Python helper PID `17072` was stopped after the verdict and port `4192` was verified
+released. This section and its R3 evidence are historical only; the R4A contract above
+owns the current next action.
 
 ### 2026-08-14 Bomb R2 human rejection and causal Boom correction
 
@@ -1093,11 +1147,11 @@ curriculum remain closed until their preceding checkpoints are green.
 2. **Audio audition gate — COMPLETE** — implement and export a compact representative set covering
    movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
    activation. Stop expansion until human listening accepts the language.
-3. **Complete audio palette — NON-BOMB ANCHORS HUMAN ACCEPTED; BOMB R3 + ORIGINAL-WAV
+3. **Complete audio palette — NON-BOMB ANCHORS HUMAN ACCEPTED; BOMB R4A + ORIGINAL-WAV
    PROVENANCE FOLLOW-UPS OPEN** — accepted Action A, Studio clear/countdown, Ice selection,
-   and the remaining support palette stay frozen. The R2 Bomb audio join is human rejected
-   and cannot inherit that acceptance; retain the Ice uploader-original archive/hash as an
-   honest parallel evidence item.
+   and the remaining support palette stay frozen. R2 and R3 Bomb audio are human rejected
+   and cannot inherit that acceptance; R4A now calibrates only a normal cue before any
+   chain work. Retain the Ice uploader-original archive/hash as an honest parallel item.
 4. **Transition and identity system — D1 HUMAN ACCEPTED; D2B PENDING; IDENTITY DEFERRED** — the
    URL-route handoff now has latest-request ownership, Canvas-ready native capture,
    continuous fallback, direction, focus/history continuity, explicit reduced motion,
@@ -1113,7 +1167,7 @@ curriculum remain closed until their preceding checkpoints are green.
    Focused current tests pass `84/84`; independent read-only review reports
    `P0/P1/P2/P3 = 0/0/0/0`; its former player-taste gap is closed by the explicit D1
    acceptance. Endgame category/level changes remain D2B-owned and are not part of D1.
-5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW PAUSED BEHIND BOMB R3** — ordinary-piece polish
+5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW PAUSED BEHIND BOMB R4** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
 6. **Endgame curriculum — N0 ACCEPTED; CANONICAL INTRO-05 CONTRACT NEXT** — the exact

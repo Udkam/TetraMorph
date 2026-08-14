@@ -2768,3 +2768,51 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   two explicit choices or rejects all. Only an accepted same-letter pair may enter the
   later product-audio checkpoint; a cross-letter choice requires one exact recomposition
   and another isolated listening pass. Material/Ice, D2B, and Endgame remain paused.
+
+### 2026-08-15 Bomb R3 rejection and R4A normal-cue contract
+
+- Player verdict: normal R3 A/B/C and chain R3 A/B/C are all `HUMAN REJECTED`.
+  Evidence candidate `af97328`, technical `99/99`, browser reports, screenshots, and all
+  R3 hashes remain valid immutable history but cannot authorize integration. Do not reuse
+  or merely attenuate/filter/relabel any R3 WAV or recipe.
+- Quantitative postmortem identifies a contract-scale defect without inventing a player
+  quote: R3 post-output peaks `0.374–0.406` were roughly twice hard-drop/one-line clear;
+  50 ms max RMS was `+11.5–+12.5 dB` and total energy `+13.1–+14.0 dB` versus hard-drop,
+  with excess low-frequency mass. The R4 gates explicitly constrain short-window RMS,
+  total energy, spectral centroid/bands, and final product-graph output.
+- The recorded helper matched PID `17072` / Python `http.server` / start
+  `2026-08-14 12:15:16 +08:00`. It was stopped after the verdict; at
+  `2026-08-15 03:30:38 +08:00`, `127.0.0.1:4192` had no listener. No other process was
+  touched.
+- R4 splits normal and chain human gates. R4A owns only the new
+  `docs/evidence/t37/bomb-soft-block-audition-r4a/**` directory and three neutral
+  procedural normal choices X/Y/Z. R4A excludes all external/real explosion media,
+  R2/R3 bytes/recipes, low pressure, long noise, and product source edits.
+- X is a rounded two-contact Action-family release with at most one `-18 dB` short
+  midrange microtexture; Y is three decaying block detents; Z is one shared-decay modal
+  cluster with no noise bed. Candidate activity is `110–160 ms`, file duration
+  `0.14–0.22 s`, and all visible labels remain neutral.
+- Audition timing and graph are product-bound: accepted production Bomb renderer at
+  full-motion `1x`; candidate start exactly at the `220 ms` impact; playback through
+  `mutation 0.96 -> master 1.85 -> compressor -> output 0.78`; exact accepted hard-drop
+  and one-line Studio references. The page defaults to reject, exposes optional reason
+  tags, has no autoplay, and must clean every source/timer/Canvas.
+- Post-graph gates: peak `0.205–0.250` (`<=0.260` absolute), full RMS `0.035–0.055`,
+  10 ms max RMS `0.080–0.130`, 50 ms max RMS `0.050–0.075`, hard-drop-relative energy
+  `+1.5–+6 dB`, candidate peak spread `<=0.5 dB`, crest `12–17 dB`, peak time
+  `8–22 ms`, centroid `190–420 Hz`, `<70 Hz <=0.5%`, `70–120 Hz <=20%`,
+  `250 Hz–1 kHz = 12–35%`, and `>4 kHz <=1%`. These reject unsafe scale only; human
+  listening remains the sole identity/comfort gate.
+- Only an explicit player X/Y/Z normal acceptance opens a separate docs-first R4B
+  chain contract and new directory. R4B must preserve the accepted normal atom at the
+  real first impact and derive only two or three quieter macro-collapse clusters from
+  the production propagation plan. R4A does not authorize chain evidence or
+  `src/game/audio/**`.
+- Contract checkpoint owner paths are only `docs/DESIGN.md`, `docs/CURRENT_TASK.md`,
+  `docs/phases/t37-unified-material-curriculum.md`, and this `STATE.md`. Inherited T27,
+  `t27-r1-followup`, the handoff, and dirty `progress.md` remain untouched/unstaged; the
+  develop-web-game iteration record stays here instead of modifying `progress.md`.
+- Unique next action: independent contract QA. After all blocking findings close, one
+  evidence writer may implement only R4A, then run deterministic metrics, the prescribed
+  web-game client, real-time browser/layout/cleanup proof, visual screenshot inspection,
+  and independent evidence QA before asking the player to choose X/Y/Z/reject all.

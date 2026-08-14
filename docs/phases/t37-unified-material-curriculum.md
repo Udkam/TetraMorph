@@ -61,7 +61,7 @@ and no Puzzle content is published without strict deterministic proof.
   `819779 / sbml / Ice cubes`) and rejects no part of the already frozen Studio subset.
   Stage B is complete; this verdict opens only Stage C.
 
-### C. Complete accepted audio language — BOMB R3 REDESIGN OPEN; ICE PROVENANCE FOLLOW-UP OPEN
+### C. Complete accepted audio language — BOMB R4A NORMAL CALIBRATION ACTIVE; ICE PROVENANCE FOLLOW-UP OPEN
 
 - Extend the accepted material grammar to every current gameplay, reward, Mutation,
   Survival, Puzzle, and UI cue.
@@ -76,6 +76,12 @@ and no Puzzle content is published without strict deterministic proof.
   claim it is archived, substitute a network runtime request, or silently transcode the
   accepted Ogg. The player's later staged-work authorization allows Stage D to proceed
   while this evidence item stays explicitly open.
+- R2 and R3 Bomb audio are both human rejected. R3's technical evidence stays immutable,
+  but its `+5–7 dB` peak window, long low-frequency body, and fixed ten-beat texture are
+  retired. R4 splits the gate: R4A first presents only three neutral normal cues in the
+  accepted `1x` Bomb animation and complete Mutation graph; only a player-selected normal
+  cue may open the later R4B chain contract. Neither R4A nor R4B pre-authorizes product
+  audio edits.
 - Extend the grammar to the remaining gameplay, reward, Survival, Mutation, Puzzle,
   and UI events as a bounded candidate. New cues require focused listening; the player
   has now supplied that verdict by accepting all preceding modifications.
@@ -183,7 +189,7 @@ and no Puzzle content is published without strict deterministic proof.
   rapid navigation, history/back/forward, focus continuity, and actual intermediate
   frames rather than endpoint screenshots alone.
 
-### E. Whole-piece material system — TECHNICAL ACCEPT; PLAYER REVIEW PAUSED BEHIND BOMB R3
+### E. Whole-piece material system — TECHNICAL ACCEPT; PLAYER REVIEW PAUSED BEHIND BOMB R4
 
 - Polish ordinary multicolour pieces as the quiet baseline.
 - Replace carrier/badge Mutation rendering with four complete materials: Ice crystal,

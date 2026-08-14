@@ -42,7 +42,76 @@ dual-field `GameState` is forbidden: object spread and independent mutation woul
 alias stale and corrupt state identity. The exact exception and final zero-retired-name gate
 are authoritative in `docs/CURRENT_TASK.md` and the Endgame workstream log.
 
-## 2026-08-14 T37 — Bomb R3 stylized block-burst audition
+## 2026-08-15 T37 — Bomb R4A normal-cue calibration
+
+The player rejects every R3 cue: normal A/B/C and chain A/B/C are all **HUMAN
+REJECTED**. R3's `99/99` signal and browser report remains valid technical history but
+cannot authorize product integration. The complete R3 directory and hashes are frozen;
+R4 may not reuse its WAV bytes, low downward sweeps, continuous seeded-noise bands,
+fixed ten-beat chain, labels, or recipes, and may not present a gain/filter-only variant
+as new work. The player's concise rejection does not identify one subjective cause, so
+the following measurements are a contract diagnosis rather than an invented taste quote.
+
+R3's final-output peaks were `0.374–0.406`, versus `0.197` for accepted hard-drop and
+`0.196` for accepted one-line Studio clear. Its 50 ms maximum RMS was roughly
+`11.5–12.5 dB` above hard-drop, total energy was `13.1–14.0 dB` above hard-drop, and its
+spectral mass sat too heavily below `120 Hz`. The R4 gate therefore removes the former
+`+5–7 dB` peak window and explicitly bounds short-window loudness, energy, and midrange
+detail. Metrics can reject another oversized candidate; only the player can decide
+whether the result is a friendly, block-like **崩**.
+
+R4 is split into two human gates. **R4A owns only the normal Bomb cue.** Its target is a
+small group of game blocks simultaneously releasing and collapsing in one short tactile
+gesture. Scale comes from two or three rounded contact voices, not sub-bass pressure,
+realistic explosion impact, continuous noise, long decay, reverberation, or a higher
+peak. R4A is original procedural synthesis only: no R2/R3 media, external Foley,
+commercial-game samples, laser/chiptune gesture, sharp crack, or independent low-pressure
+layer. Visible choices use neutral identifiers `X/Y/Z` so descriptive names do not prime
+the verdict:
+
+- `X`: one rounded `196 -> 174.61 Hz` body plus a quieter `293.66 -> 220 Hz` contact and
+  at most one `40–60 ms` deterministic midrange microtexture at `-18 dB` or lower.
+- `Y`: three damped Action-family detents at `246.94 / 220 / 196 Hz`, staggered roughly
+  `0 / 22 / 45 ms` and decaying `0 / -4 / -7 dB`, with no continuous bed.
+- `Z`: an inharmonic-but-Action-anchored modal cluster near `174.61 / 261.63 / 349.23 Hz`
+  with staggered attacks and one shared decay, no noise bed and no low downward glide.
+
+Every candidate is scheduled at the accepted normal Bomb visual impact (`220 ms` after
+the warning begins), never at event time zero. The audition uses the future product graph
+`mutation bus 0.96 -> master 1.85 -> compressor -> output 0.78`, plus exact hard-drop and
+one-line Studio reference graphs. It must run the accepted full-motion `1x` production
+Bomb renderer rather than an audio-only approximation. Candidate activity is
+`110–160 ms`; file duration is `0.14–0.22 s`, with 95% energy ended by `140 ms` and 99%
+by `180 ms`. After the complete graph, each candidate must satisfy:
+
+- peak `0.205–0.250`, absolute maximum `0.260`, and candidate-to-candidate peak spread
+  at most `0.5 dB`;
+- full-file RMS `0.035–0.055`, maximum 10 ms RMS `0.080–0.130`, and maximum 50 ms RMS
+  `0.050–0.075`;
+- total energy `+1.5–+6 dB` relative to hard-drop and crest factor `12–17 dB`;
+- peak time `8–22 ms` after impact, attack `6–14 ms`, spectral centroid `190–420 Hz`,
+  `<70 Hz <= 0.5%`, `70–120 Hz <= 20%`, `250 Hz–1 kHz = 12–35%`,
+  `2–4 kHz = 0.5–4%`, and `>4 kHz <= 1%`.
+
+R4A's sole writer boundary is the new
+`docs/evidence/t37/bomb-soft-block-audition-r4a/**` directory. Its page provides exact
+hard-drop and one-line-clear references, `reference -> candidate` comparison, three
+normal-Bomb `1x` animation controls, no autoplay, reject-all default, and optional
+nonbinding reason tags (`too loud / too dull / too sharp / too long / too note-like /
+timing wrong`). Deterministic bytes, graph measurements, hashes, timing, responsive 44 px
+controls, cleanup, one Canvas, and zero browser errors are automatic gates; no automatic
+check may claim sound acceptance. `progress.md` remains an inherited dirty path, so the
+required iteration record lives in the T37 `STATE.md` instead.
+
+Only an explicit player choice `X`, `Y`, or `Z` opens a separate docs-first **R4B** chain
+contract and new `bomb-soft-chain-audition-r4b/**` boundary. R4B must preserve the chosen
+normal atom exactly at the first real chain impact, derive duration from the production
+`chainTriggerRows` propagation plan, and use only two or three progressively quieter
+macro-collapse clusters rather than a fixed pulse train or continuous noise. R4A does not
+authorize R4B evidence or any `src/game/audio/**` edit. Product integration remains a
+third, later docs-first slice after both human gates pass.
+
+## 2026-08-14 T37 — Bomb R3 stylized block-burst audition (human rejected 2026-08-15)
 
 This section supersedes only the R2 Bomb audio identity and listening direction below.
 The R2 causal visual source `8de0cb7`, source-bound evidence `7eb1d44`, and live review
