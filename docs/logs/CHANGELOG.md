@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-14 — T37 Bomb R3 stylized audio contract opened
+
+- The player accepts the complete full-motion `1x` Bomb visual and the D1 Settled
+  Handoff route transition. Their product behavior and current evidence are frozen; this
+  sound redesign does not reopen Bomb causality/animation or route-transition source.
+- Human listening rejects all six R2 recorded-explosion choices: normal A/B/C and
+  chain-clear A/B/C. Their realistic, loud, startling identity is the defect, so the
+  archived source recordings and R2 evidence remain historical and may not be filtered,
+  shortened, gain-reduced, or relabelled into R3.
+- Contract checkpoints `a589ed1` and `84036cc` open an evidence-only procedural audition
+  under `docs/evidence/t37/bomb-block-burst-audition-r3/**`: three dry, rounded, game-like
+  block-collapse pairs with accepted hard-drop/clear references, bounded duration and
+  spectral/level checks, reject-all defaults, and a mandatory human listening gate.
+- Independent final contract QA over `aa2c9fd..84036cc` reports
+  `P0/P1/P2/P3 = 0/0/0/0`. Product integration requires both cues of one same-letter
+  pair; any cross-letter preference must be exactly recomposed and re-auditioned first.
+  Material/Ice, D2B, and Endgame remain paused through the later product-integration QA.
+
 ## 2026-08-14 — T37 D1 current-head route review ready for player verdict
 
 - A read-only current-HEAD refresh at `961c87e` confirms the D1 navigation owner and

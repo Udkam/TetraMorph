@@ -2714,3 +2714,15 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Material review/Ice provenance, D2B, and Endgame stay paused through the R3 listening
   gate and the later exact product-integration slice. Unique next action: obtain independent
   QA on this R3 contract, then implement and verify only the isolated audition directory.
+
+### 2026-08-14 Bomb R3 contract accepted for isolated evidence work
+
+- Contract commits `a589ed1` and `84036cc` change only the four declared T37 docs.
+  Independent final review of `aa2c9fd..84036cc` reports
+  `P0/P1/P2/P3 = 0/0/0/0`; both initial P1 findings are closed by the non-Bomb-only
+  acceptance summary and same-letter pair gate. The remaining changelog gap is closed by
+  the coordinator checkpoint that records this disposition.
+- Unique next action: one evidence writer may implement only
+  `docs/evidence/t37/bomb-block-burst-audition-r3/**`, then return the generated media,
+  deterministic/signal report, browser matrix, screenshots, and exact path list for
+  independent QA. Product audio remains closed.
