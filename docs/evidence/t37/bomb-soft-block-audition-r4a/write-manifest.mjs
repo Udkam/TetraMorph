@@ -24,6 +24,7 @@ const sourceFiles = [
   ['player-harness', join(root, 'audition.ts')],
   ['player-page', join(root, 'index.html')],
   ['player-style', join(root, 'styles.css')],
+  ['prescribed-client-actions', join(root, 'client-actions.json')],
   ['browser-verifier', join(root, 'browser-smoke.mjs')],
   ['signal-verifier', join(root, 'verify.mjs')],
   ['manifest-writer', join(root, 'write-manifest.mjs')],
@@ -70,7 +71,18 @@ for (const [id, recipe] of Object.entries(R4A_RECIPES)) {
 }
 
 const evidenceOutputs = [];
-for (const name of ['browser-report.json', 'r4a-desktop-impact.png', 'r4a-mobile.png', 'r4a-reduced-technical.png']) {
+for (const name of [
+  'browser-report.json',
+  'r4a-desktop-impact.png',
+  'r4a-mobile.png',
+  'r4a-reduced-technical.png',
+  'client-smoke/shot-0.png',
+  'client-smoke/shot-1.png',
+  'client-smoke/shot-2.png',
+  'client-smoke/state-0.json',
+  'client-smoke/state-1.json',
+  'client-smoke/state-2.json',
+]) {
   const path = join(root, name);
   const bytes = await readFile(path);
   evidenceOutputs.push({ path: rel(path), sha256: sha256(bytes), bytes: bytes.length });

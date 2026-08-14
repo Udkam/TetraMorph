@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { R4A_RECIPES, encodeMonoPcm16Wav, renderCandidate, validateRecipes } from './recipes.mjs';
@@ -66,6 +66,62 @@ for (const output of manifest.evidenceOutputs) {
   const bytes = await readFile(join(repository, output.path));
   check(bytes.length === output.bytes && sha256(bytes) === output.sha256, `bound evidence ${output.path}`);
 }
+
+const clientActions = JSON.parse(await readFile(join(root, 'client-actions.json'), 'utf8'));
+check(JSON.stringify(clientActions) === JSON.stringify({
+  steps: [
+    { buttons: [], frames: 6 },
+    { buttons: [], frames: 8 },
+    { buttons: [], frames: 12 },
+  ],
+}), 'prescribed client action sequence');
+const clientSmokeNames = await readdir(join(root, 'client-smoke'));
+check(!clientSmokeNames.some((name) => /^errors-.*\.json$/u.test(name)), 'prescribed client has no error report');
+const clientStates = await Promise.all([0, 1, 2].map(async (index) => JSON.parse(
+  await readFile(join(root, 'client-smoke', `state-${index}.json`), 'utf8'),
+)));
+check(clientStates.every((state) => (
+  state.ready
+  && !state.disposed
+  && state.error === null
+  && state.playCount === 1
+  && state.verdict === 'reject'
+  && state.canvasCount === 1
+  && state.domCellCount === 0
+)), 'prescribed client keeps one Canvas and reject default');
+check(clientStates.every((state) => (
+  state.pendingTimers === 0
+  && state.audio.activeSources === 0
+  && state.audio.pendingCandidates.length === 0
+)), 'prescribed client drains audio and timers at every capture');
+check(clientStates.every((state) => (
+  state.lastSchedule.candidate === 'X'
+  && state.lastSchedule.audioOffsetMs === 220
+  && near(state.lastSchedule.audioStartAtSeconds - state.lastSchedule.scheduledFromSeconds, 0.22, Number.EPSILON)
+)), 'prescribed client binds sound to the 220ms visual impact');
+check(
+  clientStates[0].reviewState === 'running'
+  && !clientStates[0].renderer.cleanupComplete
+  && clientStates[0].renderer.activeParticles > 0,
+  'prescribed client first frame retains the bounded particle field',
+);
+check(
+  clientStates[1].reviewState === 'running'
+  && !clientStates[1].renderer.cleanupComplete
+  && clientStates[1].renderer.activeParticles > 0
+  && clientStates[1].renderer.activeParticles < clientStates[0].renderer.activeParticles
+  && clientStates[1].renderer.reviewElapsedMs > clientStates[0].renderer.reviewElapsedMs,
+  'prescribed client second frame shows particle decay',
+);
+check(
+  clientStates[2].reviewState === 'complete'
+  && clientStates[2].renderer.cleanupComplete
+  && clientStates[2].renderer.reviewElapsedMs === 1470
+  && clientStates[2].renderer.activeParticles === 0
+  && clientStates[2].renderer.activeCandidate === null
+  && clientStates[2].renderer.mutationActivation === null,
+  'prescribed client final frame is residue-free',
+);
 
 const expectedGraph = {
   mutationBus: 0.96,
