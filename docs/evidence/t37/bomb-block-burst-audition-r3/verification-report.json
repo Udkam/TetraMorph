@@ -1,0 +1,413 @@
+{
+  "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+  "recipeVersion": "bomb-block-burst-r3-v1",
+  "generatedAt": "2026-08-14T04:00:27.385Z",
+  "summary": {
+    "passed": true,
+    "checks": 80,
+    "failures": 0
+  },
+  "checks": [
+    {
+      "name": "six candidate files declared",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "three candidate pairs declared",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "manifest automatic checks pass",
+      "passed": true,
+      "details": "{\"deterministicWavBytes\":true,\"finiteSamples\":true,\"zeroEndpoints\":true,\"clippedSamples\":0,\"boundedPeak\":true,\"boundedPresenceEnergy\":true,\"chainOnsetMatchesNormal\":true,\"noRealExplosionMedia\":true,\"humanListeningRequired\":true}"
+    },
+    {
+      "name": "human listening remains required",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "no autoplay",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "six core candidate controls",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "three accepted reference controls",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "three context controls",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "two reject defaults",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "same-letter gate implemented",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "test and text hooks exposed",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "recorded R2 media absent",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-normal.wav exists",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-normal.wav hash",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-normal.wav PCM contract",
+      "passed": true,
+      "details": "{\"riff\":\"RIFF\",\"wave\":\"WAVE\",\"format\":1,\"channels\":1,\"sampleRate\":48000,\"bitsPerSample\":16,\"dataBytes\":30720}"
+    },
+    {
+      "name": "assets/A-normal.wav byte length",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-normal.wav bounded signal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-normal.wav restrained high energy",
+      "passed": true,
+      "details": "{\"under70\":0.000009198317990087194,\"lowMid\":0.9999794037907075,\"presence\":0.000010798824786008828,\"high\":5.990665112529812e-7}"
+    },
+    {
+      "name": "assets/A-normal.wav restrained sub-70 energy",
+      "passed": true,
+      "details": "0.000009198317990087194"
+    },
+    {
+      "name": "assets/A-chain.wav exists",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-chain.wav hash",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-chain.wav PCM contract",
+      "passed": true,
+      "details": "{\"riff\":\"RIFF\",\"wave\":\"WAVE\",\"format\":1,\"channels\":1,\"sampleRate\":48000,\"bitsPerSample\":16,\"dataBytes\":88320}"
+    },
+    {
+      "name": "assets/A-chain.wav byte length",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-chain.wav bounded signal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-chain.wav restrained high energy",
+      "passed": true,
+      "details": "{\"under70\":0.007363894645530326,\"lowMid\":0.981554619629766,\"presence\":0.010476384967861045,\"high\":0.0006051007568498034}"
+    },
+    {
+      "name": "assets/A-chain.wav restrained sub-70 energy",
+      "passed": true,
+      "details": "0.007363894645530326"
+    },
+    {
+      "name": "assets/B-normal.wav exists",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-normal.wav hash",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-normal.wav PCM contract",
+      "passed": true,
+      "details": "{\"riff\":\"RIFF\",\"wave\":\"WAVE\",\"format\":1,\"channels\":1,\"sampleRate\":48000,\"bitsPerSample\":16,\"dataBytes\":32640}"
+    },
+    {
+      "name": "assets/B-normal.wav byte length",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-normal.wav bounded signal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-normal.wav restrained high energy",
+      "passed": true,
+      "details": "{\"under70\":0.000001678724529417358,\"lowMid\":0.9999403865537623,\"presence\":0.00005494250958183094,\"high\":0.000002992212121547843}"
+    },
+    {
+      "name": "assets/B-normal.wav restrained sub-70 energy",
+      "passed": true,
+      "details": "0.000001678724529417358"
+    },
+    {
+      "name": "assets/B-chain.wav exists",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-chain.wav hash",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-chain.wav PCM contract",
+      "passed": true,
+      "details": "{\"riff\":\"RIFF\",\"wave\":\"WAVE\",\"format\":1,\"channels\":1,\"sampleRate\":48000,\"bitsPerSample\":16,\"dataBytes\":94080}"
+    },
+    {
+      "name": "assets/B-chain.wav byte length",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-chain.wav bounded signal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-chain.wav restrained high energy",
+      "passed": true,
+      "details": "{\"under70\":0.0030248674003143135,\"lowMid\":0.9627139316636311,\"presence\":0.03175382771680435,\"high\":0.002507373219244613}"
+    },
+    {
+      "name": "assets/B-chain.wav restrained sub-70 energy",
+      "passed": true,
+      "details": "0.0030248674003143135"
+    },
+    {
+      "name": "assets/C-normal.wav exists",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-normal.wav hash",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-normal.wav PCM contract",
+      "passed": true,
+      "details": "{\"riff\":\"RIFF\",\"wave\":\"WAVE\",\"format\":1,\"channels\":1,\"sampleRate\":48000,\"bitsPerSample\":16,\"dataBytes\":28800}"
+    },
+    {
+      "name": "assets/C-normal.wav byte length",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-normal.wav bounded signal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-normal.wav restrained high energy",
+      "passed": true,
+      "details": "{\"under70\":0.00001406306846188246,\"lowMid\":0.9997030565737297,\"presence\":0.0002587806770196663,\"high\":0.000024099680791833248}"
+    },
+    {
+      "name": "assets/C-normal.wav restrained sub-70 energy",
+      "passed": true,
+      "details": "0.00001406306846188246"
+    },
+    {
+      "name": "assets/C-chain.wav exists",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-chain.wav hash",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-chain.wav PCM contract",
+      "passed": true,
+      "details": "{\"riff\":\"RIFF\",\"wave\":\"WAVE\",\"format\":1,\"channels\":1,\"sampleRate\":48000,\"bitsPerSample\":16,\"dataBytes\":84480}"
+    },
+    {
+      "name": "assets/C-chain.wav byte length",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-chain.wav bounded signal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-chain.wav restrained high energy",
+      "passed": true,
+      "details": "{\"under70\":0.0019088331575336287,\"lowMid\":0.9229205923267972,\"presence\":0.06937100851954846,\"high\":0.005799565996125502}"
+    },
+    {
+      "name": "assets/C-chain.wav restrained sub-70 energy",
+      "passed": true,
+      "details": "0.0019088331575336287"
+    },
+    {
+      "name": "A exact 56 ms onset",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "A same initial peak",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "A normal duration contract",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "A chain duration contract",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "B exact 56 ms onset",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "B same initial peak",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "B normal duration contract",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "B chain duration contract",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "C exact 56 ms onset",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "C same initial peak",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "C normal duration contract",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "C chain duration contract",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "embedded catalog parses",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "A-normal embedded bytes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "A-chain embedded bytes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "B-normal embedded bytes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "B-chain embedded bytes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "C-normal embedded bytes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "C-chain embedded bytes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "Studio reference hash",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-normal.wav independent renders",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/A-chain.wav independent renders",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-normal.wav independent renders",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/B-chain.wav independent renders",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-normal.wav independent renders",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "assets/C-chain.wav independent renders",
+      "passed": true,
+      "details": ""
+    }
+  ],
+  "failures": []
+}

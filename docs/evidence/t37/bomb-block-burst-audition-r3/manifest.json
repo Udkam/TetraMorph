@@ -1,0 +1,243 @@
+{
+  "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+  "recipeVersion": "bomb-block-burst-r3-v1",
+  "generatedAt": "2026-08-14T04:00:26.873Z",
+  "boundary": "isolated audition only; no product audio integration and no recorded explosion sources",
+  "sampleRate": 48000,
+  "format": "mono PCM16 WAV",
+  "chainBeatSeconds": [
+    0.056,
+    0.112,
+    0.168,
+    0.224,
+    0.28,
+    0.336,
+    0.392,
+    0.448,
+    0.504,
+    0.56
+  ],
+  "acceptedReferences": {
+    "hardDrop": "ACTION_A_CONTRACT hard-drop tones scheduled live with its accepted compressor",
+    "studioClear": {
+      "asset": "src/assets/audio/t37/studio-progress-step.ogg",
+      "sha256": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c",
+      "rate": 1.18,
+      "maxDuration": 0.2,
+      "targetPeaks": {
+        "one": 0.5,
+        "four": 0.54
+      },
+      "fourLineOffsetsMs": [
+        0,
+        60,
+        120,
+        180
+      ]
+    }
+  },
+  "candidates": [
+    {
+      "id": "A",
+      "label": "软质闷崩",
+      "summary": "圆润块体先压下，再带出一小撮低亮度尘屑。",
+      "normalDuration": 0.32,
+      "chainDuration": 0.92,
+      "targetPeak": 0.5,
+      "chainBand": {
+        "lowHz": 180,
+        "highHz": 760,
+        "relativeDb": -19
+      }
+    },
+    {
+      "id": "B",
+      "label": "颗粒碎崩",
+      "summary": "更干的方块碎裂纹理，但所有颗粒仍包在一个连续声体里。",
+      "normalDuration": 0.34,
+      "chainDuration": 0.98,
+      "targetPeak": 0.52,
+      "chainBand": {
+        "lowHz": 240,
+        "highHz": 1320,
+        "relativeDb": -20
+      }
+    },
+    {
+      "id": "C",
+      "label": "弹性卡崩",
+      "summary": "沿用硬降的音高血缘，像一组软质方块同时脱扣。",
+      "normalDuration": 0.3,
+      "chainDuration": 0.88,
+      "targetPeak": 0.48,
+      "chainBand": {
+        "lowHz": 320,
+        "highHz": 1500,
+        "relativeDb": -21
+      }
+    }
+  ],
+  "checks": {
+    "deterministicWavBytes": true,
+    "finiteSamples": true,
+    "zeroEndpoints": true,
+    "clippedSamples": 0,
+    "boundedPeak": true,
+    "boundedPresenceEnergy": true,
+    "chainOnsetMatchesNormal": true,
+    "noRealExplosionMedia": true,
+    "humanListeningRequired": true
+  },
+  "files": [
+    {
+      "id": "A",
+      "label": "软质闷崩",
+      "summary": "圆润块体先压下，再带出一小撮低亮度尘屑。",
+      "kind": "normal",
+      "file": "assets/A-normal.wav",
+      "bytes": 30764,
+      "sha256": "557dee352c68258ad7b8e0b8615925dbbf2a2a273e389c78b1ed453a7b88c9a9",
+      "deterministicWavBytes": true,
+      "onsetMatchesNormal": null,
+      "durationSeconds": 0.32,
+      "peak": 0.5,
+      "rms": 0.12317850662614141,
+      "crestFactor": 4.059149714467217,
+      "dcOffset": -0.00005044567038263557,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "zeroEndpoints": true,
+      "spectralEnergy": {
+        "under70": 0.000009198317990087194,
+        "lowMid": 0.9999794037907075,
+        "presence": 0.000010798824786008828,
+        "high": 5.990665112529812e-7
+      }
+    },
+    {
+      "id": "A",
+      "label": "软质闷崩",
+      "summary": "圆润块体先压下，再带出一小撮低亮度尘屑。",
+      "kind": "chain",
+      "file": "assets/A-chain.wav",
+      "bytes": 88364,
+      "sha256": "cd76a23189e7fc2bd1a804694e237f0b7d9ecfbcc3d90692d01b778a987572b0",
+      "deterministicWavBytes": true,
+      "onsetMatchesNormal": true,
+      "durationSeconds": 0.92,
+      "peak": 0.5,
+      "rms": 0.07292611911215592,
+      "crestFactor": 6.856254056671116,
+      "dcOffset": -0.000035750411207632555,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "zeroEndpoints": true,
+      "spectralEnergy": {
+        "under70": 0.007363894645530326,
+        "lowMid": 0.981554619629766,
+        "presence": 0.010476384967861045,
+        "high": 0.0006051007568498034
+      }
+    },
+    {
+      "id": "B",
+      "label": "颗粒碎崩",
+      "summary": "更干的方块碎裂纹理，但所有颗粒仍包在一个连续声体里。",
+      "kind": "normal",
+      "file": "assets/B-normal.wav",
+      "bytes": 32684,
+      "sha256": "b456d4297bab0dac6a51ff6faa83da778b3eb2dd23cac1e98b794b7c3f32e6ab",
+      "deterministicWavBytes": true,
+      "onsetMatchesNormal": null,
+      "durationSeconds": 0.34,
+      "peak": 0.52,
+      "rms": 0.10986192509301103,
+      "crestFactor": 4.733213982549085,
+      "dcOffset": -0.00003851688070737549,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "zeroEndpoints": true,
+      "spectralEnergy": {
+        "under70": 0.000001678724529417358,
+        "lowMid": 0.9999403865537623,
+        "presence": 0.00005494250958183094,
+        "high": 0.000002992212121547843
+      }
+    },
+    {
+      "id": "B",
+      "label": "颗粒碎崩",
+      "summary": "更干的方块碎裂纹理，但所有颗粒仍包在一个连续声体里。",
+      "kind": "chain",
+      "file": "assets/B-chain.wav",
+      "bytes": 94124,
+      "sha256": "025478fc60719328f88599138801b5f62cda9d2bbe0f38b11d35087a06307cdc",
+      "deterministicWavBytes": true,
+      "onsetMatchesNormal": true,
+      "durationSeconds": 0.98,
+      "peak": 0.52,
+      "rms": 0.06488145403161405,
+      "crestFactor": 8.01461693115918,
+      "dcOffset": -0.000015634538042132064,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "zeroEndpoints": true,
+      "spectralEnergy": {
+        "under70": 0.0030248674003143135,
+        "lowMid": 0.9627139316636311,
+        "presence": 0.03175382771680435,
+        "high": 0.002507373219244613
+      }
+    },
+    {
+      "id": "C",
+      "label": "弹性卡崩",
+      "summary": "沿用硬降的音高血缘，像一组软质方块同时脱扣。",
+      "kind": "normal",
+      "file": "assets/C-normal.wav",
+      "bytes": 28844,
+      "sha256": "5ee70c5291606613ade6bde7c010c820f0765d938e909bd71e6282a4d9b4e29b",
+      "deterministicWavBytes": true,
+      "onsetMatchesNormal": null,
+      "durationSeconds": 0.3,
+      "peak": 0.48,
+      "rms": 0.11471052718916115,
+      "crestFactor": 4.184445941988091,
+      "dcOffset": -0.0000014065095765345813,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "zeroEndpoints": true,
+      "spectralEnergy": {
+        "under70": 0.00001406306846188246,
+        "lowMid": 0.9997030565737297,
+        "presence": 0.0002587806770196663,
+        "high": 0.000024099680791833248
+      }
+    },
+    {
+      "id": "C",
+      "label": "弹性卡崩",
+      "summary": "沿用硬降的音高血缘，像一组软质方块同时脱扣。",
+      "kind": "chain",
+      "file": "assets/C-chain.wav",
+      "bytes": 84524,
+      "sha256": "02ca0c9eda515a711e6bfb6a7b8cb988a4842197b0efd95dca0e501ccb4f6bf9",
+      "deterministicWavBytes": true,
+      "onsetMatchesNormal": true,
+      "durationSeconds": 0.88,
+      "peak": 0.48,
+      "rms": 0.06734019850634236,
+      "crestFactor": 7.1279861159719,
+      "dcOffset": 0.000008381260913597519,
+      "clippedSamples": 0,
+      "finiteSamples": true,
+      "zeroEndpoints": true,
+      "spectralEnergy": {
+        "under70": 0.0019088331575336287,
+        "lowMid": 0.9229205923267972,
+        "presence": 0.06937100851954846,
+        "high": 0.005799565996125502
+      }
+    }
+  ]
+}

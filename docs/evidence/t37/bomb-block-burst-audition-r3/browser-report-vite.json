@@ -1,0 +1,258 @@
+{
+  "url": "http://127.0.0.1:4193/docs/evidence/t37/bomb-block-burst-audition-r3/",
+  "label": "vite",
+  "generatedAt": "2026-08-14T04:00:56.402Z",
+  "initial": {
+    "surface": "T37 Bomb R3 stylized block-burst audition",
+    "ready": true,
+    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "recipeVersion": "bomb-block-burst-r3-v1",
+    "candidateCount": 3,
+    "candidates": [
+      {
+        "id": "A",
+        "label": "软质闷崩",
+        "normalDuration": 0.32,
+        "chainDuration": 0.92
+      },
+      {
+        "id": "B",
+        "label": "颗粒碎崩",
+        "normalDuration": 0.34,
+        "chainDuration": 0.98
+      },
+      {
+        "id": "C",
+        "label": "弹性卡崩",
+        "normalDuration": 0.3,
+        "chainDuration": 0.88
+      }
+    ],
+    "currentCue": null,
+    "playCount": 0,
+    "activeSources": 0,
+    "pendingTimers": 0,
+    "volume": 0.68,
+    "normalVerdict": "reject",
+    "chainVerdict": "reject",
+    "gateMode": "reject",
+    "contextState": "suspended",
+    "contextClosed": false,
+    "humanListeningRequired": true,
+    "productIntegrated": false
+  },
+  "matchingPair": {
+    "surface": "T37 Bomb R3 stylized block-burst audition",
+    "ready": true,
+    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "recipeVersion": "bomb-block-burst-r3-v1",
+    "candidateCount": 3,
+    "candidates": [
+      {
+        "id": "A",
+        "label": "软质闷崩",
+        "normalDuration": 0.32,
+        "chainDuration": 0.92
+      },
+      {
+        "id": "B",
+        "label": "颗粒碎崩",
+        "normalDuration": 0.34,
+        "chainDuration": 0.98
+      },
+      {
+        "id": "C",
+        "label": "弹性卡崩",
+        "normalDuration": 0.3,
+        "chainDuration": 0.88
+      }
+    ],
+    "currentCue": null,
+    "playCount": 12,
+    "activeSources": 0,
+    "pendingTimers": 0,
+    "volume": 0.68,
+    "normalVerdict": "A",
+    "chainVerdict": "A",
+    "gateMode": "pair",
+    "contextState": "running",
+    "contextClosed": false,
+    "humanListeningRequired": true,
+    "productIntegrated": false
+  },
+  "crossPair": {
+    "surface": "T37 Bomb R3 stylized block-burst audition",
+    "ready": true,
+    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "recipeVersion": "bomb-block-burst-r3-v1",
+    "candidateCount": 3,
+    "candidates": [
+      {
+        "id": "A",
+        "label": "软质闷崩",
+        "normalDuration": 0.32,
+        "chainDuration": 0.92
+      },
+      {
+        "id": "B",
+        "label": "颗粒碎崩",
+        "normalDuration": 0.34,
+        "chainDuration": 0.98
+      },
+      {
+        "id": "C",
+        "label": "弹性卡崩",
+        "normalDuration": 0.3,
+        "chainDuration": 0.88
+      }
+    ],
+    "currentCue": null,
+    "playCount": 12,
+    "activeSources": 0,
+    "pendingTimers": 0,
+    "volume": 0.68,
+    "normalVerdict": "A",
+    "chainVerdict": "B",
+    "gateMode": "recompose",
+    "contextState": "running",
+    "contextClosed": false,
+    "humanListeningRequired": true,
+    "productIntegrated": false
+  },
+  "stopped": {
+    "surface": "T37 Bomb R3 stylized block-burst audition",
+    "ready": true,
+    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "recipeVersion": "bomb-block-burst-r3-v1",
+    "candidateCount": 3,
+    "candidates": [
+      {
+        "id": "A",
+        "label": "软质闷崩",
+        "normalDuration": 0.32,
+        "chainDuration": 0.92
+      },
+      {
+        "id": "B",
+        "label": "颗粒碎崩",
+        "normalDuration": 0.34,
+        "chainDuration": 0.98
+      },
+      {
+        "id": "C",
+        "label": "弹性卡崩",
+        "normalDuration": 0.3,
+        "chainDuration": 0.88
+      }
+    ],
+    "currentCue": null,
+    "playCount": 24,
+    "activeSources": 0,
+    "pendingTimers": 0,
+    "volume": 0.68,
+    "normalVerdict": "reject",
+    "chainVerdict": "reject",
+    "gateMode": "reject",
+    "contextState": "running",
+    "contextClosed": false,
+    "humanListeningRequired": true,
+    "productIntegrated": false
+  },
+  "disposed": {
+    "surface": "T37 Bomb R3 stylized block-burst audition",
+    "ready": false,
+    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "recipeVersion": "bomb-block-burst-r3-v1",
+    "candidateCount": 3,
+    "candidates": [
+      {
+        "id": "A",
+        "label": "软质闷崩",
+        "normalDuration": 0.32,
+        "chainDuration": 0.92
+      },
+      {
+        "id": "B",
+        "label": "颗粒碎崩",
+        "normalDuration": 0.34,
+        "chainDuration": 0.98
+      },
+      {
+        "id": "C",
+        "label": "弹性卡崩",
+        "normalDuration": 0.3,
+        "chainDuration": 0.88
+      }
+    ],
+    "currentCue": null,
+    "playCount": 24,
+    "activeSources": 0,
+    "pendingTimers": 0,
+    "volume": 0.68,
+    "normalVerdict": "reject",
+    "chainVerdict": "reject",
+    "gateMode": "reject",
+    "contextState": "closed",
+    "contextClosed": true,
+    "humanListeningRequired": true,
+    "productIntegrated": false
+  },
+  "mobileInitial": {
+    "surface": "T37 Bomb R3 stylized block-burst audition",
+    "ready": true,
+    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "recipeVersion": "bomb-block-burst-r3-v1",
+    "candidateCount": 3,
+    "candidates": [
+      {
+        "id": "A",
+        "label": "软质闷崩",
+        "normalDuration": 0.32,
+        "chainDuration": 0.92
+      },
+      {
+        "id": "B",
+        "label": "颗粒碎崩",
+        "normalDuration": 0.34,
+        "chainDuration": 0.98
+      },
+      {
+        "id": "C",
+        "label": "弹性卡崩",
+        "normalDuration": 0.3,
+        "chainDuration": 0.88
+      }
+    ],
+    "currentCue": null,
+    "playCount": 0,
+    "activeSources": 0,
+    "pendingTimers": 0,
+    "volume": 0.68,
+    "normalVerdict": "reject",
+    "chainVerdict": "reject",
+    "gateMode": "reject",
+    "contextState": "suspended",
+    "contextClosed": false,
+    "humanListeningRequired": true,
+    "productIntegrated": false
+  },
+  "layout": {
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "desktopMinimumControlHeight": 44,
+    "mobileMinimumControlHeight": 44
+  },
+  "screenshots": {
+    "desktop": {
+      "file": "audition-vite-desktop.png",
+      "bytes": 696778
+    },
+    "mobile": {
+      "file": "audition-vite-mobile.png",
+      "bytes": 528354
+    }
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "passed": true
+}

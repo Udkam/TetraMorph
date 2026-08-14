@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>TetraMorph Bomb R3 方块崩裂试听</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <div class="eyebrow"><span aria-hidden="true"></span>T37 / BOMB R3 / HUMAN LISTENING</div>
+        <div class="hero-copy">
+          <div>
+            <p class="overline">从“爆炸”改成“方块崩落”</p>
+            <h1>听见一声「崩」，<br />不要听见真实炸弹。</h1>
+          </div>
+          <p class="lead">
+            三组声音均为原创程序合成，不含真实爆炸录音。它们保留清楚的块体冲击，
+            但去掉电影式低频、长混响与吓人的尖锐裂响。
+          </p>
+        </div>
+        <div class="boundary" role="note">
+          <div><strong>产品接入仍关闭</strong><span>当前页面只用于人耳比较；默认结论始终是不通过。</span></div>
+          <p>自动指标只能排除削波、过强高频和错误配对，不能证明“好听”或“不吓人”。</p>
+        </div>
+      </header>
+
+      <section class="transport panel" aria-labelledby="transport-title">
+        <div>
+          <p class="kicker">LISTENING LEVEL</p>
+          <h2 id="transport-title">先把音量调到舒适</h2>
+          <p>建议先听现有硬降，再比较候选；不要为了追求冲击力调高系统音量。</p>
+        </div>
+        <div class="transport-controls">
+          <label for="master-volume"><span>试听音量</span><output id="volume-output" for="master-volume">68%</output></label>
+          <input id="master-volume" type="range" min="0" max="100" value="68" />
+          <button id="stop-all" class="stop" type="button">停止全部</button>
+          <p id="play-status" class="status" role="status" aria-live="polite">正在准备本地音频…</p>
+        </div>
+      </section>
+
+      <section class="references" aria-labelledby="references-title">
+        <div class="section-heading">
+          <div><p class="kicker">ACCEPTED REFERENCES</p><h2 id="references-title">先记住游戏原有的声音家族</h2></div>
+          <p>这些按钮使用当前已接受的硬降配方与 Studio 消行素材，只作等音量参照。</p>
+        </div>
+        <div class="reference-grid">
+          <button type="button" data-reference="hard-drop"><span>动作触点</span><strong>现有硬降</strong><small>短、圆、有接触感</small></button>
+          <button type="button" data-reference="clear-1"><span>奖励触点</span><strong>现有单行消除</strong><small>受控的明亮释放</small></button>
+          <button type="button" data-reference="clear-4"><span>奖励层级</span><strong>现有四行消除</strong><small>靠节奏扩大，不靠惊吓</small></button>
+        </div>
+      </section>
+
+      <section aria-labelledby="candidates-title">
+        <div class="section-heading">
+          <div><p class="kicker">THREE MATERIAL DIRECTIONS</p><h2 id="candidates-title">逐组听正常与连锁</h2></div>
+          <p>连锁必须从同组正常音开始，再加入低增益连续崩落；不是另一声更大的爆炸。</p>
+        </div>
+        <div class="candidate-grid">
+          <article class="candidate" data-candidate="A">
+            <div class="candidate-head"><span class="candidate-letter">A</span><div><h3>软质闷崩</h3><p>圆润块体先压下，再带出一小撮低亮度尘屑。</p></div></div>
+            <div class="candidate-bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="candidate-actions">
+              <button type="button" data-play="A-normal"><span>正常 Bomb</span><strong>试听 A · 单次崩裂</strong><small>0.32 s</small></button>
+              <button type="button" data-play="A-chain"><span>连锁清屏</span><strong>试听 A · 连续崩落</strong><small>0.92 s</small></button>
+              <button type="button" class="context" data-context="A">放进现有音效上下文</button>
+            </div>
+          </article>
+
+          <article class="candidate" data-candidate="B">
+            <div class="candidate-head"><span class="candidate-letter">B</span><div><h3>颗粒碎崩</h3><p>更干的碎裂纹理，但所有颗粒仍包在一个连续声体里。</p></div></div>
+            <div class="candidate-bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="candidate-actions">
+              <button type="button" data-play="B-normal"><span>正常 Bomb</span><strong>试听 B · 单次崩裂</strong><small>0.34 s</small></button>
+              <button type="button" data-play="B-chain"><span>连锁清屏</span><strong>试听 B · 连续崩落</strong><small>0.98 s</small></button>
+              <button type="button" class="context" data-context="B">放进现有音效上下文</button>
+            </div>
+          </article>
+
+          <article class="candidate" data-candidate="C">
+            <div class="candidate-head"><span class="candidate-letter">C</span><div><h3>弹性卡崩</h3><p>沿用硬降的音高血缘，像一组软质方块同时脱扣。</p></div></div>
+            <div class="candidate-bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="candidate-actions">
+              <button type="button" data-play="C-normal"><span>正常 Bomb</span><strong>试听 C · 单次崩裂</strong><small>0.30 s</small></button>
+              <button type="button" data-play="C-chain"><span>连锁清屏</span><strong>试听 C · 连续崩落</strong><small>0.88 s</small></button>
+              <button type="button" class="context" data-context="C">放进现有音效上下文</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="gate panel" aria-labelledby="gate-title">
+        <div class="section-heading">
+          <div><p class="kicker">HUMAN GATE</p><h2 id="gate-title">分别判断，按同组配对</h2></div>
+          <p>可以分别比较正常与连锁，但只有同字母两项都通过才可进入产品接入。</p>
+        </div>
+        <div class="gate-grid">
+          <fieldset>
+            <legend>正常 Bomb</legend>
+            <label><input type="radio" name="normal-verdict" value="A" /> A 软质闷崩</label>
+            <label><input type="radio" name="normal-verdict" value="B" /> B 颗粒碎崩</label>
+            <label><input type="radio" name="normal-verdict" value="C" /> C 弹性卡崩</label>
+            <label class="reject"><input type="radio" name="normal-verdict" value="reject" checked /> 全部不通过</label>
+          </fieldset>
+          <fieldset>
+            <legend>连锁清屏</legend>
+            <label><input type="radio" name="chain-verdict" value="A" /> A 软质闷崩</label>
+            <label><input type="radio" name="chain-verdict" value="B" /> B 颗粒碎崩</label>
+            <label><input type="radio" name="chain-verdict" value="C" /> C 弹性卡崩</label>
+            <label class="reject"><input type="radio" name="chain-verdict" value="reject" checked /> 全部不通过</label>
+          </fieldset>
+        </div>
+        <button id="record-verdict" class="record" type="button">整理本页比较结果</button>
+        <p id="gate-status" class="gate-status" role="status" aria-live="polite"><strong>未通过</strong> — 默认拒绝；页面操作不会自动授权产品接入。</p>
+      </section>
+
+      <footer>
+        <p><strong>原创程序合成 · 单声道 48 kHz PCM16</strong><br />完整配方、指标、哈希与自动验证见本目录 README 和 manifest。</p>
+        <p>请把最终判断回复到任务中；浏览器页面不会保存或上传选择。</p>
+      </footer>
+    </main>
+    <script src="embedded-audio.js"></script>
+    <script src="audition.js"></script>
+  </body>
+</html>
