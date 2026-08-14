@@ -80,6 +80,16 @@ only under `docs/evidence/t37/bomb-boom-audition-r2/`; they may not change produ
 New full/reduced dense-board evidence must prove trigger-row-only first impact, symmetric
 fronts, no unreached-row fragments, no permanent wash/border, normal-Bomb motif reuse,
 one Canvas, and zero browser errors. Existing rejected evidence is never overwritten.
+After source QA accepts exact source `8de0cb7`, the sole evidence writer owns only the new
+`docs/evidence/t37/bomb-row-causal-r2/**` directory. It binds that SHA and captures a real
+Core hard-drop/settlement chain through the production renderer at full-motion
+`0/219/220/276/332 ms` plus plan-derived mid/last/completion frames, and reduced-motion
+`0/49/50/70/90 ms` plus the same derived endpoints. The old
+`docs/evidence/t37/bomb-presentation-final/**` directory remains rejected and read-only.
+The harness must fail closed on event rows, bidirectional reached-row deltas, intact
+unreached cells, forbidden full-width/whole-board geometry, completion/no-replay, one
+Canvas, zero DOM cells, zero browser errors, and manifest hashes. Supplemental deterministic
+Core-to-renderer frames do not claim a naturally reached App run or human visual acceptance.
 
 Because `chainTriggerRows` is a required discriminated-union field, the Core checkpoint
 also owns schema-only fixture compatibility in `src/game/audio/AudioEngine.test.ts` and

@@ -2531,6 +2531,23 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   first plan beats still demand `0.14 / 0.174 s`, and the chained successor still demands
   `0.936 s`. The same source checkpoint now owns only these R2-plan numeric expectations
   (including their unchanged beat cardinality); qualitative audio assertions stay frozen.
+- Audition evidence candidate `42e42db` is human-unreviewed. Independent evidence QA
+  reports `P0 0 / P1 1 / P2 0 / P3 0 / GAP 0`: the first Git add normalized two CRLFs in
+  the archived Freesound page, so its committed blob does not match the frozen response
+  byte count/hash even though the Windows worktree verifier passes. A correction owns only
+  that binary page blob and regenerated verification report; it must prove a clean/archive
+  checkout retains `43,507` bytes and SHA-256 `0c29ca88...`.
+- Visual source candidate `8de0cb7` changes exactly the six authorized timeline,
+  renderer, and shared audio-scheduler paths. Combined focused tests pass `92/92`,
+  typecheck passes, and independent read-only QA reports
+  `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Browser/visual acceptance remains open.
+- The next sole evidence writer owns only
+  `docs/evidence/t37/bomb-row-causal-r2/**`, bound to source `8de0cb7`. It captures full
+  `0/219/220/276/332 ms` and reduced `0/49/50/70/90 ms` causal frames plus plan-derived
+  mid/last/completion frames from real Core transitions and the production renderer. It
+  must fail closed on exact trigger row, symmetric fronts, intact unreached cells, no
+  scan/wash/border/all-board particles, completion/no-replay, one Canvas, zero DOM cells,
+  zero browser errors, and artifact hashes; rejected old evidence stays untouched.
 
 ## Do not repeat
 
