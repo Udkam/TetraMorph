@@ -157,6 +157,14 @@ export class NormalBombRendererSession {
     this.renderer.setFrameCallback((deltaMs) => this.advance(Math.min(deltaMs, 100)));
   }
 
+  stop(): void {
+    this.pause();
+    if (this.renderer) this.renderer.render(this.fixture.hardDropState, [{ type: 'restarted' }], 0);
+    this.elapsedMs = 0;
+    this.activeCandidate = null;
+    this.onFrame();
+  }
+
   advance(ms: number): void {
     if (!this.renderer || !this.activeCandidate || ms <= 0) return;
     let remaining = Math.min(ms, Math.max(0, NORMAL_BOMB_REVIEW_MS - this.elapsedMs));

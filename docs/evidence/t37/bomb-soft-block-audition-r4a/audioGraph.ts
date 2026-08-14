@@ -333,6 +333,8 @@ export class R4AAudioSession {
   private buffers: Partial<Record<CandidateId | 'studio', AudioBuffer>> = {};
   private readonly voices = new Set<GestureVoice>();
   private readonly candidateSources = new Set<AudioBufferSourceNode>();
+  private readonly candidateStarts = new Map<AudioBufferSourceNode, { id: CandidateId; startAt: number }>();
+  private canceledBeforeStart = 0;
   private closed = false;
 
   async prime(): Promise<void> {
@@ -363,8 +365,11 @@ export class R4AAudioSession {
 
   stopAll(): void {
     for (const source of this.candidateSources) {
+      const scheduled = this.candidateStarts.get(source);
+      if (scheduled && this.context && this.context.currentTime < scheduled.startAt) this.canceledBeforeStart += 1;
       try { source.stop(); } catch { /* already ended */ }
       source.disconnect();
+      this.candidateStarts.delete(source);
     }
     this.candidateSources.clear();
     for (const voice of this.voices) { voice.stop(); voice.disconnect(); }
@@ -378,9 +383,14 @@ export class R4AAudioSession {
     const source = this.context.createBufferSource();
     source.buffer = buffer;
     source.connect(this.graph.mutationBus);
-    source.onended = () => { source.disconnect(); this.candidateSources.delete(source); };
+    source.onended = () => {
+      source.disconnect();
+      this.candidateSources.delete(source);
+      this.candidateStarts.delete(source);
+    };
     this.candidateSources.add(source);
     const startAt = this.context.currentTime + delayMs / 1_000;
+    this.candidateStarts.set(source, { id, startAt });
     source.start(startAt);
     return startAt;
   }
@@ -420,6 +430,8 @@ export class R4AAudioSession {
       primed: this.context !== null,
       contextState: this.context?.state ?? 'none',
       activeSources: this.candidateSources.size + this.voices.size,
+      pendingCandidates: [...this.candidateStarts.values()].map((entry) => ({ ...entry })),
+      canceledBeforeStart: this.canceledBeforeStart,
       closed: this.closed,
     };
   }

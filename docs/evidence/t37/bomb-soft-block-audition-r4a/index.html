@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>TetraMorph · Bomb R4A 正常音效试听</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body data-ready="false" data-review-state="idle">
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">T37 · BOMB R4A · NORMAL ONLY</p>
+          <h1>短促、友好的方块<span>“崩”</span></h1>
+          <p class="lede">视觉与页面过渡已通过，本页只判断新的正常 Bomb 声音。三个编号不描述材质；请在完整动画 <strong>1×</strong> 下听它是否像游戏方块同时松脱，而不像真实爆炸。</p>
+        </div>
+        <aside class="gate-note" aria-label="试听规则">
+          <strong>人工听感仍是唯一结论</strong>
+          <span>自动检查只约束响度、频段、220 ms 对齐与清理。</span>
+        </aside>
+      </header>
+
+      <section class="stage" aria-labelledby="stage-title">
+        <div class="canvas-column">
+          <div class="stage-heading">
+            <div><p class="section-kicker">PRODUCTION RENDERER</p><h2 id="stage-title">正常 Bomb · 完整动画 1×</h2></div>
+            <div class="live-pill"><span aria-hidden="true"></span><b id="render-status">正在准备</b></div>
+          </div>
+          <div class="canvas-shell">
+            <div id="canvas-host" data-testid="board-frame" aria-label="TetraMorph 正常 Bomb 动画棋盘"></div>
+            <div class="impact-marker" aria-hidden="true"><span>220 ms</span></div>
+          </div>
+          <div class="timeline" aria-label="当前回放时间">
+            <div class="timeline-track"><span id="timeline-fill"></span><i id="impact-tick"></i></div>
+            <div class="timeline-copy"><span id="phase-label">请选择 X、Y 或 Z 开始</span><output id="time-value">0 ms</output></div>
+          </div>
+        </div>
+
+        <div class="control-column">
+          <section class="reference-panel" aria-labelledby="reference-title">
+            <div class="panel-heading"><p class="section-kicker">FROZEN REFERENCES</p><h2 id="reference-title">先校准现有音量</h2></div>
+            <div class="reference-grid">
+              <button type="button" data-reference="hard-drop"><small>ACTION A</small><span>硬降</span></button>
+              <button type="button" data-reference="studio"><small>STUDIO</small><span>单行消除</span></button>
+            </div>
+          </section>
+
+          <section class="candidate-panel" aria-labelledby="candidate-title">
+            <div class="panel-heading"><p class="section-kicker">NEUTRAL CHOICES</p><h2 id="candidate-title">逐个听正常 Bomb</h2></div>
+            <div class="candidate-list">
+              <article class="candidate-card" data-candidate-card="X">
+                <div class="candidate-id"><span>X</span><p>正常 Bomb</p></div>
+                <div class="candidate-actions"><button type="button" data-play="X">动画 + X</button><button class="compare" type="button" data-compare="X">硬降 → X</button></div>
+              </article>
+              <article class="candidate-card" data-candidate-card="Y">
+                <div class="candidate-id"><span>Y</span><p>正常 Bomb</p></div>
+                <div class="candidate-actions"><button type="button" data-play="Y">动画 + Y</button><button class="compare" type="button" data-compare="Y">硬降 → Y</button></div>
+              </article>
+              <article class="candidate-card" data-candidate-card="Z">
+                <div class="candidate-id"><span>Z</span><p>正常 Bomb</p></div>
+                <div class="candidate-actions"><button type="button" data-play="Z">动画 + Z</button><button class="compare" type="button" data-compare="Z">硬降 → Z</button></div>
+              </article>
+            </div>
+            <button class="stop-button" id="stop-all" type="button">停止声音与回放</button>
+          </section>
+        </div>
+      </section>
+
+      <section class="verdict" aria-labelledby="verdict-title">
+        <div class="verdict-copy"><p class="section-kicker">HUMAN GATE</p><h2 id="verdict-title">你的正常 Bomb 结论</h2><p>默认保持“全部不通过”。网页记录不等于项目已接受；请把最终选择告诉总控。</p></div>
+        <form id="verdict-form">
+          <fieldset class="choice-group"><legend>选择一个结果</legend>
+            <label><input type="radio" name="verdict" value="reject" checked><span>全部不通过</span></label>
+            <label><input type="radio" name="verdict" value="X"><span>X</span></label>
+            <label><input type="radio" name="verdict" value="Y"><span>Y</span></label>
+            <label><input type="radio" name="verdict" value="Z"><span>Z</span></label>
+          </fieldset>
+          <fieldset class="reason-group"><legend>可选：失败原因（不绑定设计结论）</legend>
+            <label><input type="checkbox" value="too-loud"><span>太响</span></label><label><input type="checkbox" value="too-dull"><span>太闷</span></label>
+            <label><input type="checkbox" value="too-sharp"><span>太尖</span></label><label><input type="checkbox" value="too-long"><span>太长</span></label>
+            <label><input type="checkbox" value="too-note-like"><span>太像音符</span></label><label><input type="checkbox" value="timing-wrong"><span>时机不对</span></label>
+          </fieldset>
+          <div class="record-row"><button id="record-verdict" type="submit">记录本页选择</button><output id="verdict-output" aria-live="polite">尚未记录；当前默认全部不通过。</output></div>
+        </form>
+      </section>
+
+      <footer><span>R4A 仅含正常 Bomb；没有连锁清屏选项，也没有改动产品音频。</span><span id="technical-status">Canvas 0 · Audio idle</span></footer>
+    </main>
+    <script type="module" src="./audition.ts"></script>
+  </body>
+</html>
