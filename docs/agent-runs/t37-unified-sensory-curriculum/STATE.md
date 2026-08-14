@@ -2551,6 +2551,25 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   scan/wash/border/all-board particles, completion/no-replay, one Canvas, zero DOM cells,
   zero browser errors, and artifact hashes; rejected old evidence stays untouched.
 
+- Audition correction `3c07814` preserves the archived Freesound response as `43,507`
+  bytes / SHA-256 `0c29ca88...`; correction `e2c7003` fixes CC0 archive export as `7,048`
+  LF bytes / SHA-256 `a2010f34...`. Independent clean-archive verification passes
+  `23/23` with `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Listening remains open and no
+  candidate is integrated.
+- Visual evidence `7eb1d44` is bound to source `8de0cb7` and evidence base `7443f04`.
+  The final harness passes with 20 frames, zero failures/errors, exact row-30 Core cause,
+  origin rows 29/30, trigger `[30]`, mounted Canvas `[1,1]`, post-destroy `[0,0]`, zero
+  DOM cells, and pixel-identical completion/+1000 ms. Independent QA reproduces manifest
+  `25/25`, visually checks both original contact sheets, and reports all-zero findings and
+  gaps. Player visual acceptance remains `OPEN`.
+- Milestone gates after source/evidence freeze: focused `92/92`; full suite
+  `537 passed / 15 skipped` across `55 passed / 2 skipped` files; typecheck pass; production
+  build pass. No scoped Vite/Chromium listener remains. Protected inherited T27 paths and
+  `progress.md` remain unstaged.
+- Unique next action: expose the isolated Bomb Boom R2 page for the player's explicit
+  normal/chain A/B/C-or-reject listening verdict while the committed visual contact sheets
+  remain available for visual judgment. Do not integrate product audio before that verdict.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

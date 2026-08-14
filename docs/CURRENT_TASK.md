@@ -92,6 +92,22 @@ unreached cells, forbidden full-width/whole-board geometry, completion/no-replay
 Canvas, zero DOM cells, zero browser errors, and manifest hashes. Supplemental deterministic
 Core-to-renderer frames do not claim a naturally reached App run or human visual acceptance.
 
+The source/evidence candidate is now frozen. Visual source `8de0cb7` passes combined
+focused tests `92/92`, typecheck, and independent source QA with
+`P0/P1/P2/P3/GAP = 0`. Evidence `7eb1d44` records 20 frames from the exact row-30 Core
+transition, `PASS`, zero failures/browser errors, mounted Canvas counts `[1,1]`, destroy
+counts `[0,0]`, zero DOM cells, identical completion/+1000 ms frames, and a reproduced
+`25/25` manifest; independent evidence QA also reports all-zero findings/gaps. Full suite
+passes `537` with `15` skipped across `55` passed / `2` skipped files, and the final
+typecheck and production build pass. Player visual acceptance remains open.
+
+The isolated audio page is frozen at `42e42db` plus response-byte corrections `3c07814`
+and `e2c7003`. Its current-worktree and clean-archive verifiers both pass `23/23`; A/B/C
+normal cues are `0.92/1.08/1.16 s`, and their paired chain cues are
+`2.74/2.96/2.86 s`. This makes the page eligible for human listening only. Product audio
+integration remains closed until the player explicitly accepts one normal candidate and
+one chain candidate (they may differ), or rejects all.
+
 Because `chainTriggerRows` is a required discriminated-union field, the Core checkpoint
 also owns schema-only fixture compatibility in `src/game/audio/AudioEngine.test.ts` and
 `src/game/render/TetrisRenderer.test.ts`. Those two files may add only exact trigger-row
