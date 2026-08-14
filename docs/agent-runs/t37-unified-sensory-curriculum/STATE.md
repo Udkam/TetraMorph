@@ -2569,6 +2569,15 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Unique next action: expose the isolated Bomb Boom R2 page for the player's explicit
   normal/chain A/B/C-or-reject listening verdict while the committed visual contact sheets
   remain available for visual judgment. Do not integrate product audio before that verdict.
+- Human-gate helper started 2026-08-14 08:49:58+08:00 for this active T37 task only:
+  project root `E:\Proj\reproduction-tetris`; command
+  `npm.cmd run dev -- --host 127.0.0.1 --port 4192 --strictPort`; listener
+  `node.exe` PID `32148` (npm PID `17948`, intermediate cmd PIDs `24624/20640`);
+  URL `http://127.0.0.1:4192/docs/evidence/t37/bomb-boom-audition-r2/`; HTTP `200`;
+  purpose isolated A/B/C listening only. Logs are task-owned temporary files
+  `t37-bomb-r2-vite-20260814-084958.stdout.log` and `.stderr.log`, both empty at launch.
+  Keep the helper only through the listening verdict, then stop this exact process tree and
+  verify port `4192` is released. Other listeners are not T37-owned.
 
 ## Do not repeat
 
