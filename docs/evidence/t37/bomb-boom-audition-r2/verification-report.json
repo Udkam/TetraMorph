@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-14T00:06:56.808Z",
+  "generatedAt": "2026-08-14T00:13:53.767Z",
   "root": "docs/evidence/t37/bomb-boom-audition-r2",
   "passed": true,
   "summary": {
@@ -167,8 +167,8 @@
   "files": [
     {
       "path": ".gitattributes",
-      "bytes": 28,
-      "sha256": "b496ff5d1ab9a6f5af5268a35da7f464b628209e9a793ccedb652b3140623d90"
+      "bytes": 54,
+      "sha256": "de01abd7ecf66ed1abe6ffa2cc4a1e6a2918b545ede1106f39b1f95bdfd4c848"
     },
     {
       "path": "index.html",
