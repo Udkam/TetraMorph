@@ -1,11 +1,12 @@
 {
   "url": "file:///E:/Proj/reproduction-tetris/docs/evidence/t37/bomb-block-burst-audition-r3/index.html",
   "label": "file",
-  "generatedAt": "2026-08-14T04:00:31.160Z",
+  "generatedAt": "2026-08-14T04:17:49.768Z",
   "initial": {
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
-    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -33,6 +34,7 @@
     "activeSources": 0,
     "pendingTimers": 0,
     "volume": 0.68,
+    "acceptedOutputGain": 0.78,
     "normalVerdict": "reject",
     "chainVerdict": "reject",
     "gateMode": "reject",
@@ -44,7 +46,8 @@
   "matchingPair": {
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
-    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -72,6 +75,7 @@
     "activeSources": 0,
     "pendingTimers": 0,
     "volume": 0.68,
+    "acceptedOutputGain": 0.78,
     "normalVerdict": "A",
     "chainVerdict": "A",
     "gateMode": "pair",
@@ -83,7 +87,8 @@
   "crossPair": {
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
-    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -111,6 +116,7 @@
     "activeSources": 0,
     "pendingTimers": 0,
     "volume": 0.68,
+    "acceptedOutputGain": 0.78,
     "normalVerdict": "A",
     "chainVerdict": "B",
     "gateMode": "recompose",
@@ -122,7 +128,8 @@
   "stopped": {
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
-    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -150,6 +157,7 @@
     "activeSources": 0,
     "pendingTimers": 0,
     "volume": 0.68,
+    "acceptedOutputGain": 0.78,
     "normalVerdict": "reject",
     "chainVerdict": "reject",
     "gateMode": "reject",
@@ -161,7 +169,8 @@
   "disposed": {
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": false,
-    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -189,6 +198,7 @@
     "activeSources": 0,
     "pendingTimers": 0,
     "volume": 0.68,
+    "acceptedOutputGain": 0.78,
     "normalVerdict": "reject",
     "chainVerdict": "reject",
     "gateMode": "reject",
@@ -200,7 +210,8 @@
   "mobileInitial": {
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
-    "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -228,6 +239,7 @@
     "activeSources": 0,
     "pendingTimers": 0,
     "volume": 0.68,
+    "acceptedOutputGain": 0.78,
     "normalVerdict": "reject",
     "chainVerdict": "reject",
     "gateMode": "reject",

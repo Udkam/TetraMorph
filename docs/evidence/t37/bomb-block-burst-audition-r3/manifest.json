@@ -1,7 +1,17 @@
 {
   "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+  "provenance": {
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "initialEvidenceCommit": "65cb18c",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "recipesSha256": "c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6",
+    "rendererSha256": "ecf257e39ecaa48ea4761773cb3eafb0229d9c8974a613592bb47f706376cfa3",
+    "auditionSha256": "7cc794dc3fb75079ca60d92d5a1706cbf0a03fa612c48b0f29b62942312913b6",
+    "verifierSha256": "9f103ea01bea13bd1daa723476bd0f7c1a69e2adf1a3ca5cf7fbc5ff6047878d",
+    "browserSmokeSha256": "009b21897d9f740e23b7c615e5a2755411413aa447b6442d537575864cea9f9c"
+  },
   "recipeVersion": "bomb-block-burst-r3-v1",
-  "generatedAt": "2026-08-14T04:00:26.873Z",
+  "generatedAt": "2026-08-14T04:17:45.414Z",
   "boundary": "isolated audition only; no product audio integration and no recorded explosion sources",
   "sampleRate": 48000,
   "format": "mono PCM16 WAV",
@@ -18,7 +28,39 @@
     0.56
   ],
   "acceptedReferences": {
-    "hardDrop": "ACTION_A_CONTRACT hard-drop tones scheduled live with its accepted compressor",
+    "outputGain": 0.78,
+    "hardDrop": {
+      "contract": {
+        "masterGain": 1.85,
+        "compressor": {
+          "thresholdDb": -4,
+          "kneeDb": 6
+        },
+        "tones": [
+          {
+            "frequency": 174.61,
+            "duration": 0.072,
+            "gain": 0.1,
+            "attack": 0.006
+          },
+          {
+            "frequency": 349.23,
+            "duration": 0.038,
+            "gain": 0.03,
+            "delay": 0.004,
+            "attack": 0.004
+          }
+        ],
+        "voiceGainBoost": 1.45,
+        "voiceGainCeiling": 0.5
+      },
+      "peakPreOutput": 0.2524146580144856,
+      "rmsPreOutput": 0.052036732544355105,
+      "peakPostOutput": 0.19688343325129876,
+      "rmsPostOutput": 0.04058865138459698,
+      "compressorKneeStart": 0.44668359215096315,
+      "compressorInactiveByPeak": true
+    },
     "studioClear": {
       "asset": "src/assets/audio/t37/studio-progress-step.ogg",
       "sha256": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c",
@@ -33,7 +75,21 @@
         60,
         120,
         180
-      ]
+      ],
+      "pan": {
+        "one": [
+          0
+        ],
+        "four": [
+          -0.35,
+          -0.116667,
+          0.116667,
+          0.35
+        ]
+      },
+      "attackMaxSeconds": 0.004,
+      "releaseMaxSeconds": 0.024,
+      "outputGain": 0.78
     }
   },
   "candidates": [
@@ -83,8 +139,11 @@
     "zeroEndpoints": true,
     "clippedSamples": 0,
     "boundedPeak": true,
+    "boundedRms": true,
+    "boundedReferenceLevel": true,
     "boundedPresenceEnergy": true,
     "chainOnsetMatchesNormal": true,
+    "chainOnsetRmsMatchesNormal": true,
     "noRealExplosionMedia": true,
     "humanListeningRequired": true
   },
@@ -99,6 +158,9 @@
       "sha256": "557dee352c68258ad7b8e0b8615925dbbf2a2a273e389c78b1ed453a7b88c9a9",
       "deterministicWavBytes": true,
       "onsetMatchesNormal": null,
+      "onsetRms250": 0.13936057173084265,
+      "peakVsHardDropDb": 5.937108660859607,
+      "peakVsStudioOneDb": 0,
       "durationSeconds": 0.32,
       "peak": 0.5,
       "rms": 0.12317850662614141,
@@ -124,6 +186,9 @@
       "sha256": "cd76a23189e7fc2bd1a804694e237f0b7d9ecfbcc3d90692d01b778a987572b0",
       "deterministicWavBytes": true,
       "onsetMatchesNormal": true,
+      "onsetRms250": 0.13974854448040464,
+      "peakVsHardDropDb": 5.937108660859607,
+      "peakVsStudioOneDb": 0,
       "durationSeconds": 0.92,
       "peak": 0.5,
       "rms": 0.07292611911215592,
@@ -137,7 +202,8 @@
         "lowMid": 0.981554619629766,
         "presence": 0.010476384967861045,
         "high": 0.0006051007568498034
-      }
+      },
+      "onsetRmsDeltaDb": 0.024147478244089624
     },
     {
       "id": "B",
@@ -149,6 +215,9 @@
       "sha256": "b456d4297bab0dac6a51ff6faa83da778b3eb2dd23cac1e98b794b7c3f32e6ab",
       "deterministicWavBytes": true,
       "onsetMatchesNormal": null,
+      "onsetRms250": 0.12811992005848902,
+      "peakVsHardDropDb": 6.277775446835215,
+      "peakVsStudioOneDb": 0.3406667859756074,
       "durationSeconds": 0.34,
       "peak": 0.52,
       "rms": 0.10986192509301103,
@@ -174,6 +243,9 @@
       "sha256": "025478fc60719328f88599138801b5f62cda9d2bbe0f38b11d35087a06307cdc",
       "deterministicWavBytes": true,
       "onsetMatchesNormal": true,
+      "onsetRms250": 0.1283050195442059,
+      "peakVsHardDropDb": 6.277775446835215,
+      "peakVsStudioOneDb": 0.3406667859756074,
       "durationSeconds": 0.98,
       "peak": 0.52,
       "rms": 0.06488145403161405,
@@ -187,7 +259,8 @@
         "lowMid": 0.9627139316636311,
         "presence": 0.03175382771680435,
         "high": 0.002507373219244613
-      }
+      },
+      "onsetRmsDeltaDb": 0.012539762994482933
     },
     {
       "id": "C",
@@ -199,6 +272,9 @@
       "sha256": "5ee70c5291606613ade6bde7c010c820f0765d938e909bd71e6282a4d9b4e29b",
       "deterministicWavBytes": true,
       "onsetMatchesNormal": null,
+      "onsetRms250": 0.1256590866496265,
+      "peakVsHardDropDb": 5.582533321650977,
+      "peakVsStudioOneDb": -0.35457533920863205,
       "durationSeconds": 0.3,
       "peak": 0.48,
       "rms": 0.11471052718916115,
@@ -224,6 +300,9 @@
       "sha256": "02ca0c9eda515a711e6bfb6a7b8cb988a4842197b0efd95dca0e501ccb4f6bf9",
       "deterministicWavBytes": true,
       "onsetMatchesNormal": true,
+      "onsetRms250": 0.1262064370639738,
+      "peakVsHardDropDb": 5.582533321650977,
+      "peakVsStudioOneDb": -0.35457533920863205,
       "durationSeconds": 0.88,
       "peak": 0.48,
       "rms": 0.06734019850634236,
@@ -237,7 +316,8 @@
         "lowMid": 0.9229205923267972,
         "presence": 0.06937100851954846,
         "high": 0.005799565996125502
-      }
+      },
+      "onsetRmsDeltaDb": 0.03775215207390188
     }
   ]
 }

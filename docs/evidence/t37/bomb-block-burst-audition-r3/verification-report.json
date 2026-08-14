@@ -1,10 +1,20 @@
 {
   "sourceCommit": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+  "provenance": {
+    "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
+    "initialEvidenceCommit": "65cb18c",
+    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "recipesSha256": "c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6",
+    "rendererSha256": "ecf257e39ecaa48ea4761773cb3eafb0229d9c8974a613592bb47f706376cfa3",
+    "auditionSha256": "7cc794dc3fb75079ca60d92d5a1706cbf0a03fa612c48b0f29b62942312913b6",
+    "verifierSha256": "9f103ea01bea13bd1daa723476bd0f7c1a69e2adf1a3ca5cf7fbc5ff6047878d",
+    "browserSmokeSha256": "009b21897d9f740e23b7c615e5a2755411413aa447b6442d537575864cea9f9c"
+  },
   "recipeVersion": "bomb-block-burst-r3-v1",
-  "generatedAt": "2026-08-14T04:00:27.385Z",
+  "generatedAt": "2026-08-14T04:17:54.178Z",
   "summary": {
     "passed": true,
-    "checks": 80,
+    "checks": 99,
     "failures": 0
   },
   "checks": [
@@ -21,10 +31,25 @@
     {
       "name": "manifest automatic checks pass",
       "passed": true,
-      "details": "{\"deterministicWavBytes\":true,\"finiteSamples\":true,\"zeroEndpoints\":true,\"clippedSamples\":0,\"boundedPeak\":true,\"boundedPresenceEnergy\":true,\"chainOnsetMatchesNormal\":true,\"noRealExplosionMedia\":true,\"humanListeningRequired\":true}"
+      "details": "{\"deterministicWavBytes\":true,\"finiteSamples\":true,\"zeroEndpoints\":true,\"clippedSamples\":0,\"boundedPeak\":true,\"boundedRms\":true,\"boundedReferenceLevel\":true,\"boundedPresenceEnergy\":true,\"chainOnsetMatchesNormal\":true,\"chainOnsetRmsMatchesNormal\":true,\"noRealExplosionMedia\":true,\"humanListeningRequired\":true}"
     },
     {
       "name": "human listening remains required",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "accepted output gain matches product",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "provenance source hashes",
+      "passed": true,
+      "details": "{\"contractBase\":\"10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b\",\"initialEvidenceCommit\":\"65cb18c\",\"generatorCommit\":\"037c45842aedb16a445bac6857e16a9f141d7be1\",\"recipesSha256\":\"c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6\",\"rendererSha256\":\"ecf257e39ecaa48ea4761773cb3eafb0229d9c8974a613592bb47f706376cfa3\",\"auditionSha256\":\"7cc794dc3fb75079ca60d92d5a1706cbf0a03fa612c48b0f29b62942312913b6\",\"verifierSha256\":\"9f103ea01bea13bd1daa723476bd0f7c1a69e2adf1a3ca5cf7fbc5ff6047878d\",\"browserSmokeSha256\":\"009b21897d9f740e23b7c615e5a2755411413aa447b6442d537575864cea9f9c\"}"
+    },
+    {
+      "name": "provenance commits declared",
       "passed": true,
       "details": ""
     },
@@ -55,6 +80,11 @@
     },
     {
       "name": "same-letter gate implemented",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "Studio reference graph matches accepted product",
       "passed": true,
       "details": ""
     },
@@ -94,6 +124,16 @@
       "details": ""
     },
     {
+      "name": "assets/A-normal.wav bounded RMS",
+      "passed": true,
+      "details": "0.12317850662614141"
+    },
+    {
+      "name": "assets/A-normal.wav relative reference level",
+      "passed": true,
+      "details": "{\"peakVsHardDropDb\":5.937108660859607,\"peakVsStudioOneDb\":0}"
+    },
+    {
       "name": "assets/A-normal.wav restrained high energy",
       "passed": true,
       "details": "{\"under70\":0.000009198317990087194,\"lowMid\":0.9999794037907075,\"presence\":0.000010798824786008828,\"high\":5.990665112529812e-7}"
@@ -127,6 +167,16 @@
       "name": "assets/A-chain.wav bounded signal",
       "passed": true,
       "details": ""
+    },
+    {
+      "name": "assets/A-chain.wav bounded RMS",
+      "passed": true,
+      "details": "0.07292611911215592"
+    },
+    {
+      "name": "assets/A-chain.wav relative reference level",
+      "passed": true,
+      "details": "{\"peakVsHardDropDb\":5.937108660859607,\"peakVsStudioOneDb\":0}"
     },
     {
       "name": "assets/A-chain.wav restrained high energy",
@@ -164,6 +214,16 @@
       "details": ""
     },
     {
+      "name": "assets/B-normal.wav bounded RMS",
+      "passed": true,
+      "details": "0.10986192509301103"
+    },
+    {
+      "name": "assets/B-normal.wav relative reference level",
+      "passed": true,
+      "details": "{\"peakVsHardDropDb\":6.277775446835215,\"peakVsStudioOneDb\":0.3406667859756074}"
+    },
+    {
       "name": "assets/B-normal.wav restrained high energy",
       "passed": true,
       "details": "{\"under70\":0.000001678724529417358,\"lowMid\":0.9999403865537623,\"presence\":0.00005494250958183094,\"high\":0.000002992212121547843}"
@@ -197,6 +257,16 @@
       "name": "assets/B-chain.wav bounded signal",
       "passed": true,
       "details": ""
+    },
+    {
+      "name": "assets/B-chain.wav bounded RMS",
+      "passed": true,
+      "details": "0.06488145403161405"
+    },
+    {
+      "name": "assets/B-chain.wav relative reference level",
+      "passed": true,
+      "details": "{\"peakVsHardDropDb\":6.277775446835215,\"peakVsStudioOneDb\":0.3406667859756074}"
     },
     {
       "name": "assets/B-chain.wav restrained high energy",
@@ -234,6 +304,16 @@
       "details": ""
     },
     {
+      "name": "assets/C-normal.wav bounded RMS",
+      "passed": true,
+      "details": "0.11471052718916115"
+    },
+    {
+      "name": "assets/C-normal.wav relative reference level",
+      "passed": true,
+      "details": "{\"peakVsHardDropDb\":5.582533321650977,\"peakVsStudioOneDb\":-0.35457533920863205}"
+    },
+    {
       "name": "assets/C-normal.wav restrained high energy",
       "passed": true,
       "details": "{\"under70\":0.00001406306846188246,\"lowMid\":0.9997030565737297,\"presence\":0.0002587806770196663,\"high\":0.000024099680791833248}"
@@ -269,6 +349,16 @@
       "details": ""
     },
     {
+      "name": "assets/C-chain.wav bounded RMS",
+      "passed": true,
+      "details": "0.06734019850634236"
+    },
+    {
+      "name": "assets/C-chain.wav relative reference level",
+      "passed": true,
+      "details": "{\"peakVsHardDropDb\":5.582533321650977,\"peakVsStudioOneDb\":-0.35457533920863205}"
+    },
+    {
       "name": "assets/C-chain.wav restrained high energy",
       "passed": true,
       "details": "{\"under70\":0.0019088331575336287,\"lowMid\":0.9229205923267972,\"presence\":0.06937100851954846,\"high\":0.005799565996125502}"
@@ -287,6 +377,11 @@
       "name": "A same initial peak",
       "passed": true,
       "details": ""
+    },
+    {
+      "name": "A same 250 ms onset RMS",
+      "passed": true,
+      "details": "0.024147478244089624"
     },
     {
       "name": "A normal duration contract",
@@ -309,6 +404,11 @@
       "details": ""
     },
     {
+      "name": "B same 250 ms onset RMS",
+      "passed": true,
+      "details": "0.012539762994482933"
+    },
+    {
       "name": "B normal duration contract",
       "passed": true,
       "details": ""
@@ -327,6 +427,11 @@
       "name": "C same initial peak",
       "passed": true,
       "details": ""
+    },
+    {
+      "name": "C same 250 ms onset RMS",
+      "passed": true,
+      "details": "0.03775215207390188"
     },
     {
       "name": "C normal duration contract",
