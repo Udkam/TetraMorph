@@ -141,6 +141,7 @@ const manifest = {
       attackMaxSeconds: 0.004,
       releaseMaxSeconds: 0.024,
       outputGain: ACCEPTED_OUTPUT_GAIN,
+      postCompressorMeasurement: 'current Chromium OfflineAudioContext; see browser-report-file.json and browser-report-live.json',
     },
   },
   candidates: CANDIDATES.map(({ id, label, summary, normalDuration, chainDuration, targetPeak, chainBand }) => ({

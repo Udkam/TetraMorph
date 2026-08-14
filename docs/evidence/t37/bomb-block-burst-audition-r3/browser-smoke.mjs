@@ -24,6 +24,7 @@ const desktop = await browser.newPage({ viewport: { width: 1440, height: 1000 },
 observe(desktop)
 await waitReady(desktop)
 const initial = await desktop.evaluate(() => window.BOMB_R3_TEST.getState())
+const studioReferenceMetrics = await desktop.evaluate(() => window.BOMB_R3_TEST.measureStudioReferences())
 
 for (const button of await desktop.locator('[data-play]').all()) {
   await button.click()
@@ -92,6 +93,7 @@ const report = {
   stopped,
   disposed,
   mobileInitial,
+  studioReferenceMetrics,
   layout: {
     desktopOverflow,
     mobileOverflow,
@@ -108,6 +110,9 @@ const report = {
 report.passed = (
   initial.ready && initial.candidateCount === 3
   && initial.acceptedOutputGain === 0.78 && Boolean(initial.generatorCommit)
+  && studioReferenceMetrics.one.peak > 0.1 && studioReferenceMetrics.one.peak < 0.5
+  && studioReferenceMetrics.four.peak >= studioReferenceMetrics.one.peak && studioReferenceMetrics.four.peak <= 0.78
+  && studioReferenceMetrics.candidatePeakVsOneDb.every((item) => item.value >= 0 && item.value <= 7)
   && initial.normalVerdict === 'reject' && initial.chainVerdict === 'reject'
   && matchingPair.gateMode === 'pair'
   && crossPair.gateMode === 'recompose'

@@ -152,7 +152,7 @@
   function scheduleBuffer(buffer, destination, startAt, options = {}) {
     const source = context.createBufferSource()
     const gain = context.createGain()
-    const panner = options.pan && typeof context.createStereoPanner === 'function'
+    const panner = options.pan !== undefined && typeof context.createStereoPanner === 'function'
       ? context.createStereoPanner()
       : null
     source.buffer = buffer
@@ -165,14 +165,15 @@
     gain.gain.linearRampToValueAtTime(options.gain ?? 1, startAt + attack)
     gain.gain.setValueAtTime(options.gain ?? 1, Math.max(startAt, end - release))
     gain.gain.linearRampToValueAtTime(0.0001, end)
-    source.connect(gain)
     const nodes = [source, gain]
     if (panner) {
       panner.pan.value = options.pan
-      gain.connect(panner)
-      panner.connect(destination)
+      source.connect(panner)
+      panner.connect(gain)
+      gain.connect(destination)
       nodes.push(panner)
     } else {
+      source.connect(gain)
       gain.connect(destination)
     }
     trackVoice(source, nodes)
@@ -214,6 +215,71 @@
       for (const sample of buffer.getChannelData(channel)) peak = Math.max(peak, Math.abs(sample))
     }
     return peak
+  }
+
+  function bufferMetrics(buffer) {
+    let peak = 0
+    let squareSum = 0
+    let sampleCount = 0
+    for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
+      for (const sample of buffer.getChannelData(channel)) {
+        peak = Math.max(peak, Math.abs(sample))
+        squareSum += sample * sample
+        sampleCount += 1
+      }
+    }
+    return { peak, rms: Math.sqrt(squareSum / Math.max(1, sampleCount)) }
+  }
+
+  async function renderStudioReference(lines) {
+    if (!studioBuffer) throw new Error('Studio reference is not decoded.')
+    const OfflineAudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext
+    if (!OfflineAudioContextClass) throw new Error('当前浏览器不支持离线音频参照量测。')
+    const duration = Math.min(studioBuffer.duration / studioContract.rate, studioContract.maxDuration)
+    const offsets = lines === 4 ? studioContract.offsets : [0]
+    const totalDuration = duration + offsets[offsets.length - 1] + 0.16
+    const offline = new OfflineAudioContextClass(2, Math.ceil(totalDuration * studioBuffer.sampleRate), studioBuffer.sampleRate)
+    const outputNode = offline.createGain()
+    const compressor = offline.createDynamicsCompressor()
+    outputNode.gain.value = ACCEPTED_OUTPUT_GAIN
+    configureCompressor(compressor, studioContract.compressor)
+    compressor.connect(outputNode)
+    outputNode.connect(offline.destination)
+    const targetPeak = lines === 4 ? 0.54 : 0.5
+    const sourcePeak = bufferPeak(studioBuffer)
+    const normalizedGain = sourcePeak > 0 ? Math.min(2.4, targetPeak / sourcePeak) : 1
+    offsets.forEach((offset, index) => {
+      const source = offline.createBufferSource()
+      const panner = offline.createStereoPanner()
+      const gain = offline.createGain()
+      const end = offset + duration
+      source.buffer = studioBuffer
+      source.playbackRate.value = studioContract.rate
+      panner.pan.value = lines === 1 ? 0 : -0.35 + (0.7 * index) / (lines - 1)
+      gain.gain.setValueAtTime(0.0001, offset)
+      gain.gain.linearRampToValueAtTime(normalizedGain, offset + Math.min(0.004, duration * 0.1))
+      gain.gain.setValueAtTime(normalizedGain, Math.max(offset, end - Math.min(0.024, duration * 0.18)))
+      gain.gain.linearRampToValueAtTime(0.0001, end)
+      source.connect(panner)
+      panner.connect(gain)
+      gain.connect(compressor)
+      source.start(offset)
+      source.stop(end + 0.006)
+    })
+    return bufferMetrics(await offline.startRendering())
+  }
+
+  async function measureStudioReferences() {
+    await initializeAudio()
+    const [one, four] = await Promise.all([renderStudioReference(1), renderStudioReference(4)])
+    return {
+      one,
+      four,
+      candidatePeakVsOneDb: manifest.files.map((item) => ({
+        id: `${item.id}-${item.kind}`,
+        value: 20 * Math.log10((item.peak * ACCEPTED_OUTPUT_GAIN) / one.peak),
+      })),
+    }
   }
 
   function scheduleStudioClear(lines, startAt) {
@@ -359,6 +425,7 @@
     getState: () => JSON.parse(window.render_game_to_text()),
     stopAll: () => stopAll(''),
     dispose,
+    measureStudioReferences,
     manifest,
   })
 

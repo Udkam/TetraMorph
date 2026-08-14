@@ -71,8 +71,12 @@ check('two reject defaults', (html.match(/value="reject" checked/g) ?? []).lengt
 check('same-letter gate implemented', audition.includes("gateMode = 'recompose'") && audition.includes('normal !== chain'))
 check('Studio reference graph matches accepted product', (
   audition.includes('-0.35 + (0.7 * index) / (lines - 1)')
+  && audition.includes('options.pan !== undefined')
+  && audition.includes('source.connect(panner)')
+  && audition.includes('panner.connect(gain)')
   && audition.includes('attack: Math.min(0.004, duration * 0.1)')
   && audition.includes('release: Math.min(0.024, duration * 0.18)')
+  && audition.includes('measureStudioReferences')
 ))
 check('test and text hooks exposed', audition.includes('window.BOMB_R3_TEST') && audition.includes('window.render_game_to_text') && audition.includes('window.advanceTime'))
 check('recorded R2 media absent', !/Deep Explosion|Muffled Distant|bomb-boom-audition-r2|sources[\\/]assets/i.test([html, audition, recipes, embeddedSource].join('\n')))
