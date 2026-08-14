@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-14 — T37 D1 current-head route review ready for player verdict
+
+- A read-only current-HEAD refresh at `961c87e` confirms the D1 navigation owner and
+  Settled Handoff CSS retain their frozen behavior after the Puzzle-to-Endgame namespace
+  migration and D2A overlay work. Canonical paths are now `/endgames` and
+  `/play/endgame/:id`; the old evidence remains historical rather than being relabelled.
+- Real Chromium verifies native forward/back direction, exact `120/200 ms` animations,
+  Canvas-ready Classic entry, Game exit cleanup, rapid latest-request ownership, the
+  continuous `160 ms` fallback, opacity-only reduced motion, and a bounded 390x844
+  Endgame endpoint. Every D1-scoped invariant passes with one route surface, at most one
+  Canvas, zero DOM cells, no horizontal overflow, and zero browser errors.
+- The prescribed web-game client reaches the real Endgame gallery after confirming the
+  first-entry rules, and the final full-page screenshots were inspected. Focused current
+  App/route/navigation-style tests pass `84/84`; the earlier complete `537/15-skipped`
+  suite remains source-valid because no product path changed in this refresh.
+- Independent read-only source review finds no D1 regression and reports
+  `P0/P1/P2/P3/GAP = 0/0/0/0/1`. The only gap is the player's normal-speed judgment of
+  the 200 ms / 6 px handoff. D2B category/selection motion remains unimplemented and is
+  explicitly outside this D1 review.
+
 ## 2026-08-14 — T37 Bomb R2 live review surface ready for player verdict
 
 - Evidence-helper candidate `70ce61f` adds only the deterministic live Bomb R2 review

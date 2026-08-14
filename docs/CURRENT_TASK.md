@@ -1039,6 +1039,14 @@ curriculum remain closed until their preceding checkpoints are green.
    and no duplicate mounts/listeners/canvases. D1 player review remains open; in-page
    sheets/results remain later work, and site identity is deferred to the final proposal
    gate after its first draft failed semantic clarity.
+   A current-HEAD refresh at `961c87e` confirms the D1 owner and Settled Handoff CSS have
+   not regressed after the Endgame namespace and D2A work. Live Chromium passes native
+   forward/back, Canvas-ready Game entry, exit cleanup, rapid latest-owner navigation,
+   `160 ms` fallback, opacity-only reduced motion, and a 390x844 endpoint with one route
+   surface, at most one Canvas, no DOM cells, no overflow, and zero browser errors.
+   Focused current tests pass `84/84`; independent read-only review reports
+   `P0/P1/P2/P3 = 0/0/0/0` with the sole `GAP` being the player's normal-speed taste
+   verdict. Endgame category/level changes remain D2B-owned and are not part of D1.
 5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.

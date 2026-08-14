@@ -2636,6 +2636,46 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   `chain A/B/C/reject all`, and `visual accept/reject`. Only then open either the exact
   approved audio-integration slice or a new bounded redesign contract.
 
+### 2026-08-14 D1 current-head live player-review refresh
+
+- Task `T37-D1-CURRENT-HEAD-LIVE-REVIEW` is read-only against review head
+  `961c87e32d84cef7cea39e151169b92f502595b0`. It reuses the task-owned Vite listener on
+  `127.0.0.1:4192` and does not open a D1, Bomb, material, audio, or Endgame product
+  writer. The inherited T27 / `t27-r1-followup` / `progress.md` paths and untracked
+  handoff remain untouched.
+- The prescribed `develop-web-game` client first exposed an automation mismatch: its
+  fixed `left -> space` payload moved Home focus to Mutation instead of judging a route.
+  The screenshot was inspected, the result was not counted as D1 evidence, and a bounded
+  confirm-and-wait payload then reached the real `/endgames` gallery without an error
+  artifact. This is a test-harness correction, not a product repair.
+- A separate current-source Chromium matrix covers native Home->Endgame, browser back,
+  Home->Classic with Canvas readiness, Game exit to Home, two-intent rapid navigation,
+  fallback, reduced motion, and a 390x844 Endgame endpoint. The D1-scoped recomputation
+  passes all 20 invariants: exact direction and terminal cleanup, `120/200/160/<=32 ms`
+  timing, single named viewport/surface, at most one Canvas, zero DOM cells, bounded
+  mobile route controls, no overflow, and zero console/page/request errors.
+- The raw mobile assertion intentionally remains recorded as initially false because it
+  incorrectly required every visible button to be 44 px. Inspection shows the D1-owned
+  `返回首页` and `开始` controls are exactly 44 px and every control stays in the viewport;
+  only the 34 px Intro/Easy/Hard category tabs failed that over-broad condition. Those
+  same-path tabs are reserved for D2B and are excluded from the corrected D1 scope rather
+  than silently treated as a route defect.
+- Main-agent focused command
+  `.\\node_modules\\.bin\\vitest.cmd run --maxWorkers=2 src/App.test.ts src/navigation/appRoute.test.ts src/styles/navigation.test.ts`
+  passes three files / `84/84`. Independent read-only inspection confirms the D1
+  latest-owner, Canvas-ready, fallback/reduced, and cleanup algorithms plus Settled
+  Handoff CSS are behaviorally unchanged; only the canonical route namespace migrated
+  from Puzzle v1 to Endgame v2. Its disposition is
+  `P0/P1/P2/P3/GAP = 0/0/0/0/1`, with the sole gap being normal-speed player taste.
+- D1 is now eligible for current-product player review at `http://127.0.0.1:4192/`.
+  Judge Home->Endgame forward, Endgame->Home back, Home->Game Canvas handoff, Game exit,
+  and browser Back/Forward after first-entry rule sheets have already been confirmed.
+  Automated proof cannot decide whether `200 ms` / `6 px` feels natural, directional,
+  restrained, and free of perceived flash-cut or double motion.
+- Unique next action remains the Bomb three-part human verdict; the player may also close
+  D1 in the same response with `D1 route transition: accept/reject`. No product branch may
+  infer either taste result from this technical refresh.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste
