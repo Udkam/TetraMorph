@@ -10,6 +10,7 @@ const renderer = join(root, 'render-candidates.mjs')
 const recipePath = join(root, 'recipes.mjs')
 const auditionPath = join(root, 'audition.js')
 const verifierPath = fileURLToPath(import.meta.url)
+const browserSmokePath = join(root, 'browser-smoke.mjs')
 const failures = []
 const checks = []
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
@@ -59,6 +60,7 @@ check('provenance source hashes', (
   && manifest.provenance.rendererSha256 === sha256(await readFile(renderer))
   && manifest.provenance.auditionSha256 === sha256(await readFile(auditionPath))
   && manifest.provenance.verifierSha256 === sha256(await readFile(verifierPath))
+  && manifest.provenance.browserSmokeSha256 === sha256(await readFile(browserSmokePath))
 ), JSON.stringify(manifest.provenance))
 check('provenance commits declared', manifest.provenance.contractBase === manifest.sourceCommit && Boolean(manifest.provenance.initialEvidenceCommit) && Boolean(manifest.provenance.generatorCommit))
 check('no autoplay', !/autoplay/i.test(html))
@@ -67,6 +69,11 @@ check('three accepted reference controls', (html.match(/data-reference=/g) ?? []
 check('three context controls', (html.match(/data-context=/g) ?? []).length === 3)
 check('two reject defaults', (html.match(/value="reject" checked/g) ?? []).length === 2)
 check('same-letter gate implemented', audition.includes("gateMode = 'recompose'") && audition.includes('normal !== chain'))
+check('Studio reference graph matches accepted product', (
+  audition.includes('-0.35 + (0.7 * index) / (lines - 1)')
+  && audition.includes('attack: Math.min(0.004, duration * 0.1)')
+  && audition.includes('release: Math.min(0.024, duration * 0.18)')
+))
 check('test and text hooks exposed', audition.includes('window.BOMB_R3_TEST') && audition.includes('window.render_game_to_text') && audition.includes('window.advanceTime'))
 check('recorded R2 media absent', !/Deep Explosion|Muffled Distant|bomb-boom-audition-r2|sources[\\/]assets/i.test([html, audition, recipes, embeddedSource].join('\n')))
 

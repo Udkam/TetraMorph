@@ -107,6 +107,7 @@ const report = {
 }
 report.passed = (
   initial.ready && initial.candidateCount === 3
+  && initial.acceptedOutputGain === 0.78 && Boolean(initial.generatorCommit)
   && initial.normalVerdict === 'reject' && initial.chainVerdict === 'reject'
   && matchingPair.gateMode === 'pair'
   && crossPair.gateMode === 'recompose'

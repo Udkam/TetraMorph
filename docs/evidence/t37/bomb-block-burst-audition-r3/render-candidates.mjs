@@ -31,6 +31,7 @@ const recipeSourcePath = join(sourceRoot, 'recipes.mjs')
 const rendererSourcePath = fileURLToPath(import.meta.url)
 const auditionSourcePath = join(sourceRoot, 'audition.js')
 const verifierSourcePath = join(sourceRoot, 'verify.mjs')
+const browserSmokeSourcePath = join(sourceRoot, 'browser-smoke.mjs')
 
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const firstBeatFrames = Math.round(CHAIN_BEAT_SECONDS[0] * SAMPLE_RATE)
@@ -110,6 +111,7 @@ const manifest = {
     rendererSha256: sha256(await readFile(rendererSourcePath)),
     auditionSha256: sha256(await readFile(auditionSourcePath)),
     verifierSha256: sha256(await readFile(verifierSourcePath)),
+    browserSmokeSha256: sha256(await readFile(browserSmokeSourcePath)),
   },
   recipeVersion: RECIPE_VERSION,
   generatedAt: new Date().toISOString(),
@@ -187,13 +189,13 @@ const readme = [
   '| --- | ---: | ---: | ---: | ---: | --- |',
   ...rows,
   '',
-  `Generator SHA-256: recipes \`${manifest.provenance.recipesSha256}\`; renderer \`${manifest.provenance.rendererSha256}\`; audition \`${manifest.provenance.auditionSha256}\`; verifier \`${manifest.provenance.verifierSha256}\`.`,
+  `Generator SHA-256: recipes \`${manifest.provenance.recipesSha256}\`; renderer \`${manifest.provenance.rendererSha256}\`; audition \`${manifest.provenance.auditionSha256}\`; verifier \`${manifest.provenance.verifierSha256}\`; browser smoke \`${manifest.provenance.browserSmokeSha256}\`.`,
   '',
   `Accepted reference calibration: output gain ${ACCEPTED_OUTPUT_GAIN}; hard-drop peak ${hardDropMetrics.peak.toFixed(4)} before output; Studio one/four-line target peaks 0.50/0.54 before output.`,
   '',
   'Automated checks reject broken bytes, clipping, excessive high-frequency energy, timing drift, unbounded RMS/reference levels, and a mismatched chain onset. They cannot decide whether a cue sounds gentle, block-like, or appropriate. Human listening remains mandatory.',
   '',
-  'Run `node render-candidates.mjs`, `node verify.mjs`, `node browser-smoke.mjs <url> <label>`, and `node vite-smoke.mjs` from this directory.',
+  'Run `node render-candidates.mjs`, `node verify.mjs`, and `node browser-smoke.mjs <url> <label>` from this directory. The current release gate uses both `file://` and a task-owned static HTTP URL; Vite is not required by this self-contained page.',
   '',
 ].join('\n')
 
