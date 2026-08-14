@@ -1,0 +1,316 @@
+{
+  "schema": "tetramorph.t37.bomb-r4a-normal-audition.v1",
+  "generatedAt": "2026-08-14T20:34:48.024Z",
+  "contract": {
+    "baseSha": "8c2b81def4cbf2d320a26c6575fc1e9f0c023576",
+    "currentProductSha": "56a23812ec640b913de894290bca4c9511f86cff",
+    "evidenceSourceHead": "96bb1faed9ca4aad46cd13b0da151c2aed27cb6b",
+    "writerBoundary": "docs/evidence/t37/bomb-soft-block-audition-r4a/**",
+    "normalOnly": true,
+    "productAudioChanged": false
+  },
+  "humanGate": {
+    "status": "OPEN",
+    "defaultVerdict": "reject-all",
+    "candidates": [
+      "X",
+      "Y",
+      "Z"
+    ],
+    "automaticAcceptanceForbidden": true
+  },
+  "synthesis": {
+    "sampleRate": 48000,
+    "format": "mono PCM16 WAV",
+    "fileDurationMs": 180,
+    "voiceGainBoostCompletedInWav": 1.45,
+    "voiceGainCeilingCompletedInWav": 0.5,
+    "importedRecordedMedia": false,
+    "importedR2OrR3Media": false,
+    "noiseSource": false,
+    "frequencySweep": false,
+    "reverb": false
+  },
+  "timing": {
+    "tokenEnterMs": 120,
+    "tokenPulseMs": 100,
+    "recomputedImpactMs": 220,
+    "rendererDurationMs": 620,
+    "fullMotionTasteSurface": "1x",
+    "reducedMotionTechnicalOnly": true
+  },
+  "graph": {
+    "mutationBus": 0.96,
+    "candidateEffects": 1,
+    "candidateMaster": 1.85,
+    "compressor": {
+      "threshold": -4,
+      "knee": 6,
+      "ratio": 3,
+      "attack": 0.003,
+      "release": 0.12
+    },
+    "enabledGate": 1,
+    "volume": 1,
+    "output": 0.78
+  },
+  "references": {
+    "hardDropPeak": 0.17671824991703033,
+    "studioOneLinePeak": 0.1955646276473999
+  },
+  "candidates": [
+    {
+      "id": "X",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/assets/X.wav",
+      "sha256": "f6b403428b4d44b846e826c4c71d8a93f05d05079ff2c2e029771ba506aea667",
+      "bytes": 17324,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "fileDurationMs": 180,
+      "activityMs": 146,
+      "contacts": [
+        {
+          "frequency": 196,
+          "gain": 0.1069,
+          "delayMs": 0,
+          "durationMs": 146,
+          "attackMs": 11,
+          "decayRate": 7,
+          "phaseOffset": 0,
+          "partial": null
+        },
+        {
+          "frequency": 302.7,
+          "gain": 0.02635,
+          "delayMs": 7,
+          "durationMs": 125,
+          "attackMs": 8,
+          "decayRate": 7,
+          "phaseOffset": 0,
+          "partial": null
+        }
+      ]
+    },
+    {
+      "id": "Y",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/assets/Y.wav",
+      "sha256": "7a686ccdb79e7aa098eebd617df5059b2cdd52de0dd41fb42bec8d0012801958",
+      "bytes": 17324,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "fileDurationMs": 180,
+      "activityMs": 149,
+      "contacts": [
+        {
+          "frequency": 246.94,
+          "gain": 0.12114,
+          "delayMs": 0,
+          "durationMs": 132,
+          "attackMs": 10,
+          "decayRate": 14,
+          "phaseOffset": 0,
+          "partial": null
+        },
+        {
+          "frequency": 220,
+          "gain": 0.07648,
+          "delayMs": 22,
+          "durationMs": 112,
+          "attackMs": 8,
+          "decayRate": 14,
+          "phaseOffset": 0,
+          "partial": null
+        },
+        {
+          "frequency": 196,
+          "gain": 0.05415,
+          "delayMs": 45,
+          "durationMs": 104,
+          "attackMs": 7,
+          "decayRate": 14,
+          "phaseOffset": 0,
+          "partial": null
+        }
+      ]
+    },
+    {
+      "id": "Z",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/assets/Z.wav",
+      "sha256": "4e09ced7721aacb7d7c23e5ae1ddd9a694fa6de8f824e15d5f9e4b02bf05c53e",
+      "bytes": 17324,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "fileDurationMs": 180,
+      "activityMs": 148,
+      "contacts": [
+        {
+          "frequency": 174.61,
+          "gain": 0.05715,
+          "delayMs": 0,
+          "durationMs": 148,
+          "attackMs": 8,
+          "decayRate": 4,
+          "phaseOffset": 6.159,
+          "partial": null
+        },
+        {
+          "frequency": 239.7,
+          "gain": 0.04401,
+          "delayMs": 4,
+          "durationMs": 142,
+          "attackMs": 7,
+          "decayRate": 4,
+          "phaseOffset": 0.576,
+          "partial": null
+        },
+        {
+          "frequency": 326.9,
+          "gain": 0.02902,
+          "delayMs": 8,
+          "durationMs": 135,
+          "attackMs": 6,
+          "decayRate": 4,
+          "phaseOffset": 3.866,
+          "partial": null
+        }
+      ]
+    }
+  ],
+  "sourceBindings": [
+    {
+      "role": "recipe",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/recipes.mjs",
+      "sha256": "731b672b223fae20e12fc95945316109b869e6a1222deeabef8be84bf03cc3ad"
+    },
+    {
+      "role": "generator",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/render-candidates.mjs",
+      "sha256": "4e44569718d95aa983b021735764028d1fbbdf7a304d4fb7a2635398871c0979"
+    },
+    {
+      "role": "audio-graph",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/audioGraph.ts",
+      "sha256": "79098e3aa3f941036ed8e64970498bd8547d15b97b778e3057a10c7e9f4791fc"
+    },
+    {
+      "role": "core-renderer-fixture",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/fixture.ts",
+      "sha256": "a392bb525873ba979f2e398cae984abeef9bc6b190e1f0b26cbae246833caa3f"
+    },
+    {
+      "role": "player-harness",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/audition.ts",
+      "sha256": "4a4a5836cd8234a07df5494b39f2afe41dad15271913bfe0c1479435a0cf52a4"
+    },
+    {
+      "role": "player-page",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/index.html",
+      "sha256": "a2ad8730e9992e3e314a1a7dac304b7e48b4e0e98154396c218a3209cc03bc76"
+    },
+    {
+      "role": "player-style",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/styles.css",
+      "sha256": "d3939dccdef45d20b61180d24e5ca5464c0737ec3eeccca7ad2e86eb7458d1c4"
+    },
+    {
+      "role": "prescribed-client-actions",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/client-actions.json",
+      "sha256": "21881031fe7e1d070bdb0f73e8091357757d9a4c100db5cf8f0283bbd857e5db"
+    },
+    {
+      "role": "browser-verifier",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/browser-smoke.mjs",
+      "sha256": "34d309cf34d0754d404b38af05e84d660469f9624a1fb4ff1bcad47f0cb8dd0e"
+    },
+    {
+      "role": "signal-verifier",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/verify.mjs",
+      "sha256": "9033a36bd0ecadc6e3c795f90cc52183cffb4b9d087b95dd52363fd6f86175b2"
+    },
+    {
+      "role": "manifest-writer",
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/write-manifest.mjs",
+      "sha256": "c3605188d73986a9f05c6098f3ecbf4dc843a6c4d0f1788a7d2defb3bd9be5f4"
+    },
+    {
+      "role": "production-renderer",
+      "path": "src/game/render/TetrisRenderer.ts",
+      "sha256": "23dea2aa06e773582648539b4d89a923073b22f6e984c1e7b37362cbaaa3af3c"
+    },
+    {
+      "role": "production-mutation-timeline",
+      "path": "src/animation/mutationTimeline.ts",
+      "sha256": "55f5bb81781d029d964cbd9e2cf386f583afcf5979bb95b6db1564fd46ce171f"
+    },
+    {
+      "role": "production-mutation-tokens",
+      "path": "src/design/mutationTokens.ts",
+      "sha256": "86e0a1fa42050944f29243317f93f61ece7526e7414d169178a07dcb2829588a"
+    },
+    {
+      "role": "production-accepted-playback",
+      "path": "src/game/audio/acceptedPlayback.ts",
+      "sha256": "dd9b673a439676d44bf134317202e8dc18e693e1a01a7b592441590c1d039704"
+    },
+    {
+      "role": "production-audio-asset-catalog",
+      "path": "src/game/audio/audioAssetCatalog.ts",
+      "sha256": "ee1f5d40a531d9a7fe4676883c513844005375c67d0499476341af90578e03ae"
+    }
+  ],
+  "evidenceOutputs": [
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/browser-report.json",
+      "sha256": "a4fe6adc455dc9d8bb068c7e950f2d0c7885215883c6537d15ba819ed9cb2ed7",
+      "bytes": 33615
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/r4a-desktop-impact.png",
+      "sha256": "bf9f998abcbcdd73d1e89575d0896097eac351401169c0caacdcb5938b282049",
+      "bytes": 538285
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/r4a-mobile.png",
+      "sha256": "d31a71e770655a30cfa880fdcfcff682f6f1f2d57e4d85b1658f45b20f069a1e",
+      "bytes": 330115
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/r4a-reduced-technical.png",
+      "sha256": "ddfcb2a66445719a773baffba9d136d761db070a4f88a70c5494a6e722439abb",
+      "bytes": 463787
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/client-smoke/shot-0.png",
+      "sha256": "895abcbdc72d9e70f2adcce194f85d28d8964e213671533a102c1d684dc0c38e",
+      "bytes": 11487
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/client-smoke/shot-1.png",
+      "sha256": "dd56cf70c70edafe16e605fc90164457508c8c6a3b11979b3cb623a458dee6a0",
+      "bytes": 7941
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/client-smoke/shot-2.png",
+      "sha256": "ab489b348abf4db720efb52ba9e0da9a9531a5cd0b934ac83eb1fe7e1d50f226",
+      "bytes": 7694
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/client-smoke/state-0.json",
+      "sha256": "5b4d39458ff7ad3dd3b27ebf9b47fd2328b5e30df51b951dac7d55cee39feda3",
+      "bytes": 1226
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/client-smoke/state-1.json",
+      "sha256": "334d35b7f3a26b0dc6c95419bcf091bc07b3a7b5012f987a2b42e825c6537c0b",
+      "bytes": 1228
+    },
+    {
+      "path": "docs/evidence/t37/bomb-soft-block-audition-r4a/client-smoke/state-2.json",
+      "sha256": "6c0799b11ca85fc088a688080c47bf33e5f6ab2f58c68f6a36d08aa0c13d753d",
+      "bytes": 1214
+    }
+  ]
+}
