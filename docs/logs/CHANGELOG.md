@@ -2847,3 +2847,19 @@
   disposition is `P0 0 / P1 0 / P2 0 / P3 0`. The remaining `GAP 1` is deliberately the
   player's sound-quality verdict, so this is a listening candidate—not product acceptance
   or integration.
+
+## 2026-08-15 — T37 Bomb R3 rejected and R4A normal-cue contract accepted
+
+- Recorded the player's rejection of all six R3 normal/chain candidates while preserving
+  their immutable technical evidence and the accepted Bomb visual plus D1 transition.
+  Product audio was not changed, and no R3 bytes, low sweeps, noise bands, or fixed chain
+  recipe may be repackaged as R4 work.
+- Split recovery into a normal-only R4A human gate, a later docs-first R4B chain gate, and
+  only then a possible product-integration slice. R4A owns three neutral procedural choices
+  `X/Y/Z`, the current production Renderer at its `220 ms` impact, the complete future
+  candidate graph, exact accepted references, bounded loudness/spectrum, and reject-all
+  default behavior.
+- Independent review accepts exact contract range `8c2b81d..15801d6`: boundary QA is
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`; audio feasibility is `0/0/0/0/1`, with only human sound
+  quality intentionally open. Evidence implementation is authorized solely under
+  `docs/evidence/t37/bomb-soft-block-audition-r4a/**`; R4B and product source remain closed.

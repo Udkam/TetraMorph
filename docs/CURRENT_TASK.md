@@ -70,8 +70,15 @@ The R3 task-owned Python helper PID `17072` was stopped after this verdict on
 `2026-08-15`; `127.0.0.1:4192` is verified released. The docs-first R4A contract owns
 only `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, the T37 phase document, and T37
 `STATE.md`. Because `progress.md` is inherited dirty, the web-game skill's iteration notes
-remain in `STATE.md`. Unique next action: independent QA of this contract, then one writer
-implements only the R4A evidence directory and returns it for technical QA/player review.
+remain in `STATE.md`.
+
+Independent contract review now accepts exact range `8c2b81d..15801d6`: the boundary
+audit reports `P0/P1/P2/P3/GAP = 0/0/0/0/0`, while the audio-feasibility audit reports
+`0/0/0/0/1`, with the sole GAP intentionally reserved for player listening. One evidence
+writer is therefore authorized to implement only
+`docs/evidence/t37/bomb-soft-block-audition-r4a/**`. Product audio, R4B, and every paused
+workstream remain closed. Unique next action: build and independently verify the R4A
+normal-only listening evidence, then ask the player to choose `X`, `Y`, `Z`, or reject all.
 
 ### 2026-08-14 Bomb R3 stylized block-burst audition (human rejected 2026-08-15)
 

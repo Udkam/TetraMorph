@@ -2829,7 +2829,16 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   `docs/phases/t37-unified-material-curriculum.md`, and this `STATE.md`. Inherited T27,
   `t27-r1-followup`, the handoff, and dirty `progress.md` remain untouched/unstaged; the
   develop-web-game iteration record stays here instead of modifying `progress.md`.
-- Unique next action: independent contract QA. After all blocking findings close, one
-  evidence writer may implement only R4A, then run deterministic metrics, the prescribed
-  web-game client, real-time browser/layout/cleanup proof, visual screenshot inspection,
-  and independent evidence QA before asking the player to choose X/Y/Z/reject all.
+- Final read-only contract review accepts exact range `8c2b81d..15801d6` with
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`. Final audio-feasibility review accepts the same range
+  with `0/0/0/0/1`; its sole GAP is the deliberately open human listening verdict. X, Y,
+  and Z all have a feasible intersection with the complete product graph and metric matrix.
+- Local browser dependencies were repaired from the unchanged committed lock with
+  `npm.cmd ci`. Node `v24.12.0` / x64 / ABI `137` can load
+  `@rolldown/binding-win32-x64-msvc`, Vite reports `8.1.4`, and neither `package.json` nor
+  `package-lock.json` changed.
+- Unique next action: the authorized evidence writer implements only
+  `docs/evidence/t37/bomb-soft-block-audition-r4a/**`, then runs deterministic metrics,
+  the prescribed web-game client, real-time browser/layout/cleanup proof, visual screenshot
+  inspection, and independent evidence QA before asking the player to choose X/Y/Z/reject
+  all. Product audio and R4B remain closed.
