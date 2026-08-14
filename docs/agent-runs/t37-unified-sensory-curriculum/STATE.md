@@ -2906,7 +2906,12 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Current writer boundary is docs-only: `docs/DESIGN.md`, `docs/CURRENT_TASK.md`,
   `docs/phases/t37-unified-material-curriculum.md`, and this `STATE.md`. Inherited T27,
   `t27-r1-followup`, handoff, and dirty `progress.md` remain untouched/unstaged.
-- Unique next action: independently audit the R5A contract and metric feasibility. Only
-  after both accept may one evidence writer own
-  `docs/evidence/t37/bomb-familiar-language-audition-r5a/**`. R5B, product audio, and all
-  paused workstreams remain closed.
+- Contract accepted SHA: `8f29bb82f40fac00764d1be822875368f426145c`. Final boundary
+  review of `b11b7b552f1504094a94ccc5e21410a694bf2881..8f29bb82f40fac00764d1be822875368f426145c`
+  reports `P0/P1/P2/P3/GAP = 0/0/0/0/0`; a second independent pass found only a `>2 kHz`
+  versus `>=2 kHz` P3, corrected before commit. Two-stage stem feasibility is green for
+  all fixed recipes/trims and leaves no automatic gap.
+- Unique next action: this separate docs/STATE/CHANGELOG authorization checkpoint opens one
+  evidence writer only under `docs/evidence/t37/bomb-familiar-language-audition-r5a/**`.
+  It must first commit the exact source allowlist as `evidenceSourceHead`, then render and
+  verify all outputs from that head. R5B, product audio, and paused workstreams remain closed.

@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **BOMB R5A FAMILIAR-LANGUAGE CONTRACT ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
+Status: **BOMB R5A EVIDENCE AUTHORIZED / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
 
 ## Active objective
 
@@ -114,9 +114,14 @@ the complete frozen Action atoms above, never as ingredients for an R4A-like mod
 No external Foley, realistic explosion, reverb, sub-bass, stereo expansion, or chain cue
 is allowed.
 
-Before evidence work, independent contract and metric-feasibility QA must accept this
-docs-only boundary: `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, the T37 phase document, and
-T37 `STATE.md`. Then one evidence writer may own only the new
+Independent QA accepts the docs-only contract at
+`8f29bb82f40fac00764d1be822875368f426145c`. Final boundary review of exact range
+`b11b7b552f1504094a94ccc5e21410a694bf2881..8f29bb82f40fac00764d1be822875368f426145c`
+reports `P0/P1/P2/P3/GAP = 0/0/0/0/0`. Independent two-stage feasibility proof renders
+the pre-output PCM16 stem, decodes it, then applies output `.78`; fixed A/B/C peaks are
+`.168625/.165036/.168631`, energies `8.2814/6.8046/6.2689`, stem activities
+`81.938/128.625/65.396 ms`, and last-nonzero times `87.979/134.688/71.458 ms`, all inside
+the frozen contract. One evidence writer is now authorized to own only the new
 `docs/evidence/t37/bomb-familiar-language-audition-r5a/**` directory. Its manifest must
 separately name `reviewRangeBaseSha=b11b7b552f1504094a94ccc5e21410a694bf2881`, the
 eventual four-doc `contractAcceptedSha`, its later docs-only `authorizationSha`,

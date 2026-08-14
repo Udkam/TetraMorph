@@ -2863,3 +2863,25 @@
   `P0/P1/P2/P3/GAP = 0/0/0/0/0`; audio feasibility is `0/0/0/0/1`, with only human sound
   quality intentionally open. Evidence implementation is authorized solely under
   `docs/evidence/t37/bomb-soft-block-audition-r4a/**`; R4B and product source remain closed.
+
+## 2026-08-15 — T37 Bomb R4A rejected and R5A familiar-language contract accepted
+
+- Recorded the player's rejection of R4A X/Y/Z without inventing a more detailed reason.
+  R4A range `56a2381..b11b7b5` remains immutable rejected history and never changed product
+  audio. Post-verdict QA disclosed its undefined activity measure (`107.896 ms` decoded
+  versus `149 ms` scheduled for Y), missing non-idle pagehide/HMR proof, terminal state
+  inconsistency, and implicit provenance naming instead of repairing rejected evidence.
+- R5A replaces independent Bomb timbre design with three familiar-language normal cues:
+  neutral-pan Action hard-drop/lock/move; hard-drop plus a bounded candidate-only Studio-
+  derived excerpt; and one exact compact `countdown-knock` layer. Pinned Chromium generates
+  post-compressor/pre-output PCM16 stems, and listening/metrics/future accepted integration
+  all use those same bytes through only the global gate/output. R2/R3/R4A Bomb structures,
+  realistic explosions, chain audio, and product edits remain prohibited.
+- Exact recipes, trims, PCM16/Hann/FFT/RMS/activity semantics, lifecycle state cleanup,
+  commit/path provenance, and responsive player-review requirements are frozen. Independent
+  metric proof places all three stems inside the common peak/RMS/energy/activity/spectrum
+  window, including B's final `117 ms` Studio-derived excerpt and `134.6875 ms` last sample.
+- Final boundary QA accepts exact range `b11b7b5..8f29bb8` with
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`. This separate checkpoint authorizes one writer only in
+  `docs/evidence/t37/bomb-familiar-language-audition-r5a/**`; R5B and product integration
+  still require an explicit player-selected normal cue.
