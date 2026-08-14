@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>TetraMorph Bomb R2 实时特效验收</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Segoe UI", "Noto Sans SC", system-ui, sans-serif;
+      background: #06111b;
+      color: #edf7fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(circle at 50% -12%, rgba(34, 115, 142, .27), transparent 43%),
+        linear-gradient(180deg, #081824 0%, #050d15 100%);
+    }
+
+    button, a { font: inherit; }
+
+    .shell {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 36px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #79d7e4;
+      font: 700 12px/1.4 ui-monospace, "Cascadia Code", monospace;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(27px, 4vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -.035em;
+    }
+
+    .lead {
+      max-width: 780px;
+      margin: 13px 0 0;
+      color: #b8cad3;
+      font-size: 15px;
+      line-height: 1.72;
+    }
+
+    .notice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 18px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 174, 77, .34);
+      border-radius: 12px;
+      background: rgba(80, 42, 13, .2);
+      color: #ffd7a2;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .notice strong { color: #ffb45a; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 20px;
+    }
+
+    .controls button {
+      min-height: 42px;
+      padding: 0 15px;
+      border: 1px solid #2c5264;
+      border-radius: 10px;
+      background: #0c2432;
+      color: #eaf8fb;
+      cursor: pointer;
+      transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+    }
+
+    .controls button:hover { border-color: #63bccb; background: #113244; }
+    .controls button:active { transform: translateY(1px); }
+    .controls button:focus-visible { outline: 2px solid #8ce5ef; outline-offset: 2px; }
+    .controls button[data-primary] { border-color: #d8732a; background: #6a3014; }
+    .controls button[disabled] { cursor: wait; opacity: .55; }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 310px);
+      gap: 22px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      padding: clamp(10px, 2vw, 18px);
+      border: 1px solid #244353;
+      border-radius: 18px;
+      background: rgba(4, 14, 22, .84);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .32);
+    }
+
+    #board-viewport {
+      position: relative;
+      width: min(100%, 720px);
+      aspect-ratio: 18 / 23;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #071522;
+    }
+
+    #board-host {
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 720px;
+      height: 920px;
+      transform-origin: 0 0;
+    }
+
+    #board-host canvas { display: block; width: 100%; height: 100%; }
+
+    .ledger {
+      padding: 16px;
+      border: 1px solid #244353;
+      border-radius: 15px;
+      background: rgba(11, 31, 43, .78);
+    }
+
+    .ledger h2 { margin: 0 0 14px; font-size: 17px; }
+
+    .meter {
+      height: 5px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #153342;
+    }
+
+    .meter > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ff7138, #ffd15f);
+    }
+
+    .phase {
+      min-height: 48px;
+      margin: 11px 0 16px;
+      color: #f8d6aa;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    dl { display: grid; grid-template-columns: auto 1fr; gap: 9px 13px; margin: 0; }
+    dt { color: #7fa4b3; font-size: 12px; }
+    dd { margin: 0; color: #e7f3f7; font: 600 12px/1.45 ui-monospace, "Cascadia Code", monospace; }
+
+    .review-note {
+      margin: 15px 0 0;
+      color: #91aab5;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .links { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 17px; }
+    .links a { color: #82dbe6; font-size: 13px; text-underline-offset: 3px; }
+
+    body[data-review-state="error"] .stage { border-color: #a84343; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 20px, 620px); padding-top: 18px; }
+      .review-grid { grid-template-columns: 1fr; }
+      .ledger { order: -1; }
+      .controls button { flex: 1 1 calc(50% - 9px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .controls button { transition: none; }
+    }
+  </style>
+</head>
+<body data-review-state="loading">
+  <main class="shell">
+    <p class="eyebrow">T37 / Bomb R2 / Live renderer</p>
+    <h1>清屏爆炸实时验收</h1>
+    <p class="lead">真实 Core 硬降触发第 30 行消行，再由生产 Renderer 连续绘制爆炸向上、向下扩散。棋盘上没有说明性叠图，也没有候选音效干扰。</p>
+    <div class="notice"><strong>验收边界</strong><span>请以“完整动画 1×”判断正式速度与质感；0.5× 只用于确认爆炸是否确实从消行处向两侧传播。</span></div>
+
+    <div class="controls" role="group" aria-label="视觉回放控制">
+      <button type="button" data-replay="full" data-speed="1" data-primary disabled>完整动画 1×</button>
+      <button type="button" data-replay="full" data-speed="0.5" disabled>慢速复核 0.5×</button>
+      <button type="button" data-replay="reduced" data-speed="1" disabled>减少动态 1×</button>
+      <button type="button" id="pause-button" aria-pressed="false" disabled>暂停</button>
+    </div>
+
+    <div class="review-grid">
+      <section class="stage" aria-label="生产 Renderer 实时棋盘">
+        <div id="board-viewport"><div id="board-host"></div></div>
+      </section>
+      <aside class="ledger" aria-live="polite">
+        <h2>因果播放状态</h2>
+        <div class="meter" aria-hidden="true"><span id="progress-fill"></span></div>
+        <p class="phase" id="phase-text">正在验证真实 Core 事件…</p>
+        <dl>
+          <dt>播放档</dt><dd id="mode-value">—</dd>
+          <dt>产品时间</dt><dd id="time-value">0 ms</dd>
+          <dt>触发行</dt><dd>[30]</dd>
+          <dt>起点载体</dt><dd>[29, 30]</dd>
+          <dt>源码绑定</dt><dd>8de0cb7</dd>
+          <dt>Canvas</dt><dd id="canvas-value">0</dd>
+        </dl>
+        <p class="review-note">这是确定性 Core→生产 Renderer 复核入口，不冒充随机 App 自然到达，也不代表玩家已经验收。</p>
+        <div class="links">
+          <a href="../bomb-row-causal-r2/full-contact-sheet.png">完整帧接触表</a>
+          <a href="../bomb-row-causal-r2/README.md">证据说明</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module">
+    import { TetrisRenderer } from '/src/game/render/TetrisRenderer.ts';
+    import * as core from '/src/game/core/index.ts';
+    import { mutationChainPresentationPlan } from '/src/animation/mutationChainTimeline.ts';
+
+    window.__T37_BOMB_VISUAL_SESSION__?.dispose?.();
+
+    const viewport = document.querySelector('#board-viewport');
+    const host = document.querySelector('#board-host');
+    const phaseText = document.querySelector('#phase-text');
+    const modeValue = document.querySelector('#mode-value');
+    const timeValue = document.querySelector('#time-value');
+    const canvasValue = document.querySelector('#canvas-value');
+    const progressFill = document.querySelector('#progress-fill');
+    const pauseButton = document.querySelector('#pause-button');
+    const replayButtons = [...document.querySelectorAll('[data-replay]')];
+    const REVIEW_HOLD_MS = 850;
+    const RENDER_WIDTH = 720;
+    const RENDER_HEIGHT = 920;
+
+    let renderer = null;
+    let activePlan = null;
+    let activeConfig = null;
+    let elapsedMs = 0;
+    let paused = false;
+    let sessionLive = true;
+    let lastError = null;
+    const eventController = new AbortController();
+
+    const invariant = (condition, message) => {
+      if (!condition) throw new Error(message);
+    };
+
+    const makeFixture = () => {
+      let board = core.createBoard();
+      const materials = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+      for (let y = core.VISIBLE_START_ROW; y < core.BOARD_HEIGHT; y += 1) {
+        for (let x = 0; x < core.BOARD_WIDTH; x += 1) {
+          if (x >= 8 && y <= 30) continue;
+          if (y === 30 && (x === 8 || x === 9)) continue;
+          if ((x * 3 + y * 5) % 7 === 0 || y === 30) {
+            board = core.setCell(board, x, y, materials[(x + y) % materials.length]);
+          }
+        }
+      }
+      board = core.setCell(board, 0, 29, 'L');
+      board = core.setCell(board, 8, 31, 'S');
+      board = core.setCell(board, 9, 31, 'Z');
+      return {
+        ...core.dispatch(core.createInitialState(0x37b0b2, 'sprint'), { type: 'start' }).state,
+        board,
+        active: { type: 'O', rotation: 0, x: 8, y: 20 },
+        queue: ['T', 'I', 'S', 'Z', 'J'],
+        mutationActiveCarrier: null,
+        mutationCarriers: Object.freeze([
+          { id: 1, item: 'bomb', cells: Object.freeze([{ x: 0, y: 29 }, { x: 0, y: 30 }]) },
+          { id: 2, item: 'bomb', cells: Object.freeze([{ x: 1, y: 30 }]) },
+        ]),
+        mutationNextCarrierId: 3,
+        status: 'playing',
+        phase: 'active',
+        phaseTicks: 0,
+        pendingClearRows: [],
+      };
+    };
+
+    const hardDrop = core.dispatch(makeFixture(), { type: 'hard-drop' });
+    let commit = hardDrop;
+    for (let tick = 0; tick < core.LINE_CLEAR_DELAY_TICKS; tick += 1) {
+      commit = core.dispatch(commit.state, { type: 'tick' });
+    }
+    const clearStarted = hardDrop.events.find((event) => event.type === 'clear-started');
+    const lineCleared = commit.events.find((event) => event.type === 'lines-cleared');
+    const activation = commit.events.find((event) => event.type === 'mutation-activated' && event.item === 'bomb');
+    const originRows = [...new Set(activation?.chainOriginCells?.map((cell) => cell.y) ?? [])].sort((a, b) => a - b);
+    const occupiedAfterCommit = commit.state.board.flat().filter(Boolean).length;
+
+    invariant(JSON.stringify(clearStarted) === JSON.stringify({ type: 'clear-started', rows: [30], mutationBombOutcome: 'chain-clear' }), 'clear-started 因果行发生漂移');
+    invariant(JSON.stringify(lineCleared?.rows) === '[30]', 'lines-cleared 不再提交第 30 行');
+    invariant(activation?.bombOutcome === 'chain-clear', '没有生成双炸弹清屏事件');
+    invariant(JSON.stringify(activation.chainTriggerRows) === '[30]', 'chainTriggerRows 不再是 [30]');
+    invariant(JSON.stringify(originRows) === '[29,30]', '起点载体不再跨 29/30 行');
+    invariant(occupiedAfterCommit === 0, '双炸弹提交后棋盘未清空');
+    const fullPlan = mutationChainPresentationPlan(activation.chainTriggerRows, false);
+    const reducedPlan = mutationChainPresentationPlan(activation.chainTriggerRows, true);
+    invariant(fullPlan.revealMs === 220 && fullPlan.beatMs === 56 && fullPlan.fadeMs === 220 && fullPlan.durationMs === 1000, '完整动画计划不再是 220/56/220/1000 ms');
+    invariant(reducedPlan.revealMs === 50 && reducedPlan.beatMs === 20 && reducedPlan.fadeMs === 90 && reducedPlan.durationMs === 340, '减少动态计划不再是 50/20/90/340 ms');
+
+    const syncViewportScale = () => {
+      const scale = Math.min(1, viewport.clientWidth / RENDER_WIDTH);
+      host.style.transform = `scale(${scale})`;
+    };
+    const resizeObserver = new ResizeObserver(syncViewportScale);
+    resizeObserver.observe(viewport);
+    syncViewportScale();
+
+    const setControlsDisabled = (disabled) => {
+      for (const button of replayButtons) button.disabled = disabled;
+      pauseButton.disabled = disabled;
+    };
+
+    const updateLedger = () => {
+      const duration = activePlan?.durationMs ?? 1;
+      const productElapsed = Math.min(elapsedMs, duration);
+      const rows = activePlan?.rowBeats
+        .filter((beat) => beat.startMs <= productElapsed)
+        .map((beat) => beat.row) ?? [];
+      const uniqueRows = [...new Set(rows)].sort((a, b) => a - b);
+      timeValue.textContent = `${Math.round(productElapsed)} ms`;
+      canvasValue.textContent = String(host.querySelectorAll('canvas').length);
+      progressFill.style.width = `${Math.min(100, productElapsed / duration * 100)}%`;
+      if (!activePlan) phaseText.textContent = '正在准备生产 Renderer…';
+      else if (paused) phaseText.textContent = '已暂停；可继续或选择任一档重新播放。';
+      else if (productElapsed < activePlan.revealMs) phaseText.textContent = `消行处蓄力中；${activePlan.revealMs} ms 起爆。`;
+      else if (productElapsed < duration) phaseText.textContent = `爆炸从第 30 行向上、向下推进；已到达 ${uniqueRows.join(' / ')} 行。`;
+      else phaseText.textContent = '传播完成；爆炸图元已清理，没有全屏残留。';
+    };
+
+    const play = (config) => {
+      invariant(renderer !== null, '生产 Renderer 尚未初始化');
+      renderer.setFrameCallback(() => {});
+      activeConfig = config;
+      activePlan = config.reducedMotion ? reducedPlan : fullPlan;
+      elapsedMs = 0;
+      paused = false;
+      pauseButton.textContent = '暂停';
+      pauseButton.setAttribute('aria-pressed', 'false');
+      modeValue.textContent = config.reducedMotion ? '减少动态 1×' : `完整动画 ${config.speed}×`;
+      renderer.render(hardDrop.state, [{ type: 'restarted' }], 0);
+      renderer.setOptions({ visualTheme: 'deep-tide', reducedMotion: config.reducedMotion, modeSwitch: false });
+      renderer.render(commit.state, commit.events, 0);
+      invariant(host.querySelectorAll('canvas').length === 1, '回放没有保持唯一 Canvas');
+      document.body.dataset.reviewState = 'running';
+      updateLedger();
+
+      renderer.setFrameCallback((deltaMs) => {
+        try {
+          if (!sessionLive || paused || !renderer) return;
+          const scaledDelta = Math.min(deltaMs, 100) * config.speed;
+          elapsedMs = Math.min(activePlan.durationMs + REVIEW_HOLD_MS, elapsedMs + scaledDelta);
+          renderer.render(commit.state, [], scaledDelta);
+          updateLedger();
+          if (elapsedMs >= activePlan.durationMs + REVIEW_HOLD_MS) {
+            renderer.setFrameCallback(() => {});
+            invariant(renderer.getSnapshot().mutationActivation === null, '完成后仍残留爆炸状态');
+            document.body.dataset.reviewState = 'complete';
+            updateLedger();
+          }
+        } catch (error) {
+          fail(error);
+        }
+      });
+    };
+
+    const fail = (error) => {
+      lastError = error instanceof Error ? error.message : String(error);
+      renderer?.setFrameCallback(() => {});
+      console.error(error);
+      document.body.dataset.reviewState = 'error';
+      setControlsDisabled(true);
+      phaseText.textContent = `验收入口已停止：${lastError}`;
+      canvasValue.textContent = String(host.querySelectorAll('canvas').length);
+    };
+
+    const requestReplay = (config) => {
+      try {
+        play(config);
+      } catch (error) {
+        fail(error);
+      }
+    };
+
+    for (const button of replayButtons) {
+      button.addEventListener('click', () => {
+        requestReplay({
+          reducedMotion: button.dataset.replay === 'reduced',
+          speed: Number(button.dataset.speed),
+        });
+      }, { signal: eventController.signal });
+    }
+
+    pauseButton.addEventListener('click', () => {
+      if (!renderer || document.body.dataset.reviewState === 'complete') return;
+      paused = !paused;
+      pauseButton.textContent = paused ? '继续' : '暂停';
+      pauseButton.setAttribute('aria-pressed', String(paused));
+      document.body.dataset.reviewState = paused ? 'paused' : 'running';
+      updateLedger();
+    }, { signal: eventController.signal });
+
+    const dispose = () => {
+      if (!sessionLive) return;
+      sessionLive = false;
+      eventController.abort();
+      resizeObserver.disconnect();
+      if (renderer) {
+        renderer.setFrameCallback(() => {});
+        renderer.destroy();
+        renderer = null;
+      }
+      host.replaceChildren();
+      canvasValue.textContent = '0';
+    };
+
+    window.addEventListener('pagehide', dispose, { once: true, signal: eventController.signal });
+
+    window.__T37_BOMB_VISUAL_REVIEW__ = Object.freeze({
+        getState: () => ({
+          ready: renderer !== null && lastError === null,
+          reviewState: document.body.dataset.reviewState,
+          mode: activeConfig?.reducedMotion ? 'reduced' : 'full',
+          speed: activeConfig?.speed ?? null,
+          elapsedMs,
+          durationMs: activePlan?.durationMs ?? null,
+          canvasCount: host.querySelectorAll('canvas').length,
+          clearRows: [...clearStarted.rows],
+          triggerRows: [...activation.chainTriggerRows],
+          originRows: [...originRows],
+          occupiedAfterCommit,
+          mutationActivation: renderer?.getSnapshot().mutationActivation ?? null,
+          error: lastError,
+        }),
+    });
+    window.render_game_to_text = () => JSON.stringify({
+      coordinateSystem: 'board x=0..9 left-to-right; y=20..39 top-to-bottom',
+      ...window.__T37_BOMB_VISUAL_REVIEW__.getState(),
+    });
+    window.__T37_BOMB_VISUAL_SESSION__ = Object.freeze({ dispose });
+
+    const initialise = async () => {
+      setControlsDisabled(true);
+      const nextRenderer = new TetrisRenderer();
+      nextRenderer.setOptions({ visualTheme: 'deep-tide', reducedMotion: false, modeSwitch: false });
+      await nextRenderer.init(host);
+      if (!sessionLive) {
+        nextRenderer.destroy();
+        return;
+      }
+      renderer = nextRenderer;
+      invariant(host.querySelectorAll('canvas').length === 1, '初始化没有保持唯一 Canvas');
+      setControlsDisabled(false);
+      play({ reducedMotion: false, speed: 1 });
+    };
+
+    initialise().catch(fail);
+  </script>
+</body>
+</html>
