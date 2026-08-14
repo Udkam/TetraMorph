@@ -371,11 +371,10 @@ export class R4AAudioSession {
     this.voices.clear();
   }
 
-  async playCandidate(id: CandidateId, delayMs = 220): Promise<number> {
-    await this.prime();
+  scheduleCandidate(id: CandidateId, delayMs = 220): number {
+    if (!this.context || !this.graph || !this.buffers[id]) throw new Error('Audio must be primed before scheduling.');
     this.stopAll();
     const buffer = this.buffers[id];
-    if (!this.context || !this.graph || !buffer) throw new Error(`Candidate ${id} is unavailable.`);
     const source = this.context.createBufferSource();
     source.buffer = buffer;
     source.connect(this.graph.mutationBus);
@@ -384,6 +383,11 @@ export class R4AAudioSession {
     const startAt = this.context.currentTime + delayMs / 1_000;
     source.start(startAt);
     return startAt;
+  }
+
+  async playCandidate(id: CandidateId, delayMs = 220): Promise<number> {
+    await this.prime();
+    return this.scheduleCandidate(id, delayMs);
   }
 
   async playHardDrop(): Promise<void> {
