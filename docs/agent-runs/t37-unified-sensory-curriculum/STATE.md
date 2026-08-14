@@ -2704,7 +2704,8 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   break/collapse **崩**, not a realistic bomb. Include current hard-drop and Studio-clear
   context references. Normal targets `0.28–0.55 s`; chain reuses the motif with low-gain
   row-beat crumbles for `0.85–1.25 s` and no tail beyond `1.40 s`. Product audio remains
-  untouched until the player accepts one normal and one chain candidate.
+  untouched until the player accepts both cues of one same-letter pair. A cross-letter
+  preference must be recomposed exactly and re-auditioned before integration.
 - The previous task-owned Vite listener was verified as PID `472`, parent `23428`, with
   command `vite --host 127.0.0.1 --port 4192 --strictPort`, then stopped after the R2/D1
   verdict. Both processes exited and `127.0.0.1:4192` was verified released. A new helper

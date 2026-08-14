@@ -72,7 +72,10 @@ crumbles aligned to the already-frozen causal row beats. Its larger scale comes 
 duration and spatial/temporal spread, not a higher initial peak or repeated full-strength
 blasts. Target duration is `0.85–1.25 s`, with no tail beyond `1.40 s`; rapid identical
 pulses, machine-gun rhythm, noise wash, and long rumble are prohibited. Three candidates
-must differ by material character, not merely gain.
+must differ by material character, not merely gain. Normal and chain may be compared
+separately, but only a same-letter pair can pass directly into product integration. If the
+player prefers a normal cue and chain texture from different letters, that exact
+recomposition must be rendered and human-auditioned as a new pair before integration.
 
 All R3 work before human selection is evidence-only under
 `docs/evidence/t37/bomb-block-burst-audition-r3/**`. The page provides current hard-drop
@@ -81,8 +84,9 @@ default reject-all verdicts. Automated checks may prove deterministic mono 48 kH
 bytes, finite samples, bounded peak/RMS and frequency energy, timing, hashes, responsive
 layout, playback cleanup, and zero browser errors. They cannot prove that a cue feels
 gentle, block-like, or related to the game. Product palette, engine, and assets remain
-closed until the player explicitly accepts one normal candidate and one chain candidate;
-another reject-all verdict opens a new audition contract rather than product integration.
+closed until the player explicitly accepts both cues of one same-letter normal/chain pair;
+a cross-letter preference requires exact-pair re-audition, and another reject-all verdict
+opens a new audition contract rather than product integration.
 
 ## 2026-08-14 T37 — Bomb R2 causal Boom correction
 

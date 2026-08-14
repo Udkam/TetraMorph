@@ -26,7 +26,10 @@ Each chain candidate must begin with its paired normal motif, then add only low-
 block crumbles aligned to the frozen causal row-beat plan. It targets `0.85–1.25 s`, may
 not exceed `1.40 s`, and becomes larger through coherent duration/spread rather than a
 higher first peak, repeated full-strength blasts, or machine-gun pulses. A/B/C must
-differ by material character rather than volume. Normal and chain choices are independent.
+differ by material character rather than volume. Normal and chain may be judged
+independently, but product integration requires one same-letter pair whose two cues both
+pass. A cross-letter preference must first be rendered as one exact recomposed pair and
+return through this human gate; it cannot authorize an unauditioned mix.
 
 The sole writer boundary is the new
 `docs/evidence/t37/bomb-block-burst-audition-r3/**` directory. It owns local recipes,
@@ -1071,9 +1074,11 @@ curriculum remain closed until their preceding checkpoints are green.
 2. **Audio audition gate — COMPLETE** — implement and export a compact representative set covering
    movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
    activation. Stop expansion until human listening accepts the language.
-3. **Complete audio palette — HUMAN ACCEPTED; ORIGINAL-WAV PROVENANCE FOLLOW-UP OPEN** —
-   the preceding production candidate and its joined clear/Bomb behavior are accepted;
-   retain the Ice uploader-original archive/hash as an honest parallel evidence item.
+3. **Complete audio palette — NON-BOMB ANCHORS HUMAN ACCEPTED; BOMB R3 + ORIGINAL-WAV
+   PROVENANCE FOLLOW-UPS OPEN** — accepted Action A, Studio clear/countdown, Ice selection,
+   and the remaining support palette stay frozen. The R2 Bomb audio join is human rejected
+   and cannot inherit that acceptance; retain the Ice uploader-original archive/hash as an
+   honest parallel evidence item.
 4. **Transition and identity system — D1 HUMAN ACCEPTED; D2B PENDING; IDENTITY DEFERRED** — the
    URL-route handoff now has latest-request ownership, Canvas-ready native capture,
    continuous fallback, direction, focus/history continuity, explicit reduced motion,
