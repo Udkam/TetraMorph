@@ -10,6 +10,12 @@ import type { GestureVoice } from '../../../../src/game/audio/audioGesture';
 import { T37_AUDIO_ASSETS } from '../../../../src/game/audio/audioAssetCatalog';
 
 export type CandidateId = 'X' | 'Y' | 'Z';
+export interface CandidateSchedule {
+  id: CandidateId;
+  scheduledFrom: number;
+  startAt: number;
+  offsetMs: number;
+}
 
 const SAMPLE_RATE = 48_000;
 const IMPACT_SECONDS = 0.05;
@@ -376,8 +382,14 @@ export class R4AAudioSession {
     this.voices.clear();
   }
 
-  scheduleCandidate(id: CandidateId, delayMs = 220): number {
+  currentTime(): number {
+    if (!this.context) throw new Error('Audio must be primed before reading its clock.');
+    return this.context.currentTime;
+  }
+
+  scheduleCandidateAt(id: CandidateId, scheduledFrom: number, startAt: number): CandidateSchedule {
     if (!this.context || !this.graph || !this.buffers[id]) throw new Error('Audio must be primed before scheduling.');
+    if (startAt < this.context.currentTime) throw new Error('Candidate start is already in the past.');
     this.stopAll();
     const buffer = this.buffers[id];
     const source = this.context.createBufferSource();
@@ -389,13 +401,17 @@ export class R4AAudioSession {
       this.candidateStarts.delete(source);
     };
     this.candidateSources.add(source);
-    const startAt = this.context.currentTime + delayMs / 1_000;
     this.candidateStarts.set(source, { id, startAt });
     source.start(startAt);
-    return startAt;
+    return { id, scheduledFrom, startAt, offsetMs: (startAt - scheduledFrom) * 1_000 };
   }
 
-  async playCandidate(id: CandidateId, delayMs = 220): Promise<number> {
+  scheduleCandidate(id: CandidateId, delayMs = 220): CandidateSchedule {
+    const scheduledFrom = this.currentTime();
+    return this.scheduleCandidateAt(id, scheduledFrom, scheduledFrom + delayMs / 1_000);
+  }
+
+  async playCandidate(id: CandidateId, delayMs = 220): Promise<CandidateSchedule> {
     await this.prime();
     return this.scheduleCandidate(id, delayMs);
   }

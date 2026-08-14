@@ -9,6 +9,8 @@ interface ScheduleEvidence {
   candidate: CandidateId;
   reducedMotion: boolean;
   visualStartedAtMs: number;
+  visualAudioClockSeconds: number;
+  scheduledFromSeconds: number;
   audioStartAtSeconds: number;
   audioOffsetMs: number;
 }
@@ -28,6 +30,8 @@ declare global {
     advanceTime(ms: number): void;
   }
 }
+
+await window.__R4A_TEST__?.dispose?.();
 
 const required = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -124,11 +128,25 @@ const startCandidate = async (id: CandidateId, reducedMotion = false, determinis
   setBusy(true);
   try {
     await audio.prime();
+    audio.stopAll();
+    const visualAudioClockSeconds = audio.currentTime();
+    const visualStartedAtMs = performance.now();
     renderer.play(id, reducedMotion);
     if (deterministic) renderer.pause();
-    const visualStartedAtMs = performance.now();
-    const audioStartAtSeconds = audio.scheduleCandidate(id, NORMAL_BOMB_IMPACT_MS);
-    lastSchedule = { candidate: id, reducedMotion, visualStartedAtMs, audioStartAtSeconds, audioOffsetMs: NORMAL_BOMB_IMPACT_MS };
+    const schedule = audio.scheduleCandidateAt(
+      id,
+      visualAudioClockSeconds,
+      visualAudioClockSeconds + NORMAL_BOMB_IMPACT_MS / 1_000,
+    );
+    lastSchedule = {
+      candidate: id,
+      reducedMotion,
+      visualStartedAtMs,
+      visualAudioClockSeconds,
+      scheduledFromSeconds: schedule.scheduledFrom,
+      audioStartAtSeconds: schedule.startAt,
+      audioOffsetMs: schedule.offsetMs,
+    };
     lastCue = `候选 ${id}${reducedMotion ? ' · reduced technical' : ''}`;
     playCount += 1;
     updateUi();
