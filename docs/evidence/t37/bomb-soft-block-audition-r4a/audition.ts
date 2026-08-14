@@ -21,7 +21,7 @@ declare global {
     __R4A_TEST__: {
       getState(): ReturnType<typeof getState>;
       playCandidate(id: CandidateId): Promise<void>;
-      runReducedTechnical(id: CandidateId): Promise<ReturnType<typeof getState>>;
+      runReducedTechnical(id: CandidateId, atMs?: number): Promise<ReturnType<typeof getState>>;
       measureCompleteGraphs: typeof measureCompleteGraphs;
       stop(): void;
       dispose(): Promise<void>;
@@ -238,9 +238,9 @@ window.__R4A_READY__ = false;
 window.__R4A_TEST__ = Object.freeze({
   getState,
   playCandidate: (id) => startCandidate(id),
-  runReducedTechnical: async (id) => {
+  runReducedTechnical: async (id, atMs = NORMAL_BOMB_IMPACT_MS + 0.01) => {
     await startCandidate(id, true, true);
-    renderer.advance(NORMAL_BOMB_IMPACT_MS + 0.01);
+    renderer.advance(Math.max(0, atMs));
     return getState();
   },
   measureCompleteGraphs,
