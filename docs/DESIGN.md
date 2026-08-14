@@ -42,6 +42,48 @@ dual-field `GameState` is forbidden: object spread and independent mutation woul
 alias stale and corrupt state identity. The exact exception and final zero-retired-name gate
 are authoritative in `docs/CURRENT_TASK.md` and the Endgame workstream log.
 
+## 2026-08-14 T37 — Bomb R3 stylized block-burst audition
+
+This section supersedes only the R2 Bomb audio identity and listening direction below.
+The R2 causal visual source `8de0cb7`, source-bound evidence `7eb1d44`, and live review
+helper `70ce61f` are now **HUMAN ACCEPTED** at full-motion `1x`. The D1 Settled Handoff
+route transition, including its current-HEAD revalidation at `aa2c9fd`, is also
+**HUMAN ACCEPTED**. Neither accepted visual system is reopened by this audio redesign;
+Bomb rules, scoring, `chainTriggerRows`, row-front timing, route ownership, focus/history
+behavior, and reduced-motion behavior stay frozen.
+
+Human listening rejects every R2 recorded-sample option: normal A/B/C and chain A/B/C.
+Their realistic explosion identity and loud, startling presentation are the defect, so
+lowering their gain, shortening their tails, or filtering the same bytes is not a valid
+R3 repair. `Deep Explosion`, `Muffled Distant Explosion`, cinematic sub-bass pressure,
+long reverberation, sharp explosive cracks, and any copied commercial-game sound are
+prohibited. The complete R2 directory remains immutable historical rejection evidence.
+
+R3 is an isolated, deterministic, procedural audition for a stylized block-collapse
+**崩**: it should make the player feel that a TetraMorph piece has broken apart without
+suggesting real explosives. The normal cue is dry, rounded, tactile, clearly audible,
+and approximately `0.28–0.55 s`. Its weight lives in the low-mid body and controlled
+granular fracture rather than sub-bass or a hard high-frequency spike. It must remain in
+the same concise, non-musical family as the accepted hard-drop and Studio clear cues and
+must not startle at equal listening volume.
+
+The chain cue begins with the same candidate motif and extends it with low-gain block
+crumbles aligned to the already-frozen causal row beats. Its larger scale comes from
+duration and spatial/temporal spread, not a higher initial peak or repeated full-strength
+blasts. Target duration is `0.85–1.25 s`, with no tail beyond `1.40 s`; rapid identical
+pulses, machine-gun rhythm, noise wash, and long rumble are prohibited. Three candidates
+must differ by material character, not merely gain.
+
+All R3 work before human selection is evidence-only under
+`docs/evidence/t37/bomb-block-burst-audition-r3/**`. The page provides current hard-drop
+and clear context references, six independent normal/chain controls, no autoplay, and
+default reject-all verdicts. Automated checks may prove deterministic mono 48 kHz WAV
+bytes, finite samples, bounded peak/RMS and frequency energy, timing, hashes, responsive
+layout, playback cleanup, and zero browser errors. They cannot prove that a cue feels
+gentle, block-like, or related to the game. Product palette, engine, and assets remain
+closed until the player explicitly accepts one normal candidate and one chain candidate;
+another reject-all verdict opens a new audition contract rather than product integration.
+
 ## 2026-08-14 T37 — Bomb R2 causal Boom correction
 
 This section supersedes only the Bomb audio and chain-clear presentation paragraphs in the

@@ -2685,3 +2685,31 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   selected grammar.
 - Do not redesign all Endgame UI before strict level data and proof contracts are green.
 - Do not reread broad logs after compaction; continue from this file one stage at a time.
+
+### 2026-08-14 player verdict and Bomb R3 audio redesign
+
+- The player rejects every isolated R2 audio choice: normal Bomb A/B/C and chain-clear
+  A/B/C are all `REJECTED BY HUMAN LISTENING`. The defect is not audibility alone: the
+  recordings read as real explosions and are too loud/startling. R2 media, hashes, reports,
+  and pages remain immutable historical evidence; lowering, filtering, or renaming those
+  bytes is not an authorized repair.
+- The player accepts the complete full-motion `1x` Bomb visual. Freeze source `8de0cb7`,
+  evidence `7eb1d44`, and live helper `70ce61f` as `HUMAN ACCEPTED`; do not reopen Bomb
+  mechanics, `chainTriggerRows`, row-front timing, or visual language while redesigning
+  sound. The player also accepts D1 page transitions. Its current-HEAD revalidation at
+  `aa2c9fd` closes the sole normal-speed taste gap without reopening D1 source.
+- R3 is docs-first and audition-first. Its only evidence writer owns the new
+  `docs/evidence/t37/bomb-block-burst-audition-r3/**` directory. Create three original,
+  deterministic procedural normal/chain pairs whose identity is a dry, rounded block
+  break/collapse **崩**, not a realistic bomb. Include current hard-drop and Studio-clear
+  context references. Normal targets `0.28–0.55 s`; chain reuses the motif with low-gain
+  row-beat crumbles for `0.85–1.25 s` and no tail beyond `1.40 s`. Product audio remains
+  untouched until the player accepts one normal and one chain candidate.
+- The previous task-owned Vite listener was verified as PID `472`, parent `23428`, with
+  command `vite --host 127.0.0.1 --port 4192 --strictPort`, then stopped after the R2/D1
+  verdict. Both processes exited and `127.0.0.1:4192` was verified released. A new helper
+  may bind the port only after the R3 evidence candidate is ready and must record fresh
+  ownership.
+- Material review/Ice provenance, D2B, and Endgame stay paused through the R3 listening
+  gate and the later exact product-integration slice. Unique next action: obtain independent
+  QA on this R3 contract, then implement and verify only the isolated audition directory.

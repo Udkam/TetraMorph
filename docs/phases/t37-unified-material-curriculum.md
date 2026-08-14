@@ -61,7 +61,7 @@ and no Puzzle content is published without strict deterministic proof.
   `819779 / sbml / Ice cubes`) and rejects no part of the already frozen Studio subset.
   Stage B is complete; this verdict opens only Stage C.
 
-### C. Complete accepted audio language — HUMAN ACCEPTED; PROVENANCE FOLLOW-UP OPEN
+### C. Complete accepted audio language — BOMB R3 REDESIGN OPEN; ICE PROVENANCE FOLLOW-UP OPEN
 
 - Extend the accepted material grammar to every current gameplay, reward, Mutation,
   Survival, Puzzle, and UI cue.
@@ -155,7 +155,7 @@ and no Puzzle content is published without strict deterministic proof.
 
 ### D. Transition and site identity system
 
-- **D1 — Settled Handoff URL routes:** one monotonic latest-request owner invalidates
+- **D1 — Settled Handoff URL routes — HUMAN ACCEPTED:** one monotonic latest-request owner invalidates
   stale callbacks and joins History with the valid React commit. Use one stable named
   viewport, `forward/back/neutral` direction, `120 ms` release plus `200 ms` settle,
   destination opacity never below `.985`, and at most `6 px` horizontal plus `2 px`
@@ -166,20 +166,24 @@ and no Puzzle content is published without strict deterministic proof.
   waiting for visual completion. Reduced motion is one runtime-owned, no-translation,
   near-instant path. At every sample there is exactly one live route and at most one
   Canvas, with no stale listener/ticker/runtime.
-- **D2 — site identity deferred to the final proposal gate:** the first asymmetric
+- The player's current-product verdict accepts D1 after its current-HEAD route revalidation;
+  its source, timing, focus/history behavior, cleanup, and reduced-motion path are frozen.
+- **D2A — bounded in-page overlays — ACCEPTED/FROZEN:** mode introductions and result
+  sheets use the restrained in-page transition contract without moving the gameplay board.
+- **D2B — Endgame library transition — PENDING:** category changes and selected-level
+  detail changes need a separate docs-first implementation and evidence slice; they may
+  not modify the accepted D1 route owner or D2A overlay behavior.
+- **Site identity — deferred to the final proposal gate:** the first asymmetric
   Morph Core draft is rejected because its Apple-size reading is semantically unclear.
   Leave the existing product icon unchanged while Stages E/F proceed. At the final gate,
   present actual-size browser-tab and Apple-mask candidates before implementation; any
   selected mark still must avoid four equal quadrants, commercial trade dress, letters,
   manifest/service-worker work, and a PWA install surface.
-- **D3 — bounded in-page follow-up:** apply Settled Handoff restraint to mode
-  intro/results without moving the board. D3 does not reopen the accepted D1 route owner
-  or the D2 identity assets.
 - Cover Chinese and English under all three themes, native/fallback/reduced paths,
   rapid navigation, history/back/forward, focus continuity, and actual intermediate
   frames rather than endpoint screenshots alone.
 
-### E. Whole-piece material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN
+### E. Whole-piece material system — TECHNICAL ACCEPT; PLAYER REVIEW PAUSED BEHIND BOMB R3
 
 - Polish ordinary multicolour pieces as the quiet baseline.
 - Replace carrier/badge Mutation rendering with four complete materials: Ice crystal,

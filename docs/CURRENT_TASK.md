@@ -1,8 +1,49 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **BOMB R2 PLAYER REVIEW OPEN / MATERIAL REVIEW PAUSED / D1 PLAYER REVIEW + D2B IMPLEMENTATION PENDING / INTRO-05 SUCCESSOR PENDING / SURVIVAL PROPOSAL PENDING**
+Status: **BOMB R3 AUDIO AUDITION ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
 
 ## Active objective
+
+### 2026-08-14 Bomb R3 stylized block-burst audition
+
+The player has closed the preceding human gates. Normal Bomb A/B/C and chain-clear A/B/C
+are all **REJECTED BY HUMAN LISTENING** because they sound too much like real, loud,
+startling explosions. The full-motion `1x` Bomb visual is **HUMAN ACCEPTED**, freezing
+visual source `8de0cb7`, evidence `7eb1d44`, and live helper `70ce61f`. D1 page transition
+is also **HUMAN ACCEPTED**, including the current-HEAD revalidation recorded at
+`aa2c9fd`. The historical R2 paragraphs below retain their then-current open/rejected
+states; this top contract is the authoritative disposition and does not rewrite history.
+
+R3 changes audio identity only. It must create an original, deterministic, procedural
+方块崩裂/塌落 **崩** that communicates blocks breaking apart without reading as real
+explosives. Reusing, filtering, truncating, or gain-reducing the R2 `Deep Explosion` or
+`Muffled Distant Explosion` bytes is forbidden, as are cinematic sub-bass pressure,
+long reverberation, piercing cracks, noise wash, laser/chiptune gestures, or copied game
+samples. Normal candidates target `0.28–0.55 s`: dry, rounded, low-mid weighted, clearly
+audible, and not startling beside accepted hard-drop and Studio clear references.
+
+Each chain candidate must begin with its paired normal motif, then add only low-gain
+block crumbles aligned to the frozen causal row-beat plan. It targets `0.85–1.25 s`, may
+not exceed `1.40 s`, and becomes larger through coherent duration/spread rather than a
+higher first peak, repeated full-strength blasts, or machine-gun pulses. A/B/C must
+differ by material character rather than volume. Normal and chain choices are independent.
+
+The sole writer boundary is the new
+`docs/evidence/t37/bomb-block-burst-audition-r3/**` directory. It owns local recipes,
+six generated mono 48 kHz PCM16 WAVs, embedded playback bytes, a responsive audition
+page, manifests, verification, and browser evidence. The page must include current
+hard-drop/clear comparison controls, no autoplay, and reject-all defaults. Automated
+gates prove only determinism, finite/zero-ended samples, no clipping, bounded relative
+level and frequency energy, timing/hash integrity, complete playback cleanup, responsive
+44 px controls, and zero browser errors. Human listening is the only sound-quality gate.
+`src/game/audio/**`, product assets, Bomb mechanics/visuals, and navigation source remain
+closed until the player explicitly accepts one normal and one chain candidate.
+
+The prior R2 helper on `127.0.0.1:4192` was released after the verdict. After docs-first
+contract QA, implement and verify only the isolated R3 audition, then expose a newly owned
+review helper. Material review/Ice provenance, D2B, and Endgame remain paused until an
+accepted R3 pair is integrated into product source and that integration passes its own
+targeted/final/browser/independent gates.
 
 ### 2026-08-14 Bomb R2 human rejection and causal Boom correction
 
@@ -1033,11 +1074,12 @@ curriculum remain closed until their preceding checkpoints are green.
 3. **Complete audio palette — HUMAN ACCEPTED; ORIGINAL-WAV PROVENANCE FOLLOW-UP OPEN** —
    the preceding production candidate and its joined clear/Bomb behavior are accepted;
    retain the Ice uploader-original archive/hash as an honest parallel evidence item.
-4. **Transition and identity system — D1 TECHNICAL ACCEPT; IDENTITY DEFERRED** — the
+4. **Transition and identity system — D1 HUMAN ACCEPTED; D2B PENDING; IDENTITY DEFERRED** — the
    URL-route handoff now has latest-request ownership, Canvas-ready native capture,
    continuous fallback, direction, focus/history continuity, explicit reduced motion,
-   and no duplicate mounts/listeners/canvases. D1 player review remains open; in-page
-   sheets/results remain later work, and site identity is deferred to the final proposal
+   and no duplicate mounts/listeners/canvases. The player's current-product verdict now
+   accepts D1; in-page D2A sheets/results remain frozen, D2B Endgame library transitions
+   remain later work, and site identity is deferred to the final proposal
    gate after its first draft failed semantic clarity.
    A current-HEAD refresh at `961c87e` confirms the D1 owner and Settled Handoff CSS have
    not regressed after the Endgame namespace and D2A work. Live Chromium passes native
@@ -1045,9 +1087,9 @@ curriculum remain closed until their preceding checkpoints are green.
    `160 ms` fallback, opacity-only reduced motion, and a 390x844 endpoint with one route
    surface, at most one Canvas, no DOM cells, no overflow, and zero browser errors.
    Focused current tests pass `84/84`; independent read-only review reports
-   `P0/P1/P2/P3 = 0/0/0/0` with the sole `GAP` being the player's normal-speed taste
-   verdict. Endgame category/level changes remain D2B-owned and are not part of D1.
-5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW OPEN** — ordinary-piece polish
+   `P0/P1/P2/P3 = 0/0/0/0`; its former player-taste gap is closed by the explicit D1
+   acceptance. Endgame category/level changes remain D2B-owned and are not part of D1.
+5. **Material system — TECHNICAL ACCEPT; PLAYER REVIEW PAUSED BEHIND BOMB R3** — ordinary-piece polish
    and the four whole-piece Mutation materials now agree across Next, active/Ghost,
    settled, clear/activation, player copy, and serialized audio lifecycle.
 6. **Endgame curriculum — N0 ACCEPTED; CANONICAL INTRO-05 CONTRACT NEXT** — the exact
