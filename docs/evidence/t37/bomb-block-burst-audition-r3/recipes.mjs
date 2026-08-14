@@ -1,5 +1,16 @@
 export const SAMPLE_RATE = 48_000
 export const RECIPE_VERSION = 'bomb-block-burst-r3-v1'
+export const ACCEPTED_OUTPUT_GAIN = 0.78
+export const HARD_DROP_REFERENCE = Object.freeze({
+  masterGain: 1.85,
+  compressor: Object.freeze({ thresholdDb: -4, kneeDb: 6 }),
+  tones: Object.freeze([
+    Object.freeze({ frequency: 174.61, duration: 0.072, gain: 0.1, attack: 0.006 }),
+    Object.freeze({ frequency: 349.23, duration: 0.038, gain: 0.03, delay: 0.004, attack: 0.004 }),
+  ]),
+  voiceGainBoost: 1.45,
+  voiceGainCeiling: 0.5,
+})
 export const CHAIN_BEAT_SECONDS = Object.freeze(
   Array.from({ length: 10 }, (_, index) => (index + 1) * 0.056),
 )
@@ -145,6 +156,13 @@ function peakOf(samples, start = 0, end = samples.length) {
   return peak
 }
 
+function rmsOf(samples, start = 0, end = samples.length) {
+  const boundedEnd = Math.min(end, samples.length)
+  let squareSum = 0
+  for (let index = start; index < boundedEnd; index += 1) squareSum += samples[index] * samples[index]
+  return Math.sqrt(squareSum / Math.max(1, boundedEnd - start))
+}
+
 function scaleToPeak(samples, targetPeak) {
   const peak = peakOf(samples)
   const scale = peak > 0 ? targetPeak / peak : 1
@@ -155,6 +173,36 @@ function propagationShape(delta) {
   if (delta < 0 || delta >= 0.072) return 0
   if (delta < 0.012) return Math.sin((delta / 0.012) * Math.PI * 0.5) ** 2
   return Math.cos(((delta - 0.012) / 0.060) * Math.PI * 0.5) ** 2
+}
+
+function exponentialRamp(startValue, endValue, progress) {
+  return startValue * ((endValue / startValue) ** Math.max(0, Math.min(1, progress)))
+}
+
+export function renderHardDropReference() {
+  const duration = Math.max(...HARD_DROP_REFERENCE.tones.map((tone) => (tone.delay ?? 0) + tone.duration))
+  const samples = new Float64Array(Math.round(duration * SAMPLE_RATE))
+  for (const tone of HARD_DROP_REFERENCE.tones) {
+    const delay = tone.delay ?? 0
+    const start = Math.round(delay * SAMPLE_RATE)
+    const count = Math.round(tone.duration * SAMPLE_RATE)
+    const peak = Math.min(
+      HARD_DROP_REFERENCE.voiceGainCeiling,
+      tone.gain * HARD_DROP_REFERENCE.voiceGainBoost,
+    )
+    for (let index = 0; index < count && start + index < samples.length; index += 1) {
+      const time = index / SAMPLE_RATE
+      const envelope = time <= tone.attack
+        ? exponentialRamp(0.0001, peak, time / tone.attack)
+        : exponentialRamp(peak, 0.0001, (time - tone.attack) / (tone.duration - tone.attack))
+      samples[start + index] += Math.sin(Math.PI * 2 * tone.frequency * time)
+        * envelope
+        * HARD_DROP_REFERENCE.masterGain
+    }
+  }
+  samples[0] = 0
+  samples[samples.length - 1] = 0
+  return samples
 }
 
 function renderNormal(candidate) {
@@ -278,6 +326,10 @@ export function analyzeSamples(samples) {
     zeroEndpoints: samples[0] === 0 && samples[samples.length - 1] === 0,
     spectralEnergy: fftEnergy(samples),
   }
+}
+
+export function rmsForSeconds(samples, seconds) {
+  return rmsOf(samples, 0, Math.round(seconds * SAMPLE_RATE))
 }
 
 export function renderCandidates() {

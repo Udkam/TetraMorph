@@ -27,6 +27,8 @@
   let gateMode = 'reject'
   let initializationPromise = null
 
+  const ACCEPTED_OUTPUT_GAIN = 0.78
+
   const actionContract = Object.freeze({
     masterGain: 1.85,
     voiceGainBoost: 1.45,
@@ -106,7 +108,7 @@
     if (!AudioContextClass) throw new Error('当前浏览器不支持 Web Audio。')
     context = new AudioContextClass()
     output = context.createGain()
-    output.gain.value = Number(volume.value) / 100
+    output.gain.value = ACCEPTED_OUTPUT_GAIN * (Number(volume.value) / 100)
     actionMaster = context.createGain()
     actionMaster.gain.value = actionContract.masterGain
     actionCompressor = context.createDynamicsCompressor()
@@ -157,9 +159,11 @@
     source.playbackRate.value = options.rate ?? 1
     const duration = options.duration ?? (buffer.duration / source.playbackRate.value)
     const end = startAt + duration
+    const attack = options.attack ?? Math.min(0.006, duration * 0.12)
+    const release = options.release ?? Math.min(0.018, duration * 0.18)
     gain.gain.setValueAtTime(0.0001, startAt)
-    gain.gain.linearRampToValueAtTime(options.gain ?? 1, startAt + Math.min(0.006, duration * 0.12))
-    gain.gain.setValueAtTime(options.gain ?? 1, Math.max(startAt + 0.007, end - 0.018))
+    gain.gain.linearRampToValueAtTime(options.gain ?? 1, startAt + attack)
+    gain.gain.setValueAtTime(options.gain ?? 1, Math.max(startAt, end - release))
     gain.gain.linearRampToValueAtTime(0.0001, end)
     source.connect(gain)
     const nodes = [source, gain]
@@ -220,11 +224,14 @@
     const duration = Math.min(studioBuffer.duration / studioContract.rate, studioContract.maxDuration)
     const offsets = lines === 4 ? studioContract.offsets : [0]
     offsets.forEach((offset, index) => {
+      const pan = lines === 1 ? 0 : -0.35 + (0.7 * index) / (lines - 1)
       scheduleBuffer(studioBuffer, studioCompressor, startAt + offset, {
         duration,
         rate: studioContract.rate,
         gain: normalizedGain,
-        pan: lines === 4 ? [-0.24, -0.08, 0.08, 0.24][index] : 0,
+        pan,
+        attack: Math.min(0.004, duration * 0.1),
+        release: Math.min(0.024, duration * 0.18),
       })
     })
     return duration + offsets[offsets.length - 1]
@@ -319,14 +326,17 @@
   volume.addEventListener('input', () => {
     const value = Number(volume.value) / 100
     volumeOutput.value = `${volume.value}%`
-    if (context && output && context.state !== 'closed') output.gain.setTargetAtTime(value, context.currentTime, 0.012)
+    if (context && output && context.state !== 'closed') {
+      output.gain.setTargetAtTime(ACCEPTED_OUTPUT_GAIN * value, context.currentTime, 0.012)
+    }
   })
 
   window.addEventListener('pagehide', () => { void dispose() }, { once: true })
   window.render_game_to_text = () => JSON.stringify({
     surface: 'T37 Bomb R3 stylized block-burst audition',
     ready,
-    sourceCommit: manifest.sourceCommit,
+    contractBase: manifest.provenance.contractBase,
+    generatorCommit: manifest.provenance.generatorCommit,
     recipeVersion: manifest.recipeVersion,
     candidateCount: manifest.candidates.length,
     candidates: manifest.candidates.map((candidate) => ({ id: candidate.id, label: candidate.label, normalDuration: candidate.normalDuration, chainDuration: candidate.chainDuration })),
@@ -335,6 +345,7 @@
     activeSources: activeVoices.size,
     pendingTimers: pendingTimers.size,
     volume: Number(volume.value) / 100,
+    acceptedOutputGain: ACCEPTED_OUTPUT_GAIN,
     normalVerdict: selectedValue('normal-verdict'),
     chainVerdict: selectedValue('chain-verdict'),
     gateMode,
