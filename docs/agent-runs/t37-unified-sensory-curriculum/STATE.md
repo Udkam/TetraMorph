@@ -2805,9 +2805,15 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   10 ms max RMS `0.080–0.130`, 50 ms max RMS `0.050–0.075`, hard-drop-relative energy
   `+1.5–+6 dB`, candidate peak spread `<=0.5 dB`, crest `12–17 dB`, attack `6–14 ms`,
   peak time `8–22 ms`, 95%/99% energy end by `140/180 ms`, centroid `190–420 Hz`,
-  `<70 Hz <=0.5%`, `70–120 Hz <=20%`, `250 Hz–1 kHz = 12–35%`, `1–2 kHz <=8%`,
+  `<70 Hz <=0.5%`, `70–120 Hz <=20%`, `250 Hz–1 kHz = 3–20%`, `1–2 kHz <=8%`,
   `2–4 kHz <=4%`, and `>4 kHz <=1%`. These reject unsafe scale only; human listening
   remains the sole identity/comfort gate.
+- First final metric review closed the prior X/R3 topology, `2–4 kHz` feasibility, and Z
+  harmonic-ratio findings but found one new P1: the former `250 Hz–1 kHz = 12–35%` gate
+  was impossible for contracted X/Y without an unauthorized bright harmonic. The repaired
+  `3–20%` range remains above R3's greater-than-97%-below-`250 Hz` failure boundary while
+  preserving the quiet upper-contact scale of the accepted Action family. Evidence work
+  remains unauthorized until the same reviewer accepts this repair.
 - Manifest provenance must bind contract base/current product SHA and current renderer,
   Mutation timeline/token, recipe, harness, and verifier hashes, and recompute normal
   impact `220 ms`. Full-motion `1x` is the human taste surface. A separate technical

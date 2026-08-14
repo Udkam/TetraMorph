@@ -45,9 +45,11 @@ full RMS `0.035–0.055`, 10 ms max RMS `0.080–0.130`, 50 ms max RMS `0.050–
 energy only `+1.5–+6 dB` above hard-drop, peak spread `<=0.5 dB`, crest `12–17 dB`,
 attack `6–14 ms`, and peak time `8–22 ms` after impact. At least 95%/99% of energy ends
 by `140/180 ms`. Spectral centroid is `190–420 Hz`; sub-70 energy is `<=0.5%`, 70–120
-is `<=20%`, 250 Hz–1 kHz contributes `12–35%`, 1–2 kHz is `<=8%`, 2–4 kHz is `<=4%`,
+is `<=20%`, 250 Hz–1 kHz contributes `3–20%`, 1–2 kHz is `<=8%`, 2–4 kHz is `<=4%`,
 and energy above 4 kHz is `<=1%`. Automated gates also prove deterministic bytes, exact
 graph/timing, hashes, zero residue/errors, responsive 44 px controls, and no overflow.
+The modest `3%` lower bound is intentional: it excludes another greater-than-97%-below-
+`250 Hz` cue without forcing an uncontracted bright harmonic into X or Y.
 The manifest binds contract base/current product SHA and the exact renderer,
 Mutation-timeline/token, recipe, harness, and verifier hashes, then recomputes the
 `220 ms` impact invariant from current modules. Full-motion `1x` is the human taste gate;

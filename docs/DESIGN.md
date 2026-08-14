@@ -100,8 +100,13 @@ by `180 ms`. After the complete graph, each candidate must satisfy:
   `0.050–0.075`;
 - total energy `+1.5–+6 dB` relative to hard-drop and crest factor `12–17 dB`;
 - peak time `8–22 ms` after impact, attack `6–14 ms`, spectral centroid `190–420 Hz`,
-  `<70 Hz <= 0.5%`, `70–120 Hz <= 20%`, `250 Hz–1 kHz = 12–35%`,
+  `<70 Hz <= 0.5%`, `70–120 Hz <= 20%`, `250 Hz–1 kHz = 3–20%`,
   `1–2 kHz <= 8%`, `2–4 kHz <= 4%`, and `>4 kHz <= 1%`.
+
+The `250 Hz–1 kHz` floor is deliberately modest: it remains compatible with the quiet
+upper contact in the accepted Action family while still excluding R3's greater-than-97%
+concentration below `250 Hz`. It does not authorize an extra bright layer or stronger
+harmonics outside the X/Y/Z structures above.
 
 R4A's sole writer boundary is the new
 `docs/evidence/t37/bomb-soft-block-audition-r4a/**` directory. Its page provides exact
