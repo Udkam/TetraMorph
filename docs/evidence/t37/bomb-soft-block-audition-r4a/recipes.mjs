@@ -3,12 +3,14 @@ export const FILE_DURATION_SECONDS = 0.18;
 export const VOICE_GAIN_BOOST = 1.45;
 export const VOICE_GAIN_CEILING = 0.5;
 
-const contact = ({ frequency, gain, delayMs, durationMs, attackMs, partial = null }) => Object.freeze({
+const contact = ({ frequency, gain, delayMs, durationMs, attackMs, decayRate, phaseOffset = 0, partial = null }) => Object.freeze({
   frequency,
   gain,
   delayMs,
   durationMs,
   attackMs,
+  decayRate,
+  phaseOffset,
   partial,
 });
 
@@ -20,8 +22,8 @@ export const R4A_RECIPES = Object.freeze({
   X: Object.freeze({
     id: 'X',
     contacts: Object.freeze([
-      contact({ frequency: 196, gain: 0.082, delayMs: 0, durationMs: 146, attackMs: 11 }),
-      contact({ frequency: 302.7, gain: 0.0202, delayMs: 7, durationMs: 125, attackMs: 8 }),
+      contact({ frequency: 196, gain: 0.1069, delayMs: 0, durationMs: 146, attackMs: 11, decayRate: 7 }),
+      contact({ frequency: 302.7, gain: 0.02635, delayMs: 7, durationMs: 125, attackMs: 8, decayRate: 7 }),
     ]),
   }),
   Y: Object.freeze({
@@ -29,35 +31,35 @@ export const R4A_RECIPES = Object.freeze({
     contacts: Object.freeze([
       contact({
         frequency: 246.94,
-        gain: 0.073,
+        gain: 0.12114,
         delayMs: 0,
         durationMs: 132,
         attackMs: 10,
-        partial: Object.freeze({ frequency: 930, relativeDb: -14.5, durationMs: 34 }),
+        decayRate: 14,
       }),
-      contact({ frequency: 220, gain: 0.0461, delayMs: 22, durationMs: 112, attackMs: 8 }),
-      contact({ frequency: 196, gain: 0.0326, delayMs: 45, durationMs: 104, attackMs: 7 }),
+      contact({ frequency: 220, gain: 0.07648, delayMs: 22, durationMs: 112, attackMs: 8, decayRate: 14 }),
+      contact({ frequency: 196, gain: 0.05415, delayMs: 45, durationMs: 104, attackMs: 7, decayRate: 14 }),
     ]),
   }),
   Z: Object.freeze({
     id: 'Z',
     contacts: Object.freeze([
-      contact({ frequency: 174.61, gain: 0.061, delayMs: 0, durationMs: 148, attackMs: 12 }),
-      contact({ frequency: 239.7, gain: 0.047, delayMs: 6, durationMs: 142, attackMs: 10 }),
-      contact({ frequency: 326.9, gain: 0.031, delayMs: 13, durationMs: 135, attackMs: 8 }),
+      contact({ frequency: 174.61, gain: 0.05715, delayMs: 0, durationMs: 148, attackMs: 8, decayRate: 4, phaseOffset: 6.159 }),
+      contact({ frequency: 239.7, gain: 0.04401, delayMs: 4, durationMs: 142, attackMs: 7, decayRate: 4, phaseOffset: 0.576 }),
+      contact({ frequency: 326.9, gain: 0.02902, delayMs: 8, durationMs: 135, attackMs: 6, decayRate: 4, phaseOffset: 3.866 }),
     ]),
   }),
 });
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-function dampedEnvelope(ageSeconds, durationSeconds, attackSeconds) {
+function dampedEnvelope(ageSeconds, durationSeconds, attackSeconds, decayRate) {
   if (ageSeconds <= 0 || ageSeconds >= durationSeconds) return 0;
   const attackProgress = clamp(ageSeconds / attackSeconds, 0, 1);
   const attack = Math.sin(attackProgress * Math.PI * 0.5) ** 2;
   const decayAge = Math.max(0, ageSeconds - attackSeconds);
   const decayWindow = Math.max(0.001, durationSeconds - attackSeconds);
-  const body = Math.exp(-4.9 * decayAge / decayWindow);
+  const body = Math.exp(-decayRate * decayAge / decayWindow);
   const releaseStart = durationSeconds - 0.024;
   const release = ageSeconds < releaseStart
     ? 1
@@ -117,14 +119,14 @@ export function renderCandidate(id) {
     const durationSeconds = voice.durationMs / 1_000;
     const attackSeconds = voice.attackMs / 1_000;
     const boostedGain = Math.min(VOICE_GAIN_CEILING, voice.gain * VOICE_GAIN_BOOST);
-    let bodyPhase = 0;
+    let bodyPhase = voice.phaseOffset;
     let partialPhase = 0;
     const partialGain = voice.partial ? 10 ** (voice.partial.relativeDb / 20) : 0;
     for (let frame = delayFrames; frame < frameCount; frame += 1) {
       const ageSeconds = (frame - delayFrames) / SAMPLE_RATE;
       if (ageSeconds >= durationSeconds) break;
       bodyPhase += 2 * Math.PI * voice.frequency / SAMPLE_RATE;
-      const body = Math.sin(bodyPhase) * dampedEnvelope(ageSeconds, durationSeconds, attackSeconds);
+      const body = Math.sin(bodyPhase) * dampedEnvelope(ageSeconds, durationSeconds, attackSeconds, voice.decayRate);
       let detail = 0;
       if (voice.partial && ageSeconds < voice.partial.durationMs / 1_000) {
         partialPhase += 2 * Math.PI * voice.partial.frequency / SAMPLE_RATE;
