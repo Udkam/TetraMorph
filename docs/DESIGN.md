@@ -54,8 +54,9 @@ the following measurements are a contract diagnosis rather than an invented tast
 
 R3's final-output peaks were `0.374–0.406`, versus `0.197` for accepted hard-drop and
 `0.196` for accepted one-line Studio clear. Its 50 ms maximum RMS was roughly
-`11.5–12.5 dB` above hard-drop, total energy was `13.1–14.0 dB` above hard-drop, and its
-spectral mass sat too heavily below `120 Hz`. The R4 gate therefore removes the former
+`11.5–12.5 dB` above hard-drop, total energy was `13.1–14.0 dB` above hard-drop, and all
+three normal cues concentrated more than 97% of their energy below `250 Hz` (with B also
+excessive below `120 Hz`). The R4 gate therefore removes the former
 `+5–7 dB` peak window and explicitly bounds short-window loudness, energy, and midrange
 detail. Metrics can reject another oversized candidate; only the player can decide
 whether the result is a friendly, block-like **崩**.
@@ -69,18 +70,27 @@ commercial-game samples, laser/chiptune gesture, sharp crack, or independent low
 layer. Visible choices use neutral identifiers `X/Y/Z` so descriptive names do not prime
 the verdict:
 
-- `X`: one rounded `196 -> 174.61 Hz` body plus a quieter `293.66 -> 220 Hz` contact and
-  at most one `40–60 ms` deterministic midrange microtexture at `-18 dB` or lower.
+- `X`: two simultaneous fixed damped modes at `196 / 302.7 Hz`, the second starting
+  about `7 ms` later and at least `12 dB` quieter; no glide and no noise/texture bed.
 - `Y`: three damped Action-family detents at `246.94 / 220 / 196 Hz`, staggered roughly
   `0 / 22 / 45 ms` and decaying `0 / -4 / -7 dB`, with no continuous bed.
-- `Z`: an inharmonic-but-Action-anchored modal cluster near `174.61 / 261.63 / 349.23 Hz`
-  with staggered attacks and one shared decay, no noise bed and no low downward glide.
+- `Z`: a deliberately nonmusical fixed modal cluster at `174.61 / 239.7 / 326.9 Hz`
+  (ratios approximately `1 : 1.373 : 1.872`) with staggered attacks and one shared
+  decay, no noise bed and no low downward glide.
+
+Each X/Y/Z contact may include at most one internal `0.9–1.8 kHz`, `24–45 ms` damped
+partial at `-18–-14 dB`; it is part of that contact voice rather than an added texture
+layer. This is the only authorized bright detail and keeps the simultaneous-voice ceiling
+at three.
 
 Every candidate is scheduled at the accepted normal Bomb visual impact (`220 ms` after
-the warning begins), never at event time zero. The audition uses the future product graph
-`mutation bus 0.96 -> master 1.85 -> compressor -> output 0.78`, plus exact hard-drop and
-one-line Studio reference graphs. It must run the accepted full-motion `1x` production
-Bomb renderer rather than an audio-only approximation. Candidate activity is
+the warning begins), never at event time zero. At fixed measurement `volume=1`, the
+audition reproduces the complete future candidate route: recipe oscillator, per-voice
+`min(0.5, gain * 1.45)`, `mutation bus 0.96`, neutral `candidateEffects 1`,
+`candidateMaster 1.85`, Action compressor `-4 dB / knee 6 / 3:1 / 3 ms / 120 ms`,
+`enabledGate 1`, then output `volume * 0.78`. It also reproduces the exact accepted
+hard-drop and one-line Studio graphs. It must run the current production renderer rather
+than an audio-only approximation. Candidate activity is
 `110–160 ms`; file duration is `0.14–0.22 s`, with 95% energy ended by `140 ms` and 99%
 by `180 ms`. After the complete graph, each candidate must satisfy:
 
@@ -91,7 +101,7 @@ by `180 ms`. After the complete graph, each candidate must satisfy:
 - total energy `+1.5–+6 dB` relative to hard-drop and crest factor `12–17 dB`;
 - peak time `8–22 ms` after impact, attack `6–14 ms`, spectral centroid `190–420 Hz`,
   `<70 Hz <= 0.5%`, `70–120 Hz <= 20%`, `250 Hz–1 kHz = 12–35%`,
-  `2–4 kHz = 0.5–4%`, and `>4 kHz <= 1%`.
+  `1–2 kHz <= 8%`, `2–4 kHz <= 4%`, and `>4 kHz <= 1%`.
 
 R4A's sole writer boundary is the new
 `docs/evidence/t37/bomb-soft-block-audition-r4a/**` directory. Its page provides exact
@@ -99,8 +109,14 @@ hard-drop and one-line-clear references, `reference -> candidate` comparison, th
 normal-Bomb `1x` animation controls, no autoplay, reject-all default, and optional
 nonbinding reason tags (`too loud / too dull / too sharp / too long / too note-like /
 timing wrong`). Deterministic bytes, graph measurements, hashes, timing, responsive 44 px
-controls, cleanup, one Canvas, and zero browser errors are automatic gates; no automatic
-check may claim sound acceptance. `progress.md` remains an inherited dirty path, so the
+controls, cleanup, one Canvas, and zero browser errors are automatic gates. The manifest
+must bind the contract base/current product SHA plus the imported renderer, Mutation
+timeline/token, recipe, renderer harness, and verifier hashes, and must recompute the
+`220 ms` normal-impact invariant from those current modules. Full-motion `1x` is the sole
+human taste surface. A separate reduced-motion technical pass uses the same candidate
+bytes and current normal-Bomb timeline, proves audio alignment to its renderer-reported
+impact, static/no-particle presentation, cleanup, and zero errors, and does not reopen
+visual taste. No automatic check may claim sound acceptance. `progress.md` remains an inherited dirty path, so the
 required iteration record lives in the T37 `STATE.md` instead.
 
 Only an explicit player choice `X`, `Y`, or `Z` opens a separate docs-first **R4B** chain

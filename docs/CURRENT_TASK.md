@@ -23,27 +23,37 @@ laser, melody, or long falling body.
 R4 is deliberately split. R4A produces only three neutral normal-cue choices `X/Y/Z` in
 `docs/evidence/t37/bomb-soft-block-audition-r4a/**`; it does not generate any chain cue.
 All three use original synthesis anchored to accepted Action-family pitches, at most three
-rounded contact voices, `110–160 ms` of activity, and a `0.14–0.22 s` file. X is a
-rounded two-contact release with an optional very quiet midrange microtexture; Y is three
-short decaying block detents; Z is a single inharmonic modal cluster with no noise bed.
+rounded contact voices, `110–160 ms` of activity, and a `0.14–0.22 s` file. X is a fixed
+`196 / 302.7 Hz` two-mode contact with no glide/noise; Y is three short decaying detents
+at `246.94 / 220 / 196 Hz`; Z is a nonmusical `174.61 / 239.7 / 326.9 Hz` modal cluster.
+Each contact may own at most one `0.9–1.8 kHz`, `24–45 ms`, `-18–-14 dB` damped internal
+partial; no separate bright/noise layer is allowed.
 They differ structurally, not by gain, and visible labels remain neutral to avoid priming.
 
 The page must import the accepted production Bomb renderer, run the complete normal
 full-motion `1x` warning/impact animation, and schedule the candidate exactly at the
-`220 ms` impact—not at event time zero. Playback reproduces the future product graph
-`mutation 0.96 -> master 1.85 -> compressor -> output 0.78` and the exact accepted
-hard-drop/one-line Studio reference graphs. It provides explicit `reference -> candidate`
+`220 ms` impact—not at event time zero. At measurement `volume=1`, playback reproduces
+the full future route: recipe oscillator -> per-voice `min(0.5, gain * 1.45)` ->
+`mutation 0.96` -> `candidateEffects 1` -> `master 1.85` -> Action compressor
+`-4/6/3:1/3 ms/120 ms` -> `enabledGate 1` -> output `volume * 0.78`, plus exact accepted
+hard-drop/one-line Studio graphs. It provides explicit `reference -> candidate`
 comparisons, no autoplay, reject-all default, optional failure-reason tags, one Canvas,
 and deterministic cleanup.
 
 After that full graph, each candidate must have peak `0.205–0.250` (absolute `<=0.260`),
 full RMS `0.035–0.055`, 10 ms max RMS `0.080–0.130`, 50 ms max RMS `0.050–0.075`,
 energy only `+1.5–+6 dB` above hard-drop, peak spread `<=0.5 dB`, crest `12–17 dB`,
-and peak time `8–22 ms` after impact. Spectral centroid is `190–420 Hz`; sub-70 energy
-is `<=0.5%`, 70–120 is `<=20%`, 250 Hz–1 kHz contributes `12–35%`, and energy above
-4 kHz is `<=1%`. Automated gates also prove deterministic bytes, exact graph/timing,
-hashes, zero residue/errors, responsive 44 px controls, and no overflow. They cannot
-accept the sound.
+attack `6–14 ms`, and peak time `8–22 ms` after impact. At least 95%/99% of energy ends
+by `140/180 ms`. Spectral centroid is `190–420 Hz`; sub-70 energy is `<=0.5%`, 70–120
+is `<=20%`, 250 Hz–1 kHz contributes `12–35%`, 1–2 kHz is `<=8%`, 2–4 kHz is `<=4%`,
+and energy above 4 kHz is `<=1%`. Automated gates also prove deterministic bytes, exact
+graph/timing, hashes, zero residue/errors, responsive 44 px controls, and no overflow.
+The manifest binds contract base/current product SHA and the exact renderer,
+Mutation-timeline/token, recipe, harness, and verifier hashes, then recomputes the
+`220 ms` impact invariant from current modules. Full-motion `1x` is the human taste gate;
+a separate reduced-motion technical pass uses identical candidate bytes, aligns audio to
+the current renderer-reported normal impact, proves static/no-particle behavior and
+cleanup, and does not reopen visual taste. Automatic gates cannot accept the sound.
 
 Only an explicit player `X/Y/Z` normal-cue acceptance opens a separate R4B chain contract
 and new evidence directory. R4B will keep the selected normal atom at the first real

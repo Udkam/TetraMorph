@@ -85,12 +85,14 @@ and no Puzzle content is published without strict deterministic proof.
 - Extend the grammar to the remaining gameplay, reward, Survival, Mutation, Puzzle,
   and UI events as a bounded candidate. New cues require focused listening; the player
   has now supplied that verdict by accepting all preceding modifications.
-- Recover that candidate from the intact pre-T29 T28 snapshot `2c4e4ae`, using its
+- Historical Stage-C recovery record, superseded for Bomb by R4A: recover that candidate
+  from the intact pre-T29 T28 snapshot `2c4e4ae`, using its
   concise sine contours and material-specific one-shots rather than the rejected T36
   procedural-object palette. Route the restored cues through an isolated clone of the
-  Action A safety contract; do not alter Action A, Studio, or Ice 2. Bomb uses contained
-  low bass plus low-passed pressure, Multiplier uses short golden marimba dyads, and
-  Supergravity uses a rounded two-stage weight. No sustained loop is permitted.
+  Action A safety contract; do not alter Action A, Studio, or Ice 2. The former Bomb
+  low-bass/low-passed-pressure direction is rejected and is not current authorization;
+  Multiplier's short golden marimba dyads and Supergravity's rounded two-stage weight
+  remain historical accepted context. No sustained loop is permitted.
 - Candidate `95978eb` implements this palette while replacing the historical terminal
   arpeggios with compact non-melodic gestures. Listening surface `006a936` imports the
   production engine directly and passes source-bound desktop/mobile/reduced-motion
@@ -99,10 +101,11 @@ and no Puzzle content is published without strict deterministic proof.
 - Independent QA found no P0/P1/P2 and only two P3 coverage gaps. Test `2766a55` closes
   the complete Bomb-route assertion; evidence repair `94fffb9` dispatches all 28 controls
   and fixes the stale multi-button playing state found by that exhaustive pass.
-- Live play on 2026-08-10 reopens Bomb and the 2–4-line presentation/audio join. The
-  existing Bomb sound finishes before the renderer's 220 ms impact; correct it with one
-  quiet warning pressure followed by a bounded low body, deterministic low-passed crack,
-  and low tail beginning exactly at impact. Keep the 620 ms visual sequence unchanged.
+- Historical rejected Bomb correction from 2026-08-10, retained only as provenance:
+  live play had found that the then-current Bomb sound finished before the renderer's
+  `220 ms` impact. Its proposed warning pressure, low body, low-passed crack, and low tail
+  were later human rejected and are explicitly superseded by R4A. The accepted visual
+  sequence remains unchanged.
 - Preserve Core's twelve-tick / 200 ms clear pause and the accepted Studio relative
   cadence. One line stays unchanged. For 2/3/4 lines, release rows top-to-bottom at
   `0/180`, `0/90/180`, and `0/60/120/180 ms` respectively, then let Core perform its

@@ -2778,8 +2778,9 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Quantitative postmortem identifies a contract-scale defect without inventing a player
   quote: R3 post-output peaks `0.374–0.406` were roughly twice hard-drop/one-line clear;
   50 ms max RMS was `+11.5–+12.5 dB` and total energy `+13.1–+14.0 dB` versus hard-drop,
-  with excess low-frequency mass. The R4 gates explicitly constrain short-window RMS,
-  total energy, spectral centroid/bands, and final product-graph output.
+  while every normal cue concentrated more than 97% of energy below `250 Hz` (B was also
+  excessive below `120 Hz`). The R4 gates explicitly constrain short-window RMS, total
+  energy, spectral centroid/bands, and final product-graph output.
 - The recorded helper matched PID `17072` / Python `http.server` / start
   `2026-08-14 12:15:16 +08:00`. It was stopped after the verdict; at
   `2026-08-15 03:30:38 +08:00`, `127.0.0.1:4192` had no listener. No other process was
@@ -2788,21 +2789,31 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   `docs/evidence/t37/bomb-soft-block-audition-r4a/**` directory and three neutral
   procedural normal choices X/Y/Z. R4A excludes all external/real explosion media,
   R2/R3 bytes/recipes, low pressure, long noise, and product source edits.
-- X is a rounded two-contact Action-family release with at most one `-18 dB` short
-  midrange microtexture; Y is three decaying block detents; Z is one shared-decay modal
-  cluster with no noise bed. Candidate activity is `110–160 ms`, file duration
-  `0.14–0.22 s`, and all visible labels remain neutral.
-- Audition timing and graph are product-bound: accepted production Bomb renderer at
-  full-motion `1x`; candidate start exactly at the `220 ms` impact; playback through
-  `mutation 0.96 -> master 1.85 -> compressor -> output 0.78`; exact accepted hard-drop
-  and one-line Studio references. The page defaults to reject, exposes optional reason
-  tags, has no autoplay, and must clean every source/timer/Canvas.
+- X is a fixed `196 / 302.7 Hz` two-mode contact with no glide/noise; Y is three decaying
+  `246.94 / 220 / 196 Hz` block detents; Z is a deliberately nonmusical
+  `174.61 / 239.7 / 326.9 Hz` cluster. Each contact may contain at most one
+  `0.9–1.8 kHz`, `24–45 ms`, `-18–-14 dB` damped internal partial, never a separate bed.
+  Candidate activity is `110–160 ms`, file duration `0.14–0.22 s`, and labels are neutral.
+- Audition timing and graph are product-bound: current production Bomb renderer at
+  full-motion `1x`; candidate starts exactly at the `220 ms` impact. At `volume=1`, route
+  recipe -> per-voice `min(0.5, gain*1.45)` -> mutation `0.96` -> candidateEffects `1`
+  -> master `1.85` -> Action compressor `-4/6/3:1/3 ms/120 ms` -> enabledGate `1` ->
+  output `volume*0.78`; hard-drop and one-line Studio use their exact accepted graphs.
+  The page defaults to reject, exposes optional reason tags, has no autoplay, and cleans
+  every source/timer/Canvas.
 - Post-graph gates: peak `0.205–0.250` (`<=0.260` absolute), full RMS `0.035–0.055`,
   10 ms max RMS `0.080–0.130`, 50 ms max RMS `0.050–0.075`, hard-drop-relative energy
-  `+1.5–+6 dB`, candidate peak spread `<=0.5 dB`, crest `12–17 dB`, peak time
-  `8–22 ms`, centroid `190–420 Hz`, `<70 Hz <=0.5%`, `70–120 Hz <=20%`,
-  `250 Hz–1 kHz = 12–35%`, and `>4 kHz <=1%`. These reject unsafe scale only; human
-  listening remains the sole identity/comfort gate.
+  `+1.5–+6 dB`, candidate peak spread `<=0.5 dB`, crest `12–17 dB`, attack `6–14 ms`,
+  peak time `8–22 ms`, 95%/99% energy end by `140/180 ms`, centroid `190–420 Hz`,
+  `<70 Hz <=0.5%`, `70–120 Hz <=20%`, `250 Hz–1 kHz = 12–35%`, `1–2 kHz <=8%`,
+  `2–4 kHz <=4%`, and `>4 kHz <=1%`. These reject unsafe scale only; human listening
+  remains the sole identity/comfort gate.
+- Manifest provenance must bind contract base/current product SHA and current renderer,
+  Mutation timeline/token, recipe, harness, and verifier hashes, and recompute normal
+  impact `220 ms`. Full-motion `1x` is the human taste surface. A separate technical
+  reduced-motion pass uses identical bytes and current normal timeline, verifies audio at
+  the renderer-reported impact, static/no-particle output, cleanup, and zero errors without
+  reopening visual taste.
 - Only an explicit player X/Y/Z normal acceptance opens a separate docs-first R4B
   chain contract and new directory. R4B must preserve the accepted normal atom at the
   real first impact and derive only two or three quieter macro-collapse clusters from
