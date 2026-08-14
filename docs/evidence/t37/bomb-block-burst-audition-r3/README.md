@@ -1,6 +1,6 @@
 # T37 Bomb R3 — Stylized Block-Burst Audition
 
-Contract base: `10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b` · generator commit: `037c45842aedb16a445bac6857e16a9f141d7be1`
+Contract base: `10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b` · generator commit: `681b5f48c8245f18575ab7a851ea89e900add6a7`
 
 This directory is an isolated human-listening surface. The six candidate WAVs are deterministic original synthesis; they do not reuse recorded explosion media and are not integrated into product audio.
 
@@ -13,7 +13,7 @@ This directory is an isolated human-listening surface. The six candidate WAVs ar
 | C normal | 0.30 s | 0.4800 | 0.1147 | 0.03% | 5ee70c5291606613ade6bde7c010c820f0765d938e909bd71e6282a4d9b4e29b |
 | C chain | 0.88 s | 0.4800 | 0.0673 | 6.94% | 02ca0c9eda515a711e6bfb6a7b8cb988a4842197b0efd95dca0e501ccb4f6bf9 |
 
-Generator SHA-256: recipes `c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6`; renderer `ecf257e39ecaa48ea4761773cb3eafb0229d9c8974a613592bb47f706376cfa3`; audition `7cc794dc3fb75079ca60d92d5a1706cbf0a03fa612c48b0f29b62942312913b6`; verifier `9f103ea01bea13bd1daa723476bd0f7c1a69e2adf1a3ca5cf7fbc5ff6047878d`; browser smoke `009b21897d9f740e23b7c615e5a2755411413aa447b6442d537575864cea9f9c`.
+Generator SHA-256: recipes `c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6`; renderer `2bc7d295a8c032172f2cd61428983f91eb630c464ff220b41460f73b09542173`; audition `514a010374d11f188757dd7ce7f089155b8769a450eb21e864d0ef85ba7d99fb`; verifier `f6c42f8659434e56f34aaaed9da4946066e56a7ff1591cdc1d6de0e006cbd5bc`; browser smoke `b5b3b1d7377bbdb2f84505727743c1067999c95416e58da6686b6c60c6af0d9b`.
 
 Accepted reference calibration: output gain 0.78; hard-drop peak 0.2524 before output; Studio one/four-line target peaks 0.50/0.54 before output.
 

@@ -3,15 +3,15 @@
   "provenance": {
     "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
     "initialEvidenceCommit": "65cb18c",
-    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "generatorCommit": "681b5f48c8245f18575ab7a851ea89e900add6a7",
     "recipesSha256": "c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6",
-    "rendererSha256": "ecf257e39ecaa48ea4761773cb3eafb0229d9c8974a613592bb47f706376cfa3",
-    "auditionSha256": "7cc794dc3fb75079ca60d92d5a1706cbf0a03fa612c48b0f29b62942312913b6",
-    "verifierSha256": "9f103ea01bea13bd1daa723476bd0f7c1a69e2adf1a3ca5cf7fbc5ff6047878d",
-    "browserSmokeSha256": "009b21897d9f740e23b7c615e5a2755411413aa447b6442d537575864cea9f9c"
+    "rendererSha256": "2bc7d295a8c032172f2cd61428983f91eb630c464ff220b41460f73b09542173",
+    "auditionSha256": "514a010374d11f188757dd7ce7f089155b8769a450eb21e864d0ef85ba7d99fb",
+    "verifierSha256": "f6c42f8659434e56f34aaaed9da4946066e56a7ff1591cdc1d6de0e006cbd5bc",
+    "browserSmokeSha256": "b5b3b1d7377bbdb2f84505727743c1067999c95416e58da6686b6c60c6af0d9b"
   },
   "recipeVersion": "bomb-block-burst-r3-v1",
-  "generatedAt": "2026-08-14T04:17:54.178Z",
+  "generatedAt": "2026-08-14T04:24:51.514Z",
   "summary": {
     "passed": true,
     "checks": 99,
@@ -46,7 +46,7 @@
     {
       "name": "provenance source hashes",
       "passed": true,
-      "details": "{\"contractBase\":\"10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b\",\"initialEvidenceCommit\":\"65cb18c\",\"generatorCommit\":\"037c45842aedb16a445bac6857e16a9f141d7be1\",\"recipesSha256\":\"c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6\",\"rendererSha256\":\"ecf257e39ecaa48ea4761773cb3eafb0229d9c8974a613592bb47f706376cfa3\",\"auditionSha256\":\"7cc794dc3fb75079ca60d92d5a1706cbf0a03fa612c48b0f29b62942312913b6\",\"verifierSha256\":\"9f103ea01bea13bd1daa723476bd0f7c1a69e2adf1a3ca5cf7fbc5ff6047878d\",\"browserSmokeSha256\":\"009b21897d9f740e23b7c615e5a2755411413aa447b6442d537575864cea9f9c\"}"
+      "details": "{\"contractBase\":\"10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b\",\"initialEvidenceCommit\":\"65cb18c\",\"generatorCommit\":\"681b5f48c8245f18575ab7a851ea89e900add6a7\",\"recipesSha256\":\"c22a5bd280504bc1b649045095e7bad939cd55196657d8f436516bcf1f575fa6\",\"rendererSha256\":\"2bc7d295a8c032172f2cd61428983f91eb630c464ff220b41460f73b09542173\",\"auditionSha256\":\"514a010374d11f188757dd7ce7f089155b8769a450eb21e864d0ef85ba7d99fb\",\"verifierSha256\":\"f6c42f8659434e56f34aaaed9da4946066e56a7ff1591cdc1d6de0e006cbd5bc\",\"browserSmokeSha256\":\"b5b3b1d7377bbdb2f84505727743c1067999c95416e58da6686b6c60c6af0d9b\"}"
     },
     {
       "name": "provenance commits declared",

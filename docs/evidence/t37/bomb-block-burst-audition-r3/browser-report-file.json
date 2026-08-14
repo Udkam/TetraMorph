@@ -1,12 +1,12 @@
 {
   "url": "file:///E:/Proj/reproduction-tetris/docs/evidence/t37/bomb-block-burst-audition-r3/index.html",
   "label": "file",
-  "generatedAt": "2026-08-14T04:17:49.768Z",
+  "generatedAt": "2026-08-14T04:24:47.135Z",
   "initial": {
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
     "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
-    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "generatorCommit": "681b5f48c8245f18575ab7a851ea89e900add6a7",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -47,7 +47,7 @@
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
     "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
-    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "generatorCommit": "681b5f48c8245f18575ab7a851ea89e900add6a7",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -88,7 +88,7 @@
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
     "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
-    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "generatorCommit": "681b5f48c8245f18575ab7a851ea89e900add6a7",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -129,7 +129,7 @@
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
     "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
-    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "generatorCommit": "681b5f48c8245f18575ab7a851ea89e900add6a7",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -170,7 +170,7 @@
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": false,
     "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
-    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "generatorCommit": "681b5f48c8245f18575ab7a851ea89e900add6a7",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -211,7 +211,7 @@
     "surface": "T37 Bomb R3 stylized block-burst audition",
     "ready": true,
     "contractBase": "10dad00a67fc26ba8aeb0bde1edd3e54f02d4c7b",
-    "generatorCommit": "037c45842aedb16a445bac6857e16a9f141d7be1",
+    "generatorCommit": "681b5f48c8245f18575ab7a851ea89e900add6a7",
     "recipeVersion": "bomb-block-burst-r3-v1",
     "candidateCount": 3,
     "candidates": [
@@ -247,6 +247,42 @@
     "contextClosed": false,
     "humanListeningRequired": true,
     "productIntegrated": false
+  },
+  "studioReferenceMetrics": {
+    "one": {
+      "peak": 0.1955646276473999,
+      "rms": 0.023449467834584462
+    },
+    "four": {
+      "peak": 0.5866764187812805,
+      "rms": 0.06264498756803381
+    },
+    "candidatePeakVsOneDb": [
+      {
+        "id": "A-normal",
+        "value": 5.995486031983933
+      },
+      {
+        "id": "A-chain",
+        "value": 5.995486031983933
+      },
+      {
+        "id": "B-normal",
+        "value": 6.336152817959539
+      },
+      {
+        "id": "B-chain",
+        "value": 6.336152817959539
+      },
+      {
+        "id": "C-normal",
+        "value": 5.6409106927753
+      },
+      {
+        "id": "C-chain",
+        "value": 5.6409106927753
+      }
+    ]
   },
   "layout": {
     "desktopOverflow": false,
