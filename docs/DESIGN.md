@@ -113,6 +113,21 @@ sequence of identical blasts. Automated peak, duration, dispatch, and license ch
 necessary but cannot accept taste. The product asset catalog stays closed until the player
 explicitly accepts one isolated normal/chain A/B pair.
 
+### Live player-review boundary
+
+The visual player gate uses a live deterministic Core-to-production-renderer page under
+`docs/evidence/t37/bomb-row-causal-review-r2/`; a CSS reconstruction, interpolated image
+sequence, or edited video cannot stand in for the actual effect. The page dispatches the
+same public hard-drop fixture as the source-bound evidence, fails closed unless
+`clear-started.rows=[30]`, `chainTriggerRows=[30]`, origin rows `29/30`, and the committed
+board clears completely, then sends those real events to `TetrisRenderer`. Full motion
+defaults to the product's actual `1x` timing; an explicitly labelled `0.5x` inspection
+speed and the production reduced-motion plan are review aids only. Replay must replace the
+previous renderer cleanly, keep exactly one Canvas, expose no product audio, and show the
+current causal phase without drawing explanatory art over the board. This helper may make
+the already-frozen visual candidate easier to judge, but it cannot claim a natural App
+reach or player acceptance.
+
 The renderer/audio foreground queue advances after the final reached visible row finishes
 its `220 ms` local blast (`90 ms` reduced), not after the long reverberation file ends. At
 that exact visual completion, the next carrier triggered by the same clear may begin. If

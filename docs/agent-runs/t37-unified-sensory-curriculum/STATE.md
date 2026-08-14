@@ -2579,6 +2579,28 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   Keep the helper only through the listening verdict, then stop this exact process tree and
   verify port `4192` is released. Other listeners are not T37-owned.
 
+### 2026-08-14 Bomb R2 live visual-review entry
+
+- Preflight confirms current `HEAD=8e8361a`, branch `main`, and only the protected
+  inherited T27 / `t27-r1-followup` / `progress.md` paths are dirty. They remain unread,
+  unstaged, and outside this slice. The task-owned Vite listener on `127.0.0.1:4192`
+  remains live under PID `32148` for the still-open human gate.
+- Independent read-only inspection confirms `bomb-row-causal-r2` contains source-bound
+  PNG frames, contact sheets, audit, manifest, and a one-shot Node capture script, but no
+  continuous browser replay. Static frame switching is insufficient to judge the actual
+  one-second motion quality. A second independent audit confirms the random normal App
+  path cannot repeatably produce two Bomb carriers and must not be presented as a direct
+  review link.
+- Open one evidence-helper checkpoint limited to the new
+  `docs/evidence/t37/bomb-row-causal-review-r2/**` directory. It must drive the current
+  production `TetrisRenderer` from the same public Core hard-drop transition, fail closed
+  on exact causal rows and final occupancy, default to real `1x`, label `0.5x` as review
+  only, retain reduced-motion parity, disable product audio, and cleanly replace each
+  replay so exactly one Canvas remains.
+- Unique next action: implement and browser-audit that live review page, then expose it
+  beside the already-open Boom A/B/C page. Do not integrate product audio or advance the
+  material/Endgame stages before the player's explicit verdict.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

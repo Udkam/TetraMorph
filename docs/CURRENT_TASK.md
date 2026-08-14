@@ -108,6 +108,18 @@ normal cues are `0.92/1.08/1.16 s`, and their paired chain cues are
 integration remains closed until the player explicitly accepts one normal candidate and
 one chain candidate (they may differ), or rejects all.
 
+The current visual evidence has source-bound frames and contact sheets but no continuous
+player-facing replay. A bounded review-helper checkpoint therefore owns only the new
+`docs/evidence/t37/bomb-row-causal-review-r2/**` directory. Its page must import the live
+public Core and production `TetrisRenderer` through Vite, reproduce the evidence fixture
+through a public hard drop, and refuse playback unless the exact row-30 chain cause,
+29/30 origin geometry, and zero-cell committed board all hold. Default playback is the
+real full-motion `1x` plan; labelled `0.5x` inspection and reduced-motion playback may
+help judge causality but cannot replace the `1x` verdict. Replay races must leave exactly
+one Canvas and one active renderer, with zero console/page/request errors and no product
+audio. This helper does not alter product source or supersede the frozen evidence; player
+visual acceptance remains open.
+
 Because `chainTriggerRows` is a required discriminated-union field, the Core checkpoint
 also owns schema-only fixture compatibility in `src/game/audio/AudioEngine.test.ts` and
 `src/game/render/TetrisRenderer.test.ts`. Those two files may add only exact trigger-row
