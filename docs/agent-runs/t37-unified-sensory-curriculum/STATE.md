@@ -2601,6 +2601,41 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   beside the already-open Boom A/B/C page. Do not integrate product audio or advance the
   material/Endgame stages before the player's explicit verdict.
 
+### 2026-08-14 Bomb R2 live review candidate and human gate
+
+- Task `T37-BOMB-R2-LIVE-REVIEW-RECOVERY` adopts base
+  `74e75f37e89eebf74197dd3730747083b78adcce`. Evidence candidate
+  `70ce61f9b44b1184797b7bd1239cd8a400f8bcbd` changes exactly
+  `docs/evidence/t37/bomb-row-causal-review-r2/README.md` and `index.html`; inherited T27,
+  `t27-r1-followup`, `progress.md`, and the untracked handoff remain outside the commit.
+- The prescribed `develop-web-game` client runs its fixed action payload three times.
+  Every `render_game_to_text` result finishes with clear/trigger `[30]`, origin `[29,30]`,
+  zero occupied committed cells, one Canvas, and no mutation residue; no error file is
+  emitted. Focused real-time Chromium QA additionally passes full `1x`, `0.5x`, reduced
+  motion, pause/resume with zero elapsed drift, twelve rapid replay requests, explicit
+  disposal to zero Canvases, 1440-wide and 390x844 layout bounds, and zero
+  console/page/request errors.
+- The correct isolated audio URL is `docs/evidence/t37/bomb-boom-audition-r2/`. Browser
+  smoke confirms three candidates, six listening controls, normal/chain durations
+  `0.92/2.74`, `1.08/2.96`, and `1.16/2.86 s`, successful decoding of both 48 kHz embedded
+  sources, and zero browser errors. No automated run claims sound quality.
+- Final gates after the helper freeze pass: `npm.cmd run typecheck`; `npm.cmd run test`
+  with `537 passed / 15 skipped` across `55 passed / 2 skipped` files; and
+  `npm.cmd run build` with 770 transformed modules. Independent source and exact candidate
+  range QA both report `P0/P1/P2/P3/GAP = 0/0/0/0/0`; committed blob SHA-256 values are
+  `65D0391B...F15D0` for README and `C33B8896...D997C` for HTML.
+- The active human-review helper belongs only to this task: project root
+  `E:\Proj\reproduction-tetris`; command
+  `npm.cmd run dev -- --host 127.0.0.1 --port 4192 --strictPort`; listener `node.exe` PID
+  `472`, parent PID `23428`, started `2026-08-14 10:10:39 +08:00`, bound only to
+  `127.0.0.1:4192`. Both Boom audition and live visual URLs return HTTP 200. Keep this
+  exact helper only through the player verdict, then terminate it and verify port 4192 is
+  released.
+- Blocker: human taste cannot be inferred from hashes, waveform metrics, screenshots, or
+  QA. Unique next action: obtain `normal A/B/C/reject all`,
+  `chain A/B/C/reject all`, and `visual accept/reject`. Only then open either the exact
+  approved audio-integration slice or a new bounded redesign contract.
+
 ## Do not repeat
 
 - Do not replay the full T34–T36 investigation or treat their measurements as taste

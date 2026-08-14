@@ -1,6 +1,6 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **BOMB R2 HUMAN REJECTION / CAUSAL BOOM CONTRACT OPEN / MATERIAL REVIEW PAUSED / INTRO-05 SUCCESSOR PENDING**
+Status: **BOMB R2 PLAYER REVIEW OPEN / MATERIAL REVIEW PAUSED / D1 PLAYER REVIEW + D2B IMPLEMENTATION PENDING / INTRO-05 SUCCESSOR PENDING / SURVIVAL PROPOSAL PENDING**
 
 ## Active objective
 
@@ -119,6 +119,18 @@ help judge causality but cannot replace the `1x` verdict. Replay races must leav
 one Canvas and one active renderer, with zero console/page/request errors and no product
 audio. This helper does not alter product source or supersede the frozen evidence; player
 visual acceptance remains open.
+
+The live helper is now frozen at candidate `70ce61f`. The prescribed web-game client
+completed three deterministic runs with the exact `[30]` clear/trigger rows, `[29,30]`
+origin rows, zero occupied committed cells, one Canvas, no residual activation, and no
+console errors. A separate real-time browser matrix passes full `1x`, labelled `0.5x`,
+reduced motion, pause/resume with zero elapsed drift, twelve rapid replays, explicit
+dispose, desktop/mobile overflow checks, and zero console/page/request errors. Final
+typecheck, full suite (`537 passed / 15 skipped` across `55 passed / 2 skipped` files),
+and the 770-module production build pass. Independent candidate QA reports
+`P0/P1/P2/P3/GAP = 0/0/0/0/0`. These checks establish player-review eligibility only;
+the normal Bomb, chain clear, and visual presentation all remain unaccepted until the
+player supplies three explicit verdicts.
 
 Because `chainTriggerRows` is a required discriminated-union field, the Core checkpoint
 also owns schema-only fixture compatibility in `src/game/audio/AudioEngine.test.ts` and

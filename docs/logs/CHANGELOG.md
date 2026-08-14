@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-14 — T37 Bomb R2 live review surface ready for player verdict
+
+- Evidence-helper candidate `70ce61f` adds only the deterministic live Bomb R2 review
+  README and page. It drives the public Core hard-drop transition through the production
+  `TetrisRenderer`, fails closed on clear/trigger row `[30]`, origin rows `[29,30]`, and a
+  zero-cell committed board, and does not import or play product audio.
+- The prescribed web-game client completes three runs with one Canvas, no residual Bomb
+  activation, and zero error files. A separate real-time desktop/mobile matrix verifies
+  full `1x`, inspection-only `0.5x`, reduced motion, pause/resume, twelve rapid replays,
+  explicit disposal, no horizontal overflow, and zero console/page/request errors.
+- The isolated Boom page separately exposes three normal/chain pairs with six working
+  controls, exact durations `0.92/2.74`, `1.08/2.96`, and `1.16/2.86 s`, two decoded
+  48 kHz sources, and zero browser errors. This is listening eligibility, not acceptance.
+- Final typecheck, complete suite (`537 passed / 15 skipped` in `55 passed / 2 skipped`
+  files), and 770-module production build pass. Independent candidate QA over
+  `74e75f3..70ce61f` reports `P0/P1/P2/P3/GAP = 0/0/0/0/0` and confirms the two committed
+  blobs match the pre-commit audit byte-for-byte.
+- Product audio integration and later material/transition/Endgame work remain closed
+  until the player explicitly chooses or rejects the normal cue, chooses or rejects the
+  chain cue, and accepts or rejects the live `1x` visual presentation.
+
 ## 2026-08-14 — T37 precise gravity and causal Bomb automated gates accepted
 
 - Precise-gravity checkpoints `9a5977a` and `4aac3c3` implement the exact fractional
