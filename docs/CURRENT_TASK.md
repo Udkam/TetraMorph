@@ -1,10 +1,166 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **BOMB R4A NORMAL-CUE CALIBRATION ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
+Status: **BOMB R5A FAMILIAR-LANGUAGE CONTRACT ACTIVE / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
 
 ## Active objective
 
-### 2026-08-15 Bomb R4A normal-cue calibration
+### 2026-08-15 Bomb R4A rejection and R5A familiar-language contract
+
+The player rejects R4A `X/Y/Z` in full. No more detailed subjective reason was supplied,
+so the only human finding recorded is **HUMAN REJECTED — ALL THREE**. Evidence range
+`56a2381..b11b7b5`, its WAVs, recipes, screenshots, and reports remain immutable rejected
+history. They cannot open R4B, product audio integration, or a gain/filter/envelope-only
+repair. Product audio was not changed.
+
+Post-verdict independent QA also prevents the R4A `136/136` report from being described as
+a zero-finding contract pass. Audio QA reports `P0/P1/P2/P3/GAP = 0/1/0/0/0` under a
+stricter decoded-PCM interpretation: Y's first-to-last PCM16 nonzero span is `107.896 ms`,
+below `110 ms`, while the manifest reports the scheduled recipe span `149 ms`. The old
+contract never defined which activity measure owned that limit, so the historical defect
+is a measurement-definition gap plus a verifier that did not expose both values—not a
+retroactive claim that its declared recipe-span check lied.
+UI/lifecycle QA reports `0/0/1/1/0`: pagehide and HMR existed in source but were not
+exercised while priming, pending, or playing, explicit dispose left a contradictory
+`ready=true` surface, and provenance did not name accepted-contract SHA `15801d6` and
+authorization SHA `56a2381` separately. These are historical disclosure findings; the
+rejected R4A media and evidence are not repaired.
+
+R5A changes the premise rather than tuning R4A. It does not design another independent
+explosion timbre. It presents three structurally different ways to combine the game's
+familiar action/clear language into one larger block-removal gesture, normal Bomb only:
+
+- `A` — **Action stack**: the accepted Action A hard-drop recipe at impact, lock at
+  exactly `+9 ms`, and move at exactly `+18 ms`, all scheduled with neutral `pan=0`.
+  Their frozen frequencies, waveforms, attacks, durations, relative voice gains, shared
+  Action master/compressor remain unchanged; the R5 generator newly reserves all four
+  oscillator sources atomically. This is accepted recipe/graph reuse, not a claim that
+  neutral pan is a frozen directional atom.
+- `B` — **Clear collision**: the accepted Action A hard-drop at impact plus a deliberately
+  new, candidate-local Studio-derived excerpt at exactly `+12 ms`. The excerpt calls the
+  unmodified Studio scheduler with frozen source bytes, `rate=1.18`, `targetPeak=0.5`,
+  `pan=0`, its Studio compressor, and new `maxDuration=117 ms`; its fade is exactly
+  `21.06 ms` and source stop remains `end+6 ms`. It is not the complete accepted `200 ms`
+  one-line atom and does not modify or relabel that frozen product cue.
+- `C` — **Compact block knock**: exactly one procedural layer
+  `{ instrument:'countdown-knock', duration:.070, gain:.250, attack:.006, release:.240,
+  frequency:440, brightness:.20, spread:1, seed:0x544d3336 }`, with `endFrequency`
+  omitted. Its one body plus two non-integer-ratio partials share one fast-decay envelope;
+  there is no pitch glide and only the grammar's onset contact texture. Existing synthesis
+  grammar is provenance, not human acceptance of this candidate.
+
+The candidate signal is byte-bound rather than rebuilt differently for listening. A
+Chromium 48 kHz stereo `OfflineAudioContext` source harness uses the production scheduling
+functions, a `500 ms` silent pre-roll, and these exact graph branches:
+
+- A's four oscillators share `master 1.85 -> Action compressor`;
+- B's two hard-drop oscillators use that Action branch, while its one Studio buffer uses
+  its own panner/gain/Studio compressor; the two post-compressor branches then sum;
+- C's one procedural buffer uses `mutation 0.96 -> candidateEffects 1 -> master 1.85 ->
+  Action compressor`.
+
+Each sum then uses one fixed candidate trim—A `0.9793104026564039`, B `0.4452`, C
+`0.8625147192924494`—after all owned compressors and before the global gate/output. No
+pre-compressor trim, per-atom trim, dynamic normalization, or new
+sum compressor is legal. Recipe source reservations `A/B/C = 4/3/1` are atomic during
+stem generation. Playwright `1.61.1` Chromium `149.0.7827.55` renders each candidate
+twice; left/right must
+be sample-identical, both renders must encode byte-identical mono 48 kHz PCM16 stems, and
+the committed stem ends after the candidate trim but before `enabledGate` and
+`output volume*0.78`. The page and any later accepted product integration play that exact
+stem as one BufferSource through only the global gate/output, so neither the internal
+compressors nor group trim can run twice.
+
+The player-facing page uses neutral labels `A/B/C`, not the design names above. It imports
+the current production normal-Bomb fixture and Renderer, schedules each cue at the real
+`220 ms` impact, and runs the already accepted full-motion `1x` animation as the sole
+human taste surface. It provides separate exact hard-drop and Studio references plus
+reference-to-candidate controls, no autoplay, reject-all default, and optional nonbinding
+reason tags. Those references are rendered from their complete frozen production graphs,
+not from candidate B's excerpt. Reduced motion is technical evidence only and uses the
+same candidate stem/gate/output.
+
+Metrics decode the committed stem and apply the same `enabledGate 1 -> output volume*0.78`
+that the player hears. References use the production graph with the same Chromium,
+48 kHz, `500 ms` pre-roll, and fixed `180 ms` onset analysis window. At `volume=1`, every
+candidate must have peak `0.165–0.196` and never
+exceed `0.200`; peak spread is `<=0.5 dB`. Maximum 10 ms RMS is `0.075–0.105`, maximum
+50 ms RMS is `0.042–0.060`. Same-pass energy must satisfy
+`E(hardDrop) <= E(candidate) <= min(E(hardDrop)*10^(3.1/10), E(studio))`; this is an
+independent safety ceiling, not a fixed claim about Studio's ratio. Attack is at least
+`4 ms`; decoded stem activity is `60–135 ms`, `lastNonZeroMs <=135`, and 99% of final
+energy ends by `135 ms`; energy below `120 Hz` is `<=3%` and at/above `2 kHz` is `<=1%`.
+
+The metric algorithm is contract data, not writer choice. Stem encoding clamps each
+pre-output sample to `[-1,1]` and writes signed PCM16
+`round(sample*(sample<0 ? 32768 : 32767))`. Activity uses the first/last nonzero Int16
+codes; span is `(last-first)/48` ms and last time is `last/48` ms. Pinned Chromium decodes
+the stem and renders gate `1` plus gain `.78`; candidates analyze its exact 8640 Float32
+frames, while references analyze frames `[24000,32640)` after the 500 ms pre-roll. Peak
+is the first strict maximum absolute sample; attack is from the first pre-peak sample with
+`abs >= 10%` of peak through the peak sample. Energy is sum of squares; t99 is the end of
+the first sample that reaches 99% cumulative energy. Sliding RMS considers every complete
+480/2400-frame window with its fixed denominator. Spectrum applies
+`0.5-0.5*cos(2*pi*i/(8639))` to all 8640 samples, performs an unnormalized 16384-point
+zero-padded FFT, and divides band power by all positive-frequency, non-DC bins through
+Nyquist; low is `0 < f <120`, high is `f >=2000`. Bound endpoints above are inclusive.
+Recipe duration is never substituted. These are safety/consistency gates only, never
+sound-quality acceptance.
+
+R5A prohibits all R2 recorded explosion bytes and pressure/air/tail structures; current
+product `bomb`/`bomb-chain` low-frequency recipes; all R3 WAVs, downward sweeps,
+continuous noise/lobes, and fixed chain texture; and all R4A WAVs, X/Y/Z contact layouts,
+long damped modes, or parameter variants. Accepted Action A pitches may appear only inside
+the complete frozen Action atoms above, never as ingredients for an R4A-like modal recipe.
+No external Foley, realistic explosion, reverb, sub-bass, stereo expansion, or chain cue
+is allowed.
+
+Before evidence work, independent contract and metric-feasibility QA must accept this
+docs-only boundary: `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, the T37 phase document, and
+T37 `STATE.md`. Then one evidence writer may own only the new
+`docs/evidence/t37/bomb-familiar-language-audition-r5a/**` directory. Its manifest must
+separately name `reviewRangeBaseSha=b11b7b552f1504094a94ccc5e21410a694bf2881`, the
+eventual four-doc `contractAcceptedSha`, its later docs-only `authorizationSha`,
+`currentProductSourceSha=b11b7b552f1504094a94ccc5e21410a694bf2881` whose tree
+supplies every imported product module, and the evidence `evidenceSourceHead` before
+generated outputs. It verifies linear ancestry and these exact boundaries:
+
+- `reviewRangeBaseSha..contractAcceptedSha` changes only `docs/DESIGN.md`,
+  `docs/CURRENT_TASK.md`, `docs/phases/t37-unified-material-curriculum.md`, and this T37
+  `STATE.md`;
+- `contractAcceptedSha..authorizationSha` changes only `docs/CURRENT_TASK.md`, this T37
+  `STATE.md`, and `docs/logs/CHANGELOG.md`;
+- `authorizationSha..evidenceSourceHead` changes only the new R5A directory source set:
+  `.gitattributes`, `README.md`, `candidateContract.ts`, `candidateGraph.ts`,
+  `render-harness.html`, `render-harness.ts`, `render-candidates.mjs`, `audioSession.ts`,
+  `signalMetrics.ts`, `metric-harness.html`, `metric-harness.ts`, `fixture.ts`,
+  `fixture-harness.html`, `fixture-harness.ts`, `audition.ts`, `index.html`, `styles.css`,
+  `browser-smoke.mjs`, `client-actions.json`, `write-manifest.mjs`, and `verify.mjs`;
+- after `evidenceSourceHead`, generated commits may add only `assets/A.wav`, `assets/B.wav`,
+  `assets/C.wav`, `manifest.json`, `verification-report.json`, `browser-report.json`,
+  `client-smoke/shot-0.png`, `client-smoke/shot-1.png`, `client-smoke/shot-2.png`,
+  `client-smoke/state-0.json`, `client-smoke/state-1.json`, `client-smoke/state-2.json`,
+  `r5a-desktop-impact.png`, `r5a-mobile.png`, and
+  `r5a-reduced-technical.png` in that directory. A
+  source correction creates a new source head and invalidates/regenerates all outputs.
+
+The manifest hashes every imported/evidence source and generated artifact except itself and
+the terminal verification report; that report hashes the manifest and recomputes every
+entry, while Git binds the report without recursive self-hashing.
+
+Browser proof separates reusable and terminal lifecycle. Natural completion, rapid
+switch, and stop must zero the superseded cue's sources/timers/frame callbacks while
+keeping one Renderer/Canvas, an open context, and `ready=true`. Explicit dispose and
+pagehide must close the context, destroy the Renderer, remove the Canvas, and set
+`ready=false` from priming, pending-before-impact, active, and idle states. HMR proves the
+same old-instance cleanup and then exactly one fresh `ready=true` instance/Canvas.
+
+Only an explicit human acceptance of R5A `A`, `B`, or `C` opens a separate docs-first R5B
+chain contract. R5A does not authorize `src/game/audio/**`. Bomb Core/visual source
+`8de0cb7`, evidence `7eb1d44`, visual helper `70ce61f`, D1 `aa2c9fd`, Action A, Studio,
+Ice 2, and reduced-motion behavior remain frozen. Material/Ice provenance, D2B, and
+Endgame remain paused until a normal/chain pair is integrated and product-QA accepted.
+
+### 2026-08-15 Bomb R4A normal-cue calibration (human rejected)
 
 The player rejects all six R3 cues: normal A/B/C and chain A/B/C are now **HUMAN
 REJECTED**. Candidate `af97328`, its `99/99` automatic report, browser evidence, and
@@ -72,13 +228,13 @@ only `docs/DESIGN.md`, `docs/CURRENT_TASK.md`, the T37 phase document, and T37
 `STATE.md`. Because `progress.md` is inherited dirty, the web-game skill's iteration notes
 remain in `STATE.md`.
 
-Independent contract review now accepts exact range `8c2b81d..15801d6`: the boundary
+Independent contract review accepted exact range `8c2b81d..15801d6`: the boundary
 audit reports `P0/P1/P2/P3/GAP = 0/0/0/0/0`, while the audio-feasibility audit reports
 `0/0/0/0/1`, with the sole GAP intentionally reserved for player listening. One evidence
-writer is therefore authorized to implement only
+writer was therefore authorized to implement only
 `docs/evidence/t37/bomb-soft-block-audition-r4a/**`. Product audio, R4B, and every paused
-workstream remain closed. Unique next action: build and independently verify the R4A
-normal-only listening evidence, then ask the player to choose `X`, `Y`, `Z`, or reject all.
+workstream remained closed. The evidence was built at `b11b7b5` and later rejected in
+full by the player; the R5A section above now owns the unique next action.
 
 ### 2026-08-14 Bomb R3 stylized block-burst audition (human rejected 2026-08-15)
 
@@ -137,7 +293,7 @@ audio path changed.
 
 The player subsequently rejects normal A/B/C and chain A/B/C in full. The task-owned
 Python helper PID `17072` was stopped after the verdict and port `4192` was verified
-released. This section and its R3 evidence are historical only; the R4A contract above
+released. This section and its R3 evidence are historical only; the R5A contract above
 owns the current next action.
 
 ### 2026-08-14 Bomb R2 human rejection and causal Boom correction
@@ -1166,10 +1322,10 @@ curriculum remain closed until their preceding checkpoints are green.
 2. **Audio audition gate — COMPLETE** — implement and export a compact representative set covering
    movement, rotation, lock, hard drop, 1–4-line clears, countdown, and one Mutation
    activation. Stop expansion until human listening accepts the language.
-3. **Complete audio palette — NON-BOMB ANCHORS HUMAN ACCEPTED; BOMB R4A + ORIGINAL-WAV
+3. **Complete audio palette — NON-BOMB ANCHORS HUMAN ACCEPTED; BOMB R5A + ORIGINAL-WAV
    PROVENANCE FOLLOW-UPS OPEN** — accepted Action A, Studio clear/countdown, Ice selection,
-   and the remaining support palette stay frozen. R2 and R3 Bomb audio are human rejected
-   and cannot inherit that acceptance; R4A now calibrates only a normal cue before any
+   and the remaining support palette stay frozen. R2, R3, and R4A Bomb audio are human
+   rejected and cannot inherit that acceptance; R5A now tests only a normal cue before any
    chain work. Retain the Ice uploader-original archive/hash as an honest parallel item.
 4. **Transition and identity system — D1 HUMAN ACCEPTED; D2B PENDING; IDENTITY DEFERRED** — the
    URL-route handoff now has latest-request ownership, Canvas-ready native capture,

@@ -61,7 +61,7 @@ and no Puzzle content is published without strict deterministic proof.
   `819779 / sbml / Ice cubes`) and rejects no part of the already frozen Studio subset.
   Stage B is complete; this verdict opens only Stage C.
 
-### C. Complete accepted audio language — BOMB R4A NORMAL CALIBRATION ACTIVE; ICE PROVENANCE FOLLOW-UP OPEN
+### C. Complete accepted audio language — BOMB R5A FAMILIAR-LANGUAGE CONTRACT ACTIVE; ICE PROVENANCE FOLLOW-UP OPEN
 
 - Extend the accepted material grammar to every current gameplay, reward, Mutation,
   Survival, Puzzle, and UI cue.
@@ -76,16 +76,24 @@ and no Puzzle content is published without strict deterministic proof.
   claim it is archived, substitute a network runtime request, or silently transcode the
   accepted Ogg. The player's later staged-work authorization allows Stage D to proceed
   while this evidence item stays explicitly open.
-- R2 and R3 Bomb audio are both human rejected. R3's technical evidence stays immutable,
-  but its `+5–7 dB` peak window, long low-frequency body, and fixed ten-beat texture are
-  retired. R4 splits the gate: R4A first presents only three neutral normal cues in the
-  accepted `1x` Bomb animation and complete Mutation graph; only a player-selected normal
-  cue may open the later R4B chain contract. Neither R4A nor R4B pre-authorizes product
-  audio edits.
+- R2, R3, and R4A Bomb audio are human rejected. R4A's evidence remains immutable and
+  cannot claim a zero-finding `136/136`: post-verdict QA exposed an undefined activity
+  measure (`107.896 ms` decoded versus `149 ms` scheduled for Y), non-idle pagehide/HMR
+  coverage gaps, and provenance labels that did not separate accepted-contract and
+  authorization SHAs. These findings are recorded, not repaired into a rejected candidate.
+- R5A presents three neutral normal cues in the accepted `1x` Bomb animation: neutral-pan
+  Action hard-drop/lock/move recipe reuse; Action hard-drop plus a candidate-only bounded
+  Studio-derived excerpt that does not alter the accepted full Studio cue; and one compact
+  existing-grammar block knock. They are structurally distinct,
+  share a hard-drop-relative energy ceiling no higher than same-pass Studio, and reuse no
+  R2/R3/R4A Bomb media or recipe.
+  Only a player-selected normal cue may open a later R5B chain contract; neither R5A nor
+  R5B pre-authorizes product audio edits.
 - Extend the grammar to the remaining gameplay, reward, Survival, Mutation, Puzzle,
-  and UI events as a bounded candidate. New cues require focused listening; the player
-  has now supplied that verdict by accepting all preceding modifications.
-- Historical Stage-C recovery record, superseded for Bomb by R4A: recover that candidate
+  and UI events as a bounded candidate. The recorded acceptance of preceding non-Bomb
+  Stage-C modifications does not accept the later R5A Bomb candidates; they still require
+  focused listening.
+- Historical Stage-C recovery record, superseded for Bomb by R5A: recover that candidate
   from the intact pre-T29 T28 snapshot `2c4e4ae`, using its
   concise sine contours and material-specific one-shots rather than the rejected T36
   procedural-object palette. Route the restored cues through an isolated clone of the
@@ -104,7 +112,7 @@ and no Puzzle content is published without strict deterministic proof.
 - Historical rejected Bomb correction from 2026-08-10, retained only as provenance:
   live play had found that the then-current Bomb sound finished before the renderer's
   `220 ms` impact. Its proposed warning pressure, low body, low-passed crack, and low tail
-  were later human rejected and are explicitly superseded by R4A. The accepted visual
+  were later human rejected and are explicitly superseded by R5A. The accepted visual
   sequence remains unchanged.
 - Preserve Core's twelve-tick / 200 ms clear pause and the accepted Studio relative
   cadence. One line stays unchanged. For 2/3/4 lines, release rows top-to-bottom at

@@ -2842,3 +2842,71 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   the prescribed web-game client, real-time browser/layout/cleanup proof, visual screenshot
   inspection, and independent evidence QA before asking the player to choose X/Y/Z/reject
   all. Product audio and R4B remain closed.
+
+### 2026-08-15 Bomb R4A rejection and R5A familiar-language contract
+
+- Player verdict: R4A normal X/Y/Z are all `HUMAN REJECTED`. The player supplied no more
+  specific subjective reason, so do not attribute one. Candidate range
+  `56a2381..b11b7b5`, all three WAVs, recipes, screenshots, reports, and hashes are frozen
+  rejected history. R4B and product integration remain closed; product audio never changed.
+- Independent audio QA disposition is `P0/P1/P2/P3/GAP = 0/1/0/0/0`, `HUMAN=FAIL`.
+  Under its stricter decoded-PCM interpretation, Y's nonzero span is `107.896 ms`
+  (`first=0.146 ms`, `last=108.021 ms`) versus the recipe-derived `149 ms`. The old
+  contract did not define which activity measure owned `110–160 ms`; record that
+  measurement gap and dual-value omission rather than retroactively relabeling the old
+  recipe-span verifier dishonest.
+  X=`141.292 ms` and Z=`145.542 ms` are within the old range. Do not regenerate Y.
+- Independent UI/lifecycle disposition is `0/0/1/1/0`, `HUMAN=FAIL`. The P2 is missing
+  active-state pagehide/HMR evidence plus terminal `ready=true` inconsistency; the P3 is
+  implicit provenance naming (`15801d6` accepted contract and `56a2381` authorization were
+  recoverable but not separately asserted). The remaining fixture, Renderer, impact timing,
+  source/output hashes, responsive layout, cleanup paths actually exercised, one Canvas,
+  screenshots, and zero browser errors were independently valid.
+- R5A changes premise: combine familiar game atoms instead of inventing another explosion
+  timbre. Neutral A is Action hard-drop/lock/move at exact `0/+9/+18 ms`, neutral pan,
+  four oscillators, and one shared Action compressor. Neutral B is hard-drop plus a new
+  candidate-local Studio-derived excerpt at exact `+12 ms`, `maxDuration=117 ms`,
+  `rate=1.18`, target peak `0.5`, pan zero, `21.06 ms` fade, and separate Action/Studio
+  compressors before their sum; it is not the frozen complete Studio cue. Neutral C is
+  one exact `countdown-knock` layer: duration `.070`, gain `.250`, attack `.006`, release
+  `.240`, frequency `440`, brightness `.20`, spread `1`, seed `0x544d3336`, no endFrequency;
+  its body plus two non-integer-ratio partials share one envelope and onset-only contact.
+- A/B/C generation reserves `4/3/1` sources atomically. A pinned Chromium stereo 48 kHz
+  OfflineAudioContext renders twice after 500 ms silence through the production graphs and
+  exact post-compressor trims A=`0.9793104026564039`, B=`0.4452`,
+  C=`0.8625147192924494`. Playwright `1.61.1` / Chromium `149.0.7827.55` is the pinned
+  generator. Identical left/right channel 0 becomes a byte-stable
+  mono PCM16 stem ending before the global gate/output. Audition and any accepted product
+  integration play that one stem source through only `enabledGate -> output*0.78`.
+- Complete-graph safety window: peak `0.165–0.196` (`<=0.200`), peak spread `<=0.5 dB`,
+  10 ms RMS `0.075–0.105`, 50 ms RMS `0.042–0.060`, energy
+  `hardDrop <= candidate <= min(hardDrop*10^(3.1/10), same-pass Studio)`, attack `>=4 ms`,
+  decoded nonzero activity `60–135 ms`, last nonzero and 99% energy end `<=135 ms`,
+  `<120 Hz <=3%`, and `>=2 kHz <=1%`.
+  Decoded activity and energy endpoints must be recomputed, not trusted from recipes.
+- Independent two-stage feasibility proof (pre-output PCM16 stem -> decode -> output `.78`)
+  keeps all fixed trims. Final A/B/C peaks are `.168625/.165036/.168631`, 10 ms RMS
+  `.099238/.076458/.088914`, 50 ms RMS `.058741/.043515/.051099`, energy
+  `8.2814/6.8046/6.2689`, stem activity `81.938/128.625/65.396 ms`, and last nonzero
+  `87.979/134.688/71.458 ms`; peak spread is `.18715 dB`. All contracted bounds intersect.
+- R2 media/pressure/air/tails, current low-frequency product Bomb, R3 media/sweeps/noise/
+  lobes/fixed beats, and R4A media/contact layouts/damped-mode variants are prohibited.
+  Accepted Action pitches are legal only inside complete frozen Action A atoms. No chain,
+  external Foley, realistic explosion, reverb, sub-bass, or stereo exaggeration is admitted.
+- Provenance begins at exact review/product snapshot `b11b7b552f1504094a94ccc5e21410a694bf2881`,
+  then separately binds the accepted four-doc contract, later authorization, and evidence
+  source-only head. Base-to-contract owns the four contract docs; contract-to-authorization
+  owns only CURRENT_TASK, this STATE, and CHANGELOG; later source/generated ranges use the
+  exact new-directory allowlists in CURRENT_TASK. Manifest hashes sources/outputs except
+  itself/final report; the report hashes and verifies the manifest without recursion.
+- Completion/switch/stop zero old cue resources but retain ready context/Renderer/one Canvas.
+  Dispose/pagehide terminally clean priming/pending/active/idle states to `ready=false`,
+  closed context, destroyed Renderer, Canvas zero. HMR additionally proves one fresh ready
+  instance/Canvas after old-instance cleanup.
+- Current writer boundary is docs-only: `docs/DESIGN.md`, `docs/CURRENT_TASK.md`,
+  `docs/phases/t37-unified-material-curriculum.md`, and this `STATE.md`. Inherited T27,
+  `t27-r1-followup`, handoff, and dirty `progress.md` remain untouched/unstaged.
+- Unique next action: independently audit the R5A contract and metric feasibility. Only
+  after both accept may one evidence writer own
+  `docs/evidence/t37/bomb-familiar-language-audition-r5a/**`. R5B, product audio, and all
+  paused workstreams remain closed.
