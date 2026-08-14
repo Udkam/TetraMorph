@@ -17,6 +17,8 @@ import { TetrisRenderer } from '../../../../src/game/render/TetrisRenderer';
 export const NORMAL_BOMB_IMPACT_MS = MUTATION_VFX_TOKENS.bomb.animation.enterMs
   + MUTATION_VFX_TOKENS.bomb.animation.pulseMs;
 export const NORMAL_BOMB_DURATION_MS = createMutationActivationTimeline('bomb').duration;
+export const REVIEW_HOLD_MS = 850;
+export const NORMAL_BOMB_REVIEW_MS = NORMAL_BOMB_DURATION_MS + REVIEW_HOLD_MS;
 
 type BombActivation = Extract<GameEvent, { type: 'mutation-activated'; item: 'bomb' }>;
 
@@ -101,11 +103,13 @@ export interface RendererState {
   ready: boolean;
   reducedMotion: boolean;
   elapsedMs: number;
+  reviewElapsedMs: number;
   impactMs: number;
   durationMs: number;
   activeCandidate: string | null;
   canvasCount: number;
   activeParticles: number;
+  cleanupComplete: boolean;
   mutationActivation: ReturnType<TetrisRenderer['getSnapshot']>['mutationActivation'];
 }
 
@@ -140,16 +144,35 @@ export class NormalBombRendererSession {
     this.renderer.setOptions({ visualTheme: 'deep-tide', reducedMotion, modeSwitch: false });
     this.renderer.render(this.fixture.committedState, this.fixture.committedEvents, 0);
     invariant(this.host.querySelectorAll('canvas').length === 1, 'Replay did not preserve one Canvas.');
-    this.renderer.setFrameCallback((deltaMs) => this.advance(Math.min(deltaMs, 100)));
+    this.resume();
     this.onFrame();
+  }
+
+  pause(): void {
+    this.renderer?.setFrameCallback(() => {});
+  }
+
+  resume(): void {
+    if (!this.renderer || !this.activeCandidate || this.elapsedMs >= NORMAL_BOMB_REVIEW_MS) return;
+    this.renderer.setFrameCallback((deltaMs) => this.advance(Math.min(deltaMs, 100)));
   }
 
   advance(ms: number): void {
     if (!this.renderer || !this.activeCandidate || ms <= 0) return;
-    const delta = Math.min(ms, Math.max(0, NORMAL_BOMB_DURATION_MS - this.elapsedMs));
-    this.elapsedMs += delta;
-    this.renderer.render(this.fixture.committedState, [], delta);
-    if (this.elapsedMs >= NORMAL_BOMB_DURATION_MS) this.renderer.setFrameCallback(() => {});
+    let remaining = Math.min(ms, Math.max(0, NORMAL_BOMB_REVIEW_MS - this.elapsedMs));
+    while (remaining > 0) {
+      const delta = Math.min(remaining, 1_000 / 60);
+      this.elapsedMs += delta;
+      remaining -= delta;
+      this.renderer.render(this.fixture.committedState, [], delta);
+    }
+    if (this.elapsedMs >= NORMAL_BOMB_REVIEW_MS) {
+      this.renderer.setFrameCallback(() => {});
+      const snapshot = this.renderer.getSnapshot();
+      invariant(snapshot.mutationActivation === null, 'Normal Bomb activation survived the review hold.');
+      invariant(snapshot.mutationActiveParticleCount === 0, 'Normal Bomb particles survived the review hold.');
+      this.activeCandidate = null;
+    }
     this.onFrame();
   }
 
@@ -158,12 +181,16 @@ export class NormalBombRendererSession {
     return {
       ready: this.renderer !== null,
       reducedMotion: this.reducedMotion,
-      elapsedMs: this.elapsedMs,
+      elapsedMs: Math.min(this.elapsedMs, NORMAL_BOMB_DURATION_MS),
+      reviewElapsedMs: this.elapsedMs,
       impactMs: NORMAL_BOMB_IMPACT_MS,
       durationMs: NORMAL_BOMB_DURATION_MS,
       activeCandidate: this.activeCandidate,
       canvasCount: this.host.querySelectorAll('canvas').length,
       activeParticles: snapshot?.mutationActiveParticleCount ?? 0,
+      cleanupComplete: this.elapsedMs >= NORMAL_BOMB_REVIEW_MS
+        && snapshot?.mutationActivation === null
+        && (snapshot?.mutationActiveParticleCount ?? 0) === 0,
       mutationActivation: snapshot?.mutationActivation ?? null,
     };
   }
