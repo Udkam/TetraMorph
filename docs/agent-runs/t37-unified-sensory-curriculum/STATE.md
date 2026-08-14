@@ -2543,8 +2543,10 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   `P0 0 / P1 0 / P2 0 / P3 0 / GAP 0`. Browser/visual acceptance remains open.
 - The next sole evidence writer owns only
   `docs/evidence/t37/bomb-row-causal-r2/**`, bound to source `8de0cb7`. It captures full
-  `0/219/220/276/332 ms` and reduced `0/49/50/70/90 ms` causal frames plus plan-derived
-  mid/last/completion frames from real Core transitions and the production renderer. It
+  `0/219/220/276/332/500/780/999/1000/2000 ms` and reduced
+  `0/49/50/70/90/150/250/339/340/1340 ms` causal frames from real Core transitions and
+  the production renderer. The actual row-30 projection completes at `1000 ms` full and
+  `340 ms` reduced; earlier larger values were rejected first-run harness assumptions. It
   must fail closed on exact trigger row, symmetric fronts, intact unreached cells, no
   scan/wash/border/all-board particles, completion/no-replay, one Canvas, zero DOM cells,
   zero browser errors, and artifact hashes; rejected old evidence stays untouched.

@@ -83,8 +83,9 @@ one Canvas, and zero browser errors. Existing rejected evidence is never overwri
 After source QA accepts exact source `8de0cb7`, the sole evidence writer owns only the new
 `docs/evidence/t37/bomb-row-causal-r2/**` directory. It binds that SHA and captures a real
 Core hard-drop/settlement chain through the production renderer at full-motion
-`0/219/220/276/332 ms` plus plan-derived mid/last/completion frames, and reduced-motion
-`0/49/50/70/90 ms` plus the same derived endpoints. The old
+`0/219/220/276/332 ms` plus plan-derived `500/780/999/1000/2000 ms` mid,
+last-front, completion-before, completion, and no-replay frames, and reduced-motion
+`0/49/50/70/90 ms` plus `150/250/339/340/1340 ms` equivalents. The old
 `docs/evidence/t37/bomb-presentation-final/**` directory remains rejected and read-only.
 The harness must fail closed on event rows, bidirectional reached-row deltas, intact
 unreached cells, forbidden full-width/whole-board geometry, completion/no-replay, one
