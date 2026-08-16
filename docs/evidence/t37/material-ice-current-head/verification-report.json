@@ -1,0 +1,4055 @@
+{
+  "schema": "tetramorph.t37.material-ice-verification.v2",
+  "generatedAt": "2026-08-16T16:56:11.351Z",
+  "passed": true,
+  "failures": [],
+  "checks": [
+    {
+      "label": "R5B terminal precedes legacy authorization",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "legacy authorization precedes legacy source",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "legacy source precedes correction authorization",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "correction authorization precedes generated input",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "legacy-authorization-to-source exact endpoint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "legacy-authorization-to-source exact linear history",
+      "passed": true,
+      "detail": {
+        "commits": [
+          "bcdfe9a94ba0b59141d09a5654ca56c6de787b5c",
+          "74dfee78eaadaae5dd85b67d461830cae27096c6",
+          "4518c20cfb2e137c1509a71906a2c27dd89cddb7",
+          "0e4b9ba0c2774a48c37e2916c7e7f9b13c859637",
+          "02ddaeef1fc99a50b579726a49fedded106aa0dc",
+          "9023be7ed44e015da9a7d37d02b0464bceef8ecd",
+          "a21ce4808d4b150fbd22947896f67279845159ce",
+          "ee8dcd43b006abae99d7904c6c827b95d15c626f",
+          "f24c4ecb1a78223274177045779ac7b08c7aed3c",
+          "c45b9fa85447f6be3c9211c06ef5c762fc89e9d1",
+          "d05327e3e08faec825b3f86f683bd7e7b8315367",
+          "3ba83a943d7c8fdf6ac534bfc23192ac90dc5855",
+          "c49d0eb9bf4c87ec0c5a0d1e7481a233b861bb41"
+        ],
+        "touched": [
+          "docs/evidence/t37/material-ice-current-head/.gitattributes",
+          "docs/evidence/t37/material-ice-current-head/README.md",
+          "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+          "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+          "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+          "docs/evidence/t37/material-ice-current-head/client-actions.json",
+          "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+          "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+          "docs/evidence/t37/material-ice-current-head/verify.mjs",
+          "docs/evidence/t37/material-ice-current-head/write-manifest.mjs"
+        ],
+        "historyErrors": []
+      }
+    },
+    {
+      "label": "legacy source exact tree",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "legacy-source-to-correction-authorization exact endpoint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "legacy-source-to-correction-authorization exact linear history",
+      "passed": true,
+      "detail": {
+        "commits": [
+          "f9ce885c654056208f595846907642553488dcea"
+        ],
+        "touched": [
+          "docs/CURRENT_TASK.md",
+          "docs/DESIGN.md"
+        ],
+        "historyErrors": []
+      }
+    },
+    {
+      "label": "correction-authorization-to-source exact endpoint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "correction-authorization-to-source exact linear history",
+      "passed": true,
+      "detail": {
+        "commits": [
+          "8da1bb533df51f26e203f72b3b145e88ad97dcc0",
+          "263017d2617668fa53b55965c2278a97aa234d5d",
+          "a461177106cf8aaeacf83b87d4b51cf28af361c8",
+          "f220eb73c23951561498f5c8db15210b1a7b81ea",
+          "894ef498effddd5be4b7f3e82fb78c7523c619b2",
+          "da8ded9c90381d1caee4666ccdeef7736901eb68"
+        ],
+        "touched": [
+          "docs/evidence/t37/material-ice-current-head/README.md",
+          "docs/evidence/t37/material-ice-current-head/bomb-activation.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-clear.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-next.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-settled.png",
+          "docs/evidence/t37/material-ice-current-head/browser-report.json",
+          "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+          "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+          "docs/evidence/t37/material-ice-current-head/client-attestation.json",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/shot-0.png",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/shot-1.png",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/shot-2.png",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/state-0.json",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/state-1.json",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/state-2.json",
+          "docs/evidence/t37/material-ice-current-head/collapse-activation.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-clear.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-next.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-settled.png",
+          "docs/evidence/t37/material-ice-current-head/deep-normal-desktop-freeze.png",
+          "docs/evidence/t37/material-ice-current-head/deep-reduced-mobile-collapse.png",
+          "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+          "docs/evidence/t37/material-ice-current-head/freeze-activation.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-clear.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-next.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-settled.png",
+          "docs/evidence/t37/material-ice-current-head/ice-provenance-audit.json",
+          "docs/evidence/t37/material-ice-current-head/manifest.json",
+          "docs/evidence/t37/material-ice-current-head/material-matrix-audit.json",
+          "docs/evidence/t37/material-ice-current-head/material-semantic-audit.json",
+          "docs/evidence/t37/material-ice-current-head/mineral-normal-portrait-multiplier.png",
+          "docs/evidence/t37/material-ice-current-head/mineral-reduced-mobile-bomb.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-activation.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-clear.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-next.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-settled.png",
+          "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+          "docs/evidence/t37/material-ice-current-head/sunstone-normal-desktop-collapse.png",
+          "docs/evidence/t37/material-ice-current-head/sunstone-reduced-portrait-freeze.png",
+          "docs/evidence/t37/material-ice-current-head/verify.mjs",
+          "docs/evidence/t37/material-ice-current-head/write-manifest.mjs"
+        ],
+        "historyErrors": []
+      }
+    },
+    {
+      "label": "source-to-generated exact endpoint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "source-to-generated exact linear history",
+      "passed": true,
+      "detail": {
+        "commits": [
+          "3a0078a09904d6fa345dad073ac236a1b2b2fb70"
+        ],
+        "touched": [
+          "docs/evidence/t37/material-ice-current-head/bomb-activation.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-clear.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-next.png",
+          "docs/evidence/t37/material-ice-current-head/bomb-settled.png",
+          "docs/evidence/t37/material-ice-current-head/browser-report.json",
+          "docs/evidence/t37/material-ice-current-head/client-attestation.json",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/shot-0.png",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/shot-1.png",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/shot-2.png",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/state-0.json",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/state-1.json",
+          "docs/evidence/t37/material-ice-current-head/client-smoke/state-2.json",
+          "docs/evidence/t37/material-ice-current-head/collapse-activation.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-clear.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-next.png",
+          "docs/evidence/t37/material-ice-current-head/collapse-settled.png",
+          "docs/evidence/t37/material-ice-current-head/deep-normal-desktop-freeze.png",
+          "docs/evidence/t37/material-ice-current-head/deep-reduced-mobile-collapse.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-activation.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-clear.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-next.png",
+          "docs/evidence/t37/material-ice-current-head/freeze-settled.png",
+          "docs/evidence/t37/material-ice-current-head/ice-provenance-audit.json",
+          "docs/evidence/t37/material-ice-current-head/manifest.json",
+          "docs/evidence/t37/material-ice-current-head/material-matrix-audit.json",
+          "docs/evidence/t37/material-ice-current-head/material-semantic-audit.json",
+          "docs/evidence/t37/material-ice-current-head/mineral-normal-portrait-multiplier.png",
+          "docs/evidence/t37/material-ice-current-head/mineral-reduced-mobile-bomb.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-activation.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-active-ghost.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-clear.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-next.png",
+          "docs/evidence/t37/material-ice-current-head/multiplier-settled.png",
+          "docs/evidence/t37/material-ice-current-head/sunstone-normal-desktop-collapse.png",
+          "docs/evidence/t37/material-ice-current-head/sunstone-reduced-portrait-freeze.png"
+        ],
+        "historyErrors": []
+      }
+    },
+    {
+      "label": "source exact tree",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "generated exact tree",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest exact top-level keys",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest schema",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest generatedAt canonical",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest exact provenance envelope",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest runtime input binding matches clean source/product worktree",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest human status open",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest byte contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest path contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest count contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest Stage E anchors",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest Ice contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/.gitattributes: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/.gitattributes: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/.gitattributes: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/README.md: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/README.md: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/README.md: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/product-fixture.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/product-fixture.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/product-fixture.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-client.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-client.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/capture-client.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/client-actions.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/client-actions.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/client-actions.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/write-manifest.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/write-manifest.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/write-manifest.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/verify.mjs: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/verify.mjs: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "docs/evidence/t37/material-ice-current-head/verify.mjs: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "f9ce885c654056208f595846907642553488dcea:docs/DESIGN.md: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "f9ce885c654056208f595846907642553488dcea:docs/DESIGN.md: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "f9ce885c654056208f595846907642553488dcea:docs/DESIGN.md: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "f9ce885c654056208f595846907642553488dcea:docs/CURRENT_TASK.md: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "f9ce885c654056208f595846907642553488dcea:docs/CURRENT_TASK.md: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "f9ce885c654056208f595846907642553488dcea:docs/CURRENT_TASK.md: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze-next.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 42088,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "freeze-active-ghost.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 48569,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "freeze-settled.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 50578,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "freeze-clear.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 46807,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "freeze-activation.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 48577,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "bomb-next.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 40936,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "bomb-active-ghost.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 49740,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "bomb-settled.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 51410,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "bomb-clear.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 48961,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "bomb-activation.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 49976,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "multiplier-next.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 41604,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "multiplier-active-ghost.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 48592,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "multiplier-settled.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 52280,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "multiplier-clear.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 47941,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "multiplier-activation.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 48958,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "collapse-next.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 41948,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "collapse-active-ghost.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 49865,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "collapse-settled.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 51115,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "collapse-clear.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 49003,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "collapse-activation.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 47646,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "deep-normal-desktop-freeze.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 48572,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "deep-reduced-mobile-collapse.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 32596,
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "mineral-normal-portrait-multiplier.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 44929,
+        "width": 1125,
+        "height": 1196
+      }
+    },
+    {
+      "label": "mineral-reduced-mobile-bomb.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 29916,
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "sunstone-normal-desktop-collapse.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 49498,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "label": "sunstone-reduced-portrait-freeze.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 44732,
+        "width": 1125,
+        "height": 1196
+      }
+    },
+    {
+      "label": "material-semantic-audit.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "material-semantic-audit.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "material-semantic-audit.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "material-matrix-audit.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "material-matrix-audit.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "material-matrix-audit.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser-report.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser-report.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser-report.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "ice-provenance-audit.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "ice-provenance-audit.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "ice-provenance-audit.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/shot-0.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 85193,
+        "width": 1248,
+        "height": 632
+      }
+    },
+    {
+      "label": "client-smoke/shot-1.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 47376,
+        "width": 1248,
+        "height": 632
+      }
+    },
+    {
+      "label": "client-smoke/shot-2.png: real PNG dimensions",
+      "passed": true,
+      "detail": {
+        "bytes": 49256,
+        "width": 1248,
+        "height": 632
+      }
+    },
+    {
+      "label": "client-smoke/state-0.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-0.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-0.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-1.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-1.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-1.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-2.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-2.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-2.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-attestation.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-attestation.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-attestation.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "source Git-blob bindings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "contract Git-blob bindings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "product Git-object bindings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "output Git-blob bindings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Stage E ancestor fa3a70e",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Stage E ancestor 581c004",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Stage E ancestor ba3b0e3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Stage E ancestor a184952",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Stage E ancestor 1058dbd",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Stage E ancestor 731bf6f",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Stage E ancestor 8e336fe",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "semantic audit: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "semantic audit: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "semantic audit: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "semantic audit declared green",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "semantic audit exact runtime input binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "semantic four items",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze: exact fixture contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze: five stages",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/next: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/next: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/next: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/next: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/next: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/active-ghost: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/active-ghost: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/active-ghost: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/active-ghost: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/active-ghost: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/settled: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/settled: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/settled: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/settled: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/settled: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/clear: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/clear: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/clear: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/clear: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/clear: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/activation: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/activation: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/activation: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/activation: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/activation: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze: three observation groups",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "freeze/observations-0: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/observations-1: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "freeze/observations-2: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb: exact fixture contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb: five stages",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/next: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/next: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/next: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/next: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/next: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/active-ghost: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/active-ghost: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/active-ghost: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/active-ghost: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/active-ghost: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/settled: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/settled: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/settled: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/settled: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/settled: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/clear: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/clear: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/clear: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/clear: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/clear: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/activation: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/activation: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/activation: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/activation: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/activation: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb: three observation groups",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "bomb/observations-0: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/observations-1: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "bomb/observations-2: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier: exact fixture contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier: five stages",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/next: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/next: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/next: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/next: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/next: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/active-ghost: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/active-ghost: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/active-ghost: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/active-ghost: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/active-ghost: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/settled: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/settled: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/settled: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/settled: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/settled: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/clear: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/clear: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/clear: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/clear: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/clear: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/activation: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/activation: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/activation: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/activation: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/activation: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier: three observation groups",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "multiplier/observations-0: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/observations-1: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "multiplier/observations-2: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse: exact fixture contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse: five stages",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/next: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/next: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/next: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/next: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/next: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/active-ghost: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/active-ghost: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/active-ghost: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/active-ghost: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/active-ghost: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/settled: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/settled: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/settled: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/settled: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/settled: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/clear: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/clear: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/clear: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/clear: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/clear: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/activation: filename",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/activation: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/activation: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/activation: semantic settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/activation: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse: three observation groups",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "collapse/observations-0: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/observations-1: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "collapse/observations-2: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "semantic filename contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "matrix audit: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "matrix audit: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "matrix audit: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "matrix audit declared green",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "matrix audit exact runtime input binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "matrix six cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "matrix exact coverage",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "deep-normal-desktop-freeze: contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "deep-normal-desktop-freeze: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "deep-normal-desktop-freeze: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "deep-normal-desktop-freeze: root state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "deep-normal-desktop-freeze: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "deep-normal-desktop-freeze: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "deep-reduced-mobile-collapse: contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "deep-reduced-mobile-collapse: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "deep-reduced-mobile-collapse: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "deep-reduced-mobile-collapse: root state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "deep-reduced-mobile-collapse: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "deep-reduced-mobile-collapse: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "mineral-normal-portrait-multiplier: contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "mineral-normal-portrait-multiplier: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "mineral-normal-portrait-multiplier: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "mineral-normal-portrait-multiplier: root state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "mineral-normal-portrait-multiplier: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "mineral-normal-portrait-multiplier: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "mineral-reduced-mobile-bomb: contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "mineral-reduced-mobile-bomb: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "mineral-reduced-mobile-bomb: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "mineral-reduced-mobile-bomb: root state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "mineral-reduced-mobile-bomb: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "mineral-reduced-mobile-bomb: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "sunstone-normal-desktop-collapse: contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "sunstone-normal-desktop-collapse: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "sunstone-normal-desktop-collapse: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "sunstone-normal-desktop-collapse: root state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "sunstone-normal-desktop-collapse: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "sunstone-normal-desktop-collapse: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "sunstone-reduced-portrait-freeze: contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "sunstone-reduced-portrait-freeze: screenshot byte binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "sunstone-reduced-portrait-freeze: independent item snapshot semantics",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "sunstone-reduced-portrait-freeze: root state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "sunstone-reduced-portrait-freeze: textState",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "sunstone-reduced-portrait-freeze: zero browser errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "label": "matrix filename contract",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser report: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser report: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser report: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser report declared green",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser audit exact runtime input binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: realProductRoute",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: observationsClean",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: initialOwners",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: initialContextRecordExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: restartOwnersExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: restartCanvasesExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: restartRafsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: restartContextsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: restartListenersExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: preferencesOwnersExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: preferencesCanvasesExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: preferencesRafsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: preferencesContextsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: preferencesListenersExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: exitOwnersClean",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: exitRafsZero",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: exitListenersZero",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: exitContextsClosedExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: reentryOwnersFresh",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: reentryCanvasesExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: reentryRafsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: reentryContextsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: reentryListenersExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrEventWindowExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: uiExitHistoryExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: fullMotionExitPreparationExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: iceHmrMarkerBindingExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrAppTouchExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrProofExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrDelivered",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrOwnersBound",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrCanvasOwnersExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrPreferencesExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrBoardProbesExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrRafBaselineActive",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrRafsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrRafsNotDoubled",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrListenersExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: preHmrContextsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrContextBranchValid",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: hmrContextsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: terminalOwnersClean",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: terminalRafsZero",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: terminalListenersZero",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle: terminalContextsExact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "browser lifecycle proof matches raw tracker data",
+      "passed": true,
+      "detail": {
+        "expected": {
+          "hmr": {
+            "branch": "document-reload",
+            "delivery": "update-fallback-reload",
+            "sequencesValid": true,
+            "epoch": {
+              "before": 1,
+              "after": 2
+            },
+            "counts": {
+              "events": 107,
+              "appNamespaceEvents": 6,
+              "invalidAppNamespaceEvents": 0,
+              "appRequests": 2,
+              "preNavigationAppRequests": 1,
+              "bootstrapAppRequests": 1,
+              "appResponses": 2,
+              "appFinished": 2,
+              "appFailed": 0,
+              "documentRequests": 1,
+              "documentNavigations": 1,
+              "sameDocumentNavigations": 1,
+              "unboundNavigations": 0,
+              "historyCalls": 1,
+              "invalidHistoryCalls": 0,
+              "appUpdateFrames": 1,
+              "fullReloadFrames": 1
+            },
+            "sequence": {
+              "firstUpdate": 116,
+              "firstFullReload": 121,
+              "documentRequest": 122,
+              "navigation": 123
+            },
+            "binding": {
+              "beforeQa": {
+                "epoch": 1,
+                "id": 5
+              },
+              "afterQa": {
+                "epoch": 2,
+                "id": 2
+              },
+              "beforeCanvas": {
+                "epoch": 1,
+                "id": 6
+              },
+              "afterCanvas": {
+                "epoch": 2,
+                "id": 3
+              },
+              "beforeContextEventCursor": 4,
+              "afterContextEventCursor": 1
+            },
+            "sameUrlReload": true,
+            "websocketEndpointsValid": true,
+            "appNamespaceExact": true,
+            "requestIdsUnique": true,
+            "requestIdsMonotonic": true,
+            "appTransfersExact": true,
+            "historyNamespaceExact": true,
+            "documentNavigationBindingExact": true,
+            "cacheBridgeExact": true,
+            "sameDocumentNavigationExact": true,
+            "eventOrderValid": true,
+            "ownerIdentitiesValid": true,
+            "canvasIdentitiesValid": true,
+            "contextsExact": true,
+            "preferencesStable": true,
+            "boardProbesValid": true,
+            "reloadExact": true,
+            "passed": true
+          },
+          "canvasOwners": {
+            "initial": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "restartBefore": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "restartAfter": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "preferences": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "exit": {
+              "canvases": 0
+            },
+            "reentry": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "hmrBaseline": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "hmrAfter": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "terminal": {
+              "canvases": 0
+            }
+          },
+          "activeRafs": {
+            "initial": 2,
+            "restartBefore": 2,
+            "restartAfter": 2,
+            "preferences": 2,
+            "exit": 0,
+            "reentry": 2,
+            "hmrBaseline": 2,
+            "hmrAfter": 2,
+            "terminal": 0
+          },
+          "relevantListeners": {
+            "initial": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "restartBefore": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "restartAfter": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "preferences": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "exit": {},
+            "reentry": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "hmrBaseline": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "hmrAfter": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "terminal": {}
+          },
+          "contexts": {
+            "initial": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "restartBefore": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "restartAfter": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "preferences": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "exit": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              }
+            ],
+            "reentry": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "hmrBaseline": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "hmrAfter": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "terminal": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              }
+            ]
+          },
+          "contextEvents": {
+            "initial": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "restartBefore": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "restartAfter": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "preferences": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "exit": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              }
+            ],
+            "reentry": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              },
+              {
+                "sequence": 4,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                }
+              }
+            ],
+            "hmrBaseline": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              },
+              {
+                "sequence": 4,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                }
+              }
+            ],
+            "hmrAfter": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                }
+              }
+            ],
+            "terminal": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              }
+            ]
+          },
+          "hmrContexts": {
+            "branch": "document-reload",
+            "before": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "after": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "beforeLiveContexts": 1,
+            "afterLiveContexts": 1
+          },
+          "preHmrContexts": {
+            "reentry": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "beforeHmr": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "reentryLiveContexts": 1,
+            "beforeHmrLiveContexts": 1
+          },
+          "terminalContexts": {
+            "afterHmr": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "terminal": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              }
+            ],
+            "afterHmrLiveContexts": 1,
+            "terminalLiveContexts": 0
+          }
+        },
+        "actual": {
+          "hmr": {
+            "branch": "document-reload",
+            "delivery": "update-fallback-reload",
+            "sequencesValid": true,
+            "epoch": {
+              "before": 1,
+              "after": 2
+            },
+            "counts": {
+              "events": 107,
+              "appNamespaceEvents": 6,
+              "invalidAppNamespaceEvents": 0,
+              "appRequests": 2,
+              "preNavigationAppRequests": 1,
+              "bootstrapAppRequests": 1,
+              "appResponses": 2,
+              "appFinished": 2,
+              "appFailed": 0,
+              "documentRequests": 1,
+              "documentNavigations": 1,
+              "sameDocumentNavigations": 1,
+              "unboundNavigations": 0,
+              "historyCalls": 1,
+              "invalidHistoryCalls": 0,
+              "appUpdateFrames": 1,
+              "fullReloadFrames": 1
+            },
+            "sequence": {
+              "firstUpdate": 116,
+              "firstFullReload": 121,
+              "documentRequest": 122,
+              "navigation": 123
+            },
+            "binding": {
+              "beforeQa": {
+                "epoch": 1,
+                "id": 5
+              },
+              "afterQa": {
+                "epoch": 2,
+                "id": 2
+              },
+              "beforeCanvas": {
+                "epoch": 1,
+                "id": 6
+              },
+              "afterCanvas": {
+                "epoch": 2,
+                "id": 3
+              },
+              "beforeContextEventCursor": 4,
+              "afterContextEventCursor": 1
+            },
+            "sameUrlReload": true,
+            "websocketEndpointsValid": true,
+            "appNamespaceExact": true,
+            "requestIdsUnique": true,
+            "requestIdsMonotonic": true,
+            "appTransfersExact": true,
+            "historyNamespaceExact": true,
+            "documentNavigationBindingExact": true,
+            "cacheBridgeExact": true,
+            "sameDocumentNavigationExact": true,
+            "eventOrderValid": true,
+            "ownerIdentitiesValid": true,
+            "canvasIdentitiesValid": true,
+            "contextsExact": true,
+            "preferencesStable": true,
+            "boardProbesValid": true,
+            "reloadExact": true,
+            "passed": true
+          },
+          "canvasOwners": {
+            "initial": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "restartBefore": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "restartAfter": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "preferences": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "exit": {
+              "canvases": 0
+            },
+            "reentry": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "hmrBaseline": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "hmrAfter": {
+              "canvasCount": 1,
+              "canvases": 1
+            },
+            "terminal": {
+              "canvases": 0
+            }
+          },
+          "activeRafs": {
+            "initial": 2,
+            "restartBefore": 2,
+            "restartAfter": 2,
+            "preferences": 2,
+            "exit": 0,
+            "reentry": 2,
+            "hmrBaseline": 2,
+            "hmrAfter": 2,
+            "terminal": 0
+          },
+          "relevantListeners": {
+            "initial": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "restartBefore": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "restartAfter": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "preferences": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "exit": {},
+            "reentry": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "hmrBaseline": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "hmrAfter": {
+              "document:visibilitychange": 1,
+              "window:blur": 1,
+              "window:keydown": 6,
+              "window:keyup": 1
+            },
+            "terminal": {}
+          },
+          "contexts": {
+            "initial": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "restartBefore": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "restartAfter": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "preferences": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "exit": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              }
+            ],
+            "reentry": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "hmrBaseline": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "hmrAfter": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "terminal": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              }
+            ]
+          },
+          "contextEvents": {
+            "initial": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "restartBefore": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "restartAfter": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "preferences": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              }
+            ],
+            "exit": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              }
+            ],
+            "reentry": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              },
+              {
+                "sequence": 4,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                }
+              }
+            ],
+            "hmrBaseline": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              },
+              {
+                "sequence": 4,
+                "kind": "create",
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                }
+              }
+            ],
+            "hmrAfter": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                }
+              }
+            ],
+            "terminal": [
+              {
+                "sequence": 1,
+                "kind": "create",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                }
+              },
+              {
+                "sequence": 2,
+                "kind": "close-call",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "call": 1
+              },
+              {
+                "sequence": 3,
+                "kind": "close-resolve",
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "call": 1,
+                "state": "closed"
+              }
+            ]
+          },
+          "hmrContexts": {
+            "branch": "document-reload",
+            "before": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "after": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "beforeLiveContexts": 1,
+            "afterLiveContexts": 1
+          },
+          "preHmrContexts": {
+            "reentry": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "beforeHmr": [
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              },
+              {
+                "id": {
+                  "epoch": 1,
+                  "id": 4
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "reentryLiveContexts": 1,
+            "beforeHmrLiveContexts": 1
+          },
+          "terminalContexts": {
+            "afterHmr": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": false,
+                "closeCalls": 0,
+                "state": "running"
+              }
+            ],
+            "terminal": [
+              {
+                "id": {
+                  "epoch": 2,
+                  "id": 1
+                },
+                "closed": true,
+                "closeCalls": 1,
+                "state": "closed"
+              }
+            ],
+            "afterHmrLiveContexts": 1,
+            "terminalLiveContexts": 0
+          }
+        }
+      }
+    },
+    {
+      "label": "browser assertions match independent recomputation",
+      "passed": true,
+      "detail": {
+        "expected": {
+          "realProductRoute": true,
+          "observationsClean": true,
+          "initialOwners": true,
+          "initialContextRecordExact": true,
+          "restartOwnersExact": true,
+          "restartCanvasesExact": true,
+          "restartRafsExact": true,
+          "restartContextsExact": true,
+          "restartListenersExact": true,
+          "preferencesOwnersExact": true,
+          "preferencesCanvasesExact": true,
+          "preferencesRafsExact": true,
+          "preferencesContextsExact": true,
+          "preferencesListenersExact": true,
+          "exitOwnersClean": true,
+          "exitRafsZero": true,
+          "exitListenersZero": true,
+          "exitContextsClosedExact": true,
+          "reentryOwnersFresh": true,
+          "reentryCanvasesExact": true,
+          "reentryRafsExact": true,
+          "reentryContextsExact": true,
+          "reentryListenersExact": true,
+          "hmrEventWindowExact": true,
+          "uiExitHistoryExact": true,
+          "fullMotionExitPreparationExact": true,
+          "iceHmrMarkerBindingExact": true,
+          "hmrAppTouchExact": true,
+          "hmrProofExact": true,
+          "hmrDelivered": true,
+          "hmrOwnersBound": true,
+          "hmrCanvasOwnersExact": true,
+          "hmrPreferencesExact": true,
+          "hmrBoardProbesExact": true,
+          "hmrRafBaselineActive": true,
+          "hmrRafsExact": true,
+          "hmrRafsNotDoubled": true,
+          "hmrListenersExact": true,
+          "preHmrContextsExact": true,
+          "hmrContextBranchValid": true,
+          "hmrContextsExact": true,
+          "terminalOwnersClean": true,
+          "terminalRafsZero": true,
+          "terminalListenersZero": true,
+          "terminalContextsExact": true
+        },
+        "actual": {
+          "realProductRoute": true,
+          "observationsClean": true,
+          "initialOwners": true,
+          "initialContextRecordExact": true,
+          "restartOwnersExact": true,
+          "restartCanvasesExact": true,
+          "restartRafsExact": true,
+          "restartContextsExact": true,
+          "restartListenersExact": true,
+          "preferencesOwnersExact": true,
+          "preferencesCanvasesExact": true,
+          "preferencesRafsExact": true,
+          "preferencesContextsExact": true,
+          "preferencesListenersExact": true,
+          "exitOwnersClean": true,
+          "exitRafsZero": true,
+          "exitListenersZero": true,
+          "exitContextsClosedExact": true,
+          "reentryOwnersFresh": true,
+          "reentryCanvasesExact": true,
+          "reentryRafsExact": true,
+          "reentryContextsExact": true,
+          "reentryListenersExact": true,
+          "hmrEventWindowExact": true,
+          "uiExitHistoryExact": true,
+          "fullMotionExitPreparationExact": true,
+          "iceHmrMarkerBindingExact": true,
+          "hmrAppTouchExact": true,
+          "hmrProofExact": true,
+          "hmrDelivered": true,
+          "hmrOwnersBound": true,
+          "hmrCanvasOwnersExact": true,
+          "hmrPreferencesExact": true,
+          "hmrBoardProbesExact": true,
+          "hmrRafBaselineActive": true,
+          "hmrRafsExact": true,
+          "hmrRafsNotDoubled": true,
+          "hmrListenersExact": true,
+          "preHmrContextsExact": true,
+          "hmrContextBranchValid": true,
+          "hmrContextsExact": true,
+          "terminalOwnersClean": true,
+          "terminalRafsZero": true,
+          "terminalListenersZero": true,
+          "terminalContextsExact": true
+        }
+      }
+    },
+    {
+      "label": "Ice provenance: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice provenance: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice provenance: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice provenance declared green",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice provenance exact runtime input binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice raw response strict module-plus-asset classification",
+      "passed": true,
+      "detail": {
+        "expected": {
+          "origin": "http://127.0.0.1:5193",
+          "pathname": "/src/assets/audio/t37/freeze-ice-cubes-hq.ogg",
+          "moduleSearch": "?import&url",
+          "assetSearch": "",
+          "assetBytes": 54564,
+          "assetSha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450"
+        },
+        "counts": {
+          "total": 2,
+          "module": 1,
+          "asset": 1,
+          "invalid": 0
+        },
+        "assetBytesExact": true,
+        "moduleExportExact": true,
+        "entries": [
+          {
+            "index": 0,
+            "sequence": 72,
+            "kind": "module",
+            "checks": {
+              "sequenceOrdered": true,
+              "urlValid": true,
+              "sameOrigin": true,
+              "exactPath": true,
+              "noHash": true,
+              "redirectShape": true,
+              "noRedirect": true,
+              "noBodyError": true,
+              "canonicalBase64": true,
+              "moduleMetadata": true,
+              "moduleExportExact": true,
+              "assetMetadata": false
+            },
+            "body": {
+              "bytes": 505,
+              "sha256": "dcfb4a1f30f6b0781f56eb6bbeae0e0adbeed130df135d6361357f6bf06cc7e2",
+              "moduleExport": "/src/assets/audio/t37/freeze-ice-cubes-hq.ogg"
+            }
+          },
+          {
+            "index": 1,
+            "sequence": 101,
+            "kind": "asset",
+            "checks": {
+              "sequenceOrdered": true,
+              "urlValid": true,
+              "sameOrigin": true,
+              "exactPath": true,
+              "noHash": true,
+              "redirectShape": true,
+              "noRedirect": true,
+              "noBodyError": true,
+              "canonicalBase64": true,
+              "moduleMetadata": false,
+              "moduleExportExact": false,
+              "assetMetadata": true
+            },
+            "body": {
+              "bytes": 54564,
+              "sha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+              "moduleExport": null
+            }
+          }
+        ],
+        "passed": true
+      }
+    },
+    {
+      "label": "Ice persisted classification matches independent raw recomputation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice browser/provenance raw response records identical",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice browser/provenance phase markers identical",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice HMR phase markers bind the unified HMR event window",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice initial events bind every materialized response metadata field",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice response phase classification exact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice full catalog Git identity and runtime descriptor",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice exact heads and runtime origin",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice exact product identity",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice original gap remains open",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "Ice checks non-empty and independently exact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest Ice recomputation summary",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client attestation: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client attestation: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client attestation: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client exact attestation envelope",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client attestation declared green",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client attestation timestamps canonical and ordered",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client attestation exact browser origin",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client exact frozen invocation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client persisted exact start/end runtime inputs",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client persisted exact output bindings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest client attestation summary",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest complete audit summary exact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "manifest timestamp follows canonical audit timestamps",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-0.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-0.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-0.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-0.json: prescribed real product state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-1.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-1.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-1.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-1.json: prescribed real product state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-2.json: no BOM",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-2.json: LF-only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-2.json: final LF",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "client-smoke/state-2.json: prescribed real product state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "label": "worktree exact directory",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "manifestSha256": "9b9556803216eeff17da3158750d76bad6dc2d1aeb85fa68f7da29a465842188",
+  "evidenceSourceHead": "da8ded9c90381d1caee4666ccdeef7736901eb68",
+  "generatedInputHead": "3a0078a09904d6fa345dad073ac236a1b2b2fb70",
+  "r5bTerminalBase": "171181228c0408cfa1bfb1259eb98c29a63efae3",
+  "pathContracts": {
+    "source": [
+      "docs/evidence/t37/material-ice-current-head/.gitattributes",
+      "docs/evidence/t37/material-ice-current-head/README.md",
+      "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+      "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+      "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+      "docs/evidence/t37/material-ice-current-head/client-actions.json",
+      "docs/evidence/t37/material-ice-current-head/write-manifest.mjs",
+      "docs/evidence/t37/material-ice-current-head/verify.mjs"
+    ],
+    "outputs": [
+      "docs/evidence/t37/material-ice-current-head/freeze-next.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-settled.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-clear.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-activation.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-next.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-settled.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-clear.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-activation.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-next.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-settled.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-clear.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-activation.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-next.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-settled.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-clear.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-activation.png",
+      "docs/evidence/t37/material-ice-current-head/deep-normal-desktop-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/deep-reduced-mobile-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-normal-portrait-multiplier.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-reduced-mobile-bomb.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-normal-desktop-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-reduced-portrait-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/material-semantic-audit.json",
+      "docs/evidence/t37/material-ice-current-head/material-matrix-audit.json",
+      "docs/evidence/t37/material-ice-current-head/browser-report.json",
+      "docs/evidence/t37/material-ice-current-head/ice-provenance-audit.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-0.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-1.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-2.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-0.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-1.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-2.json",
+      "docs/evidence/t37/material-ice-current-head/client-attestation.json"
+    ],
+    "preReport": [
+      "docs/evidence/t37/material-ice-current-head/freeze-next.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-settled.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-clear.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-activation.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-next.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-settled.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-clear.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-activation.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-next.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-settled.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-clear.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-activation.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-next.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-settled.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-clear.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-activation.png",
+      "docs/evidence/t37/material-ice-current-head/deep-normal-desktop-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/deep-reduced-mobile-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-normal-portrait-multiplier.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-reduced-mobile-bomb.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-normal-desktop-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-reduced-portrait-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/material-semantic-audit.json",
+      "docs/evidence/t37/material-ice-current-head/material-matrix-audit.json",
+      "docs/evidence/t37/material-ice-current-head/browser-report.json",
+      "docs/evidence/t37/material-ice-current-head/ice-provenance-audit.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-0.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-1.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-2.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-0.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-1.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-2.json",
+      "docs/evidence/t37/material-ice-current-head/client-attestation.json",
+      "docs/evidence/t37/material-ice-current-head/manifest.json"
+    ],
+    "terminal": [
+      "docs/evidence/t37/material-ice-current-head/verification-report.json"
+    ]
+  },
+  "runtimeInput": {
+    "schema": "tetramorph.t37.material-runtime-input.v3",
+    "evidenceSourceHead": "da8ded9c90381d1caee4666ccdeef7736901eb68",
+    "validatedSourceTree": "4737c0450d05cc34c218f13fd98ca2b8123dc091",
+    "executionPolicy": "source HEAD or a verified linear descendant; containing audit binds its actual phase HEAD",
+    "productHead": "171181228c0408cfa1bfb1259eb98c29a63efae3",
+    "statusScope": [
+      ".gitattributes",
+      "docs/evidence/t26/phase-d/mutation-scenarios.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json",
+      "docs/evidence/t37/material-ice-current-head/.gitattributes",
+      "docs/evidence/t37/material-ice-current-head/README.md",
+      "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+      "docs/evidence/t37/material-ice-current-head/client-actions.json",
+      "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+      "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+      "docs/evidence/t37/material-ice-current-head/verify.mjs",
+      "docs/evidence/t37/material-ice-current-head/write-manifest.mjs",
+      "index.html",
+      "package-lock.json",
+      "package.json",
+      "src",
+      "tsconfig.app.json",
+      "tsconfig.json",
+      "tsconfig.node.json",
+      "vite.config.ts"
+    ],
+    "indexAndWorktree": "clean",
+    "sourceBindings": [
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/.gitattributes",
+        "mode": "100644",
+        "gitObject": "94afc642601372e041806b12a5fcea82dac719b7",
+        "sha256": "2525079f24c269e6dd6a3900265327fff74e49440821c798686b1de1590904de",
+        "bytes": 67
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/README.md",
+        "mode": "100644",
+        "gitObject": "e98ebce2ae5783b82556c6dd8af29140f2f74f34",
+        "sha256": "60b300069e6fb7d3404dcbcfa18c4bc7399672b284e64cde38c26f895a41bf1f",
+        "bytes": 10827
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+        "mode": "100644",
+        "gitObject": "9f7511e898734b625f8d2f087a37f2cb370a5437",
+        "sha256": "119ab6575b180ec6e7463c1505f54677a00bbf6d02c238f2df4ede33509a21e2",
+        "bytes": 30159
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+        "mode": "100644",
+        "gitObject": "de84fb5fe9149c890b3ff33b4ee1dc230c29f33b",
+        "sha256": "fa474a6d4081781e5bc3c51e1f9047a211ee607a8055cc8c907eef277580bb4d",
+        "bytes": 30844
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+        "mode": "100644",
+        "gitObject": "5f7b985f02201fe8444cdf937c3161df95f7c17f",
+        "sha256": "2b4c7e3c794630fc4a07080ac8e74625da82774d630ec2975244513b1f5f521f",
+        "bytes": 4832
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+        "mode": "100644",
+        "gitObject": "641b7fafabef233f6eccbfac1a4717278859e198",
+        "sha256": "a180a434678e2ef8500b7721a23aae1178f63e59029adf912fa40612044174f0",
+        "bytes": 3445
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+        "mode": "100644",
+        "gitObject": "97aaa9221ee47fb34fe8d83d2d8486bbedd218ed",
+        "sha256": "ed1b90bedd045b7f84b32e0a8c33a803b05ee5dc63312959bdc1434212e992e6",
+        "bytes": 132798
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+        "mode": "100644",
+        "gitObject": "a64919314828e50d5b6084e2e017ecd0d005b146",
+        "sha256": "1084fa78dc3a456600936d318d41f4968d51cd9f357b5db5100d9b2778d929b7",
+        "bytes": 5226
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/client-actions.json",
+        "mode": "100644",
+        "gitObject": "65616a10e2e9144f33d008b90391432418aa8932",
+        "sha256": "3400e70c3670a4cb8f7c3045b1c21aec007df0542b288877f16daf3b24f37033",
+        "bytes": 215
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/write-manifest.mjs",
+        "mode": "100644",
+        "gitObject": "94262facae9b3ceb365b1b37632afd6be5d243c4",
+        "sha256": "3ed90b2631c281bd0d9de93742b83e67b371af4e828fd250d416ef7bd1872143",
+        "bytes": 134478
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/verify.mjs",
+        "mode": "100644",
+        "gitObject": "645b9d7069e7b16b984d3ab39eec2052baa4b9d9",
+        "sha256": "496edc06e7ebf5565b19e14ab9ed3ca7b5b814c0e64c0ae8c7ce8d28cc02135d",
+        "bytes": 140764
+      }
+    ],
+    "product": {
+      "path": "src",
+      "gitTree": "0ba34e0271faef2543eb73040b480d65c84347d7",
+      "trackedFiles": 126,
+      "cleanObjectDigest": "9b7b6a2083b15478f6e72d08b70fa758d76249e978769777b743141816237b10",
+      "rawByteDigest": "4a34f348ecc3e69c6ec8079205590e1fb507d21bbf6f8b9f99e7adfd6ab4b6ff",
+      "rawForms": {
+        "gitBlob": 99,
+        "canonicalCrlf": 3,
+        "mixedLfCrlf": 24
+      },
+      "externalBindings": [
+        {
+          "path": ".gitattributes",
+          "mode": "100644",
+          "gitObject": "46b0f08dc495ef0a279131df2c312073fb733e2d",
+          "rawForm": "git-blob",
+          "sha256": "c6f0f954d93ecf7ca7527d89c417a81c1de56c85b679b1646676f03eeac6ab7e",
+          "bytes": 472
+        },
+        {
+          "path": "index.html",
+          "mode": "100644",
+          "gitObject": "0ad39d3452606d0ec50fa38a7070579260b88af5",
+          "rawForm": "mixed-lf-crlf",
+          "sha256": "84e562fee68275b480528c3b899a2ca0e01f050c6bccff801c5e946fe93c49f9",
+          "bytes": 3623
+        },
+        {
+          "path": "package.json",
+          "mode": "100644",
+          "gitObject": "c6d4aebd986c5b987f7e996514a7b54e18e7ae9d",
+          "rawForm": "canonical-crlf",
+          "sha256": "5bc1b3ec30f7479c4ae461fea177f5908eb4b228b4cb27e0200fa93d0c9ed71e",
+          "bytes": 833
+        },
+        {
+          "path": "package-lock.json",
+          "mode": "100644",
+          "gitObject": "ded639cfb5d74514f3468991f79e13a89fac103e",
+          "rawForm": "canonical-crlf",
+          "sha256": "9db1ccc985940805ff970fe67fdf7a63068269d394a269633b329bccc8ba3166",
+          "bytes": 87728
+        },
+        {
+          "path": "vite.config.ts",
+          "mode": "100644",
+          "gitObject": "8962b00212b93e081198470d268be1ebe92a85ea",
+          "rawForm": "git-blob",
+          "sha256": "558bf63ff0d83f3cceb80b9f92aa5d07ac1047dee811a4b3e8a39a3fd420ba6c",
+          "bytes": 305
+        },
+        {
+          "path": "tsconfig.json",
+          "mode": "100644",
+          "gitObject": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+          "rawForm": "canonical-crlf",
+          "sha256": "ad28d132ee48d6e23917cf5827cace785d0fc01a44ca68b0dda51cc8c3fd3f52",
+          "bytes": 126
+        },
+        {
+          "path": "tsconfig.app.json",
+          "mode": "100644",
+          "gitObject": "252250ad279132e1b6fc66872e0fe15c9440c2fe",
+          "rawForm": "canonical-crlf",
+          "sha256": "70f818f1b534b098e89fc92c317dd74c96a8bfe099e003557b1e8e87b8e9adb3",
+          "bytes": 633
+        },
+        {
+          "path": "tsconfig.node.json",
+          "mode": "100644",
+          "gitObject": "3950b4b1904b2932389e09ead72fd1324da88a3b",
+          "rawForm": "canonical-crlf",
+          "sha256": "c7627e57032829ebebc7ef7252151281981f8a679385d2cb5a97376ed6d52924",
+          "bytes": 429
+        },
+        {
+          "path": "docs/evidence/t26/phase-d/mutation-scenarios.json",
+          "mode": "100644",
+          "gitObject": "2f5d98294c1c0df845f2b9d77e17b7f44ffe1d3e",
+          "rawForm": "git-blob",
+          "sha256": "0869017d36510da585555afb37c8702a2530d34ac8eb15a97ae3332bb38c37b4",
+          "bytes": 3206
+        },
+        {
+          "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json",
+          "mode": "100644",
+          "gitObject": "11ee5541babff7ae1b66a63aae71699212ed5203",
+          "rawForm": "git-blob",
+          "sha256": "a2629a4d74309aa64c88cb8f4780ae205cfabd970b38c3fa46828ff078951bfb",
+          "bytes": 21137
+        }
+      ]
+    },
+    "environment": {
+      "node": {
+        "locator": "process.execPath",
+        "bytes": 89935872,
+        "sha256": "2ffe3acc0458fdde999f50d11809bbe7c9b7ef204dcf17094e325d26ace101d8",
+        "version": "v24.12.0",
+        "platform": "win32",
+        "arch": "x64"
+      },
+      "git": {
+        "locator": "PATH:git.exe (byte-verified)",
+        "version": "git version 2.51.0.windows.2",
+        "launcher": {
+          "bytes": 46480,
+          "sha256": "ee3d2a38093c3680745a5c973488f5bb78a16f010145d5cdc7470a7395c9e7e8"
+        },
+        "runtime": {
+          "bytes": 4284816,
+          "sha256": "e996432581a70df2e7aaac5db71e3811ec0daa7f93a8ba73fe6db6f9941f4bf9"
+        }
+      },
+      "repositoryModules": {
+        "locator": "repository:node_modules",
+        "files": 9453,
+        "directories": 704,
+        "symlinks": 0,
+        "bytes": 274520862,
+        "sha256": "823bd6ae44ea3e9a2304dae725db6b007bab18e8f7a850efea3320d5d0212a60",
+        "excludedRootEntries": [
+          ".bin",
+          ".cache",
+          ".vite*"
+        ]
+      },
+      "prescribedClient": {
+        "locator": "codex-home:skills/develop-web-game/scripts/web_game_playwright_client.js",
+        "bytes": 9963,
+        "sha256": "e95c3bcbdc0d15eb08fd3a6021283ec32f715b51f1e5847d3db20df526be5996"
+      },
+      "prescribedClientModules": {
+        "locator": "codex-home:skills/develop-web-game/node_modules",
+        "files": 169,
+        "directories": 36,
+        "symlinks": 0,
+        "bytes": 17577700,
+        "sha256": "14a12c88915605fbb3ff6df60e70ad771e189516b262c144433a9ee9a77a32d3",
+        "excludedRootEntries": [
+          ".bin",
+          ".cache",
+          ".vite*"
+        ]
+      },
+      "chromium": {
+        "locator": "playwright:chromium-1228/chrome-win64",
+        "executableLocator": "playwright.chromium.executablePath()",
+        "files": 310,
+        "directories": 9,
+        "symlinks": 0,
+        "bytes": 436026456,
+        "sha256": "fea0ab3c989305aa358a97bd8b32fa37d16115c52baa42629443b7f88c0690d1",
+        "revision": "1228",
+        "version": "149.0.7827.55"
+      },
+      "versions": {
+        "vite": "8.1.4",
+        "playwright": "1.61.1",
+        "prescribedClientPlaywright": "1.61.1"
+      },
+      "processInjection": {
+        "execArgv": [],
+        "restrictedEnvironment": []
+      },
+      "absentRootInputs": [
+        ".env",
+        ".env.local",
+        ".env.development",
+        ".env.development.local",
+        "vite.config.js",
+        "vite.config.mjs",
+        "vite.config.cjs",
+        "vite.config.mts",
+        "vite.config.cts",
+        "postcss.config.js",
+        "postcss.config.mjs",
+        "postcss.config.cjs",
+        "postcss.config.ts",
+        "postcss.config.mts",
+        "postcss.config.cts",
+        ".postcssrc",
+        ".postcssrc.json",
+        ".postcssrc.yaml",
+        ".postcssrc.yml",
+        ".postcssrc.ts",
+        ".postcssrc.cts",
+        ".postcssrc.mts",
+        ".postcssrc.js",
+        ".postcssrc.cjs",
+        ".postcssrc.mjs",
+        "public"
+      ],
+      "absentAncestorInputs": [
+        "repository-ancestor-1:package.json",
+        "repository-ancestor-1:postcss.config.js",
+        "repository-ancestor-1:postcss.config.mjs",
+        "repository-ancestor-1:postcss.config.cjs",
+        "repository-ancestor-1:postcss.config.ts",
+        "repository-ancestor-1:postcss.config.mts",
+        "repository-ancestor-1:postcss.config.cts",
+        "repository-ancestor-1:.postcssrc",
+        "repository-ancestor-1:.postcssrc.json",
+        "repository-ancestor-1:.postcssrc.yaml",
+        "repository-ancestor-1:.postcssrc.yml",
+        "repository-ancestor-1:.postcssrc.ts",
+        "repository-ancestor-1:.postcssrc.cts",
+        "repository-ancestor-1:.postcssrc.mts",
+        "repository-ancestor-1:.postcssrc.js",
+        "repository-ancestor-1:.postcssrc.cjs",
+        "repository-ancestor-1:.postcssrc.mjs",
+        "repository-ancestor-2:package.json",
+        "repository-ancestor-2:postcss.config.js",
+        "repository-ancestor-2:postcss.config.mjs",
+        "repository-ancestor-2:postcss.config.cjs",
+        "repository-ancestor-2:postcss.config.ts",
+        "repository-ancestor-2:postcss.config.mts",
+        "repository-ancestor-2:postcss.config.cts",
+        "repository-ancestor-2:.postcssrc",
+        "repository-ancestor-2:.postcssrc.json",
+        "repository-ancestor-2:.postcssrc.yaml",
+        "repository-ancestor-2:.postcssrc.yml",
+        "repository-ancestor-2:.postcssrc.ts",
+        "repository-ancestor-2:.postcssrc.cts",
+        "repository-ancestor-2:.postcssrc.mts",
+        "repository-ancestor-2:.postcssrc.js",
+        "repository-ancestor-2:.postcssrc.cjs",
+        "repository-ancestor-2:.postcssrc.mjs"
+      ],
+      "viteOptimizerPolicy": {
+        "force": true,
+        "mutableCacheExcludedFromIdentity": true
+      }
+    },
+    "assertions": {
+      "sourceHeadIsExecutionAncestor": true,
+      "sourceObjectsExact": true,
+      "indexMatchesHead": true,
+      "trackedWorktreeMatchesIndex": true,
+      "sourceRawBytesMatchGit": true,
+      "productRawBytesMatchGitOrCanonicalEol": true,
+      "srcTreeMatchesProductHead": true,
+      "noUntrackedOrIgnoredSrc": true,
+      "productRootInputsExact": true,
+      "runtimeEnvironmentExact": true
+    }
+  },
+  "humanStatus": "OPEN / NOT ACCEPTED — final consolidated human review only"
+}
