@@ -714,3 +714,26 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   remain zero. The commit containing this section is the sole final-binding candidate. It must
   receive fresh exact-HEAD/history/blob/command review before one no-write preflight; production
   remains closed until that preflight result and post-state are independently accepted.
+
+### F4E-R5 v5 consumed resource-failure receipt
+
+F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator":{"path":"t37-f4e-endgame-canonical-validate-v5.mjs","bytes":55930,"sha256":"02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A"},"attempt":{"path":"t37-f4e-endgame-canonical-attempt-v5.json","bytes":5209,"sha256":"2A9CA91B23CAA5AB0E03C83B62B9F251F28761C887C2B798AC9943A5EC28A1A8","runId":"9cc9e97fae7c4fc3c1223195"},"candidate":{"path":"t37-f4e-endgame-canonical-candidate-v5.json","present":false},"terminal":{"path":"t37-f4e-endgame-canonical-terminal-v5.json","bytes":6873,"sha256":"EDF1BB238647604DB5965FC68AC78CB001D36957BA9233106BC9AD3ACD9796AB","status":"failed","passed":false,"workerExitCode":134,"signal":null},"outerExitCode":1,"stagingFiles":[],"matchingProcesses":[],"failureClass":"node-default-heap-oom","stderr":{"bytes":1389,"sha256":"2ECC09B0935CEA7DE16F9E60695D0A9936D8C77C51B9C1A11617460879D4F285"},"audit":"P0/P1/P2/P3/GAP=0/0/0/0/0+0/0/0/0/0"}
+
+- The sole production invocation ran from `2026-08-16T18:29:33.473Z` through
+  `2026-08-16T19:06:32.252Z` (`2,218,779 ms`). Its worker was observed closed and reaped,
+  all transport-error fields are null, stdout is empty, and the complete 1,389-byte stderr
+  records V8 allocation failure and `JavaScript heap out of memory` near the default
+  `4,115.1 MB` heap limit.
+- This is a fail-closed resource exhaustion after the exclusive attempt receipt was durably
+  claimed. It permanently consumes v5. The validator, attempt, and terminal remain immutable;
+  candidate absence, zero stage files, and zero matching processes are part of the receipt.
+  V5 must not be rerun, renamed, repaired in place, or presented as an Intro-05 certificate.
+- The failure does not prove the definition unsatisfiable or the supplied seven-lock route
+  non-optimal: the exact traversal never completed and produced no negative certificate.
+- Two fresh independent read-only output audits each report
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0` for this consumed-failure claim. They do not accept product
+  integration.
+- Next action: independently review this THREAD_LOG-only receipt, then author a docs-first
+  successor contract in a fresh v6 namespace. Any v6 attempt must pin its explicit heap
+  execution domain and pass new static reviews, final-HEAD binding, and a no-write preflight;
+  it is a new attempt, never a v5 retry. Intro-05 source remains closed.
