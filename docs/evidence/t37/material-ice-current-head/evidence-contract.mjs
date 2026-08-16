@@ -66,6 +66,11 @@ export const OUTPUT = Object.freeze([
 ]);
 export const PRE_REPORT = Object.freeze([...OUTPUT, 'manifest.json']);
 export const TERMINAL = Object.freeze(['verification-report.json']);
+export const PROOF_RECOVERY = Object.freeze({
+  commit: '894ef498effddd5be4b7f3e82fb78c7523c619b2',
+  parent: 'f220eb73c23951561498f5c8db15210b1a7b81ea',
+  deletedPaths: Object.freeze(PRE_REPORT.map((path) => `${prefix}${path}`)),
+});
 export const CONTRACT = Object.freeze(['docs/DESIGN.md', 'docs/CURRENT_TASK.md']);
 export const PRODUCT_BINDINGS = Object.freeze([
   { kind: 'tree', path: 'src' },

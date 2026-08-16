@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import {
   AUTH, BASE, BYTE_CONTRACT, CLIENT, CONTRACT, HUMAN_STATUS, ICE, ITEMS, LEGACY_AUTH,
   LEGACY_SOURCE, LEGACY_SOURCE_HEAD, MATRIX_CASES, MATRIX_PNG, OUTPUT, PRE_REPORT,
-  PRODUCT_BINDINGS, PROFILE, SEMANTIC_PNG, SOURCE, SOURCE_DELTA, STAGES, SEEDS,
+  PRODUCT_BINDINGS, PROFILE, PROOF_RECOVERY, SEMANTIC_PNG, SOURCE, SOURCE_DELTA, STAGES, SEEDS,
   STAGE_E_ANCHORS, TERMINAL, assertRuntimeInputBinding, prefix, runGitBytes, runGitText, root,
 } from './evidence-contract.mjs';
 import { assertItemSnapshot } from './product-fixture.mjs';
@@ -35,6 +35,7 @@ const legacySourcePaths = LEGACY_SOURCE.map((path) => prefix + path);
 const sourceDeltaPaths = SOURCE_DELTA.map((path) => prefix + path);
 const outputPaths = OUTPUT.map((path) => prefix + path);
 const preReportPaths = PRE_REPORT.map((path) => prefix + path);
+const sourceHistoryPaths = [...sourceDeltaPaths, ...preReportPaths];
 const terminalPaths = TERMINAL.map((path) => prefix + path);
 
 /** @param {Buffer} bytes @param {string} label */
@@ -82,6 +83,7 @@ function linearHistory(from, to, allowed, label) {
   const commits = git('rev-list', '--reverse', '--ancestry-path', `${from}..${to}`).split(/\r?\n/u).filter(Boolean);
   const touched = new Set(); const allowedSet = new Set(allowed); const historyErrors = [];
   let expectedParent = from; let frozenCopyCount = 0;
+  const recoveryDeletes = new Set();
   if (commits.length === 0) historyErrors.push('empty range');
   for (const commit of commits) {
     const parents = git('rev-list', '--parents', '-n', '1', commit).split(/\s+/u);
@@ -113,6 +115,13 @@ function linearHistory(from, to, allowed, label) {
       }
       const path = fields[index++];
       if (!path) { historyErrors.push(`missing path after ${status} in ${commit}`); break; }
+      if (status === 'D' && commit === PROOF_RECOVERY.commit && parents[1] === PROOF_RECOVERY.parent
+        && PROOF_RECOVERY.deletedPaths.includes(path)) {
+        if (recoveryDeletes.has(path) || !allowedSet.has(path)) historyErrors.push(`invalid recovery deletion ${path}`);
+        recoveryDeletes.add(path);
+        touched.add(path);
+        continue;
+      }
       if (status !== 'A' && status !== 'M') historyErrors.push(`forbidden status ${status} ${path}`);
       if (!allowedSet.has(path)) historyErrors.push(`out-of-set path ${commit} ${path}`);
       touched.add(path);
@@ -121,6 +130,8 @@ function linearHistory(from, to, allowed, label) {
   }
   const expectedFrozenCopyCount = commits.includes(FROZEN_C050.commit) ? 1 : 0;
   if (frozenCopyCount !== expectedFrozenCopyCount) historyErrors.push(`frozen C050 count ${frozenCopyCount} != ${expectedFrozenCopyCount}`);
+  const expectedRecoveryDeletes = commits.includes(PROOF_RECOVERY.commit) ? PROOF_RECOVERY.deletedPaths : [];
+  if (!equalSet([...recoveryDeletes], expectedRecoveryDeletes)) historyErrors.push(`recovery deletions ${sorted([...recoveryDeletes]).join(',')}`);
   if (expectedParent !== to) historyErrors.push(`endpoint ${expectedParent} != ${to}`);
   if (!equalSet([...touched], allowed)) historyErrors.push(`touched ${sorted([...touched]).join(',')}`);
   check(historyErrors.length === 0, label, { commits, touched: sorted([...touched]), historyErrors });
@@ -1484,7 +1495,7 @@ check(equalSet(tree(LEGACY_SOURCE_HEAD), legacySourcePaths), 'legacy source exac
 check(equalSet(range(LEGACY_SOURCE_HEAD, AUTH), CONTRACT), 'legacy-source-to-correction-authorization exact endpoint');
 const expectedCorrectionCommits = linearHistory(LEGACY_SOURCE_HEAD, AUTH, CONTRACT, 'legacy-source-to-correction-authorization exact linear history');
 check(equalSet(range(AUTH, sourceHead), sourceDeltaPaths), 'correction-authorization-to-source exact endpoint');
-const expectedSourceCommits = linearHistory(AUTH, sourceHead, sourceDeltaPaths, 'correction-authorization-to-source exact linear history');
+const expectedSourceCommits = linearHistory(AUTH, sourceHead, sourceHistoryPaths, 'correction-authorization-to-source exact linear history');
 check(equalSet(range(sourceHead, generated), preReportPaths), 'source-to-generated exact endpoint');
 linearHistory(sourceHead, generated, preReportPaths, 'source-to-generated exact linear history');
 check(equalSet(tree(sourceHead), sourcePaths), 'source exact tree');

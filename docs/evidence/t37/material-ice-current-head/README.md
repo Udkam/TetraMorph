@@ -8,6 +8,14 @@ terminal head `171181228c0408cfa1bfb1259eb98c29a63efae3`. It uses the real produ
 real Mutation route, public DEV QA surface, current renderer, and current audio catalog.
 Historical material PNGs and audits are never copied or read by these scripts.
 
+The first current-HEAD pre-report commit `f220eb73c23951561498f5c8db15210b1a7b81ea`
+exposed Node's default 1 MiB synchronous child-process buffer while the terminal verifier
+read the committed multi-megabyte audits. Recovery commit
+`894ef498effddd5be4b7f3e82fb78c7523c619b2` therefore removed exactly those 38
+pre-report paths and raised the Git-output ceiling to 64 MiB. The manifest and terminal
+verifier recognize only that exact parent/commit/path deletion envelope; the final proof is
+regenerated from the later source-only head and does not reuse the removed outputs.
+
 The browser contract keeps representation and lifecycle boundaries explicit. An App
 mtime touch requires byte-for-byte identical checkout content, fatal UTF-8 decoding,
 CRLF-to-LF canonical bytes equal to the frozen Git blob, and clean-filter object identity;

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import {
   AUTH, BASE, BYTE_CONTRACT, CLIENT, CONTRACT, HUMAN_STATUS, ICE, ITEMS, MATRIX_CASES, OUTPUT,
   LEGACY_AUTH, LEGACY_SOURCE, LEGACY_SOURCE_HEAD, PRE_REPORT, PRODUCT_BINDINGS, PROFILE,
-  SEEDS, SOURCE, SOURCE_DELTA, STAGES, STAGE_E_ANCHORS, TERMINAL, assertRuntimeInputBinding,
+  PROOF_RECOVERY, SEEDS, SOURCE, SOURCE_DELTA, STAGES, STAGE_E_ANCHORS, TERMINAL, assertRuntimeInputBinding,
   prefix, runGitBytes, runGitText, root,
 } from './evidence-contract.mjs';
 import { assertItemSnapshot } from './product-fixture.mjs';
@@ -29,6 +29,7 @@ const legacySourcePaths = LEGACY_SOURCE.map((path) => prefix + path);
 const sourceDeltaPaths = SOURCE_DELTA.map((path) => prefix + path);
 const outputPaths = OUTPUT.map((path) => prefix + path);
 const preReportPaths = PRE_REPORT.map((path) => prefix + path);
+const sourceHistoryPaths = [...sourceDeltaPaths, ...preReportPaths];
 const terminalPaths = TERMINAL.map((path) => prefix + path);
 
 /** @param {Buffer} bytes @param {string} label */
@@ -89,6 +90,7 @@ function linearHistory(from, to, allowed, label) {
   const touched = new Set();
   let expectedParent = from;
   let frozenCopyCount = 0;
+  const recoveryDeletes = new Set();
   const allowedSet = new Set(allowed);
   for (const commit of commits) {
     const line = git('rev-list', '--parents', '-n', '1', commit).split(/\s+/u);
@@ -114,6 +116,13 @@ function linearHistory(from, to, allowed, label) {
       }
       const path = fields[index++];
       if (!path) throw new Error(`${label}: missing path after ${status} in ${commit}`);
+      if (status === 'D' && commit === PROOF_RECOVERY.commit && line[1] === PROOF_RECOVERY.parent
+        && PROOF_RECOVERY.deletedPaths.includes(path)) {
+        if (recoveryDeletes.has(path) || !allowedSet.has(path)) throw new Error(`${label}: invalid recovery deletion ${path}`);
+        recoveryDeletes.add(path);
+        touched.add(path);
+        continue;
+      }
       if (status !== 'A' && status !== 'M') throw new Error(`${label}: forbidden status ${status} ${path}`);
       if (!allowedSet.has(path)) throw new Error(`${label}: out-of-set path ${commit} ${path}`);
       touched.add(path);
@@ -122,6 +131,8 @@ function linearHistory(from, to, allowed, label) {
   }
   const expectedFrozenCopyCount = commits.includes(FROZEN_C050.commit) ? 1 : 0;
   if (frozenCopyCount !== expectedFrozenCopyCount) throw new Error(`${label}: frozen C050 count ${frozenCopyCount} != ${expectedFrozenCopyCount}`);
+  const expectedRecoveryDeletes = commits.includes(PROOF_RECOVERY.commit) ? PROOF_RECOVERY.deletedPaths : [];
+  if (!equalSet([...recoveryDeletes], expectedRecoveryDeletes)) throw new Error(`${label}: recovery deletions ${[...recoveryDeletes].join(',')}`);
   if (expectedParent !== to) throw new Error(`${label}: endpoint ${expectedParent} != ${to}`);
   if (!equalSet([...touched], allowed)) throw new Error(`${label}: touched ${[...touched].join(',')}`);
   return commits;
@@ -1511,7 +1522,7 @@ exactTree(LEGACY_SOURCE_HEAD, legacySourcePaths, 'legacy source exact tree');
 exactRange(LEGACY_SOURCE_HEAD, AUTH, CONTRACT, 'legacy-source-to-correction-authorization exact range');
 const correctionCommits = linearHistory(LEGACY_SOURCE_HEAD, AUTH, CONTRACT, 'legacy-source-to-correction-authorization history');
 exactRange(AUTH, head, sourceDeltaPaths, 'correction-authorization-to-source exact range');
-const sourceCommits = linearHistory(AUTH, head, sourceDeltaPaths, 'correction-authorization-to-source history');
+const sourceCommits = linearHistory(AUTH, head, sourceHistoryPaths, 'correction-authorization-to-source history');
 exactTree(head, sourcePaths, 'source exact tree');
 
 const actual = await files(root);
