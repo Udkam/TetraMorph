@@ -363,10 +363,23 @@ function exactRuntimeCatalog(runtime) {
 
 /** @param {any} event */
 function eventUrl(event) { try { return new URL(event?.url); } catch { return null; } }
+const appPathname = '/src/App.tsx';
+const appEventKinds = new Set(['request', 'response', 'requestfinished', 'requestfailed', 'app-response', 'app-requestfinished', 'app-requestfailed']);
+/** @param {any} value @param {string[]} expected */
+function plainExactKeys(value, expected) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value) || Object.getPrototypeOf(value) !== Object.prototype) return false;
+  const keys = Reflect.ownKeys(value);
+  return keys.every((key) => typeof key === 'string') && deepEqual(keys.map(String).sort(), [...expected].sort());
+}
+/** @param {any} event */
+function isAppNamespaceEvent(event) {
+  if (!appEventKinds.has(event?.kind) || typeof event?.url !== 'string') return false;
+  try { return new URL(event.url).pathname === appPathname; } catch { return event.url.includes(appPathname); }
+}
 /** @param {any} event @param {string} expectedOrigin */
-const isAppEvent = (event, expectedOrigin) => ['request', 'app-response', 'app-requestfinished', 'app-requestfailed'].includes(event?.kind)
+const isAppEvent = (event, expectedOrigin) => isAppNamespaceEvent(event) && Number.isInteger(event?.requestId) && event.requestId > 0
   && event?.method === 'GET' && event?.resourceType === 'script' && event?.mainFrame === true && event?.navigationRequest === false
-  && eventUrl(event)?.origin === new URL(expectedOrigin).origin && eventUrl(event)?.pathname === '/src/App.tsx';
+  && eventUrl(event)?.origin === new URL(expectedOrigin).origin && eventUrl(event)?.pathname === appPathname;
 /** @param {any} event @param {string} expectedOrigin */
 const isAppRequest = (event, expectedOrigin) => event?.kind === 'request' && isAppEvent(event, expectedOrigin);
 /** @param {any} event @param {string} expectedOrigin */
@@ -379,6 +392,14 @@ const isAppFinished = (event, expectedOrigin) => event?.kind === 'app-requestfin
 /** @param {any} event @param {string} expectedOrigin */
 const isAppFailed = (event, expectedOrigin) => event?.kind === 'app-requestfailed' && isAppEvent(event, expectedOrigin)
   && typeof event?.errorText === 'string' && event.errorText.length > 0;
+/** @param {any} event @param {string} expectedOrigin */
+function isValidAppNamespaceEvent(event, expectedOrigin) {
+  if (event?.kind === 'request') return isAppRequest(event, expectedOrigin);
+  if (event?.kind === 'app-response') return isAppResponse(event, expectedOrigin);
+  if (event?.kind === 'app-requestfinished') return isAppFinished(event, expectedOrigin);
+  if (event?.kind === 'app-requestfailed') return isAppFailed(event, expectedOrigin);
+  return false;
+}
 /** @param {any} event */
 const isDocumentRequest = (event) => event?.kind === 'request' && event?.method === 'GET' && event?.resourceType === 'document'
   && event?.mainFrame === true && event?.navigationRequest === true;
@@ -405,23 +426,45 @@ function isAppUpdateFrame(event, expectedOrigin) {
 }
 /** @param {any} event @param {string} expectedOrigin */
 const isFullReloadFrame = (event, expectedOrigin) => exactViteWebsocketEndpoint(event, expectedOrigin) && rawWebsocketPayload(event)?.type === 'full-reload';
+/** @param {any} value */
+const finiteNumber = (value) => typeof value === 'number' && Number.isFinite(value);
+/** @param {any} value */
+const positiveInteger = (value) => Number.isInteger(value) && value > 0;
 /** @param {any} snapshotValue */
-const validBoardProbe = (snapshotValue) => snapshotValue?.boardProbe !== null && typeof snapshotValue?.boardProbe === 'object'
-  && !Object.prototype.hasOwnProperty.call(snapshotValue.boardProbe, 'error');
+function validBoardProbe(snapshotValue) {
+  const probe = snapshotValue?.boardProbe;
+  if (!plainExactKeys(probe, ['frame', 'resolution', 'outputPixels', 'pixelProbe'])
+    || !plainExactKeys(probe.frame, ['x', 'y', 'width', 'height'])
+    || !plainExactKeys(probe.outputPixels, ['width', 'height'])
+    || !plainExactKeys(probe.pixelProbe, ['samples', 'nonTransparentSamples', 'distinctBuckets'])) return false;
+  const { frame, resolution, outputPixels, pixelProbe } = probe;
+  return finiteNumber(frame.x) && finiteNumber(frame.y) && finiteNumber(frame.width) && frame.width > 0
+    && finiteNumber(frame.height) && frame.height > 0 && finiteNumber(resolution) && resolution > 0
+    && positiveInteger(outputPixels.width) && positiveInteger(outputPixels.height)
+    && positiveInteger(pixelProbe.samples) && positiveInteger(pixelProbe.nonTransparentSamples)
+    && pixelProbe.nonTransparentSamples <= pixelProbe.samples && positiveInteger(pixelProbe.distinctBuckets)
+    && pixelProbe.distinctBuckets <= pixelProbe.samples;
+}
+/** @param {any} left @param {any} right */
+function sameAppRequestMetadata(left, right) {
+  return ['requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest']
+    .every((field) => deepEqual(left?.[field], right?.[field]));
+}
 /** @param {any} request @param {any[]} responses @param {any[]} finished @param {any[]} failed */
 function appTransfer(request, responses, finished, failed) {
-  const matchingResponses = responses.filter((event) => event.url === request.url);
-  const matchingFinished = finished.filter((event) => event.url === request.url);
-  const matchingFailed = failed.filter((event) => event.url === request.url);
+  const matchingResponses = responses.filter((event) => event.requestId === request.requestId);
+  const matchingFinished = finished.filter((event) => event.requestId === request.requestId);
+  const matchingFailed = failed.filter((event) => event.requestId === request.requestId);
   const response = matchingResponses[0]; const completion = matchingFinished[0];
   return { request, response, finished: completion,
     exact: matchingResponses.length === 1 && matchingFinished.length === 1 && matchingFailed.length === 0
+      && sameAppRequestMetadata(request, response) && sameAppRequestMetadata(request, completion)
       && request.sequence < response?.sequence && response?.sequence < completion?.sequence };
 }
 /** @param {any} event @param {string} expectedOrigin */
 function isRelevantHmrEvent(event, expectedOrigin) {
   const payload = rawWebsocketPayload(event);
-  return isAppEvent(event, expectedOrigin) || isDocumentRequest(event) || (event?.kind === 'navigation' && event?.mainFrame === true)
+  return isAppNamespaceEvent(event) || isDocumentRequest(event) || (event?.kind === 'navigation' && event?.mainFrame === true)
     || payload?.type === 'update' || payload?.type === 'full-reload';
 }
 /** @param {any[]} events @param {any[]} responses @param {number} markerSequence */
@@ -444,10 +487,13 @@ function deriveHmrProof(hmr, expectedOrigin) {
     Number.isInteger(event?.sequence) && event.sequence === markerSequence + index + 1);
   const documentRequests = events.filter(isDocumentRequest);
   const navigations = events.filter((/** @type {any} */ event) => event?.kind === 'navigation' && event?.mainFrame === true);
-  const appRequests = events.filter((/** @type {any} */ event) => isAppRequest(event, expectedOrigin));
-  const appResponses = events.filter((/** @type {any} */ event) => isAppResponse(event, expectedOrigin));
-  const appFinished = events.filter((/** @type {any} */ event) => isAppFinished(event, expectedOrigin));
-  const appFailed = events.filter((/** @type {any} */ event) => isAppFailed(event, expectedOrigin));
+  const appNamespaceEvents = events.filter(isAppNamespaceEvent);
+  const appRequests = appNamespaceEvents.filter((/** @type {any} */ event) => isAppRequest(event, expectedOrigin));
+  const appResponses = appNamespaceEvents.filter((/** @type {any} */ event) => isAppResponse(event, expectedOrigin));
+  const appFinished = appNamespaceEvents.filter((/** @type {any} */ event) => isAppFinished(event, expectedOrigin));
+  const appFailed = appNamespaceEvents.filter((/** @type {any} */ event) => isAppFailed(event, expectedOrigin));
+  const appNamespaceExact = appNamespaceEvents.every((/** @type {any} */ event) => isValidAppNamespaceEvent(event, expectedOrigin))
+    && appNamespaceEvents.length === appRequests.length + appResponses.length + appFinished.length + appFailed.length;
   const updateFrames = events.filter((/** @type {any} */ event) => isAppUpdateFrame(event, expectedOrigin));
   const fullReloadFrames = events.filter((/** @type {any} */ event) => isFullReloadFrame(event, expectedOrigin));
   const hmrFrames = events.filter((/** @type {any} */ event) => ['update', 'full-reload'].includes(rawWebsocketPayload(event)?.type));
@@ -457,7 +503,10 @@ function deriveHmrProof(hmr, expectedOrigin) {
   const preNavigationApps = appRequests.filter((/** @type {any} */ event) => event.sequence < documentSequence);
   const bootstrapApps = appRequests.filter((/** @type {any} */ event) => event.sequence > navigationSequence);
   const transfers = appRequests.map((/** @type {any} */ request) => appTransfer(request, appResponses, appFinished, appFailed));
-  const appTransfersExact = transfers.length > 0 && transfers.every((/** @type {any} */ transfer) => transfer.exact)
+  const requestIdsUnique = new Set(appRequests.map((/** @type {any} */ request) => request.requestId)).size === appRequests.length;
+  const requestIdsMonotonic = appRequests.every((/** @type {any} */ request, /** @type {number} */ index) => index === 0 || appRequests[index - 1].requestId < request.requestId);
+  const appTransfersExact = appNamespaceExact && requestIdsUnique && requestIdsMonotonic && transfers.length > 0
+    && transfers.every((/** @type {any} */ transfer) => transfer.exact)
     && appResponses.length === appRequests.length && appFinished.length === appRequests.length && appFailed.length === 0;
   const beforeEpoch = Number(hmr?.before?.navigation?.epoch); const afterEpoch = Number(hmr?.after?.navigation?.epoch);
   const owner = hmr?.oldOwner ?? {};
@@ -520,7 +569,9 @@ function deriveHmrProof(hmr, expectedOrigin) {
   return {
     branch, delivery, sequencesValid,
     epoch: { before: Number.isInteger(beforeEpoch) ? beforeEpoch : null, after: Number.isInteger(afterEpoch) ? afterEpoch : null },
-    counts: { events: events.length, appRequests: appRequests.length, preNavigationAppRequests: preNavigationApps.length,
+    counts: { events: events.length, appNamespaceEvents: appNamespaceEvents.length,
+      invalidAppNamespaceEvents: appNamespaceEvents.length - appRequests.length - appResponses.length - appFinished.length - appFailed.length,
+      appRequests: appRequests.length, preNavigationAppRequests: preNavigationApps.length,
       bootstrapAppRequests: bootstrapApps.length, appResponses: appResponses.length, appFinished: appFinished.length, appFailed: appFailed.length,
       documentRequests: documentRequests.length, navigations: navigations.length, appUpdateFrames: updateFrames.length, fullReloadFrames: fullReloadFrames.length },
     sequence: { firstUpdate: Number.isFinite(firstUpdate) ? firstUpdate : null, firstFullReload: firstFull,
@@ -528,7 +579,7 @@ function deriveHmrProof(hmr, expectedOrigin) {
     binding: { beforeQa, afterQa, beforeCanvas, afterCanvas,
       beforeContextEventCursor: Number.isInteger(hmr?.before?.tracker?.contextEventCursor) ? hmr.before.tracker.contextEventCursor : null,
       afterContextEventCursor: Number.isInteger(hmr?.after?.tracker?.contextEventCursor) ? hmr.after.tracker.contextEventCursor : null },
-    sameUrlReload, websocketEndpointsValid, appTransfersExact, eventOrderValid, ownerIdentitiesValid, canvasIdentitiesValid,
+    sameUrlReload, websocketEndpointsValid, appNamespaceExact, requestIdsUnique, requestIdsMonotonic, appTransfersExact, eventOrderValid, ownerIdentitiesValid, canvasIdentitiesValid,
     contextsExact, preferencesStable, boardProbesValid, reloadExact, passed,
   };
 }
@@ -656,22 +707,27 @@ function runIndependentContractFixtures() {
     [{ sequence: 1, kind: 'create', id: id(1, 1) }, { sequence: 2, kind: 'close-call', id: id(1, 1), call: 1 },
       { sequence: 3, kind: 'close-resolve', id: id(1, 1), call: 1, state: 'closed' }, { sequence: 4, kind: 'create', id: id(1, 2) }], 11, 21);
   const route = `${normalizedOrigin}/play/mutation`;
+  const validBoardCapture = {
+    frame: { x: 24, y: 16, width: 250, height: 500 }, resolution: 2,
+    outputPixels: { width: 500, height: 1000 },
+    pixelProbe: { samples: 32, nonTransparentSamples: 32, distinctBuckets: 4 },
+  };
   const snap = (/** @type {number} */ epoch, /** @type {any} */ value, type = 'navigate') => ({
     navigation: { epoch, type, url: route }, tracker: value,
     root: { language: 'zh-CN', theme: 'mineral-mist', reducedMotion: 'true' }, canvasCount: 1,
-    boardProbe: { frame: 1, resolution: 1, outputPixels: 4, pixelProbe: { alpha: 255 } },
+    boardProbe: clone(validBoardCapture),
   });
   const wsUrl = `${new URL(normalizedOrigin).protocol === 'https:' ? 'wss:' : 'ws:'}//${new URL(normalizedOrigin).host}/`;
   const update = (sequence = 11) => ({ sequence, kind: 'websocket-frame', direction: 'received', encoding: 'utf8', url: wsUrl,
     body: JSON.stringify({ type: 'update', updates: [{ type: 'js-update', path: '/src/App.tsx', acceptedPath: '/src/App.tsx' }] }) });
   const full = (sequence = 11) => ({ sequence, kind: 'websocket-frame', direction: 'received', encoding: 'utf8', url: wsUrl,
     body: JSON.stringify({ type: 'full-reload', path: '*' }) });
-  const app = (/** @type {number} */ sequence, suffix = '?t=1') => ({ sequence, kind: 'request', url: `${normalizedOrigin}/src/App.tsx${suffix}`,
+  const app = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared') => ({ sequence, kind: 'request', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
     method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false });
-  const response = (/** @type {number} */ sequence, suffix = '?t=1') => ({ sequence, kind: 'app-response', url: `${normalizedOrigin}/src/App.tsx${suffix}`,
+  const response = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared') => ({ sequence, kind: 'app-response', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
     method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, status: 200,
     contentType: 'text/javascript; charset=utf-8', bodyEncoding: 'base64', bodyBase64: Buffer.from('transformed App module').toString('base64') });
-  const finished = (/** @type {number} */ sequence, suffix = '?t=1') => ({ sequence, kind: 'app-requestfinished', url: `${normalizedOrigin}/src/App.tsx${suffix}`,
+  const finished = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared') => ({ sequence, kind: 'app-requestfinished', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
     method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false });
   const doc = (/** @type {number} */ sequence) => ({ sequence, kind: 'request', url: route, method: 'GET', resourceType: 'document', mainFrame: true, navigationRequest: true });
   const nav = (/** @type {number} */ sequence) => ({ sequence, kind: 'navigation', url: route, mainFrame: true });
@@ -688,12 +744,13 @@ function runIndependentContractFixtures() {
   };
   const reload = {
     marker: { eventSequence: 10 },
-    events: [update(11), app(12), response(13), finished(14), full(15), doc(16), nav(17), app(18, ''), response(19, ''), finished(20, '')],
+    events: [update(11), app(12, 101), response(13, 101), finished(14, 101), full(15), doc(16), nav(17),
+      app(18, 102), response(19, 102), finished(20, 102)],
     before, after: snap(2, live(2), 'reload'),
     oldOwner: { ownerPresent: false, sameOwner: false, oldRenderer: 'unavailable', beforeIdentity: id(1, 10), ownerIdentity: null,
       currentIdentity: id(2, 10), probe: { target: null, targetIdentity: null, outcome: 'unavailable' } },
   };
-  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, ''), response(15, ''), finished(16, '')] };
+  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, 102), response(15, 102), finished(16, 102)] };
   for (const [label, value] of [['same owner', same], ['replacement', replacement], ['fallback reload', reload], ['direct reload', direct]]) {
     assertFixture(deriveHmrProof(value, normalizedOrigin).passed, `valid HMR ${label}`);
   }
@@ -717,11 +774,41 @@ function runIndependentContractFixtures() {
     { sequence: 3, kind: 'close-call', id: id(1, 1), call: 1 }, { sequence: 4, kind: 'close-resolve', id: id(1, 1), call: 1, state: 'closed' },
   ];
   const noResponse = clone(reload);
-  noResponse.events = noResponse.events.filter((/** @type {any} */ event) => !(event.kind === 'app-response' && event.url.includes('?t=1')));
+  noResponse.events = noResponse.events.filter((/** @type {any} */ event) => !(event.kind === 'app-response' && event.requestId === 101));
   const failedResponse = clone(reload);
-  failedResponse.events[2] = { ...finished(13), kind: 'app-requestfailed', errorText: 'net::ERR_FAILED' };
+  failedResponse.events[2] = { ...finished(13, 101), kind: 'app-requestfailed', errorText: 'net::ERR_FAILED' };
   const thirdApp = clone(reload);
-  thirdApp.events.push(app(21, '?t=third'), response(22, '?t=third'), finished(23, '?t=third'));
+  thirdApp.events.push(app(21, 103, '?t=third'), response(22, 103, '?t=third'), finished(23, 103, '?t=third'));
+  const duplicateRequestId = clone(reload);
+  duplicateRequestId.events = duplicateRequestId.events.map((/** @type {any} */ event) => event.requestId === 102 ? { ...event, requestId: 101 } : event);
+  const wrongResponseId = clone(reload);
+  wrongResponseId.events[2] = { ...wrongResponseId.events[2], requestId: 999 };
+  const danglingResponse = clone(reload);
+  danglingResponse.events.push(response(21, 999));
+  const extraResponse = clone(reload);
+  extraResponse.events.push(response(21, 101));
+  const invalidOrigin = clone(reload);
+  invalidOrigin.events[1] = { ...invalidOrigin.events[1], url: 'https://invalid.example/src/App.tsx?t=shared' };
+  const invalidMethod = clone(reload);
+  invalidMethod.events[1] = { ...invalidMethod.events[1], method: 'POST' };
+  const invalidResourceType = clone(reload);
+  invalidResourceType.events[2] = { ...invalidResourceType.events[2], resourceType: 'fetch' };
+  const malformedAppUrl = clone(reload);
+  malformedAppUrl.events[1] = { ...malformedAppUrl.events[1], url: 'not-a-url:/src/App.tsx' };
+  const rawResponseKind = clone(reload);
+  rawResponseKind.events[2] = { ...rawResponseKind.events[2], kind: 'response' };
+  /** @param {any} boardProbe */
+  const withBoardProbe = (boardProbe) => {
+    const value = clone(reload);
+    value.before.boardProbe = boardProbe;
+    return value;
+  };
+  const nanBoard = clone(validBoardCapture); nanBoard.frame.width = Number.NaN;
+  const zeroBoard = clone(validBoardCapture); zeroBoard.resolution = 0;
+  const outputZeroBoard = clone(validBoardCapture); outputZeroBoard.outputPixels.width = 0;
+  const fractionalBoard = clone(validBoardCapture); fractionalBoard.pixelProbe.samples = 1.5;
+  const alphaBoundsBoard = clone(validBoardCapture); alphaBoundsBoard.pixelProbe.nonTransparentSamples = 33;
+  const bucketBoundsBoard = clone(validBoardCapture); bucketBoundsBoard.pixelProbe.distinctBuckets = 33;
   /** @type {Array<[string, any]>} */
   const hmrRejects = [
     ['missing owner called retired', { ...clone(same), oldOwner: { ...clone(same.oldOwner), ownerPresent: false, sameOwner: false, oldRenderer: 'retired' } }],
@@ -737,10 +824,20 @@ function runIndependentContractFixtures() {
     ['replacement extra create', extraCreate],
     ['reload zero live', { ...clone(reload), after: snap(2, tracker(2, [], []), 'reload') }],
     ['reload two live', twoLive],
-    ['bad request order', { ...clone(reload), events: [doc(11), nav(12), update(13), app(14), response(15), finished(16), app(17, ''), response(18, ''), finished(19, '')] }],
+    ['bad request order', { ...clone(reload), events: [doc(11), nav(12), update(13), app(14, 101), response(15, 101), finished(16, 101),
+      app(17, 102), response(18, 102), finished(19, 102)] }],
     ['App response missing', noResponse],
     ['App request failed', failedResponse],
     ['third App transfer', thirdApp],
+    ['duplicate App requestId', duplicateRequestId],
+    ['wrong App response requestId', wrongResponseId],
+    ['dangling App response requestId', danglingResponse],
+    ['extra App response', extraResponse],
+    ['App namespace invalid origin', invalidOrigin],
+    ['App namespace invalid method', invalidMethod],
+    ['App namespace invalid resource type', invalidResourceType],
+    ['App namespace malformed raw URL', malformedAppUrl],
+    ['App namespace raw response kind', rawResponseKind],
     ['owner snapshot forged', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), beforeIdentity: id(1, 99) } }],
     ['same renderer failed probe', { ...clone(same), oldOwner: { ...clone(same.oldOwner), oldRenderer: 'invalid',
       probe: { ...clone(same.oldOwner.probe), outcome: 'throws' } } }],
@@ -749,6 +846,17 @@ function runIndependentContractFixtures() {
     ['replacement create before close', createBeforeClose],
     ['cross-origin websocket', { ...clone(reload), events: clone(reload.events).map((/** @type {any} */ event) =>
       event.kind === 'websocket-frame' ? { ...event, url: 'ws://localhost:5193/' } : event) }],
+    ['board probe array', withBoardProbe([])],
+    ['board probe empty', withBoardProbe({})],
+    ['board probe extra key', withBoardProbe({ ...clone(validBoardCapture), extra: true })],
+    ['board probe error key', withBoardProbe({ ...clone(validBoardCapture), error: 'capture failed' })],
+    ['board probe null', withBoardProbe(null)],
+    ['board probe NaN', withBoardProbe(nanBoard)],
+    ['board probe zero resolution', withBoardProbe(zeroBoard)],
+    ['board probe zero output dimension', withBoardProbe(outputZeroBoard)],
+    ['board probe fractional samples', withBoardProbe(fractionalBoard)],
+    ['board probe alpha bounds', withBoardProbe(alphaBoundsBoard)],
+    ['board probe bucket bounds', withBoardProbe(bucketBoundsBoard)],
   ];
   for (const [label, value] of hmrRejects) {
     assertFixture(!deriveHmrProof(value, normalizedOrigin).passed, `reject HMR ${label}`);
@@ -760,6 +868,8 @@ function runIndependentContractFixtures() {
   const exactEvents = [...filler, ...clone(reload.events)];
   assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: windowed }), 'valid HMR eventEnd window');
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, doc(21)] }, hmr: windowed }), 'reject slow late reload after eventEnd');
+  const lateMalformedApp = { ...response(21, 999), url: 'not-a-url:/src/App.tsx' };
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, lateMalformedApp] }, hmr: windowed }), 'reject late malformed App namespace event after eventEnd');
 
   const terminalTracker = tracker(1, [{ id: id(1, 1), closed: true, closeCalls: 1, state: 'closed' }],
     [{ sequence: 1, kind: 'create', id: id(1, 1) }, { sequence: 2, kind: 'close-call', id: id(1, 1), call: 1 },
@@ -789,7 +899,7 @@ function runIndependentContractFixtures() {
   }
   return {
     iceAccepted: 2, iceRejected: iceRejects.length + 2,
-    hmrAccepted: 4, hmrRejected: hmrRejects.length + 2,
+    hmrAccepted: 4, hmrRejected: hmrRejects.length + 3,
     terminalAccepted: 1, terminalRejected: 3,
   };
 }

@@ -29,6 +29,7 @@ export function attachObservers(page, label = 'page') {
   /** @type {any} */
   const observed = { label, consoleErrors: [], pageErrors: [], requestErrors: [], requests: [], events: [] };
   let sequence = 0;
+  let requestSequence = 0;
   let initialIceWindowOpen = true;
   /** @param {string} kind @param {Record<string, any>} detail @returns {Record<string, any>} */
   const record = (kind, detail) => {
@@ -40,12 +41,22 @@ export function attachObservers(page, label = 'page') {
   const isAppUrl = (value) => {
     try { return new URL(value).pathname === '/src/App.tsx'; } catch { return false; }
   };
+  /** @type {WeakMap<import('playwright').Request, number>} */
+  const requestIds = new WeakMap();
+  /** @param {import('playwright').Request} request */
+  const requestId = (request) => {
+    const existing = requestIds.get(request);
+    if (existing !== undefined) return existing;
+    const allocated = ++requestSequence;
+    requestIds.set(request, allocated);
+    return allocated;
+  };
   /** @param {import('playwright').Request} request */
   const requestDetail = (request) => {
     let mainFrame = false;
     try { mainFrame = request.frame() === page.mainFrame(); } catch { mainFrame = false; }
     return {
-      url: request.url(), method: request.method(), resourceType: request.resourceType(),
+      requestId: requestId(request), url: request.url(), method: request.method(), resourceType: request.resourceType(),
       mainFrame, navigationRequest: request.isNavigationRequest(),
     };
   };
@@ -132,7 +143,7 @@ export function attachObservers(page, label = 'page') {
     const redirectedFrom = request.redirectedFrom();
     const captureWindow = initialIceWindowOpen ? 'initial-freeze' : 'hmr';
     const metadata = {
-      url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
+      requestId: requestId(request), url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
       contentType: response.headers()['content-type'] ?? null,
       redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
       captureWindow, bodyEncoding: 'base64', body: null,
