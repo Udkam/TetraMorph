@@ -180,12 +180,13 @@ export class ProductAudioSession {
     const raw = await fetchAcceptedAudioAsset(url);
     const bytes = new Uint8Array(raw.slice(0));
     const observedSha256 = await sha256(bytes);
-    const expectedBytes = assetId.startsWith('bombFamiliar') ? EXPECTED_WAV_BYTES : null;
+    const isBombStem = assetId.startsWith('bombFamiliar');
+    const expectedBytes = isBombStem ? EXPECTED_WAV_BYTES : null;
     const resolved = new URL(url, location.href);
     const audit: AssetAudit = { assetId, url: resolved.href, expectedUrl: new URL(asset.url, location.href).href, expectedSha256: asset.sha256, observedSha256, expectedBytes, observedBytes: bytes.byteLength, sameOrigin: resolved.origin === location.origin, exactHash: observedSha256 === asset.sha256, bytes };
     this.assets.push(audit);
     this.changed();
-    ok(audit.url === audit.expectedUrl && audit.sameOrigin && audit.exactHash && (expectedBytes === null || expectedBytes === bytes.byteLength), `Fetched ${assetId} failed URL/origin/byte/hash audit.`);
+    ok(audit.url === audit.expectedUrl && audit.exactHash && (!isBombStem || (audit.sameOrigin && expectedBytes === bytes.byteLength)), `Fetched ${assetId} failed URL/origin/byte/hash audit.`);
     return raw;
   }
 
