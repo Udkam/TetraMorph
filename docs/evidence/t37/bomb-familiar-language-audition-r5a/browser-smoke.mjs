@@ -137,7 +137,10 @@ const hardDropReference = await state(desktop);
 await desktop.locator('[data-reference="studio"]:not([data-compare])').click();
 await desktop.waitForFunction(() => window.__R5A_TEST__.getState().lastCue?.includes('Studio'));
 const studioReference = await state(desktop);
-check(hardDropReference.audio.currentCue === 'hard-drop' && studioReference.audio.currentCue === 'studio', 'complete reference controls');
+check(hardDropReference.lastCue === '参照 · Action A 硬降'
+  && studioReference.lastCue === '参照 · Studio 完整单行'
+  && studioReference.playCount === hardDropReference.playCount + 1
+  && studioReference.audio.currentCue === 'studio', 'complete reference controls');
 await desktop.locator('#stop-all').click();
 await desktop.locator('.choice-group label').filter({ has: desktop.locator('input[value="B"]') }).click();
 await desktop.locator('.reason-group label').filter({ has: desktop.locator('input[value="not-block-like"]') }).click();
