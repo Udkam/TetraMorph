@@ -3231,3 +3231,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - The preclaim marker now has an anchored canonical schema and strict ancestor/same-validator/
   zero-artifact validation. Validator and all mutable paths remain absent.
 - Next: commit and obtain two all-zero R4 reviews. No gate or proof execution is open.
+
+### F4E-R6B R4 split and R5 preclaim governance correction
+
+- R4 `c40bea9` reviews are all-zero, all-zero, and `0/1/0/0/0`. The sole defect was an
+  impossible claim that a zero-artifact abort could let the same HEAD detect its own reuse.
+- R5 makes one invocation per bound HEAD honest-coordinator governance. Abort evidence must be
+  externally audited and committed before a replacement binding; same-HEAD reuse is forbidden
+  but not technically authenticated.
+- Replacement validators still parse strict-ancestor abort markers and bind the same validator;
+  durable attempt remains the sole global consumption claim. All paths remain absent.
+- Next: commit and obtain two all-zero reviews before authoring.

@@ -10321,3 +10321,12 @@ Validator records only its owned worker; attempt adds `outerPid`, and worker ver
 R4 also freezes the line-anchored preclaim-abort schema and how a replacement HEAD validates
 prior zero-artifact aborts. No v6 path exists. Commit and obtain two fresh all-zero R4 reviews
 before validator authoring.
+
+### F4E-R6B R4 split — R5 governance correction
+
+R4 `c40bea9` receives two all-zero reviews and one `0/1/0/0/0` rejection. A preclaim abort
+deliberately leaves zero artifacts, so validator code cannot technically detect a second call
+on that same HEAD before the later marker exists. R5 labels the per-HEAD single invocation as
+honest-coordinator governance and removes that overclaim; replacement HEADs still parse and
+validate prior abort markers, while durable attempt remains the unique technical consumption
+boundary. Commit and re-review R5 before authoring.

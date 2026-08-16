@@ -857,3 +857,12 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   bounded global scan before/after preflight and production.
 - The preclaim-abort marker now has exact anchored keys and replacement-HEAD validation.
 - Next: commit and independently review R4. Validator and every v6 runtime path remain absent.
+
+### F4E-R6B R4 split verdict and R5 governance candidate
+
+- R4 reviews are `0/0/0/0/0`, `0/0/0/0/0`, and `0/1/0/0/0`. The validator cannot detect
+  reuse of a HEAD after a deliberately zero-artifact preclaim abort.
+- R5 records per-HEAD single invocation as honest-coordinator governance, while retaining
+  audited strict-ancestor abort markers for replacement bindings and durable attempt as the
+  only technical consumption boundary.
+- Next: commit and obtain two all-zero R5 reviews. Authoring/execution remain closed.

@@ -9711,3 +9711,28 @@ The consumption receipt's `matchingProcesses` is the parsed coordinator post-exi
 not validator terminal state. R4 requires a fresh commit and two all-zero reviews. The exact
 encoded payload is frozen in the later command-pin checkpoint alongside validator SHA and HEAD;
 no process gate, validator authoring/mode, Store, or Intro-05 work is open before R4 acceptance.
+
+### F4E-R6B R4 split verdict and R5 honest preclaim governance
+
+R4 `c40bea9` reviews are all-zero, all-zero, and `P0/P1/P2/P3/GAP = 0/1/0/0/0`.
+The sole rejection is correct: a zero-artifact preclaim abort cannot leave a machine-readable
+claim, so the same bound HEAD cannot technically detect a forbidden second invocation before
+the later marker commit. R5 supersedes that one overclaim without widening execution.
+
+The one-production-mode-invocation-per-bound-HEAD rule is an explicit honest-coordinator
+governance constraint, not a validator-enforced authentication property. A preclaim abort
+leaves no v6 artifact and consumes no attempt; the coordinator must stop, retain the external
+command/exit/stream/process-scan evidence, obtain two audits, and commit the anchored abort
+marker before any replacement invocation. Reusing the same HEAD before that checkpoint is a
+governance violation indistinguishable to the validator from a first call.
+
+A later replacement-bound validator parses and canonical-rebuilds every abort marker, proves
+each marker references a strict ancestor and the same validator, and confirms all recorded
+namespace/process facts are zero. It does **not** claim to prove that the referenced historical
+HEAD ran only once, nor can a current HEAD contain a strict-ancestor marker about itself.
+Same-permission invocation/replay/forgery remains within the already frozen excluded threat
+boundary. Durable attempt claim is still globally unique and technically prevents any retry
+after proof authority is consumed.
+
+R5 requires a fresh four-document commit and two all-zero reviews. Validator authoring and all
+execution remain closed until then.
