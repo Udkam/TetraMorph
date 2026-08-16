@@ -141,69 +141,417 @@ const noRelevantListeners = (tracker) => Boolean(tracker?.listenerCounts)
   && Object.values(relevantListeners(tracker)).every((count) => count === 0);
 /** @param {any} tracker */
 const activeRafs = (tracker) => Number.isInteger(tracker?.activeRafs) ? Number(tracker.activeRafs) : -1;
-/** @param {any} tracker @returns {Array<{id: number|null, closed: boolean, closeCalls: number, state: string|null}>|null} */
+/** @param {any} value @returns {{epoch: number, id: number}|null} */
+const identityRecord = (value) => Number.isInteger(value?.epoch) && Number(value.epoch) >= 1 && Number.isInteger(value?.id) && Number(value.id) >= 1
+  ? { epoch: Number(value.epoch), id: Number(value.id) } : null;
+/** @param {any} left @param {any} right */
+const sameIdentity = (left, right) => identityRecord(left) !== null && deepEqual(identityRecord(left), identityRecord(right));
+/** @param {any} left @param {any} right */
+const differentIdentity = (left, right) => identityRecord(left) !== null && identityRecord(right) !== null && !sameIdentity(left, right);
+/** @param {any} tracker @returns {Array<{id: {epoch: number, id: number}|null, closed: boolean, closeCalls: number, state: string|null}>|null} */
 const contextRecords = (tracker) => Array.isArray(tracker?.contexts) ? tracker.contexts.map((/** @type {any} */ entry) => ({
-  id: Number.isInteger(entry?.id) ? Number(entry.id) : null,
+  id: identityRecord(entry?.id),
   closed: entry?.closed === true,
   closeCalls: Number.isInteger(entry?.closeCalls) ? Number(entry.closeCalls) : -1,
   state: typeof entry?.state === 'string' ? entry.state : null,
 })) : null;
+/** @param {any} tracker */
+const contextEvents = (tracker) => Array.isArray(tracker?.contextEvents) ? tracker.contextEvents.map((/** @type {any} */ entry) => ({
+  sequence: Number.isInteger(entry?.sequence) ? Number(entry.sequence) : -1,
+  kind: typeof entry?.kind === 'string' ? entry.kind : null,
+  id: identityRecord(entry?.id),
+  ...(entry?.kind === 'close-call' || entry?.kind === 'close-resolve' || entry?.kind === 'close-reject'
+    ? { call: Number.isInteger(entry?.call) ? Number(entry.call) : -1 } : {}),
+  ...(entry?.kind === 'close-resolve' ? { state: typeof entry?.state === 'string' ? entry.state : null } : {}),
+  ...(entry?.kind === 'close-reject' ? { error: typeof entry?.error === 'string' ? entry.error : null } : {}),
+})) : null;
+/** @param {any} tracker */
+function validContextSnapshot(tracker) {
+  const records = contextRecords(tracker); const events = contextEvents(tracker); const epoch = Number(tracker?.documentEpoch);
+  if (!Number.isInteger(epoch) || epoch < 1 || records === null || events === null
+    || tracker?.contextEventCursor !== events.length || tracker?.liveContexts !== records.filter((entry) => !entry.closed && entry.state !== 'closed').length) return false;
+  const replay = new Map();
+  for (const [index, event] of events.entries()) {
+    if (event.sequence !== index + 1 || event.id === null || event.id.epoch !== epoch) return false;
+    const key = `${event.id.epoch}:${event.id.id}`;
+    if (event.kind === 'create') {
+      if (replay.has(key)) return false;
+      replay.set(key, { closeCalls: 0, closed: false });
+    } else if (event.kind === 'close-call') {
+      const value = replay.get(key);
+      if (!value || value.closed || event.call !== value.closeCalls + 1 || event.call !== 1) return false;
+      value.closeCalls = event.call;
+    } else if (event.kind === 'close-resolve') {
+      const value = replay.get(key);
+      if (!value || value.closed || event.call !== value.closeCalls || event.call !== 1 || event.state !== 'closed') return false;
+      value.closed = true;
+    } else return false;
+  }
+  if (replay.size !== records.length) return false;
+  return records.every((record) => {
+    if (record.id === null || record.id.epoch !== epoch) return false;
+    const value = replay.get(`${record.id.epoch}:${record.id.id}`);
+    return value && value.closeCalls === record.closeCalls && value.closed === record.closed
+      && (record.closed ? record.state === 'closed' : record.state !== null && record.state !== 'closed');
+  });
+}
 /** @param {any} before @param {any} after */
-const sameContextRecords = (before, after) => contextRecords(before) !== null && deepEqual(contextRecords(before), contextRecords(after));
+const sameContextRecords = (before, after) => validContextSnapshot(before) && validContextSnapshot(after)
+  && deepEqual(contextRecords(before), contextRecords(after)) && deepEqual(contextEvents(before), contextEvents(after));
 /** @param {any} reentry @param {any} beforeHmr */
 const exactPreHmrContextContinuity = (reentry, beforeHmr) => reentry?.liveContexts === 1 && beforeHmr?.liveContexts === 1
   && sameContextRecords(reentry, beforeHmr);
 /** @param {any} before @param {any} after */
 function closedContextSuccessors(before, after) {
   const baseline = contextRecords(before); const closed = contextRecords(after);
-  return baseline !== null && closed !== null && closed.length === baseline.length
-    && closed.every((entry, index) => entry.id === baseline[index]?.id && baseline[index]?.closed === false
+  const beforeEvents = contextEvents(before); const afterEvents = contextEvents(after);
+  return validContextSnapshot(before) && validContextSnapshot(after) && baseline !== null && closed !== null
+    && beforeEvents !== null && afterEvents !== null && closed.length === baseline.length
+    && closed.every((entry, index) => sameIdentity(entry.id, baseline[index]?.id) && baseline[index]?.closed === false
       && baseline[index]?.state !== null && baseline[index]?.state !== 'closed' && baseline[index]?.closeCalls === 0
-      && entry.closed && entry.state === 'closed' && entry.closeCalls === 1);
+      && entry.closed && entry.state === 'closed' && entry.closeCalls === 1)
+    && deepEqual(afterEvents.slice(0, beforeEvents.length), beforeEvents)
+    && afterEvents.slice(beforeEvents.length).length === baseline.length * 2
+    && baseline.every((entry) => {
+      const delta = afterEvents.slice(beforeEvents.length).filter((/** @type {any} */ event) => sameIdentity(event.id, entry.id));
+      return delta.length === 2 && delta[0]?.kind === 'close-call' && delta[1]?.kind === 'close-resolve';
+    });
 }
 /** @param {any} before @param {any} after */
 function exactReentryContexts(before, after) {
   const baseline = contextRecords(before); const reentry = contextRecords(after);
-  if (baseline === null || reentry === null || reentry.length !== baseline.length + 1) return false;
-  const oldClosed = reentry.slice(0, baseline.length).every((entry, index) => entry.id === baseline[index]?.id
+  const beforeEvents = contextEvents(before); const afterEvents = contextEvents(after);
+  if (!validContextSnapshot(before) || !validContextSnapshot(after) || baseline === null || reentry === null
+    || beforeEvents === null || afterEvents === null || reentry.length !== baseline.length + 1
+    || !deepEqual(afterEvents.slice(0, beforeEvents.length), beforeEvents)) return false;
+  const oldClosed = reentry.slice(0, baseline.length).every((entry, index) => sameIdentity(entry.id, baseline[index]?.id)
     && baseline[index]?.closed === false && baseline[index]?.state !== null && baseline[index]?.state !== 'closed' && baseline[index]?.closeCalls === 0
     && entry.closed && entry.state === 'closed' && entry.closeCalls === 1);
   const fresh = reentry.at(-1);
-  return oldClosed && fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
-    && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0;
+  const delta = afterEvents.slice(beforeEvents.length);
+  return oldClosed && fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => sameIdentity(id, fresh.id))
+    && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0
+    && delta.length === 3 && delta[0]?.kind === 'close-call' && sameIdentity(delta[0]?.id, baseline.at(-1)?.id)
+    && delta.some((/** @type {any} */ event) => event.kind === 'close-resolve' && sameIdentity(event.id, baseline.at(-1)?.id))
+    && delta.some((/** @type {any} */ event) => event.kind === 'create' && sameIdentity(event.id, fresh.id));
 }
-/** @param {any} oldOwner @returns {'same-owner'|'replacement'|'invalid'} */
-const deriveHmrContextBranch = (oldOwner) => oldOwner?.sameOwner === true && oldOwner?.oldRenderer === 'active' ? 'same-owner'
-  : oldOwner?.sameOwner === false && oldOwner?.oldRenderer === 'retired' ? 'replacement' : 'invalid';
-/** @param {any} before @param {any} after @param {'same-owner'|'replacement'|'invalid'} branch */
+/** @param {any} before @param {any} after @param {'same-owner'|'same-realm-replacement'|'document-reload'|'invalid'} branch */
 function exactHmrContexts(before, after, branch) {
   const baseline = contextRecords(before); const result = contextRecords(after);
-  if (baseline === null || result === null || before?.liveContexts !== 1 || after?.liveContexts !== 1) return false;
-  if (branch === 'same-owner') return deepEqual(baseline, result);
-  if (branch !== 'replacement' || baseline.length < 1 || result.length !== baseline.length + 1) return false;
+  const beforeEvents = contextEvents(before); const afterEvents = contextEvents(after);
+  if (!validContextSnapshot(before) || !validContextSnapshot(after) || baseline === null || result === null
+    || beforeEvents === null || afterEvents === null || before?.liveContexts !== 1 || after?.liveContexts !== 1) return false;
+  if (branch === 'same-owner') return deepEqual(baseline, result) && deepEqual(beforeEvents, afterEvents);
+  if (branch === 'document-reload') {
+    const fresh = result[0];
+    return after.documentEpoch === before.documentEpoch + 1 && baseline.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1
+      && baseline.filter((entry) => entry.closed).every((entry) => entry.closeCalls === 1 && entry.state === 'closed')
+      && result.length === 1 && fresh?.id?.epoch === after.documentEpoch && !fresh.closed && fresh.closeCalls === 0 && fresh.state !== null && fresh.state !== 'closed'
+      && afterEvents.length === 1 && afterEvents[0]?.kind === 'create' && sameIdentity(afterEvents[0]?.id, fresh.id);
+  }
+  if (branch !== 'same-realm-replacement' || baseline.length < 1 || result.length !== baseline.length + 1
+    || !deepEqual(afterEvents.slice(0, beforeEvents.length), beforeEvents)) return false;
   const oldLive = baseline.at(-1); const retired = result[baseline.length - 1]; const fresh = result.at(-1);
   const unchangedPrefix = deepEqual(baseline.slice(0, -1), result.slice(0, baseline.length - 1));
   const baselineLive = oldLive !== undefined && oldLive.id !== null && !oldLive.closed && oldLive.state !== null
     && oldLive.state !== 'closed' && oldLive.closeCalls === 0
     && baseline.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
-  const oldClosed = retired !== undefined && retired.id === oldLive?.id && retired.closed && retired.state === 'closed' && retired.closeCalls === 1;
-  const freshLive = fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
+  const oldClosed = retired !== undefined && sameIdentity(retired.id, oldLive?.id) && retired.closed && retired.state === 'closed' && retired.closeCalls === 1;
+  const freshLive = fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => sameIdentity(id, fresh.id))
     && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0
     && result.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
-  return unchangedPrefix && baselineLive && oldClosed && freshLive;
+  const delta = afterEvents.slice(beforeEvents.length);
+  const deltaExact = delta.length === 3 && delta[0]?.kind === 'close-call' && sameIdentity(delta[0]?.id, oldLive?.id)
+    && delta.filter((/** @type {any} */ event) => event.kind === 'close-resolve' && sameIdentity(event.id, oldLive?.id)).length === 1
+    && delta.filter((/** @type {any} */ event) => event.kind === 'create' && sameIdentity(event.id, fresh?.id)).length === 1;
+  return unchangedPrefix && baselineLive && oldClosed && freshLive && deltaExact;
 }
 /** @param {any} afterHmr @param {any} terminal */
 function exactTerminalContexts(afterHmr, terminal) {
   const baseline = contextRecords(afterHmr); const result = contextRecords(terminal);
-  if (baseline === null || result === null || baseline.length < 1 || result.length !== baseline.length
+  const baselineEvents = contextEvents(afterHmr); const terminalEvents = contextEvents(terminal);
+  if (!validContextSnapshot(afterHmr) || !validContextSnapshot(terminal) || baseline === null || result === null
+    || baselineEvents === null || terminalEvents === null || baseline.length < 1 || result.length !== baseline.length
     || afterHmr?.liveContexts !== 1 || terminal?.liveContexts !== 0) return false;
   const live = baseline.at(-1); const closed = result.at(-1);
   const uniqueLastLive = live !== undefined && live.id !== null && !live.closed && live.state !== null && live.state !== 'closed'
     && live.closeCalls === 0 && baseline.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
-  const exactClose = closed !== undefined && closed.id === live?.id && closed.closed && closed.state === 'closed' && closed.closeCalls === 1;
-  return uniqueLastLive && exactClose && deepEqual(baseline.slice(0, -1), result.slice(0, -1));
+  const exactClose = closed !== undefined && sameIdentity(closed.id, live?.id) && closed.closed && closed.state === 'closed' && closed.closeCalls === 1;
+  const delta = terminalEvents.slice(baselineEvents.length);
+  return uniqueLastLive && exactClose && deepEqual(baseline.slice(0, -1), result.slice(0, -1))
+    && deepEqual(terminalEvents.slice(0, baselineEvents.length), baselineEvents)
+    && delta.length === 2 && delta[0]?.kind === 'close-call' && delta[1]?.kind === 'close-resolve'
+    && sameIdentity(delta[0]?.id, live?.id) && sameIdentity(delta[1]?.id, live?.id);
 }
 
+/** @param {any} value */
+const contentTypeEssence = (value) => typeof value === 'string' ? value.split(';', 1)[0].trim().toLowerCase() : null;
+/** @param {any} value @returns {Buffer|null} */
+function canonicalBase64(value) {
+  if (typeof value !== 'string' || value.length === 0 || value.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/u.test(value)) return null;
+  const bytes = Buffer.from(value, 'base64'); return bytes.toString('base64') === value ? bytes : null;
+}
+/** @param {Buffer|null} bytes @param {string} expectedPath */
+function exactModuleExport(bytes, expectedPath) {
+  if (bytes === null) return null;
+  let source; try { source = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch { return null; }
+  const markers = source.match(/\/\/# sourceMappingURL=data:/gu) ?? [];
+  if (markers.length > 1) return null;
+  if (markers.length === 1) {
+    const map = /(?:\r?\n)?\/\/# sourceMappingURL=data:application\/json(?:;charset=utf-8)?;base64,[A-Za-z0-9+/=]+\s*$/u.exec(source);
+    if (!map) return null; source = source.slice(0, map.index);
+  }
+  const value = source.trim();
+  return value === `export default "${expectedPath}"` || value === `export default '${expectedPath}'` ? expectedPath : null;
+}
+/** @param {any[]} rawResponses @param {string} expectedOrigin */
+function classifyIceResponses(rawResponses, expectedOrigin) {
+  const originValue = new URL(expectedOrigin).origin; const expectedPath = new URL(`/${ICE.path}`, `${originValue}/`).pathname;
+  let previousSequence = 0;
+  const entries = (Array.isArray(rawResponses) ? rawResponses : []).map((raw, index) => {
+    let parsed = null; try { parsed = new URL(raw?.url); } catch { parsed = null; }
+    const bytes = canonicalBase64(raw?.body); const moduleExport = exactModuleExport(bytes, expectedPath);
+    const sequenceOrdered = Number.isInteger(raw?.sequence) && raw.sequence > previousSequence;
+    if (Number.isInteger(raw?.sequence)) previousSequence = raw.sequence;
+    const redirectShape = raw?.redirectedFrom === null || (typeof raw?.redirectedFrom?.url === 'string' && typeof raw?.redirectedFrom?.method === 'string');
+    const noBodyError = !Object.prototype.hasOwnProperty.call(raw ?? {}, 'bodyError');
+    const common = parsed !== null && parsed.origin === originValue && parsed.pathname === expectedPath && parsed.hash === ''
+      && sequenceOrdered && redirectShape && noBodyError && raw?.bodyEncoding === 'base64' && bytes !== null;
+    const moduleMetadata = common && parsed?.search === '?import&url' && raw?.method === 'GET' && raw?.resourceType === 'script'
+      && raw?.status === 200 && raw?.redirectedFrom === null && ['text/javascript', 'application/javascript'].includes(contentTypeEssence(raw?.contentType) ?? '');
+    const assetMetadata = common && parsed?.search === '' && raw?.method === 'GET' && raw?.resourceType === 'fetch'
+      && raw?.status === 200 && raw?.redirectedFrom === null && contentTypeEssence(raw?.contentType) === 'audio/ogg';
+    const kind = moduleMetadata && moduleExport === expectedPath ? 'module' : assetMetadata ? 'asset' : 'invalid';
+    return { index, sequence: Number.isInteger(raw?.sequence) ? raw.sequence : null, kind,
+      checks: { sequenceOrdered, urlValid: parsed !== null, sameOrigin: parsed?.origin === originValue, exactPath: parsed?.pathname === expectedPath,
+        noHash: parsed?.hash === '', redirectShape, noRedirect: raw?.redirectedFrom === null, noBodyError,
+        canonicalBase64: bytes !== null, moduleMetadata, moduleExportExact: moduleExport === expectedPath, assetMetadata },
+      body: { bytes: bytes?.length ?? null, sha256: bytes ? sha(bytes) : null, moduleExport } };
+  });
+  const counts = { total: entries.length, module: entries.filter(({ kind }) => kind === 'module').length,
+    asset: entries.filter(({ kind }) => kind === 'asset').length, invalid: entries.filter(({ kind }) => kind === 'invalid').length };
+  const asset = entries.find(({ kind }) => kind === 'asset'); const moduleEntry = entries.find(({ kind }) => kind === 'module');
+  const assetBytesExact = asset?.body.bytes === ICE.bytes && asset?.body.sha256 === ICE.sha256;
+  const moduleExportExact = moduleEntry?.body.moduleExport === expectedPath;
+  return { expected: { origin: originValue, pathname: expectedPath, moduleSearch: '?import&url', assetSearch: '', assetBytes: ICE.bytes, assetSha256: ICE.sha256 },
+    counts, assetBytesExact, moduleExportExact, entries,
+    passed: counts.total === 2 && counts.module === 1 && counts.asset === 1 && counts.invalid === 0 && assetBytesExact && moduleExportExact };
+}
+
+/** @param {any} runtime */
+function exactRuntimeCatalog(runtime) {
+  const value = { url: `/${ICE.path}`, sha256: ICE.sha256, license: 'CC0-1.0', licenseFile: 'licenses/audio/CC0-1.0.txt', uses: ['freeze-activation'],
+    source: { publisher: ICE.publisher, pageUrl: ICE.pageUrl, soundId: ICE.soundId, author: ICE.author, title: ICE.title,
+      runtimeFileKind: ICE.runtimeFileKind, originalFormat: 'WAV, 1.723 seconds, 96 kHz, 32-bit, stereo' },
+    windowStartSeconds: ICE.windowStartSeconds, windowDurationSeconds: ICE.windowDurationSeconds, gain: ICE.gain,
+    attack: ICE.attackSeconds, release: ICE.releaseSeconds, originalFilename: ICE.originalFilename, originalSha256: null, status: 'pending' };
+  return deepEqual(runtime, { modulePath: '/src/game/audio/audioAssetCatalog.ts',
+    catalogOwnKeys: ['studioProgress', 'studioStart', 'freezeIce', 'bombFamiliarA', 'bombFamiliarB', 'bombFamiliarC'], freezeKeyCount: 1,
+    freezeOwnKeys: ['url', 'sha256', 'license', 'licenseFile', 'uses', 'source', 'windowStartSeconds', 'windowDurationSeconds', 'gain', 'attack', 'release', 'originalFilename', 'originalSha256', 'status'],
+    descriptor: { configurable: true, enumerable: true, writable: true, get: false, set: false, value }, value });
+}
+
+/** @param {any} event */
+function eventUrl(event) { try { return new URL(event?.url); } catch { return null; } }
+/** @param {any} event @param {string} expectedOrigin */
+const isAppRequest = (event, expectedOrigin) => event?.kind === 'request' && event?.method === 'GET' && event?.resourceType === 'script'
+  && event?.mainFrame === true && event?.navigationRequest === false && eventUrl(event)?.origin === new URL(expectedOrigin).origin && eventUrl(event)?.pathname === '/src/App.tsx';
+/** @param {any} event */
+const isDocumentRequest = (event) => event?.kind === 'request' && event?.method === 'GET' && event?.resourceType === 'document'
+  && event?.mainFrame === true && event?.navigationRequest === true;
+/** @param {any} event */
+function websocketPayload(event) {
+  if (event?.kind !== 'websocket-frame' || event?.direction !== 'received' || event?.encoding !== 'utf8' || typeof event?.body !== 'string') return null;
+  try { return JSON.parse(event.body); } catch { return null; }
+}
+/** @param {any} event @param {string} expectedOrigin */
+function isAppUpdateFrame(event, expectedOrigin) {
+  const payload = websocketPayload(event);
+  return payload?.type === 'update' && Array.isArray(payload.updates) && payload.updates.some((/** @type {any} */ update) => update?.type === 'js-update'
+    && [update.path, update.acceptedPath].some((value) => {
+      if (typeof value !== 'string') return false;
+      try { return new URL(value, `${new URL(expectedOrigin).origin}/`).pathname === '/src/App.tsx'; } catch { return false; }
+    }));
+}
+/** @param {any} hmr @param {string} expectedOrigin */
+function deriveHmrProof(hmr, expectedOrigin) {
+  const events = Array.isArray(hmr?.events) ? hmr.events : [];
+  const markerSequence = Number(hmr?.marker?.eventSequence ?? 0);
+  const sequencesValid = events.length > 0 && events.every((/** @type {any} */ event, /** @type {number} */ index) => Number.isInteger(event?.sequence)
+    && event.sequence === markerSequence + index + 1);
+  const documentRequests = events.filter(isDocumentRequest); const navigations = events.filter((/** @type {any} */ event) => event?.kind === 'navigation' && event?.mainFrame === true);
+  const appRequests = events.filter((/** @type {any} */ event) => isAppRequest(event, expectedOrigin)); const updateFrames = events.filter((/** @type {any} */ event) => isAppUpdateFrame(event, expectedOrigin));
+  const fullReloadFrames = events.filter((/** @type {any} */ event) => websocketPayload(event)?.type === 'full-reload');
+  const navigationSequence = navigations[0]?.sequence ?? Number.POSITIVE_INFINITY; const documentSequence = documentRequests[0]?.sequence ?? Number.POSITIVE_INFINITY;
+  const preNavigationApps = appRequests.filter((/** @type {any} */ event) => event.sequence < documentSequence); const bootstrapApps = appRequests.filter((/** @type {any} */ event) => event.sequence > navigationSequence);
+  const beforeEpoch = Number(hmr?.before?.navigation?.epoch); const afterEpoch = Number(hmr?.after?.navigation?.epoch); const owner = hmr?.oldOwner ?? {};
+  let branch = 'invalid';
+  if (sequencesValid && beforeEpoch === afterEpoch && documentRequests.length === 0 && navigations.length === 0) {
+    if (owner.ownerPresent === true && owner.sameOwner === true && owner.oldRenderer === 'active') branch = 'same-owner';
+    else if (owner.ownerPresent === true && owner.sameOwner === false && owner.oldRenderer === 'retired') branch = 'same-realm-replacement';
+  } else if (sequencesValid && afterEpoch === beforeEpoch + 1 && documentRequests.length === 1 && navigations.length === 1
+    && owner.ownerPresent === false && owner.sameOwner === false && owner.oldRenderer === 'unavailable') branch = 'document-reload';
+  let delivery = 'invalid';
+  if (branch === 'same-owner' || branch === 'same-realm-replacement') delivery = 'hot-update';
+  else if (branch === 'document-reload' && preNavigationApps.length > 0) delivery = 'update-fallback-reload';
+  else if (branch === 'document-reload' && preNavigationApps.length === 0 && fullReloadFrames.length > 0) delivery = 'direct-full-reload';
+  const firstUpdate = updateFrames[0]?.sequence ?? Number.POSITIVE_INFINITY; const firstApp = appRequests[0]?.sequence ?? Number.POSITIVE_INFINITY;
+  const firstFull = fullReloadFrames[0]?.sequence ?? null; const firstBootstrap = bootstrapApps[0]?.sequence ?? Number.POSITIVE_INFINITY;
+  const sameUrlReload = documentRequests.length === 1 && navigations.length === 1 && documentRequests[0]?.url === hmr?.before?.navigation?.url
+    && navigations[0]?.url === hmr?.before?.navigation?.url && hmr?.after?.navigation?.url === hmr?.before?.navigation?.url;
+  let eventOrderValid = false;
+  if (delivery === 'hot-update') eventOrderValid = updateFrames.length === 1 && appRequests.length === 1 && fullReloadFrames.length === 0 && firstUpdate < firstApp;
+  else if (delivery === 'update-fallback-reload') eventOrderValid = updateFrames.length === 1 && preNavigationApps.length === 1
+    && bootstrapApps.length === 1 && fullReloadFrames.length <= 1 && firstUpdate < preNavigationApps[0].sequence
+    && preNavigationApps.at(-1).sequence < documentSequence && documentSequence < navigationSequence && navigationSequence < firstBootstrap
+    && (firstFull === null || (preNavigationApps[0].sequence < firstFull && firstFull < documentSequence));
+  else if (delivery === 'direct-full-reload') eventOrderValid = updateFrames.length === 0 && fullReloadFrames.length === 1 && bootstrapApps.length === 1 && firstFull !== null
+    && firstFull < documentSequence && documentSequence < navigationSequence && navigationSequence < firstBootstrap;
+  const ownerIdentitiesValid = branch === 'same-owner' ? sameIdentity(owner.beforeIdentity, owner.ownerIdentity) && sameIdentity(owner.beforeIdentity, owner.currentIdentity)
+    : branch === 'same-realm-replacement' ? sameIdentity(owner.beforeIdentity, owner.ownerIdentity) && differentIdentity(owner.beforeIdentity, owner.currentIdentity)
+      : branch === 'document-reload' ? identityRecord(owner.beforeIdentity)?.epoch === beforeEpoch && identityRecord(owner.currentIdentity)?.epoch === afterEpoch : false;
+  const contextsExact = exactHmrContexts(hmr?.before?.tracker, hmr?.after?.tracker, /** @type {any} */ (branch));
+  const preferencesStable = hmr?.after?.root?.theme === 'mineral-mist' && hmr?.after?.root?.reducedMotion === 'true';
+  const reloadExact = branch !== 'document-reload' || (sameUrlReload && hmr?.after?.navigation?.type === 'reload' && bootstrapApps.length >= 1
+    && hmr?.after?.canvasCount === 1 && hmr?.after?.tracker?.canvases === 1 && activeRafs(hmr?.after?.tracker) === activeRafs(hmr?.before?.tracker)
+    && sameRelevantListeners(hmr?.before?.tracker, hmr?.after?.tracker) && preferencesStable);
+  return { branch, delivery, sequencesValid, epoch: { before: Number.isInteger(beforeEpoch) ? beforeEpoch : null, after: Number.isInteger(afterEpoch) ? afterEpoch : null },
+    counts: { events: events.length, appRequests: appRequests.length, preNavigationAppRequests: preNavigationApps.length, bootstrapAppRequests: bootstrapApps.length,
+      documentRequests: documentRequests.length, navigations: navigations.length, appUpdateFrames: updateFrames.length, fullReloadFrames: fullReloadFrames.length },
+    sequence: { firstUpdate: Number.isFinite(firstUpdate) ? firstUpdate : null, firstApp: Number.isFinite(firstApp) ? firstApp : null, firstFullReload: firstFull,
+      documentRequest: Number.isFinite(documentSequence) ? documentSequence : null, navigation: Number.isFinite(navigationSequence) ? navigationSequence : null,
+      firstBootstrapApp: Number.isFinite(firstBootstrap) ? firstBootstrap : null },
+    sameUrlReload, eventOrderValid, ownerIdentitiesValid, contextsExact, preferencesStable, reloadExact,
+    passed: branch !== 'invalid' && delivery !== 'invalid' && eventOrderValid && ownerIdentitiesValid && contextsExact && reloadExact };
+}
+
+/** @param {any} browser */
+function exactHmrEventWindow(browser) {
+  const all = browser?.observations?.events; const marker = browser?.hmr?.marker;
+  if (!Array.isArray(all) || !Number.isInteger(marker?.eventIndex) || !Number.isInteger(marker?.endEventIndex)
+    || marker.eventIndex < 0 || marker.endEventIndex < marker.eventIndex || marker.endEventIndex > all.length) return false;
+  const beforeSequence = marker.eventIndex === 0 ? 0 : all[marker.eventIndex - 1]?.sequence;
+  const endSequence = marker.endEventIndex === marker.eventIndex ? marker.eventSequence : all[marker.endEventIndex - 1]?.sequence;
+  return all.every((/** @type {any} */ event, /** @type {number} */ index) => event?.sequence === index + 1)
+    && beforeSequence === marker.eventSequence && endSequence === marker.endEventSequence
+    && deepEqual(all.slice(marker.eventIndex, marker.endEventIndex), browser.hmr?.events);
+}
+
+/** @param {any} hmr */
+function exactAppTouch(hmr) {
+  const bytes = blob(BASE, 'src/App.tsx'); const expectedSha = sha(bytes); const touch = hmr?.appTouch;
+  return touch?.path === 'src/App.tsx' && touch.beforeBytes === bytes.length && touch.afterBytes === bytes.length
+    && touch.beforeSha256 === expectedSha && touch.afterSha256 === expectedSha
+    && Number.isFinite(touch.beforeMtimeMs) && Number.isFinite(touch.requestedMtimeMs) && Number.isFinite(touch.afterMtimeMs)
+    && touch.requestedMtimeMs > touch.beforeMtimeMs && touch.afterMtimeMs > touch.beforeMtimeMs;
+}
+
+/** Independent adversarial contract fixtures. */
+function runIndependentContractFixtures() {
+  const fixtureOrigin = 'http://127.0.0.1:5193';
+  const clone = (/** @type {any} */ value) => structuredClone(value);
+  const assertFixture = (/** @type {unknown} */ value, /** @type {string} */ label) => { if (!value) throw new Error(`contract fixture failed: ${label}`); };
+  const assetBytes = blob(BASE, ICE.path); const iceUrl = `${fixtureOrigin}/${ICE.path}`;
+  /** @type {any[]} */
+  const goodIce = [
+    { sequence: 1, url: `${iceUrl}?import&url`, status: 200, method: 'GET', resourceType: 'script', contentType: 'application/javascript',
+      redirectedFrom: null, bodyEncoding: 'base64', body: Buffer.from(`export default "/${ICE.path}"`).toString('base64') },
+    { sequence: 2, url: iceUrl, status: 200, method: 'GET', resourceType: 'fetch', contentType: 'audio/ogg',
+      redirectedFrom: null, bodyEncoding: 'base64', body: assetBytes.toString('base64') },
+  ];
+  assertFixture(classifyIceResponses(goodIce, fixtureOrigin).passed, 'valid Ice pair');
+  const mapped = clone(goodIce); mapped[0].body = Buffer.from(`export default "/${ICE.path}"\n//# sourceMappingURL=data:application/json;base64,e30=`).toString('base64');
+  assertFixture(classifyIceResponses(mapped, fixtureOrigin).passed, 'valid single EOF sourcemap');
+  /** @type {Array<[string, (raw: any[]) => void]>} */
+  const iceRejects = [
+    ['duplicate asset', (raw) => raw.push({ ...clone(raw[1]), sequence: 3 })],
+    ['wrong asset', (raw) => { const bytes = Buffer.from(assetBytes); bytes[0] ^= 0xff; raw[1].body = bytes.toString('base64'); }],
+    ['missing module', (raw) => { raw.shift(); }], ['missing asset', (raw) => { raw.pop(); }],
+    ['duplicate module', (raw) => raw.splice(1, 0, { ...clone(raw[0]), sequence: 2 })],
+    ['query variant', (raw) => { raw[0].url = `${iceUrl}?url&import`; }], ['query extra', (raw) => { raw[0].url += '&x=1'; }],
+    ['bare JS', (raw) => { raw[0].url = iceUrl; }], ['query Ogg', (raw) => { raw[1].url += '?t=1'; }],
+    ['cross origin', (raw) => { raw[1].url = `http://localhost:5193/${ICE.path}`; }],
+    ['wrong path', (raw) => { raw[1].url = `${fixtureOrigin}/wrong/freeze-ice-cubes-hq.ogg`; }],
+    ['non200', (raw) => { raw[1].status = 404; }], ['redirect', (raw) => { raw[1].redirectedFrom = { url: fixtureOrigin, method: 'GET' }; }],
+    ['POST', (raw) => { raw[1].method = 'POST'; }], ['wrong type', (raw) => { raw[1].resourceType = 'media'; }],
+    ['wrong MIME', (raw) => { raw[1].contentType = 'application/octet-stream'; }],
+    ['body error', (raw) => { raw[1].body = null; raw[1].bodyError = 'failed'; }],
+    ['module semicolon', (raw) => { raw[0].body = Buffer.from(`export default "/${ICE.path}";`).toString('base64'); }],
+  ];
+  for (const [label, mutate] of iceRejects) { const raw = clone(goodIce); mutate(raw); assertFixture(!classifyIceResponses(raw, fixtureOrigin).passed, `reject Ice ${label}`); }
+  const forged = clone(classifyIceResponses(goodIce, fixtureOrigin)); forged.entries[0].checks = {};
+  assertFixture(!deepEqual(forged, classifyIceResponses(goodIce, fixtureOrigin)), 'reject forged empty checks');
+
+  const id = (/** @type {number} */ epoch, /** @type {number} */ value) => ({ epoch, id: value });
+  const tracker = (/** @type {number} */ epoch, /** @type {any[]} */ contexts, /** @type {any[]} */ events) => ({
+    documentEpoch: epoch, canvases: 1, activeRafs: 1,
+    listenerCounts: { 'window:keydown': 1, 'window:keyup': 1, 'window:blur': 1, 'document:visibilitychange': 1 },
+    contexts, liveContexts: contexts.filter((entry) => !entry.closed && entry.state !== 'closed').length,
+    contextEventCursor: events.length, contextEvents: events,
+  });
+  const live = (/** @type {number} */ epoch) => tracker(epoch, [{ id: id(epoch, 1), closed: false, closeCalls: 0, state: 'suspended' }],
+    [{ sequence: 1, kind: 'create', id: id(epoch, 1) }]);
+  const replaced = tracker(1, [{ id: id(1, 1), closed: true, closeCalls: 1, state: 'closed' }, { id: id(1, 2), closed: false, closeCalls: 0, state: 'suspended' }],
+    [{ sequence: 1, kind: 'create', id: id(1, 1) }, { sequence: 2, kind: 'close-call', id: id(1, 1), call: 1 },
+      { sequence: 3, kind: 'close-resolve', id: id(1, 1), call: 1, state: 'closed' }, { sequence: 4, kind: 'create', id: id(1, 2) }]);
+  const route = `${fixtureOrigin}/play/mutation`;
+  const snap = (/** @type {number} */ epoch, /** @type {any} */ value, type = 'navigate') => ({
+    navigation: { epoch, type, url: route }, tracker: value, root: { theme: 'mineral-mist', reducedMotion: 'true' }, canvasCount: 1,
+  });
+  const frame = (/** @type {number} */ sequence, type = 'update') => ({ sequence, kind: 'websocket-frame', direction: 'received', encoding: 'utf8', url: 'ws://127.0.0.1:5193',
+    body: JSON.stringify(type === 'update' ? { type, updates: [{ type: 'js-update', path: '/src/App.tsx', acceptedPath: '/src/App.tsx' }] } : { type, path: '*' }) });
+  const app = (/** @type {number} */ sequence, suffix = '?t=1') => ({ sequence, kind: 'request', url: `${fixtureOrigin}/src/App.tsx${suffix}`, method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false });
+  const doc = (/** @type {number} */ sequence) => ({ sequence, kind: 'request', url: route, method: 'GET', resourceType: 'document', mainFrame: true, navigationRequest: true });
+  const nav = (/** @type {number} */ sequence) => ({ sequence, kind: 'navigation', url: route, mainFrame: true });
+  const before = snap(1, live(1));
+  const same = { marker: { eventSequence: 10 }, events: [frame(11), app(12)], before, after: snap(1, live(1)),
+    oldOwner: { ownerPresent: true, sameOwner: true, oldRenderer: 'active', beforeIdentity: id(1, 10), ownerIdentity: id(1, 10), currentIdentity: id(1, 10) } };
+  const replacement = { ...clone(same), after: snap(1, replaced),
+    oldOwner: { ownerPresent: true, sameOwner: false, oldRenderer: 'retired', beforeIdentity: id(1, 10), ownerIdentity: id(1, 10), currentIdentity: id(1, 11) } };
+  const reload = { marker: { eventSequence: 10 }, events: [frame(11), app(12), doc(13), nav(14), app(15, '')], before, after: snap(2, live(2), 'reload'),
+    oldOwner: { ownerPresent: false, sameOwner: false, oldRenderer: 'unavailable', beforeIdentity: id(1, 10), ownerIdentity: null, currentIdentity: id(2, 10) } };
+  const direct = { ...clone(reload), events: [frame(11, 'full-reload'), doc(12), nav(13), app(14, '')] };
+  for (const [label, value] of [['same', same], ['replacement', replacement], ['reload', reload], ['direct', direct]]) {
+    assertFixture(deriveHmrProof(value, fixtureOrigin).passed, `valid HMR ${label}`);
+  }
+  const doubleClose = clone(replacement);
+  doubleClose.after.tracker.contexts[0].closeCalls = 2;
+  doubleClose.after.tracker.contextEvents.splice(2, 0, { sequence: 3, kind: 'close-call', id: id(1, 1), call: 2 });
+  doubleClose.after.tracker.contextEvents[3].sequence = 4; doubleClose.after.tracker.contextEvents[4].sequence = 5; doubleClose.after.tracker.contextEventCursor = 5;
+  const extraCreate = clone(replacement);
+  extraCreate.after.tracker.contexts.push({ id: id(1, 3), closed: false, closeCalls: 0, state: 'suspended' });
+  extraCreate.after.tracker.contextEvents.push({ sequence: 5, kind: 'create', id: id(1, 3) }); extraCreate.after.tracker.contextEventCursor = 5; extraCreate.after.tracker.liveContexts = 2;
+  /** @type {Array<[string, any]>} */
+  const rejects = [
+    ['missing as retired', { ...clone(same), oldOwner: { ...clone(same.oldOwner), ownerPresent: false, sameOwner: false, oldRenderer: 'retired' } }],
+    ['same epoch nav', { ...clone(reload), after: snap(1, live(1), 'reload') }],
+    ['epoch no nav', { ...clone(same), after: snap(2, live(2), 'reload'), oldOwner: clone(reload.oldOwner) }],
+    ['multiple nav', { ...clone(reload), events: [...clone(reload.events), doc(16), nav(17)] }],
+    ['wrong path', { ...clone(reload), events: clone(reload.events).map((/** @type {any} */ event) => event.sequence === 13 ? { ...event, url: fixtureOrigin + '/wrong' } : event) }],
+    ['non-document nav', { ...clone(reload), events: clone(reload.events).map((/** @type {any} */ event) => event.sequence === 13 ? { ...event, resourceType: 'fetch', navigationRequest: false } : event) }],
+    ['cross epoch bare id', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), currentIdentity: id(1, 10) } }],
+    ['same owner context mutation', { ...clone(same), after: snap(1, replaced) }],
+    ['replacement no close', { ...clone(replacement), after: snap(1, live(1)) }],
+    ['replacement double close', doubleClose], ['replacement extra create', extraCreate],
+    ['reload zero live', { ...clone(reload), after: snap(2, tracker(2, [], []), 'reload') }],
+    ['reload two live', { ...clone(reload), after: snap(2, tracker(2,
+      [{ id: id(2, 1), closed: false, closeCalls: 0, state: 'suspended' }, { id: id(2, 2), closed: false, closeCalls: 0, state: 'suspended' }],
+      [{ sequence: 1, kind: 'create', id: id(2, 1) }, { sequence: 2, kind: 'create', id: id(2, 2) }]), 'reload') }],
+    ['bad order', { ...clone(reload), events: [doc(11), nav(12), frame(13), app(14), app(15, '')] }],
+  ];
+  for (const [label, value] of rejects) assertFixture(!deriveHmrProof(value, fixtureOrigin).passed, `reject HMR ${label}`);
+  const terminal = tracker(1, [{ id: id(1, 1), closed: true, closeCalls: 1, state: 'closed' }],
+    [{ sequence: 1, kind: 'create', id: id(1, 1) }, { sequence: 2, kind: 'close-call', id: id(1, 1), call: 1 },
+      { sequence: 3, kind: 'close-resolve', id: id(1, 1), call: 1, state: 'closed' }]);
+  assertFixture(exactTerminalContexts(live(1), terminal), 'valid terminal');
+  terminal.contexts[0].closeCalls = 0; assertFixture(!exactTerminalContexts(live(1), terminal), 'reject imprecise terminal');
+  return { iceAccepted: 2, iceRejected: iceRejects.length + 1, hmrAccepted: 4, hmrRejected: rejects.length + 1 };
+}
+
+if (process.argv.includes('--self-test')) {
+  console.log(JSON.stringify({ passed: true, ...runIndependentContractFixtures() }));
+  process.exit(0);
+}
 /** @param {any} value @param {string} label @param {string[]} errors */
 function assertTextState(value, label, errors) {
   if (typeof value?.textState !== 'string') { errors.push(`${label}: missing textState`); return; }
@@ -277,8 +625,10 @@ async function matrixProofErrors(audit) {
 
 /** @param {any} browser */
 function browserLifecycleProof(browser) {
-  const hmrContextBranch = deriveHmrContextBranch(browser.hmr?.oldOwner);
+  const hmrProof = deriveHmrProof(browser.hmr, String(browser.origin));
+  const hmrContextBranch = /** @type {'same-owner'|'same-realm-replacement'|'document-reload'|'invalid'} */ (hmrProof.branch);
   return {
+    hmr: hmrProof,
     canvasOwners: {
       initial: { canvasCount: browser.initial?.canvasCount, canvases: browser.initial?.tracker?.canvases },
       restartBefore: { canvasCount: browser.restarted?.before?.canvasCount, canvases: browser.restarted?.before?.canvases },
@@ -305,6 +655,11 @@ function browserLifecycleProof(browser) {
       preferences: contextRecords(browser.changedPreferences?.tracker), exit: contextRecords(browser.exited?.tracker), reentry: contextRecords(browser.reentered?.tracker),
       hmrBaseline: contextRecords(browser.hmr?.before?.tracker), hmrAfter: contextRecords(browser.hmr?.after?.tracker), terminal: contextRecords(browser.terminal),
     },
+    contextEvents: {
+      initial: contextEvents(browser.initial?.tracker), restartBefore: contextEvents(browser.restarted?.before), restartAfter: contextEvents(browser.restarted?.after),
+      preferences: contextEvents(browser.changedPreferences?.tracker), exit: contextEvents(browser.exited?.tracker), reentry: contextEvents(browser.reentered?.tracker),
+      hmrBaseline: contextEvents(browser.hmr?.before?.tracker), hmrAfter: contextEvents(browser.hmr?.after?.tracker), terminal: contextEvents(browser.terminal),
+    },
     hmrContexts: {
       branch: hmrContextBranch, before: contextRecords(browser.hmr?.before?.tracker), after: contextRecords(browser.hmr?.after?.tracker),
       beforeLiveContexts: browser.hmr?.before?.tracker?.liveContexts, afterLiveContexts: browser.hmr?.after?.tracker?.liveContexts,
@@ -323,7 +678,8 @@ function browserLifecycleProof(browser) {
 /** @param {any} browser */
 function browserLifecycleAssertions(browser) {
   const observations = browser.observations ?? {};
-  const hmrContextBranch = deriveHmrContextBranch(browser.hmr?.oldOwner);
+  const hmrProof = deriveHmrProof(browser.hmr, String(browser.origin));
+  const hmrContextBranch = /** @type {'same-owner'|'same-realm-replacement'|'document-reload'|'invalid'} */ (hmrProof.branch);
   return {
     realProductRoute: typeof browser.pageUrl === 'string' && browser.pageUrl.startsWith(String(browser.origin).replace(/\/$/u, '')),
     observationsClean: Array.isArray(observations.consoleErrors) && observations.consoleErrors.length === 0
@@ -331,16 +687,16 @@ function browserLifecycleAssertions(browser) {
       && Array.isArray(observations.requestErrors) && observations.requestErrors.length === 0,
     initialOwners: browser.initial?.canvasCount === 1 && browser.initial?.tracker?.canvases === 1 && browser.initial?.domCellCount === 0
       && browser.initial?.tracker?.liveContexts === 1 && activeRafs(browser.initial?.tracker) >= 1,
-    initialContextRecordExact: contextRecords(browser.initial?.tracker)?.length === 1 && contextRecords(browser.initial?.tracker)?.[0]?.id !== null
+    initialContextRecordExact: validContextSnapshot(browser.initial?.tracker) && contextRecords(browser.initial?.tracker)?.length === 1 && contextRecords(browser.initial?.tracker)?.[0]?.id !== null
       && contextRecords(browser.initial?.tracker)?.[0]?.closed === false && contextRecords(browser.initial?.tracker)?.[0]?.closeCalls === 0,
-    restartOwnersExact: browser.restarted?.before?.qaId === browser.restarted?.after?.qaId && browser.restarted?.before?.canvasId === browser.restarted?.after?.canvasId
+    restartOwnersExact: sameIdentity(browser.restarted?.before?.qaId, browser.restarted?.after?.qaId) && sameIdentity(browser.restarted?.before?.canvasId, browser.restarted?.after?.canvasId)
       && browser.restarted?.after?.liveContexts === 1,
     restartCanvasesExact: browser.restarted?.before?.canvasCount === 1 && browser.restarted?.before?.canvases === 1
       && browser.restarted?.after?.canvasCount === 1 && browser.restarted?.after?.canvases === 1,
     restartRafsExact: activeRafs(browser.restarted?.before) >= 1 && activeRafs(browser.restarted?.after) === activeRafs(browser.restarted?.before),
     restartContextsExact: sameContextRecords(browser.restarted?.before, browser.restarted?.after),
     restartListenersExact: sameRelevantListeners(browser.restarted?.before, browser.restarted?.after),
-    preferencesOwnersExact: browser.changedPreferences?.tracker?.qaId === browser.initial?.tracker?.qaId && browser.changedPreferences?.tracker?.canvasId === browser.initial?.tracker?.canvasId
+    preferencesOwnersExact: sameIdentity(browser.changedPreferences?.tracker?.qaId, browser.initial?.tracker?.qaId) && sameIdentity(browser.changedPreferences?.tracker?.canvasId, browser.initial?.tracker?.canvasId)
       && browser.changedPreferences?.tracker?.liveContexts === 1,
     preferencesCanvasesExact: browser.changedPreferences?.canvasCount === 1 && browser.changedPreferences?.tracker?.canvases === 1,
     preferencesRafsExact: activeRafs(browser.changedPreferences?.tracker) === activeRafs(browser.restarted?.after)
@@ -353,21 +709,23 @@ function browserLifecycleAssertions(browser) {
     exitRafsZero: activeRafs(browser.exited?.tracker) === 0,
     exitListenersZero: noRelevantListeners(browser.exited?.tracker),
     exitContextsClosedExact: closedContextSuccessors(browser.changedPreferences?.tracker, browser.exited?.tracker),
-    reentryOwnersFresh: browser.reentered?.tracker?.qaId !== browser.initial?.tracker?.qaId && browser.reentered?.tracker?.canvasId !== browser.initial?.tracker?.canvasId
+    reentryOwnersFresh: differentIdentity(browser.reentered?.tracker?.qaId, browser.initial?.tracker?.qaId) && differentIdentity(browser.reentered?.tracker?.canvasId, browser.initial?.tracker?.canvasId)
       && browser.reentered?.tracker?.liveContexts === 1,
     reentryCanvasesExact: browser.reentered?.canvasCount === 1 && browser.reentered?.tracker?.canvases === 1,
     reentryRafsExact: activeRafs(browser.reentered?.tracker) === activeRafs(browser.changedPreferences?.tracker),
     reentryContextsExact: exactReentryContexts(browser.changedPreferences?.tracker, browser.reentered?.tracker),
     reentryListenersExact: sameRelevantListeners(browser.changedPreferences?.tracker, browser.reentered?.tracker),
-    hmrDelivered: Array.isArray(browser.hmr?.requests) && browser.hmr.requests.length >= 1,
-    hmrOwnersBound: browser.hmr?.after?.canvasCount === 1 && browser.hmr?.after?.tracker?.liveContexts === 1
-      && (browser.hmr?.oldOwner?.sameOwner === true || browser.hmr?.oldOwner?.oldRenderer === 'retired'),
+    hmrEventWindowExact: exactHmrEventWindow(browser),
+    hmrAppTouchExact: exactAppTouch(browser.hmr),
+    hmrProofExact: deepEqual(browser.hmr?.proof, hmrProof),
+    hmrDelivered: hmrProof.eventOrderValid && hmrProof.counts.appRequests + hmrProof.counts.fullReloadFrames >= 1,
+    hmrOwnersBound: browser.hmr?.after?.canvasCount === 1 && browser.hmr?.after?.tracker?.liveContexts === 1 && hmrProof.ownerIdentitiesValid,
     hmrRafBaselineActive: activeRafs(browser.hmr?.before?.tracker) >= 1,
     hmrRafsExact: activeRafs(browser.hmr?.after?.tracker) === activeRafs(browser.hmr?.before?.tracker),
     hmrRafsNotDoubled: activeRafs(browser.hmr?.after?.tracker) <= activeRafs(browser.hmr?.before?.tracker),
     hmrListenersExact: sameRelevantListeners(browser.hmr?.before?.tracker, browser.hmr?.after?.tracker),
     preHmrContextsExact: exactPreHmrContextContinuity(browser.reentered?.tracker, browser.hmr?.before?.tracker),
-    hmrContextBranchValid: hmrContextBranch !== 'invalid',
+    hmrContextBranchValid: hmrProof.passed && hmrContextBranch !== 'invalid',
     hmrContextsExact: exactHmrContexts(browser.hmr?.before?.tracker, browser.hmr?.after?.tracker, hmrContextBranch),
     terminalOwnersClean: browser.terminal?.canvases === 0 && browser.terminal?.liveContexts === 0,
     terminalRafsZero: activeRafs(browser.terminal) === 0,
@@ -435,6 +793,41 @@ if (lifecycleFailures.length > 0) throw new Error(`browser lifecycle recomputati
 if (!deepEqual(browser.lifecycleProof, recomputedLifecycleProof)) throw new Error('browser lifecycle proof does not match raw tracker data.');
 if (!deepEqual(browser.assertions, recomputedLifecycleAssertions)) throw new Error('browser lifecycle assertions do not match independent recomputation.');
 
+const expectedOrigin = new URL(String(browser.origin)).origin;
+const recomputedIceClassification = classifyIceResponses(ice.runtimeResponses, expectedOrigin);
+if (!recomputedIceClassification.passed) throw new Error('Ice raw response classification is not strict-green.');
+if (!deepEqual(ice.runtimeClassification, recomputedIceClassification)) throw new Error('Ice persisted classification differs from raw-response recomputation.');
+if (!deepEqual(browser.observations?.iceResponses, ice.runtimeResponses)) throw new Error('Ice browser and provenance raw response records differ.');
+const initialIceEvents = (browser.observations?.events ?? []).filter((/** @type {any} */ event) => event?.kind === 'ice-response');
+const lateIceEvents = (browser.observations?.events ?? []).filter((/** @type {any} */ event) => event?.kind === 'ice-response-hmr');
+if (initialIceEvents.length !== 2 || !deepEqual(initialIceEvents.map((/** @type {any} */ event) => event.sequence), ice.runtimeResponses.map((/** @type {any} */ response) => response.sequence))
+  || initialIceEvents.some((/** @type {any} */ event) => event.sequence > browser.hmr?.marker?.eventSequence)
+  || lateIceEvents.some((/** @type {any} */ event) => event.sequence <= browser.hmr?.marker?.eventSequence)) {
+  throw new Error('Ice initial Freeze response window is not isolated from HMR responses.');
+}
+const catalogPath = 'src/game/audio/audioAssetCatalog.ts';
+const catalogBytes = blob(BASE, catalogPath);
+const expectedCatalog = { path: catalogPath, gitBlob: git('rev-parse', `${BASE}:${catalogPath}`), bytes: catalogBytes.length,
+  sha256: sha(catalogBytes), runtime: ice.catalog?.runtime };
+if (!exactRuntimeCatalog(ice.catalog?.runtime) || !deepEqual(ice.catalog, expectedCatalog)) throw new Error('Ice full catalog identity/runtime descriptor mismatch.');
+const expectedProduct = { ...ICE, observedGitBlob: ICE.gitBlob, observedBytes: ICE.bytes, observedSha256: ICE.sha256 };
+if (ice.productHead !== BASE || ice.authorizationHead !== AUTH || ice.origin !== expectedOrigin || !deepEqual(ice.product, expectedProduct)) {
+  throw new Error('Ice product/head/origin binding mismatch.');
+}
+const expectedOriginal = { filename: ICE.originalFilename, sha256: null, status: 'OPEN / login required', productOggIsOriginal: false, previewSubstitutionAllowed: false };
+if (!deepEqual(ice.originalAcquisition, expectedOriginal)) throw new Error('Ice original acquisition disclosure mismatch.');
+const recomputedIceChecks = [
+  { label: 'product Ogg bytes/hash/blob', passed: true },
+  { label: 'full catalog Git blob/bytes/hash', passed: expectedCatalog.gitBlob.length === 40 && git('cat-file', '-t', expectedCatalog.gitBlob) === 'blob'
+    && Number(git('cat-file', '-s', expectedCatalog.gitBlob)) === expectedCatalog.bytes && expectedCatalog.sha256.length === 64 },
+  { label: 'runtime catalog own freezeIce descriptor/value', passed: exactRuntimeCatalog(ice.catalog?.runtime) },
+  { label: 'no original substitution', passed: ICE.originalSha256 === null && ICE.originalStatus === 'OPEN / login required' && ICE.substitutionAllowed === false },
+  { label: 'runtime exact module-plus-asset pair', passed: recomputedIceClassification.passed },
+];
+if (recomputedIceChecks.length === 0 || !deepEqual(ice.checks, recomputedIceChecks) || !ice.checks.every((/** @type {any} */ entry) => entry?.passed === true)) {
+  throw new Error('Ice provenance checks are empty, forged, or differ from independent recomputation.');
+}
+
 const manifest = {
   schema: 'tetramorph.t37.material-ice-manifest.v1', generatedAt: new Date().toISOString(),
   provenance: { r5bTerminalBase: BASE, authorizationHead: AUTH, evidenceSourceHead: head, sourceCommits, productHead: BASE, writerBoundary: `${prefix}**` },
@@ -449,7 +842,8 @@ const manifest = {
     semantic: { schema: semantic.schema, generatedAt: semantic.generatedAt, passed: semantic.passed, cases: Object.keys(semantic.cases).sort() },
     matrix: { schema: matrix.schema, generatedAt: matrix.generatedAt, passed: matrix.passed, cases: Object.keys(matrix.cases).sort(), coverage: matrix.coverage },
     browser: { schema: browser.schema, generatedAt: browser.generatedAt, passed: browser.passed, assertions: browser.assertions },
-    ice: { schema: ice.schema, generatedAt: ice.generatedAt, passed: ice.passed, originalAcquisition: ice.originalAcquisition },
+    ice: { schema: ice.schema, generatedAt: ice.generatedAt, passed: ice.passed, originalAcquisition: ice.originalAcquisition,
+      runtimeClassification: recomputedIceClassification, catalog: expectedCatalog },
   },
 };
 await writeFile(join(root, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');

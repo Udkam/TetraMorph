@@ -27,22 +27,100 @@ export function scenarioFor(scenarios, item) {
 /** @param {import('playwright').Page} page @param {string} [label] */
 export function attachObservers(page, label = 'page') {
   /** @type {any} */
-  const observed = { label, consoleErrors: [], pageErrors: [], requestErrors: [], requests: [] };
+  const observed = { label, consoleErrors: [], pageErrors: [], requestErrors: [], requests: [], events: [] };
+  let sequence = 0;
+  let initialIceWindowOpen = true;
+  /** @param {string} kind @param {Record<string, any>} detail */
+  const record = (kind, detail) => {
+    const event = { sequence: ++sequence, kind, ...detail };
+    observed.events.push(event);
+    return event;
+  };
   Object.defineProperty(observed, 'iceResponsePromises', { value: [], enumerable: false });
+  Object.defineProperty(observed, 'freezeIceResponseWindow', {
+    enumerable: false,
+    value: async () => {
+      initialIceWindowOpen = false;
+      const responses = await Promise.all([...observed.iceResponsePromises]);
+      responses.sort((left, right) => left.sequence - right.sequence);
+      observed.iceResponses = responses;
+      return responses;
+    },
+  });
   page.on('console', (message) => { if (message.type() === 'error') observed.consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => observed.pageErrors.push(error.message));
   page.on('requestfailed', (request) => observed.requestErrors.push(`${request.method()} ${request.url()}: ${request.failure()?.errorText ?? 'failed'}`));
-  page.on('request', (request) => observed.requests.push(request.url()));
+  page.on('request', (request) => {
+    let mainFrame = false;
+    try { mainFrame = request.frame() === page.mainFrame(); } catch { mainFrame = false; }
+    const detail = {
+      url: request.url(), method: request.method(), resourceType: request.resourceType(),
+      mainFrame, navigationRequest: request.isNavigationRequest(),
+    };
+    observed.requests.push(record('request', detail));
+  });
+  page.on('framenavigated', (frame) => {
+    if (frame === page.mainFrame()) record('navigation', { url: frame.url(), mainFrame: true });
+  });
+  page.on('websocket', (socket) => {
+    record('websocket-open', { url: socket.url() });
+    socket.on('framereceived', ({ payload }) => record('websocket-frame', {
+      url: socket.url(), direction: 'received', encoding: typeof payload === 'string' ? 'utf8' : 'base64',
+      body: typeof payload === 'string' ? payload : Buffer.from(payload).toString('base64'),
+    }));
+    socket.on('framesent', ({ payload }) => record('websocket-frame', {
+      url: socket.url(), direction: 'sent', encoding: typeof payload === 'string' ? 'utf8' : 'base64',
+      body: typeof payload === 'string' ? payload : Buffer.from(payload).toString('base64'),
+    }));
+  });
   page.on('response', (response) => {
-    if (!response.url().includes('freeze-ice-cubes-hq.ogg')) return;
-    observed.iceResponsePromises.push(response.body().then((bytes) => ({ url: response.url(), status: response.status(), body: bytes })));
+    let parsed;
+    try { parsed = new URL(response.url()); } catch { return; }
+    if (parsed.pathname.split('/').at(-1) !== 'freeze-ice-cubes-hq.ogg') return;
+    const request = response.request();
+    const redirectedFrom = request.redirectedFrom();
+    const responseEvent = record(initialIceWindowOpen ? 'ice-response' : 'ice-response-hmr', {
+      url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
+      contentType: response.headers()['content-type'] ?? null,
+      redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
+      captureWindow: initialIceWindowOpen ? 'initial-freeze' : 'hmr',
+    });
+    if (!initialIceWindowOpen) return;
+    observed.iceResponsePromises.push(response.body().then((bytes) => ({
+      sequence: responseEvent.sequence,
+      url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
+      contentType: response.headers()['content-type'] ?? null,
+      redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
+      bodyEncoding: 'base64', body: bytes.toString('base64'),
+    })).catch((error) => ({
+      sequence: responseEvent.sequence,
+      url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
+      contentType: response.headers()['content-type'] ?? null,
+      redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
+      bodyEncoding: 'base64', body: null, bodyError: String(error),
+    })));
   });
   return observed;
 }
 
-/** @param {import('playwright').Page} page */
-export async function installInstrumentation(page) {
-  await page.addInitScript(() => {
+/** @param {import('playwright').Page} page @param {any} settings */
+export async function installInstrumentation(page, settings) {
+  await page.addInitScript((values) => {
+    if (window.top !== window) return;
+    const epochKey = 'tetramorph:t37-document-epoch';
+    const previousEpoch = Number(sessionStorage.getItem(epochKey) ?? '0');
+    const documentEpoch = Number.isSafeInteger(previousEpoch) && previousEpoch >= 0 ? previousEpoch + 1 : 1;
+    sessionStorage.setItem(epochKey, String(documentEpoch));
+    const initializedKey = 'tetramorph:t37-fixture-initialized';
+    if (sessionStorage.getItem(initializedKey) !== 'yes') {
+      localStorage.clear();
+      localStorage.setItem('tetramorph:qa-seed', String(values.seed));
+      localStorage.setItem('tetramorph:language:v1', values.language);
+      localStorage.setItem('tetramorph:visual-theme:v1', values.theme);
+      localStorage.setItem('tetramorph:reduced-motion:v1', values.reduced ? 'on' : 'off');
+      localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['marathon', 'race', 'sprint', 'endgame']));
+      sessionStorage.setItem(initializedKey, 'yes');
+    }
     const originalRandom = Crypto.prototype.getRandomValues;
     const cryptoOwner = globalThis.crypto;
     Crypto.prototype.getRandomValues = /** @type {Crypto['getRandomValues']} */ (function deterministicQaSeed(array) {
@@ -60,22 +138,42 @@ export async function installInstrumentation(page) {
       if (!identities.has(value)) identities.set(value, nextIdentity++);
       return identities.get(value);
     };
-    /** @type {Array<{context: AudioContext, record: {id: number|null, closed: boolean, closeCalls: number}}>} */
+    /** @param {any} value */
+    const scopedIdentity = (value) => {
+      const id = identity(value);
+      return id === null ? null : { epoch: documentEpoch, id };
+    };
+    /** @type {Array<{context: AudioContext, record: {id: {epoch: number, id: number}|null, closed: boolean, closeCalls: number}}>} */
     const contexts = [];
+    /** @type {Array<Record<string, any>>} */
+    const contextEvents = [];
+    let contextEventSequence = 0;
+    /** @param {'create'|'close-call'|'close-resolve'|'close-reject'} kind @param {{epoch: number, id: number}|null} id @param {Record<string, any>} [detail] */
+    const recordContextEvent = (kind, id, detail = {}) => {
+      contextEvents.push({ sequence: ++contextEventSequence, kind, id, ...detail });
+    };
     const browserWindow = /** @type {any} */ (window);
     const NativeAudioContext = window.AudioContext ?? browserWindow.webkitAudioContext;
     if (NativeAudioContext) {
       const Wrapped = new Proxy(NativeAudioContext, {
         construct(target, args) {
           const context = Reflect.construct(target, args, target);
-          const record = { id: identity(context), closed: false, closeCalls: 0 };
+          const record = { id: scopedIdentity(context), closed: false, closeCalls: 0 };
           contexts.push({ context, record });
+          recordContextEvent('create', record.id);
           const close = context.close.bind(context);
           context.close = async () => {
             record.closeCalls += 1;
-            const result = await close();
-            record.closed = true;
-            return result;
+            recordContextEvent('close-call', record.id, { call: record.closeCalls });
+            try {
+              const result = await close();
+              record.closed = context.state === 'closed';
+              recordContextEvent('close-resolve', record.id, { call: record.closeCalls, state: context.state });
+              return result;
+            } catch (error) {
+              recordContextEvent('close-reject', record.id, { call: record.closeCalls, error: String(error) });
+              throw error;
+            }
           };
           return context;
         },
@@ -122,7 +220,7 @@ export async function installInstrumentation(page) {
     window.cancelAnimationFrame = (handle) => { rafs.delete(handle); nativeCancelRaf(handle); };
 
     /** @type {any} */ (window).__MATERIAL_TRACKER__ = {
-      identity,
+      identity: scopedIdentity,
       snapshot: () => {
         /** @type {Record<string, number>} */
         const listenerCounts = {};
@@ -130,17 +228,20 @@ export async function installInstrumentation(page) {
           const key = `${owner}:${type}`; listenerCounts[key] = (listenerCounts[key] ?? 0) + 1;
         }
         return {
-          qaId: identity(/** @type {any} */ (window).__TETRAMORPH_QA__),
-          canvasId: identity(document.querySelector('canvas')),
+          documentEpoch,
+          qaId: scopedIdentity(/** @type {any} */ (window).__TETRAMORPH_QA__),
+          canvasId: scopedIdentity(document.querySelector('canvas')),
           canvases: document.querySelectorAll('canvas').length,
           activeRafs: rafs.size,
           listenerCounts,
           contexts: contexts.map(({ context, record }) => ({ ...record, state: context.state })),
           liveContexts: contexts.filter(({ context, record }) => !record.closed && context.state !== 'closed').length,
+          contextEventCursor: contextEvents.length,
+          contextEvents: contextEvents.map((event) => ({ ...event, id: event.id ? { ...event.id } : null })),
         };
       },
     };
-  });
+  }, settings);
 }
 
 /** @param {import('playwright').Browser} browser @param {string} origin @param {any} settings */
@@ -148,15 +249,7 @@ export async function openMutation(browser, origin, settings) {
   const context = await browser.newContext({ viewport: settings.viewport, deviceScaleFactor: 1, reducedMotion: settings.reduced ? 'reduce' : 'no-preference' });
   const page = await context.newPage();
   const observed = attachObservers(page, settings.label ?? settings.item ?? 'mutation');
-  await installInstrumentation(page);
-  await page.addInitScript((values) => {
-    localStorage.clear();
-    localStorage.setItem('tetramorph:qa-seed', String(values.seed));
-    localStorage.setItem('tetramorph:language:v1', values.language);
-    localStorage.setItem('tetramorph:visual-theme:v1', values.theme);
-    localStorage.setItem('tetramorph:reduced-motion:v1', values.reduced ? 'on' : 'off');
-    localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['marathon', 'race', 'sprint', 'endgame']));
-  }, settings);
+  await installInstrumentation(page, settings);
   await page.goto(`${origin.replace(/\/$/u, '')}/play/mutation`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
   await page.getByTestId('game-screen').waitFor({ state: 'visible' });
@@ -192,6 +285,8 @@ export async function snapshot(page) {
     const state = w.__TETRAMORPH_QA__?.getState() ?? null;
     const renderer = w.__TETRAMORPH_QA__?.getRendererSnapshot() ?? null;
     const layout = w.__TETRAMORPH_LAYOUT_QA__?.collect() ?? null;
+    const tracker = w.__MATERIAL_TRACKER__?.snapshot() ?? null;
+    const navigationEntry = /** @type {PerformanceNavigationTiming|undefined} */ (performance.getEntriesByType('navigation').at(-1));
     let boardProbe = null;
     try {
       const captured = w.__TETRAMORPH_QA__?.captureBoardPng();
@@ -200,7 +295,8 @@ export async function snapshot(page) {
     return {
       state, renderer, layout, boardProbe,
       textState: w.render_game_to_text?.() ?? null,
-      tracker: w.__MATERIAL_TRACKER__?.snapshot() ?? null,
+      tracker,
+      navigation: { epoch: tracker?.documentEpoch ?? null, type: navigationEntry?.type ?? null, url: location.href },
       canvasCount: document.querySelectorAll('canvas').length,
       domCellCount: document.querySelectorAll('[data-game-cell], [data-cell], .board-cell').length,
       nextAria: document.querySelector('[data-testid="next-slot"]')?.getAttribute('aria-label') ?? null,
