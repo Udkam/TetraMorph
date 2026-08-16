@@ -35,6 +35,7 @@ export function attachObservers(page, label = 'page') {
   let requestSequence = 0;
   /** @type {'initial-freeze'|'pre-hmr'|'hmr'|'post-hmr'} */
   let icePhase = 'initial-freeze';
+  let uiExitBoundaryArmed = false;
   /** @param {string} kind @param {Record<string, any>} detail @returns {Record<string, any>} */
   const record = (kind, detail) => {
     const event = { sequence: ++sequence, kind, ...detail };
@@ -113,6 +114,14 @@ export function attachObservers(page, label = 'page') {
       const marker = phaseMarker();
       observed.icePhaseMarkers.hmrEnd = marker;
       return { ...marker };
+    },
+  });
+  Object.defineProperty(observed, 'armUiExitBoundary', {
+    enumerable: false,
+    value: () => {
+      if (icePhase !== 'post-hmr' || uiExitBoundaryArmed) throw new Error('Cannot arm the UI-exit boundary twice or before HMR ends.');
+      uiExitBoundaryArmed = true;
+      return phaseMarker();
     },
   });
   Object.defineProperty(observed, 'recordHistoryCall', {
@@ -282,12 +291,20 @@ export async function installInstrumentation(page, settings, observed) {
     };
     const browserWindow = /** @type {any} */ (window);
     let historyCallId = 0;
+    let historyBindingTail = Promise.resolve();
+    /** @type {string|null} */
+    let historyBindingError = null;
     const nativeReplaceState = History.prototype.replaceState;
     const nativePushState = History.prototype.pushState;
     /** @param {'replaceState'|'pushState'} method @param {number} callId @param {string} beforeUrl @param {string} afterUrl @param {string|null} urlArgument */
     const emitHistoryCall = (method, callId, beforeUrl, afterUrl, urlArgument) => {
       const binding = browserWindow[values.historyBinding];
-      if (typeof binding === 'function') void Promise.resolve(binding({ documentEpoch, callId, method, beforeUrl, afterUrl, urlArgument })).catch(() => undefined);
+      if (typeof binding !== 'function') {
+        historyBindingError = 'History QA binding is unavailable.';
+        return;
+      }
+      historyBindingTail = historyBindingTail.then(() => binding({ documentEpoch, callId, method, beforeUrl, afterUrl, urlArgument }))
+        .catch((error) => { historyBindingError = String(error); });
     };
     History.prototype.replaceState = function trackedReplaceState(data, unused, url) {
       const callId = ++historyCallId; const beforeUrl = window.location.href;
@@ -369,6 +386,10 @@ export async function installInstrumentation(page, settings, observed) {
 
     /** @type {any} */ (window).__MATERIAL_TRACKER__ = {
       identity: scopedIdentity,
+      drainHistory: async () => {
+        await historyBindingTail;
+        if (historyBindingError !== null) throw new Error(historyBindingError);
+      },
       snapshot: () => {
         /** @type {Record<string, number>} */
         const listenerCounts = {};
@@ -395,16 +416,22 @@ export async function installInstrumentation(page, settings, observed) {
 /** @param {import('playwright').Browser} browser @param {string} origin @param {any} settings */
 export async function openMutation(browser, origin, settings) {
   const context = await browser.newContext({ viewport: settings.viewport, deviceScaleFactor: 1, reducedMotion: settings.reduced ? 'reduce' : 'no-preference' });
-  const page = await context.newPage();
-  const observed = attachObservers(page, settings.label ?? settings.item ?? 'mutation');
-  await installInstrumentation(page, settings, observed);
-  await page.goto(`${origin.replace(/\/$/u, '')}/play/mutation`, { waitUntil: 'networkidle' });
-  await page.evaluate(() => document.fonts.ready);
-  await page.getByTestId('game-screen').waitFor({ state: 'visible' });
-  await page.getByTestId('entry-countdown').waitFor({ state: 'detached', timeout: 12_000 });
-  await page.waitForFunction(() => { const w = /** @type {any} */ (window); return Boolean(w.__TETRAMORPH_QA__ && w.__TETRAMORPH_LAYOUT_QA__ && w.render_game_to_text); });
-  await page.evaluate(() => /** @type {any} */ (window).__TETRAMORPH_QA__.setFrozen(true));
-  return { context, page, observed };
+  try {
+    const page = await context.newPage();
+    const observed = attachObservers(page, settings.label ?? settings.item ?? 'mutation');
+    await installInstrumentation(page, settings, observed);
+    await page.goto(`${origin.replace(/\/$/u, '')}/play/mutation`, { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByTestId('game-screen').waitFor({ state: 'visible' });
+    await page.getByTestId('entry-countdown').waitFor({ state: 'detached', timeout: 12_000 });
+    await page.waitForFunction(() => { const w = /** @type {any} */ (window); return Boolean(w.__TETRAMORPH_QA__ && w.__TETRAMORPH_LAYOUT_QA__ && w.render_game_to_text); });
+    await page.evaluate(() => /** @type {any} */ (window).__TETRAMORPH_QA__.setFrozen(true));
+    return { context, page, observed };
+  } catch (error) {
+    try { await context.close(); }
+    catch (cleanupError) { throw new AggregateError([error, cleanupError], 'Mutation page setup and context cleanup failed.'); }
+    throw error;
+  }
 }
 
 /** @param {import('playwright').Page} page @param {string[]} actions */

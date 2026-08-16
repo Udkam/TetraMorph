@@ -1,5 +1,8 @@
 // @ts-check
-import { dirname, join } from 'node:path';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const root = dirname(fileURLToPath(import.meta.url));
@@ -66,6 +69,122 @@ export const PRODUCT_BINDINGS = Object.freeze([
   { kind: 'blob', path: 'docs/evidence/t26/phase-d/mutation-scenarios.json' },
   { kind: 'blob', path: 'docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json' },
 ]);
+
+/** @param {import('node:crypto').BinaryLike} value */
+const sha256 = (value) => createHash('sha256').update(value).digest('hex');
+/** @param {...string} args */
+const gitText = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
+/** @param {...string} args */
+const gitBytes = (...args) => execFileSync('git', args, { cwd: repo });
+/** @param {Buffer} bytes @param {string} path */
+const cleanObject = (bytes, path) => execFileSync('git', ['hash-object', '--stdin', `--path=${path}`], {
+  cwd: repo, input: bytes, encoding: 'utf8',
+}).trim();
+/** @param {...string} args */
+function gitQuiet(...args) {
+  try {
+    execFileSync('git', args, { cwd: repo, stdio: 'ignore' });
+    return true;
+  } catch { return false; }
+}
+
+/**
+ * Fail closed unless the exact evidence sources and every product input used by
+ * the browser are represented by committed Git objects. Generated outputs are
+ * deliberately outside this scope so a pre-manifest run can remain untracked.
+ * @param {string} [expectedSourceHead]
+ * @param {{allowDescendantExecutionHead?: boolean}} [options]
+ */
+export function assertRuntimeInputBinding(expectedSourceHead, options = {}) {
+  const executionHead = gitText('rev-parse', 'HEAD');
+  const evidenceSourceHead = expectedSourceHead ?? executionHead;
+  if (!/^[0-9a-f]{40}$/u.test(evidenceSourceHead)
+    || (options.allowDescendantExecutionHead === true
+      ? !gitQuiet('merge-base', '--is-ancestor', evidenceSourceHead, executionHead)
+      : executionHead !== evidenceSourceHead)) {
+    throw new Error(`Runtime execution HEAD ${executionHead} does not satisfy evidence source ${evidenceSourceHead}.`);
+  }
+
+  const sourcePaths = SOURCE.map((path) => `${prefix}${path}`);
+  const productFilePaths = PRODUCT_BINDINGS.filter(({ kind, path }) => kind === 'blob' && !path.startsWith('src/')).map(({ path }) => path);
+  const statusScope = [...new Set(['src', ...sourcePaths, ...productFilePaths])].sort();
+  if (!gitQuiet('diff-index', '--cached', '--quiet', executionHead, '--', ...statusScope)) throw new Error('Runtime input index differs from execution HEAD.');
+  if (!gitQuiet('diff-files', '--quiet', '--', ...statusScope)) throw new Error('Runtime tracked worktree differs from the index.');
+  const dirty = gitBytes('status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ...statusScope);
+  if (dirty.length !== 0) {
+    throw new Error(`Runtime input scope is dirty: ${dirty.toString('utf8').replace(/\0/gu, '\n').trim()}`);
+  }
+  const untrackedSrc = gitBytes('ls-files', '--others', '--exclude-standard', '-z', '--', 'src');
+  const ignoredSrc = gitBytes('ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', 'src');
+  if (untrackedSrc.length !== 0 || ignoredSrc.length !== 0) throw new Error('Runtime src contains untracked or ignored inputs.');
+
+  const sourceBindings = sourcePaths.map((path) => {
+    const worktree = readFileSync(join(repo, ...path.split('/')));
+    const committed = gitBytes('show', `${evidenceSourceHead}:${path}`);
+    const gitObject = gitText('rev-parse', `${evidenceSourceHead}:${path}`);
+    const executionObject = gitText('rev-parse', `${executionHead}:${path}`);
+    if (!worktree.equals(committed) || executionObject !== gitObject || cleanObject(worktree, path) !== gitObject) {
+      throw new Error(`Runtime source does not match ${evidenceSourceHead}:${path}.`);
+    }
+    const mode = gitText('ls-tree', evidenceSourceHead, '--', path).split(/\s+/u)[0];
+    return { path, mode, gitObject, sha256: sha256(worktree), bytes: worktree.length };
+  });
+
+  const productTree = gitText('rev-parse', `${BASE}:src`);
+  const sourceProductTree = gitText('rev-parse', `${evidenceSourceHead}:src`);
+  const executionProductTree = gitText('rev-parse', `${executionHead}:src`);
+  if (sourceProductTree !== productTree || executionProductTree !== productTree) {
+    throw new Error('Runtime src tree differs from the frozen product tree.');
+  }
+  const trackedSrc = gitBytes('ls-tree', '-r', '--name-only', '-z', evidenceSourceHead, '--', 'src').toString('utf8').split('\0').filter(Boolean);
+  const cleanDigest = createHash('sha256');
+  const rawDigest = createHash('sha256');
+  for (const path of trackedSrc) {
+    const bytes = readFileSync(join(repo, ...path.split('/')));
+    const expectedObject = gitText('rev-parse', `${evidenceSourceHead}:${path}`);
+    const actualObject = cleanObject(bytes, path);
+    if (actualObject !== expectedObject) throw new Error(`Runtime product input does not match ${evidenceSourceHead}:${path}.`);
+    cleanDigest.update(path).update('\0').update(actualObject).update('\0');
+    rawDigest.update(path).update('\0').update(sha256(bytes)).update('\0');
+  }
+
+  const externalProductBindings = productFilePaths.map((path) => {
+    const bytes = readFileSync(join(repo, ...path.split('/')));
+    const committed = gitBytes('show', `${BASE}:${path}`);
+    const gitObject = gitText('rev-parse', `${BASE}:${path}`);
+    if (!bytes.equals(committed) || gitText('rev-parse', `${evidenceSourceHead}:${path}`) !== gitObject || cleanObject(bytes, path) !== gitObject) {
+      throw new Error(`Runtime product input does not match ${BASE}:${path}.`);
+    }
+    const mode = gitText('ls-tree', BASE, '--', path).split(/\s+/u)[0];
+    return { path, mode, gitObject, sha256: sha256(bytes), bytes: bytes.length };
+  });
+
+  return {
+    schema: 'tetramorph.t37.material-runtime-input.v2',
+    evidenceSourceHead,
+    executionHead: evidenceSourceHead,
+    executionTree: gitText('rev-parse', `${evidenceSourceHead}^{tree}`),
+    productHead: BASE,
+    statusScope,
+    indexAndWorktree: 'clean',
+    sourceBindings,
+    product: {
+      path: 'src', gitTree: productTree, trackedFiles: trackedSrc.length,
+      cleanObjectDigest: cleanDigest.digest('hex'), rawByteDigest: rawDigest.digest('hex'),
+      externalBindings: externalProductBindings,
+    },
+    assertions: {
+      executionHeadExact: true,
+      sourceAncestorVerified: true,
+      indexMatchesHead: true,
+      trackedWorktreeMatchesIndex: true,
+      sourceRawBytesMatchGit: true,
+      srcTreeMatchesProductHead: true,
+      noUntrackedOrIgnoredSrc: true,
+    },
+  };
+}
+
 export const STAGE_E_ANCHORS = Object.freeze(['fa3a70e', '581c004', 'ba3b0e3', 'a184952', '1058dbd', '731bf6f', '8e336fe']);
 export const ICE = Object.freeze({
   path: 'src/assets/audio/t37/freeze-ice-cubes-hq.ogg',
@@ -84,4 +203,10 @@ export const ICE = Object.freeze({
 if (SOURCE.length !== 10 || SEMANTIC_PNG.length !== 20 || MATRIX_PNG.length !== 6
   || OUTPUT.length !== 36 || PRE_REPORT.length !== 37 || TERMINAL.length !== 1) {
   throw new Error('Frozen path-count contract drifted.');
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--preflight')) {
+  const sourceArgument = process.argv.find((value) => value.startsWith('--source-head='));
+  const sourceHead = sourceArgument?.slice('--source-head='.length);
+  console.log(JSON.stringify(assertRuntimeInputBinding(sourceHead)));
 }

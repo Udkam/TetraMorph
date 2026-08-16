@@ -18,7 +18,10 @@ followed by either a fresh `200` or an ETag-bound `304` bootstrap response. A re
 counted only when the frame event is bound to its exact main-frame document request;
 direct instrumentation of `History.prototype.replaceState` and `pushState` must observe
 exactly one route-preserving `replaceState`, bound to the reloaded document and its separate
-same-document navigation. Ice responses use four explicit phases: `initial-freeze`,
+same-document navigation. The exposed History binding is drained without swallowing errors;
+an exact `uiExitArm` cursor is frozen after the exit confirmation opens and immediately before
+its route-changing confirmation, so extra History calls cannot hide after HMR while the normal
+exit remains allowed. Ice responses use four explicit phases: `initial-freeze`,
 `pre-hmr`, `hmr`, and `post-hmr`; only the two frozen initial responses are materialized as
 provenance bytes, while every later response must remain inside its recorded phase marker
 boundary and the Ice HMR phase markers must equal the primary HMR window markers.
@@ -80,26 +83,81 @@ try {
 
 ## Coordinator-only generation
 
-The source writer must not run this sequence. From repository root, first prove port
-`5193` is free, then start exactly one project-owned Vite process:
+The source writer must not run this sequence. Start from the committed source candidate with
+the exact 36 pre-manifest outputs absent. The shared runtime-input v2 preflight rejects HEAD,
+index, tracked, untracked, ignored, raw-source, clean-filter, frozen `src` tree, and external
+fixture drift. The in-repository generators run it both before capture and before writing; the
+generic prescribed client is bracketed by two byte-identical preflight attestations. From the
+repository root, use one exact owned Vite PID and an exception-safe cleanup boundary:
 
 ```powershell
-E:\Nodejs\node.exe node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5193 --strictPort
+$port = 5193
+$origin = "http://127.0.0.1:$port"
+$repoRoot = (Resolve-Path '.').Path
+$nodePath = (Resolve-Path 'E:\Nodejs\node.exe').Path
+$existing = @(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue)
+if ($existing.Count -ne 0) { throw "Port $port is already owned by PID(s): $($existing.OwningProcess -join ',')." }
+
+$vite = Start-Process -FilePath $nodePath -WorkingDirectory $repoRoot -WindowStyle Hidden -PassThru -ArgumentList @(
+  'node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', "$port", '--strictPort'
+)
+try {
+  $deadline = [DateTime]::UtcNow.AddSeconds(12)
+  $ready = $false
+  while ([DateTime]::UtcNow -lt $deadline) {
+    $vite.Refresh()
+    if ($vite.HasExited) { throw "Owned Vite PID $($vite.Id) exited before readiness." }
+    $listener = @(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue)
+    if ($listener.Count -eq 1 -and $listener[0].OwningProcess -eq $vite.Id) {
+      try {
+        $response = Invoke-WebRequest -UseBasicParsing -Uri "$origin/" -TimeoutSec 2
+        if ($response.StatusCode -eq 200) { $ready = $true; break }
+      } catch { }
+    }
+    Start-Sleep -Milliseconds 100
+  }
+  if (-not $ready) { throw "Owned Vite PID $($vite.Id) did not become ready." }
+
+  node docs/evidence/t37/material-ice-current-head/capture-semantic.mjs $origin
+  if ($LASTEXITCODE -ne 0) { throw 'Semantic capture failed.' }
+  node docs/evidence/t37/material-ice-current-head/capture-matrix.mjs $origin
+  if ($LASTEXITCODE -ne 0) { throw 'Matrix capture failed.' }
+  node docs/evidence/t37/material-ice-current-head/browser-smoke.mjs $origin
+  if ($LASTEXITCODE -ne 0) { throw 'Browser lifecycle capture failed.' }
+
+  $clientBindingBefore = node docs/evidence/t37/material-ice-current-head/evidence-contract.mjs --preflight
+  if ($LASTEXITCODE -ne 0) { throw 'Prescribed-client input preflight failed.' }
+  node "C:\Users\Alex Chen\.codex\skills\develop-web-game\scripts\web_game_playwright_client.js" --url "$origin/play/mutation" --iterations 3 --pause-ms 250 --screenshot-dir docs/evidence/t37/material-ice-current-head/client-smoke --actions-file docs/evidence/t37/material-ice-current-head/client-actions.json
+  if ($LASTEXITCODE -ne 0) { throw 'Prescribed client failed.' }
+  $clientBindingAfter = node docs/evidence/t37/material-ice-current-head/evidence-contract.mjs --preflight
+  if ($LASTEXITCODE -ne 0 -or $clientBindingAfter -cne $clientBindingBefore) { throw 'Prescribed-client runtime input changed.' }
+
+  node docs/evidence/t37/material-ice-current-head/write-manifest.mjs
+  if ($LASTEXITCODE -ne 0) { throw 'Manifest writer failed.' }
+} finally {
+  $vite.Refresh()
+  if (-not $vite.HasExited) {
+    Stop-Process -Id $vite.Id
+    $stopDeadline = [DateTime]::UtcNow.AddSeconds(10)
+    do {
+      Start-Sleep -Milliseconds 100
+      $vite.Refresh()
+    } while (-not $vite.HasExited -and [DateTime]::UtcNow -lt $stopDeadline)
+    if (-not $vite.HasExited) { throw "Owned Vite PID $($vite.Id) did not exit." }
+  }
+  $releaseDeadline = [DateTime]::UtcNow.AddSeconds(5)
+  do {
+    $remaining = @(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue)
+    if ($remaining.Count -eq 0) { break }
+    Start-Sleep -Milliseconds 100
+  } while ([DateTime]::UtcNow -lt $releaseDeadline)
+  if ($remaining.Count -ne 0) { throw "Port $port remains owned after stopping exact PID $($vite.Id)." }
+}
 ```
 
-With that exact process alive, run in order:
-
-```powershell
-node docs/evidence/t37/material-ice-current-head/capture-semantic.mjs http://127.0.0.1:5193
-node docs/evidence/t37/material-ice-current-head/capture-matrix.mjs http://127.0.0.1:5193
-node docs/evidence/t37/material-ice-current-head/browser-smoke.mjs http://127.0.0.1:5193
-node "C:\Users\Alex Chen\.codex\skills\develop-web-game\scripts\web_game_playwright_client.js" --url http://127.0.0.1:5193/play/mutation --iterations 3 --pause-ms 250 --screenshot-dir docs/evidence/t37/material-ice-current-head/client-smoke --actions-file docs/evidence/t37/material-ice-current-head/client-actions.json
-node docs/evidence/t37/material-ice-current-head/write-manifest.mjs
-```
-
-The client script path is quoted because the user-profile path contains a space. Stop the
-exact Vite PID and prove port
-`5193` free before reviewing and committing the exact 37-file pre-report set. Inspect all
+The client script path is quoted because the user-profile path contains a space. The `finally`
+block stops only the process started above and proves port `5193` free before review. Commit the
+exact 37-file pre-report set only after that release proof. Inspect all
 26 principal frames plus the three prescribed-client frames; JSON alone is not visual
 acceptance. From the clean generated commit run:
 

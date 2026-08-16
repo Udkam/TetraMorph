@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import {
   AUTH, BASE, BYTE_CONTRACT, CONTRACT, HUMAN_STATUS, ICE, ITEMS, MATRIX_CASES, OUTPUT,
   PRE_REPORT, PRODUCT_BINDINGS, PROFILE, SEEDS, SOURCE, STAGES, STAGE_E_ANCHORS,
-  TERMINAL, prefix, repo, root,
+  TERMINAL, assertRuntimeInputBinding, prefix, repo, root,
 } from './evidence-contract.mjs';
 import { assertItemSnapshot } from './product-fixture.mjs';
 
@@ -514,6 +514,8 @@ function isRelevantHmrEvent(event, expectedOrigin) {
   return isAppNamespaceEvent(event) || isDocumentRequest(event) || isDocumentNavigation(event) || isUnboundNavigation(event)
     || payload?.type === 'update' || payload?.type === 'full-reload';
 }
+/** @param {any} event */
+const isHistoryBoundaryEvent = (event) => event?.kind === 'history-call' || event?.kind === 'same-document-navigation';
 /** @param {any} marker */
 const exactPhaseMarker = (marker) => plainExactKeys(marker, ['eventIndex', 'eventSequence'])
   && Number.isInteger(marker.eventIndex) && marker.eventIndex >= 0
@@ -700,15 +702,21 @@ function deriveHmrProof(hmr, expectedOrigin) {
 /** @param {any} browser */
 function exactHmrEventWindow(browser) {
   const all = browser?.observations?.events; const marker = browser?.hmr?.marker; const expectedOrigin = String(browser?.origin);
-  if (!Array.isArray(all) || !Number.isInteger(marker?.eventIndex) || !Number.isInteger(marker?.endEventIndex)
-    || marker.eventIndex < 0 || marker.endEventIndex <= marker.eventIndex || marker.endEventIndex > all.length) return false;
+  const uiExitArm = marker?.uiExitArm;
+  if (!Array.isArray(all) || !plainExactKeys(marker, ['eventIndex', 'eventSequence', 'navigationArm', 'endEventIndex', 'endEventSequence', 'uiExitArm'])
+    || !plainExactKeys(marker.navigationArm, ['eventIndex', 'eventSequence', 'url']) || !plainExactKeys(uiExitArm, ['eventIndex', 'eventSequence'])
+    || !Number.isInteger(marker.eventIndex) || !Number.isInteger(marker.endEventIndex) || !Number.isInteger(uiExitArm.eventIndex)
+    || marker.eventIndex < 0 || marker.endEventIndex <= marker.eventIndex || uiExitArm.eventIndex < marker.endEventIndex || uiExitArm.eventIndex > all.length) return false;
   const beforeSequence = marker.eventIndex === 0 ? 0 : all[marker.eventIndex - 1]?.sequence;
   const endSequence = all[marker.endEventIndex - 1]?.sequence;
+  const uiExitArmSequence = uiExitArm.eventIndex === 0 ? 0 : all[uiExitArm.eventIndex - 1]?.sequence;
   const arm = marker.navigationArm;
   return all.every((/** @type {any} */ event, /** @type {number} */ index) => event?.sequence === index + 1)
     && marker.eventSequence === beforeSequence && marker.endEventSequence === endSequence
+    && uiExitArm.eventSequence === uiExitArmSequence
     && arm?.eventIndex === marker.eventIndex && arm?.eventSequence === marker.eventSequence && arm?.url === browser?.hmr?.before?.navigation?.url
     && deepEqual(all.slice(marker.eventIndex, marker.endEventIndex), browser?.hmr?.events)
+    && all.slice(marker.endEventIndex, uiExitArm.eventIndex).every((/** @type {any} */ event) => !isHistoryBoundaryEvent(event))
     && all.slice(marker.endEventIndex).every((/** @type {any} */ event) => !isRelevantHmrEvent(event, expectedOrigin));
 }
 /** @param {any} hmr */
@@ -732,7 +740,7 @@ function exactAppTouch(hmr) {
     && mtime.requestedMs - mtime.beforeMs >= 1000 && Math.abs(mtime.afterMs - mtime.requestedMs) <= 1;
 }
 const terminalOwnKeys = ['schema', 'generatedAt', 'passed', 'failures', 'checks', 'manifestSha256', 'evidenceSourceHead',
-  'generatedInputHead', 'r5bTerminalBase', 'pathContracts', 'humanStatus'];
+  'generatedInputHead', 'r5bTerminalBase', 'pathContracts', 'runtimeInput', 'humanStatus'];
 /** @param {any} value */
 const canonicalIso = (value) => typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value;
 /** @param {any} committed @param {any} expectedWithoutTimestamp */
@@ -1081,12 +1089,30 @@ function runIndependentContractFixtures() {
   const filler = Array.from({ length: 10 }, (_, index) => ({ sequence: index + 1, kind: 'fixture' }));
   const windowed = clone(reload);
   windowed.marker = { eventIndex: 10, eventSequence: 10, navigationArm: { eventIndex: 10, eventSequence: 10, url: route },
-    endEventIndex: 22, endEventSequence: 22 };
+    endEventIndex: 22, endEventSequence: 22, uiExitArm: { eventIndex: 22, eventSequence: 22 } };
   const exactEvents = [...filler, ...clone(reload.events)];
   assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: windowed }), 'valid HMR eventEnd window');
+  assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, history(23, 'replaceState', 2, 2), sameNav(24)] }, hmr: windowed }),
+    'allow normal route History after the frozen HMR History guard');
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, doc(23)] }, hmr: windowed }), 'reject slow late reload after eventEnd');
   const lateMalformedApp = { ...response(23, 999), url: 'not-a-url:/src/App.tsx' };
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, lateMalformedApp] }, hmr: windowed }), 'reject late malformed App namespace event after eventEnd');
+  const missingExitArm = clone(windowed); delete missingExitArm.marker.uiExitArm;
+  const extraMarkerKey = clone(windowed); extraMarkerKey.marker.forged = true;
+  const earlyExitArm = clone(windowed); earlyExitArm.marker.uiExitArm = { eventIndex: 21, eventSequence: 21 };
+  const overflowExitArm = clone(windowed); overflowExitArm.marker.uiExitArm = { eventIndex: 23, eventSequence: 23 };
+  const driftedExitArm = clone(windowed); driftedExitArm.marker.uiExitArm = { eventIndex: 22, eventSequence: 21 };
+  const lateHistory = clone(windowed); lateHistory.marker.uiExitArm = { eventIndex: 23, eventSequence: 23 };
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: missingExitArm }), 'reject missing UI-exit arm');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: extraMarkerKey }), 'reject extra HMR marker key');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: earlyExitArm }), 'reject UI-exit arm before HMR end');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: overflowExitArm }), 'reject UI-exit arm beyond event array');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: driftedExitArm }), 'reject UI-exit arm sequence drift');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, history(23, 'replaceState', 2, 2)] }, hmr: lateHistory }), 'reject replaceState after HMR end before History guard');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, history(23, 'pushState', 2, 2)] }, hmr: lateHistory }), 'reject pushState after HMR end before History guard');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, sameNav(23)] }, hmr: lateHistory }), 'reject same-document navigation after HMR end before History guard');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, { sequence: 23, kind: 'history-call' }] }, hmr: lateHistory }), 'reject malformed History namespace event before UI exit');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, { sequence: 23, kind: 'same-document-navigation' }] }, hmr: lateHistory }), 'reject malformed same-document namespace event before UI exit');
 
   const committedApp = blob(BASE, 'src/App.tsx'); const committedAppSha = sha(committedApp); const committedAppBlob = git('rev-parse', `${BASE}:src/App.tsx`);
   const validTouch = {
@@ -1114,16 +1140,17 @@ function runIndependentContractFixtures() {
   assertFixture(!exactTerminalContexts(live(1), imprecise), 'reject imprecise terminal context close');
 
   const terminalExpected = {
-    schema: 'tetramorph.t37.material-ice-verification.v1', passed: true, failures: [],
+    schema: 'tetramorph.t37.material-ice-verification.v2', passed: true, failures: [],
     checks: [{ label: 'fixture', passed: true, detail: null }], manifestSha256: 'a'.repeat(64),
     evidenceSourceHead: 'b'.repeat(40), generatedInputHead: 'c'.repeat(40), r5bTerminalBase: BASE,
-    pathContracts: { source: [], outputs: [], preReport: [], terminal: [] }, humanStatus: HUMAN_STATUS,
+    pathContracts: { source: [], outputs: [], preReport: [], terminal: [] }, runtimeInput: { schema: 'fixture' }, humanStatus: HUMAN_STATUS,
   };
   const committed = {
     schema: terminalExpected.schema, generatedAt: '2026-08-16T00:00:00.000Z', passed: terminalExpected.passed,
     failures: clone(terminalExpected.failures), checks: clone(terminalExpected.checks), manifestSha256: terminalExpected.manifestSha256,
     evidenceSourceHead: terminalExpected.evidenceSourceHead, generatedInputHead: terminalExpected.generatedInputHead,
-    r5bTerminalBase: terminalExpected.r5bTerminalBase, pathContracts: clone(terminalExpected.pathContracts), humanStatus: terminalExpected.humanStatus,
+    r5bTerminalBase: terminalExpected.r5bTerminalBase, pathContracts: clone(terminalExpected.pathContracts),
+    runtimeInput: clone(terminalExpected.runtimeInput), humanStatus: terminalExpected.humanStatus,
   };
   assertFixture(exactCommittedTerminal(committed, terminalExpected), 'valid committed terminal exact envelope');
   const emptyChecks = clone(committed); emptyChecks.checks = [];
@@ -1134,7 +1161,7 @@ function runIndependentContractFixtures() {
   }
   return {
     iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + markerBindingRejects.length + 3,
-    hmrAccepted: 4, hmrRejected: hmrRejects.length + 3,
+    hmrAccepted: 4, hmrRejected: hmrRejects.length + 13,
     terminalAccepted: 1, terminalRejected: 3,
   };
 }
@@ -1339,6 +1366,7 @@ function bind(head, entry) {
 }
 
 const head = git('rev-parse', 'HEAD');
+const runtimeInput = assertRuntimeInputBinding(head);
 if (git('merge-base', '--is-ancestor', BASE, AUTH) !== '') throw new Error('R5B terminal is not the authorization parent.');
 if (git('merge-base', '--is-ancestor', AUTH, head) !== '') throw new Error('Authorization is not source ancestor.');
 exactRange(AUTH, head, sourcePaths, 'authorization-to-source exact range');
@@ -1370,13 +1398,14 @@ const matrix = JSON.parse(await readFile(join(root, 'material-matrix-audit.json'
 const browser = JSON.parse(await readFile(join(root, 'browser-report.json'), 'utf8'));
 const ice = JSON.parse(await readFile(join(root, 'ice-provenance-audit.json'), 'utf8'));
 for (const [label, value, schema] of [
-  ['semantic', semantic, 'tetramorph.t37.material-semantic.v1'],
-  ['matrix', matrix, 'tetramorph.t37.material-matrix.v1'],
-  ['browser', browser, 'tetramorph.t37.material-browser.v1'],
-  ['ice', ice, 'tetramorph.t37.ice-provenance.v1'],
+  ['semantic', semantic, 'tetramorph.t37.material-semantic.v2'],
+  ['matrix', matrix, 'tetramorph.t37.material-matrix.v2'],
+  ['browser', browser, 'tetramorph.t37.material-browser.v2'],
+  ['ice', ice, 'tetramorph.t37.ice-provenance.v2'],
 ]) {
   if (value.schema !== schema || value.passed !== true || value.errors?.length > 0 || value.failures?.length > 0) throw new Error(`${label} audit is not fail-closed green.`);
   if (new Date(value.generatedAt).toISOString() !== value.generatedAt) throw new Error(`${label} generatedAt is not canonical ISO.`);
+  if (!deepEqual(value.runtimeInput, runtimeInput)) throw new Error(`${label} audit runtime input binding differs from the clean worktree preflight.`);
 }
 const semanticErrors = await semanticProofErrors(semantic);
 if (semanticErrors.length > 0) throw new Error(`semantic proof recomputation failed:\n${semanticErrors.join('\n')}`);
@@ -1427,8 +1456,9 @@ if (recomputedIceChecks.length === 0 || !deepEqual(ice.checks, recomputedIceChec
 }
 
 const manifest = {
-  schema: 'tetramorph.t37.material-ice-manifest.v1', generatedAt: new Date().toISOString(),
+  schema: 'tetramorph.t37.material-ice-manifest.v2', generatedAt: new Date().toISOString(),
   provenance: { r5bTerminalBase: BASE, authorizationHead: AUTH, evidenceSourceHead: head, sourceCommits, productHead: BASE, writerBoundary: `${prefix}**` },
+  runtimeInput,
   humanStatus: HUMAN_STATUS,
   pathContracts: { source: sourcePaths, outputs: outputPaths, preReport: preReportPaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_BINDINGS },
   countContracts: { source: 10, semanticPng: 20, matrixPng: 6, outputsBeforeManifest: 36, preReport: 37, terminal: 1 },

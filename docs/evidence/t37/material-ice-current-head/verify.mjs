@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import {
   AUTH, BASE, BYTE_CONTRACT, CLIENT, CONTRACT, HUMAN_STATUS, ICE, ITEMS, MATRIX_CASES,
   MATRIX_PNG, OUTPUT, PRE_REPORT, PRODUCT_BINDINGS, PROFILE, SEMANTIC_PNG, SOURCE,
-  STAGES, SEEDS, STAGE_E_ANCHORS, TERMINAL, prefix, repo, root,
+  STAGES, SEEDS, STAGE_E_ANCHORS, TERMINAL, assertRuntimeInputBinding, prefix, repo, root,
 } from './evidence-contract.mjs';
 import { assertItemSnapshot } from './product-fixture.mjs';
 
@@ -518,6 +518,8 @@ function isRelevantHmrEvent(event, expectedOrigin) {
   return isAppNamespaceEvent(event) || isDocumentRequest(event) || isDocumentNavigation(event) || isUnboundNavigation(event)
     || payload?.type === 'update' || payload?.type === 'full-reload';
 }
+/** @param {any} event */
+const isHistoryBoundaryEvent = (event) => event?.kind === 'history-call' || event?.kind === 'same-document-navigation';
 /** @param {any} marker */
 const exactPhaseMarker = (marker) => plainExactKeys(marker, ['eventIndex', 'eventSequence'])
   && Number.isInteger(marker.eventIndex) && marker.eventIndex >= 0
@@ -704,15 +706,21 @@ function deriveHmrProof(hmr, expectedOrigin) {
 /** @param {any} browser */
 function exactHmrEventWindow(browser) {
   const all = browser?.observations?.events; const marker = browser?.hmr?.marker; const expectedOrigin = String(browser?.origin);
-  if (!Array.isArray(all) || !Number.isInteger(marker?.eventIndex) || !Number.isInteger(marker?.endEventIndex)
-    || marker.eventIndex < 0 || marker.endEventIndex <= marker.eventIndex || marker.endEventIndex > all.length) return false;
+  const uiExitArm = marker?.uiExitArm;
+  if (!Array.isArray(all) || !plainExactKeys(marker, ['eventIndex', 'eventSequence', 'navigationArm', 'endEventIndex', 'endEventSequence', 'uiExitArm'])
+    || !plainExactKeys(marker.navigationArm, ['eventIndex', 'eventSequence', 'url']) || !plainExactKeys(uiExitArm, ['eventIndex', 'eventSequence'])
+    || !Number.isInteger(marker.eventIndex) || !Number.isInteger(marker.endEventIndex) || !Number.isInteger(uiExitArm.eventIndex)
+    || marker.eventIndex < 0 || marker.endEventIndex <= marker.eventIndex || uiExitArm.eventIndex < marker.endEventIndex || uiExitArm.eventIndex > all.length) return false;
   const beforeSequence = marker.eventIndex === 0 ? 0 : all[marker.eventIndex - 1]?.sequence;
   const endSequence = all[marker.endEventIndex - 1]?.sequence;
+  const uiExitArmSequence = uiExitArm.eventIndex === 0 ? 0 : all[uiExitArm.eventIndex - 1]?.sequence;
   const arm = marker.navigationArm;
   return all.every((/** @type {any} */ event, /** @type {number} */ index) => event?.sequence === index + 1)
     && marker.eventSequence === beforeSequence && marker.endEventSequence === endSequence
+    && uiExitArm.eventSequence === uiExitArmSequence
     && arm?.eventIndex === marker.eventIndex && arm?.eventSequence === marker.eventSequence && arm?.url === browser?.hmr?.before?.navigation?.url
     && deepEqual(all.slice(marker.eventIndex, marker.endEventIndex), browser?.hmr?.events)
+    && all.slice(marker.endEventIndex, uiExitArm.eventIndex).every((/** @type {any} */ event) => !isHistoryBoundaryEvent(event))
     && all.slice(marker.endEventIndex).every((/** @type {any} */ event) => !isRelevantHmrEvent(event, expectedOrigin));
 }
 /** @param {any} hmr */
@@ -736,7 +744,7 @@ function exactAppTouch(hmr) {
     && mtime.requestedMs - mtime.beforeMs >= 1000 && Math.abs(mtime.afterMs - mtime.requestedMs) <= 1;
 }
 const terminalOwnKeys = ['schema', 'generatedAt', 'passed', 'failures', 'checks', 'manifestSha256', 'evidenceSourceHead',
-  'generatedInputHead', 'r5bTerminalBase', 'pathContracts', 'humanStatus'];
+  'generatedInputHead', 'r5bTerminalBase', 'pathContracts', 'runtimeInput', 'humanStatus'];
 /** @param {any} value */
 const canonicalIso = (value) => typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value;
 /** @param {any} committed @param {any} expectedWithoutTimestamp */
@@ -1085,12 +1093,30 @@ function runIndependentContractFixtures() {
   const filler = Array.from({ length: 10 }, (_, index) => ({ sequence: index + 1, kind: 'fixture' }));
   const windowed = clone(reload);
   windowed.marker = { eventIndex: 10, eventSequence: 10, navigationArm: { eventIndex: 10, eventSequence: 10, url: route },
-    endEventIndex: 22, endEventSequence: 22 };
+    endEventIndex: 22, endEventSequence: 22, uiExitArm: { eventIndex: 22, eventSequence: 22 } };
   const exactEvents = [...filler, ...clone(reload.events)];
   assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: windowed }), 'valid HMR eventEnd window');
+  assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, history(23, 'replaceState', 2, 2), sameNav(24)] }, hmr: windowed }),
+    'allow normal route History after the frozen HMR History guard');
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, doc(23)] }, hmr: windowed }), 'reject slow late reload after eventEnd');
   const lateMalformedApp = { ...response(23, 999), url: 'not-a-url:/src/App.tsx' };
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, lateMalformedApp] }, hmr: windowed }), 'reject late malformed App namespace event after eventEnd');
+  const missingExitArm = clone(windowed); delete missingExitArm.marker.uiExitArm;
+  const extraMarkerKey = clone(windowed); extraMarkerKey.marker.forged = true;
+  const earlyExitArm = clone(windowed); earlyExitArm.marker.uiExitArm = { eventIndex: 21, eventSequence: 21 };
+  const overflowExitArm = clone(windowed); overflowExitArm.marker.uiExitArm = { eventIndex: 23, eventSequence: 23 };
+  const driftedExitArm = clone(windowed); driftedExitArm.marker.uiExitArm = { eventIndex: 22, eventSequence: 21 };
+  const lateHistory = clone(windowed); lateHistory.marker.uiExitArm = { eventIndex: 23, eventSequence: 23 };
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: missingExitArm }), 'reject missing UI-exit arm');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: extraMarkerKey }), 'reject extra HMR marker key');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: earlyExitArm }), 'reject UI-exit arm before HMR end');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: overflowExitArm }), 'reject UI-exit arm beyond event array');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: driftedExitArm }), 'reject UI-exit arm sequence drift');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, history(23, 'replaceState', 2, 2)] }, hmr: lateHistory }), 'reject replaceState after HMR end before History guard');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, history(23, 'pushState', 2, 2)] }, hmr: lateHistory }), 'reject pushState after HMR end before History guard');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, sameNav(23)] }, hmr: lateHistory }), 'reject same-document navigation after HMR end before History guard');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, { sequence: 23, kind: 'history-call' }] }, hmr: lateHistory }), 'reject malformed History namespace event before UI exit');
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, { sequence: 23, kind: 'same-document-navigation' }] }, hmr: lateHistory }), 'reject malformed same-document namespace event before UI exit');
 
   const committedApp = blob(BASE, 'src/App.tsx'); const committedAppSha = sha(committedApp); const committedAppBlob = git('rev-parse', `${BASE}:src/App.tsx`);
   const validTouch = {
@@ -1118,16 +1144,17 @@ function runIndependentContractFixtures() {
   assertFixture(!exactTerminalContexts(live(1), imprecise), 'reject imprecise terminal context close');
 
   const terminalExpected = {
-    schema: 'tetramorph.t37.material-ice-verification.v1', passed: true, failures: [],
+    schema: 'tetramorph.t37.material-ice-verification.v2', passed: true, failures: [],
     checks: [{ label: 'fixture', passed: true, detail: null }], manifestSha256: 'a'.repeat(64),
     evidenceSourceHead: 'b'.repeat(40), generatedInputHead: 'c'.repeat(40), r5bTerminalBase: BASE,
-    pathContracts: { source: [], outputs: [], preReport: [], terminal: [] }, humanStatus: HUMAN_STATUS,
+    pathContracts: { source: [], outputs: [], preReport: [], terminal: [] }, runtimeInput: { schema: 'fixture' }, humanStatus: HUMAN_STATUS,
   };
   const committed = {
     schema: terminalExpected.schema, generatedAt: '2026-08-16T00:00:00.000Z', passed: terminalExpected.passed,
     failures: clone(terminalExpected.failures), checks: clone(terminalExpected.checks), manifestSha256: terminalExpected.manifestSha256,
     evidenceSourceHead: terminalExpected.evidenceSourceHead, generatedInputHead: terminalExpected.generatedInputHead,
-    r5bTerminalBase: terminalExpected.r5bTerminalBase, pathContracts: clone(terminalExpected.pathContracts), humanStatus: terminalExpected.humanStatus,
+    r5bTerminalBase: terminalExpected.r5bTerminalBase, pathContracts: clone(terminalExpected.pathContracts),
+    runtimeInput: clone(terminalExpected.runtimeInput), humanStatus: terminalExpected.humanStatus,
   };
   assertFixture(exactCommittedTerminal(committed, terminalExpected), 'valid committed terminal exact envelope');
   const emptyChecks = clone(committed); emptyChecks.checks = [];
@@ -1138,7 +1165,7 @@ function runIndependentContractFixtures() {
   }
   return {
     iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + markerBindingRejects.length + 3,
-    hmrAccepted: 4, hmrRejected: hmrRejects.length + 3,
+    hmrAccepted: 4, hmrRejected: hmrRejects.length + 13,
     terminalAccepted: 1, terminalRejected: 3,
   };
 }
@@ -1306,6 +1333,7 @@ check(git('merge-base', '--is-ancestor', AUTH, generated) === '', 'authorization
 const manifestBytes = blob(generated, prefix + 'manifest.json');
 const manifest = JSON.parse(text(manifestBytes, 'manifest'));
 const sourceHead = manifest.provenance.evidenceSourceHead;
+const runtimeInput = assertRuntimeInputBinding(sourceHead, { allowDescendantExecutionHead: true });
 check(equalSet(range(AUTH, sourceHead), sourcePaths), 'authorization-to-source exact endpoint');
 linearHistory(AUTH, sourceHead, sourcePaths, 'authorization-to-source exact linear history');
 check(equalSet(range(sourceHead, generated), preReportPaths), 'source-to-generated exact endpoint');
@@ -1318,9 +1346,10 @@ if (terminalCommitted) {
   check(equalSet(tree(head), [...sourcePaths, ...preReportPaths, ...terminalPaths]), 'terminal exact tree');
 }
 
-check(manifest.schema === 'tetramorph.t37.material-ice-manifest.v1', 'manifest schema');
+check(manifest.schema === 'tetramorph.t37.material-ice-manifest.v2', 'manifest schema');
 check(manifest.provenance.r5bTerminalBase === BASE && manifest.provenance.authorizationHead === AUTH
   && manifest.provenance.productHead === BASE, 'manifest exact heads');
+check(deepEqual(manifest.runtimeInput, runtimeInput), 'manifest runtime input binding matches clean source/product worktree');
 check(manifest.humanStatus === HUMAN_STATUS, 'manifest human status open');
 check(deepEqual(manifest.byteContract, BYTE_CONTRACT), 'manifest byte contract');
 check(deepEqual(manifest.pathContracts, { source: sourcePaths, outputs: outputPaths, preReport: preReportPaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_BINDINGS }), 'manifest path contracts');
@@ -1343,8 +1372,9 @@ check(deepEqual(manifest.outputBindings, expectedOutputBindings), 'output Git-bl
 for (const anchor of STAGE_E_ANCHORS) check(git('merge-base', '--is-ancestor', anchor, BASE) === '', `Stage E ancestor ${anchor}`);
 
 const semantic = JSON.parse(text(blob(generated, prefix + 'material-semantic-audit.json'), 'semantic audit'));
-check(semantic.schema === 'tetramorph.t37.material-semantic.v1' && semantic.passed === true
+check(semantic.schema === 'tetramorph.t37.material-semantic.v2' && semantic.passed === true
   && Array.isArray(semantic.errors) && semantic.errors.length === 0, 'semantic audit declared green');
+check(deepEqual(semantic.runtimeInput, runtimeInput), 'semantic audit exact runtime input binding');
 check(equalSet(Object.keys(semantic.cases), ITEMS), 'semantic four items');
 for (const item of /** @type {Array<'freeze'|'bomb'|'multiplier'|'collapse'>} */ (ITEMS)) {
   const entry = semantic.cases[item];
@@ -1377,8 +1407,9 @@ for (const item of /** @type {Array<'freeze'|'bomb'|'multiplier'|'collapse'>} */
 check(equalSet(SEMANTIC_PNG, ITEMS.flatMap((item) => STAGES.map((stage) => `${item}-${stage}.png`))), 'semantic filename contract');
 
 const matrix = JSON.parse(text(blob(generated, prefix + 'material-matrix-audit.json'), 'matrix audit'));
-check(matrix.schema === 'tetramorph.t37.material-matrix.v1' && matrix.passed === true
+check(matrix.schema === 'tetramorph.t37.material-matrix.v2' && matrix.passed === true
   && Array.isArray(matrix.errors) && matrix.errors.length === 0, 'matrix audit declared green');
+check(deepEqual(matrix.runtimeInput, runtimeInput), 'matrix audit exact runtime input binding');
 check(equalSet(Object.keys(matrix.cases), MATRIX_CASES.map(({ name }) => name)), 'matrix six cases');
 check(deepEqual(matrix.coverage, { themes: ['deep-tide', 'mineral-mist', 'sunstone'], motion: ['full', 'reduced'], languages: ['en', 'zh-CN'], viewports: ['1125x1196', '1440x900', '390x844'], items: ['bomb', 'collapse', 'freeze', 'multiplier'] }), 'matrix exact coverage');
 for (const entry of MATRIX_CASES) {
@@ -1403,8 +1434,9 @@ for (const entry of MATRIX_CASES) {
 check(equalSet(MATRIX_PNG, MATRIX_CASES.map(({ name }) => `${name}.png`)), 'matrix filename contract');
 
 const browser = JSON.parse(text(blob(generated, prefix + 'browser-report.json'), 'browser report'));
-check(browser.schema === 'tetramorph.t37.material-browser.v1' && browser.passed === true
+check(browser.schema === 'tetramorph.t37.material-browser.v2' && browser.passed === true
   && Array.isArray(browser.failures) && browser.failures.length === 0, 'browser report declared green');
+check(deepEqual(browser.runtimeInput, runtimeInput), 'browser audit exact runtime input binding');
 const recomputedLifecycleProof = browserLifecycleProof(browser);
 const recomputedLifecycleAssertions = browserLifecycleAssertions(browser);
 for (const [label, passed] of Object.entries(recomputedLifecycleAssertions)) check(passed, `browser lifecycle: ${label}`);
@@ -1414,8 +1446,9 @@ check(deepEqual(browser.assertions, recomputedLifecycleAssertions), 'browser ass
 const ice = JSON.parse(text(blob(generated, prefix + 'ice-provenance-audit.json'), 'Ice provenance'));
 const expectedOrigin = new URL(String(browser.origin)).origin;
 const recomputedIceClassification = classifyIceResponses(ice.runtimeResponses, expectedOrigin);
-check(ice.schema === 'tetramorph.t37.ice-provenance.v1' && ice.passed === true && Array.isArray(ice.failures) && ice.failures.length === 0,
+check(ice.schema === 'tetramorph.t37.ice-provenance.v2' && ice.passed === true && Array.isArray(ice.failures) && ice.failures.length === 0,
   'Ice provenance declared green');
+check(deepEqual(ice.runtimeInput, runtimeInput), 'Ice provenance exact runtime input binding');
 check(recomputedIceClassification.passed, 'Ice raw response strict module-plus-asset classification', recomputedIceClassification);
 check(deepEqual(ice.runtimeClassification, recomputedIceClassification), 'Ice persisted classification matches independent raw recomputation');
 check(deepEqual(browser.observations?.iceResponses, ice.runtimeResponses), 'Ice browser/provenance raw response records identical');
@@ -1457,11 +1490,12 @@ const expectedDirectory = terminalCommitted ? [...SOURCE, ...PRE_REPORT, ...TERM
 check(equalSet(await files(root), expectedDirectory), 'worktree exact directory');
 const manifestSha256 = sha(manifestBytes);
 const report = {
-  schema: 'tetramorph.t37.material-ice-verification.v1', generatedAt: new Date().toISOString(),
+  schema: 'tetramorph.t37.material-ice-verification.v2', generatedAt: new Date().toISOString(),
   passed: failures.length === 0, failures, checks,
   manifestSha256, evidenceSourceHead: sourceHead, generatedInputHead: generated,
   r5bTerminalBase: BASE,
   pathContracts: { source: sourcePaths, outputs: outputPaths, preReport: preReportPaths, terminal: terminalPaths },
+  runtimeInput,
   humanStatus: HUMAN_STATUS,
 };
 
@@ -1476,6 +1510,7 @@ if (terminalCommitted) {
     generatedInputHead: report.generatedInputHead,
     r5bTerminalBase: report.r5bTerminalBase,
     pathContracts: structuredClone(report.pathContracts),
+    runtimeInput: structuredClone(report.runtimeInput),
     humanStatus: report.humanStatus,
   };
   check(exactCommittedTerminal(committedTerminal, expectedCommittedTerminal), 'committed terminal report exact envelope');
