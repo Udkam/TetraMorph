@@ -9142,45 +9142,56 @@ audited default-heap failure recorded in `F4E-R5-CONSUMED-V1`; it produced no ca
 and does not prove Intro-05 unsatisfiable. A v6 production attempt remains closed.
 
 Before v6, the renderer-independent exact certifier gains this synchronous optional
-frontier-store boundary (names are normative):
+run-storage boundary (names are normative):
 
 ```ts
-interface EndgameProofFrontierLayer {
+interface EndgameProofRun {
+  readonly id: string;
   readonly size: number;
   values(): Iterable<string>;
   dispose(): void;
 }
-interface EndgameProofFrontierWriter {
-  add(key: string): void;
-  finish(): EndgameProofFrontierLayer;
+interface EndgameProofRunWriter {
+  write(key: string): void;
+  finish(): EndgameProofRun;
   abort(): void;
 }
-interface EndgameProofFrontierStore {
-  createInitial(key: string): EndgameProofFrontierLayer;
-  createNext(depth: number): EndgameProofFrontierWriter;
+interface EndgameProofRunStoreDiagnostics {
+  readonly activeRuns: readonly string[];
+  readonly residue: readonly string[];
+  readonly residueTruncated: boolean;
+  readonly cleanupErrors: readonly string[];
+  readonly cleanupErrorsTruncated: boolean;
+}
+interface EndgameProofRunStore {
+  createRun(id: string): EndgameProofRunWriter;
+  diagnostics(): EndgameProofRunStoreDiagnostics;
   dispose(): void;
 }
 interface EndgameOptimalRouteCertificateOptions {
-  frontierStore?: EndgameProofFrontierStore;
+  runStore?: EndgameProofRunStore;
 }
 ```
 
 Both public certifiers keep their synchronous `Certificate | null` return and accept the
-options only as a final optional parameter. With no option they use the source-compatible
-in-memory store. Core imports neither the disk adapter nor any `node:*` module. A store is
-single-certificate/single-use: `createInitial` runs once; every layer's `values()` runs once
-and must yield exactly `size` records; `createNext(depth)` runs once per entered depth;
-`add` precedes one `finish`, while `abort` is idempotent and invalidates unfinished output.
-`finish` returns a valid zero-size layer when no key was emitted. Layer and store `dispose`
-are idempotent. Core owns these calls, closes the previous layer only after next-layer
-finalization, and preserves a primary proof exception plus every cleanup exception in an
-`AggregateError` (or an exactly equivalent multi-error value).
+options only as a final optional parameter. With no option they preserve the current in-memory
+`Set` algorithm byte-for-byte. Core imports neither the disk adapter nor any `node:*` module.
+A supplied store is single-certificate/single-use. Run `values()` is repeatable and immutable,
+and each iteration must yield exactly `size` strictly increasing full records. `write` precedes
+one `finish`; `abort`, Run `dispose`, and Store `dispose` are idempotent. `diagnostics()` remains
+callable after any failure/dispose and is the normative residue channel. Core preserves a
+primary proof exception plus every cleanup exception in `AggregateError` (or an exactly
+equivalent multi-error value) while the caller retains the Store for diagnostics.
 
 Core continues to own every proof decision in the same order: decode the full
 11-segment canonical state key, apply the existing target-column-deficit lower bound,
 enumerate the complete public-control landing domain, reject any shorter win before child
-pruning, apply the same child bound, and emit the same complete key. The default store keeps
-the current in-memory behavior and every existing call remains source-compatible.
+pruning, apply the same child bound, and emit the same complete key. In the injected path,
+Core—not the Store—also owns chunk admission, ordinal sort, full-key dedupe, fan-in grouping,
+k-way merge, counts, and deterministic run IDs. The Store is only immutable run persistence.
+An injected result is acceptable only with the exact independently reviewed adapter blob bound
+by its validator; this is an audited honest-adapter boundary, not a claim that arbitrary
+third-party Store code is proof-safe.
 
 The Node-only authoring adapter stores only full canonical printable-ASCII keys. It may not use a
 hash, board mask, target-row projection, probabilistic structure, or other lossy identity.
@@ -9189,30 +9200,47 @@ missing terminal LF, truncated lines, and longer records are fatal. Empty layers
 files. Ordering is explicit unsigned-byte ordinal comparison, never locale, prefix, or hash
 comparison; every persisted run is strictly increasing and fully byte-deduplicated.
 
-One chunk holds at most `64 * 1024 * 1024` record bytes **including** each LF and at most
-`131072` records. The writer flushes *before* an added record would exceed either limit and
+One Core-owned chunk holds at most `64 * 1024 * 1024` record bytes **including** each LF and
+at most `131072` records. Core flushes *before* an added record would exceed either limit and
 rejects a single over-limit record. Sorting is in place with at most O(record-count) reference
 scratch; encoding/writing may not join a whole chunk into a second monolithic string or buffer.
 The fixed output buffer is at most 1 MiB.
 
-Chunk runs are merged with fan-in exactly 32 through deterministic numbered passes. At most
-32 input handles, one output handle, one `64 * 1024`-byte buffer per reader, one current record
-per reader, and the 1 MiB output buffer are open/resident. Each group output is fully flushed,
-closed, reopened, and checked for framing, strict order, and exact descriptor count before its
-inputs may be unlinked. Multi-pass and final merges use complete-byte equality for cross-run
-dedupe. Layer descriptors carry exact unique-key count; Core independently counts yielded
-records. Core telemetry and certificate fields remain unchanged.
+Core creates at most 4096 chunk runs for one layer; exceeding that cap fails closed without a
+certificate. Merge groups contain `min(32, remainingRuns)` inputs. A tail group of one is
+revalidated and carried forward unchanged; zero inputs produce one verified zero-byte run.
+For 33 inputs, pass 0 therefore creates one 32-way output and carries one input, then pass 1
+merges those two. Pass/group/run IDs are fixed zero-padded depth/pass/group ordinals.
 
-The injected lifecycle is fail-closed. Core disposes the current layer after the next layer
+Groups of 2..32 are merged through deterministic numbered passes. At most
+32 input handles, one output handle, one `64 * 1024`-byte buffer per reader, one current record
+per reader, and the 1 MiB output buffer are open/resident. Core writes each sorted/deduped chunk,
+then reopens it and compares every record byte-for-byte against the still-resident source array
+before releasing that array. For every merge, Core writes the expected merged stream, closes it,
+then reopens all inputs plus output and recomputes the merge while comparing every output record
+byte-for-byte; only a complete exact comparison permits input disposal. Thus the Store cannot
+select, omit, add, replace, or deduplicate a key without detection under immutable-repeatable
+run semantics. The final layer is consumed once by Core with strict order/count validation.
+Core telemetry and certificate fields remain unchanged.
+
+At most 4096 run descriptors plus one current-layer run and one output run are active; all
+descriptor, created-file-registry, residue, and cleanup-error collections are capped at 4098
+entries. Stage paths are at most 512 UTF-16 code units; deterministic run IDs are at most 96
+ASCII bytes; each normalized cleanup error is at most 2048 UTF-8 bytes. Overflow is represented
+by the two explicit `*Truncated` flags and is itself fatal. These caps bound non-record metadata
+independently of frontier width; 4096 full chunks represent 256 GiB of raw records before the
+proof fails closed.
+
+The injected lifecycle is fail-closed. Core disposes the current run only after the next run
 is finalized and closes the entire store on success or exception. The Node adapter receives
 one exact absent stage path beneath an existing caller-verified parent, creates it exclusively,
 rejects symlink/reparse/realpath drift under its honest-caller boundary, and keeps an exact
 created-file registry. Deterministic filesystem operations are injectable for fault tests.
 Every handle closes before unlink; cleanup unlinks only registered exact files, refuses any
 foreign directory entry, and removes only its now-empty exact stage directory without a
-recursive delete. A primary error and cleanup errors are preserved together; the adapter also
-returns a residue manifest when cleanup cannot complete. Any create/open/write/flush/read/
-sort/merge/close/count/enumerate/unlink/directory-remove fault propagates and cannot yield a
+recursive delete. A primary error and cleanup errors are preserved together; the adapter
+exposes the capped residue/error manifest through `diagnostics()`. Any create/open/write/flush/
+read/close/count/enumerate/unlink/directory-remove fault propagates and cannot yield a
 certificate. Production v6 must independently bind the stage parent/path and rescan real
 residue after worker exit. Active same-permission path replacement or foreign-file injection is
 outside this infrastructure's honest-caller guarantee and remains a governance violation,
@@ -9230,7 +9258,11 @@ and small synthetic definitions, including every telemetry field; deterministic 
 and duplicate collapse; more-than-32-run multi-pass merge; full-key/prefix/hash-collision
 adversaries; exact peak raw-record/count/handle/read/write-buffer accounting; invalid or
 unterminated framing; descriptor-count mismatch; and injected create/open/write/flush/read/
-merge/close/enumerate/unlink/directory-remove failures. Tests use both the injectable seam and
+close/enumerate/unlink/directory-remove failures. Store-fault tests keep self-reported size
+unchanged while separately omitting, adding, and replacing records; Core's chunk/merge readback
+comparison must reject all three. Tests also cover empty, one-run, 31/32/33-run, 4096-run, and
+4097th-run rejection; metadata/diagnostic caps and truncation; repeated immutable reads; and
+primary-plus-cleanup `AggregateError`. Tests use both the injectable seam and
 the real Windows filesystem, including real handle/flush/close/rename-or-finalize/unlink order
 and a final absent stage directory. The Node test lives under `src/**` so current Vitest
 discovery executes it without a config change. No test or diagnostic may run Intro-05, a

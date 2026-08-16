@@ -10236,12 +10236,14 @@ V5 is closed as an audited resource failure at receipt commit `77e2427`; its imm
 attempt/terminal prove a default Node heap OOM, not an unsatisfiable Intro-05. Never rerun
 or repair v5 in place.
 
-The sole open implementation slice is the exact frontier-store infrastructure defined in
-`docs/DESIGN.md`. Add the optional Core store boundary, its source-compatible in-memory
-default, the Node-only external-sort/full-key-dedupe adapter, and exact tests at
+The sole open implementation slice is the exact run-storage infrastructure defined in
+`docs/DESIGN.md`. Preserve the default in-memory certifier; add the optional Core-owned
+external-sort/full-key-dedupe path, the Node-only immutable-run adapter, and exact tests at
 `src/game/core/endgameProofFrontierStore.test.ts` and
-`src/authoring/endgameDiskFrontier.test.mjs`. The adapter freezes a 64 MiB / 131072-record
-chunk, 2048-byte record, 32-way multi-pass merge, 64 KiB reader, and 1 MiB writer boundary.
+`src/authoring/endgameDiskFrontier.test.mjs`. The path freezes a 64 MiB / 131072-record
+chunk, 2048-byte record, at most 4096 chunks, 32-way multi-pass merge, 64 KiB reader, 1 MiB
+writer, and 4098-entry metadata/diagnostic boundary. Core exact-compares each persisted chunk
+and recomputed merge before releasing inputs; adapter `diagnostics()` remains observable.
 Do not run Intro-05 or any target-specific partial search. Do not edit Intro-05 definitions/
 fixtures, later curriculum, Vite config, UI, audio, scoring, storage, or protected inherited
 paths in this checkpoint.

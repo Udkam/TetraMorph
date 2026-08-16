@@ -772,3 +772,17 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   a later v6 terminal owner must bind and rescan its own namespace.
 - Next: commit only this four-document R2 correction and obtain two fresh all-zero reviews.
   The four source paths and all proof execution remain closed meanwhile.
+
+### F4E-R6A R2 split verdict and R3 contract candidate
+
+- R2 `731ba8c` receives one all-zero review and one rejection at `0/1/3/0/1`. The blocking
+  issue is proof completeness: a high-level Store could omit a next-layer key while reporting
+  a self-consistent size. Tail groups, metadata bounds, and residue observation also drifted.
+- R3 changes the seam to immutable run persistence. Core owns every emitted-key chunk, sort,
+  full-key dedupe, deterministic 32-way pass, merge, count, and exact post-write/recomputed-
+  merge byte comparison before input disposal. Arbitrary Store code is not trusted proof input.
+- Empty/one/31/32/33 groups and the 4097th-chunk failure are exact. At most 4098 active
+  descriptors/registry/residue/errors are retained; diagnostics has explicit truncation and
+  remains callable after dispose. Same-size omit/add/replace faults must all fail closed.
+- Next: commit this four-doc R3 correction and obtain two fresh all-zero reviews. No source or
+  proof execution is open before that result.

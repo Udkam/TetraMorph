@@ -3137,3 +3137,17 @@ unstaged.
   diagnostics; injectable and real-Windows tests; and honest-caller staging governance.
 - Next: commit this four-doc correction and obtain two fresh all-zero contract reviews.
   Implementation and v6 both remain closed.
+
+### F4E-R6A R2 split verdict and R3 integrity correction
+
+- R2 `731ba8c` review A is all-zero, but adversarial review B rejects it at
+  `0/1/3/0/1`: a Store could self-consistently omit/replace keys; tail merge groups,
+  metadata caps, and residue observation were incomplete. No source implementation began.
+- R3 moves chunking, sort, dedupe, pass grouping, merge, exact run readback comparison, and
+  counts into Core. The Node adapter persists repeatable immutable runs only. Proof acceptance
+  requires its exact independently reviewed blob; arbitrary injected Stores are untrusted.
+- Tail groups are deterministic; 4096 chunk / 4098 active-metadata caps fail closed; diagnostic
+  arrays and messages are bounded and expose truncation. Core exact-compares same-size omit/add/
+  replace faults and preserves primary plus cleanup errors.
+- Next: commit the four R3 docs and obtain two fresh all-zero contract reviews. Source and v6
+  remain closed until then.
