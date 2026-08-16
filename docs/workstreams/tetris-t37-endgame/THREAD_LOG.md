@@ -694,3 +694,23 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Next: exact four-doc commit and two fresh independent all-zero static reviews. Only after a
   subsequent THREAD_LOG-only binding commit and exact-HEAD command audit may preflight run.
   Production remains closed.
+
+### F4E-R5 R4 committed static-QA disposition and final-binding candidate
+
+- Exact command-contract candidate `29a75980ab5b92afc654f750a5039122683521f9` changes only
+  the four authorized governing documents from parent `d767c7c`; Core remains
+  `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`. Validator remains exact at 55,930 bytes /
+  `02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A`.
+- Two fresh independent read-only reviews of that committed HEAD and exact external bytes each
+  report `P0/P1/P2/P3/GAP = 0/0/0/0/0`. They independently bind linear four-doc authority,
+  marker/hash, Node/Git/environment, captured-Core loader, geometry/admission/routes/support,
+  schema-8 output, capability/attempt, truly bounded streams, close/reap, publication, and the
+  honest-coordinator governance boundary. Neither review ran any validator mode.
+- Fail-closed boundary checks are explicit: synchronous pre-child spawn failure leaves an
+  attempt-only consumed state; terminal link followed by failed stage removal yields nonzero
+  outer exit plus real stage residue, so complete output audit rejects it regardless of the
+  terminal payload. Final audit must always rescan the actual namespace and process exit.
+- Candidate, attempt, terminal, both stage prefixes, and matching validator/worker processes
+  remain zero. The commit containing this section is the sole final-binding candidate. It must
+  receive fresh exact-HEAD/history/blob/command review before one no-write preflight; production
+  remains closed until that preflight result and post-state are independently accepted.
