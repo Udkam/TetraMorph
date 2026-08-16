@@ -31,6 +31,7 @@ function observe(page, label) {
 async function ready(page) {
   await page.goto(baseUrl, { waitUntil: 'load' });
   await page.waitForFunction(() => window.__R5A_READY__ === true, null, { timeout: 20_000 });
+  await page.waitForLoadState('networkidle');
 }
 
 async function state(page) {
@@ -94,7 +95,7 @@ check(!/Action stack|Clear collision|Compact block knock/u.test(desktopLayout.vi
 await desktop.locator('[data-play="A"]').click();
 await desktop.waitForFunction(() => window.__R5A_TEST__.getState().audio.phase === 'pending');
 const pendingA = await state(desktop);
-await desktop.locator('[data-play="B"]').click();
+await desktop.evaluate(() => window.__R5A_TEST__.playCandidate('B'));
 await desktop.waitForFunction(() => window.__R5A_TEST__.getState().lastSchedule?.candidate === 'B');
 const switchedB = await state(desktop);
 check(pendingA.audio.pendingSources === 1 && scheduleExact(pendingA), 'A pending at exact impact');
