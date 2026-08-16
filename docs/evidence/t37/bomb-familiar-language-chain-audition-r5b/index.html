@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark"><title>TetraMorph · Bomb R5B 产品连锁试听</title><link rel="stylesheet" href="./styles.css"></head>
+<body data-ready="false"><main>
+  <header><p class="kicker">T37 · R5B · PRODUCT AUDIO</p><h1>正常 Bomb → <span>连锁扩散</span></h1>
+    <p>每次完整播放都使用真实 Core 事件、生产 Renderer 与生产 AudioEngine。只在完整动画 <b>1×</b> 下听感；reduced 仅供技术核验。</p>
+    <aside><b>最终集中评审前不作人耳结论</b><br>默认 A 仍是临时候选，自动检查不能接受任何声音。</aside></header>
+  <section class="stage"><div class="visual"><div class="row"><h2 id="scene-title">真实 Core · 正常 Bomb</h2><output id="time">0 ms</output></div>
+    <div id="canvas-host" aria-label="TetraMorph Bomb 产品动画棋盘"></div><p id="status">正在准备生产 Renderer…</p></div>
+    <div class="controls"><h2>完整 1×：正常 → 连锁</h2><div class="variants">
+      <button data-pair="A"><b>A</b><span>播放完整顺序</span></button><button data-pair="B"><b>B</b><span>播放完整顺序</span></button><button data-pair="C"><b>C</b><span>播放完整顺序</span></button>
+    </div><div class="utilities"><button id="stop">停止</button><button id="restart">重新播放</button><button id="disable">禁用声音</button><button id="reduced">A · reduced 技术核验</button></div>
+    <form id="verdict"><fieldset><legend>最终集中评审前保持失败关闭</legend><label><input type="radio" name="verdict" value="reject" checked><span>全部不通过</span></label><label><input type="radio" name="verdict" value="A"><span>A</span></label><label><input type="radio" name="verdict" value="B"><span>B</span></label><label><input type="radio" name="verdict" value="C"><span>C</span></label></fieldset>
+      <button type="submit">记录本页临时选择</button><output id="verdict-output">未记录；不会保存到浏览器或产品。</output></form></div></section>
+  <footer><span>无自动播放 · 无持久化 · 无产品选择器</span><span id="technical">Instance 0 · Canvas 0 · Audio cold</span></footer>
+</main><script type="module" src="./audition.ts"></script></body></html>
