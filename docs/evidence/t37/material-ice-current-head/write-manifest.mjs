@@ -384,15 +384,19 @@ const isAppEvent = (event, expectedOrigin) => isAppNamespaceEvent(event) && Numb
 /** @param {any} event @param {string} expectedOrigin */
 const isAppRequest = (event, expectedOrigin) => event?.kind === 'request' && isAppEvent(event, expectedOrigin)
   && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch']);
+/** @param {Buffer} body */
+const viteWeakEtag = (body) => `W/"${body.length.toString(16)}-${createHash('sha1').update(body).digest('base64').substring(0, 27)}"`;
 /** @param {any} event @param {string} expectedOrigin */
-const isFreshAppResponse = (event, expectedOrigin) => event?.kind === 'app-response' && isAppEvent(event, expectedOrigin)
-  && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch',
-    'status', 'contentType', 'etag', 'bodyDisposition', 'bodyEncoding', 'bodyBase64'])
-  && event?.status === 200 && ['text/javascript', 'application/javascript'].includes(contentTypeEssence(event?.contentType) ?? '')
-  && (event?.etag === null || (typeof event?.etag === 'string' && event.etag.length > 0)) && event?.bodyDisposition === 'captured'
-  && event?.bodyEncoding === 'base64' && canonicalBase64(event?.bodyBase64) !== null
-  && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyUnavailable')
-  && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyError');
+function isFreshAppResponse(event, expectedOrigin) {
+  const body = canonicalBase64(event?.bodyBase64);
+  return event?.kind === 'app-response' && isAppEvent(event, expectedOrigin)
+    && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch',
+      'status', 'contentType', 'etag', 'bodyDisposition', 'bodyEncoding', 'bodyBase64'])
+    && event?.status === 200 && ['text/javascript', 'application/javascript'].includes(contentTypeEssence(event?.contentType) ?? '')
+    && body !== null && body.length > 0 && event?.etag === viteWeakEtag(body) && event?.bodyDisposition === 'captured'
+    && event?.bodyEncoding === 'base64' && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyUnavailable')
+    && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyError');
+}
 /** @param {any} event @param {string} expectedOrigin */
 const isNotModifiedAppResponse = (event, expectedOrigin) => event?.kind === 'app-response' && isAppEvent(event, expectedOrigin)
   && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch',
@@ -434,6 +438,18 @@ const isSameDocumentNavigation = (event) => event?.kind === 'same-document-navig
 const isUnboundNavigation = (event) => event?.kind === 'unbound-navigation' && event?.mainFrame === true
   && plainExactKeys(event, ['sequence', 'kind', 'url', 'mainFrame', 'pendingDocumentRequests'])
   && typeof event?.url === 'string' && Array.isArray(event?.pendingDocumentRequests) && event.pendingDocumentRequests.length > 0;
+/** @param {any} event */
+const isHistoryCall = (event) => event?.kind === 'history-call'
+  && plainExactKeys(event, ['sequence', 'kind', 'documentEpoch', 'callId', 'method', 'beforeUrl', 'afterUrl', 'urlArgument'])
+  && Number.isInteger(event?.documentEpoch) && event.documentEpoch > 0 && Number.isInteger(event?.callId) && event.callId > 0
+  && ['replaceState', 'pushState'].includes(event?.method) && typeof event?.beforeUrl === 'string' && typeof event?.afterUrl === 'string'
+  && (event?.urlArgument === null || typeof event?.urlArgument === 'string');
+/** @param {any} event */
+function historyUrlExact(event) {
+  try {
+    return event.urlArgument === null ? event.beforeUrl === event.afterUrl : new URL(event.urlArgument, event.beforeUrl).href === event.afterUrl;
+  } catch { return false; }
+}
 /** @param {any} event */
 function rawWebsocketPayload(event) {
   if (event?.kind !== 'websocket-frame' || event?.direction !== 'received' || event?.encoding !== 'utf8' || typeof event?.body !== 'string') return null;
@@ -518,7 +534,8 @@ function exactInitialIceEventBinding(events, responses, phaseMarkers) {
 /** @param {any[]} events @param {any} phaseMarkers */
 function exactIcePhaseClassification(events, phaseMarkers) {
   const { initialEnd, hmrArm, hmrEnd } = phaseMarkers ?? {};
-  if (!exactPhaseMarker(initialEnd) || !exactPhaseMarker(hmrArm) || !exactPhaseMarker(hmrEnd)
+  if (!plainExactKeys(phaseMarkers, ['initialEnd', 'hmrArm', 'hmrEnd'])
+    || !exactPhaseMarker(initialEnd) || !exactPhaseMarker(hmrArm) || !exactPhaseMarker(hmrEnd)
     || initialEnd.eventSequence > hmrArm.eventSequence || hmrArm.eventSequence >= hmrEnd.eventSequence) return false;
   const definitions = [
     ['ice-response', 'initial-freeze', (/** @type {number} */ sequence) => sequence <= initialEnd.eventSequence],
@@ -533,6 +550,15 @@ function exactIcePhaseClassification(events, phaseMarkers) {
       && event.captureWindow === definition[1] && /** @type {(sequence: number) => boolean} */ (definition[2])(event.sequence);
   });
 }
+/** @param {any} phaseMarkers @param {any} hmrMarker */
+function exactIceHmrMarkerBinding(phaseMarkers, hmrMarker) {
+  return plainExactKeys(phaseMarkers, ['initialEnd', 'hmrArm', 'hmrEnd'])
+    && exactPhaseMarker(phaseMarkers.initialEnd) && exactPhaseMarker(phaseMarkers.hmrArm) && exactPhaseMarker(phaseMarkers.hmrEnd)
+    && Number.isInteger(hmrMarker?.eventIndex) && Number.isInteger(hmrMarker?.eventSequence)
+    && Number.isInteger(hmrMarker?.endEventIndex) && Number.isInteger(hmrMarker?.endEventSequence)
+    && deepEqual(phaseMarkers.hmrArm, { eventIndex: hmrMarker.eventIndex, eventSequence: hmrMarker.eventSequence })
+    && deepEqual(phaseMarkers.hmrEnd, { eventIndex: hmrMarker.endEventIndex, eventSequence: hmrMarker.endEventSequence });
+}
 /** @param {any} hmr @param {string} expectedOrigin */
 function deriveHmrProof(hmr, expectedOrigin) {
   const events = Array.isArray(hmr?.events) ? hmr.events : [];
@@ -543,6 +569,9 @@ function deriveHmrProof(hmr, expectedOrigin) {
   const documentNavigations = events.filter(isDocumentNavigation);
   const sameDocumentNavigations = events.filter(isSameDocumentNavigation);
   const unboundNavigations = events.filter(isUnboundNavigation);
+  const historyNamespaceEvents = events.filter((/** @type {any} */ event) => event?.kind === 'history-call');
+  const historyCalls = historyNamespaceEvents.filter(isHistoryCall);
+  const historyNamespaceExact = historyCalls.length === historyNamespaceEvents.length;
   const appNamespaceEvents = events.filter(isAppNamespaceEvent);
   const appRequests = appNamespaceEvents.filter((/** @type {any} */ event) => isAppRequest(event, expectedOrigin));
   const appResponses = appNamespaceEvents.filter((/** @type {any} */ event) => isAppResponse(event, expectedOrigin));
@@ -596,9 +625,13 @@ function deriveHmrProof(hmr, expectedOrigin) {
         && bootstrapTransfer.request.ifNoneMatch === preTransfer.response.etag
         && bootstrapTransfer.response.etag === preTransfer.response.etag));
   const sameDocumentNavigationExact = branch === 'document-reload'
-    ? sameDocumentNavigations.length === 1 && bootstrapTransfer?.finished?.sequence < sameDocumentNavigations[0]?.sequence
-      && sameDocumentNavigations[0]?.url === hmr?.after?.navigation?.url
-    : sameDocumentNavigations.length === 0;
+    ? historyNamespaceExact && historyCalls.length === 1 && historyCalls[0]?.method === 'replaceState'
+      && historyCalls[0]?.documentEpoch === afterEpoch && historyCalls[0]?.callId === 1 && historyUrlExact(historyCalls[0])
+      && historyCalls[0]?.beforeUrl === hmr?.after?.navigation?.url && historyCalls[0]?.afterUrl === hmr?.after?.navigation?.url
+      && sameDocumentNavigations.length === 1 && bootstrapTransfer?.finished?.sequence < historyCalls[0]?.sequence
+      && bootstrapTransfer?.finished?.sequence < sameDocumentNavigations[0]?.sequence
+      && sameDocumentNavigations[0]?.url === historyCalls[0]?.afterUrl
+    : historyNamespaceExact && historyCalls.length === 0 && sameDocumentNavigations.length === 0;
   let eventOrderValid = false;
   if (delivery === 'hot-update') {
     const transfer = transfers[0];
@@ -641,7 +674,7 @@ function deriveHmrProof(hmr, expectedOrigin) {
     && hmr?.after?.canvasCount === 1 && hmr?.after?.tracker?.canvases === 1 && activeRafs(hmr?.after?.tracker) === activeRafs(hmr?.before?.tracker)
     && sameRelevantListeners(hmr?.before?.tracker, hmr?.after?.tracker) && preferencesStable);
   const passed = branch !== 'invalid' && delivery !== 'invalid' && sequencesValid && websocketEndpointsValid && appTransfersExact
-    && documentNavigationBindingExact === (branch === 'document-reload') && eventOrderValid && ownerIdentitiesValid
+    && historyNamespaceExact && documentNavigationBindingExact === (branch === 'document-reload') && eventOrderValid && ownerIdentitiesValid
     && canvasIdentitiesValid && contextsExact && preferencesStable && boardProbesValid && reloadExact;
   return {
     branch, delivery, sequencesValid,
@@ -652,6 +685,7 @@ function deriveHmrProof(hmr, expectedOrigin) {
       bootstrapAppRequests: bootstrapApps.length, appResponses: appResponses.length, appFinished: appFinished.length, appFailed: appFailed.length,
       documentRequests: documentRequests.length, documentNavigations: documentNavigations.length,
       sameDocumentNavigations: sameDocumentNavigations.length, unboundNavigations: unboundNavigations.length,
+      historyCalls: historyCalls.length, invalidHistoryCalls: historyNamespaceEvents.length - historyCalls.length,
       appUpdateFrames: updateFrames.length, fullReloadFrames: fullReloadFrames.length },
     sequence: { firstUpdate: Number.isFinite(firstUpdate) ? firstUpdate : null, firstFullReload: firstFull,
       documentRequest: Number.isFinite(documentSequence) ? documentSequence : null, navigation: Number.isFinite(navigationSequence) ? navigationSequence : null },
@@ -659,7 +693,7 @@ function deriveHmrProof(hmr, expectedOrigin) {
       beforeContextEventCursor: Number.isInteger(hmr?.before?.tracker?.contextEventCursor) ? hmr.before.tracker.contextEventCursor : null,
       afterContextEventCursor: Number.isInteger(hmr?.after?.tracker?.contextEventCursor) ? hmr.after.tracker.contextEventCursor : null },
     sameUrlReload, websocketEndpointsValid, appNamespaceExact, requestIdsUnique, requestIdsMonotonic, appTransfersExact,
-    documentNavigationBindingExact, cacheBridgeExact, sameDocumentNavigationExact, eventOrderValid, ownerIdentitiesValid, canvasIdentitiesValid,
+    historyNamespaceExact, documentNavigationBindingExact, cacheBridgeExact, sameDocumentNavigationExact, eventOrderValid, ownerIdentitiesValid, canvasIdentitiesValid,
     contextsExact, preferencesStable, boardProbesValid, reloadExact, passed,
   };
 }
@@ -788,6 +822,8 @@ function runIndependentContractFixtures() {
   ];
   assertFixture(exactInitialIceEventBinding(iceEvents, goodIce, phaseMarkers), 'valid Ice event binding');
   assertFixture(exactIcePhaseClassification(iceEvents, phaseMarkers), 'valid Ice phase classification');
+  const hmrPhaseMarker = { eventIndex: 3, eventSequence: 3, endEventIndex: 4, endEventSequence: 4 };
+  assertFixture(exactIceHmrMarkerBinding(phaseMarkers, hmrPhaseMarker), 'valid Ice/HMR marker binding');
   const contradictoryIce = clone(iceEvents); contradictoryIce[0].contentType = 'audio/ogg';
   assertFixture(!exactInitialIceEventBinding(contradictoryIce, goodIce, phaseMarkers), 'reject Ice event metadata contradiction');
   const contradictoryIceRequestId = clone(iceEvents); contradictoryIceRequestId[0].requestId = 999;
@@ -802,6 +838,14 @@ function runIndependentContractFixtures() {
     ['unknown Ice response phase', { events: [...clone(iceEvents), { ...clone(iceEvents[4]), sequence: 6, kind: 'ice-response-limbo' }], markers: clone(phaseMarkers) }],
   ];
   for (const [label, value] of phaseRejects) assertFixture(!exactIcePhaseClassification(value.events, value.markers), `reject Ice phase ${label}`);
+  const markerBindingRejects = [
+    ['HMR eventIndex drift', { ...hmrPhaseMarker, eventIndex: 2 }],
+    ['HMR eventSequence drift', { ...hmrPhaseMarker, eventSequence: 2 }],
+    ['HMR endEventIndex drift', { ...hmrPhaseMarker, endEventIndex: 5 }],
+    ['HMR endEventSequence drift', { ...hmrPhaseMarker, endEventSequence: 5 }],
+    ['internally valid shifted Ice window', { ...hmrPhaseMarker, eventIndex: 4, eventSequence: 4, endEventIndex: 5, endEventSequence: 5 }],
+  ];
+  for (const [label, marker] of markerBindingRejects) assertFixture(!exactIceHmrMarkerBinding(phaseMarkers, marker), `reject Ice/HMR marker ${label}`);
 
   const id = (/** @type {number} */ epoch, /** @type {number} */ value) => ({ epoch, id: value });
   const tracker = (/** @type {number} */ epoch, /** @type {any[]} */ contexts, /** @type {any[]} */ events, qa = 10, canvas = 20) => ({
@@ -833,7 +877,8 @@ function runIndependentContractFixtures() {
     body: JSON.stringify({ type: 'update', updates: [{ type: 'js-update', path: '/src/App.tsx', acceptedPath: '/src/App.tsx' }] }) });
   const full = (sequence = 11) => ({ sequence, kind: 'websocket-frame', direction: 'received', encoding: 'utf8', url: wsUrl,
     body: JSON.stringify({ type: 'full-reload', path: '*' }) });
-  const appEtag = 'W/"fixture-app-etag"';
+  const appBody = Buffer.from('transformed App module');
+  const appEtag = viteWeakEtag(appBody);
   const app = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared', /** @type {string|null} */ ifNoneMatch = null) => ({
     sequence, kind: 'request', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
     method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
@@ -842,7 +887,7 @@ function runIndependentContractFixtures() {
     sequence, kind: 'app-response', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
     method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
     status: 200, contentType: 'text/javascript; charset=utf-8', etag: appEtag, bodyDisposition: 'captured',
-    bodyEncoding: 'base64', bodyBase64: Buffer.from('transformed App module').toString('base64'),
+    bodyEncoding: 'base64', bodyBase64: appBody.toString('base64'),
   });
   const notModified = (/** @type {number} */ sequence, requestId = 102, suffix = '?t=shared', ifNoneMatch = appEtag) => ({
     sequence, kind: 'app-response', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
@@ -857,6 +902,9 @@ function runIndependentContractFixtures() {
     resourceType: 'document', mainFrame: true, navigationRequest: true, ifNoneMatch: null });
   const nav = (/** @type {number} */ sequence, requestId = 201) => ({ sequence, kind: 'document-navigation', url: route, mainFrame: true,
     documentRequestId: requestId, documentRequestSequence: sequence - 1 });
+  const history = (/** @type {number} */ sequence, method = 'replaceState', documentEpoch = 2, callId = 1, urlArgument = '/play/mutation') => ({
+    sequence, kind: 'history-call', documentEpoch, callId, method, beforeUrl: route, afterUrl: route, urlArgument,
+  });
   const sameNav = (/** @type {number} */ sequence, url = route) => ({ sequence, kind: 'same-document-navigation', url, mainFrame: true });
   const before = snap(1, live(1));
   const same = {
@@ -872,12 +920,12 @@ function runIndependentContractFixtures() {
   const reload = {
     marker: { eventSequence: 10 },
     events: [update(11), app(12, 101), response(13, 101), finished(14, 101), full(15), doc(16), nav(17),
-      app(18, 102, '?t=shared', appEtag), notModified(19, 102), finished(20, 102, '?t=shared', appEtag), sameNav(21)],
+      app(18, 102, '?t=shared', appEtag), notModified(19, 102), finished(20, 102, '?t=shared', appEtag), history(21), sameNav(22)],
     before, after: snap(2, live(2), 'reload'),
     oldOwner: { ownerPresent: false, sameOwner: false, oldRenderer: 'unavailable', beforeIdentity: id(1, 10), ownerIdentity: null,
       currentIdentity: id(2, 10), probe: { target: null, targetIdentity: null, outcome: 'unavailable' } },
   };
-  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, 102), response(15, 102), finished(16, 102), sameNav(17)] };
+  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, 102), response(15, 102), finished(16, 102), history(17), sameNav(18)] };
   for (const [label, value] of [['same owner', same], ['replacement', replacement], ['fallback reload', reload], ['direct reload', direct]]) {
     assertFixture(deriveHmrProof(value, normalizedOrigin).passed, `valid HMR ${label}`);
   }
@@ -905,7 +953,7 @@ function runIndependentContractFixtures() {
   const failedResponse = clone(reload);
   failedResponse.events[2] = { ...finished(13, 101), kind: 'app-requestfailed', errorText: 'net::ERR_FAILED' };
   const thirdApp = clone(reload);
-  thirdApp.events.push(app(22, 103, '?t=third'), response(23, 103, '?t=third'), finished(24, 103, '?t=third'));
+  thirdApp.events.push(app(23, 103, '?t=third'), response(24, 103, '?t=third'), finished(25, 103, '?t=third'));
   const duplicateRequestId = clone(reload);
   duplicateRequestId.events = duplicateRequestId.events.map((/** @type {any} */ event) => event.requestId === 102 ? { ...event, requestId: 101 } : event);
   const wrongResponseId = clone(reload);
@@ -924,6 +972,8 @@ function runIndependentContractFixtures() {
   malformedAppUrl.events[1] = { ...malformedAppUrl.events[1], url: 'not-a-url:/src/App.tsx' };
   const rawResponseKind = clone(reload);
   rawResponseKind.events[2] = { ...rawResponseKind.events[2], kind: 'response' };
+  const freshBodyMismatch = clone(reload);
+  freshBodyMismatch.events[2].bodyBase64 = Buffer.from('different transformed App module').toString('base64');
   const initialNotModified = clone(reload);
   initialNotModified.events[1] = app(12, 101, '?t=shared', appEtag);
   initialNotModified.events[2] = notModified(13, 101);
@@ -934,16 +984,21 @@ function runIndependentContractFixtures() {
   bootstrapWrongUrl.events = bootstrapWrongUrl.events.map((/** @type {any} */ event) => event.requestId === 102
     ? { ...event, url: `${normalizedOrigin}/src/App.tsx?t=different` } : event);
   const missingBootstrapFinished = clone(reload);
-  missingBootstrapFinished.events.splice(9, 1); missingBootstrapFinished.events[9].sequence = 20;
+  missingBootstrapFinished.events.splice(9, 1); missingBootstrapFinished.events[9].sequence = 20; missingBootstrapFinished.events[10].sequence = 21;
   const missingSameDocument = clone(reload); missingSameDocument.events.pop();
-  const extraSameDocument = clone(reload); extraSameDocument.events.push(sameNav(22));
+  const extraSameDocument = clone(reload); extraSameDocument.events.push(sameNav(23));
   const wrongDocumentBinding = clone(reload); wrongDocumentBinding.events[6].documentRequestId = 999;
   const unboundDocumentNavigation = clone(reload);
   unboundDocumentNavigation.events[6] = { sequence: 17, kind: 'unbound-navigation', url: route, mainFrame: true,
     pendingDocumentRequests: [{ requestId: 201, sequence: 16, url: route }] };
   const earlySameDocument = clone(reload);
-  const bootstrapFinished = earlySameDocument.events[9]; const historyNavigation = earlySameDocument.events[10];
-  earlySameDocument.events.splice(9, 2, { ...historyNavigation, sequence: 20 }, { ...bootstrapFinished, sequence: 21 });
+  const bootstrapFinished = earlySameDocument.events[9]; const mountHistory = earlySameDocument.events[10]; const historyNavigation = earlySameDocument.events[11];
+  earlySameDocument.events.splice(9, 3, { ...historyNavigation, sequence: 20 }, { ...bootstrapFinished, sequence: 21 }, { ...mountHistory, sequence: 22 });
+  const missingHistory = clone(reload); missingHistory.events.splice(10, 1); missingHistory.events[10].sequence = 21;
+  const pushHistory = clone(reload); pushHistory.events[10].method = 'pushState';
+  const wrongHistoryEpoch = clone(reload); wrongHistoryEpoch.events[10].documentEpoch = 1;
+  const wrongHistoryArgument = clone(reload); wrongHistoryArgument.events[10].urlArgument = '/wrong';
+  const extraHistory = clone(reload); extraHistory.events.push(history(23, 'replaceState', 2, 2));
   /** @param {any} boardProbe */
   const withBoardProbe = (boardProbe) => {
     const value = clone(reload);
@@ -961,7 +1016,7 @@ function runIndependentContractFixtures() {
     ['missing owner called retired', { ...clone(same), oldOwner: { ...clone(same.oldOwner), ownerPresent: false, sameOwner: false, oldRenderer: 'retired' } }],
     ['same epoch navigation', { ...clone(reload), after: snap(1, live(1), 'reload') }],
     ['epoch change no navigation', { ...clone(same), after: snap(2, live(2), 'reload'), oldOwner: clone(reload.oldOwner) }],
-    ['multiple navigation', { ...clone(reload), events: [...clone(reload.events), doc(22), nav(23)] }],
+    ['multiple navigation', { ...clone(reload), events: [...clone(reload.events), doc(23), nav(24)] }],
     ['wrong reload path', { ...clone(reload), events: clone(reload.events).map((/** @type {any} */ event) => event.sequence === 16 ? { ...event, url: `${normalizedOrigin}/wrong` } : event) }],
     ['non-document request', { ...clone(reload), events: clone(reload.events).map((/** @type {any} */ event) => event.sequence === 16 ? { ...event, resourceType: 'fetch', navigationRequest: false } : event) }],
     ['cross epoch owner id', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), currentIdentity: id(1, 10) } }],
@@ -985,6 +1040,7 @@ function runIndependentContractFixtures() {
     ['App namespace invalid resource type', invalidResourceType],
     ['App namespace malformed raw URL', malformedAppUrl],
     ['App namespace raw response kind', rawResponseKind],
+    ['fresh App body does not match ETag', freshBodyMismatch],
     ['initial App response is 304', initialNotModified],
     ['bootstrap 304 carries a body', bootstrapBody],
     ['bootstrap 304 URL differs', bootstrapWrongUrl],
@@ -994,6 +1050,11 @@ function runIndependentContractFixtures() {
     ['wrong document-navigation request binding', wrongDocumentBinding],
     ['unbound document navigation', unboundDocumentNavigation],
     ['mount same-document navigation before bootstrap finish', earlySameDocument],
+    ['missing replaceState record', missingHistory],
+    ['pushState substituted for replaceState', pushHistory],
+    ['replaceState wrong document epoch', wrongHistoryEpoch],
+    ['replaceState argument does not resolve to observed URL', wrongHistoryArgument],
+    ['extra history call', extraHistory],
     ['owner snapshot forged', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), beforeIdentity: id(1, 99) } }],
     ['same renderer failed probe', { ...clone(same), oldOwner: { ...clone(same.oldOwner), oldRenderer: 'invalid',
       probe: { ...clone(same.oldOwner.probe), outcome: 'throws' } } }],
@@ -1020,11 +1081,11 @@ function runIndependentContractFixtures() {
   const filler = Array.from({ length: 10 }, (_, index) => ({ sequence: index + 1, kind: 'fixture' }));
   const windowed = clone(reload);
   windowed.marker = { eventIndex: 10, eventSequence: 10, navigationArm: { eventIndex: 10, eventSequence: 10, url: route },
-    endEventIndex: 21, endEventSequence: 21 };
+    endEventIndex: 22, endEventSequence: 22 };
   const exactEvents = [...filler, ...clone(reload.events)];
   assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: windowed }), 'valid HMR eventEnd window');
-  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, doc(22)] }, hmr: windowed }), 'reject slow late reload after eventEnd');
-  const lateMalformedApp = { ...response(22, 999), url: 'not-a-url:/src/App.tsx' };
+  assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, doc(23)] }, hmr: windowed }), 'reject slow late reload after eventEnd');
+  const lateMalformedApp = { ...response(23, 999), url: 'not-a-url:/src/App.tsx' };
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, lateMalformedApp] }, hmr: windowed }), 'reject late malformed App namespace event after eventEnd');
 
   const committedApp = blob(BASE, 'src/App.tsx'); const committedAppSha = sha(committedApp); const committedAppBlob = git('rev-parse', `${BASE}:src/App.tsx`);
@@ -1072,7 +1133,7 @@ function runIndependentContractFixtures() {
     assertFixture(!exactCommittedTerminal(value, terminalExpected), `reject terminal ${label}`);
   }
   return {
-    iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + 3,
+    iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + markerBindingRejects.length + 3,
     hmrAccepted: 4, hmrRejected: hmrRejects.length + 3,
     terminalAccepted: 1, terminalRejected: 3,
   };
@@ -1246,6 +1307,7 @@ function browserLifecycleAssertions(browser) {
     reentryContextsExact: exactReentryContexts(browser.changedPreferences?.tracker, browser.reentered?.tracker),
     reentryListenersExact: sameRelevantListeners(browser.changedPreferences?.tracker, browser.reentered?.tracker),
     hmrEventWindowExact: exactHmrEventWindow(browser),
+    iceHmrMarkerBindingExact: exactIceHmrMarkerBinding(browser.observations?.icePhaseMarkers, browser.hmr?.marker),
     hmrAppTouchExact: exactAppTouch(browser.hmr),
     hmrProofExact: deepEqual(browser.hmr?.proof, hmrProof),
     hmrDelivered: hmrProof.passed && hmrProof.branch === 'document-reload' && hmrProof.delivery === 'update-fallback-reload'
@@ -1333,6 +1395,7 @@ if (!recomputedIceClassification.passed) throw new Error('Ice raw response class
 if (!deepEqual(ice.runtimeClassification, recomputedIceClassification)) throw new Error('Ice persisted classification differs from raw-response recomputation.');
 if (!deepEqual(browser.observations?.iceResponses, ice.runtimeResponses)) throw new Error('Ice browser and provenance raw response records differ.');
 if (!deepEqual(browser.observations?.icePhaseMarkers, ice.runtimePhaseMarkers)) throw new Error('Ice browser and provenance phase markers differ.');
+if (!exactIceHmrMarkerBinding(ice.runtimePhaseMarkers, browser.hmr?.marker)) throw new Error('Ice HMR phase markers do not bind the unified HMR event window.');
 if (!exactInitialIceEventBinding(browser.observations?.events ?? [], ice.runtimeResponses, ice.runtimePhaseMarkers)) {
   throw new Error('Ice initial events do not bind every materialized response metadata field.');
 }
@@ -1357,6 +1420,7 @@ const recomputedIceChecks = [
   { label: 'runtime exact module-plus-asset pair', passed: recomputedIceClassification.passed },
   { label: 'runtime Ice events bind materialized response metadata', passed: exactInitialIceEventBinding(browser.observations?.events ?? [], ice.runtimeResponses, ice.runtimePhaseMarkers) },
   { label: 'runtime Ice response phases are exact', passed: exactIcePhaseClassification(browser.observations?.events ?? [], ice.runtimePhaseMarkers) },
+  { label: 'runtime Ice phase markers bind HMR event window', passed: exactIceHmrMarkerBinding(ice.runtimePhaseMarkers, browser.hmr?.marker) },
 ];
 if (recomputedIceChecks.length === 0 || !deepEqual(ice.checks, recomputedIceChecks) || !ice.checks.every((/** @type {any} */ entry) => entry?.passed === true)) {
   throw new Error('Ice provenance checks are empty, forged, or differ from independent recomputation.');

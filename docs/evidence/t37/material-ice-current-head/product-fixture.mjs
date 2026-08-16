@@ -115,6 +115,10 @@ export function attachObservers(page, label = 'page') {
       return { ...marker };
     },
   });
+  Object.defineProperty(observed, 'recordHistoryCall', {
+    enumerable: false,
+    value: (/** @type {Record<string, any>} */ detail) => record('history-call', detail),
+  });
   page.on('console', (message) => { if (message.type() === 'error') observed.consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => observed.pageErrors.push(error.message));
   page.on('request', (request) => {
@@ -222,8 +226,13 @@ export function attachObservers(page, label = 'page') {
   return observed;
 }
 
-/** @param {import('playwright').Page} page @param {any} settings */
-export async function installInstrumentation(page, settings) {
+/** @param {import('playwright').Page} page @param {any} settings @param {any} observed */
+export async function installInstrumentation(page, settings, observed) {
+  const historyBinding = '__T37_MATERIAL_HISTORY_QA_RECORD__';
+  await page.exposeBinding(historyBinding, (source, detail) => {
+    if (source.page !== page || source.frame !== page.mainFrame()) return;
+    observed.recordHistoryCall(detail);
+  });
   await page.addInitScript((values) => {
     if (window.top !== window) return;
     const epochKey = 'tetramorph:t37-document-epoch';
@@ -272,6 +281,26 @@ export async function installInstrumentation(page, settings) {
       contextEvents.push({ sequence: ++contextEventSequence, kind, id, ...detail });
     };
     const browserWindow = /** @type {any} */ (window);
+    let historyCallId = 0;
+    const nativeReplaceState = History.prototype.replaceState;
+    const nativePushState = History.prototype.pushState;
+    /** @param {'replaceState'|'pushState'} method @param {number} callId @param {string} beforeUrl @param {string} afterUrl @param {string|null} urlArgument */
+    const emitHistoryCall = (method, callId, beforeUrl, afterUrl, urlArgument) => {
+      const binding = browserWindow[values.historyBinding];
+      if (typeof binding === 'function') void Promise.resolve(binding({ documentEpoch, callId, method, beforeUrl, afterUrl, urlArgument })).catch(() => undefined);
+    };
+    History.prototype.replaceState = function trackedReplaceState(data, unused, url) {
+      const callId = ++historyCallId; const beforeUrl = window.location.href;
+      const result = nativeReplaceState.call(this, data, unused, url);
+      emitHistoryCall('replaceState', callId, beforeUrl, window.location.href, url === undefined ? null : String(url));
+      return result;
+    };
+    History.prototype.pushState = function trackedPushState(data, unused, url) {
+      const callId = ++historyCallId; const beforeUrl = window.location.href;
+      const result = nativePushState.call(this, data, unused, url);
+      emitHistoryCall('pushState', callId, beforeUrl, window.location.href, url === undefined ? null : String(url));
+      return result;
+    };
     const NativeAudioContext = window.AudioContext ?? browserWindow.webkitAudioContext;
     if (NativeAudioContext) {
       const Wrapped = new Proxy(NativeAudioContext, {
@@ -360,7 +389,7 @@ export async function installInstrumentation(page, settings) {
         };
       },
     };
-  }, settings);
+  }, { ...settings, historyBinding });
 }
 
 /** @param {import('playwright').Browser} browser @param {string} origin @param {any} settings */
@@ -368,7 +397,7 @@ export async function openMutation(browser, origin, settings) {
   const context = await browser.newContext({ viewport: settings.viewport, deviceScaleFactor: 1, reducedMotion: settings.reduced ? 'reduce' : 'no-preference' });
   const page = await context.newPage();
   const observed = attachObservers(page, settings.label ?? settings.item ?? 'mutation');
-  await installInstrumentation(page, settings);
+  await installInstrumentation(page, settings, observed);
   await page.goto(`${origin.replace(/\/$/u, '')}/play/mutation`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
   await page.getByTestId('game-screen').waitFor({ state: 'visible' });

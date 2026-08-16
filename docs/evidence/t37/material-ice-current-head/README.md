@@ -12,13 +12,16 @@ The browser contract keeps representation and lifecycle boundaries explicit. An 
 mtime touch requires byte-for-byte identical checkout content, fatal UTF-8 decoding,
 CRLF-to-LF canonical bytes equal to the frozen Git blob, and clean-filter object identity;
 mixed LF/CRLF checkout representation is therefore allowed but content drift is not.
-HMR accepts a fresh `200` transformed App response followed by either a fresh `200` or
-an ETag-bound `304` bootstrap response. A reload is counted only when the frame event is
-bound to its exact main-frame document request; the App's subsequent `replaceState` is a
-separately verified same-document navigation. Ice responses use four explicit phases:
-`initial-freeze`, `pre-hmr`, `hmr`, and `post-hmr`; only the two frozen initial responses
-are materialized as provenance bytes, while every later response must remain inside its
-recorded phase marker boundary.
+HMR accepts a fresh `200` transformed App response only when its weak ETag is independently
+recomputed from the captured response body with Vite's bundled `etag@1.8.1` algorithm,
+followed by either a fresh `200` or an ETag-bound `304` bootstrap response. A reload is
+counted only when the frame event is bound to its exact main-frame document request;
+direct instrumentation of `History.prototype.replaceState` and `pushState` must observe
+exactly one route-preserving `replaceState`, bound to the reloaded document and its separate
+same-document navigation. Ice responses use four explicit phases: `initial-freeze`,
+`pre-hmr`, `hmr`, and `post-hmr`; only the two frozen initial responses are materialized as
+provenance bytes, while every later response must remain inside its recorded phase marker
+boundary and the Ice HMR phase markers must equal the primary HMR window markers.
 
 ## Reproducible cold strict checkJs
 
