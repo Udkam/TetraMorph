@@ -1,0 +1,1341 @@
+{
+  "schema": "tetramorph.t37.material-ice-manifest.v2",
+  "generatedAt": "2026-08-16T16:33:21.539Z",
+  "provenance": {
+    "r5bTerminalBase": "171181228c0408cfa1bfb1259eb98c29a63efae3",
+    "legacyAuthorizationHead": "3eb110f546e84c5003c9d2eaa73dfa0f8f9986e9",
+    "legacySourceHead": "c49d0eb9bf4c87ec0c5a0d1e7481a233b861bb41",
+    "legacySourceCommits": [
+      "bcdfe9a94ba0b59141d09a5654ca56c6de787b5c",
+      "74dfee78eaadaae5dd85b67d461830cae27096c6",
+      "4518c20cfb2e137c1509a71906a2c27dd89cddb7",
+      "0e4b9ba0c2774a48c37e2916c7e7f9b13c859637",
+      "02ddaeef1fc99a50b579726a49fedded106aa0dc",
+      "9023be7ed44e015da9a7d37d02b0464bceef8ecd",
+      "a21ce4808d4b150fbd22947896f67279845159ce",
+      "ee8dcd43b006abae99d7904c6c827b95d15c626f",
+      "f24c4ecb1a78223274177045779ac7b08c7aed3c",
+      "c45b9fa85447f6be3c9211c06ef5c762fc89e9d1",
+      "d05327e3e08faec825b3f86f683bd7e7b8315367",
+      "3ba83a943d7c8fdf6ac534bfc23192ac90dc5855",
+      "c49d0eb9bf4c87ec0c5a0d1e7481a233b861bb41"
+    ],
+    "correctionAuthorizationHead": "f9ce885c654056208f595846907642553488dcea",
+    "correctionCommits": [
+      "f9ce885c654056208f595846907642553488dcea"
+    ],
+    "evidenceSourceHead": "a461177106cf8aaeacf83b87d4b51cf28af361c8",
+    "sourceCommits": [
+      "8da1bb533df51f26e203f72b3b145e88ad97dcc0",
+      "263017d2617668fa53b55965c2278a97aa234d5d",
+      "a461177106cf8aaeacf83b87d4b51cf28af361c8"
+    ],
+    "productHead": "171181228c0408cfa1bfb1259eb98c29a63efae3",
+    "writerBoundary": "docs/evidence/t37/material-ice-current-head/**"
+  },
+  "runtimeInput": {
+    "schema": "tetramorph.t37.material-runtime-input.v3",
+    "evidenceSourceHead": "a461177106cf8aaeacf83b87d4b51cf28af361c8",
+    "validatedSourceTree": "f29585237441b6816a90f875b7bd749dae053013",
+    "executionPolicy": "source HEAD or a verified linear descendant; containing audit binds its actual phase HEAD",
+    "productHead": "171181228c0408cfa1bfb1259eb98c29a63efae3",
+    "statusScope": [
+      ".gitattributes",
+      "docs/evidence/t26/phase-d/mutation-scenarios.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json",
+      "docs/evidence/t37/material-ice-current-head/.gitattributes",
+      "docs/evidence/t37/material-ice-current-head/README.md",
+      "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+      "docs/evidence/t37/material-ice-current-head/client-actions.json",
+      "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+      "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+      "docs/evidence/t37/material-ice-current-head/verify.mjs",
+      "docs/evidence/t37/material-ice-current-head/write-manifest.mjs",
+      "index.html",
+      "package-lock.json",
+      "package.json",
+      "src",
+      "tsconfig.app.json",
+      "tsconfig.json",
+      "tsconfig.node.json",
+      "vite.config.ts"
+    ],
+    "indexAndWorktree": "clean",
+    "sourceBindings": [
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/.gitattributes",
+        "mode": "100644",
+        "gitObject": "94afc642601372e041806b12a5fcea82dac719b7",
+        "sha256": "2525079f24c269e6dd6a3900265327fff74e49440821c798686b1de1590904de",
+        "bytes": 67
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/README.md",
+        "mode": "100644",
+        "gitObject": "bdb846e0d503183bdbf3cba6b9b3f4d7bc3dda10",
+        "sha256": "f2259c55512bf716dc69960e45b749087a53b3c2d4faf9dc1368db94a8aecd07",
+        "bytes": 10252
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+        "mode": "100644",
+        "gitObject": "5ae5460c440bfcf273209a8e629f9439a391d336",
+        "sha256": "1c018a1509c0cf40f51f1da385d7205019c96ed3dd6d8c17be518e44df5a87bd",
+        "bytes": 29647
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+        "mode": "100644",
+        "gitObject": "de84fb5fe9149c890b3ff33b4ee1dc230c29f33b",
+        "sha256": "fa474a6d4081781e5bc3c51e1f9047a211ee607a8055cc8c907eef277580bb4d",
+        "bytes": 30844
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+        "mode": "100644",
+        "gitObject": "5f7b985f02201fe8444cdf937c3161df95f7c17f",
+        "sha256": "2b4c7e3c794630fc4a07080ac8e74625da82774d630ec2975244513b1f5f521f",
+        "bytes": 4832
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+        "mode": "100644",
+        "gitObject": "641b7fafabef233f6eccbfac1a4717278859e198",
+        "sha256": "a180a434678e2ef8500b7721a23aae1178f63e59029adf912fa40612044174f0",
+        "bytes": 3445
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+        "mode": "100644",
+        "gitObject": "97aaa9221ee47fb34fe8d83d2d8486bbedd218ed",
+        "sha256": "ed1b90bedd045b7f84b32e0a8c33a803b05ee5dc63312959bdc1434212e992e6",
+        "bytes": 132798
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+        "mode": "100644",
+        "gitObject": "a64919314828e50d5b6084e2e017ecd0d005b146",
+        "sha256": "1084fa78dc3a456600936d318d41f4968d51cd9f357b5db5100d9b2778d929b7",
+        "bytes": 5226
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/client-actions.json",
+        "mode": "100644",
+        "gitObject": "65616a10e2e9144f33d008b90391432418aa8932",
+        "sha256": "3400e70c3670a4cb8f7c3045b1c21aec007df0542b288877f16daf3b24f37033",
+        "bytes": 215
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/write-manifest.mjs",
+        "mode": "100644",
+        "gitObject": "a2caf69d269d00ba64978896eba13c95de5cc657",
+        "sha256": "662e904f44dc3a51e003aaf8d607b108f68e82677b1d2dd4af1d6e8b2bbbae94",
+        "bytes": 133726
+      },
+      {
+        "path": "docs/evidence/t37/material-ice-current-head/verify.mjs",
+        "mode": "100644",
+        "gitObject": "5e9fa0f1f2be853ee5149cdd07c89593d3646df4",
+        "sha256": "a97236cb6e2e7b876d3895e4309e81db6c248da86652c5c129156e91adafedad",
+        "bytes": 140015
+      }
+    ],
+    "product": {
+      "path": "src",
+      "gitTree": "0ba34e0271faef2543eb73040b480d65c84347d7",
+      "trackedFiles": 126,
+      "cleanObjectDigest": "9b7b6a2083b15478f6e72d08b70fa758d76249e978769777b743141816237b10",
+      "rawByteDigest": "4a34f348ecc3e69c6ec8079205590e1fb507d21bbf6f8b9f99e7adfd6ab4b6ff",
+      "rawForms": {
+        "gitBlob": 99,
+        "canonicalCrlf": 3,
+        "mixedLfCrlf": 24
+      },
+      "externalBindings": [
+        {
+          "path": ".gitattributes",
+          "mode": "100644",
+          "gitObject": "46b0f08dc495ef0a279131df2c312073fb733e2d",
+          "rawForm": "git-blob",
+          "sha256": "c6f0f954d93ecf7ca7527d89c417a81c1de56c85b679b1646676f03eeac6ab7e",
+          "bytes": 472
+        },
+        {
+          "path": "index.html",
+          "mode": "100644",
+          "gitObject": "0ad39d3452606d0ec50fa38a7070579260b88af5",
+          "rawForm": "mixed-lf-crlf",
+          "sha256": "84e562fee68275b480528c3b899a2ca0e01f050c6bccff801c5e946fe93c49f9",
+          "bytes": 3623
+        },
+        {
+          "path": "package.json",
+          "mode": "100644",
+          "gitObject": "c6d4aebd986c5b987f7e996514a7b54e18e7ae9d",
+          "rawForm": "canonical-crlf",
+          "sha256": "5bc1b3ec30f7479c4ae461fea177f5908eb4b228b4cb27e0200fa93d0c9ed71e",
+          "bytes": 833
+        },
+        {
+          "path": "package-lock.json",
+          "mode": "100644",
+          "gitObject": "ded639cfb5d74514f3468991f79e13a89fac103e",
+          "rawForm": "canonical-crlf",
+          "sha256": "9db1ccc985940805ff970fe67fdf7a63068269d394a269633b329bccc8ba3166",
+          "bytes": 87728
+        },
+        {
+          "path": "vite.config.ts",
+          "mode": "100644",
+          "gitObject": "8962b00212b93e081198470d268be1ebe92a85ea",
+          "rawForm": "git-blob",
+          "sha256": "558bf63ff0d83f3cceb80b9f92aa5d07ac1047dee811a4b3e8a39a3fd420ba6c",
+          "bytes": 305
+        },
+        {
+          "path": "tsconfig.json",
+          "mode": "100644",
+          "gitObject": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+          "rawForm": "canonical-crlf",
+          "sha256": "ad28d132ee48d6e23917cf5827cace785d0fc01a44ca68b0dda51cc8c3fd3f52",
+          "bytes": 126
+        },
+        {
+          "path": "tsconfig.app.json",
+          "mode": "100644",
+          "gitObject": "252250ad279132e1b6fc66872e0fe15c9440c2fe",
+          "rawForm": "canonical-crlf",
+          "sha256": "70f818f1b534b098e89fc92c317dd74c96a8bfe099e003557b1e8e87b8e9adb3",
+          "bytes": 633
+        },
+        {
+          "path": "tsconfig.node.json",
+          "mode": "100644",
+          "gitObject": "3950b4b1904b2932389e09ead72fd1324da88a3b",
+          "rawForm": "canonical-crlf",
+          "sha256": "c7627e57032829ebebc7ef7252151281981f8a679385d2cb5a97376ed6d52924",
+          "bytes": 429
+        },
+        {
+          "path": "docs/evidence/t26/phase-d/mutation-scenarios.json",
+          "mode": "100644",
+          "gitObject": "2f5d98294c1c0df845f2b9d77e17b7f44ffe1d3e",
+          "rawForm": "git-blob",
+          "sha256": "0869017d36510da585555afb37c8702a2530d34ac8eb15a97ae3332bb38c37b4",
+          "bytes": 3206
+        },
+        {
+          "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json",
+          "mode": "100644",
+          "gitObject": "11ee5541babff7ae1b66a63aae71699212ed5203",
+          "rawForm": "git-blob",
+          "sha256": "a2629a4d74309aa64c88cb8f4780ae205cfabd970b38c3fa46828ff078951bfb",
+          "bytes": 21137
+        }
+      ]
+    },
+    "environment": {
+      "node": {
+        "locator": "process.execPath",
+        "bytes": 89935872,
+        "sha256": "2ffe3acc0458fdde999f50d11809bbe7c9b7ef204dcf17094e325d26ace101d8",
+        "version": "v24.12.0",
+        "platform": "win32",
+        "arch": "x64"
+      },
+      "git": {
+        "locator": "PATH:git.exe (byte-verified)",
+        "version": "git version 2.51.0.windows.2",
+        "launcher": {
+          "bytes": 46480,
+          "sha256": "ee3d2a38093c3680745a5c973488f5bb78a16f010145d5cdc7470a7395c9e7e8"
+        },
+        "runtime": {
+          "bytes": 4284816,
+          "sha256": "e996432581a70df2e7aaac5db71e3811ec0daa7f93a8ba73fe6db6f9941f4bf9"
+        }
+      },
+      "repositoryModules": {
+        "locator": "repository:node_modules",
+        "files": 9453,
+        "directories": 704,
+        "symlinks": 0,
+        "bytes": 274520862,
+        "sha256": "823bd6ae44ea3e9a2304dae725db6b007bab18e8f7a850efea3320d5d0212a60",
+        "excludedRootEntries": [
+          ".bin",
+          ".cache",
+          ".vite*"
+        ]
+      },
+      "prescribedClient": {
+        "locator": "codex-home:skills/develop-web-game/scripts/web_game_playwright_client.js",
+        "bytes": 9963,
+        "sha256": "e95c3bcbdc0d15eb08fd3a6021283ec32f715b51f1e5847d3db20df526be5996"
+      },
+      "prescribedClientModules": {
+        "locator": "codex-home:skills/develop-web-game/node_modules",
+        "files": 169,
+        "directories": 36,
+        "symlinks": 0,
+        "bytes": 17577700,
+        "sha256": "14a12c88915605fbb3ff6df60e70ad771e189516b262c144433a9ee9a77a32d3",
+        "excludedRootEntries": [
+          ".bin",
+          ".cache",
+          ".vite*"
+        ]
+      },
+      "chromium": {
+        "locator": "playwright:chromium-1228/chrome-win64",
+        "executableLocator": "playwright.chromium.executablePath()",
+        "files": 310,
+        "directories": 9,
+        "symlinks": 0,
+        "bytes": 436026456,
+        "sha256": "fea0ab3c989305aa358a97bd8b32fa37d16115c52baa42629443b7f88c0690d1",
+        "revision": "1228",
+        "version": "149.0.7827.55"
+      },
+      "versions": {
+        "vite": "8.1.4",
+        "playwright": "1.61.1",
+        "prescribedClientPlaywright": "1.61.1"
+      },
+      "processInjection": {
+        "execArgv": [],
+        "restrictedEnvironment": []
+      },
+      "absentRootInputs": [
+        ".env",
+        ".env.local",
+        ".env.development",
+        ".env.development.local",
+        "vite.config.js",
+        "vite.config.mjs",
+        "vite.config.cjs",
+        "vite.config.mts",
+        "vite.config.cts",
+        "postcss.config.js",
+        "postcss.config.mjs",
+        "postcss.config.cjs",
+        "postcss.config.ts",
+        "postcss.config.mts",
+        "postcss.config.cts",
+        ".postcssrc",
+        ".postcssrc.json",
+        ".postcssrc.yaml",
+        ".postcssrc.yml",
+        ".postcssrc.ts",
+        ".postcssrc.cts",
+        ".postcssrc.mts",
+        ".postcssrc.js",
+        ".postcssrc.cjs",
+        ".postcssrc.mjs",
+        "public"
+      ],
+      "absentAncestorInputs": [
+        "repository-ancestor-1:package.json",
+        "repository-ancestor-1:postcss.config.js",
+        "repository-ancestor-1:postcss.config.mjs",
+        "repository-ancestor-1:postcss.config.cjs",
+        "repository-ancestor-1:postcss.config.ts",
+        "repository-ancestor-1:postcss.config.mts",
+        "repository-ancestor-1:postcss.config.cts",
+        "repository-ancestor-1:.postcssrc",
+        "repository-ancestor-1:.postcssrc.json",
+        "repository-ancestor-1:.postcssrc.yaml",
+        "repository-ancestor-1:.postcssrc.yml",
+        "repository-ancestor-1:.postcssrc.ts",
+        "repository-ancestor-1:.postcssrc.cts",
+        "repository-ancestor-1:.postcssrc.mts",
+        "repository-ancestor-1:.postcssrc.js",
+        "repository-ancestor-1:.postcssrc.cjs",
+        "repository-ancestor-1:.postcssrc.mjs",
+        "repository-ancestor-2:package.json",
+        "repository-ancestor-2:postcss.config.js",
+        "repository-ancestor-2:postcss.config.mjs",
+        "repository-ancestor-2:postcss.config.cjs",
+        "repository-ancestor-2:postcss.config.ts",
+        "repository-ancestor-2:postcss.config.mts",
+        "repository-ancestor-2:postcss.config.cts",
+        "repository-ancestor-2:.postcssrc",
+        "repository-ancestor-2:.postcssrc.json",
+        "repository-ancestor-2:.postcssrc.yaml",
+        "repository-ancestor-2:.postcssrc.yml",
+        "repository-ancestor-2:.postcssrc.ts",
+        "repository-ancestor-2:.postcssrc.cts",
+        "repository-ancestor-2:.postcssrc.mts",
+        "repository-ancestor-2:.postcssrc.js",
+        "repository-ancestor-2:.postcssrc.cjs",
+        "repository-ancestor-2:.postcssrc.mjs"
+      ],
+      "viteOptimizerPolicy": {
+        "force": true,
+        "mutableCacheExcludedFromIdentity": true
+      }
+    },
+    "assertions": {
+      "sourceHeadIsExecutionAncestor": true,
+      "sourceObjectsExact": true,
+      "indexMatchesHead": true,
+      "trackedWorktreeMatchesIndex": true,
+      "sourceRawBytesMatchGit": true,
+      "productRawBytesMatchGitOrCanonicalEol": true,
+      "srcTreeMatchesProductHead": true,
+      "noUntrackedOrIgnoredSrc": true,
+      "productRootInputsExact": true,
+      "runtimeEnvironmentExact": true
+    }
+  },
+  "humanStatus": "OPEN / NOT ACCEPTED — final consolidated human review only",
+  "pathContracts": {
+    "source": [
+      "docs/evidence/t37/material-ice-current-head/.gitattributes",
+      "docs/evidence/t37/material-ice-current-head/README.md",
+      "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+      "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+      "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+      "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+      "docs/evidence/t37/material-ice-current-head/client-actions.json",
+      "docs/evidence/t37/material-ice-current-head/write-manifest.mjs",
+      "docs/evidence/t37/material-ice-current-head/verify.mjs"
+    ],
+    "outputs": [
+      "docs/evidence/t37/material-ice-current-head/freeze-next.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-settled.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-clear.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-activation.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-next.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-settled.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-clear.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-activation.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-next.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-settled.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-clear.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-activation.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-next.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-settled.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-clear.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-activation.png",
+      "docs/evidence/t37/material-ice-current-head/deep-normal-desktop-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/deep-reduced-mobile-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-normal-portrait-multiplier.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-reduced-mobile-bomb.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-normal-desktop-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-reduced-portrait-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/material-semantic-audit.json",
+      "docs/evidence/t37/material-ice-current-head/material-matrix-audit.json",
+      "docs/evidence/t37/material-ice-current-head/browser-report.json",
+      "docs/evidence/t37/material-ice-current-head/ice-provenance-audit.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-0.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-1.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-2.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-0.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-1.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-2.json",
+      "docs/evidence/t37/material-ice-current-head/client-attestation.json"
+    ],
+    "preReport": [
+      "docs/evidence/t37/material-ice-current-head/freeze-next.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-settled.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-clear.png",
+      "docs/evidence/t37/material-ice-current-head/freeze-activation.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-next.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-settled.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-clear.png",
+      "docs/evidence/t37/material-ice-current-head/bomb-activation.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-next.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-settled.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-clear.png",
+      "docs/evidence/t37/material-ice-current-head/multiplier-activation.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-next.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-active-ghost.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-settled.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-clear.png",
+      "docs/evidence/t37/material-ice-current-head/collapse-activation.png",
+      "docs/evidence/t37/material-ice-current-head/deep-normal-desktop-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/deep-reduced-mobile-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-normal-portrait-multiplier.png",
+      "docs/evidence/t37/material-ice-current-head/mineral-reduced-mobile-bomb.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-normal-desktop-collapse.png",
+      "docs/evidence/t37/material-ice-current-head/sunstone-reduced-portrait-freeze.png",
+      "docs/evidence/t37/material-ice-current-head/material-semantic-audit.json",
+      "docs/evidence/t37/material-ice-current-head/material-matrix-audit.json",
+      "docs/evidence/t37/material-ice-current-head/browser-report.json",
+      "docs/evidence/t37/material-ice-current-head/ice-provenance-audit.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-0.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-1.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/shot-2.png",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-0.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-1.json",
+      "docs/evidence/t37/material-ice-current-head/client-smoke/state-2.json",
+      "docs/evidence/t37/material-ice-current-head/client-attestation.json",
+      "docs/evidence/t37/material-ice-current-head/manifest.json"
+    ],
+    "terminal": [
+      "docs/evidence/t37/material-ice-current-head/verification-report.json"
+    ],
+    "contract": [
+      "docs/DESIGN.md",
+      "docs/CURRENT_TASK.md"
+    ],
+    "product": [
+      {
+        "kind": "tree",
+        "path": "src"
+      },
+      {
+        "kind": "blob",
+        "path": ".gitattributes"
+      },
+      {
+        "kind": "blob",
+        "path": "index.html"
+      },
+      {
+        "kind": "blob",
+        "path": "package.json"
+      },
+      {
+        "kind": "blob",
+        "path": "package-lock.json"
+      },
+      {
+        "kind": "blob",
+        "path": "vite.config.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "tsconfig.json"
+      },
+      {
+        "kind": "blob",
+        "path": "tsconfig.app.json"
+      },
+      {
+        "kind": "blob",
+        "path": "tsconfig.node.json"
+      },
+      {
+        "kind": "blob",
+        "path": "src/App.tsx"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/runtime/GameRuntime.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/render/TetrisRenderer.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/render/theme.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/audio/AudioEngine.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/audio/audioAssetCatalog.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/audio/acceptedPlayback.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/assets/audio/t37/freeze-ice-cubes-hq.ogg"
+      },
+      {
+        "kind": "blob",
+        "path": "docs/evidence/t26/phase-d/mutation-scenarios.json"
+      },
+      {
+        "kind": "blob",
+        "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json"
+      }
+    ]
+  },
+  "countContracts": {
+    "source": 11,
+    "semanticPng": 20,
+    "matrixPng": 6,
+    "outputsBeforeManifest": 37,
+    "preReport": 38,
+    "terminal": 1
+  },
+  "byteContract": {
+    "text": "UTF-8 no-BOM LF-only",
+    "png": "binary-unfiltered",
+    "committedDomain": "git blob",
+    "precommitDomain": "validated raw worktree bytes",
+    "manifestSelfHash": "excluded"
+  },
+  "stageEAnchors": [
+    "fa3a70e",
+    "581c004",
+    "ba3b0e3",
+    "a184952",
+    "1058dbd",
+    "731bf6f",
+    "8e336fe"
+  ],
+  "iceContract": {
+    "path": "src/assets/audio/t37/freeze-ice-cubes-hq.ogg",
+    "sha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+    "bytes": 54564,
+    "gitBlob": "12e767d2157f3ed2150a743ac2c161f8f99207f1",
+    "publisher": "Freesound",
+    "pageUrl": "https://freesound.org/people/sbml/sounds/819779/",
+    "soundId": 819779,
+    "author": "sbml",
+    "title": "Ice cubes",
+    "license": "CC0",
+    "runtimeFileKind": "Freesound-generated HQ Ogg preview",
+    "windowStartSeconds": 0.19375,
+    "windowDurationSeconds": 0.44,
+    "windowEndSeconds": 0.63375,
+    "gain": 0.78,
+    "attackSeconds": 0.003,
+    "releaseSeconds": 0.012,
+    "originalFilename": "819779__sbml__ice-cubes.wav",
+    "originalSha256": null,
+    "originalStatus": "OPEN / login required",
+    "substitutionAllowed": false
+  },
+  "sourceBindings": [
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/.gitattributes",
+      "gitObject": "94afc642601372e041806b12a5fcea82dac719b7",
+      "sha256": "2525079f24c269e6dd6a3900265327fff74e49440821c798686b1de1590904de",
+      "bytes": 67
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/README.md",
+      "gitObject": "bdb846e0d503183bdbf3cba6b9b3f4d7bc3dda10",
+      "sha256": "f2259c55512bf716dc69960e45b749087a53b3c2d4faf9dc1368db94a8aecd07",
+      "bytes": 10252
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/evidence-contract.mjs",
+      "gitObject": "5ae5460c440bfcf273209a8e629f9439a391d336",
+      "sha256": "1c018a1509c0cf40f51f1da385d7205019c96ed3dd6d8c17be518e44df5a87bd",
+      "bytes": 29647
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/product-fixture.mjs",
+      "gitObject": "de84fb5fe9149c890b3ff33b4ee1dc230c29f33b",
+      "sha256": "fa474a6d4081781e5bc3c51e1f9047a211ee607a8055cc8c907eef277580bb4d",
+      "bytes": 30844
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/capture-semantic.mjs",
+      "gitObject": "5f7b985f02201fe8444cdf937c3161df95f7c17f",
+      "sha256": "2b4c7e3c794630fc4a07080ac8e74625da82774d630ec2975244513b1f5f521f",
+      "bytes": 4832
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/capture-matrix.mjs",
+      "gitObject": "641b7fafabef233f6eccbfac1a4717278859e198",
+      "sha256": "a180a434678e2ef8500b7721a23aae1178f63e59029adf912fa40612044174f0",
+      "bytes": 3445
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/browser-smoke.mjs",
+      "gitObject": "97aaa9221ee47fb34fe8d83d2d8486bbedd218ed",
+      "sha256": "ed1b90bedd045b7f84b32e0a8c33a803b05ee5dc63312959bdc1434212e992e6",
+      "bytes": 132798
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/capture-client.mjs",
+      "gitObject": "a64919314828e50d5b6084e2e017ecd0d005b146",
+      "sha256": "1084fa78dc3a456600936d318d41f4968d51cd9f357b5db5100d9b2778d929b7",
+      "bytes": 5226
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-actions.json",
+      "gitObject": "65616a10e2e9144f33d008b90391432418aa8932",
+      "sha256": "3400e70c3670a4cb8f7c3045b1c21aec007df0542b288877f16daf3b24f37033",
+      "bytes": 215
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/write-manifest.mjs",
+      "gitObject": "a2caf69d269d00ba64978896eba13c95de5cc657",
+      "sha256": "662e904f44dc3a51e003aaf8d607b108f68e82677b1d2dd4af1d6e8b2bbbae94",
+      "bytes": 133726
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/verify.mjs",
+      "gitObject": "5e9fa0f1f2be853ee5149cdd07c89593d3646df4",
+      "sha256": "a97236cb6e2e7b876d3895e4309e81db6c248da86652c5c129156e91adafedad",
+      "bytes": 140015
+    }
+  ],
+  "outputBindings": [
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/freeze-next.png",
+      "sha256": "7e90ef3b98a3a587d7a10fae3a81c8d572f43aa877445ecccad793ab03ba9c5a",
+      "bytes": 42088
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/freeze-active-ghost.png",
+      "sha256": "5399037c7d9ae154a76a852c58e008430de63bafd697eebf9ccf9213528124ba",
+      "bytes": 48543
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/freeze-settled.png",
+      "sha256": "42c56b76b1485b676daca7308a4e37a6befe9363099f804bcb2cd7095d3895c6",
+      "bytes": 50578
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/freeze-clear.png",
+      "sha256": "ef8e87f2b5d9cdc78e56ccdba69b52cda0db6982f349a5288aeaafa49857bc04",
+      "bytes": 47244
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/freeze-activation.png",
+      "sha256": "b33af26fa875d26106db9d26e7e0cd009a44e2c564e822d3fba7f2fa45b95e7c",
+      "bytes": 48846
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/bomb-next.png",
+      "sha256": "6247898f5bdf87e1bc6d216fd10a9cbcf702fa1bcdc3b977f815e72f7fdbd0cc",
+      "bytes": 40936
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/bomb-active-ghost.png",
+      "sha256": "17f7d00800d3522b70a8fcaf186bec8e2cc08dd01b2cb7fa773f079424143cab",
+      "bytes": 49750
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/bomb-settled.png",
+      "sha256": "e8d0531f5634575f0db48a96b81fadb6969eff876ea313ce2e75868d2c63b1eb",
+      "bytes": 51403
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/bomb-clear.png",
+      "sha256": "f5025d576070b14719a19e747dad8d9ff79568c720b74225800da45f8484712e",
+      "bytes": 49358
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/bomb-activation.png",
+      "sha256": "251b3e964112c8cd206775ce97d0cf450eadcdb09babdfe91b2b7f6681351070",
+      "bytes": 50234
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/multiplier-next.png",
+      "sha256": "bc0281bcb7b63999aaed124bfe7e858225e1ae7fce7d28cc700b7f128b2f9585",
+      "bytes": 41606
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/multiplier-active-ghost.png",
+      "sha256": "0cac4df505dedc6942d21c2619a9562ce4be4618731c7e7eab6940105709980a",
+      "bytes": 48845
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/multiplier-settled.png",
+      "sha256": "72d843271262c626414f5d4776680c07bec47147bf5a33feeb164e705808afa7",
+      "bytes": 52558
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/multiplier-clear.png",
+      "sha256": "8cdb0e99bb7c2384cf8679c251b7379cdeb8bea966945cae6242505e8c5e79f5",
+      "bytes": 48339
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/multiplier-activation.png",
+      "sha256": "48c2b0526f9f83637e9e3f4402584255f20c542728b4dde8794e1b51c0178d79",
+      "bytes": 48992
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/collapse-next.png",
+      "sha256": "7a0c0aa6558ea517166da21e52a136776ce3d20e6c268af780fda9a62236de32",
+      "bytes": 41944
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/collapse-active-ghost.png",
+      "sha256": "d779ac3c8d9e1b9855dc49405c2fc466b1808ecb523476dcfd031fac1d533d6a",
+      "bytes": 50124
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/collapse-settled.png",
+      "sha256": "f2dba2f6f4f01b5d4a6281d07edec2f54d720ff659fc0d3c6ffef6710fd88185",
+      "bytes": 51347
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/collapse-clear.png",
+      "sha256": "f7fa69bc438db23a228c188fc91fa6ad899d386a9784c5ac987c924403b812a9",
+      "bytes": 49003
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/collapse-activation.png",
+      "sha256": "df0015bb0ccb0ca1b5f9ae20b1ad4b513d0121d6a68987847fa965ab228c618e",
+      "bytes": 47667
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/deep-normal-desktop-freeze.png",
+      "sha256": "a06aa55ae6b7549f7221257867a7c2dd58b1752db7a99c64d5001192c1e0aebe",
+      "bytes": 48580
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/deep-reduced-mobile-collapse.png",
+      "sha256": "4285c2d78ab978f5da4ab4bfe24dcbd9a010b54079d2869558c6faffd6ebffa9",
+      "bytes": 32596
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/mineral-normal-portrait-multiplier.png",
+      "sha256": "5f038153ced326259ee6e348c07168a055a2b81d3e088e43eac2258ff12a13cd",
+      "bytes": 44956
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/mineral-reduced-mobile-bomb.png",
+      "sha256": "28b8fda160ac2fe32d135d0d3d2998a7851284216f86e67b225127074a551694",
+      "bytes": 29916
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/sunstone-normal-desktop-collapse.png",
+      "sha256": "ce4a09f1abf1018b57572b438748974d91b1eaf10f7251f0a3ec110643b35f1e",
+      "bytes": 49495
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/sunstone-reduced-portrait-freeze.png",
+      "sha256": "97f1b95bfd9f0ef36a0111084d0f7019426bad9297cff55b7064c483d1a05242",
+      "bytes": 44732
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/material-semantic-audit.json",
+      "sha256": "20baea407b717bcc65c5394daa8c4f8dae99e1f06634fe3c46ff11864eeb9583",
+      "bytes": 10047655
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/material-matrix-audit.json",
+      "sha256": "111bee441361885842247bad462773241940ee2f5736772b72966ff1c80f2bfe",
+      "bytes": 4801224
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/browser-report.json",
+      "sha256": "b9b2f2702292e38c3b6ae06ac431eb0e9707ce4e4f7e072a24ba1d335d3da20c",
+      "bytes": 2434108
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/ice-provenance-audit.json",
+      "sha256": "2bdfb30dbdffbf78db3f72597433910e4756f673c3258e579a5e2bfd536404f0",
+      "bytes": 95516
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-smoke/shot-0.png",
+      "sha256": "15c9d7a5c66232c8cb5085ce057ea98c7dcc5315ba83920a34796bb230a555ec",
+      "bytes": 85481
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-smoke/shot-1.png",
+      "sha256": "a99c03953ae7f69eb74d49985c5dc913cd2f1727444d6c62620897ffad8fd8de",
+      "bytes": 47477
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-smoke/shot-2.png",
+      "sha256": "4a4fac2ca384628c91692b15518b480f7b6b52659597b11aafbafa15d03bc511",
+      "bytes": 50191
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-smoke/state-0.json",
+      "sha256": "b5d6cb48091e13b776f25daa8c1c180783fa36b17303c6897c288eb4b4f848a3",
+      "bytes": 1038
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-smoke/state-1.json",
+      "sha256": "14a3b5465a589193113a76af65ef733b7b3f489750b42e936b70ec466c8186f4",
+      "bytes": 1043
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-smoke/state-2.json",
+      "sha256": "294cc1e125ee4e26108eae6192bbd90e2ce4252b5e70c2a4f5fbf0774a1916d0",
+      "bytes": 1044
+    },
+    {
+      "path": "docs/evidence/t37/material-ice-current-head/client-attestation.json",
+      "sha256": "6427949226b12ca5b2b08abd8b892989d1099e37ae58891d710c3c803c1be468",
+      "bytes": 29285
+    }
+  ],
+  "contractBindings": [
+    {
+      "path": "docs/DESIGN.md",
+      "gitObject": "3f1eacbc25d6d901cc41112d853dfdb6ab9d46e3",
+      "sha256": "ced438391663815428854b1f72a380529273a50b4b5aeae65e813fa60eeb0628",
+      "bytes": 603342
+    },
+    {
+      "path": "docs/CURRENT_TASK.md",
+      "gitObject": "473dd9df050b00fb264f4d9d04711c5caa4ea54d",
+      "sha256": "584227a99e7d9795415839992c76f78c813db8bd23d46b8630c1149237b1226d",
+      "bytes": 698352
+    }
+  ],
+  "productBindings": [
+    {
+      "kind": "tree",
+      "path": "src",
+      "gitObject": "0ba34e0271faef2543eb73040b480d65c84347d7"
+    },
+    {
+      "kind": "blob",
+      "path": ".gitattributes",
+      "gitObject": "46b0f08dc495ef0a279131df2c312073fb733e2d",
+      "sha256": "c6f0f954d93ecf7ca7527d89c417a81c1de56c85b679b1646676f03eeac6ab7e",
+      "bytes": 472
+    },
+    {
+      "kind": "blob",
+      "path": "index.html",
+      "gitObject": "0ad39d3452606d0ec50fa38a7070579260b88af5",
+      "sha256": "17f9ad214d915b0fa88b93c0dac71dd6565acb1b6f283d337d450c907e270ce1",
+      "bytes": 3614
+    },
+    {
+      "kind": "blob",
+      "path": "package.json",
+      "gitObject": "c6d4aebd986c5b987f7e996514a7b54e18e7ae9d",
+      "sha256": "0ef89308bf6750496978e5c45819eb49b2662d2e530ffeab46895f8d5db25a97",
+      "bytes": 801
+    },
+    {
+      "kind": "blob",
+      "path": "package-lock.json",
+      "gitObject": "ded639cfb5d74514f3468991f79e13a89fac103e",
+      "sha256": "3b5af91fa51153edc4cabaa99c849228f958f941bcf92f6381b29387486a6b40",
+      "bytes": 85247
+    },
+    {
+      "kind": "blob",
+      "path": "vite.config.ts",
+      "gitObject": "8962b00212b93e081198470d268be1ebe92a85ea",
+      "sha256": "558bf63ff0d83f3cceb80b9f92aa5d07ac1047dee811a4b3e8a39a3fd420ba6c",
+      "bytes": 305
+    },
+    {
+      "kind": "blob",
+      "path": "tsconfig.json",
+      "gitObject": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+      "sha256": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808",
+      "bytes": 119
+    },
+    {
+      "kind": "blob",
+      "path": "tsconfig.app.json",
+      "gitObject": "252250ad279132e1b6fc66872e0fe15c9440c2fe",
+      "sha256": "add258757e7aa413273736d2c854d28424c84ad300deea0547cfde238d02172b",
+      "bytes": 611
+    },
+    {
+      "kind": "blob",
+      "path": "tsconfig.node.json",
+      "gitObject": "3950b4b1904b2932389e09ead72fd1324da88a3b",
+      "sha256": "2fba2f25e1859f193b54edef5d2d2cd08cae2a37fab64c08699f6f8672bea2cc",
+      "bytes": 413
+    },
+    {
+      "kind": "blob",
+      "path": "src/App.tsx",
+      "gitObject": "e5c4de58fcba7674609d831fd1e38e35dc00e3d7",
+      "sha256": "37a25fa2f209446b2d6d8a0b69f083029d27b69b6cc995e02530f23be730f548",
+      "bytes": 140634
+    },
+    {
+      "kind": "blob",
+      "path": "src/game/runtime/GameRuntime.ts",
+      "gitObject": "094047c554bd3b8e65884dcb494583f08f8f5c2f",
+      "sha256": "367b7a06d07e4b93ca673d63a698117ca69cb315dd9c6263d785d6ea1d0816ad",
+      "bytes": 15309
+    },
+    {
+      "kind": "blob",
+      "path": "src/game/render/TetrisRenderer.ts",
+      "gitObject": "a1b3ca8ef1b3fd1b4203f495336c51af5908e7da",
+      "sha256": "568470508de4ec32fdf7fba25307a3f102c5ab6936a7856b13a215b2d122bb65",
+      "bytes": 187271
+    },
+    {
+      "kind": "blob",
+      "path": "src/game/render/theme.ts",
+      "gitObject": "4a5a7f172adacb415d2adcb434091b7217e0cacd",
+      "sha256": "9152d20c233b4f37fda546414ca156c8ef346a8e2c412ce4d7a5f80c953469e2",
+      "bytes": 4781
+    },
+    {
+      "kind": "blob",
+      "path": "src/game/audio/AudioEngine.ts",
+      "gitObject": "2e53dff4ec5db9333c83f9e530d5730ca1ba66a7",
+      "sha256": "0cacf55cf24c801a279ffa1847b0d76259819855f266fda187323d550232ac42",
+      "bytes": 21761
+    },
+    {
+      "kind": "blob",
+      "path": "src/game/audio/audioAssetCatalog.ts",
+      "gitObject": "136fa8d342627d2811e3897f8c840ece50243dcf",
+      "sha256": "4def583f04332b745a8007023394ca6c215a456ca2c5e13dea8cfddc1f713c4b",
+      "bytes": 3743
+    },
+    {
+      "kind": "blob",
+      "path": "src/game/audio/acceptedPlayback.ts",
+      "gitObject": "5f4dec7aa14097ab252066aa5ea01129b1b15c31",
+      "sha256": "dd9b673a439676d44bf134317202e8dc18e693e1a01a7b592441590c1d039704",
+      "bytes": 9431
+    },
+    {
+      "kind": "blob",
+      "path": "src/assets/audio/t37/freeze-ice-cubes-hq.ogg",
+      "gitObject": "12e767d2157f3ed2150a743ac2c161f8f99207f1",
+      "sha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+      "bytes": 54564
+    },
+    {
+      "kind": "blob",
+      "path": "docs/evidence/t26/phase-d/mutation-scenarios.json",
+      "gitObject": "2f5d98294c1c0df845f2b9d77e17b7f44ffe1d3e",
+      "sha256": "0869017d36510da585555afb37c8702a2530d34ac8eb15a97ae3332bb38c37b4",
+      "bytes": 3206
+    },
+    {
+      "kind": "blob",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json",
+      "gitObject": "11ee5541babff7ae1b66a63aae71699212ed5203",
+      "sha256": "a2629a4d74309aa64c88cb8f4780ae205cfabd970b38c3fa46828ff078951bfb",
+      "bytes": 21137
+    }
+  ],
+  "auditSummary": {
+    "semantic": {
+      "schema": "tetramorph.t37.material-semantic.v2",
+      "generatedAt": "2026-08-16T16:28:29.282Z",
+      "passed": true,
+      "cases": [
+        "bomb",
+        "collapse",
+        "freeze",
+        "multiplier"
+      ]
+    },
+    "matrix": {
+      "schema": "tetramorph.t37.material-matrix.v2",
+      "generatedAt": "2026-08-16T16:30:08.642Z",
+      "passed": true,
+      "cases": [
+        "deep-normal-desktop-freeze",
+        "deep-reduced-mobile-collapse",
+        "mineral-normal-portrait-multiplier",
+        "mineral-reduced-mobile-bomb",
+        "sunstone-normal-desktop-collapse",
+        "sunstone-reduced-portrait-freeze"
+      ],
+      "coverage": {
+        "themes": [
+          "deep-tide",
+          "mineral-mist",
+          "sunstone"
+        ],
+        "motion": [
+          "full",
+          "reduced"
+        ],
+        "languages": [
+          "en",
+          "zh-CN"
+        ],
+        "viewports": [
+          "1125x1196",
+          "1440x900",
+          "390x844"
+        ],
+        "items": [
+          "bomb",
+          "collapse",
+          "freeze",
+          "multiplier"
+        ]
+      }
+    },
+    "browser": {
+      "schema": "tetramorph.t37.material-browser.v2",
+      "generatedAt": "2026-08-16T16:31:58.037Z",
+      "passed": true,
+      "assertions": {
+        "realProductRoute": true,
+        "observationsClean": true,
+        "initialOwners": true,
+        "initialContextRecordExact": true,
+        "restartOwnersExact": true,
+        "restartCanvasesExact": true,
+        "restartRafsExact": true,
+        "restartContextsExact": true,
+        "restartListenersExact": true,
+        "preferencesOwnersExact": true,
+        "preferencesCanvasesExact": true,
+        "preferencesRafsExact": true,
+        "preferencesContextsExact": true,
+        "preferencesListenersExact": true,
+        "exitOwnersClean": true,
+        "exitRafsZero": true,
+        "exitListenersZero": true,
+        "exitContextsClosedExact": true,
+        "reentryOwnersFresh": true,
+        "reentryCanvasesExact": true,
+        "reentryRafsExact": true,
+        "reentryContextsExact": true,
+        "reentryListenersExact": true,
+        "hmrEventWindowExact": true,
+        "uiExitHistoryExact": true,
+        "fullMotionExitPreparationExact": true,
+        "iceHmrMarkerBindingExact": true,
+        "hmrAppTouchExact": true,
+        "hmrProofExact": true,
+        "hmrDelivered": true,
+        "hmrOwnersBound": true,
+        "hmrCanvasOwnersExact": true,
+        "hmrPreferencesExact": true,
+        "hmrBoardProbesExact": true,
+        "hmrRafBaselineActive": true,
+        "hmrRafsExact": true,
+        "hmrRafsNotDoubled": true,
+        "hmrListenersExact": true,
+        "preHmrContextsExact": true,
+        "hmrContextBranchValid": true,
+        "hmrContextsExact": true,
+        "terminalOwnersClean": true,
+        "terminalRafsZero": true,
+        "terminalListenersZero": true,
+        "terminalContextsExact": true
+      }
+    },
+    "ice": {
+      "schema": "tetramorph.t37.ice-provenance.v2",
+      "generatedAt": "2026-08-16T16:31:57.961Z",
+      "passed": true,
+      "originalAcquisition": {
+        "filename": "819779__sbml__ice-cubes.wav",
+        "sha256": null,
+        "status": "OPEN / login required",
+        "productOggIsOriginal": false,
+        "previewSubstitutionAllowed": false
+      },
+      "runtimeClassification": {
+        "expected": {
+          "origin": "http://127.0.0.1:5193",
+          "pathname": "/src/assets/audio/t37/freeze-ice-cubes-hq.ogg",
+          "moduleSearch": "?import&url",
+          "assetSearch": "",
+          "assetBytes": 54564,
+          "assetSha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450"
+        },
+        "counts": {
+          "total": 2,
+          "module": 1,
+          "asset": 1,
+          "invalid": 0
+        },
+        "assetBytesExact": true,
+        "moduleExportExact": true,
+        "entries": [
+          {
+            "index": 0,
+            "sequence": 72,
+            "kind": "module",
+            "checks": {
+              "sequenceOrdered": true,
+              "urlValid": true,
+              "sameOrigin": true,
+              "exactPath": true,
+              "noHash": true,
+              "redirectShape": true,
+              "noRedirect": true,
+              "noBodyError": true,
+              "canonicalBase64": true,
+              "moduleMetadata": true,
+              "moduleExportExact": true,
+              "assetMetadata": false
+            },
+            "body": {
+              "bytes": 505,
+              "sha256": "dcfb4a1f30f6b0781f56eb6bbeae0e0adbeed130df135d6361357f6bf06cc7e2",
+              "moduleExport": "/src/assets/audio/t37/freeze-ice-cubes-hq.ogg"
+            }
+          },
+          {
+            "index": 1,
+            "sequence": 101,
+            "kind": "asset",
+            "checks": {
+              "sequenceOrdered": true,
+              "urlValid": true,
+              "sameOrigin": true,
+              "exactPath": true,
+              "noHash": true,
+              "redirectShape": true,
+              "noRedirect": true,
+              "noBodyError": true,
+              "canonicalBase64": true,
+              "moduleMetadata": false,
+              "moduleExportExact": false,
+              "assetMetadata": true
+            },
+            "body": {
+              "bytes": 54564,
+              "sha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+              "moduleExport": null
+            }
+          }
+        ],
+        "passed": true
+      },
+      "catalog": {
+        "path": "src/game/audio/audioAssetCatalog.ts",
+        "gitBlob": "136fa8d342627d2811e3897f8c840ece50243dcf",
+        "bytes": 3743,
+        "sha256": "4def583f04332b745a8007023394ca6c215a456ca2c5e13dea8cfddc1f713c4b",
+        "runtime": {
+          "modulePath": "/src/game/audio/audioAssetCatalog.ts",
+          "catalogOwnKeys": [
+            "studioProgress",
+            "studioStart",
+            "freezeIce",
+            "bombFamiliarA",
+            "bombFamiliarB",
+            "bombFamiliarC"
+          ],
+          "freezeKeyCount": 1,
+          "freezeOwnKeys": [
+            "url",
+            "sha256",
+            "license",
+            "licenseFile",
+            "uses",
+            "source",
+            "windowStartSeconds",
+            "windowDurationSeconds",
+            "gain",
+            "attack",
+            "release",
+            "originalFilename",
+            "originalSha256",
+            "status"
+          ],
+          "descriptor": {
+            "configurable": true,
+            "enumerable": true,
+            "writable": true,
+            "get": false,
+            "set": false,
+            "value": {
+              "url": "/src/assets/audio/t37/freeze-ice-cubes-hq.ogg",
+              "sha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+              "license": "CC0-1.0",
+              "licenseFile": "licenses/audio/CC0-1.0.txt",
+              "uses": [
+                "freeze-activation"
+              ],
+              "source": {
+                "publisher": "Freesound",
+                "pageUrl": "https://freesound.org/people/sbml/sounds/819779/",
+                "soundId": 819779,
+                "author": "sbml",
+                "title": "Ice cubes",
+                "runtimeFileKind": "Freesound-generated HQ Ogg preview",
+                "originalFormat": "WAV, 1.723 seconds, 96 kHz, 32-bit, stereo"
+              },
+              "windowStartSeconds": 0.19375,
+              "windowDurationSeconds": 0.44,
+              "gain": 0.78,
+              "attack": 0.003,
+              "release": 0.012,
+              "originalFilename": "819779__sbml__ice-cubes.wav",
+              "originalSha256": null,
+              "status": "pending"
+            }
+          },
+          "value": {
+            "url": "/src/assets/audio/t37/freeze-ice-cubes-hq.ogg",
+            "sha256": "5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450",
+            "license": "CC0-1.0",
+            "licenseFile": "licenses/audio/CC0-1.0.txt",
+            "uses": [
+              "freeze-activation"
+            ],
+            "source": {
+              "publisher": "Freesound",
+              "pageUrl": "https://freesound.org/people/sbml/sounds/819779/",
+              "soundId": 819779,
+              "author": "sbml",
+              "title": "Ice cubes",
+              "runtimeFileKind": "Freesound-generated HQ Ogg preview",
+              "originalFormat": "WAV, 1.723 seconds, 96 kHz, 32-bit, stereo"
+            },
+            "windowStartSeconds": 0.19375,
+            "windowDurationSeconds": 0.44,
+            "gain": 0.78,
+            "attack": 0.003,
+            "release": 0.012,
+            "originalFilename": "819779__sbml__ice-cubes.wav",
+            "originalSha256": null,
+            "status": "pending"
+          }
+        }
+      }
+    },
+    "client": {
+      "schema": "tetramorph.t37.material-client-attestation.v1",
+      "generatedAt": "2026-08-16T16:32:48.127Z",
+      "passed": true,
+      "startedAt": "2026-08-16T16:32:20.668Z",
+      "finishedAt": "2026-08-16T16:32:48.127Z",
+      "origin": "http://127.0.0.1:5193",
+      "outputs": [
+        {
+          "path": "client-smoke/shot-0.png",
+          "bytes": 85481,
+          "sha256": "15c9d7a5c66232c8cb5085ce057ea98c7dcc5315ba83920a34796bb230a555ec"
+        },
+        {
+          "path": "client-smoke/shot-1.png",
+          "bytes": 47477,
+          "sha256": "a99c03953ae7f69eb74d49985c5dc913cd2f1727444d6c62620897ffad8fd8de"
+        },
+        {
+          "path": "client-smoke/shot-2.png",
+          "bytes": 50191,
+          "sha256": "4a4fac2ca384628c91692b15518b480f7b6b52659597b11aafbafa15d03bc511"
+        },
+        {
+          "path": "client-smoke/state-0.json",
+          "bytes": 1038,
+          "sha256": "b5d6cb48091e13b776f25daa8c1c180783fa36b17303c6897c288eb4b4f848a3"
+        },
+        {
+          "path": "client-smoke/state-1.json",
+          "bytes": 1043,
+          "sha256": "14a3b5465a589193113a76af65ef733b7b3f489750b42e936b70ec466c8186f4"
+        },
+        {
+          "path": "client-smoke/state-2.json",
+          "bytes": 1044,
+          "sha256": "294cc1e125ee4e26108eae6192bbd90e2ce4252b5e70c2a4f5fbf0774a1916d0"
+        }
+      ]
+    }
+  }
+}
