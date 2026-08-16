@@ -5,9 +5,10 @@ import { readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
   AUTH, BASE, BYTE_CONTRACT, CLIENT, CONTRACT, HUMAN_STATUS, ICE, ITEMS, MATRIX_CASES,
-  MATRIX_PNG, OUTPUT, PRE_REPORT, PRODUCT_BINDINGS, SEMANTIC_PNG, SOURCE, STAGES,
-  SEEDS, STAGE_E_ANCHORS, TERMINAL, prefix, repo, root,
+  MATRIX_PNG, OUTPUT, PRE_REPORT, PRODUCT_BINDINGS, PROFILE, SEMANTIC_PNG, SOURCE,
+  STAGES, SEEDS, STAGE_E_ANCHORS, TERMINAL, prefix, repo, root,
 } from './evidence-contract.mjs';
+import { assertItemSnapshot } from './product-fixture.mjs';
 
 /** @param {import('node:crypto').BinaryLike} bytes */
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -53,19 +54,43 @@ function exists(head, path) { try { git('cat-file', '-e', `${head}:${path}`); re
 /** @param {string} from @param {string} to @param {string[]} allowed @param {string} label */
 function linearHistory(from, to, allowed, label) {
   const commits = git('rev-list', '--reverse', '--ancestry-path', `${from}..${to}`).split(/\r?\n/u).filter(Boolean);
-  const touched = new Set(); let valid = commits.length > 0;
+  const touched = new Set(); const allowedSet = new Set(allowed); const historyErrors = [];
+  let expectedParent = from;
+  if (commits.length === 0) historyErrors.push('empty range');
   for (const commit of commits) {
     const parents = git('rev-list', '--parents', '-n', '1', commit).split(/\s+/u);
-    if (parents.length !== 2) { valid = false; continue; }
-    const changes = gitRaw('diff-tree', '--no-commit-id', '--name-status', '-r', '-z', parents[1], commit).toString('utf8').split('\0').filter(Boolean);
-    if (changes.length % 2 !== 0) { valid = false; continue; }
-    for (let index = 0; index < changes.length; index += 2) {
-      const status = changes[index]; const path = changes[index + 1];
-      if (!['A', 'M', 'D'].includes(status) || !allowed.includes(path)) valid = false;
+    if (parents.length !== 2 || parents[1] !== expectedParent) {
+      historyErrors.push(`non-linear ${commit}`);
+      continue;
+    }
+    const fields = gitRaw(
+      'diff-tree', '--no-commit-id', '--name-status', '-r', '-z',
+      '--find-renames=50%', '--find-copies=50%', parents[1], commit,
+    ).toString('utf8').split('\0');
+    if (fields.pop() !== '' || fields.length === 0) {
+      historyErrors.push(`empty or malformed commit ${commit}`);
+      expectedParent = commit;
+      continue;
+    }
+    let index = 0;
+    while (index < fields.length) {
+      const status = fields[index++];
+      if (/^[RC]\d+$/u.test(status)) {
+        const fromPath = fields[index++]; const toPath = fields[index++];
+        historyErrors.push(!fromPath || !toPath ? `malformed ${status} ${commit}` : `forbidden ${status} ${fromPath} -> ${toPath}`);
+        continue;
+      }
+      const path = fields[index++];
+      if (!path) { historyErrors.push(`missing path after ${status} in ${commit}`); break; }
+      if (status !== 'A' && status !== 'M') historyErrors.push(`forbidden status ${status} ${path}`);
+      if (!allowedSet.has(path)) historyErrors.push(`out-of-set path ${commit} ${path}`);
       touched.add(path);
     }
+    expectedParent = commit;
   }
-  check(valid && equalSet([...touched], allowed), label, { commits, touched: sorted([...touched]) });
+  if (expectedParent !== to) historyErrors.push(`endpoint ${expectedParent} != ${to}`);
+  if (!equalSet([...touched], allowed)) historyErrors.push(`touched ${sorted([...touched]).join(',')}`);
+  check(historyErrors.length === 0, label, { commits, touched: sorted([...touched]), historyErrors });
   return commits;
 }
 /** @param {string} head @param {{kind: string, path: string}} entry */
@@ -81,6 +106,92 @@ function png(bytes, label) {
   const valid = bytes.length > 1000 && bytes.subarray(0, 8).toString('hex') === signature;
   const width = valid ? bytes.readUInt32BE(16) : 0; const height = valid ? bytes.readUInt32BE(20) : 0;
   check(valid && width >= 300 && height >= 300, `${label}: real PNG dimensions`, { bytes: bytes.length, width, height });
+}
+
+/** @param {any} tracker */
+const relevantListeners = (tracker) => {
+  const counts = tracker?.listenerCounts ?? {};
+  return Object.fromEntries(Object.keys(counts)
+    .filter((key) => /:(keydown|keyup|blur|visibilitychange)$/u.test(key))
+    .sort()
+    .map((key) => [key, Number(counts[key])]));
+};
+/** @param {any} before @param {any} after */
+const sameRelevantListeners = (before, after) => Boolean(before?.listenerCounts && after?.listenerCounts)
+  && deepEqual(relevantListeners(before), relevantListeners(after));
+/** @param {any} tracker */
+const noRelevantListeners = (tracker) => Boolean(tracker?.listenerCounts)
+  && Object.values(relevantListeners(tracker)).every((count) => count === 0);
+/** @param {any} tracker */
+const activeRafs = (tracker) => Number.isInteger(tracker?.activeRafs) ? Number(tracker.activeRafs) : -1;
+
+/** @param {any} value @param {string} label @param {string[]} errors */
+function assertTextState(value, label, errors) {
+  if (typeof value?.textState !== 'string') { errors.push(`${label}: missing textState`); return; }
+  try {
+    const state = JSON.parse(value.textState);
+    if (state.mode !== 'sprint' || state.screen !== 'game') errors.push(`${label}: textState route mismatch`);
+  } catch { errors.push(`${label}: invalid textState JSON`); }
+}
+
+/** @param {any} observed @param {string} label @param {string[]} errors */
+function assertCleanObservations(observed, label, errors) {
+  if (!observed || typeof observed !== 'object') { errors.push(`${label}: missing observations`); return; }
+  for (const key of ['consoleErrors', 'pageErrors', 'requestErrors']) {
+    if (!Array.isArray(observed[key])) errors.push(`${label}: ${key} is not an array`);
+    else if (observed[key].length > 0) errors.push(`${label}: ${key} is not empty`);
+  }
+}
+
+/** @param {any} browser */
+function browserLifecycleProof(browser) {
+  return {
+    activeRafs: {
+      initial: activeRafs(browser.initial?.tracker), restartBefore: activeRafs(browser.restarted?.before), restartAfter: activeRafs(browser.restarted?.after),
+      preferences: activeRafs(browser.changedPreferences?.tracker), exit: activeRafs(browser.exited?.tracker), reentry: activeRafs(browser.reentered?.tracker),
+      hmrBaseline: activeRafs(browser.hmr?.before?.tracker), hmrAfter: activeRafs(browser.hmr?.after?.tracker), terminal: activeRafs(browser.terminal),
+    },
+    relevantListeners: {
+      initial: relevantListeners(browser.initial?.tracker), restartBefore: relevantListeners(browser.restarted?.before), restartAfter: relevantListeners(browser.restarted?.after),
+      preferences: relevantListeners(browser.changedPreferences?.tracker), exit: relevantListeners(browser.exited?.tracker), reentry: relevantListeners(browser.reentered?.tracker),
+      hmrBaseline: relevantListeners(browser.hmr?.before?.tracker), hmrAfter: relevantListeners(browser.hmr?.after?.tracker), terminal: relevantListeners(browser.terminal),
+    },
+  };
+}
+
+/** @param {any} browser */
+function browserLifecycleAssertions(browser) {
+  const observations = browser.observations ?? {};
+  return {
+    realProductRoute: typeof browser.pageUrl === 'string' && browser.pageUrl.startsWith(String(browser.origin).replace(/\/$/u, '')),
+    observationsClean: Array.isArray(observations.consoleErrors) && observations.consoleErrors.length === 0
+      && Array.isArray(observations.pageErrors) && observations.pageErrors.length === 0
+      && Array.isArray(observations.requestErrors) && observations.requestErrors.length === 0,
+    initialOwners: browser.initial?.canvasCount === 1 && browser.initial?.domCellCount === 0 && browser.initial?.tracker?.liveContexts === 1 && activeRafs(browser.initial?.tracker) >= 1,
+    restartOwnersExact: browser.restarted?.before?.qaId === browser.restarted?.after?.qaId && browser.restarted?.before?.canvasId === browser.restarted?.after?.canvasId
+      && browser.restarted?.before?.contexts?.at(-1)?.id === browser.restarted?.after?.contexts?.at(-1)?.id && browser.restarted?.after?.liveContexts === 1,
+    restartListenersExact: sameRelevantListeners(browser.restarted?.before, browser.restarted?.after),
+    preferencesOwnersExact: browser.changedPreferences?.tracker?.qaId === browser.initial?.tracker?.qaId && browser.changedPreferences?.tracker?.canvasId === browser.initial?.tracker?.canvasId
+      && browser.changedPreferences?.tracker?.contexts?.at(-1)?.id === browser.initial?.tracker?.contexts?.at(-1)?.id && browser.changedPreferences?.tracker?.liveContexts === 1,
+    preferencesListenersExact: sameRelevantListeners(browser.initial?.tracker, browser.changedPreferences?.tracker),
+    exitOwnersClean: browser.exited?.oldRendererRetired === true && browser.exited?.tracker?.canvases === 0 && browser.exited?.tracker?.liveContexts === 0
+      && browser.exited?.qaPresent === false && browser.exited?.textHook === false,
+    exitRafsZero: activeRafs(browser.exited?.tracker) === 0,
+    exitListenersZero: noRelevantListeners(browser.exited?.tracker),
+    reentryOwnersFresh: browser.reentered?.tracker?.qaId !== browser.initial?.tracker?.qaId && browser.reentered?.tracker?.canvasId !== browser.initial?.tracker?.canvasId
+      && browser.reentered?.tracker?.liveContexts === 1 && browser.reentered?.tracker?.contexts?.slice(0, -1).every((/** @type {any} */ entry) => entry.closed),
+    reentryListenersExact: sameRelevantListeners(browser.changedPreferences?.tracker, browser.reentered?.tracker),
+    hmrDelivered: Array.isArray(browser.hmr?.requests) && browser.hmr.requests.length >= 1,
+    hmrOwnersBound: browser.hmr?.after?.canvasCount === 1 && browser.hmr?.after?.tracker?.liveContexts === 1
+      && (browser.hmr?.oldOwner?.sameOwner === true || browser.hmr?.oldOwner?.oldRenderer === 'retired'),
+    hmrRafBaselineActive: activeRafs(browser.hmr?.before?.tracker) >= 1,
+    hmrRafsExact: activeRafs(browser.hmr?.after?.tracker) === activeRafs(browser.hmr?.before?.tracker),
+    hmrRafsNotDoubled: activeRafs(browser.hmr?.after?.tracker) <= activeRafs(browser.hmr?.before?.tracker),
+    hmrListenersExact: sameRelevantListeners(browser.hmr?.before?.tracker, browser.hmr?.after?.tracker),
+    terminalOwnersClean: browser.terminal?.canvases === 0 && browser.terminal?.liveContexts === 0,
+    terminalRafsZero: activeRafs(browser.terminal) === 0,
+    terminalListenersZero: noRelevantListeners(browser.terminal),
+  };
 }
 /** @param {string} directory @param {string} [base] @returns {Promise<string[]>} */
 async function files(directory, base = '') {
@@ -145,45 +256,73 @@ check(deepEqual(manifest.outputBindings, expectedOutputBindings), 'output Git-bl
 for (const anchor of STAGE_E_ANCHORS) check(git('merge-base', '--is-ancestor', anchor, BASE) === '', `Stage E ancestor ${anchor}`);
 
 const semantic = JSON.parse(text(blob(generated, prefix + 'material-semantic-audit.json'), 'semantic audit'));
-check(semantic.schema === 'tetramorph.t37.material-semantic.v1' && semantic.passed === true && semantic.errors.length === 0, 'semantic audit green');
+check(semantic.schema === 'tetramorph.t37.material-semantic.v1' && semantic.passed === true
+  && Array.isArray(semantic.errors) && semantic.errors.length === 0, 'semantic audit declared green');
 check(equalSet(Object.keys(semantic.cases), ITEMS), 'semantic four items');
 for (const item of /** @type {Array<'freeze'|'bomb'|'multiplier'|'collapse'>} */ (ITEMS)) {
   const entry = semantic.cases[item];
-  check(entry.seed === SEEDS[item], `${item}: exact seed`);
+  check(entry.seed === SEEDS[item] && entry.profile === PROFILE[item], `${item}: exact fixture contract`);
   check(equalSet(Object.keys(entry.stages), STAGES), `${item}: five stages`);
   for (const stage of STAGES) {
     const proof = entry.stages[stage];
     check(proof.file === `${item}-${stage}.png`, `${item}/${stage}: filename`);
-    check(proof.sha256 === sha(blob(generated, prefix + proof.file)), `${item}/${stage}: screenshot hash`);
-    check(proof.value.canvasCount === 1 && proof.value.domCellCount === 0, `${item}/${stage}: one Canvas zero cells`);
-    check(proof.value.layout?.assertions?.noHorizontalOverflow === true && proof.value.layout?.assertions?.noVerticalOverflow === true, `${item}/${stage}: no overflow`);
-    check(typeof proof.value.textState === 'string' && JSON.parse(proof.value.textState).mode === 'sprint', `${item}/${stage}: real text-state route`);
+    const screenshot = blob(generated, prefix + proof.file);
+    check(proof.sha256 === sha(screenshot) && proof.bytes === screenshot.length, `${item}/${stage}: screenshot byte binding`);
+    /** @type {string[]} */
+    const snapshotErrors = [];
+    assertItemSnapshot(proof.value, item, stage, snapshotErrors);
+    check(snapshotErrors.length === 0, `${item}/${stage}: independent item snapshot semantics`, snapshotErrors);
+    check(proof.value.root?.language === 'zh-CN' && proof.value.root?.theme === 'deep-tide'
+      && proof.value.root?.reducedMotion === 'false', `${item}/${stage}: semantic settings`);
+    /** @type {string[]} */
+    const textErrors = [];
+    assertTextState(proof.value, `${item}/${stage}`, textErrors);
+    check(textErrors.length === 0, `${item}/${stage}: textState`, textErrors);
+  }
+  check(Array.isArray(entry.observations) && entry.observations.length === 3, `${item}: three observation groups`);
+  for (const [index, observed] of entry.observations.entries()) {
+    /** @type {string[]} */
+    const observationErrors = [];
+    assertCleanObservations(observed, `${item}/observations-${index}`, observationErrors);
+    check(observationErrors.length === 0, `${item}/observations-${index}: zero browser errors`, observationErrors);
   }
 }
 check(equalSet(SEMANTIC_PNG, ITEMS.flatMap((item) => STAGES.map((stage) => `${item}-${stage}.png`))), 'semantic filename contract');
 
 const matrix = JSON.parse(text(blob(generated, prefix + 'material-matrix-audit.json'), 'matrix audit'));
-check(matrix.schema === 'tetramorph.t37.material-matrix.v1' && matrix.passed === true && matrix.errors.length === 0, 'matrix audit green');
+check(matrix.schema === 'tetramorph.t37.material-matrix.v1' && matrix.passed === true
+  && Array.isArray(matrix.errors) && matrix.errors.length === 0, 'matrix audit declared green');
 check(equalSet(Object.keys(matrix.cases), MATRIX_CASES.map(({ name }) => name)), 'matrix six cases');
 check(deepEqual(matrix.coverage, { themes: ['deep-tide', 'mineral-mist', 'sunstone'], motion: ['full', 'reduced'], languages: ['en', 'zh-CN'], viewports: ['1125x1196', '1440x900', '390x844'], items: ['bomb', 'collapse', 'freeze', 'multiplier'] }), 'matrix exact coverage');
 for (const entry of MATRIX_CASES) {
   const proof = matrix.cases[entry.name];
-  check(deepEqual(proof.contract, entry), `${entry.name}: contract`);
-  check(proof.sha256 === sha(blob(generated, prefix + `${entry.name}.png`)), `${entry.name}: screenshot hash`);
+  check(deepEqual(proof.contract, entry) && proof.file === `${entry.name}.png`, `${entry.name}: contract`);
+  const screenshot = blob(generated, prefix + `${entry.name}.png`);
+  check(proof.sha256 === sha(screenshot) && proof.bytes === screenshot.length, `${entry.name}: screenshot byte binding`);
+  /** @type {string[]} */
+  const snapshotErrors = [];
+  assertItemSnapshot(proof.value, /** @type {'freeze'|'bomb'|'multiplier'|'collapse'} */ (entry.item), 'active-ghost', snapshotErrors);
+  check(snapshotErrors.length === 0, `${entry.name}: independent item snapshot semantics`, snapshotErrors);
   check(proof.value.root.language === entry.language && proof.value.root.theme === entry.theme && proof.value.root.reducedMotion === String(entry.reduced), `${entry.name}: root state`);
+  /** @type {string[]} */
+  const textErrors = [];
+  assertTextState(proof.value, entry.name, textErrors);
+  check(textErrors.length === 0, `${entry.name}: textState`, textErrors);
+  /** @type {string[]} */
+  const observationErrors = [];
+  assertCleanObservations(proof.observations, `${entry.name}/observations`, observationErrors);
+  check(observationErrors.length === 0, `${entry.name}: zero browser errors`, observationErrors);
 }
 check(equalSet(MATRIX_PNG, MATRIX_CASES.map(({ name }) => `${name}.png`)), 'matrix filename contract');
 
 const browser = JSON.parse(text(blob(generated, prefix + 'browser-report.json'), 'browser report'));
-check(browser.schema === 'tetramorph.t37.material-browser.v1' && browser.passed === true && browser.failures.length === 0, 'browser report green');
-check(Object.values(browser.assertions).every((value) => value === true), 'browser lifecycle assertions');
-check(browser.initial.canvasCount === 1 && browser.initial.domCellCount === 0 && browser.initial.tracker.liveContexts === 1, 'browser initial owners');
-check(browser.restarted.before.qaId === browser.restarted.after.qaId && browser.restarted.before.canvasId === browser.restarted.after.canvasId, 'browser restart reuse');
-check(browser.changedPreferences.tracker.qaId === browser.initial.tracker.qaId && browser.changedPreferences.tracker.canvasId === browser.initial.tracker.canvasId, 'browser preference reuse');
-check(browser.exited.oldRendererRetired && browser.exited.tracker.canvases === 0 && browser.exited.tracker.liveContexts === 0, 'browser UI exit terminal');
-check(browser.reentered.tracker.qaId !== browser.initial.tracker.qaId && browser.reentered.tracker.canvasId !== browser.initial.tracker.canvasId && browser.reentered.tracker.liveContexts === 1, 'browser re-entry replacement');
-check(browser.hmr.requests.length >= 1 && browser.hmr.after.canvasCount === 1 && browser.hmr.after.tracker.liveContexts === 1, 'browser HMR no owner leak');
-check(browser.terminal.canvases === 0 && browser.terminal.liveContexts === 0, 'browser final cleanup');
+check(browser.schema === 'tetramorph.t37.material-browser.v1' && browser.passed === true
+  && Array.isArray(browser.failures) && browser.failures.length === 0, 'browser report declared green');
+const recomputedLifecycleProof = browserLifecycleProof(browser);
+const recomputedLifecycleAssertions = browserLifecycleAssertions(browser);
+for (const [label, passed] of Object.entries(recomputedLifecycleAssertions)) check(passed, `browser lifecycle: ${label}`);
+check(deepEqual(browser.lifecycleProof, recomputedLifecycleProof), 'browser lifecycle proof matches raw tracker data', { expected: recomputedLifecycleProof, actual: browser.lifecycleProof });
+check(deepEqual(browser.assertions, recomputedLifecycleAssertions), 'browser assertions match independent recomputation', { expected: recomputedLifecycleAssertions, actual: browser.assertions });
 
 const ice = JSON.parse(text(blob(generated, prefix + 'ice-provenance-audit.json'), 'Ice provenance'));
 check(ice.schema === 'tetramorph.t37.ice-provenance.v1' && ice.passed === true && ice.failures.length === 0 && ice.checks.every((/** @type {any} */ entry) => entry.passed), 'Ice provenance green');

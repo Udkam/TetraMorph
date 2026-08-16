@@ -20,9 +20,21 @@ const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8'
 /** @param {string} head @param {string} path */
 const gitBytes = (head, path) => execFileSync('git', ['show', `${head}:${path}`], { cwd: repo });
 /** @param {any} tracker */
-const relevantListeners = (tracker) => Object.fromEntries(Object.entries(tracker?.listenerCounts ?? {}).filter(([key]) => /:(keydown|keyup|blur|visibilitychange)$/u.test(key)));
+const relevantListeners = (tracker) => {
+  const counts = tracker?.listenerCounts ?? {};
+  return Object.fromEntries(Object.keys(counts)
+    .filter((key) => /:(keydown|keyup|blur|visibilitychange)$/u.test(key))
+    .sort()
+    .map((key) => [key, Number(counts[key])]));
+};
 /** @param {any} before @param {any} after */
-const noListenerGrowth = (before, after) => Object.entries(relevantListeners(after)).every(([key, count]) => Number(count) <= Number(relevantListeners(before)[key] ?? 0));
+const sameRelevantListeners = (before, after) => Boolean(before?.listenerCounts && after?.listenerCounts)
+  && JSON.stringify(relevantListeners(before)) === JSON.stringify(relevantListeners(after));
+/** @param {any} tracker */
+const noRelevantListeners = (tracker) => Boolean(tracker?.listenerCounts)
+  && Object.values(relevantListeners(tracker)).every((count) => count === 0);
+/** @param {any} tracker */
+const activeRafs = (tracker) => Number.isInteger(tracker?.activeRafs) ? Number(tracker.activeRafs) : -1;
 
 check(git('rev-parse', AUTH) === AUTH, 'authorization head missing');
 check(git('rev-parse', BASE) === BASE, 'R5B terminal base missing');
@@ -63,7 +75,7 @@ const restarted = await page.evaluate(() => {
 });
 check(restarted.before.qaId === restarted.after.qaId && restarted.before.canvasId === restarted.after.canvasId, 'restart reuses runtime and Canvas');
 check(restarted.before.contexts.at(-1)?.id === restarted.after.contexts.at(-1)?.id && restarted.after.liveContexts === 1, 'restart reuses AudioContext');
-check(noListenerGrowth(restarted.before, restarted.after), 'restart listener stability');
+check(sameRelevantListeners(restarted.before, restarted.after), 'restart relevant listener set is exactly stable');
 
 await page.getByTestId('open-settings').click();
 await page.getByTestId('theme-mineral-mist').click();
@@ -74,14 +86,20 @@ await page.waitForFunction(() => document.querySelector('.app')?.getAttribute('d
 const changedPreferences = await snapshot(page);
 check(changedPreferences.tracker?.qaId === initial.tracker?.qaId && changedPreferences.tracker?.canvasId === initial.tracker?.canvasId, 'theme/motion reuse runtime and Canvas');
 check(changedPreferences.tracker?.contexts.at(-1)?.id === initial.tracker?.contexts.at(-1)?.id && changedPreferences.tracker?.liveContexts === 1, 'theme/motion reuse AudioContext');
-check(noListenerGrowth(initial.tracker, changedPreferences.tracker), 'theme/motion listener stability');
+check(sameRelevantListeners(initial.tracker, changedPreferences.tracker), 'theme/motion relevant listener set is exactly stable');
 
 await page.evaluate(() => { const w = /** @type {any} */ (window); w.__MATERIAL_EXIT_QA__ = w.__TETRAMORPH_QA__; });
 await page.getByTestId('exit-game').click();
 await page.locator('.action-sheet__actions > .primary-action').click();
 await page.getByTestId('mode-home').waitFor({ state: 'visible' });
-await page.waitForFunction(() => { const w = /** @type {any} */ (window); return !w.__TETRAMORPH_QA__ && document.querySelectorAll('canvas').length === 0
-  && w.__MATERIAL_TRACKER__.snapshot().liveContexts === 0; });
+await page.waitForFunction(() => {
+  const w = /** @type {any} */ (window);
+  const tracker = w.__MATERIAL_TRACKER__.snapshot();
+  const relevant = Object.entries(tracker.listenerCounts).filter(([key]) => /:(keydown|keyup|blur|visibilitychange)$/u.test(key));
+  return !w.__TETRAMORPH_QA__ && document.querySelectorAll('canvas').length === 0
+    && tracker.liveContexts === 0 && tracker.activeRafs === 0
+    && relevant.every(([, count]) => Number(count) === 0);
+});
 const exited = await page.evaluate(() => {
   const w = /** @type {any} */ (window);
   let oldRendererRetired = false;
@@ -90,8 +108,8 @@ const exited = await page.evaluate(() => {
 });
 check(exited.tracker.canvases === 0 && exited.tracker.liveContexts === 0 && exited.oldRendererRetired, 'UI exit retires Canvas/renderer/audio');
 check(!exited.qaPresent && !exited.textHook, 'UI exit retires QA hooks');
-check(Number(relevantListeners(exited.tracker)['window:keydown'] ?? 0) < Number(relevantListeners(changedPreferences.tracker)['window:keydown'] ?? 0), 'UI exit removes input listeners');
-check(Number(relevantListeners(exited.tracker)['document:visibilitychange'] ?? 0) < Number(relevantListeners(changedPreferences.tracker)['document:visibilitychange'] ?? 0), 'UI exit removes visibility listener');
+check(activeRafs(exited.tracker) === 0, 'UI exit retires every tracked RAF');
+check(noRelevantListeners(exited.tracker), 'UI exit retires every relevant listener');
 
 await page.getByTestId('enter-sprint').click();
 await page.getByTestId('game-screen').waitFor({ state: 'visible' });
@@ -104,7 +122,7 @@ const reentered = await snapshot(page);
 check(reentered.tracker?.qaId !== initial.tracker?.qaId && reentered.tracker?.canvasId !== initial.tracker?.canvasId, 're-entry owns fresh runtime and Canvas');
 check(reentered.tracker?.liveContexts === 1 && reentered.tracker?.contexts.length >= 2
   && reentered.tracker?.contexts.slice(0, -1).every((/** @type {any} */ entry) => entry.closed), 're-entry owns one fresh AudioContext');
-check(JSON.stringify(relevantListeners(reentered.tracker)) === JSON.stringify(relevantListeners(changedPreferences.tracker)), 're-entry restores one listener set');
+check(sameRelevantListeners(reentered.tracker, changedPreferences.tracker), 're-entry restores the exact relevant listener set');
 
 await page.evaluate(() => { const w = /** @type {any} */ (window); w.__MATERIAL_HMR_QA__ = w.__TETRAMORPH_QA__; });
 const beforeHmr = await snapshot(page);
@@ -126,16 +144,21 @@ const oldHmrOwner = await page.evaluate(() => {
 });
 check(hmrRequests.length >= 1, 'Vite delivered App HMR update');
 check(afterHmr.canvasCount === 1 && afterHmr.tracker?.liveContexts === 1, 'HMR leaves one Canvas and AudioContext');
-check(afterHmr.tracker?.activeRafs <= (beforeHmr.tracker?.activeRafs ?? 1) + 1, 'HMR frame/ticker callback bound');
-check(noListenerGrowth(beforeHmr.tracker, afterHmr.tracker), 'HMR listener bound');
+check(activeRafs(beforeHmr.tracker) >= 1 && activeRafs(afterHmr.tracker) === activeRafs(beforeHmr.tracker), 'HMR active RAFs exactly equal the live baseline');
+check(sameRelevantListeners(beforeHmr.tracker, afterHmr.tracker), 'HMR relevant listener set is exactly stable');
 check(oldHmrOwner.sameOwner || oldHmrOwner.oldRenderer === 'retired', 'HMR old renderer disposition');
 
 await page.getByTestId('exit-game').click();
 await page.locator('.action-sheet__actions > .primary-action').click();
 await page.getByTestId('mode-home').waitFor({ state: 'visible' });
-await page.waitForFunction(() => document.querySelectorAll('canvas').length === 0 && /** @type {any} */ (window).__MATERIAL_TRACKER__.snapshot().liveContexts === 0);
+await page.waitForFunction(() => {
+  const tracker = /** @type {any} */ (window).__MATERIAL_TRACKER__.snapshot();
+  const relevant = Object.entries(tracker.listenerCounts).filter(([key]) => /:(keydown|keyup|blur|visibilitychange)$/u.test(key));
+  return document.querySelectorAll('canvas').length === 0 && tracker.liveContexts === 0
+    && tracker.activeRafs === 0 && relevant.every(([, count]) => Number(count) === 0);
+});
 const terminal = await page.evaluate(() => /** @type {any} */ (window).__MATERIAL_TRACKER__.snapshot());
-check(terminal.canvases === 0 && terminal.liveContexts === 0 && Number(relevantListeners(terminal)['window:keydown'] ?? 0) === 0, 'post-HMR terminal cleanup');
+check(terminal.canvases === 0 && terminal.liveContexts === 0 && activeRafs(terminal) === 0 && noRelevantListeners(terminal), 'post-HMR terminal cleanup');
 
 const iceBytes = gitBytes(BASE, ICE.path);
 const catalog = gitBytes(BASE, 'src/game/audio/audioAssetCatalog.ts').toString('utf8');
@@ -163,19 +186,52 @@ const iceProvenance = {
 };
 if (!iceProvenance.passed) failures.push(...iceProvenance.failures.map((value) => `Ice provenance: ${value}`));
 
+const lifecycleProof = {
+  activeRafs: {
+    initial: activeRafs(initial.tracker), restartBefore: activeRafs(restarted.before), restartAfter: activeRafs(restarted.after),
+    preferences: activeRafs(changedPreferences.tracker), exit: activeRafs(exited.tracker), reentry: activeRafs(reentered.tracker),
+    hmrBaseline: activeRafs(beforeHmr.tracker), hmrAfter: activeRafs(afterHmr.tracker), terminal: activeRafs(terminal),
+  },
+  relevantListeners: {
+    initial: relevantListeners(initial.tracker), restartBefore: relevantListeners(restarted.before), restartAfter: relevantListeners(restarted.after),
+    preferences: relevantListeners(changedPreferences.tracker), exit: relevantListeners(exited.tracker), reentry: relevantListeners(reentered.tracker),
+    hmrBaseline: relevantListeners(beforeHmr.tracker), hmrAfter: relevantListeners(afterHmr.tracker), terminal: relevantListeners(terminal),
+  },
+};
+const lifecycleAssertions = {
+  realProductRoute: page.url().startsWith(origin.replace(/\/$/u, '')),
+  observationsClean: observed.consoleErrors.length === 0 && observed.pageErrors.length === 0 && observed.requestErrors.length === 0,
+  initialOwners: initial.canvasCount === 1 && initial.domCellCount === 0 && initial.tracker?.liveContexts === 1 && activeRafs(initial.tracker) >= 1,
+  restartOwnersExact: restarted.before.qaId === restarted.after.qaId && restarted.before.canvasId === restarted.after.canvasId
+    && restarted.before.contexts.at(-1)?.id === restarted.after.contexts.at(-1)?.id && restarted.after.liveContexts === 1,
+  restartListenersExact: sameRelevantListeners(restarted.before, restarted.after),
+  preferencesOwnersExact: changedPreferences.tracker?.qaId === initial.tracker?.qaId && changedPreferences.tracker?.canvasId === initial.tracker?.canvasId
+    && changedPreferences.tracker?.contexts.at(-1)?.id === initial.tracker?.contexts.at(-1)?.id && changedPreferences.tracker?.liveContexts === 1,
+  preferencesListenersExact: sameRelevantListeners(initial.tracker, changedPreferences.tracker),
+  exitOwnersClean: exited.oldRendererRetired && exited.tracker.canvases === 0 && exited.tracker.liveContexts === 0 && !exited.qaPresent && !exited.textHook,
+  exitRafsZero: activeRafs(exited.tracker) === 0,
+  exitListenersZero: noRelevantListeners(exited.tracker),
+  reentryOwnersFresh: reentered.tracker?.qaId !== initial.tracker?.qaId && reentered.tracker?.canvasId !== initial.tracker?.canvasId
+    && reentered.tracker?.liveContexts === 1 && reentered.tracker?.contexts.slice(0, -1).every((/** @type {any} */ entry) => entry.closed),
+  reentryListenersExact: sameRelevantListeners(changedPreferences.tracker, reentered.tracker),
+  hmrDelivered: hmrRequests.length >= 1,
+  hmrOwnersBound: afterHmr.canvasCount === 1 && afterHmr.tracker?.liveContexts === 1 && (oldHmrOwner.sameOwner || oldHmrOwner.oldRenderer === 'retired'),
+  hmrRafBaselineActive: activeRafs(beforeHmr.tracker) >= 1,
+  hmrRafsExact: activeRafs(afterHmr.tracker) === activeRafs(beforeHmr.tracker),
+  hmrRafsNotDoubled: activeRafs(afterHmr.tracker) <= activeRafs(beforeHmr.tracker),
+  hmrListenersExact: sameRelevantListeners(beforeHmr.tracker, afterHmr.tracker),
+  terminalOwnersClean: terminal.canvases === 0 && terminal.liveContexts === 0,
+  terminalRafsZero: activeRafs(terminal) === 0,
+  terminalListenersZero: noRelevantListeners(terminal),
+};
+for (const [label, passed] of Object.entries(lifecycleAssertions)) check(passed, `lifecycle assertion: ${label}`);
+
 const report = {
   schema: 'tetramorph.t37.material-browser.v1', generatedAt: new Date().toISOString(),
-  origin, browser: await browser.version(), passed: failures.length === 0, failures,
+  origin, pageUrl: page.url(), browser: await browser.version(), passed: failures.length === 0, failures,
   initial, afterFreeze, restarted, changedPreferences, exited, reentered,
   hmr: { before: beforeHmr, requests: hmrRequests, after: afterHmr, oldOwner: oldHmrOwner },
-  terminal, observations: observed,
-  assertions: {
-    realProductRoute: page.url().startsWith(origin.replace(/\/$/u, '')),
-    restartThemeMotionReuse: restarted.before.qaId === restarted.after.qaId && changedPreferences.tracker?.qaId === initial.tracker?.qaId,
-    uiExitReentryReplacement: exited.oldRendererRetired && reentered.tracker?.qaId !== initial.tracker?.qaId,
-    hmrDelivered: hmrRequests.length >= 1,
-    terminalClean: terminal.canvases === 0 && terminal.liveContexts === 0,
-  },
+  terminal, observations: observed, lifecycleProof, assertions: lifecycleAssertions,
   humanStatus: HUMAN_STATUS,
 };
 
