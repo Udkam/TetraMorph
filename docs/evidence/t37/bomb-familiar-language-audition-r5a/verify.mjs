@@ -155,9 +155,10 @@ for (const [id, value] of Object.entries(liveMetrics.candidates)) {
   check(value.below120Percent <= 3 && value.atOrAbove2000Percent <= 1, `${id} spectral threshold`);
 }
 
-function terminalClean(value) {
-  return !value.ready && value.disposed && value.canvasCount === 0 && value.pendingTimers === 0
+function terminalClean(value, expectedCanvasCount = 0) {
+  return !value.ready && value.disposed && value.canvasCount === expectedCanvasCount && value.pendingTimers === 0
     && !value.renderer.ready && value.renderer.disposed && !value.renderer.frameCallbackActive
+    && value.renderer.canvasCount === expectedCanvasCount
     && value.renderer.activeParticles === 0 && value.audio.phase === 'disposed' && value.audio.closed
     && value.audio.activeSources === 0 && value.audio.pendingSources === 0 && value.audio.timers === 0;
 }
@@ -176,9 +177,11 @@ for (const scenario of browserReport.lifecycle) {
   lifecycleKeys.add(`${scenario.method}:${scenario.entryState}`);
   const expectedPhase = scenario.entryState === 'idle' ? 'ready' : scenario.entryState;
   check(scenario.before.audio.phase === expectedPhase, `${scenario.method}/${scenario.entryState} entry state`);
-  check(terminalClean(scenario.terminal), `${scenario.method}/${scenario.entryState} terminal cleanup`);
+  check(terminalClean(scenario.terminal, scenario.method === 'hmr' ? 1 : 0), `${scenario.method}/${scenario.entryState} terminal cleanup`);
   if (scenario.entryState === 'priming') check(scenario.terminal.audio.latePrimeIgnored >= 1, `${scenario.method} late-prime guard`);
   if (scenario.method === 'hmr') check(scenario.fresh?.ready && scenario.fresh.canvasCount === 1
+    && scenario.fresh.renderer.ready && !scenario.fresh.renderer.disposed
+    && scenario.fresh.renderer.canvasCount === 1
     && scenario.fresh.audio.phase === 'cold', `hmr/${scenario.entryState} fresh instance`);
 }
 check(lifecycleKeys.size === 12, 'browser lifecycle matrix uniqueness');

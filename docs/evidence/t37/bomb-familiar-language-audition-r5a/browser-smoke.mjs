@@ -54,15 +54,15 @@ function scheduleExact(value) {
     && near(value.lastSchedule.audioOffsetMs, 220, 1e-6);
 }
 
-function terminalClean(value) {
+function terminalClean(value, expectedCanvasCount = 0) {
   return !value.ready
     && value.disposed
     && !value.disposing
-    && value.canvasCount === 0
+    && value.canvasCount === expectedCanvasCount
     && value.pendingTimers === 0
     && !value.renderer.ready
     && value.renderer.disposed
-    && value.renderer.canvasCount === 0
+    && value.renderer.canvasCount === expectedCanvasCount
     && !value.renderer.frameCallbackActive
     && value.renderer.activeParticles === 0
     && value.audio.phase === 'disposed'
@@ -252,9 +252,10 @@ async function lifecycleScenario(method, entryState) {
   }
   const expectedPhase = entryState === 'idle' ? 'ready' : entryState;
   check(before.audio.phase === expectedPhase, `${label} entered exact state`);
-  check(terminalClean(terminal), `${label} terminal cleanup`);
+  check(terminalClean(terminal, method === 'hmr' ? 1 : 0), `${label} terminal cleanup`);
   if (entryState === 'priming') check(terminal.audio.latePrimeIgnored >= 1, `${label} late prime ignored`);
   if (fresh) check(fresh.ready && fresh.instanceId > oldInstanceId && fresh.canvasCount === 1
+    && fresh.renderer.ready && !fresh.renderer.disposed && fresh.renderer.canvasCount === 1
     && fresh.audio.phase === 'cold' && fresh.terminalAuditCount >= 1, `${label} fresh instance`);
   await page.close();
   return { method, entryState, before, terminal, fresh };
