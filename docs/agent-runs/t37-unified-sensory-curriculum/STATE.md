@@ -2971,3 +2971,41 @@ unstaged.
 - Current exact action: finish the three green source checkpoints, run the one final
   typecheck/full-suite/build set after the last source edit, then stop for independent
   source QA before opening product-backed R5B evidence.
+
+### R5B source disposition and product-backed evidence opening
+
+- Final source chain: `24a76cb` stems/catalog, `61810ba` compositor, `02272d5` runtime
+  routing, `94957fd` legacy Bomb retirement. The exact `9bf3f62..94957fd` diff is 15
+  authorized product/test paths; Core tree `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`,
+  Renderer, App/styles, and the shared chain timeline remain frozen.
+- Final gates pass: focused tests; typecheck; `544 passed / 15 skipped` in
+  `56 passed / 2 skipped` files; 770-module build with only the existing chunk warning.
+  Independent product/lifecycle review reports no defect. Audio/provenance QA reports
+  `P0/P1/P2/P3/GAP = 0/0/0/1/1`; its P3 is the disclosed four-commit realization of
+  three logical checkpoints and the later retirement checkpoint. The final boundary is
+  correct; after `02272d5` Bomb dispatch bypassed the legacy route, and `94957fd` removed
+  it. No history rewrite or audio repair is warranted. GAP 1 is only human listening;
+  A/B/C remain OPEN / NOT ACCEPTED.
+- New writer boundary only:
+  `docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/**`. The exact source
+  allowlist is README, index, styles, fixture, productAudioSession, audition, browser smoke,
+  client actions, manifest writer, and verifier. No WAV duplication/generation and no
+  product or R5A edit is authorized.
+- Evidence must use real Core normal and row-39 chain fixtures, current production
+  Renderer, current AudioEngine, and only its constructor A/B/C seam. It exposes explicit
+  full-motion `1x` normal-then-chain playback for all variants, reduced-motion technical
+  proof, no autoplay, reject-all default, no persistence, and no product selector.
+- Browser proof must bind exact shared-plan beats/lengths, one mono buffer/source per
+  event, finite unclipped samples, product-local asset requests, desktop/mobile layout,
+  keyboard and 44 px controls, one Canvas/zero DOM cells, and replay/stop/disable/restart/
+  pagehide/HMR/destroy cleanup with zero errors and terminal residue. Source remains the
+  exact ten-file allowlist. Generated output is exactly browser-report, four named
+  screenshots (`r5b-desktop-normal-a`, `r5b-desktop-chain-a`, `r5b-mobile-chain-a`,
+  `r5b-reduced-technical-a`), three numbered client-smoke shots, three matching states,
+  and manifest. Manifest hashes every source and pre-report output except itself. The
+  terminal checkpoint contains only verification-report, which binds manifest hash and
+  generated-input HEAD. Both scripts enforce exact equality for all three Git ranges.
+  The human gate stays deferred to the final consolidated review.
+- Unique next action: commit this docs disposition/authorization, obtain read-only docs
+  QA, then let one evidence writer create only the source allowlist and stop before any
+  generated output.

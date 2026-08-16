@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-16 — T37 R5B provisional product audio implemented
+
+- Added byte-exact R5A A/B/C stems as provisional product assets, a strict single-buffer
+  Bomb compositor, and constructor-frozen default A routing for normal and shared-plan
+  chain events. Old Bomb/Bomb-chain palette recipes and fixed propagation pulses are
+  retired; no Core, Renderer, timeline, UI, storage, or score behavior changed.
+- Source range `9bf3f62..94957fd` passes focused tests, typecheck, the complete suite
+  (`544 passed / 15 skipped`), and the 770-module build. Independent numeric recomputation
+  confirms normal 400 ms, full row-39 chain 1368 ms, reduced chain 466 ms, finite unclipped
+  samples, one source per event, and exact R5A asset bytes.
+- Audio/provenance QA records one P3 because three logical authorized claims became four
+  small commits and retirement followed routing. The final 15-path tree is within scope;
+  routing made the legacy branch unreachable before final retirement removed it. The
+  deviation is disclosed without history rewrite. Human listening is still OPEN: no
+  variant or provisional default is accepted.
+- Product-backed R5B evidence is authorized only under
+  `docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/**`. It must use real Core,
+  production Renderer/AudioEngine, no copied WAVs, fail-closed defaults, complete lifecycle
+  proof, and defer its listening surface to the final consolidated review.
+
 ## 2026-08-16 — T37 completion-first recovery and R5B source work opened
 
 - The player's latest sequencing instruction defers all subjective review to one final

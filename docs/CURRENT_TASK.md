@@ -78,8 +78,9 @@ force A/B/C, while UI and storage expose no choice.
     Classic last product -> Survival proposal -> one final gates/browser/QA pass -> one
     consolidated human review -> fixes -> push. Subjective work is never accepted early.
 
-**Current next action:** implement and prove R5B against the adopted recovery head without
-changing Core, Renderer, or the frozen presentation timeline.
+**Current next action:** build product-backed R5B technical evidence under the newly
+authorized directory, without changing product source, Core, Renderer, or the frozen
+presentation timeline and without asking for an interim human verdict.
 
 ### 2026-08-16 R5B product-writer authorization
 
@@ -102,6 +103,63 @@ last source edit, run one full suite and one build. Do not edit Core, Renderer,
 `mutationChainTimeline*`, UI, Settings, storage, R5A evidence, changelog, or inherited
 dirty paths. Product evidence opens only after the complete source range is independently
 reviewable; the writer does not push or claim human acceptance.
+
+### 2026-08-16 R5B source disposition and evidence authorization
+
+The final source range is `9bf3f62..94957fd`, with four linear commits:
+`24a76cb` admits the three stems/catalog, `61810ba` adds the pure compositor,
+`02272d5` routes AudioEngine/GameRuntime, and `94957fd` retires the legacy Bomb palette
+and pulse path. The final diff is exactly the authorized 15 product/test paths. Core tree
+`e9b3a3ed0d001072f5291a8fc841c1849e4db44f`, Renderer, App/styles, and
+`mutationChainTimeline.ts` are unchanged. Focused tests, final typecheck, the complete
+suite (`544 passed / 15 skipped` in `56 passed / 2 skipped` files), and the 770-module
+build pass.
+
+Independent source/lifecycle review finds no product defect. Independent audio/provenance
+review reports `P0/P1/P2/P3/GAP = 0/0/0/1/1`: the P3 records that the authorized three
+logical claims were committed as four smaller checkpoints, with legacy retirement after
+runtime routing instead of in the compositor checkpoint. The final tree stayed within the
+authorized boundary; after `02272d5` Bomb dispatch no longer reached the legacy route, and
+`94957fd` removed that implementation. This is accepted as a
+disclosed checkpoint-granularity deviation rather than repaired by rewriting history or
+changing audio. The sole GAP is human listening: A/B/C and default A remain **OPEN / NOT
+ACCEPTED**.
+
+One evidence writer is authorized only under
+`docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/**`. The source-only commit
+may contain exactly `README.md`, `index.html`, `styles.css`, `fixture.ts`,
+`productAudioSession.ts`, `audition.ts`, `browser-smoke.mjs`, `client-actions.json`,
+`write-manifest.mjs`, and `verify.mjs`. It may import current product modules and load the
+three product assets, but may not copy or generate WAVs, edit `src/**`, or touch R5A.
+
+The page must use the current production AudioEngine through the constructor-only A/B/C
+seam and the current production Renderer. A real Core normal fixture and a real row-39
+chain fixture own the events; handwritten lookalike events are not listening evidence.
+For each A/B/C it offers explicit, no-autoplay normal-then-chain playback at full motion
+`1x`; reduced motion is technical-only. It defaults to reject-all, persists no verdict,
+and cannot change the product default. Browser instrumentation must prove one mono
+AudioBuffer and one BufferSource per Bomb event, exact normal/chain lengths and shared-plan
+starts, finite unclipped samples, local product-asset requests, and reduced-motion changes
+only on subsequent events.
+
+The browser matrix covers desktop and 390x844 mobile, full/reduced motion, keyboard and
+44 px targets, replay/stop, disable/re-enable, restart, pagehide/HMR replacement, and
+destroy. It requires one Canvas while mounted, zero DOM board cells, zero overflow,
+zero console/page/request errors, no residual sources/timers/frame callbacks after each
+terminal path, and zero Canvas after disposal. Commit source first. The exact pre-report
+generated allowlist is `browser-report.json`, `r5b-desktop-normal-a.png`,
+`r5b-desktop-chain-a.png`, `r5b-mobile-chain-a.png`, `r5b-reduced-technical-a.png`,
+`client-smoke/shot-0.png`, `client-smoke/shot-1.png`, `client-smoke/shot-2.png`,
+`client-smoke/state-0.json`, `client-smoke/state-1.json`,
+`client-smoke/state-2.json`, and `manifest.json`; no other file is legal. The manifest
+binds contract, authorization, product source, R5A evidence/report, all three WAV hashes,
+Core/Renderer/timeline blobs, every source hash, and every pre-report output hash except
+its own. Commit exactly that generated set second. Finally commit only
+`verification-report.json`; it binds the manifest SHA-256, the generated-input HEAD, and
+fresh recomputation of every manifest assertion. `write-manifest.mjs` and `verify.mjs`
+must enforce exact path equality for authorization-to-source, source-to-generated, and
+generated-to-terminal-report ranges. Automated evidence remains technical eligibility;
+the page is presented only in the final consolidated human review.
 
 ## Active objective
 

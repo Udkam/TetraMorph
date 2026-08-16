@@ -96,7 +96,10 @@ The eight F5 technique mappings are: `preserve-well / t5r-horizon-15` to Endgame
 The sole current order is R5B, Ice/material current-head proof, F4E/F5, D2B, line/icon,
 Classic as the last product change, Survival proposal, one final gate/browser/independent-QA
 pass, one consolidated human review, fixes, then push. No interim subjective result opens
-or closes a later stage. The next action is R5B implementation against the adopted head.
+or closes a later stage. R5B product source is now frozen at `94957fd`; its next action is
+product-backed technical evidence under the separately authorized R5B directory. That page
+remains fail-closed and joins the final consolidated review rather than opening an interim
+listening gate.
 
 ## 2026-08-12 T37 — Canonical Endgame namespace
 
