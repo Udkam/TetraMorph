@@ -9,9 +9,10 @@ import { NORMAL_IMPACT_MS, type Scene, type Variant } from './fixture';
 
 type SourceAudit = { id: number; started: boolean; startAt: number | null; stopCalls: number; disconnected: boolean; connections: number };
 type BufferAudit = { id: number; channels: number; frames: number; sampleRate: number; buffer: AudioBuffer };
-type ContextAudit = { id: number; context: AudioContext; closed: boolean; closePromise: Promise<void> | null; buffers: BufferAudit[]; sources: SourceAudit[] };
+type ContextAudit = { id: number; ownerId: number; context: AudioContext; closed: boolean; closePromise: Promise<void> | null; buffers: BufferAudit[]; sources: SourceAudit[] };
 type StemAssetId = 'bombFamiliarA' | 'bombFamiliarB' | 'bombFamiliarC';
-type AssetAudit = { assetId: T37AudioAssetId; url: string; expectedUrl: string; expectedSha256: string; observedSha256: string; expectedBytes: number | null; observedBytes: number; sameOrigin: boolean; exactHash: boolean; bytes: Uint8Array };
+type EngineSelection = { engine: AudioEngine; ownerId: number; variant: Variant };
+type AssetAudit = { ownerId: number; assetId: T37AudioAssetId; url: string; expectedUrl: string; expectedSha256: string; observedSha256: string; expectedBytes: number | null; observedBytes: number; sameOrigin: boolean; exactHash: boolean; bytes: Uint8Array };
 type WavProof = { encoding: number; channels: number; sampleRate: number; bitsPerSample: number; frames: number; dataBytes: number; samples: Float32Array; pcm16Sha256: string; sampleCheckpoints: Array<{ frame: number; pcm16: number; float: number }> };
 
 export type EventAudit = {
@@ -20,6 +21,7 @@ export type EventAudit = {
   reducedMotion: boolean;
   beatStartsMs: number[];
   contextId: number;
+  engineOwnerId: number;
   bufferId: number;
   sourceId: number;
   selectedAssetId: StemAssetId;
@@ -126,16 +128,38 @@ export class ProductAudioSession {
   private enabled = true;
   private disposed = false;
   private generation = 0;
+  private nextEngineOwnerId = 0;
+  private activeEngineOwnerId = 0;
+  private transitionTail: Promise<void> = Promise.resolve();
+  private pendingTransitions = 0;
+  private completedTransitions = 0;
+  private maxLiveContextsObserved = 0;
+  private staleAssetCallbacksDropped = 0;
   private contexts: ContextAudit[] = [];
   private events: EventAudit[] = [];
   private assets: AssetAudit[] = [];
   constructor(private changed: () => void = () => {}) {}
 
   private current(generation: number): boolean { return generation === this.generation && !this.disposed && this.enabled; }
-  private makeContext() {
+  private exclusive<T>(operation: () => Promise<T>): Promise<T> {
+    this.pendingTransitions += 1;
+    const result = this.transitionTail.then(operation, operation);
+    this.transitionTail = result.then(() => undefined, () => undefined);
+    return result.finally(() => {
+      this.pendingTransitions -= 1;
+      this.completedTransitions += 1;
+      if (!this.disposed) this.changed();
+    });
+  }
+  private liveContextCount(): number { return this.contexts.filter((context) => !context.closed).length; }
+  private makeContext(ownerId: number) {
+    ok(ownerId === this.activeEngineOwnerId && !this.disposed, 'Stale AudioEngine attempted to create a context.');
     const context = new AudioContext({ sampleRate: BOMB_STEM_SAMPLE_RATE });
-    const audit: ContextAudit = { id: this.contexts.length + 1, context, closed: false, closePromise: null, buffers: [], sources: [] };
+    const audit: ContextAudit = { id: this.contexts.length + 1, ownerId, context, closed: false, closePromise: null, buffers: [], sources: [] };
     this.contexts.push(audit);
+    const liveContexts = this.liveContextCount();
+    this.maxLiveContextsObserved = Math.max(this.maxLiveContextsObserved, liveContexts);
+    ok(liveContexts <= 1, 'Audio variant transition admitted overlapping live contexts.');
     const makeBuffer = context.createBuffer.bind(context);
     const makeSource = context.createBufferSource.bind(context);
     const close = context.close.bind(context);
@@ -165,7 +189,10 @@ export class ProductAudioSession {
       return source;
     }) as typeof context.createBufferSource;
     context.close = (() => {
-      const pending = close().then(() => { audit.closed = true; this.changed(); });
+      const pending = close().then(() => {
+        audit.closed = true;
+        if (!this.disposed && ownerId === this.activeEngineOwnerId) this.changed();
+      });
       audit.closePromise = pending;
       return pending;
     }) as typeof context.close;
@@ -173,7 +200,7 @@ export class ProductAudioSession {
     return context;
   }
 
-  private async loadAsset(url: string): Promise<ArrayBuffer> {
+  private async loadAsset(url: string, ownerId: number): Promise<ArrayBuffer> {
     const assetEntry = (Object.entries(T37_AUDIO_ASSETS) as Array<[T37AudioAssetId, (typeof T37_AUDIO_ASSETS)[T37AudioAssetId]]>).find(([, asset]) => asset.url === url);
     ok(assetEntry, `AudioEngine requested an unknown asset URL: ${url}`);
     const [assetId, asset] = assetEntry;
@@ -183,48 +210,62 @@ export class ProductAudioSession {
     const isBombStem = assetId.startsWith('bombFamiliar');
     const expectedBytes = isBombStem ? EXPECTED_WAV_BYTES : null;
     const resolved = new URL(url, location.href);
-    const audit: AssetAudit = { assetId, url: resolved.href, expectedUrl: new URL(asset.url, location.href).href, expectedSha256: asset.sha256, observedSha256, expectedBytes, observedBytes: bytes.byteLength, sameOrigin: resolved.origin === location.origin, exactHash: observedSha256 === asset.sha256, bytes };
-    this.assets.push(audit);
-    this.changed();
+    const audit: AssetAudit = { ownerId, assetId, url: resolved.href, expectedUrl: new URL(asset.url, location.href).href, expectedSha256: asset.sha256, observedSha256, expectedBytes, observedBytes: bytes.byteLength, sameOrigin: resolved.origin === location.origin, exactHash: observedSha256 === asset.sha256, bytes };
     ok(audit.url === audit.expectedUrl && audit.exactHash && (!isBombStem || (audit.sameOrigin && expectedBytes === bytes.byteLength)), `Fetched ${assetId} failed URL/origin/byte/hash audit.`);
+    if (!this.disposed && ownerId === this.activeEngineOwnerId) {
+      this.assets.push(audit);
+      this.changed();
+    } else {
+      this.staleAssetCallbacksDropped += 1;
+    }
     return raw;
   }
 
-  private async select(variant: Variant, generation: number): Promise<boolean> {
-    if (!this.current(generation)) return false;
-    if (this.engine && this.variant === variant) return true;
-    if (this.engine) {
-      this.engine.destroy();
+  private async select(variant: Variant, generation: number): Promise<EngineSelection | null> {
+    return this.exclusive(async () => {
+      if (!this.current(generation)) return null;
+      if (this.engine && this.variant === variant) return { engine: this.engine, ownerId: this.activeEngineOwnerId, variant };
+      const previous = this.engine;
       this.engine = null;
       this.variant = null;
+      this.activeEngineOwnerId = 0;
+      this.assets = [];
+      previous?.destroy();
       await Promise.all(this.contexts.map((context) => context.closePromise).filter((promise): promise is Promise<void> => !!promise));
-      if (!this.current(generation)) return false;
-    }
-    const platform = createBrowserPlatform({ window, document, audioContextFactory: () => this.makeContext() });
-    this.engine = new AudioEngine(platform, (url) => this.loadAsset(url), { forceBombStemVariantForTest: variant as BombStemVariant });
-    this.variant = variant;
-    this.engine.setEnabled(true);
-    this.engine.setVolume(1);
-    return true;
+      ok(this.liveContextCount() === 0, 'Previous variant context did not close before replacement.');
+      if (!this.current(generation)) return null;
+      const ownerId = ++this.nextEngineOwnerId;
+      this.activeEngineOwnerId = ownerId;
+      const platform = createBrowserPlatform({ window, document, audioContextFactory: () => this.makeContext(ownerId) });
+      const engine = new AudioEngine(platform, (url) => this.loadAsset(url, ownerId), { forceBombStemVariantForTest: variant as BombStemVariant });
+      this.engine = engine;
+      this.variant = variant;
+      engine.setEnabled(true);
+      engine.setVolume(1);
+      return { engine, ownerId, variant };
+    });
   }
 
-  private async prepare(variant: Variant, generation: number): Promise<boolean> {
-    if (!await this.select(variant, generation) || !this.engine) return false;
-    const selected = this.engine;
-    await selected.prime();
-    return this.current(generation) && this.engine === selected && this.variant === variant;
+  private async prepare(variant: Variant, generation: number): Promise<EngineSelection | null> {
+    const selected = await this.select(variant, generation);
+    if (!selected || !this.current(generation) || this.engine !== selected.engine) return null;
+    await selected.engine.prime();
+    return this.current(generation) && this.engine === selected.engine && this.activeEngineOwnerId === selected.ownerId && this.variant === variant ? selected : null;
   }
   async prime(variant: Variant): Promise<boolean> {
     const generation = ++this.generation;
-    const ready = await this.prepare(variant, generation);
-    if (ready) this.changed();
-    return ready;
+    const selected = await this.prepare(variant, generation);
+    if (selected) this.changed();
+    return !!selected;
   }
   async play(scene: Scene, variant: Variant, reducedMotion: boolean, event: GameEvent, beforeDispatch: () => void = () => {}): Promise<{ started: boolean; generation: number }> {
     const generation = ++this.generation;
-    if (!await this.prepare(variant, generation) || !this.engine) return { started: false, generation };
-    const engine = this.engine;
-    const context = this.contexts.at(-1)!;
+    const selected = await this.prepare(variant, generation);
+    if (!selected || !this.current(generation) || this.engine !== selected.engine) return { started: false, generation };
+    const engine = selected.engine;
+    const engineOwnerId = selected.ownerId;
+    const context = [...this.contexts].reverse().find((entry) => entry.ownerId === engineOwnerId);
+    ok(context, 'Active AudioEngine has no audited context.');
     const bufferCount = context.buffers.length;
     const sourceCount = context.sources.length;
     engine.play([{ type: 'restarted' }]);
@@ -237,7 +278,7 @@ export class ProductAudioSession {
     const buffer = context.buffers.at(-1)!;
     const source = context.sources.at(-1)!;
     const assetId = STEM_ASSET[variant];
-    const asset = [...this.assets].reverse().find((entry) => entry.assetId === assetId);
+    const asset = [...this.assets].reverse().find((entry) => entry.ownerId === engineOwnerId && entry.assetId === assetId);
     ok(asset, `Selected ${variant} stem was not fetched and audited.`);
     const wav = await decodePcm16Wav(asset.bytes);
     if (!this.current(generation) || this.engine !== engine) return { started: false, generation };
@@ -247,7 +288,7 @@ export class ProductAudioSession {
     const residual = signalProof(observed, expected.samples);
     const [expectedFloat32Sha256, observedFloat32Sha256] = await Promise.all([sha256(expected.samples), sha256(observed)]);
     if (!this.current(generation) || this.engine !== engine) return { started: false, generation };
-    this.events.push({ scene, variant, reducedMotion, beatStartsMs: beats, contextId: context.id, bufferId: buffer.id, sourceId: source.id, selectedAssetId: assetId, selectedAssetSha256: asset.observedSha256, selectedAssetBytes: asset.observedBytes, pcm16Sha256: wav.pcm16Sha256, pcm16Checkpoints: wav.sampleCheckpoints, expectedFrames: expected.samples.length, residualMaxAbs: residual.residualMaxAbs, exactWithinTolerance: residual.exactWithinTolerance, expectedFloat32Sha256, observedFloat32Sha256, beatProof: expected.beatProof });
+    this.events.push({ scene, variant, reducedMotion, beatStartsMs: beats, contextId: context.id, engineOwnerId, bufferId: buffer.id, sourceId: source.id, selectedAssetId: assetId, selectedAssetSha256: asset.observedSha256, selectedAssetBytes: asset.observedBytes, pcm16Sha256: wav.pcm16Sha256, pcm16Checkpoints: wav.sampleCheckpoints, expectedFrames: expected.samples.length, residualMaxAbs: residual.residualMaxAbs, exactWithinTolerance: residual.exactWithinTolerance, expectedFloat32Sha256, observedFloat32Sha256, beatProof: expected.beatProof });
     this.changed();
     return { started: true, generation };
   }
@@ -271,7 +312,7 @@ export class ProductAudioSession {
   }
   state() {
     const live = this.contexts.filter((context) => !context.closed);
-    const current = this.contexts.at(-1);
+    const current = [...this.contexts].reverse().find((context) => context.ownerId === this.activeEngineOwnerId) ?? this.contexts.at(-1);
     const eventDetails = this.events.map((event) => {
       const context = this.contexts.find((entry) => entry.id === event.contextId);
       const buffer = context?.buffers.find((entry) => entry.id === event.bufferId);
@@ -284,17 +325,21 @@ export class ProductAudioSession {
       return { ...event, channels: buffer?.channels ?? 0, frames: buffer?.frames ?? 0, sampleRate: buffer?.sampleRate ?? 0, finite: signal.finite, maxAbs: signal.maxAbs, preBeatMaxAbs, firstNonZeroFrame: signal.firstNonZeroFrame, sourceStarted: source?.started ?? false, sourceDisconnected: source?.disconnected ?? false, sourceConnections: source?.connections ?? 0 };
     });
     const assets = this.assets.map(({ bytes: _bytes, ...asset }) => asset);
-    return { disposed: this.disposed, generation: this.generation, variant: this.variant, enabled: this.enabled, contextsCreated: this.contexts.length, liveContexts: live.length, contextState: current?.context.state ?? 'none', eventSources: this.contexts.flatMap((context) => context.sources).filter((source) => !source.disconnected).length, eventBuffers: this.contexts.reduce((count, context) => count + context.buffers.length, 0), assets, events: eventDetails };
+    return { disposed: this.disposed, generation: this.generation, variant: this.variant, enabled: this.enabled, activeEngineOwnerId: this.activeEngineOwnerId, pendingTransitions: this.pendingTransitions, completedTransitions: this.completedTransitions, staleAssetCallbacksDropped: this.staleAssetCallbacksDropped, contextsCreated: this.contexts.length, liveContexts: live.length, maxLiveContextsObserved: this.maxLiveContextsObserved, contextState: current?.context.state ?? 'none', eventSources: this.contexts.flatMap((context) => context.sources).filter((source) => !source.disconnected).length, eventBuffers: this.contexts.reduce((count, context) => count + context.buffers.length, 0), assets, events: eventDetails };
   }
   async dispose() {
     if (this.disposed) return;
     ++this.generation;
     this.disposed = true;
     this.enabled = false;
-    this.engine?.destroy();
-    this.engine = null;
-    this.variant = null;
-    await Promise.all(this.contexts.map((context) => context.closePromise).filter((promise): promise is Promise<void> => !!promise));
-    this.changed();
+    await this.exclusive(async () => {
+      const engine = this.engine;
+      this.engine = null;
+      this.variant = null;
+      this.activeEngineOwnerId = 0;
+      engine?.destroy();
+      await Promise.all(this.contexts.map((context) => context.closePromise).filter((promise): promise is Promise<void> => !!promise));
+      ok(this.liveContextCount() === 0, 'Disposed audio owner retained a live context.');
+    });
   }
 }

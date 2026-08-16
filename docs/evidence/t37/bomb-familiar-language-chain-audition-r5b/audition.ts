@@ -30,6 +30,7 @@ const interactionLog: Array<{ variant: Variant; route: 'pointer' | 'keyboard'; a
 let ready = false;
 let disposed = false;
 let disposing = false;
+let domRetired = false;
 let enabled = true;
 let lastVariant: Variant = 'A';
 let pageEpoch = 0;
@@ -127,6 +128,7 @@ function fail(value: unknown) {
   console.error(value);
 }
 function update() {
+  if (domRetired || (window.__R5B_TEST__ !== undefined && window.__R5B_TEST__ !== api)) return;
   const rendererState = renderer.state();
   const audioState = audio.state();
   time.value = `${Math.round(rendererState.elapsedMs)} ms`;
@@ -154,7 +156,7 @@ listen(form, 'submit', ((event: SubmitEvent) => {
 
 function state() {
   const selected = document.querySelector<HTMLInputElement>('input[name=verdict]:checked');
-  return { instanceId, ready: ready && !disposed && !disposing, disposed, disposing, enabled, pageEpoch, playCount, pairPhase, pairSettledCount, interactionLog: [...interactionLog], verdict: selected?.value ?? 'reject', pendingTimers: timers.size, listenerCount: listeners.length, renderer: renderer.state(), audio: audio.state(), fixture: renderer.fixtureState(), canvasCount: document.querySelectorAll('canvas').length, domCellCount: document.querySelectorAll('[data-cell]').length, qaGlobals: window.__R5B_TEST__ === api, error };
+  return { instanceId, ready: ready && !disposed && !disposing, disposed, disposing, domRetired, enabled, pageEpoch, playCount, pairPhase, pairSettledCount, interactionLog: [...interactionLog], verdict: selected?.value ?? 'reject', pendingTimers: timers.size, listenerCount: listeners.length, renderer: renderer.state(), audio: audio.state(), fixture: renderer.fixtureState(), canvasCount: document.querySelectorAll('canvas').length, domCellCount: document.querySelectorAll('[data-cell]').length, qaGlobals: window.__R5B_TEST__ === api, error };
 }
 let disposePromise: Promise<void> | null = null;
 function dispose(_reason = 'destroy') {
@@ -169,13 +171,14 @@ function dispose(_reason = 'destroy') {
     await audio.dispose();
     disposed = true;
     disposing = false;
+    update();
+    domRetired = true;
     if (window.__R5B_TEST__ === api) {
       delete window.__R5B_TEST__;
       delete window.__R5B_READY__;
       delete window.render_game_to_text;
       delete window.advanceTime;
     }
-    update();
   })();
   return disposePromise;
 }
