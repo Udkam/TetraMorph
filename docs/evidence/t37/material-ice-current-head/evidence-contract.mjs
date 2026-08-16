@@ -143,7 +143,11 @@ function exactProductRawForm(worktree, committed, path) {
   if (PRODUCT_BINARY_EXTENSIONS.has(extension)) return worktree.equals(committed) ? 'git-blob' : null;
   if (!PRODUCT_TEXT_EXTENSIONS.has(extension) && path !== '.gitattributes') throw new Error(`Unclassified frozen product input extension: ${path}.`);
   if (worktree.equals(committed)) return 'git-blob';
-  return worktree.equals(canonicalCrlf(committed)) ? 'canonical-crlf' : null;
+  if (worktree.equals(canonicalCrlf(committed))) return 'canonical-crlf';
+  const text = worktree.toString('utf8');
+  if (!Buffer.from(text, 'utf8').equals(worktree) || text.charCodeAt(0) === 0xfeff || /\r(?!\n)/u.test(text)) return null;
+  const normalized = Buffer.from(text.replace(/\r\n/gu, '\n'), 'utf8');
+  return normalized.equals(committed) && text.includes('\r\n') && /(?<!\r)\n/u.test(text) ? 'mixed-lf-crlf' : null;
 }
 /** @param {ReturnType<typeof createHash>} digest @param {string} path @param {number} size */
 function updateDigestWithFile(digest, path, size) {
@@ -372,7 +376,7 @@ export function assertRuntimeInputBinding(expectedSourceHead, options = {}) {
   const trackedSrc = runGitBytes('ls-tree', '-r', '--name-only', '-z', evidenceSourceHead, '--', 'src').toString('utf8').split('\0').filter(Boolean);
   const cleanDigest = createHash('sha256');
   const rawDigest = createHash('sha256');
-  const rawForms = { gitBlob: 0, canonicalCrlf: 0 };
+  const rawForms = { gitBlob: 0, canonicalCrlf: 0, mixedLfCrlf: 0 };
   for (const path of trackedSrc) {
     const bytes = readFileSync(join(repo, ...path.split('/')));
     const committed = runGitBytes('show', `${evidenceSourceHead}:${path}`);
@@ -380,7 +384,9 @@ export function assertRuntimeInputBinding(expectedSourceHead, options = {}) {
     const actualObject = cleanGitObject(bytes, path);
     const rawForm = exactProductRawForm(bytes, committed, path);
     if (rawForm === null || actualObject !== expectedObject) throw new Error(`Runtime product input does not match ${evidenceSourceHead}:${path}.`);
-    if (rawForm === 'git-blob') rawForms.gitBlob += 1; else rawForms.canonicalCrlf += 1;
+    if (rawForm === 'git-blob') rawForms.gitBlob += 1;
+    else if (rawForm === 'canonical-crlf') rawForms.canonicalCrlf += 1;
+    else rawForms.mixedLfCrlf += 1;
     cleanDigest.update(path).update('\0').update(actualObject).update('\0');
     rawDigest.update(path).update('\0').update(sha256(bytes)).update('\0');
   }
