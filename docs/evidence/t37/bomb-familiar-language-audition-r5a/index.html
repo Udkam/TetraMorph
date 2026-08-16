@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>TetraMorph · Bomb R5A 正常音效试听</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body data-ready="false" data-review-state="cold">
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">T37 · BOMB R5A · NORMAL ONLY</p>
+          <h1>让 Bomb 说<span>游戏自己的语言</span></h1>
+          <p class="lede">这轮只听正常 Bomb，并沿用已经熟悉的游戏反馈语言。请在完整动画 <strong>1×</strong> 下判断声音是否有清楚的方块崩落感，又不会像真实爆炸一样吓人。</p>
+        </div>
+        <aside class="gate-note" aria-label="试听规则">
+          <strong>页面只帮助对比，不替你下结论</strong>
+          <span>自动检查约束响度、频段、220 ms 对齐、字节一致与生命周期清理。</span>
+        </aside>
+      </header>
+
+      <section class="stage" aria-labelledby="stage-title">
+        <div class="canvas-column">
+          <div class="stage-heading">
+            <div><p class="section-kicker">PRODUCTION RENDERER</p><h2 id="stage-title">正常 Bomb · 完整动画 1×</h2></div>
+            <div class="live-pill"><span aria-hidden="true"></span><b id="render-status">正在准备</b></div>
+          </div>
+          <div class="canvas-shell">
+            <div id="canvas-host" data-testid="board-frame" aria-label="TetraMorph 正常 Bomb 动画棋盘"></div>
+            <div class="impact-marker" aria-hidden="true"><span>220 ms</span></div>
+          </div>
+          <div class="timeline" aria-label="当前回放时间">
+            <div class="timeline-track"><span id="timeline-fill"></span><i></i></div>
+            <div class="timeline-copy"><span id="phase-label">请选择 A、B 或 C 开始</span><output id="time-value">0 ms</output></div>
+          </div>
+        </div>
+
+        <div class="control-column">
+          <section class="reference-panel" aria-labelledby="reference-title">
+            <div class="panel-heading"><p class="section-kicker">FROZEN REFERENCES</p><h2 id="reference-title">先听完整参照</h2></div>
+            <p class="panel-note">参照使用产品冻结的完整图，不是候选中的局部片段。</p>
+            <div class="reference-grid">
+              <button type="button" data-reference="hard-drop" data-starts-audio><small>ACTION A</small><span>硬降（完整）</span></button>
+              <button type="button" data-reference="studio" data-starts-audio><small>STUDIO</small><span>单行消除（完整）</span></button>
+            </div>
+          </section>
+
+          <section class="candidate-panel" aria-labelledby="candidate-title">
+            <div class="panel-heading"><p class="section-kicker">NEUTRAL CHOICES</p><h2 id="candidate-title">逐个听正常 Bomb</h2></div>
+            <div class="candidate-list">
+              <article class="candidate-card" data-candidate-card="A">
+                <div class="candidate-id"><span>A</span><small>正常 Bomb</small></div>
+                <div class="candidate-actions">
+                  <button type="button" data-play="A" data-starts-audio>动画 + A</button>
+                  <button class="compare" type="button" data-compare="A" data-reference="hard-drop" data-starts-audio>硬降 → A</button>
+                  <button class="compare" type="button" data-compare="A" data-reference="studio" data-starts-audio>Studio → A</button>
+                </div>
+              </article>
+              <article class="candidate-card" data-candidate-card="B">
+                <div class="candidate-id"><span>B</span><small>正常 Bomb</small></div>
+                <div class="candidate-actions">
+                  <button type="button" data-play="B" data-starts-audio>动画 + B</button>
+                  <button class="compare" type="button" data-compare="B" data-reference="hard-drop" data-starts-audio>硬降 → B</button>
+                  <button class="compare" type="button" data-compare="B" data-reference="studio" data-starts-audio>Studio → B</button>
+                </div>
+              </article>
+              <article class="candidate-card" data-candidate-card="C">
+                <div class="candidate-id"><span>C</span><small>正常 Bomb</small></div>
+                <div class="candidate-actions">
+                  <button type="button" data-play="C" data-starts-audio>动画 + C</button>
+                  <button class="compare" type="button" data-compare="C" data-reference="hard-drop" data-starts-audio>硬降 → C</button>
+                  <button class="compare" type="button" data-compare="C" data-reference="studio" data-starts-audio>Studio → C</button>
+                </div>
+              </article>
+            </div>
+            <button class="stop-button" id="stop-all" type="button">停止声音与回放</button>
+          </section>
+        </div>
+      </section>
+
+      <section class="verdict" aria-labelledby="verdict-title">
+        <div class="verdict-copy">
+          <p class="section-kicker">HUMAN INPUT</p><h2 id="verdict-title">记录本轮正常 Bomb 感受</h2>
+          <p>默认保持“全部不通过”。这里的记录只供后续汇总，不会自动改动产品或打开连锁音效。</p>
+        </div>
+        <form id="verdict-form">
+          <fieldset class="choice-group"><legend>选择一个结果</legend>
+            <label><input type="radio" name="verdict" value="reject" checked><span>全部不通过</span></label>
+            <label><input type="radio" name="verdict" value="A"><span>A</span></label>
+            <label><input type="radio" name="verdict" value="B"><span>B</span></label>
+            <label><input type="radio" name="verdict" value="C"><span>C</span></label>
+          </fieldset>
+          <fieldset class="reason-group"><legend>可选：听感标签（不绑定设计结论）</legend>
+            <label><input type="checkbox" name="reason" value="too-loud"><span>太响</span></label>
+            <label><input type="checkbox" name="reason" value="too-dull"><span>太闷</span></label>
+            <label><input type="checkbox" name="reason" value="too-sharp"><span>太尖</span></label>
+            <label><input type="checkbox" name="reason" value="too-long"><span>太长</span></label>
+            <label><input type="checkbox" name="reason" value="too-note-like"><span>太像音符</span></label>
+            <label><input type="checkbox" name="reason" value="not-block-like"><span>不像方块</span></label>
+            <label><input type="checkbox" name="reason" value="timing-wrong"><span>时机不对</span></label>
+          </fieldset>
+          <div class="record-row"><button id="record-verdict" type="submit">记录本页选择</button><output id="verdict-output" aria-live="polite">尚未记录；当前默认全部不通过。</output></div>
+        </form>
+      </section>
+
+      <footer><span>R5A 仅含正常 Bomb；没有连锁候选，也没有改动产品音频。</span><span id="technical-status">Instance 0 · Canvas 0 · Audio cold</span></footer>
+    </main>
+    <script type="module" src="./audition.ts"></script>
+  </body>
+</html>

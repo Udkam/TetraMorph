@@ -245,7 +245,7 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-compare
     void compare(button.dataset.reference as ReferenceId, button.dataset.compare as CandidateId).catch(fail);
   }, { signal: eventController.signal });
 }
-for (const button of document.querySelectorAll<HTMLButtonElement>('[data-reference]')) {
+for (const button of document.querySelectorAll<HTMLButtonElement>('[data-reference]:not([data-compare])')) {
   button.addEventListener('click', () => {
     void playReference(button.dataset.reference as ReferenceId).catch(fail);
   }, { signal: eventController.signal });
