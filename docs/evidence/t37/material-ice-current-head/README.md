@@ -8,6 +8,18 @@ terminal head `171181228c0408cfa1bfb1259eb98c29a63efae3`. It uses the real produ
 real Mutation route, public DEV QA surface, current renderer, and current audio catalog.
 Historical material PNGs and audits are never copied or read by these scripts.
 
+The browser contract keeps representation and lifecycle boundaries explicit. An App
+mtime touch requires byte-for-byte identical checkout content, fatal UTF-8 decoding,
+CRLF-to-LF canonical bytes equal to the frozen Git blob, and clean-filter object identity;
+mixed LF/CRLF checkout representation is therefore allowed but content drift is not.
+HMR accepts a fresh `200` transformed App response followed by either a fresh `200` or
+an ETag-bound `304` bootstrap response. A reload is counted only when the frame event is
+bound to its exact main-frame document request; the App's subsequent `replaceState` is a
+separately verified same-document navigation. Ice responses use four explicit phases:
+`initial-freeze`, `pre-hmr`, `hmr`, and `post-hmr`; only the two frozen initial responses
+are materialized as provenance bytes, while every later response must remain inside its
+recorded phase marker boundary.
+
 ## Reproducible cold strict checkJs
 
 Run this from the repository root. It creates a unique npm cache below `$env:TEMP`,

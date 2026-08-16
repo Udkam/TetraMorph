@@ -27,10 +27,14 @@ export function scenarioFor(scenarios, item) {
 /** @param {import('playwright').Page} page @param {string} [label] */
 export function attachObservers(page, label = 'page') {
   /** @type {any} */
-  const observed = { label, consoleErrors: [], pageErrors: [], requestErrors: [], requests: [], events: [] };
+  const observed = {
+    label, consoleErrors: [], pageErrors: [], requestErrors: [], requests: [], events: [],
+    icePhaseMarkers: { initialEnd: null, hmrArm: null, hmrEnd: null },
+  };
   let sequence = 0;
   let requestSequence = 0;
-  let initialIceWindowOpen = true;
+  /** @type {'initial-freeze'|'pre-hmr'|'hmr'|'post-hmr'} */
+  let icePhase = 'initial-freeze';
   /** @param {string} kind @param {Record<string, any>} detail @returns {Record<string, any>} */
   const record = (kind, detail) => {
     const event = { sequence: ++sequence, kind, ...detail };
@@ -58,10 +62,14 @@ export function attachObservers(page, label = 'page') {
     return {
       requestId: requestId(request), url: request.url(), method: request.method(), resourceType: request.resourceType(),
       mainFrame, navigationRequest: request.isNavigationRequest(),
+      ifNoneMatch: request.headers()['if-none-match'] ?? null,
     };
   };
+  const phaseMarker = () => ({ eventIndex: observed.events.length, eventSequence: observed.events.at(-1)?.sequence ?? 0 });
   /** @type {WeakMap<import('playwright').Request, () => void>} */
   const appRequestSettlers = new WeakMap();
+  /** @type {Array<Record<string, any>>} */
+  const pendingDocumentRequests = [];
   Object.defineProperty(observed, 'iceResponsePromises', { value: [], enumerable: false });
   Object.defineProperty(observed, 'appResponsePromises', { value: [], enumerable: false });
   Object.defineProperty(observed, 'appRequestFinishedPromises', { value: [], enumerable: false });
@@ -78,18 +86,44 @@ export function attachObservers(page, label = 'page') {
   Object.defineProperty(observed, 'freezeIceResponseWindow', {
     enumerable: false,
     value: async () => {
-      initialIceWindowOpen = false;
+      if (icePhase !== 'initial-freeze') throw new Error(`Cannot close Ice initial window from ${icePhase}.`);
+      icePhase = 'pre-hmr';
+      observed.icePhaseMarkers.initialEnd = phaseMarker();
       const responses = await Promise.all([...observed.iceResponsePromises]);
       responses.sort((left, right) => left.sequence - right.sequence);
       observed.iceResponses = responses;
       return responses;
     },
   });
+  Object.defineProperty(observed, 'armHmrIceWindow', {
+    enumerable: false,
+    value: () => {
+      if (icePhase !== 'pre-hmr') throw new Error(`Cannot arm Ice HMR window from ${icePhase}.`);
+      icePhase = 'hmr';
+      const marker = phaseMarker();
+      observed.icePhaseMarkers.hmrArm = marker;
+      return { ...marker };
+    },
+  });
+  Object.defineProperty(observed, 'endHmrIceWindow', {
+    enumerable: false,
+    value: () => {
+      if (icePhase !== 'hmr') throw new Error(`Cannot close Ice HMR window from ${icePhase}.`);
+      icePhase = 'post-hmr';
+      const marker = phaseMarker();
+      observed.icePhaseMarkers.hmrEnd = marker;
+      return { ...marker };
+    },
+  });
   page.on('console', (message) => { if (message.type() === 'error') observed.consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => observed.pageErrors.push(error.message));
   page.on('request', (request) => {
     const detail = requestDetail(request);
-    observed.requests.push(record('request', detail));
+    const requestEvent = record('request', detail);
+    observed.requests.push(requestEvent);
+    if (detail.mainFrame === true && detail.navigationRequest === true && detail.resourceType === 'document') {
+      pendingDocumentRequests.push(requestEvent);
+    }
     if (isAppUrl(request.url())) {
       observed.appRequestFinishedPromises.push(new Promise((resolve) => appRequestSettlers.set(request, () => resolve(undefined))));
     }
@@ -103,13 +137,33 @@ export function attachObservers(page, label = 'page') {
   page.on('requestfailed', (request) => {
     const errorText = request.failure()?.errorText ?? 'failed';
     observed.requestErrors.push(`${request.method()} ${request.url()}: ${errorText}`);
+    const failedRequestId = requestId(request);
+    const pendingIndex = pendingDocumentRequests.findIndex((event) => event.requestId === failedRequestId);
+    if (pendingIndex >= 0) pendingDocumentRequests.splice(pendingIndex, 1);
     if (!isAppUrl(request.url())) return;
     record('app-requestfailed', { ...requestDetail(request), errorText });
     appRequestSettlers.get(request)?.();
     appRequestSettlers.delete(request);
   });
   page.on('framenavigated', (frame) => {
-    if (frame === page.mainFrame()) record('navigation', { url: frame.url(), mainFrame: true });
+    if (frame !== page.mainFrame()) return;
+    const url = frame.url();
+    const matchIndex = pendingDocumentRequests.findIndex((event) => event.url === url);
+    if (matchIndex >= 0) {
+      const [requestEvent] = pendingDocumentRequests.splice(matchIndex, 1);
+      record('document-navigation', {
+        url, mainFrame: true, documentRequestId: requestEvent.requestId, documentRequestSequence: requestEvent.sequence,
+      });
+    } else if (pendingDocumentRequests.length > 0) {
+      record('unbound-navigation', {
+        url, mainFrame: true,
+        pendingDocumentRequests: pendingDocumentRequests.map((event) => ({
+          requestId: event.requestId, sequence: event.sequence, url: event.url,
+        })),
+      });
+    } else {
+      record('same-document-navigation', { url, mainFrame: true });
+    }
   });
   page.on('websocket', (socket) => {
     record('websocket-open', { url: socket.url() });
@@ -125,31 +179,38 @@ export function attachObservers(page, label = 'page') {
   page.on('response', (response) => {
     const request = response.request();
     if (isAppUrl(response.url())) {
+      const status = response.status();
+      const responseHeaders = response.headers();
       const appEvent = record('app-response', {
-        ...requestDetail(request), status: response.status(), contentType: response.headers()['content-type'] ?? null,
-        bodyEncoding: 'base64', bodyBase64: null,
+        ...requestDetail(request), status, contentType: responseHeaders['content-type'] ?? null,
+        etag: responseHeaders.etag ?? null,
+        bodyDisposition: status === 304 ? 'not-modified' : 'captured',
+        bodyEncoding: status === 304 ? null : 'base64', bodyBase64: null,
       });
-      observed.appResponsePromises.push(response.body().then((bytes) => {
-        appEvent.bodyBase64 = bytes.toString('base64');
-        return appEvent;
-      }).catch((error) => {
-        appEvent.bodyError = String(error);
-        return appEvent;
-      }));
+      observed.appResponsePromises.push(status === 304 ? Promise.resolve(appEvent) : response.body().then((bytes) => {
+          appEvent.bodyBase64 = bytes.toString('base64');
+          return appEvent;
+        }).catch((error) => {
+          appEvent.bodyError = String(error);
+          return appEvent;
+        }));
     }
     let parsed;
     try { parsed = new URL(response.url()); } catch { return; }
     if (parsed.pathname.split('/').at(-1) !== 'freeze-ice-cubes-hq.ogg') return;
     const redirectedFrom = request.redirectedFrom();
-    const captureWindow = initialIceWindowOpen ? 'initial-freeze' : 'hmr';
+    const captureWindow = icePhase;
     const metadata = {
       requestId: requestId(request), url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
       contentType: response.headers()['content-type'] ?? null,
       redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
       captureWindow, bodyEncoding: 'base64', body: null,
     };
-    const responseEvent = record(initialIceWindowOpen ? 'ice-response' : 'ice-response-hmr', metadata);
-    if (!initialIceWindowOpen) return;
+    const responseKind = icePhase === 'initial-freeze' ? 'ice-response'
+      : icePhase === 'pre-hmr' ? 'ice-response-pre-hmr'
+        : icePhase === 'hmr' ? 'ice-response-hmr' : 'ice-response-post-hmr';
+    const responseEvent = record(responseKind, metadata);
+    if (icePhase !== 'initial-freeze') return;
     observed.iceResponsePromises.push(response.body().then((bytes) => {
       responseEvent.body = bytes.toString('base64');
       return { sequence: responseEvent.sequence, ...metadata, body: responseEvent.body };

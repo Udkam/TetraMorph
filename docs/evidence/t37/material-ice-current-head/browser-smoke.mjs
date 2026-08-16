@@ -23,6 +23,17 @@ const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
 /** @param {string} head @param {string} path */
 const gitBytes = (head, path) => execFileSync('git', ['show', `${head}:${path}`], { cwd: repo });
+/** @param {Buffer} bytes */
+const cleanAppBlob = (bytes) => execFileSync('git', ['hash-object', '--stdin', '--path=src/App.tsx'], {
+  cwd: repo, input: bytes, encoding: 'utf8',
+}).trim();
+/** @param {Buffer} bytes */
+function canonicalAppBytes(bytes) {
+  if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) throw new Error('src/App.tsx checkout has a UTF-8 BOM.');
+  const value = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  if (/\r(?!\n)/u.test(value)) throw new Error('src/App.tsx checkout has a bare CR.');
+  return Buffer.from(value.replace(/\r\n/gu, '\n'), 'utf8');
+}
 /** @param {any} tracker */
 const relevantListeners = (tracker) => {
   const counts = tracker?.listenerCounts ?? {};
@@ -302,18 +313,38 @@ function isAppNamespaceEvent(event) {
 /** @param {any} event @param {string} expectedOrigin */
 const isAppEvent = (event, expectedOrigin) => isAppNamespaceEvent(event) && Number.isInteger(event?.requestId) && event.requestId > 0
   && event?.method === 'GET' && event?.resourceType === 'script' && event?.mainFrame === true && event?.navigationRequest === false
+  && (event?.ifNoneMatch === null || (typeof event?.ifNoneMatch === 'string' && event.ifNoneMatch.length > 0))
   && eventUrl(event)?.origin === new URL(expectedOrigin).origin && eventUrl(event)?.pathname === appPathname;
 /** @param {any} event @param {string} expectedOrigin */
-const isAppRequest = (event, expectedOrigin) => event?.kind === 'request' && isAppEvent(event, expectedOrigin);
+const isAppRequest = (event, expectedOrigin) => event?.kind === 'request' && isAppEvent(event, expectedOrigin)
+  && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch']);
 /** @param {any} event @param {string} expectedOrigin */
-const isAppResponse = (event, expectedOrigin) => event?.kind === 'app-response' && isAppEvent(event, expectedOrigin)
+const isFreshAppResponse = (event, expectedOrigin) => event?.kind === 'app-response' && isAppEvent(event, expectedOrigin)
+  && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch',
+    'status', 'contentType', 'etag', 'bodyDisposition', 'bodyEncoding', 'bodyBase64'])
   && event?.status === 200 && ['text/javascript', 'application/javascript'].includes(contentTypeEssence(event?.contentType) ?? '')
+  && (event?.etag === null || (typeof event?.etag === 'string' && event.etag.length > 0))
+  && event?.bodyDisposition === 'captured'
   && event?.bodyEncoding === 'base64' && canonicalBase64(event?.bodyBase64) !== null
+  && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyUnavailable')
   && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyError');
 /** @param {any} event @param {string} expectedOrigin */
-const isAppFinished = (event, expectedOrigin) => event?.kind === 'app-requestfinished' && isAppEvent(event, expectedOrigin);
+const isNotModifiedAppResponse = (event, expectedOrigin) => event?.kind === 'app-response' && isAppEvent(event, expectedOrigin)
+  && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch',
+    'status', 'contentType', 'etag', 'bodyDisposition', 'bodyEncoding', 'bodyBase64'])
+  && event?.status === 304 && event?.contentType === null
+  && typeof event?.ifNoneMatch === 'string' && event.ifNoneMatch.length > 0
+  && typeof event?.etag === 'string' && event.etag === event.ifNoneMatch
+  && event?.bodyDisposition === 'not-modified' && event?.bodyEncoding === null && event?.bodyBase64 === null
+  && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyError');
+/** @param {any} event @param {string} expectedOrigin */
+const isAppResponse = (event, expectedOrigin) => isFreshAppResponse(event, expectedOrigin) || isNotModifiedAppResponse(event, expectedOrigin);
+/** @param {any} event @param {string} expectedOrigin */
+const isAppFinished = (event, expectedOrigin) => event?.kind === 'app-requestfinished' && isAppEvent(event, expectedOrigin)
+  && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch']);
 /** @param {any} event @param {string} expectedOrigin */
 const isAppFailed = (event, expectedOrigin) => event?.kind === 'app-requestfailed' && isAppEvent(event, expectedOrigin)
+  && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch', 'errorText'])
   && typeof event?.errorText === 'string' && event.errorText.length > 0;
 /** @param {any} event @param {string} expectedOrigin */
 function isValidAppNamespaceEvent(event, expectedOrigin) {
@@ -326,6 +357,18 @@ function isValidAppNamespaceEvent(event, expectedOrigin) {
 /** @param {any} event */
 const isDocumentRequest = (event) => event?.kind === 'request' && event?.method === 'GET' && event?.resourceType === 'document'
   && event?.mainFrame === true && event?.navigationRequest === true;
+/** @param {any} event */
+const isDocumentNavigation = (event) => event?.kind === 'document-navigation' && event?.mainFrame === true
+  && plainExactKeys(event, ['sequence', 'kind', 'url', 'mainFrame', 'documentRequestId', 'documentRequestSequence'])
+  && Number.isInteger(event?.documentRequestId) && event.documentRequestId > 0
+  && Number.isInteger(event?.documentRequestSequence) && event.documentRequestSequence > 0 && typeof event?.url === 'string';
+/** @param {any} event */
+const isSameDocumentNavigation = (event) => event?.kind === 'same-document-navigation' && event?.mainFrame === true
+  && plainExactKeys(event, ['sequence', 'kind', 'url', 'mainFrame']) && typeof event?.url === 'string';
+/** @param {any} event */
+const isUnboundNavigation = (event) => event?.kind === 'unbound-navigation' && event?.mainFrame === true
+  && plainExactKeys(event, ['sequence', 'kind', 'url', 'mainFrame', 'pendingDocumentRequests'])
+  && typeof event?.url === 'string' && Array.isArray(event?.pendingDocumentRequests) && event.pendingDocumentRequests.length > 0;
 /** @param {any} event */
 function rawWebsocketPayload(event) {
   if (event?.kind !== 'websocket-frame' || event?.direction !== 'received' || event?.encoding !== 'utf8' || typeof event?.body !== 'string') return null;
@@ -372,7 +415,7 @@ function validBoardProbe(snapshotValue) {
 }
 /** @param {any} left @param {any} right */
 function sameAppRequestMetadata(left, right) {
-  return ['requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest']
+  return ['requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch']
     .every((field) => deepEqual(left?.[field], right?.[field]));
 }
 /** @param {any} request @param {any[]} responses @param {any[]} finished @param {any[]} failed */
@@ -392,7 +435,7 @@ function appTransfer(request, responses, finished, failed) {
 function isRelevantHmrEvent(event, expectedOrigin) {
   const payload = rawWebsocketPayload(event);
   return isAppNamespaceEvent(event) || isDocumentRequest(event)
-    || (event?.kind === 'navigation' && event?.mainFrame === true)
+    || isDocumentNavigation(event) || isUnboundNavigation(event)
     || payload?.type === 'update' || payload?.type === 'full-reload';
 }
 /** @param {any[]} all @param {any} hmr @param {string} expectedOrigin */
@@ -409,19 +452,40 @@ function exactHmrEventWindow(all, hmr, expectedOrigin) {
     && deepEqual(all.slice(marker.eventIndex, marker.endEventIndex), hmr?.events)
     && all.slice(marker.endEventIndex).every((event) => !isRelevantHmrEvent(event, expectedOrigin));
 }
-/** @param {any[]} events @param {any[]} responses @param {number} markerSequence */
-function exactInitialIceEventBinding(events, responses, markerSequence) {
+/** @param {any} marker */
+const exactPhaseMarker = (marker) => plainExactKeys(marker, ['eventIndex', 'eventSequence'])
+  && Number.isInteger(marker.eventIndex) && marker.eventIndex >= 0
+  && Number.isInteger(marker.eventSequence) && marker.eventSequence >= 0 && marker.eventIndex === marker.eventSequence;
+/** @param {any[]} events @param {any[]} responses @param {any} phaseMarkers */
+function exactInitialIceEventBinding(events, responses, phaseMarkers) {
   const initial = events.filter((event) => event?.kind === 'ice-response');
-  const late = events.filter((event) => event?.kind === 'ice-response-hmr');
+  const initialEnd = phaseMarkers?.initialEnd;
   const fields = ['requestId', 'url', 'status', 'method', 'resourceType', 'contentType', 'redirectedFrom', 'captureWindow', 'bodyEncoding', 'body'];
-  return initial.length === 2 && responses.length === 2 && initial.every((event, index) => event.sequence === responses[index]?.sequence
+  return exactPhaseMarker(initialEnd) && initial.length === 2 && responses.length === 2 && initial.every((event, index) => event.sequence === responses[index]?.sequence
     && Number.isInteger(event?.requestId) && event.requestId > 0
     && Number.isInteger(responses[index]?.requestId) && responses[index].requestId > 0
     && fields.every((field) => deepEqual(event?.[field], responses[index]?.[field]))
     && Object.prototype.hasOwnProperty.call(event, 'bodyError') === Object.prototype.hasOwnProperty.call(responses[index] ?? {}, 'bodyError')
     && (!Object.prototype.hasOwnProperty.call(event, 'bodyError') || event.bodyError === responses[index]?.bodyError)
-    && event.captureWindow === 'initial-freeze' && event.sequence <= markerSequence)
-    && late.every((event) => event.captureWindow === 'hmr' && event.sequence > markerSequence);
+    && event.captureWindow === 'initial-freeze' && event.sequence <= initialEnd.eventSequence);
+}
+/** @param {any[]} events @param {any} phaseMarkers */
+function exactIcePhaseClassification(events, phaseMarkers) {
+  const { initialEnd, hmrArm, hmrEnd } = phaseMarkers ?? {};
+  if (!exactPhaseMarker(initialEnd) || !exactPhaseMarker(hmrArm) || !exactPhaseMarker(hmrEnd)
+    || initialEnd.eventSequence > hmrArm.eventSequence || hmrArm.eventSequence >= hmrEnd.eventSequence) return false;
+  const definitions = [
+    ['ice-response', 'initial-freeze', (/** @type {number} */ sequence) => sequence <= initialEnd.eventSequence],
+    ['ice-response-pre-hmr', 'pre-hmr', (/** @type {number} */ sequence) => sequence > initialEnd.eventSequence && sequence <= hmrArm.eventSequence],
+    ['ice-response-hmr', 'hmr', (/** @type {number} */ sequence) => sequence > hmrArm.eventSequence && sequence <= hmrEnd.eventSequence],
+    ['ice-response-post-hmr', 'post-hmr', (/** @type {number} */ sequence) => sequence > hmrEnd.eventSequence],
+  ];
+  const iceEvents = events.filter((event) => typeof event?.kind === 'string' && event.kind.startsWith('ice-response'));
+  return iceEvents.every((event) => {
+    const definition = definitions.find(([kind]) => event.kind === kind);
+    return definition !== undefined && Number.isInteger(event?.sequence) && Number.isInteger(event?.requestId) && event.requestId > 0
+      && event.captureWindow === definition[1] && /** @type {(sequence: number) => boolean} */ (definition[2])(event.sequence);
+  });
 }
 /** @param {any} hmr @param {string} expectedOrigin */
 function deriveHmrProof(hmr, expectedOrigin) {
@@ -430,7 +494,9 @@ function deriveHmrProof(hmr, expectedOrigin) {
   const sequencesValid = events.length > 0 && events.every((/** @type {any} */ event, /** @type {number} */ index) => Number.isInteger(event?.sequence)
     && event.sequence === markerSequence + index + 1);
   const documentRequests = events.filter(isDocumentRequest);
-  const navigations = events.filter((/** @type {any} */ event) => event?.kind === 'navigation' && event?.mainFrame === true);
+  const documentNavigations = events.filter(isDocumentNavigation);
+  const sameDocumentNavigations = events.filter(isSameDocumentNavigation);
+  const unboundNavigations = events.filter(isUnboundNavigation);
   const appNamespaceEvents = events.filter(isAppNamespaceEvent);
   const appRequests = appNamespaceEvents.filter((/** @type {any} */ event) => isAppRequest(event, expectedOrigin));
   const appResponses = appNamespaceEvents.filter((/** @type {any} */ event) => isAppResponse(event, expectedOrigin));
@@ -442,7 +508,7 @@ function deriveHmrProof(hmr, expectedOrigin) {
   const fullReloadFrames = events.filter((/** @type {any} */ event) => isFullReloadFrame(event, expectedOrigin));
   const hmrFrames = events.filter((/** @type {any} */ event) => ['update', 'full-reload'].includes(rawWebsocketPayload(event)?.type));
   const websocketEndpointsValid = hmrFrames.length > 0 && hmrFrames.every((/** @type {any} */ event) => exactViteWebsocketEndpoint(event, expectedOrigin));
-  const navigationSequence = navigations[0]?.sequence ?? Number.POSITIVE_INFINITY;
+  const navigationSequence = documentNavigations[0]?.sequence ?? Number.POSITIVE_INFINITY;
   const documentSequence = documentRequests[0]?.sequence ?? Number.POSITIVE_INFINITY;
   const preNavigationApps = appRequests.filter((/** @type {any} */ event) => event.sequence < documentSequence);
   const bootstrapApps = appRequests.filter((/** @type {any} */ event) => event.sequence > navigationSequence);
@@ -452,13 +518,18 @@ function deriveHmrProof(hmr, expectedOrigin) {
   const appTransfersExact = appNamespaceExact && requestIdsUnique && requestIdsMonotonic && transfers.length > 0
     && transfers.every((/** @type {any} */ transfer) => transfer.exact)
     && appResponses.length === appRequests.length && appFinished.length === appRequests.length && appFailed.length === 0;
+  const documentNavigationBindingExact = documentRequests.length === 1 && documentNavigations.length === 1 && unboundNavigations.length === 0
+    && documentNavigations[0]?.documentRequestId === documentRequests[0]?.requestId
+    && documentNavigations[0]?.documentRequestSequence === documentRequests[0]?.sequence
+    && documentNavigations[0]?.url === documentRequests[0]?.url
+    && documentRequests[0]?.sequence < documentNavigations[0]?.sequence;
   const beforeEpoch = Number(hmr?.before?.navigation?.epoch); const afterEpoch = Number(hmr?.after?.navigation?.epoch);
   const owner = hmr?.oldOwner ?? {};
   let branch = 'invalid';
-  if (sequencesValid && beforeEpoch === afterEpoch && documentRequests.length === 0 && navigations.length === 0) {
+  if (sequencesValid && beforeEpoch === afterEpoch && documentRequests.length === 0 && documentNavigations.length === 0 && unboundNavigations.length === 0) {
     if (owner.ownerPresent === true && owner.sameOwner === true && owner.oldRenderer === 'active') branch = 'same-owner';
     else if (owner.ownerPresent === true && owner.sameOwner === false && owner.oldRenderer === 'retired') branch = 'same-realm-replacement';
-  } else if (sequencesValid && afterEpoch === beforeEpoch + 1 && documentRequests.length === 1 && navigations.length === 1
+  } else if (sequencesValid && afterEpoch === beforeEpoch + 1 && documentNavigationBindingExact
     && owner.ownerPresent === false && owner.sameOwner === false && owner.oldRenderer === 'unavailable') branch = 'document-reload';
   let delivery = 'invalid';
   if (branch === 'same-owner' || branch === 'same-realm-replacement') delivery = 'hot-update';
@@ -466,25 +537,40 @@ function deriveHmrProof(hmr, expectedOrigin) {
   else if (branch === 'document-reload' && preNavigationApps.length === 0 && fullReloadFrames.length > 0) delivery = 'direct-full-reload';
   const firstUpdate = updateFrames[0]?.sequence ?? Number.POSITIVE_INFINITY;
   const firstFull = fullReloadFrames[0]?.sequence ?? null;
-  const sameUrlReload = documentRequests.length === 1 && navigations.length === 1
-    && documentRequests[0]?.url === hmr?.before?.navigation?.url && navigations[0]?.url === hmr?.before?.navigation?.url
+  const sameUrlReload = documentNavigationBindingExact
+    && documentRequests[0]?.url === hmr?.before?.navigation?.url && documentNavigations[0]?.url === hmr?.before?.navigation?.url
     && hmr?.after?.navigation?.url === hmr?.before?.navigation?.url;
   let eventOrderValid = false;
   const preTransfer = transfers.find((/** @type {any} */ transfer) => transfer.request === preNavigationApps[0]);
   const bootstrapTransfer = transfers.find((/** @type {any} */ transfer) => transfer.request === bootstrapApps[0]);
+  const cacheBridgeExact = preTransfer?.exact === true && bootstrapTransfer?.exact === true
+    && isFreshAppResponse(preTransfer.response, expectedOrigin)
+    && preTransfer.request.url === bootstrapTransfer.request.url
+    && (isFreshAppResponse(bootstrapTransfer.response, expectedOrigin)
+      || (isNotModifiedAppResponse(bootstrapTransfer.response, expectedOrigin)
+        && typeof preTransfer.response?.etag === 'string' && preTransfer.response.etag.length > 0
+        && bootstrapTransfer.request.ifNoneMatch === preTransfer.response.etag
+        && bootstrapTransfer.response.etag === preTransfer.response.etag));
+  const sameDocumentNavigationExact = branch === 'document-reload'
+    ? sameDocumentNavigations.length === 1 && bootstrapTransfer?.finished?.sequence < sameDocumentNavigations[0]?.sequence
+      && sameDocumentNavigations[0]?.url === hmr?.after?.navigation?.url
+    : sameDocumentNavigations.length === 0;
   if (delivery === 'hot-update') {
     const transfer = transfers[0];
-    eventOrderValid = updateFrames.length === 1 && fullReloadFrames.length === 0 && documentRequests.length === 0 && navigations.length === 0
-      && transfers.length === 1 && firstUpdate < transfer?.request?.sequence && transfer?.exact === true;
+    eventOrderValid = updateFrames.length === 1 && fullReloadFrames.length === 0 && documentRequests.length === 0 && documentNavigations.length === 0
+      && unboundNavigations.length === 0 && transfers.length === 1 && firstUpdate < transfer?.request?.sequence && transfer?.exact === true
+      && isFreshAppResponse(transfer?.response, expectedOrigin) && sameDocumentNavigationExact;
   } else if (delivery === 'update-fallback-reload') {
     eventOrderValid = updateFrames.length === 1 && fullReloadFrames.length <= 1 && preNavigationApps.length === 1 && bootstrapApps.length === 1
       && transfers.length === 2 && firstUpdate < preTransfer?.request?.sequence && preTransfer?.exact === true
       && preTransfer.finished.sequence < (firstFull ?? documentSequence) && (firstFull === null || firstFull < documentSequence)
-      && documentSequence < navigationSequence && navigationSequence < bootstrapTransfer?.request?.sequence && bootstrapTransfer?.exact === true;
+      && documentSequence < navigationSequence && navigationSequence < bootstrapTransfer?.request?.sequence && bootstrapTransfer?.exact === true
+      && cacheBridgeExact && sameDocumentNavigationExact;
   } else if (delivery === 'direct-full-reload') {
     eventOrderValid = updateFrames.length === 0 && fullReloadFrames.length === 1 && preNavigationApps.length === 0 && bootstrapApps.length === 1
       && transfers.length === 1 && firstFull !== null && firstFull < documentSequence && documentSequence < navigationSequence
-      && navigationSequence < bootstrapTransfer?.request?.sequence && bootstrapTransfer?.exact === true;
+      && navigationSequence < bootstrapTransfer?.request?.sequence && bootstrapTransfer?.exact === true
+      && isFreshAppResponse(bootstrapTransfer?.response, expectedOrigin) && sameDocumentNavigationExact;
   }
   const beforeQa = identityRecord(hmr?.before?.tracker?.qaId); const afterQa = identityRecord(hmr?.after?.tracker?.qaId);
   const ownerProbeBound = owner.ownerPresent === true
@@ -511,7 +597,8 @@ function deriveHmrProof(hmr, expectedOrigin) {
     && activeRafs(hmr?.after?.tracker) === activeRafs(hmr?.before?.tracker)
     && sameRelevantListeners(hmr?.before?.tracker, hmr?.after?.tracker) && preferencesStable);
   const passed = branch !== 'invalid' && delivery !== 'invalid' && sequencesValid && websocketEndpointsValid && appTransfersExact
-    && eventOrderValid && ownerIdentitiesValid && canvasIdentitiesValid && contextsExact && preferencesStable && boardProbesValid && reloadExact;
+    && documentNavigationBindingExact === (branch === 'document-reload') && eventOrderValid && ownerIdentitiesValid
+    && canvasIdentitiesValid && contextsExact && preferencesStable && boardProbesValid && reloadExact;
   return {
     branch, delivery, sequencesValid,
     epoch: { before: Number.isInteger(beforeEpoch) ? beforeEpoch : null, after: Number.isInteger(afterEpoch) ? afterEpoch : null },
@@ -519,13 +606,16 @@ function deriveHmrProof(hmr, expectedOrigin) {
       invalidAppNamespaceEvents: appNamespaceEvents.length - appRequests.length - appResponses.length - appFinished.length - appFailed.length,
       appRequests: appRequests.length, preNavigationAppRequests: preNavigationApps.length,
       bootstrapAppRequests: bootstrapApps.length, appResponses: appResponses.length, appFinished: appFinished.length, appFailed: appFailed.length,
-      documentRequests: documentRequests.length, navigations: navigations.length, appUpdateFrames: updateFrames.length, fullReloadFrames: fullReloadFrames.length },
+      documentRequests: documentRequests.length, documentNavigations: documentNavigations.length,
+      sameDocumentNavigations: sameDocumentNavigations.length, unboundNavigations: unboundNavigations.length,
+      appUpdateFrames: updateFrames.length, fullReloadFrames: fullReloadFrames.length },
     sequence: { firstUpdate: Number.isFinite(firstUpdate) ? firstUpdate : null, firstFullReload: firstFull,
       documentRequest: Number.isFinite(documentSequence) ? documentSequence : null, navigation: Number.isFinite(navigationSequence) ? navigationSequence : null },
     binding: { beforeQa, afterQa, beforeCanvas, afterCanvas,
       beforeContextEventCursor: Number.isInteger(hmr?.before?.tracker?.contextEventCursor) ? hmr.before.tracker.contextEventCursor : null,
       afterContextEventCursor: Number.isInteger(hmr?.after?.tracker?.contextEventCursor) ? hmr.after.tracker.contextEventCursor : null },
-    sameUrlReload, websocketEndpointsValid, appNamespaceExact, requestIdsUnique, requestIdsMonotonic, appTransfersExact, eventOrderValid, ownerIdentitiesValid, canvasIdentitiesValid,
+    sameUrlReload, websocketEndpointsValid, appNamespaceExact, requestIdsUnique, requestIdsMonotonic, appTransfersExact,
+    documentNavigationBindingExact, cacheBridgeExact, sameDocumentNavigationExact, eventOrderValid, ownerIdentitiesValid, canvasIdentitiesValid,
     contextsExact, preferencesStable, boardProbesValid, reloadExact, passed,
   };
 }
@@ -534,11 +624,21 @@ function deriveHmrProof(hmr, expectedOrigin) {
 function exactAppTouch(hmr) {
   const bytes = gitBytes(BASE, 'src/App.tsx'); const expectedSha = hash(bytes); const expectedBlob = git('rev-parse', `${BASE}:src/App.tsx`);
   const touch = hmr?.appTouch;
-  return touch?.path === 'src/App.tsx' && touch.beforeBytes === bytes.length && touch.afterBytes === bytes.length && touch.baseBytes === bytes.length
-    && touch.beforeSha256 === expectedSha && touch.afterSha256 === expectedSha && touch.baseSha256 === expectedSha
-    && touch.beforeGitBlob === expectedBlob && touch.afterGitBlob === expectedBlob && touch.baseGitBlob === expectedBlob
-    && Number.isFinite(touch.beforeMtimeMs) && Number.isFinite(touch.requestedMtimeMs) && Number.isFinite(touch.afterMtimeMs)
-    && touch.requestedMtimeMs > touch.beforeMtimeMs && touch.afterMtimeMs > touch.beforeMtimeMs;
+  const raw = touch?.raw; const canonical = touch?.canonical; const base = touch?.base;
+  const cleanGitBlob = touch?.cleanGitBlob; const mtime = touch?.mtime;
+  return plainExactKeys(touch, ['path', 'raw', 'canonical', 'base', 'cleanGitBlob', 'mtime']) && touch.path === 'src/App.tsx'
+    && plainExactKeys(raw, ['beforeBytes', 'afterBytes', 'beforeSha256', 'afterSha256'])
+    && Number.isInteger(raw.beforeBytes) && raw.beforeBytes > 0 && raw.afterBytes === raw.beforeBytes
+    && typeof raw.beforeSha256 === 'string' && /^[0-9a-f]{64}$/u.test(raw.beforeSha256) && raw.afterSha256 === raw.beforeSha256
+    && plainExactKeys(canonical, ['beforeBytes', 'afterBytes', 'beforeSha256', 'afterSha256'])
+    && canonical.beforeBytes === bytes.length && canonical.afterBytes === bytes.length
+    && canonical.beforeSha256 === expectedSha && canonical.afterSha256 === expectedSha
+    && plainExactKeys(base, ['bytes', 'sha256', 'gitBlob'])
+    && base.bytes === bytes.length && base.sha256 === expectedSha && base.gitBlob === expectedBlob
+    && plainExactKeys(cleanGitBlob, ['before', 'after']) && cleanGitBlob.before === expectedBlob && cleanGitBlob.after === expectedBlob
+    && plainExactKeys(mtime, ['beforeMs', 'requestedMs', 'afterMs'])
+    && Number.isFinite(mtime.beforeMs) && Number.isFinite(mtime.requestedMs) && Number.isFinite(mtime.afterMs)
+    && mtime.requestedMs - mtime.beforeMs >= 1000 && Math.abs(mtime.afterMs - mtime.requestedMs) <= 1;
 }
 
 const terminalOwnKeys = ['schema', 'generatedAt', 'passed', 'failures', 'checks', 'manifestSha256', 'evidenceSourceHead',
@@ -619,12 +719,33 @@ function runContractFixtures(assetBytes) {
   }
   const forged = clone(classifyIceResponses(goodIce, normalizedOrigin)); forged.entries[0].checks = {};
   assertFixture(!deepEqual(forged, classifyIceResponses(goodIce, normalizedOrigin)), 'reject forged Ice checks');
-  const iceEvents = goodIce.map((entry) => ({ kind: 'ice-response', ...clone(entry) }));
-  assertFixture(exactInitialIceEventBinding(iceEvents, goodIce, 50), 'valid Ice event binding');
+  const phaseMarkers = {
+    initialEnd: { eventIndex: 2, eventSequence: 2 }, hmrArm: { eventIndex: 3, eventSequence: 3 }, hmrEnd: { eventIndex: 4, eventSequence: 4 },
+  };
+  const iceEvents = [
+    ...goodIce.map((entry) => ({ kind: 'ice-response', ...clone(entry) })),
+    { ...clone(goodIce[1]), sequence: 3, requestId: 3, kind: 'ice-response-pre-hmr', captureWindow: 'pre-hmr' },
+    { ...clone(goodIce[1]), sequence: 4, requestId: 4, kind: 'ice-response-hmr', captureWindow: 'hmr' },
+    { ...clone(goodIce[1]), sequence: 5, requestId: 5, kind: 'ice-response-post-hmr', captureWindow: 'post-hmr' },
+  ];
+  assertFixture(exactInitialIceEventBinding(iceEvents, goodIce, phaseMarkers), 'valid Ice event binding');
+  assertFixture(exactIcePhaseClassification(iceEvents, phaseMarkers), 'valid Ice phase classification');
   const contradictoryIce = clone(iceEvents); contradictoryIce[0].contentType = 'audio/ogg';
-  assertFixture(!exactInitialIceEventBinding(contradictoryIce, goodIce, 50), 'reject Ice event metadata contradiction');
+  assertFixture(!exactInitialIceEventBinding(contradictoryIce, goodIce, phaseMarkers), 'reject Ice event metadata contradiction');
   const contradictoryIceRequestId = clone(iceEvents); contradictoryIceRequestId[0].requestId = 999;
-  assertFixture(!exactInitialIceEventBinding(contradictoryIceRequestId, goodIce, 50), 'reject Ice event requestId contradiction');
+  assertFixture(!exactInitialIceEventBinding(contradictoryIceRequestId, goodIce, phaseMarkers), 'reject Ice event requestId contradiction');
+  /** @type {Array<[string, {events: any[], markers: any}]>} */
+  const phaseRejects = [
+    ['pre-HMR mislabeled HMR', { events: clone(iceEvents).map((/** @type {any} */ event) => event.sequence === 3 ? { ...event, kind: 'ice-response-hmr', captureWindow: 'hmr' } : event), markers: clone(phaseMarkers) }],
+    ['HMR at arm boundary', { events: clone(iceEvents).map((/** @type {any} */ event) => event.sequence === 4 ? { ...event, sequence: 3 } : event), markers: clone(phaseMarkers) }],
+    ['post-HMR inside HMR boundary', { events: clone(iceEvents).map((/** @type {any} */ event) => event.sequence === 5 ? { ...event, sequence: 4 } : event), markers: clone(phaseMarkers) }],
+    ['marker order', { events: clone(iceEvents), markers: { ...clone(phaseMarkers), hmrEnd: clone(phaseMarkers.hmrArm) } }],
+    ['marker extra key', { events: clone(iceEvents), markers: { ...clone(phaseMarkers), hmrArm: { ...clone(phaseMarkers.hmrArm), forged: true } } }],
+    ['unknown Ice response phase', { events: [...clone(iceEvents), { ...clone(iceEvents[4]), sequence: 6, kind: 'ice-response-limbo' }], markers: clone(phaseMarkers) }],
+  ];
+  for (const [label, value] of phaseRejects) {
+    assertFixture(!exactIcePhaseClassification(value.events, value.markers), `reject Ice phase ${label}`);
+  }
 
   const id = (/** @type {number} */ epoch, /** @type {number} */ value) => ({ epoch, id: value });
   const tracker = (/** @type {number} */ epoch, /** @type {any[]} */ contexts, /** @type {any[]} */ events, qa = 10, canvas = 20) => ({
@@ -656,15 +777,31 @@ function runContractFixtures(assetBytes) {
     body: JSON.stringify({ type: 'update', updates: [{ type: 'js-update', path: '/src/App.tsx', acceptedPath: '/src/App.tsx' }] }) });
   const full = (sequence = 11) => ({ sequence, kind: 'websocket-frame', direction: 'received', encoding: 'utf8', url: wsUrl,
     body: JSON.stringify({ type: 'full-reload', path: '*' }) });
-  const app = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared') => ({ sequence, kind: 'request', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
-    method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false });
-  const response = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared') => ({ sequence, kind: 'app-response', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
-    method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, status: 200,
-    contentType: 'text/javascript; charset=utf-8', bodyEncoding: 'base64', bodyBase64: Buffer.from('transformed App module').toString('base64') });
-  const finished = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared') => ({ sequence, kind: 'app-requestfinished', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
-    method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false });
-  const doc = (/** @type {number} */ sequence) => ({ sequence, kind: 'request', url: route, method: 'GET', resourceType: 'document', mainFrame: true, navigationRequest: true });
-  const nav = (/** @type {number} */ sequence) => ({ sequence, kind: 'navigation', url: route, mainFrame: true });
+  const appEtag = 'W/"fixture-app-etag"';
+  const app = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared', /** @type {string|null} */ ifNoneMatch = null) => ({
+    sequence, kind: 'request', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
+    method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
+  });
+  const response = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared', /** @type {string|null} */ ifNoneMatch = null) => ({
+    sequence, kind: 'app-response', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
+    method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
+    status: 200, contentType: 'text/javascript; charset=utf-8', etag: appEtag, bodyDisposition: 'captured',
+    bodyEncoding: 'base64', bodyBase64: Buffer.from('transformed App module').toString('base64'),
+  });
+  const notModified = (/** @type {number} */ sequence, requestId = 102, suffix = '?t=shared', ifNoneMatch = appEtag) => ({
+    sequence, kind: 'app-response', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
+    method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
+    status: 304, contentType: null, etag: appEtag, bodyDisposition: 'not-modified', bodyEncoding: null, bodyBase64: null,
+  });
+  const finished = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared', /** @type {string|null} */ ifNoneMatch = null) => ({
+    sequence, kind: 'app-requestfinished', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
+    method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
+  });
+  const doc = (/** @type {number} */ sequence, requestId = 201) => ({ sequence, kind: 'request', requestId, url: route, method: 'GET',
+    resourceType: 'document', mainFrame: true, navigationRequest: true, ifNoneMatch: null });
+  const nav = (/** @type {number} */ sequence, requestId = 201) => ({ sequence, kind: 'document-navigation', url: route, mainFrame: true,
+    documentRequestId: requestId, documentRequestSequence: sequence - 1 });
+  const sameNav = (/** @type {number} */ sequence, url = route) => ({ sequence, kind: 'same-document-navigation', url, mainFrame: true });
   const before = snap(1, live(1));
   const same = {
     marker: { eventSequence: 10 }, events: [update(11), app(12), response(13), finished(14)], before, after: snap(1, live(1)),
@@ -679,12 +816,12 @@ function runContractFixtures(assetBytes) {
   const reload = {
     marker: { eventSequence: 10 },
     events: [update(11), app(12, 101), response(13, 101), finished(14, 101), full(15), doc(16), nav(17),
-      app(18, 102), response(19, 102), finished(20, 102)],
+      app(18, 102, '?t=shared', appEtag), notModified(19, 102), finished(20, 102, '?t=shared', appEtag), sameNav(21)],
     before, after: snap(2, live(2), 'reload'),
     oldOwner: { ownerPresent: false, sameOwner: false, oldRenderer: 'unavailable', beforeIdentity: id(1, 10), ownerIdentity: null,
       currentIdentity: id(2, 10), probe: { target: null, targetIdentity: null, outcome: 'unavailable' } },
   };
-  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, 102), response(15, 102), finished(16, 102)] };
+  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, 102), response(15, 102), finished(16, 102), sameNav(17)] };
   for (const [label, value] of [['same owner', same], ['replacement', replacement], ['fallback reload', reload], ['direct reload', direct]]) {
     assertFixture(deriveHmrProof(value, normalizedOrigin).passed, `valid HMR ${label}`);
   }
@@ -712,7 +849,7 @@ function runContractFixtures(assetBytes) {
   const failedResponse = clone(reload);
   failedResponse.events[2] = { ...finished(13, 101), kind: 'app-requestfailed', errorText: 'net::ERR_FAILED' };
   const thirdApp = clone(reload);
-  thirdApp.events.push(app(21, 103, '?t=third'), response(22, 103, '?t=third'), finished(23, 103, '?t=third'));
+  thirdApp.events.push(app(22, 103, '?t=third'), response(23, 103, '?t=third'), finished(24, 103, '?t=third'));
   const duplicateRequestId = clone(reload);
   duplicateRequestId.events = duplicateRequestId.events.map((/** @type {any} */ event) => event.requestId === 102 ? { ...event, requestId: 101 } : event);
   const wrongResponseId = clone(reload);
@@ -731,6 +868,26 @@ function runContractFixtures(assetBytes) {
   malformedAppUrl.events[1] = { ...malformedAppUrl.events[1], url: 'not-a-url:/src/App.tsx' };
   const rawResponseKind = clone(reload);
   rawResponseKind.events[2] = { ...rawResponseKind.events[2], kind: 'response' };
+  const initialNotModified = clone(reload);
+  initialNotModified.events[1] = app(12, 101, '?t=shared', appEtag);
+  initialNotModified.events[2] = notModified(13, 101);
+  initialNotModified.events[3] = finished(14, 101, '?t=shared', appEtag);
+  const bootstrapBody = clone(reload);
+  bootstrapBody.events[8] = { ...bootstrapBody.events[8], bodyDisposition: 'captured', bodyEncoding: 'base64', bodyBase64: 'YQ==' };
+  const bootstrapWrongUrl = clone(reload);
+  bootstrapWrongUrl.events = bootstrapWrongUrl.events.map((/** @type {any} */ event) => event.requestId === 102
+    ? { ...event, url: `${normalizedOrigin}/src/App.tsx?t=different` } : event);
+  const missingBootstrapFinished = clone(reload);
+  missingBootstrapFinished.events.splice(9, 1); missingBootstrapFinished.events[9].sequence = 20;
+  const missingSameDocument = clone(reload); missingSameDocument.events.pop();
+  const extraSameDocument = clone(reload); extraSameDocument.events.push(sameNav(22));
+  const wrongDocumentBinding = clone(reload); wrongDocumentBinding.events[6].documentRequestId = 999;
+  const unboundDocumentNavigation = clone(reload);
+  unboundDocumentNavigation.events[6] = { sequence: 17, kind: 'unbound-navigation', url: route, mainFrame: true,
+    pendingDocumentRequests: [{ requestId: 201, sequence: 16, url: route }] };
+  const earlySameDocument = clone(reload);
+  const bootstrapFinished = earlySameDocument.events[9]; const historyNavigation = earlySameDocument.events[10];
+  earlySameDocument.events.splice(9, 2, { ...historyNavigation, sequence: 20 }, { ...bootstrapFinished, sequence: 21 });
   /** @param {any} boardProbe */
   const withBoardProbe = (boardProbe) => {
     const value = clone(reload);
@@ -748,7 +905,7 @@ function runContractFixtures(assetBytes) {
     ['missing owner called retired', { ...clone(same), oldOwner: { ...clone(same.oldOwner), ownerPresent: false, sameOwner: false, oldRenderer: 'retired' } }],
     ['same epoch navigation', { ...clone(reload), after: snap(1, live(1), 'reload') }],
     ['epoch change no navigation', { ...clone(same), after: snap(2, live(2), 'reload'), oldOwner: clone(reload.oldOwner) }],
-    ['multiple navigation', { ...clone(reload), events: [...clone(reload.events), doc(21), nav(22)] }],
+    ['multiple navigation', { ...clone(reload), events: [...clone(reload.events), doc(22), nav(23)] }],
     ['wrong reload path', { ...clone(reload), events: clone(reload.events).map((/** @type {any} */ event) => event.sequence === 16 ? { ...event, url: `${normalizedOrigin}/wrong` } : event) }],
     ['non-document request', { ...clone(reload), events: clone(reload.events).map((/** @type {any} */ event) => event.sequence === 16 ? { ...event, resourceType: 'fetch', navigationRequest: false } : event) }],
     ['cross epoch owner id', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), currentIdentity: id(1, 10) } }],
@@ -772,6 +929,15 @@ function runContractFixtures(assetBytes) {
     ['App namespace invalid resource type', invalidResourceType],
     ['App namespace malformed raw URL', malformedAppUrl],
     ['App namespace raw response kind', rawResponseKind],
+    ['initial App response is 304', initialNotModified],
+    ['bootstrap 304 carries a body', bootstrapBody],
+    ['bootstrap 304 URL differs', bootstrapWrongUrl],
+    ['bootstrap request missing finished', missingBootstrapFinished],
+    ['missing mount same-document navigation', missingSameDocument],
+    ['extra mount same-document navigation', extraSameDocument],
+    ['wrong document-navigation request binding', wrongDocumentBinding],
+    ['unbound document navigation', unboundDocumentNavigation],
+    ['mount same-document navigation before bootstrap finish', earlySameDocument],
     ['owner snapshot forged', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), beforeIdentity: id(1, 99) } }],
     ['same renderer failed probe', { ...clone(same), oldOwner: { ...clone(same.oldOwner), oldRenderer: 'invalid',
       probe: { ...clone(same.oldOwner.probe), outcome: 'throws' } } }],
@@ -798,12 +964,39 @@ function runContractFixtures(assetBytes) {
   const filler = Array.from({ length: 10 }, (_, index) => ({ sequence: index + 1, kind: 'fixture' }));
   const windowed = clone(reload);
   windowed.marker = { eventIndex: 10, eventSequence: 10, navigationArm: { eventIndex: 10, eventSequence: 10, url: route },
-    endEventIndex: 20, endEventSequence: 20 };
+    endEventIndex: 21, endEventSequence: 21 };
   const exactEvents = [...filler, ...clone(reload.events)];
   assertFixture(exactHmrEventWindow(exactEvents, windowed, normalizedOrigin), 'valid HMR eventEnd window');
-  assertFixture(!exactHmrEventWindow([...exactEvents, doc(21)], windowed, normalizedOrigin), 'reject slow late reload after eventEnd');
-  const lateMalformedApp = { ...response(21, 999), url: 'not-a-url:/src/App.tsx' };
+  assertFixture(!exactHmrEventWindow([...exactEvents, doc(22)], windowed, normalizedOrigin), 'reject slow late reload after eventEnd');
+  const lateMalformedApp = { ...response(22, 999), url: 'not-a-url:/src/App.tsx' };
   assertFixture(!exactHmrEventWindow([...exactEvents, lateMalformedApp], windowed, normalizedOrigin), 'reject late malformed App namespace event after eventEnd');
+
+  const committedApp = gitBytes(BASE, 'src/App.tsx'); const committedAppSha = hash(committedApp); const committedAppBlob = git('rev-parse', `${BASE}:src/App.tsx`);
+  let newline = 0;
+  const mixedApp = Buffer.from(new TextDecoder('utf-8', { fatal: true }).decode(committedApp).replace(/\n/gu, () => (++newline % 2 === 0 ? '\r\n' : '\n')), 'utf8');
+  assertFixture(canonicalAppBytes(committedApp).equals(committedApp) && canonicalAppBytes(mixedApp).equals(committedApp)
+    && cleanAppBlob(mixedApp) === committedAppBlob, 'valid LF and mixed-EOL App canonicalization');
+  let bareCrRejected = false;
+  try { canonicalAppBytes(Buffer.from('x\ry', 'utf8')); } catch { bareCrRejected = true; }
+  assertFixture(bareCrRejected, 'reject bare CR App checkout');
+  const validTouch = {
+    path: 'src/App.tsx',
+    raw: { beforeBytes: mixedApp.length, afterBytes: mixedApp.length, beforeSha256: hash(mixedApp), afterSha256: hash(mixedApp) },
+    canonical: { beforeBytes: committedApp.length, afterBytes: committedApp.length, beforeSha256: committedAppSha, afterSha256: committedAppSha },
+    base: { bytes: committedApp.length, sha256: committedAppSha, gitBlob: committedAppBlob },
+    cleanGitBlob: { before: committedAppBlob, after: committedAppBlob },
+    mtime: { beforeMs: 1000, requestedMs: 2100, afterMs: 2100 },
+  };
+  assertFixture(exactAppTouch({ appTouch: validTouch }), 'valid exact App touch envelope');
+  const touchRejects = [
+    ['raw drift', { ...clone(validTouch), raw: { ...clone(validTouch.raw), afterSha256: '0'.repeat(64) } }],
+    ['canonical drift', { ...clone(validTouch), canonical: { ...clone(validTouch.canonical), afterSha256: '0'.repeat(64) } }],
+    ['clean-filter drift', { ...clone(validTouch), cleanGitBlob: { ...clone(validTouch.cleanGitBlob), after: '0'.repeat(40) } }],
+    ['base drift', { ...clone(validTouch), base: { ...clone(validTouch.base), bytes: validTouch.base.bytes + 1 } }],
+    ['mtime not realized', { ...clone(validTouch), mtime: { ...clone(validTouch.mtime), afterMs: 2090 } }],
+    ['extra key', { ...clone(validTouch), forged: true }],
+  ];
+  for (const [label, value] of touchRejects) assertFixture(!exactAppTouch({ appTouch: value }), `reject App touch ${label}`);
 
   const terminalTracker = tracker(1, [{ id: id(1, 1), closed: true, closeCalls: 1, state: 'closed' }],
     [{ sequence: 1, kind: 'create', id: id(1, 1) }, { sequence: 2, kind: 'close-call', id: id(1, 1), call: 1 },
@@ -832,7 +1025,7 @@ function runContractFixtures(assetBytes) {
     assertFixture(!exactCommittedTerminal(value, terminalExpected), `reject terminal ${label}`);
   }
   return {
-    iceAccepted: 2, iceRejected: iceRejects.length + 3,
+    iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + 3,
     hmrAccepted: 4, hmrRejected: hmrRejects.length + 3,
     terminalAccepted: 1, terminalRejected: 3,
   };
@@ -977,7 +1170,7 @@ const beforeHmrOwner = await page.evaluate(() => {
 });
 const beforeHmr = await snapshot(page);
 check(exactPreHmrContextContinuity(reentered.tracker, beforeHmr.tracker), 're-entry to HMR-before exact AudioContext continuity');
-const eventMarker = { eventIndex: observed.events.length, eventSequence: observed.events.at(-1)?.sequence ?? 0 };
+const eventMarker = observed.armHmrIceWindow();
 const navigationArm = { ...eventMarker, url: beforeHmr.navigation.url };
 const reloadNavigationPromise = page.waitForEvent('framenavigated', {
   predicate: (frame) => frame === page.mainFrame() && frame.url() === navigationArm.url,
@@ -986,17 +1179,21 @@ const reloadNavigationPromise = page.waitForEvent('framenavigated', {
 const appPath = join(repo, 'src/App.tsx');
 const beforeStat = statSync(appPath);
 const beforeAppBytes = readFileSync(appPath);
+const beforeCanonicalAppBytes = canonicalAppBytes(beforeAppBytes);
 const baseAppBytes = gitBytes(BASE, 'src/App.tsx');
 const baseAppBlob = git('rev-parse', `${BASE}:src/App.tsx`);
-const beforeAppBlob = git('hash-object', 'src/App.tsx');
+const beforeAppBlob = cleanAppBlob(beforeAppBytes);
 const touch = new Date(Math.max(Date.now(), beforeStat.mtimeMs + 1100));
 utimesSync(appPath, beforeStat.atime, touch);
 const afterStat = statSync(appPath);
 const afterAppBytes = readFileSync(appPath);
-const afterAppBlob = git('hash-object', 'src/App.tsx');
-check(afterStat.mtimeMs > beforeStat.mtimeMs && beforeAppBytes.length === afterAppBytes.length && beforeAppBytes.length === baseAppBytes.length
-  && hash(beforeAppBytes) === hash(afterAppBytes) && hash(beforeAppBytes) === hash(baseAppBytes)
-  && beforeAppBlob === afterAppBlob && beforeAppBlob === baseAppBlob, 'HMR touch changes only monotonic App mtime');
+const afterCanonicalAppBytes = canonicalAppBytes(afterAppBytes);
+const afterAppBlob = cleanAppBlob(afterAppBytes);
+check(afterStat.mtimeMs - touch.getTime() <= 1 && touch.getTime() - afterStat.mtimeMs <= 1
+  && touch.getTime() - beforeStat.mtimeMs >= 1000 && beforeAppBytes.equals(afterAppBytes)
+  && beforeCanonicalAppBytes.equals(baseAppBytes) && afterCanonicalAppBytes.equals(baseAppBytes)
+  && beforeAppBlob === afterAppBlob && beforeAppBlob === baseAppBlob,
+  'HMR touch changes only monotonic App mtime across raw, canonical, and clean-filter domains');
 await reloadNavigationPromise;
 await page.waitForLoadState('domcontentloaded', { timeout: 12_000 });
 await page.waitForLoadState('load', { timeout: 12_000 });
@@ -1035,7 +1232,7 @@ const afterHmrOwner = await page.evaluate(() => {
   };
 });
 const oldHmrOwner = { ...beforeHmrOwner, ...afterHmrOwner };
-const eventEnd = { eventIndex: observed.events.length, eventSequence: observed.events.at(-1)?.sequence ?? eventMarker.eventSequence };
+const eventEnd = observed.endHmrIceWindow();
 const hmrEvents = observed.events.slice(eventMarker.eventIndex, eventEnd.eventIndex);
 /** @type {any} */
 const hmr = {
@@ -1043,10 +1240,15 @@ const hmr = {
   marker: { ...eventMarker, navigationArm, endEventIndex: eventEnd.eventIndex, endEventSequence: eventEnd.eventSequence },
   events: hmrEvents,
   appTouch: {
-    path: 'src/App.tsx', beforeMtimeMs: beforeStat.mtimeMs, requestedMtimeMs: touch.getTime(), afterMtimeMs: afterStat.mtimeMs,
-    beforeBytes: beforeAppBytes.length, afterBytes: afterAppBytes.length, beforeSha256: hash(beforeAppBytes), afterSha256: hash(afterAppBytes),
-    baseBytes: baseAppBytes.length, baseSha256: hash(baseAppBytes), baseGitBlob: baseAppBlob,
-    beforeGitBlob: beforeAppBlob, afterGitBlob: afterAppBlob,
+    path: 'src/App.tsx',
+    raw: { beforeBytes: beforeAppBytes.length, afterBytes: afterAppBytes.length, beforeSha256: hash(beforeAppBytes), afterSha256: hash(afterAppBytes) },
+    canonical: {
+      beforeBytes: beforeCanonicalAppBytes.length, afterBytes: afterCanonicalAppBytes.length,
+      beforeSha256: hash(beforeCanonicalAppBytes), afterSha256: hash(afterCanonicalAppBytes),
+    },
+    base: { bytes: baseAppBytes.length, sha256: hash(baseAppBytes), gitBlob: baseAppBlob },
+    cleanGitBlob: { before: beforeAppBlob, after: afterAppBlob },
+    mtime: { beforeMs: beforeStat.mtimeMs, requestedMs: touch.getTime(), afterMs: afterStat.mtimeMs },
   },
   after: afterHmr,
   oldOwner: oldHmrOwner,
@@ -1078,7 +1280,8 @@ await observed.settleAppNetwork();
 check(terminal.canvases === 0 && terminal.liveContexts === 0 && activeRafs(terminal) === 0 && noRelevantListeners(terminal), 'post-HMR terminal cleanup');
 check(exactTerminalContexts(afterHmr.tracker, terminal), 'post-HMR terminal exact AudioContext closure');
 check(exactHmrEventWindow(observed.events, hmr, normalizedOrigin), 'no late App/HMR/reload/navigation event after the frozen HMR eventEnd');
-check(exactInitialIceEventBinding(observed.events, rawIceResponses, eventMarker.eventSequence), 'Ice raw responses bind every initial event metadata field');
+check(exactInitialIceEventBinding(observed.events, rawIceResponses, observed.icePhaseMarkers), 'Ice raw responses bind every initial event metadata field');
+check(exactIcePhaseClassification(observed.events, observed.icePhaseMarkers), 'Ice response events obey the explicit initial/pre-HMR/HMR/post-HMR windows');
 
 const iceBytes = gitBytes(BASE, ICE.path);
 const catalogBytes = gitBytes(BASE, catalogPath);
@@ -1091,7 +1294,8 @@ const provenanceChecks = [
   { label: 'runtime catalog own freezeIce descriptor/value', passed: exactRuntimeCatalog(runtimeCatalog) },
   { label: 'no original substitution', passed: ICE.originalSha256 === null && ICE.originalStatus === 'OPEN / login required' && ICE.substitutionAllowed === false },
   { label: 'runtime exact module-plus-asset pair', passed: runtimeIceClassification.passed },
-  { label: 'runtime Ice events bind materialized response metadata', passed: exactInitialIceEventBinding(observed.events, rawIceResponses, eventMarker.eventSequence) },
+  { label: 'runtime Ice events bind materialized response metadata', passed: exactInitialIceEventBinding(observed.events, rawIceResponses, observed.icePhaseMarkers) },
+  { label: 'runtime Ice response phases are exact', passed: exactIcePhaseClassification(observed.events, observed.icePhaseMarkers) },
 ];
 const iceProvenance = {
   schema: 'tetramorph.t37.ice-provenance.v1', generatedAt: new Date().toISOString(),
@@ -1100,6 +1304,7 @@ const iceProvenance = {
   product: { ...ICE, observedGitBlob: lsTree[2] ?? null, observedBytes: iceBytes.length, observedSha256: hash(iceBytes) },
   catalog: { path: catalogPath, gitBlob: catalogGitBlob, bytes: catalogBytes.length, sha256: hash(catalogBytes), runtime: runtimeCatalog },
   runtimeResponses: rawIceResponses,
+  runtimePhaseMarkers: observed.icePhaseMarkers,
   runtimeClassification: runtimeIceClassification,
   originalAcquisition: { filename: ICE.originalFilename, sha256: null, status: 'OPEN / login required', productOggIsOriginal: false, previewSubstitutionAllowed: false },
   humanStatus: HUMAN_STATUS,
