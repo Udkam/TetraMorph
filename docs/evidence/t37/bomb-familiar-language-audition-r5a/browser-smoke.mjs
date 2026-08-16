@@ -273,6 +273,7 @@ for (const method of ['dispose', 'pagehide', 'hmr']) {
 }
 
 await desktop.evaluate(() => window.__R5A_TEST__.dispose('desktop-finish'));
+await Promise.all([desktop, mobile, reduced].map((page) => page.waitForTimeout(500)));
 for (const page of [desktop, mobile, reduced]) {
   await page.waitForLoadState('networkidle');
   await page.close();
