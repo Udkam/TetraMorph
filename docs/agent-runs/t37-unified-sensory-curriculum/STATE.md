@@ -3218,3 +3218,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - A zero-artifact preclaim abort blocks immediate reuse and requires a new audited binding;
   only durable attempt claim consumes v6. Validator and all mutable paths remain absent.
 - Next: commit and obtain two fresh all-zero R3 reviews before authoring.
+
+### F4E-R6B R3 split and R4 Windows process correction
+
+- R3 `306d9bb` reviews are all-zero, all-zero, and `0/1/1/0/0`. The rejected clause asked
+  Node to enumerate global Windows processes without authorizing a non-Git backend.
+- R4 limits validator process evidence to its one owned child. Attempt binds `outerPid`; worker
+  checks `process.ppid`; terminal derives at most one residual child.
+- Global matching processes move to a coordinator outer gate: pinned PowerShell 7.6.4 binary
+  plus a 1,062-byte/`06645CC...1556A` read-only CIM EncodedCommand, 1 MiB capture, 256 bounded
+  entries, strict canonical schema, truncation fatal. It runs around preflight and production.
+- The preclaim marker now has an anchored canonical schema and strict ancestor/same-validator/
+  zero-artifact validation. Validator and all mutable paths remain absent.
+- Next: commit and obtain two all-zero R4 reviews. No gate or proof execution is open.

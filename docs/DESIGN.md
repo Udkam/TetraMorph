@@ -9629,3 +9629,85 @@ slice remains bounded and no other R6A implementation/test path opens.
 
 R3 requires a fresh commit and two all-zero reviews. Validator authoring, all validator modes,
 Store creation, and every Intro-05 proof or source edit remain closed meanwhile.
+
+### F4E-R6B R3 split verdict and R4 Windows process correction
+
+R3 `306d9bb` receives two all-zero reviews and one adversarial rejection at
+`P0/P1/P2/P3/GAP = 0/1/1/0/0`. The remaining defect is executable: Node cannot enumerate
+global Windows process image/command state while R2 permits only Git and the one worker.
+R4 supersedes only process evidence, attempt parent binding, and preclaim-marker clauses.
+
+The validator performs no global OS process enumeration and spawns no new process backend.
+Its `namespaceAudit` keys are now
+`validator,attemptPresent,candidatePresent,terminalPresent,frontierStagePresent,publicationStages,publicationStagesTruncated,ownedProcesses,ownedProcessesTruncated`.
+Preflight and preclaim outer have no owned child. Production outer owns at most the one exact
+worker handle. Terminal `residualProcesses` is derived only from that handle: empty after
+observed close/reap, otherwise the one PID or `unidentified-worker`; its truncation flag is
+therefore always false. Worker validates `process.ppid` against the attempt's `outerPid` and
+does not claim to discover unrelated same-user processes.
+
+Attempt key order becomes
+`schema,runId,claimedAt,outerPid,sourcePin,clue,parameters,outputPath,terminalPath,frontierStagePath,workerCapabilitySha256`.
+`outerPid` is the positive decimal PID observed before claim. The run-ID input becomes UTF-8
+`sourcePin.head NUL sourcePin.validator.sha256 NUL claimedAt NUL outerPid-decimal NUL
+workerCapabilitySha256 NUL frontierStagePath`, with the same first-24-lowercase-hex result.
+Outer rebuilds the attempt using its current PID; worker requires exact parent equality before
+and after proof. Same-permission process spoofing remains outside the honest-coordinator claim.
+
+Global matching-process evidence is a coordinator-owned, read-only outer gate, not a validator
+child and not part of candidate correctness. It runs immediately before and after the sole
+preflight, immediately before production-mode invocation, and immediately after outer exit.
+All four successful gate outputs must have zero entries and `truncated:false`; final receipt
+uses the post-exit output. The fixed backend is
+`C:\Program Files\PowerShell\7\pwsh.exe`, 301,368 bytes, file version `7.6.4.500`, PowerShell
+semantic version `7.6.4`, SHA-256
+`DB6DD81183FE57D22E03B911EC9A30A2FD7C40542E97743615355A6FB44F458F`.
+Its argv is exactly `-NoLogo -NoProfile -NonInteractive -EncodedCommand <payload>`, where
+`payload` is UTF-16LE Base64 of this exact 1,062-byte ASCII/LF source (SHA-256
+`06645CCADA1DD038E4CF78A6DD4FEBD169DE4AE51076880EDF1F383B51F1556A`):
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$needle = 't37-f4e-endgame-canonical-validate-v6.mjs'
+$matches = @(Get-CimInstance -ClassName Win32_Process | Where-Object { [string]$_.CommandLine -like ('*' + $needle + '*') } | Sort-Object ProcessId)
+$entries = @($matches | Select-Object -First 256 | ForEach-Object {
+  $name = [string]$_.Name
+  $image = [string]$_.ExecutablePath
+  $command = [string]$_.CommandLine
+  [ordered]@{
+    pid = [int]$_.ProcessId
+    parentPid = [int]$_.ParentProcessId
+    name = if ($name.Length -le 128) { $name } else { $name.Substring(0, 128) }
+    nameTruncated = $name.Length -gt 128
+    executablePath = if ($image.Length -le 512) { $image } else { $image.Substring(0, 512) }
+    executablePathTruncated = $image.Length -gt 512
+    commandLine = if ($command.Length -le 512) { $command } else { $command.Substring(0, 512) }
+    commandLineTruncated = $command.Length -gt 512
+  }
+})
+$result = [ordered]@{ entries = $entries; truncated = $matches.Count -gt 256 }
+[Console]::Out.Write((ConvertTo-Json -InputObject $result -Compress -Depth 4))
+```
+
+The coordinator captures at most 1 MiB stdout and stderr, requires exit 0, zero stderr, exact
+UTF-8 canonical JSON with keys `entries,truncated`, at most 256 entries ordered by PID, and
+entry keys exactly
+`pid,parentPid,name,nameTruncated,executablePath,executablePathTruncated,commandLine,commandLineTruncated`.
+Any field or overall truncation is fatal for a zero-process gate. The encoded command hides the
+plain needle from its own command line. A same-permission process starting between scans is a
+declared governance violation, not an authenticated exclusion.
+
+The preclaim marker is line-anchored as `^F4E-R6-PRECLAIM-ABORT-V1 \{`. Its canonical JSON
+key order is exactly
+`head,validator,outerExitCode,error,attemptPresent,candidatePresent,terminalPresent,frontierStage,publicationStages,publicationStagesTruncated,matchingProcesses,matchingProcessesTruncated,audit`.
+Validator is `path,bytes,sha256`; error is at most 2048 UTF-8 bytes; frontier stage and lists
+use the R3 shapes. A valid marker requires all three artifact booleans false, stage absent,
+both lists empty, both truncation flags false, and two all-zero audits. A replacement-bound
+validator parses/rebuilds every such line, proves each referenced HEAD is a strict ancestor
+with the same validator and zero attempt, and refuses a second production invocation for the
+current HEAD.
+
+The consumption receipt's `matchingProcesses` is the parsed coordinator post-exit global scan,
+not validator terminal state. R4 requires a fresh commit and two all-zero reviews. The exact
+encoded payload is frozen in the later command-pin checkpoint alongside validator SHA and HEAD;
+no process gate, validator authoring/mode, Store, or Intro-05 work is open before R4 acceptance.

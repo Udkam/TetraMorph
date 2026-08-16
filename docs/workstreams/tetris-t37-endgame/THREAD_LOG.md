@@ -847,3 +847,13 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   equality tests. Those two may only pin/iterate the accepted first-four prefix and remain
   prohibited from fixture/proof 05.
 - Next: commit and obtain two fresh all-zero R3 reviews. Authoring and execution stay closed.
+
+### F4E-R6B R3 split verdict and R4 process candidate
+
+- R3 reviews are `0/0/0/0/0`, `0/0/0/0/0`, and `0/1/1/0/0`. The remaining issue is the
+  unavailable global-process API under the validator's subprocess allowlist.
+- R4 records only the validator-owned worker internally and binds worker `process.ppid` through
+  attempt `outerPid`. A pinned, read-only PowerShell/CIM EncodedCommand is the coordinator's
+  bounded global scan before/after preflight and production.
+- The preclaim-abort marker now has exact anchored keys and replacement-HEAD validation.
+- Next: commit and independently review R4. Validator and every v6 runtime path remain absent.

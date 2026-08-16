@@ -10309,3 +10309,15 @@ The later Intro-05 integration boundary is six paths. The two R6A equality tests
 original four only to change their hard-coded four-draft whole-array traversal into the exact
 first-four prefix; they may never execute or load Intro-05. No validator file or mutable v6
 artifact exists. Commit and independently review R3 before authoring begins.
+
+### F4E-R6B R3 split — R4 process contract review only
+
+R3 `306d9bb` has two all-zero reviews and one `0/1/1/0/0` rejection: Node cannot satisfy a
+global Windows process scan without an authorized backend. R4 keeps validator subprocesses
+unchanged and moves global scans to a frozen coordinator-owned PowerShell 7.6.4/CIM gate.
+Validator records only its owned worker; attempt adds `outerPid`, and worker verifies
+`process.ppid` exactly.
+
+R4 also freezes the line-anchored preclaim-abort schema and how a replacement HEAD validates
+prior zero-artifact aborts. No v6 path exists. Commit and obtain two fresh all-zero R4 reviews
+before validator authoring.
