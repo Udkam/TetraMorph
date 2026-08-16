@@ -49,10 +49,54 @@ event sources, timers, and frame callbacks without multiplying listeners. Termin
 pagehide, and HMR close the old AudioContext, remove listeners, destroy the Renderer ticker,
 and remove its Canvas. HMR then proves exactly one fresh owner/context/Renderer/Canvas.
 
+### Material and Ice current-HEAD proof
+
+R5B terminal evidence closes at repository head
+`171181228c0408cfa1bfb1259eb98c29a63efae3`. The next evidence-only slice binds that exact
+head and re-proves the already implemented Stage E whole-piece material system on the real
+product root. It changes no product, renderer, Core, audio, UI, storage, or accepted timing.
+Historical Stage E PNGs and audits are inputs neither to the verdict nor to the new hashes;
+only the old deterministic scenario algorithm and fixture data may be reused, and every
+current frame, state, audit, and binding is recomputed.
+
+The proof directory is exactly `docs/evidence/t37/material-ice-current-head/**`. Its ten
+authored source files are `.gitattributes`, `README.md`, `evidence-contract.mjs`,
+`product-fixture.mjs`, `capture-semantic.mjs`, `capture-matrix.mjs`, `browser-smoke.mjs`,
+`client-actions.json`, `write-manifest.mjs`, and `verify.mjs`. The real Mutation entry and
+DEV QA surfaces run from the product root on strict port `5193`. Deterministic item seeds are
+Freeze `49`, Bomb `90`, Multiplier `11`, and Supergravity/Collapse `163`.
+
+The pre-report set is exactly 37 files: twenty full-page semantic frames for
+`freeze/bomb/multiplier/collapse` across `next`, `active-ghost`, `settled`, `clear`, and
+`activation`; six named theme/motion/viewport matrix frames; semantic, matrix, browser, and
+Ice-provenance JSON audits; three prescribed-client screenshots plus three text states; and
+`manifest.json`. The only terminal file is `verification-report.json`. Source, output, and
+terminal commits are separate. Git-blob SHA-256, exact tree/range/history, strict UTF-8
+no-BOM LF text, raw PNG bytes, real one-Canvas layout, zero DOM cells/overflow/errors, and
+semantic state-to-frame agreement are fail-closed.
+
+Lifecycle proof exercises restart plus live theme and motion changes while reusing the same
+runtime Canvas, renderer/ticker owner, listener set, and AudioContext; then an actual UI exit
+must retire them before real Mutation re-entry creates one fresh owner. A Vite HMR pass must
+neither multiply nor leak Canvas, renderer/ticker activity, audio contexts, frame callbacks,
+or window/document listeners. Browser instrumentation is observational and may not replace
+the production lifecycle or inject product state.
+
 Ice 2 remains the accepted runtime material: use the locally proven Ogg and local
 provenance. The original uploader WAV on the official page still requires login and is
 explicitly **OPEN**; it is not replaced with a preview transcode and does not block the
 rest of the curriculum. Disclose it in the final report.
+
+The current Ice binding is
+`src/assets/audio/t37/freeze-ice-cubes-hq.ogg`, `54564` bytes, Git blob
+`12e767d2157f3ed2150a743ac2c161f8f99207f1`, and SHA-256
+`5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450`.
+Its catalog provenance is the official Freesound record `819779`, uploader `sbml`, title
+`Ice cubes`, CC0, using source window `0.19375–0.63375 s`, gain `0.78`, attack `3 ms`, and
+release `12 ms`. The uploader-original filename is known, but its SHA remains `null` and
+status `OPEN / login required`; neither the product Ogg nor a preview may impersonate it.
+Automated material eligibility and Ice byte/provenance integrity join the final consolidated
+human visual/listening review and do not claim a new subjective acceptance here.
 
 ### Remaining material, curriculum, and presentation contract
 

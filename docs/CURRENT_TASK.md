@@ -180,6 +180,73 @@ SHA-256. Thus `core.autocrlf` and checkout EOL cannot redefine the evidence doma
 Automated evidence remains technical eligibility; the page is presented only in the final
 consolidated human review.
 
+### 2026-08-16 R5B terminal disposition and material/Ice proof authorization
+
+R5B's final evidence source is `f7f59d0`, its exact 12-file generated checkpoint is
+`526f2b6`, and its terminal report-only checkpoint is
+`171181228c0408cfa1bfb1259eb98c29a63efae3`. This committed terminal head is the sole base
+for the next slice. R5B remains provisional and joins the final consolidated listening
+review; no interim verdict is requested.
+
+One evidence writer is authorized to change exactly `docs/DESIGN.md` and
+`docs/CURRENT_TASK.md` in this contract checkpoint, then exactly these ten new source paths
+under `docs/evidence/t37/material-ice-current-head/`: `.gitattributes`, `README.md`,
+`evidence-contract.mjs`, `product-fixture.mjs`, `capture-semantic.mjs`,
+`capture-matrix.mjs`, `browser-smoke.mjs`, `client-actions.json`, `write-manifest.mjs`, and
+`verify.mjs`. The source checkpoint is an explicit `docs/COMMIT_POLICY.md` exception to the
+500-line default: the ten-file browser harness, shared fixture, manifest writer, and terminal
+verifier form one mutually hash-bound evidence claim that cannot be split without admitting
+an unverified generator. It may not exceed these ten paths, and the whole source range must
+pass Node syntax/import checks, strict JavaScript type checking, project typecheck, UTF-8/LF
+checks, and exact path/linear-history review before commit. Do not update changelog, product,
+old evidence, the inherited T27 paths, or `progress.md`; do not run generation or a server in
+the source-writer task.
+
+The coordinator later runs only the real product root at strict `127.0.0.1:5193`. Old Stage E
+PNG/audit bytes are prohibited; only `docs/evidence/t26/phase-d/mutation-scenarios.json` and
+the old capture algorithm may inform a fresh deterministic computation. Seeds are Freeze
+`49`, Bomb `90`, Multiplier `11`, and Collapse/Supergravity `163`. The exact pre-report set is:
+
+- twenty full-page PNGs named from each of `freeze`, `bomb`, `multiplier`, and `collapse`
+  plus `next`, `active-ghost`, `settled`, `clear`, and `activation`;
+- `deep-normal-desktop-freeze.png`, `deep-reduced-mobile-collapse.png`,
+  `mineral-normal-portrait-multiplier.png`, `mineral-reduced-mobile-bomb.png`,
+  `sunstone-normal-desktop-collapse.png`, and `sunstone-reduced-portrait-freeze.png`;
+- `material-semantic-audit.json`, `material-matrix-audit.json`, `browser-report.json`,
+  `ice-provenance-audit.json`, three `client-smoke/shot-*.png`, three
+  `client-smoke/state-*.json`, and `manifest.json`.
+
+That list is exactly 37 paths. The terminal set is exactly one
+`verification-report.json`. Commit the 37 pre-report files separately, then run the terminal
+verifier from that clean generated HEAD and commit only its report. Every authored/generated
+text byte is UTF-8 without BOM and LF-only; PNG is unfiltered binary. Manifest and terminal
+verification bind Git blobs, exact directory trees, exact linear histories, authorization,
+source/generated heads, the R5B terminal base, live product trees/blobs, fresh audits, and
+all output hashes.
+
+Semantic evidence uses the real Mutation entry and QA surface and captures all four complete
+materials in Next, active plus Ghost, settled, captured clear, and activation states. The six
+matrix cases cover all three themes, full/reduced motion, Chinese/English, and desktop,
+portrait, and mobile layouts. Every case requires one Canvas, zero DOM cells, matching
+canonical item/state/renderer data, 44 px controls where present, no overflow, and zero
+console/page/request errors. Lifecycle proof must demonstrate restart/theme/motion reuse,
+then UI exit and real re-entry replacement, plus Vite HMR without Canvas, renderer/ticker,
+AudioContext, frame-callback, or listener multiplication/leak.
+
+Ice provenance is fixed to product Ogg
+`src/assets/audio/t37/freeze-ice-cubes-hq.ogg`, SHA-256
+`5a68425717de348ba3d10767618fa4c428a97f26c2e85abc96f45b7bfb35a450`, `54564` bytes,
+and Git blob `12e767d2157f3ed2150a743ac2c161f8f99207f1`. The official catalog record is Freesound
+`819779 / sbml / Ice cubes / CC0`; playback uses window `0.19375–0.63375 s`, gain `0.78`,
+attack `3 ms`, and release `12 ms`. The uploader-original filename is recorded, but its
+SHA-256 is exactly `null` and its login-required acquisition stays **OPEN**. Product Ogg and
+preview bytes may never be relabelled as that original. This open provenance item and human
+material/audio judgment are deferred to the final consolidated review; automated proof is
+technical eligibility only.
+
+**Current next action:** implement and independently review the exact ten-file evidence
+source at base `1711812`, without browser/service/generation or product changes.
+
 ## Active objective
 
 ### 2026-08-15 Bomb R4A rejection and R5A familiar-language contract
