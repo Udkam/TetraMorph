@@ -3079,3 +3079,31 @@ unstaged.
 - `--expect-head` binds the final QA-only THREAD_LOG checkpoint exactly for both preflight and
   production; any later commit fails before claim. Next: commit R3 docs, obtain two fresh
   static reviews, then freeze/audit that final binding head before preflight.
+
+### F4E-R5 R3 rejection and R4 exact-byte candidate
+
+- R3 is rejected without preflight or production. Review A reports
+  `P0/P1/P2/P3/GAP = 0/1/2/0/0`: terminal could follow ChildProcess `error` before observed
+  close/reap, overflow still retained every pipe chunk, and only `NODE_*` names—not exact
+  value bytes/hashes—were frozen. Review B reports `0/2/0/0/0`: a direct worker could reuse or
+  forge an insufficient receipt, while replacement objects and local Git helpers remained
+  available. V5 attempt/candidate/terminal and all v5 stage paths remain absent.
+- R4 freezes at 55,930 strict UTF-8/LF/no-BOM bytes / SHA-256
+  `02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A`;
+  `node --check` passes. Exact Node environment values are pinned. Git now disables replace,
+  pager, fsmonitor, hooks, external diff/textconv and inherited PATH; rejects `.git` redirection,
+  replace refs, grafts, alternates, shallow/partial clone and executable/include config; and
+  rechecks its byte/config domain plus Core and all four authority docs after proof.
+- The nine-key attempt commits a random 32-byte capability, and run ID binds its hash. Raw
+  capability is sent only through worker stdin, which must end at exactly 32 bytes. Both
+  processes verify the full canonical attempt; worker repeats the check immediately before
+  candidate publication. This is continuity for an unchanged honest-coordinator receipt, not
+  same-user authentication. Same-permission create/delete/replace/manual worker/forged terminal
+  and path/history rebind are explicit governance violations, bound in `sourcePin` as
+  `honest-coordinator-no-same-permission-artifact-forgery-v1`.
+- Stdout/stderr retain at most 4 MiB for parsing and otherwise only incremental bytes/hash plus
+  a 4096-byte tail. ChildProcess/stdin/stdout/stderr errors and kill errors are recorded; none
+  bypasses the close wait. Terminal is impossible without observed close/reap, and its residual
+  process list is derived rather than asserted empty.
+- Next: commit exactly these four docs, then obtain two fresh all-zero static audits of the
+  exact R4 bytes. Do not run preflight or production before a later audited final-binding HEAD.

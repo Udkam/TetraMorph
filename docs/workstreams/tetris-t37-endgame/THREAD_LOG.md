@@ -672,3 +672,25 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   non-`./` and unbound Core import.
 - Next: commit these four R3 docs, obtain two new all-zero static reviews, then create and
   audit a THREAD_LOG-only final binding head. Production remains closed.
+
+### F4E-R5 R3 rejection and R4 command candidate
+
+- R3 `43,058 / 888EF45F...083B` is rejected before any preflight/production invocation.
+  Independent totals are `P0/P1/P2/P3/GAP = 0/1/2/0/0` and `0/2/0/0/0`: close/reap could
+  be bypassed by transport error, pipe retention was unbounded after overflow, exact Node
+  values were not frozen, direct-worker continuity was insufficient, and Git replace/helper
+  execution was open. All persistent v5 paths and stages remain absent.
+- R4 is 55,930 UTF-8/LF/no-BOM bytes / SHA-256
+  `02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A`.
+  Syntax passes. It freezes exact Node values; closes/rechecks Git replace, helper, config,
+  metadata, shallow/partial-clone, Core and authority-doc domains; and retains the sole private
+  captured-Core loader, worker spawn, and exact-certificate call.
+- Production attempt is now nine-key canonical receipt plus stdin-only 32-byte capability,
+  complete pre/post receipt verification, bounded incremental streams, error-safe close/reap,
+  and derived residual-process state. The capability provides honest-coordinator continuity,
+  not same-permission identity. Active same-user artifact/executable/history forgery is an
+  explicit governance violation recorded in source pin; candidate without the audited outer
+  success terminal remains integration-invalid.
+- Next: exact four-doc commit and two fresh independent all-zero static reviews. Only after a
+  subsequent THREAD_LOG-only binding commit and exact-HEAD command audit may preflight run.
+  Production remains closed.

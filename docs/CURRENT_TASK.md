@@ -326,19 +326,26 @@ independent exact-byte/AST/no-production-spawn reviews, `node --check`, a self-h
 one read-only preflight that creates no attempt/candidate/terminal and never invokes the exact
 certificate. Both reviews and preflight require
 `P0/P1/P2/P3/GAP = 0/0/0/0/0`. Preflight permits only the pinned direct Git binary with
-sanitized fixed arguments. Production additionally permits exactly one same-path/same-hash
-Node worker with fixed arguments and bounded pipes; the worker permits only that Git binary.
-Core executes from all 16 captured HEAD blobs through Node's built-in transform/private
-loader, never Vite, `node_modules`, or working-tree source.
+replacement objects, fsmonitor, hooks, external diff/textconv, partial clone, alternates,
+grafts, shallow state, include files, and executable local/worktree helpers fail-closed.
+Production additionally permits exactly one same-path/same-hash Node worker with fixed
+arguments and bounded pipes; the worker permits only that Git binary. Core executes from all
+16 captured HEAD blobs through Node's built-in transform/private loader, never Vite,
+`node_modules`, or working-tree source.
 
 Authority is the exact single-parent four-document union from `b177b20`, with one committed
 validator byte/hash marker and no consumption marker. Production exclusively creates and
-fsyncs the attempt before the worker's Core capture/loading/proof. Candidate uses exclusive
+fsyncs the complete attempt before the worker's Core capture/loading/proof. A random 32-byte
+capability is committed by hash in that receipt and sent raw only over anonymous stdin; it is
+an honest-coordinator continuity guard, not same-user authentication. Candidate uses exclusive
 staged fsync + no-replace hard-link publication; the worker never writes terminal. The audited
-outer validator waits for worker close, validates attempt/candidate/staging/output state, and
-atomically writes the terminal. Only a valid success terminal opens output audit. Any attempt-only, staged,
-candidate-without-success-terminal, or failed-terminal state is consumed failure. No retry,
-resume, beam, state cap, network, old artifact, or alternate search series is allowed.
+outer validator retains bounded incremental stream records, records every transport error,
+waits for close/reap, validates attempt/candidate/staging/output state, and only then atomically
+writes terminal. Only a valid success terminal opens output audit. Any attempt-only, staged,
+candidate-without-success-terminal, or failed-terminal state is consumed failure. Same-
+permission creation/replacement/manual worker/terminal forgery is an explicit governance
+violation outside the filesystem claim. No retry, resume, beam, state cap, network, old
+artifact, or alternate search series is allowed.
 
 The complete frozen invariants are those in the new `docs/DESIGN.md` v5 section: eight legal
 zero-clear setup drops; 32 bottom-four-row targets; per-row gaps `1..3` totaling eight;
@@ -350,10 +357,14 @@ later positive releases totaling four; zero remaining targets; primary 5-7 locks
 at most +2; and one uncapped exact primary certificate. Candidate review must rebuild every
 schema-8 hash and replay before the existing four-path Intro-05 integration opens.
 
-The frozen external validator is 43,058 UTF-8/LF bytes with SHA-256
-`888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B`.
+R3 at 43,058 bytes / `888EF45F...083B` is rejected without preflight at independent totals
+`0/1/2/0/0` and `0/2/0/0/0` for close/reap, truly bounded pipes, exact Node environment
+values, worker continuity, and Git replacement/helper gaps. Attempt/candidate/terminal remain
+absent. The frozen R4 external validator is 55,930 UTF-8/LF/no-BOM bytes with SHA-256
+`02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A`;
+`node --check` passes.
 
-**Current next action:** commit this four-document R3 correction/command marker; obtain two
+**Current next action:** commit this four-document R4 correction/command marker; obtain two
 all-zero exact-byte reviews; commit one THREAD_LOG-only final QA binding; audit that exact
 HEAD and command, run one all-zero no-write preflight at it, then consume one production
 attempt through the audited outer/worker state machine.

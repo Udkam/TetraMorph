@@ -136,18 +136,30 @@ The new validator embeds those values and does not load an old clue, validator, 
 candidate at runtime.
 
 V5 has a read-only `--preflight` mode and one production mode. Both bind their own exact
-UTF-8/LF bytes and SHA-256, fixed Node and direct Git executable identities, a frozen
-warning-only `execArgv`, the exact permitted `NODE_*` environment, literal external paths,
-and initially absent v5 candidate/attempt/terminal/staging namespaces. Preflight uses only
-the pinned Git binary with fixed argument arrays and a sanitized environment. Production's
-outer validator additionally starts exactly one same-path, same-hash Node worker with a fixed
-argument array, bounded stdout/stderr, no shell, and the same frozen environment; that worker
-may use only the pinned Git binary. There is no network, search-tool, old-validator, or other
-proof subprocess.
+UTF-8/LF bytes and SHA-256, fixed Node and direct Git executable byte identities, a frozen
+warning-only `execArgv`, and exactly two permitted `NODE_*` variables including their values'
+byte lengths and SHA-256. They also bind literal external paths and initially absent v5
+candidate/attempt/terminal/staging namespaces. Preflight uses only the pinned Git binary with
+fixed argument arrays and a sanitized allowlist environment. Production's outer validator
+additionally starts exactly one same-path, same-hash Node worker with a fixed argument array,
+bounded stdout/stderr, no shell, and the same frozen environment; that worker may use only the
+pinned Git binary. There is no network, search-tool, old-validator, or other proof subprocess.
+The exact environment records are
+`NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S` = 129 bytes /
+`36816623CF40FFD5A13F444AF68A441001F99ED8B21D0CD03B221914185FCEE1` and
+`NODE_REPL_TRUSTED_CODE_PATHS` = 25 bytes /
+`C99D703D69CE82B4803CEBB3E94F20CFB4D8F43A298C592018507394AD1B3A2D`.
 
 Repository authority is fail-closed: base `b177b20..captured HEAD` must be a single-parent
 chain whose every edge is non-renaming `M` on only the four governing documents and whose
-union is exactly those four paths. Current Core must be clean and retain the frozen tree.
+union is exactly those four paths. Current Core and all four governing documents must be
+clean before proof and again before publication. Git runs with replacement objects disabled
+in both arguments and environment, no pager or inherited `PATH`, fsmonitor/untracked-cache/
+hooks/external-diff disabled, and `--no-ext-diff --no-textconv` on every show/diff family
+command. A real in-root `.git` directory, identical common directory, no replace refs,
+grafts, alternates, shallow state/lock, partial clone/promisor, include, executable diff/
+filter, or helper-bearing local/worktree config are mandatory and rechecked after proof.
+Current Core must retain the frozen tree.
 The captured HEAD must contain exactly one command marker matching the validator's actual
 bytes/hash and no `F4E-R5-CONSUMED-V1` marker. The validator captures all 16 non-test Core
 Git blobs at that HEAD, rejects BOM/CR/extra imports, records each Git blob/raw hash and
@@ -155,7 +167,7 @@ Node-built-in transformed hash, and executes them through a private `registerHoo
 after `stripTypeScriptTypes`. Vite, repository config, `node_modules`, and working-tree Core
 bytes are outside the executed proof domain.
 
-F4E-R5-COMMAND-MARKER-V1 validatorBytes=43058 validatorSha256=888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B base=b177b206db3729ae37351c287b18afa35b7df54c coreTree=e9b3a3ed0d001072f5291a8fc841c1849e4db44f
+F4E-R5-COMMAND-MARKER-V1 validatorBytes=55930 validatorSha256=02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A base=b177b206db3729ae37351c287b18afa35b7df54c coreTree=e9b3a3ed0d001072f5291a8fc841c1849e4db44f
 
 Preflight may load captured Core and run bounded geometry/replay/admission checks, but it
 creates no persistent file and never invokes the uncapped certificate. Production repeats
@@ -172,7 +184,7 @@ run is permitted. The fixed production validator invocation is:
   --terminal 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v5.json' `
   --expect-repo-base 'b177b206db3729ae37351c287b18afa35b7df54c' `
   --expect-core-tree 'e9b3a3ed0d001072f5291a8fc841c1849e4db44f' `
-  --expect-validator-sha '888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B' `
+  --expect-validator-sha '02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A' `
   --expect-head '<FINAL_QA_BINDING_HEAD>'
 ```
 
@@ -209,26 +221,67 @@ bindings. Its 19 fixture keys are exactly `schemaVersion`, `campaignRevision`,
 
 Candidate publication uses an exclusive same-directory stage, file fsync, no-replace hard
 link, byte re-read, and mandatory successful stage removal. The proof worker never writes the
-terminal. The same audited validator's outer owner creates and fsyncs attempt, starts the
-same-byte worker, waits for its `close`, captures bounded stdout/stderr and exit status,
-validates the complete attempt and candidate bytes, and confirms zero candidate/terminal
-staging. It then atomically publishes terminal v5 through an exclusive same-directory staged
-fsync, no-replace hard link, byte re-read, and successful stage removal. Terminal always
-uses keys `schema,status,passed,startedAt,finishedAt,exitCode,sourcePin,attempt,candidate,stdout,stderr,stagingFiles,residualProcesses,reason`.
+terminal. The same audited validator's outer owner creates and fsyncs the nine-key attempt,
+including a SHA-256 commitment to a random 32-byte capability. Its run ID binds HEAD,
+validator, timestamp, and capability commitment. The raw capability exists only in outer
+memory and the anonymous worker stdin pipe; it never enters arguments, environment, receipt,
+candidate, terminal, or disk. Worker stdin must reach EOF at exactly 32 bytes, and both worker
+and outer verify the complete canonical attempt before accepting output.
+Attempt keys are exactly
+`schema,runId,claimedAt,sourcePin,clue,parameters,outputPath,terminalPath,workerCapabilitySha256`
+in that order.
 
-Only a reaped worker with `exitCode=0`, a valid complete candidate, zero staging residue, and terminal
-`status='succeeded' / passed=true` form an admissible success. A post-claim failure yields a
-failed terminal when the outer runner can publish it; `attempt` alone, `attempt+stage`, or
+The outer waits for the worker's `close`; ChildProcess and all three stdio errors are recorded
+without settling that wait. Stdout and stderr each retain at most 4 MiB for parsing, while
+incremental byte count/SHA-256 and only the last 4096 bytes continue after overflow; overflow
+requests one kill and successful output may not be truncated. Terminal publication is
+forbidden until `closeObserved=true` and `reaped=true`. It then atomically publishes terminal
+v5 through an exclusive same-directory staged fsync, no-replace hard link, byte re-read, and
+successful stage removal. Terminal keys are exactly
+`schema,status,passed,startedAt,finishedAt,exitCode,signal,sourcePin,attempt,candidate,workerLifecycle,stdout,stderr,stagingFiles,residualProcesses,reason`.
+Each stream record is exactly
+`bytes,sha256,boundedTailBase64,truncated,exceededOutputLimit`; lifecycle is exactly
+`pid,spawnError,stdinError,stdoutError,stderrError,killRequested,killResult,killError,closeObserved,reaped`.
+
+Only a reaped worker with `exitCode=0`, a valid complete candidate, zero staging residue, and
+terminal `status='succeeded' / passed=true` form an admissible success. A post-claim failure
+yields a failed terminal when the outer can publish it; `attempt` alone, `attempt+stage`, or
 `attempt+candidate` without a valid success terminal are consumed failure states and never
-open integration. Same-permission deletion or Git-history rewriting is an explicit governance
-trust boundary, not a claimed filesystem property. Immediately after output audit, the
-coordinator commits one `F4E-R5-CONSUMED-V1` hash receipt in THREAD_LOG; the validator rejects
-that durable marker on every later invocation.
+open integration.
+
+The capability is an honest-coordinator continuity/replay guard for the unchanged outer-owned
+receipt, not same-user origin authentication. Same-permission creation, deletion, replacement,
+manual `--worker`, forged terminal, executable/path rebind, nested metadata reparse, or Git
+history rewrite is an explicit governance violation outside the claimed filesystem threat
+model. Such a process could deny the run but cannot create an admissible result without also
+forging the required outer success terminal. This exact boundary is recorded in `sourcePin` as
+`honest-coordinator-no-same-permission-artifact-forgery-v1`; an OS-authenticated adversarial
+same-user claim would require a separately privileged broker and is not asserted here.
+Immediately after output audit, the coordinator commits one `F4E-R5-CONSUMED-V1` hash receipt
+in THREAD_LOG; the validator rejects that durable marker on every later invocation.
 
 Only after attempt, candidate, valid success terminal, process exit, and the committed
 consumption receipt receive independent byte, schema, replay, causal, admission, certificate,
 and state-machine review may integration change the four authorized Intro-05 paths.
 No live roster, persistence, UI, transition, sensory, icon, or Classic path opens in F4E-R5.
+
+#### R3 rejection and R4 exact-byte candidate
+
+R3 at 43,058 bytes / `888EF45F...083B` is rejected before preflight. One independent review
+reports `P0/P1/P2/P3/GAP = 0/1/2/0/0`: an error event could reach terminal before observed
+close/reap, pipe retention was not actually bounded after overflow, and `NODE_*` values were
+not frozen. The other reports `0/2/0/0/0`: direct worker replay/forged receipt was not bounded,
+and Git replacement/helper execution remained open. No v5 persistent path exists.
+
+R4 is frozen at 55,930 UTF-8/LF/no-BOM bytes with SHA-256
+`02439F7DC439CFEDD521719E06AC2930E101CE8E28BA1F0B3D893FBA15B48A4A`.
+It implements the exact Node-value pins, hardened/rechecked Git proof domain, full nine-key
+attempt and governance boundary, stdin-only capability continuity, bounded incremental pipe
+records, error-safe close/reap wait, derived residual-process state, and pre-publication
+attempt re-read described above. `node --check` passes; the exact certificate and worker spawn
+remain one site each. This is not yet execution authority: commit these four documents, obtain
+two fresh exact-byte all-zero reviews, create and audit a THREAD_LOG-only final binding HEAD,
+then and only then run the non-writing preflight.
 
 ### Remaining material, curriculum, and presentation contract
 
