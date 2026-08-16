@@ -10229,3 +10229,20 @@ all production sentinels remained zero and the consumed-v3 receipt stayed unchan
 Execution remains closed. Commit and independently review this exact four-document
 candidate, add only the required QA disposition to THREAD_LOG, then bind the resulting
 final HEAD and repeat the no-spawn preflight before the sole production invocation.
+
+## Current checkpoint — F4E-R6A memory-bounded exact frontier
+
+V5 is closed as an audited resource failure at receipt commit `77e2427`; its immutable
+attempt/terminal prove a default Node heap OOM, not an unsatisfiable Intro-05. Never rerun
+or repair v5 in place.
+
+The sole open implementation slice is the exact frontier-store infrastructure defined in
+`docs/DESIGN.md`. Add the optional Core store boundary, its source-compatible in-memory
+default, the Node-only 64 MiB external-sort/full-key-dedupe adapter, and focused equality,
+boundedness, and fault-cleanup tests. Do not run Intro-05 or any target-specific partial
+search. Do not edit Intro-05 definitions/fixtures, later curriculum, UI, audio, scoring,
+storage, or protected inherited paths in this checkpoint.
+
+Run focused tests while editing; after the last source change run typecheck, the complete
+suite, and build once. Browser evidence is not applicable. Produce a bounded candidate SHA
+and independent all-zero QA before opening a separate docs-first v6 proof contract.

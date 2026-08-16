@@ -737,3 +737,22 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   successor contract in a fresh v6 namespace. Any v6 attempt must pin its explicit heap
   execution domain and pass new static reviews, final-HEAD binding, and a no-write preflight;
   it is a new attempt, never a v5 retry. Intro-05 source remains closed.
+
+### F4E-R6A memory-bounded exact frontier contract candidate
+
+- Base is consumed-v5 receipt commit `77e2427`. V5 validator, attempt, and terminal stay
+  immutable; candidate is absent. This slice neither reruns v5 nor opens v6.
+- Current Core retains a whole current frontier plus a whole next-layer string `Set`; the
+  default-heap failure shows that representation is not a viable 46-certificate foundation.
+- The candidate contract opens exactly `src/game/core/endgameRouteSearch.ts`, one focused
+  Core test, `scripts/endgame-disk-frontier.mjs`, and one focused adapter test. Core receives
+  an optional store and keeps an in-memory default; browser/product behavior remains unchanged.
+- The authoring adapter writes complete canonical ASCII keys under an exact empty staging
+  directory, uses a 64 MiB raw-key chunk budget, deterministic sort/full-key dedupe, and
+  bounded k-way merge. Hash-only or lossy identity is forbidden.
+- Equality covers Intro-01 through Intro-04 and synthetic domains, including proof telemetry.
+  Fault matrices cover all I/O/finalize/dispose paths and require no certificate on failure.
+  Intro-05 and every partial or sampled variant remain prohibited during infrastructure QA.
+- Next: commit these four governing documents, obtain independent all-zero contract review,
+  implement the four-path infrastructure candidate, run focused plus final gates, and obtain
+  independent source QA. A separate docs-first v6 contract is the only later proof authority.

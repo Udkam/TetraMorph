@@ -9134,3 +9134,51 @@ and retain only the bound Git runner call. The reviewed harness completed the fu
 preflight in 52.5 seconds with the sole output
 `T37-R4L-NO-SPAWN-PREFLIGHT-PASS`; it created no v4 receipt, output, stage, or process.
 This materialization alone does not open production execution.
+
+## 2026-08-17 F4E-R6A — memory-bounded exact frontier infrastructure
+
+This section supersedes older F4E next-action text. V5 is permanently consumed by the
+audited default-heap failure recorded in `F4E-R5-CONSUMED-V1`; it produced no candidate
+and does not prove Intro-05 unsatisfiable. A v6 production attempt remains closed.
+
+Before v6, the renderer-independent exact certifier gains an optional frontier-store
+boundary. Core continues to own every proof decision in the same order: decode the full
+11-segment canonical state key, apply the existing target-column-deficit lower bound,
+enumerate the complete public-control landing domain, reject any shorter win before child
+pruning, apply the same child bound, and emit the same complete key. The default store keeps
+the current in-memory behavior and every existing call remains source-compatible.
+
+The Node-only authoring adapter stores only full canonical ASCII keys. It may not use a
+hash, board mask, target-row projection, probabilistic structure, or other lossy identity.
+It buffers a fixed 64 MiB raw-key budget, sorts and fully deduplicates each chunk, then
+performs a deterministic k-way full-byte merge into the next layer. Only a bounded chunk,
+one line per merge input, and bounded read/write buffers may be resident. Layer descriptors
+carry exact unique-key count; Core telemetry and certificate fields remain unchanged.
+
+The injected lifecycle is fail-closed. Core disposes the current layer after the next layer
+is finalized and closes the entire store on success or exception. The adapter owns one
+caller-supplied, already-empty staging directory; exclusive creation, regular-file checks,
+ASCII/LF framing, exact count, deterministic names, complete write/flush/close handling,
+and recursive *enumeration* are mandatory. Cleanup deletes only exact files created under
+that verified directory. Any open/read/write/sort/merge/close/count/cleanup fault propagates,
+cannot yield a certificate, and must be observable to a later terminal owner as residue or
+an explicit cleanup failure.
+
+The infrastructure checkpoint is limited to:
+
+- `src/game/core/endgameRouteSearch.ts`;
+- one focused Core frontier-store test;
+- `scripts/endgame-disk-frontier.mjs`;
+- one focused Node adapter test.
+
+Acceptance requires old-versus-injected certificate equality for Intro-01 through Intro-04
+and small synthetic definitions, including every telemetry field; deterministic chunk-order
+and duplicate collapse; multi-chunk k-way merge; full-key collision adversaries; bounded
+buffer accounting; and injected create/write/read/merge/close/cleanup failures. No test or
+diagnostic may run Intro-05, a partial Intro-05 depth, or target-specific sampling. This is
+proof infrastructure only, has no gameplay, renderer, storage, audio, score, or browser
+behavior change, and does not authorize v6.
+
+After focused and full automated gates plus independent all-zero QA, commit the infrastructure.
+Only then may a fresh docs-first v6 validator contract bind the new Core tree and adapter blob,
+new validator/candidate/attempt/terminal/staging schemas, and explicit runtime heap domain.

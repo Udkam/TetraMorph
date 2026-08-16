@@ -3107,3 +3107,19 @@ unstaged.
   process list is derived rather than asserted empty.
 - Next: commit exactly these four docs, then obtain two fresh all-zero static audits of the
   exact R4 bytes. Do not run preflight or production before a later audited final-binding HEAD.
+
+## 2026-08-17 current checkpoint — v5 consumed; memory-bounded frontier next
+
+- Receipt commit `77e2427` binds immutable v5 attempt `5209 / 2A9CA91B...28A1A8`, absent
+  candidate, terminal `6873 / EDF1BB23...9796AB`, worker exit 134, outer exit 1, complete
+  Node heap-OOM stderr, and zero stage/process residue. Two independent audits are each
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0` for the consumed-failure claim only.
+- V5 remains permanently consumed and Intro-05 source remains closed. The failure is not a
+  negative certificate and does not justify changing the frozen geometry or seven-lock routes.
+- Heap-only v6 is rejected as the primary recovery: the current full-string next-layer `Set`
+  has no reliable 8–12 GiB completion margin and does not scale to the final 46-level corpus.
+- F4E-R6A opens only source-compatible Core frontier injection plus a Node-only, full-key,
+  64 MiB chunked external-sort/k-way-merge adapter and focused equivalence/failure tests.
+  No Intro-05, partial-depth, or target-specific proof diagnostic is authorized.
+- Next action: commit and independently review this four-document contract, then implement
+  only its four-path infrastructure boundary and complete automated gates. V6 remains closed.
