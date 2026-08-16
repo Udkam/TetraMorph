@@ -138,9 +138,12 @@ candidate at runtime.
 V5 has a read-only `--preflight` mode and one production mode. Both bind their own exact
 UTF-8/LF bytes and SHA-256, fixed Node and direct Git executable identities, a frozen
 warning-only `execArgv`, the exact permitted `NODE_*` environment, literal external paths,
-and initially absent v5 candidate/attempt/terminal/staging namespaces. The only permitted
-child process is the pinned Git binary with fixed argument arrays and a sanitized environment;
-there is no shell, network, search-tool, validator, or proof subprocess.
+and initially absent v5 candidate/attempt/terminal/staging namespaces. Preflight uses only
+the pinned Git binary with fixed argument arrays and a sanitized environment. Production's
+outer validator additionally starts exactly one same-path, same-hash Node worker with a fixed
+argument array, bounded stdout/stderr, no shell, and the same frozen environment; that worker
+may use only the pinned Git binary. There is no network, search-tool, old-validator, or other
+proof subprocess.
 
 Repository authority is fail-closed: base `b177b20..captured HEAD` must be a single-parent
 chain whose every edge is non-renaming `M` on only the four governing documents and whose
@@ -152,7 +155,7 @@ Node-built-in transformed hash, and executes them through a private `registerHoo
 after `stripTypeScriptTypes`. Vite, repository config, `node_modules`, and working-tree Core
 bytes are outside the executed proof domain.
 
-F4E-R5-COMMAND-MARKER-V1 validatorBytes=35284 validatorSha256=4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950 base=b177b206db3729ae37351c287b18afa35b7df54c coreTree=e9b3a3ed0d001072f5291a8fc841c1849e4db44f
+F4E-R5-COMMAND-MARKER-V1 validatorBytes=43058 validatorSha256=888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B base=b177b206db3729ae37351c287b18afa35b7df54c coreTree=e9b3a3ed0d001072f5291a8fc841c1849e4db44f
 
 Preflight may load captured Core and run bounded geometry/replay/admission checks, but it
 creates no persistent file and never invokes the uncapped certificate. Production repeats
@@ -169,12 +172,16 @@ run is permitted. The fixed production validator invocation is:
   --terminal 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v5.json' `
   --expect-repo-base 'b177b206db3729ae37351c287b18afa35b7df54c' `
   --expect-core-tree 'e9b3a3ed0d001072f5291a8fc841c1849e4db44f' `
-  --expect-validator-sha '4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950'
+  --expect-validator-sha '888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B' `
+  --expect-head '<FINAL_QA_BINDING_HEAD>'
 ```
 
 The exact preflight adds `--preflight` and is otherwise byte-for-byte the same. Static review
 requires UTF-8/LF, `node --check`, exact byte/hash review, one production certificate-call
-site, no old family or non-Git spawn API, and no production invocation. Two independent
+site, one same-byte worker spawn site, no old family or other non-Git spawn API, and no
+production invocation. The final QA-only THREAD_LOG checkpoint supplies
+`FINAL_QA_BINDING_HEAD`; preflight and production both require exact equality to it, so any
+later commit fails before claim. Two independent
 reviews and the later no-write preflight must each report
 `P0/P1/P2/P3/GAP = 0/0/0/0/0` before the sole production command is authorized.
 
@@ -201,14 +208,15 @@ bindings. Its 19 fixture keys are exactly `schemaVersion`, `campaignRevision`,
 `lowerBoundVersion`, `exhaustedDepths`, `exploredStateCount`, and `transitionCount`.
 
 Candidate publication uses an exclusive same-directory stage, file fsync, no-replace hard
-link, byte re-read, and mandatory successful stage removal. The validator never writes the
-terminal. The coordinator-owned outer runner waits for the validator process to exit, captures
-bounded stdout/stderr and exit status, validates the complete attempt and candidate bytes,
-confirms zero candidate/terminal staging and no matching process, then atomically publishes
-terminal v5 through an exclusive same-directory stage and no-replace move. Terminal always
+link, byte re-read, and mandatory successful stage removal. The proof worker never writes the
+terminal. The same audited validator's outer owner creates and fsyncs attempt, starts the
+same-byte worker, waits for its `close`, captures bounded stdout/stderr and exit status,
+validates the complete attempt and candidate bytes, and confirms zero candidate/terminal
+staging. It then atomically publishes terminal v5 through an exclusive same-directory staged
+fsync, no-replace hard link, byte re-read, and successful stage removal. Terminal always
 uses keys `schema,status,passed,startedAt,finishedAt,exitCode,sourcePin,attempt,candidate,stdout,stderr,stagingFiles,residualProcesses,reason`.
 
-Only `exitCode=0`, a valid complete candidate, zero staging/process residue, and terminal
+Only a reaped worker with `exitCode=0`, a valid complete candidate, zero staging residue, and terminal
 `status='succeeded' / passed=true` form an admissible success. A post-claim failure yields a
 failed terminal when the outer runner can publish it; `attempt` alone, `attempt+stage`, or
 `attempt+candidate` without a valid success terminal are consumed failure states and never

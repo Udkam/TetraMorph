@@ -659,3 +659,16 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   also requires a committed `F4E-R5-CONSUMED-V1` receipt after independent output audit.
 - Next: commit the corrected four docs, obtain two all-zero byte/AST reviews and one all-zero
   no-write preflight. Production remains closed.
+
+### F4E-R5 R2 rejection and R3 exact-byte candidate
+
+- R2 `4BFCCB...D950` is rejected at `P0/P1/P2/P3/GAP = 0/1/1/0/1`: it lacked a
+  frozen outer terminal owner, allowed non-local loader delegation, and drifted during review.
+  It never ran preflight or production; all three output/receipt paths remain absent.
+- R3 validator is 43,058 bytes / SHA-256
+  `888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B`.
+  One audited outer process owns attempt/worker/terminal; one same-byte worker owns captured
+  Core proof/candidate only. Both use exact `--expect-head`; the private loader rejects every
+  non-`./` and unbound Core import.
+- Next: commit these four R3 docs, obtain two new all-zero static reviews, then create and
+  audit a THREAD_LOG-only final binding head. Production remains closed.

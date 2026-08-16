@@ -325,16 +325,18 @@ The v5 source is created outside the repository. Before production it must pass 
 independent exact-byte/AST/no-production-spawn reviews, `node --check`, a self-hash check, and
 one read-only preflight that creates no attempt/candidate/terminal and never invokes the exact
 certificate. Both reviews and preflight require
-`P0/P1/P2/P3/GAP = 0/0/0/0/0`. The only validator child process is the pinned direct Git
-binary with sanitized fixed arguments. Core executes from all 16 captured HEAD blobs through
-Node's built-in transform/private loader, never Vite, `node_modules`, or working-tree source.
+`P0/P1/P2/P3/GAP = 0/0/0/0/0`. Preflight permits only the pinned direct Git binary with
+sanitized fixed arguments. Production additionally permits exactly one same-path/same-hash
+Node worker with fixed arguments and bounded pipes; the worker permits only that Git binary.
+Core executes from all 16 captured HEAD blobs through Node's built-in transform/private
+loader, never Vite, `node_modules`, or working-tree source.
 
 Authority is the exact single-parent four-document union from `b177b20`, with one committed
 validator byte/hash marker and no consumption marker. Production exclusively creates and
-fsyncs the attempt before Core capture/loading/proof. Candidate uses exclusive staged fsync +
-no-replace hard-link publication; the validator never writes terminal. The outer owner waits
-for process exit, validates attempt/candidate/staging/process state, and atomically writes the
-terminal. Only a valid success terminal opens output audit. Any attempt-only, staged,
+fsyncs the attempt before the worker's Core capture/loading/proof. Candidate uses exclusive
+staged fsync + no-replace hard-link publication; the worker never writes terminal. The audited
+outer validator waits for worker close, validates attempt/candidate/staging/output state, and
+atomically writes the terminal. Only a valid success terminal opens output audit. Any attempt-only, staged,
 candidate-without-success-terminal, or failed-terminal state is consumed failure. No retry,
 resume, beam, state cap, network, old artifact, or alternate search series is allowed.
 
@@ -348,12 +350,13 @@ later positive releases totaling four; zero remaining targets; primary 5-7 locks
 at most +2; and one uncapped exact primary certificate. Candidate review must rebuild every
 schema-8 hash and replay before the existing four-path Intro-05 integration opens.
 
-The frozen external validator is 35,284 UTF-8/LF bytes with SHA-256
-`4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950`.
+The frozen external validator is 43,058 UTF-8/LF bytes with SHA-256
+`888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B`.
 
-**Current next action:** commit this four-document correction/command marker; obtain two
-all-zero exact-byte reviews of the new validator and one all-zero no-write preflight; then
-consume exactly one production attempt through the outer terminal owner.
+**Current next action:** commit this four-document R3 correction/command marker; obtain two
+all-zero exact-byte reviews; commit one THREAD_LOG-only final QA binding; audit that exact
+HEAD and command, run one all-zero no-write preflight at it, then consume one production
+attempt through the audited outer/worker state machine.
 
 ## Active objective
 

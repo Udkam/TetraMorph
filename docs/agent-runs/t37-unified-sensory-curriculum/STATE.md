@@ -3063,3 +3063,19 @@ unstaged.
   receipt closes the deletion/retry governance boundary before source integration.
 - Next: commit this exact four-document correction, obtain two fresh static reviews, then one
   no-write preflight. Production remains closed meanwhile.
+
+### F4E-R5 R2 rejection and R3 outer-owner candidate
+
+- R2 35,284-byte / `4BFCCB...D950` review is rejected at
+  `P0/P1/P2/P3/GAP = 0/1/1/0/1`: no executable outer terminal owner existed, the custom
+  loader delegated non-`./` imports, and bytes drifted during review. No preflight/production
+  ran; attempt/candidate/terminal remain absent.
+- R3 is 43,058 bytes / SHA-256
+  `888EF45F638DB072A0EFBA06869B1FA10BD31EAA8D0E323E3593F809F46A083B`.
+  The audited outer validator writes attempt, starts exactly one same-byte worker, waits for
+  close, validates candidate and bounded output, then atomically writes terminal. The worker
+  alone runs the exact certificate and cannot write terminal. Core imports now reject every
+  non-local or unbound specifier.
+- `--expect-head` binds the final QA-only THREAD_LOG checkpoint exactly for both preflight and
+  production; any later commit fails before claim. Next: commit R3 docs, obtain two fresh
+  static reviews, then freeze/audit that final binding head before preflight.
