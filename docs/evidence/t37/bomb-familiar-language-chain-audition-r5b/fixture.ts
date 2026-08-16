@@ -2,11 +2,14 @@ import { BOARD_HEIGHT, BOARD_WIDTH, LINE_CLEAR_DELAY_TICKS, VISIBLE_START_ROW, c
 import { mutationChainPresentationPlan } from '../../../../src/animation/mutationChainTimeline';
 import { MUTATION_VFX_TOKENS } from '../../../../src/design/mutationTokens';
 import { TetrisRenderer } from '../../../../src/game/render/TetrisRenderer';
+import type { Application, Ticker } from 'pixi.js';
 
 export type Variant = 'A' | 'B' | 'C';
 export type Scene = 'normal' | 'chain';
 type Bomb = Extract<GameEvent, { type: 'mutation-activated'; item: 'bomb' }>;
 type Chain = Extract<Bomb, { bombOutcome: 'chain-clear' }>;
+type RendererInternals = { app: Application | null };
+let nextTickerIdentity = 0;
 
 function ok(value: unknown, message: string): asserts value { if (!value) throw new Error(message); }
 function commit(state: GameState) {
@@ -42,6 +45,11 @@ export function reviewDurationMs(scene: Scene, reduced: boolean): number { retur
 
 export class ProductRendererSession {
   private renderer: TetrisRenderer | null = null;
+  private pixiApplication: Application | null = null;
+  private ticker: Ticker | null = null;
+  private tickerIdentity = 0;
+  private tickerInitialListenerCount = 0;
+  private tickerDestroyed = false;
   private scene: Scene | null = null;
   private reduced = false;
   private elapsed = 0;
@@ -58,7 +66,14 @@ export class ProductRendererSession {
     renderer.setOptions({ visualTheme: 'deep-tide', reducedMotion: false, modeSwitch: false });
     await renderer.init(this.host);
     if (this.disposed) { renderer.destroy(); return; }
+    const application = (renderer as unknown as RendererInternals).app;
+    ok(application?.ticker, 'Production Renderer did not retain its Pixi Application ticker.');
     this.renderer = renderer;
+    this.pixiApplication = application;
+    this.ticker = application.ticker;
+    this.tickerIdentity = ++nextTickerIdentity;
+    this.tickerInitialListenerCount = application.ticker.count;
+    ok(application.ticker.started && application.ticker.count > 0, 'Production Pixi ticker must be started with real listeners.');
     renderer.render(FIXTURES.normal.hardDropState, [{ type: 'restarted' }], 0);
     ok(this.host.querySelectorAll('canvas').length === 1, 'Renderer must own one Canvas.');
     this.changed();
@@ -125,7 +140,12 @@ export class ProductRendererSession {
   }
   state() {
     const snapshot = this.renderer?.getSnapshot();
-    return { ready: !!this.renderer && !this.disposed, disposed: this.disposed, scene: this.scene, reducedMotion: this.reduced, elapsedMs: this.elapsed, frameCallbacks: this.raf === null ? 0 : 1, settledCount: this.settledCount, tickerOwners: this.renderer ? 1 : 0, rendererOwners: this.renderer ? 1 : 0, canvasCount: this.host.querySelectorAll('canvas').length, particles: snapshot?.mutationActiveParticleCount ?? 0 };
+    const ticker = this.ticker;
+    const tickerApplicationBound = !!ticker && this.pixiApplication?.ticker === ticker;
+    const tickerListenerCount = ticker?.count ?? 0;
+    const tickerStarted = ticker?.started ?? false;
+    const tickerLive = tickerApplicationBound && !this.tickerDestroyed && tickerStarted && tickerListenerCount > 0;
+    return { ready: !!this.renderer && !this.disposed, disposed: this.disposed, scene: this.scene, reducedMotion: this.reduced, elapsedMs: this.elapsed, frameCallbacks: this.raf === null ? 0 : 1, settledCount: this.settledCount, tickerOwners: tickerLive ? 1 : 0, tickerObserved: !!ticker, tickerIdentity: this.tickerIdentity, tickerApplicationBound, tickerListenerCount, tickerInitialListenerCount: this.tickerInitialListenerCount, tickerStarted, tickerDestroyed: this.tickerDestroyed, rendererOwners: this.renderer ? 1 : 0, canvasCount: this.host.querySelectorAll('canvas').length, particles: snapshot?.mutationActiveParticleCount ?? 0 };
   }
   fixtureState() {
     const chain = FIXTURES.chain.activation as Chain;
@@ -135,8 +155,12 @@ export class ProductRendererSession {
     if (this.disposed) return;
     this.stop();
     this.disposed = true;
+    const ticker = this.ticker;
     this.renderer?.destroy();
+    this.pixiApplication = null;
     this.renderer = null;
+    if (ticker) ok(ticker.count === 0 && !ticker.started, 'Destroyed Pixi ticker retained listeners or remained started.');
+    this.tickerDestroyed = !!ticker;
     this.host.replaceChildren();
     this.changed();
   }
