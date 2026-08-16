@@ -105,6 +105,75 @@ status `OPEN / login required`; neither the product Ogg nor a preview may impers
 Automated material eligibility and Ice byte/provenance integrity join the final consolidated
 human visual/listening review and do not claim a new subjective acceptance here.
 
+### Material terminal disposition and F4E-R5 v5 generation contract
+
+The current-head material proof is technically closed. Recovery source `da8ded9`, fresh
+pre-report output `3a0078a`, and report-only terminal commit
+`b177b206db3729ae37351c287b18afa35b7df54c` form the accepted linear record. The terminal
+verifier passes `407/407`; independent terminal review reports
+`P0/P1/P2/P3 = 0/0/0/0`. The product `src` tree and Core tree remain unchanged from the
+R5B terminal. Human material judgment and the login-gated uploader-original Ice WAV remain
+`OPEN / NOT ACCEPTED` for the final consolidated review.
+
+F4E-R5 therefore adopts repository base `b177b206db3729ae37351c287b18afa35b7df54c`
+and Core tree `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`. All v1-v4 validator,
+candidate, attempt, terminal, wrapper, and production-search authorities remain consumed or
+rejected and may not be read as proof, executed, patched, or copied into v5. V5 is a fresh,
+self-contained external implementation with exactly these persistent paths:
+
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v5.mjs`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v5.json`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v5.json`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v5.json`.
+
+The reviewed 633-byte clue is re-frozen as data, not as proof: `t3r-shaft-04` / `后手` /
+difficulty `5`, target rows `4`, gameplay seed `3887`, setup seed `37220`, placements
+`I0@5,T0@2,S0@4,L0@0,J2@7,Z0@2,O0@0,L2@7`, primary route
+`SQLHTTTQLHTTTCLLHTTTRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRHTTTTTTTTTTTTLLLLHTTTTTTTTTTTT`,
+and alternative route
+`SQLHTTTQLHTTTQLHTTTRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRHTTTTTTTTTTTTLLLLHTTTTTTTTTTTT`.
+The new validator embeds those values and does not load an old clue, validator, receipt, or
+candidate at runtime.
+
+V5 has a read-only `--preflight` mode and one production mode. Both bind their own exact
+UTF-8/LF bytes and SHA-256, repository base ancestry, the captured pre/post HEAD, the exact
+Core tree and clean Core worktree, config-free in-process Vite loading, fixed path arguments,
+and initially absent v5 candidate/attempt/terminal paths. Preflight may load and reconcile
+current Core and run bounded geometry/replay/admission checks, but it creates no persistent
+file and never invokes the uncapped certificate. Production repeats the cheap pins, then
+exclusively creates and synchronizes the immutable attempt receipt before any Core load or
+proof. Any post-claim failure consumes v5; no retry or replacement is permitted.
+
+The validator must have no child-process, shell, network, resume, checkpoint, beam, state-cap,
+or old-artifact path. Static review requires UTF-8/LF, `node --check`, exact byte/hash review,
+AST confirmation of one production certificate call and no process-spawn API, plus a no-write
+preflight. Two independent reviews must each report all-zero P0-P3 before the sole production
+command is authorized.
+
+Production rebuilds the eight legal zero-clear setup drops and exactly 32 targets in rows
+36-39, with each row gap count in `1..3` and total gaps `8`. It rejects exact, topology, and
+near-topology matches against all 50 live definitions plus the four frozen drafts and requires
+the gameplay seed to be unique across those 54 comparisons. Each route is reconstructed
+lock-by-lock through a unique `exhaustiveEndgameLandings` result. Both use literal
+Current/Next-1/Next-2 for their first three locks with releases `[0,0,0]`, share lock 1,
+first diverge at lock 2 or 3, and prove both complete nonempty remove-then-descend blocker
+ownership chains. Later releases contain at least two positive events, total four, and end
+with zero target cells. Primary length is 5-7 and the alternative is at most two locks longer.
+
+Only `certifyOptimalEndgameRouteForDefinition` over the complete public landing domain may
+produce the primary certificate. On success, candidate v5 contains the deterministic
+schema-8 fixture plus source, validator, geometry, admission, causal, replay, and certificate
+bindings. Its fixture field order is the frozen 20-key Intro schema and its proof field order
+is the frozen five-key schema. Candidate publication is exclusive/no-replace. Terminal v5 is
+then exclusively published and binds the attempt bytes, candidate bytes/hash, captured HEAD,
+Core tree, validator hash, and `passed: true`. Failure writes no candidate and, when possible,
+an exclusive `passed: false` terminal bound to the attempt; the attempt alone is sufficient
+to prove consumption if terminal publication itself fails.
+
+After a complete candidate receives independent byte, schema, replay, causal, admission, and
+certificate review, integration may change only the four already authorized Intro-05 paths.
+No live roster, persistence, UI, transition, sensory, icon, or Classic path opens in F4E-R5.
+
 ### Remaining material, curriculum, and presentation contract
 
 1. **D2B motion.** After the final 46-level library is live, category release is

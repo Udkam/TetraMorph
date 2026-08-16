@@ -3020,3 +3020,25 @@ unstaged.
 - Unique next action: commit this docs disposition/authorization, obtain read-only docs
   QA, then let one evidence writer create only the source allowlist and stop before any
   generated output.
+
+## 2026-08-17 current checkpoint — Material closed; F4E-R5 v5 generation open
+
+- Material/Ice terminal HEAD is `b177b206db3729ae37351c287b18afa35b7df54c`; source is
+  `da8ded9`, regenerated pre-report is `3a0078a`, terminal verification is `407/407`, and
+  independent terminal QA is `P0/P1/P2/P3 = 0/0/0/0`. Product/Core stayed frozen. Human
+  material/audio judgment and original-WAV acquisition remain open for final review.
+- F4E-R5 adopts that HEAD and Core tree
+  `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`. All four v5 external paths are absent.
+  Older validator/candidate/attempt/terminal families and old production search tools remain
+  consumed or rejected and have no execution/proof authority.
+- The new docs contract re-freezes the candidate geometry and two physical-pose routes as
+  clue data only. A fresh self-contained v5 validator must derive the board, all 54 admission
+  comparisons, both exhaustive route replays and support chains, canonical hashes, and the
+  uncapped primary certificate from current Core.
+- V5 has one non-writing, non-certifying preflight and exactly one production claim. The
+  attempt receipt is exclusive and precedes Core loading/proof. Candidate and terminal are
+  exclusive outputs; any post-claim failure consumes the attempt. Static acceptance requires
+  two independent byte/AST/no-spawn reviews with P0-P3 all zero.
+- Exact next action: commit the four-document contract, generate only external validator-v5,
+  freeze its bytes/hash and command, obtain the two reviews and green preflight, then run the
+  sole production attempt. Intro-05 source remains closed until candidate audit passes.

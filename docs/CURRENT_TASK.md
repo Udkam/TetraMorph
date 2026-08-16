@@ -299,6 +299,48 @@ final consolidated review.
 seven-path hardening source, and obtain independent zero-finding pre-candidate QA before any
 Material/Ice browser generation.
 
+### 2026-08-17 material terminal closure and F4E-R5 v5 authorization
+
+Material/Ice is technically complete at terminal commit
+`b177b206db3729ae37351c287b18afa35b7df54c`. Its regenerated pre-report input is
+`3a0078a`, evidence source is `da8ded9`, terminal verification passes `407/407`, and an
+independent review reports `P0/P1/P2/P3 = 0/0/0/0`. Product source and Core did not change.
+Human material/audio judgment and the uploader-original Ice WAV remain exactly
+`OPEN / NOT ACCEPTED — final consolidated human review only`.
+
+F4E-R5 now binds base `b177b206db3729ae37351c287b18afa35b7df54c` and Core tree
+`e9b3a3ed0d001072f5291a8fc841c1849e4db44f`. The only new external namespace is:
+
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v5.mjs`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v5.json`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v5.json`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v5.json`.
+
+All four are absent before generation. V1-v4 and old tiling-first production authorities
+remain consumed and are not execution or proof inputs. A fresh self-contained v5 validator
+may embed only the re-frozen clue values in `docs/DESIGN.md`; it must rebuild all board,
+route, causal, admission, state/hash, and uncapped certificate results from current Core.
+
+The v5 source is created outside the repository. Before production it must pass two
+independent exact-byte/AST/no-spawn reviews, `node --check`, a self-hash check, and one
+read-only preflight that creates no attempt/candidate/terminal and never invokes the exact
+certificate. The production attempt exclusively creates the immutable attempt receipt before
+Core loading or proof. Success exclusively publishes candidate then terminal; failure leaves
+candidate absent and consumes the attempt. No retry, resume, beam, state cap, child process,
+network, old artifact, or alternate search series is allowed.
+
+The complete frozen invariants are those in the new `docs/DESIGN.md` v5 section: eight legal
+zero-clear setup drops; 32 bottom-four-row targets; per-row gaps `1..3` totaling eight;
+54-way exact/topology/near-topology rejection and unique seed; unique exhaustive landing
+reconstruction; first-three `[0,0,0]`; two complete nonempty support chains; at least two
+later positive releases totaling four; zero remaining targets; primary 5-7 locks; alternative
+at most +2; and one uncapped exact primary certificate. Candidate review must rebuild every
+schema-8 hash and replay before the existing four-path Intro-05 integration opens.
+
+**Current next action:** commit this four-document v5 generation contract; create only the
+external validator; freeze its exact bytes/hash and command; obtain two all-zero static
+reviews and a green no-write preflight; then consume exactly one production attempt.
+
 ## Active objective
 
 ### 2026-08-15 Bomb R4A rejection and R5A familiar-language contract

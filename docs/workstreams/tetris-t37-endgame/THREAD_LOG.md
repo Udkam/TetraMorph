@@ -627,3 +627,20 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   recovery requires a fresh successor contract; it may not reuse or replay this command.
 - The player next opens precise `0.60 -> 0.08 s/cell` Classic/Mutation gravity, `0.80`
   Ice, row-causal Bomb bands, and Bomb-on-Bomb chain clear. Survival is design-output only.
+
+### F4E-R5 v5 generation contract
+
+- Base is Material terminal `b177b206db3729ae37351c287b18afa35b7df54c`; Core tree is
+  unchanged at `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`.
+- Material/Ice technical proof is closed at `407/407` with independent
+  `P0/P1/P2/P3 = 0/0/0/0`; subjective review remains deferred.
+- Validator/candidate/attempt/terminal v5 are a fresh four-path external namespace and are
+  all absent. V1-v4 remain consumed or rejected and are not proof or execution inputs.
+- The candidate geometry and two seven-lock route strings are frozen only as clue data. V5
+  must rederive every setup, admission, replay, two-hop support, hash, and uncapped certificate
+  result through current Core.
+- One non-writing preflight precedes one exclusive production attempt. Two independent
+  byte/AST/no-spawn reviews must be all-zero before that attempt. Failure consumes v5.
+- Next: commit this four-document contract, create/freeze only external validator-v5, review
+  exact bytes and command, then run the sole attempt. The four Intro-05 source paths remain
+  closed until independent candidate audit succeeds.
