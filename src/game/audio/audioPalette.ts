@@ -1,6 +1,5 @@
 import type { AudioBus } from './audioGesture';
 import type { AcceptedActionTone } from './acceptedPlayback';
-import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 
 /**
  * Stage-C production candidates recovered from the intact pre-T29 T28 snapshot.
@@ -10,7 +9,7 @@ export type CandidateAudioCueId =
   | 'soft-drop' | 'endgame-undo'
   | 'bedrock-rise' | 'bedrock-lower' | 'stone-warning' | 'stone-spawn' | 'stone-land'
   | 'level-up' | 'finished' | 'game-over' | 'pause' | 'resume'
-  | 'supergravity' | 'bomb' | 'bomb-chain' | 'multiplier-2' | 'multiplier-4';
+  | 'supergravity' | 'multiplier-2' | 'multiplier-4';
 
 export interface CandidateAirLayer {
   readonly duration: number;
@@ -52,10 +51,6 @@ const gesture = (
 ): CandidateAudioCue => ({ bus, tones, ...options });
 
 const BRIGHT_PARTIAL_RATIO = 2.01;
-const BOMB_IMPACT_DELAY_SECONDS = (
-  MUTATION_VFX_TOKENS.bomb.animation.enterMs
-  + MUTATION_VFX_TOKENS.bomb.animation.pulseMs
-) / 1_000;
 
 const marimbaStrike = (frequency: number, gain: number, delay: number): readonly AcceptedActionTone[] => [
   tone(frequency, 0.145, gain, { delay, waveform: 'triangle' }),
@@ -112,40 +107,6 @@ const PALETTE: Readonly<Record<CandidateAudioCueId, CandidateAudioCue>> = {
     tone(148, 0.09, 0.25, { attack: 0.008 }),
     tone(93, 0.12, 0.17, { delay: 0.018, attack: 0.009 }),
   ], { mutationOwned: true }),
-  bomb: gesture('mutation', [
-    tone(74, BOMB_IMPACT_DELAY_SECONDS, 0.16, { attack: 0.035 }),
-    tone(111, 0.22, 0.34, {
-      delay: BOMB_IMPACT_DELAY_SECONDS,
-      endFrequency: 48,
-      attack: 0.006,
-    }),
-    tone(55, 0.255, 0.105, {
-      delay: BOMB_IMPACT_DELAY_SECONDS + 0.015,
-      endFrequency: 42,
-      attack: 0.014,
-    }),
-  ], {
-    mutationOwned: true,
-    air: [{
-      duration: 0.12,
-      gain: 0.17,
-      delay: BOMB_IMPACT_DELAY_SECONDS,
-      cutoff: 880,
-      q: 0.55,
-      attack: 0.004,
-    }],
-  }),
-  'bomb-chain': gesture('mutation', [
-    tone(58, 0.42, 0.24, { endFrequency: 34, attack: 0.012 }),
-    tone(91, 0.28, 0.38, { delay: 0.11, endFrequency: 41, attack: 0.005 }),
-    tone(43, 0.37, 0.17, { delay: 0.12, endFrequency: 29, attack: 0.016 }),
-  ], {
-    mutationOwned: true,
-    air: [
-      { duration: 0.22, gain: 0.24, delay: 0.1, cutoff: 1_050, q: 0.48, attack: 0.003 },
-      { duration: 0.3, gain: 0.12, delay: 0.18, cutoff: 460, q: 0.42, attack: 0.012 },
-    ],
-  }),
   'multiplier-2': gesture('mutation', [
     ...marimbaStrike(523.25, 0.165, 0),
     ...marimbaStrike(659.25, 0.145, 0.052),

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { scheduleChainPropagationPulses, scheduleRecoveredNoisePuff } from './candidatePlayback';
+import { scheduleRecoveredNoisePuff } from './candidatePlayback';
 
 class FakeParam {
   value = 0;
@@ -33,11 +33,6 @@ class FakeSource extends FakeNode {
   start(at: number): void { this.starts.push(at); }
   stop(at: number): void { this.stops.push(at); }
 }
-class FakeOscillator extends FakeSource {
-  type: OscillatorType = 'sine';
-  readonly frequency = new FakeParam();
-}
-
 describe('recovered candidate playback', () => {
   it('reproduces a deterministic low-passed pressure puff and cleans it up', () => {
     const samples = new Float32Array(480);
@@ -84,31 +79,5 @@ describe('recovered candidate playback', () => {
     expect(filter.disconnected).toBe(true);
     expect(gain.disconnected).toBe(true);
     expect(ended).toHaveBeenCalledWith(voice);
-  });
-
-  it('schedules every chain distance beat on one cancellable voice', () => {
-    const oscillator = new FakeOscillator();
-    const gain = new FakeGain();
-    const context = {
-      currentTime: 2,
-      createOscillator: () => oscillator as unknown as OscillatorNode,
-      createGain: () => gain as unknown as GainNode,
-    } as unknown as AudioContext;
-    const offsets = Array.from({ length: 20 }, (_, index) => .14 + index * .034);
-
-    const voice = scheduleChainPropagationPulses(context, new FakeNode() as unknown as AudioNode, {
-      startAt: 2,
-      beatOffsetsSeconds: offsets,
-      gain: .036,
-      gainBoost: 1.45,
-      gainCeiling: .5,
-    });
-
-    expect(oscillator.starts).toEqual([2]);
-    expect(oscillator.frequency.set).toHaveLength(20);
-    expect(oscillator.frequency.set.at(-1)?.time).toBeCloseTo(2 + offsets.at(-1)!);
-    expect(gain.gain.ramps).toHaveLength(40);
-    voice?.stop(2.2);
-    expect(oscillator.stops).toContain(2.2);
   });
 });

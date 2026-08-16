@@ -6,11 +6,10 @@ import {
   cueEnergy,
   type CandidateAudioCueId,
 } from './audioPalette';
-import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 
 describe('T37 recovered soft support palette', () => {
-  it('keeps all seventeen candidate cues bounded and separate from accepted playback', () => {
-    expect(AUDIO_CUE_IDS).toHaveLength(17);
+  it('keeps all fifteen candidate cues bounded and separate from accepted playback', () => {
+    expect(AUDIO_CUE_IDS).toHaveLength(15);
     expect(AUDIO_CUE_IDS).not.toEqual(expect.arrayContaining([
       'move', 'rotate', 'lock', 'hard-drop',
       'clear-1', 'clear-2', 'clear-3', 'clear-4',
@@ -79,34 +78,6 @@ describe('T37 recovered soft support palette', () => {
 
   it('gives every remaining Mutation a distinct material-bound one-shot', () => {
     expect(audioCue('supergravity').tones.map((layer) => layer.frequency)).toEqual([148, 93]);
-    const bombImpactSeconds = (
-      MUTATION_VFX_TOKENS.bomb.animation.enterMs
-      + MUTATION_VFX_TOKENS.bomb.animation.pulseMs
-    ) / 1_000;
-    expect(bombImpactSeconds).toBe(0.22);
-    expect(audioCue('bomb').tones).toEqual([
-      expect.objectContaining({
-        frequency: 74, duration: 0.22, gain: 0.16, attack: 0.035, waveform: 'sine',
-      }),
-      expect.objectContaining({
-        frequency: 111, endFrequency: 48, delay: bombImpactSeconds,
-        duration: 0.22, gain: 0.34, attack: 0.006, waveform: 'sine',
-      }),
-      expect.objectContaining({
-        frequency: 55, endFrequency: 42, delay: 0.235,
-        duration: 0.255, gain: 0.105, attack: 0.014, waveform: 'sine',
-      }),
-    ]);
-    expect(audioCue('bomb').air).toEqual([
-      expect.objectContaining({
-        cutoff: 880, q: 0.55, attack: 0.004,
-        duration: 0.12, gain: 0.17, delay: bombImpactSeconds,
-      }),
-    ]);
-    expect(cueDuration(audioCue('bomb'))).toBeCloseTo(0.49);
-    expect(cueDuration(audioCue('bomb'))).toBeLessThan(
-      MUTATION_VFX_TOKENS.bomb.animation.activationMs / 1_000,
-    );
     expect(audioCue('multiplier-2').tones).toHaveLength(4);
     expect(audioCue('multiplier-4').tones).toHaveLength(6);
     expect(audioCue('multiplier-2').tones.map((layer) => layer.waveform)).toEqual([
@@ -118,9 +89,6 @@ describe('T37 recovered soft support palette', () => {
       expect(audioCue(id).mutationOwned).toBe(true);
       expect(cueDuration(audioCue(id)), id).toBeLessThan(0.3);
     }
-    expect(audioCue('bomb').mutationOwned).toBe(true);
-    expect(audioCue('bomb-chain').mutationOwned).toBe(true);
-    expect(cueDuration(audioCue('bomb-chain'))).toBeCloseTo(.49);
   });
 
   it('keeps all gameplay, reward, Endgame, Survival, and UI candidates represented', () => {
@@ -128,7 +96,7 @@ describe('T37 recovered soft support palette', () => {
       'soft-drop', 'endgame-undo',
       'bedrock-rise', 'bedrock-lower', 'stone-warning', 'stone-spawn', 'stone-land',
       'level-up', 'finished', 'game-over', 'pause', 'resume',
-      'supergravity', 'bomb', 'bomb-chain', 'multiplier-2', 'multiplier-4',
+      'supergravity', 'multiplier-2', 'multiplier-4',
     ] satisfies CandidateAudioCueId[];
     expect(AUDIO_CUE_IDS).toEqual(expected);
   });
