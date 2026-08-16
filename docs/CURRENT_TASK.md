@@ -247,6 +247,58 @@ technical eligibility only.
 **Current next action:** implement and independently review the exact ten-file evidence
 source at base `1711812`, without browser/service/generation or product changes.
 
+### 2026-08-16 material/Ice proof correction authorization
+
+This newer checkpoint supersedes only the preceding material/Ice source-count,
+pre-report-count, runtime-closure, and next-action clauses. It preserves the R5B terminal
+base, existing evidence-source history, product freeze, seeds, semantic/matrix cases, Ice
+contract, and final consolidated human-review boundary. The already committed ten-source
+baseline remains auditable history; it is not rewritten.
+
+The final authored directory contains exactly eleven source paths: `.gitattributes`,
+`README.md`, `evidence-contract.mjs`, `product-fixture.mjs`, `capture-semantic.mjs`,
+`capture-matrix.mjs`, `browser-smoke.mjs`, new `capture-client.mjs`, `client-actions.json`,
+`write-manifest.mjs`, and `verify.mjs`. After this two-document correction checkpoint, one
+evidence writer may harden exactly these seven paths:
+
+- `docs/evidence/t37/material-ice-current-head/README.md`;
+- `docs/evidence/t37/material-ice-current-head/browser-smoke.mjs`;
+- `docs/evidence/t37/material-ice-current-head/evidence-contract.mjs`;
+- `docs/evidence/t37/material-ice-current-head/product-fixture.mjs`;
+- `docs/evidence/t37/material-ice-current-head/verify.mjs`;
+- `docs/evidence/t37/material-ice-current-head/write-manifest.mjs`;
+- new `docs/evidence/t37/material-ice-current-head/capture-client.mjs`.
+
+This is an explicit `docs/COMMIT_POLICY.md` exception to the normal 500-line limit. The
+schema, raw-byte/product/toolchain envelope, trusted-click/View-Transition cause chain,
+HMR/lifecycle observation window, prescribed-client clean-start attestation, manifest, and
+two-phase terminal verifier are one mutually bound evidence claim; splitting them would
+temporarily admit a generator or verifier whose asserted envelope differs from its peer.
+No product, old evidence, changelog, inherited T27 path, or `progress.md` change is allowed.
+
+The exact pre-report set is now 38 paths: the preceding 37-path list plus
+`client-attestation.json`. The wrapper requires its six `client-smoke/**` outputs and
+attestation to be absent before execution, invokes the hash-bound prescribed client without
+a shell, then records exact start/end runtime bindings and output bytes. Runtime preflight
+binds raw product/root inputs and a portable byte-identified Node/Git/Vite/Playwright/
+Chromium environment; generation forces Vite dependency re-optimization and rejects
+unbound public/PostCSS/environment inputs. The final full-motion trusted exit must prove
+that its cause crosses the native View Transition callback into the one canonical
+`pushState('/', ...)` call. The terminal report's persisted checks are phase-stable: a clean
+generated run and a committed-terminal rerun compare the same base check set, while
+terminal-file and generated-to-terminal self-checks remain rerun-only gates.
+
+Before the corrected source commit, run Node syntax/import checks, all three adversarial
+selftests, strict checkJs over all eight JavaScript sources, project typecheck, full tests,
+build, UTF-8/LF checks, exact path review, and independent pre-candidate QA. Browser/service
+generation starts only after that corrected source candidate has `P0/P1/P2/P3 = 0/0/0/0`.
+Human material/audio judgment remains **OPEN / NOT ACCEPTED** and is presented only in the
+final consolidated review.
+
+**Current next action:** commit this exact two-document correction contract, finish the
+seven-path hardening source, and obtain independent zero-finding pre-candidate QA before any
+Material/Ice browser generation.
+
 ## Active objective
 
 ### 2026-08-15 Bomb R4A rejection and R5A familiar-language contract

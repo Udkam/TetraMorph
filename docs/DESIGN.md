@@ -59,28 +59,35 @@ Historical Stage E PNGs and audits are inputs neither to the verdict nor to the 
 only the old deterministic scenario algorithm and fixture data may be reused, and every
 current frame, state, audit, and binding is recomputed.
 
-The proof directory is exactly `docs/evidence/t37/material-ice-current-head/**`. Its ten
+The proof directory is exactly `docs/evidence/t37/material-ice-current-head/**`. Its eleven
 authored source files are `.gitattributes`, `README.md`, `evidence-contract.mjs`,
 `product-fixture.mjs`, `capture-semantic.mjs`, `capture-matrix.mjs`, `browser-smoke.mjs`,
-`client-actions.json`, `write-manifest.mjs`, and `verify.mjs`. The real Mutation entry and
-DEV QA surfaces run from the product root on strict port `5193`. Deterministic item seeds are
-Freeze `49`, Bomb `90`, Multiplier `11`, and Supergravity/Collapse `163`.
+`capture-client.mjs`, `client-actions.json`, `write-manifest.mjs`, and `verify.mjs`. The real
+Mutation entry and DEV QA surfaces run from the product root on strict port `5193`.
+Deterministic item seeds are Freeze `49`, Bomb `90`, Multiplier `11`, and
+Supergravity/Collapse `163`.
 
-The pre-report set is exactly 37 files: twenty full-page semantic frames for
+The pre-report set is exactly 38 files: twenty full-page semantic frames for
 `freeze/bomb/multiplier/collapse` across `next`, `active-ghost`, `settled`, `clear`, and
 `activation`; six named theme/motion/viewport matrix frames; semantic, matrix, browser, and
-Ice-provenance JSON audits; three prescribed-client screenshots plus three text states; and
-`manifest.json`. The only terminal file is `verification-report.json`. Source, output, and
-terminal commits are separate. Git-blob SHA-256, exact tree/range/history, strict UTF-8
-no-BOM LF text, raw PNG bytes, real one-Canvas layout, zero DOM cells/overflow/errors, and
-semantic state-to-frame agreement are fail-closed.
+Ice-provenance JSON audits; three prescribed-client screenshots plus three text states;
+`client-attestation.json`; and `manifest.json`. The wrapper requires the client output
+directory and attestation to be absent before capture, then persists exact start/end runtime
+bindings and output hashes. The only terminal file is `verification-report.json`. Source,
+output, and terminal commits are separate. Git-blob SHA-256, exact tree/range/history, strict
+UTF-8 no-BOM LF text, raw PNG bytes, real one-Canvas layout, zero DOM
+cells/overflow/errors, and semantic state-to-frame agreement are fail-closed.
 
 Lifecycle proof exercises restart plus live theme and motion changes while reusing the same
-runtime Canvas, renderer/ticker owner, listener set, and AudioContext; then an actual UI exit
-must retire them before real Mutation re-entry creates one fresh owner. A Vite HMR pass must
-neither multiply nor leak Canvas, renderer/ticker activity, audio contexts, frame callbacks,
-or window/document listeners. Browser instrumentation is observational and may not replace
-the production lifecycle or inject product state.
+runtime Canvas, renderer/ticker owner, listener set, and AudioContext; then an actual
+full-motion trusted UI exit must propagate its cause through the native View Transition
+callback, retire those owners, and precede a real Mutation re-entry with one fresh owner. A
+Vite HMR pass must neither multiply nor leak Canvas, renderer/ticker activity, audio contexts,
+frame callbacks, or window/document listeners. Browser instrumentation is observational and
+may not replace the production lifecycle or inject product state. Generation uses a forced
+Vite dependency re-optimization and rejects effective unbound root/public/PostCSS inputs,
+Git/Node/Vite/Playwright injection variables, and runtime/toolchain drift. Persisted evidence
+uses portable locators plus byte/version identities rather than personal absolute paths.
 
 Ice 2 remains the accepted runtime material: use the locally proven Ogg and local
 provenance. The original uploader WAV on the official page still requires login and is
