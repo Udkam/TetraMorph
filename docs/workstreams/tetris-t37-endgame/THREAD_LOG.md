@@ -884,3 +884,22 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
 - This four-doc candidate pins the one validator marker, the exact public CLI, and exact
   PowerShell/CIM encoded process gate. Commit and review the exact range twice. Only then may
   one THREAD_LOG-only final-HEAD binding be added and reviewed twice; execution remains closed.
+
+### F4E-R6B command-pin accepted and final-binding candidate
+
+- Command-pin commit b5c1ecf9496fef6e71452e8896fb71e75439edea changes exactly the four
+  authority documents from parent 27d1fff0d0540f584fc33ada77dc83705579eed6.
+- Validator remains frozen at 89,769 bytes / SHA-256
+  7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311.
+  The command marker is exactly one; consumed and preclaim-abort markers are zero.
+- Fresh command QA-A and QA-B each report P0/P1/P2/P3/GAP = 0/0/0/0/0. They independently
+  bind the linear four-document authority, validator identity, 13 ordered CLI pairs, Node
+  flags, v5 predecessor, R5 governance, and the 2,832-character Base64 payload. The payload
+  decodes to the exact 1,062-byte ASCII/LF source with SHA-256
+  06645CCADA1DD038E4CF78A6DD4FEBD169DE4AE51076880EDF1F383B51F1556A.
+- Both reviews confirm attempt/candidate/terminal/frontier and both publication prefixes are
+  absent. Neither executed Node/import, process gate, validator mode, Store, or Intro-05.
+- The commit containing this section is the sole final-binding candidate. Its exact resulting
+  HEAD replaces FINAL_QA_BINDING_HEAD in the frozen public arguments only after two fresh
+  exact-HEAD/history/blob/command reviews each return all-zero. Until then, process gate,
+  preflight, worker, production, Store, and Intro-05 remain closed.
