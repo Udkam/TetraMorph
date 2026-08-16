@@ -644,3 +644,18 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
 - Next: commit this four-document contract, create/freeze only external validator-v5, review
   exact bytes and command, then run the sole attempt. The four Intro-05 source paths remain
   closed until independent candidate audit succeeds.
+
+### F4E-R5 R1 rejection and R2 command candidate
+
+- R1 docs `61bd33b` and validator 26,911 bytes / `0F4CA8...D543` are rejected without any
+  preflight or production run. Docs QA is `P0/P1/P2/P3/GAP = 0/5/2/0/0`; byte QA is
+  `0/2/2/0/1`. Attempt/candidate/terminal remain absent.
+- R2 validator is 35,284 bytes / SHA-256
+  `4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950`.
+  It replaces Vite with a fixed Node built-in transform/private loader over 16 captured HEAD
+  Core blobs, pins direct Git and linear four-doc authority, corrects the fixture to 19 keys,
+  and moves terminal ownership outside the validator after process exit.
+- Any attempt/candidate without a valid success terminal is consumed failure. Integration
+  also requires a committed `F4E-R5-CONSUMED-V1` receipt after independent output audit.
+- Next: commit the corrected four docs, obtain two all-zero byte/AST reviews and one all-zero
+  no-write preflight. Production remains closed.

@@ -322,24 +322,38 @@ may embed only the re-frozen clue values in `docs/DESIGN.md`; it must rebuild al
 route, causal, admission, state/hash, and uncapped certificate results from current Core.
 
 The v5 source is created outside the repository. Before production it must pass two
-independent exact-byte/AST/no-spawn reviews, `node --check`, a self-hash check, and one
-read-only preflight that creates no attempt/candidate/terminal and never invokes the exact
-certificate. The production attempt exclusively creates the immutable attempt receipt before
-Core loading or proof. Success exclusively publishes candidate then terminal; failure leaves
-candidate absent and consumes the attempt. No retry, resume, beam, state cap, child process,
-network, old artifact, or alternate search series is allowed.
+independent exact-byte/AST/no-production-spawn reviews, `node --check`, a self-hash check, and
+one read-only preflight that creates no attempt/candidate/terminal and never invokes the exact
+certificate. Both reviews and preflight require
+`P0/P1/P2/P3/GAP = 0/0/0/0/0`. The only validator child process is the pinned direct Git
+binary with sanitized fixed arguments. Core executes from all 16 captured HEAD blobs through
+Node's built-in transform/private loader, never Vite, `node_modules`, or working-tree source.
+
+Authority is the exact single-parent four-document union from `b177b20`, with one committed
+validator byte/hash marker and no consumption marker. Production exclusively creates and
+fsyncs the attempt before Core capture/loading/proof. Candidate uses exclusive staged fsync +
+no-replace hard-link publication; the validator never writes terminal. The outer owner waits
+for process exit, validates attempt/candidate/staging/process state, and atomically writes the
+terminal. Only a valid success terminal opens output audit. Any attempt-only, staged,
+candidate-without-success-terminal, or failed-terminal state is consumed failure. No retry,
+resume, beam, state cap, network, old artifact, or alternate search series is allowed.
 
 The complete frozen invariants are those in the new `docs/DESIGN.md` v5 section: eight legal
 zero-clear setup drops; 32 bottom-four-row targets; per-row gaps `1..3` totaling eight;
-54-way exact/topology/near-topology rejection and unique seed; unique exhaustive landing
-reconstruction; first-three `[0,0,0]`; two complete nonempty support chains; at least two
+empty hidden/anchor sets and board rows exactly replay-derived; 54-way exact/topology/
+near-topology rejection and unique seed; unique exhaustive landing reconstruction;
+first-three `[0,0,0]`; both support hops on each route with complete nonempty blocker ownership;
+at least two
 later positive releases totaling four; zero remaining targets; primary 5-7 locks; alternative
 at most +2; and one uncapped exact primary certificate. Candidate review must rebuild every
 schema-8 hash and replay before the existing four-path Intro-05 integration opens.
 
-**Current next action:** commit this four-document v5 generation contract; create only the
-external validator; freeze its exact bytes/hash and command; obtain two all-zero static
-reviews and a green no-write preflight; then consume exactly one production attempt.
+The frozen external validator is 35,284 UTF-8/LF bytes with SHA-256
+`4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950`.
+
+**Current next action:** commit this four-document correction/command marker; obtain two
+all-zero exact-byte reviews of the new validator and one all-zero no-write preflight; then
+consume exactly one production attempt through the outer terminal owner.
 
 ## Active objective
 

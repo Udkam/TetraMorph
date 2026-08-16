@@ -136,42 +136,90 @@ The new validator embeds those values and does not load an old clue, validator, 
 candidate at runtime.
 
 V5 has a read-only `--preflight` mode and one production mode. Both bind their own exact
-UTF-8/LF bytes and SHA-256, repository base ancestry, the captured pre/post HEAD, the exact
-Core tree and clean Core worktree, config-free in-process Vite loading, fixed path arguments,
-and initially absent v5 candidate/attempt/terminal paths. Preflight may load and reconcile
-current Core and run bounded geometry/replay/admission checks, but it creates no persistent
-file and never invokes the uncapped certificate. Production repeats the cheap pins, then
-exclusively creates and synchronizes the immutable attempt receipt before any Core load or
-proof. Any post-claim failure consumes v5; no retry or replacement is permitted.
+UTF-8/LF bytes and SHA-256, fixed Node and direct Git executable identities, a frozen
+warning-only `execArgv`, the exact permitted `NODE_*` environment, literal external paths,
+and initially absent v5 candidate/attempt/terminal/staging namespaces. The only permitted
+child process is the pinned Git binary with fixed argument arrays and a sanitized environment;
+there is no shell, network, search-tool, validator, or proof subprocess.
 
-The validator must have no child-process, shell, network, resume, checkpoint, beam, state-cap,
-or old-artifact path. Static review requires UTF-8/LF, `node --check`, exact byte/hash review,
-AST confirmation of one production certificate call and no process-spawn API, plus a no-write
-preflight. Two independent reviews must each report all-zero P0-P3 before the sole production
-command is authorized.
+Repository authority is fail-closed: base `b177b20..captured HEAD` must be a single-parent
+chain whose every edge is non-renaming `M` on only the four governing documents and whose
+union is exactly those four paths. Current Core must be clean and retain the frozen tree.
+The captured HEAD must contain exactly one command marker matching the validator's actual
+bytes/hash and no `F4E-R5-CONSUMED-V1` marker. The validator captures all 16 non-test Core
+Git blobs at that HEAD, rejects BOM/CR/extra imports, records each Git blob/raw hash and
+Node-built-in transformed hash, and executes them through a private `registerHooks` loader
+after `stripTypeScriptTypes`. Vite, repository config, `node_modules`, and working-tree Core
+bytes are outside the executed proof domain.
 
-Production rebuilds the eight legal zero-clear setup drops and exactly 32 targets in rows
-36-39, with each row gap count in `1..3` and total gaps `8`. It rejects exact, topology, and
+F4E-R5-COMMAND-MARKER-V1 validatorBytes=35284 validatorSha256=4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950 base=b177b206db3729ae37351c287b18afa35b7df54c coreTree=e9b3a3ed0d001072f5291a8fc841c1849e4db44f
+
+Preflight may load captured Core and run bounded geometry/replay/admission checks, but it
+creates no persistent file and never invokes the uncapped certificate. Production repeats
+the cheap pins, then exclusively creates and fsyncs the attempt receipt before capturing or
+loading Core. Any post-claim failure consumes v5; no retry, replacement, cleanup, or recovery
+run is permitted. The fixed production validator invocation is:
+
+```powershell
+& 'E:\Nodejs\node.exe' --disable-warning=ExperimentalWarning `
+  'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v5.mjs' `
+  --root 'E:\Proj\reproduction-tetris' `
+  --output 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v5.json' `
+  --attempt 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v5.json' `
+  --terminal 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v5.json' `
+  --expect-repo-base 'b177b206db3729ae37351c287b18afa35b7df54c' `
+  --expect-core-tree 'e9b3a3ed0d001072f5291a8fc841c1849e4db44f' `
+  --expect-validator-sha '4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950'
+```
+
+The exact preflight adds `--preflight` and is otherwise byte-for-byte the same. Static review
+requires UTF-8/LF, `node --check`, exact byte/hash review, one production certificate-call
+site, no old family or non-Git spawn API, and no production invocation. Two independent
+reviews and the later no-write preflight must each report
+`P0/P1/P2/P3/GAP = 0/0/0/0/0` before the sole production command is authorized.
+
+Production rebuilds `boardRows` exactly through `replayEndgameSetup`, with empty
+`hiddenCells` and `anchorCells`, eight legal zero-clear setup drops, and exactly 32 targets in
+rows 36-39; each row gap count is in `1..3` and total gaps are `8`. It rejects exact, topology, and
 near-topology matches against all 50 live definitions plus the four frozen drafts and requires
 the gameplay seed to be unique across those 54 comparisons. Each route is reconstructed
 lock-by-lock through a unique `exhaustiveEndgameLandings` result. Both use literal
 Current/Next-1/Next-2 for their first three locks with releases `[0,0,0]`, share lock 1,
-first diverge at lock 2 or 3, and prove both complete nonempty remove-then-descend blocker
-ownership chains. Later releases contain at least two positive events, total four, and end
+first diverge at lock 2 or 3, and each route separately proves the complete nonempty
+lock-1-to-2 and lock-2-to-3 blocker sets plus owner-only remove-then-descend counterfactuals.
+Later releases contain at least two positive events, total four, and end
 with zero target cells. Primary length is 5-7 and the alternative is at most two locks longer.
 
 Only `certifyOptimalEndgameRouteForDefinition` over the complete public landing domain may
 produce the primary certificate. On success, candidate v5 contains the deterministic
 schema-8 fixture plus source, validator, geometry, admission, causal, replay, and certificate
-bindings. Its fixture field order is the frozen 20-key Intro schema and its proof field order
-is the frozen five-key schema. Candidate publication is exclusive/no-replace. Terminal v5 is
-then exclusively published and binds the attempt bytes, candidate bytes/hash, captured HEAD,
-Core tree, validator hash, and `passed: true`. Failure writes no candidate and, when possible,
-an exclusive `passed: false` terminal bound to the attempt; the attempt alone is sufficient
-to prove consumption if terminal publication itself fails.
+bindings. Its 19 fixture keys are exactly `schemaVersion`, `campaignRevision`,
+`rulesetRevision`, `routeTokenVersion`, `searchStateKeyVersion`, `operationMetric`, `levelId`,
+`authoringDefinitionHash`, `behaviorHash`, `initialStateHash`, `optimalLockedPieces`,
+`optimalRoute`, `routeHash`, `lockSignatures`, `finalStateHash`, `solutionMultiplicity`,
+`proof`, `alternatives`, and `techniqueEvidenceId`; proof has exactly `kind`,
+`lowerBoundVersion`, `exhaustedDepths`, `exploredStateCount`, and `transitionCount`.
 
-After a complete candidate receives independent byte, schema, replay, causal, admission, and
-certificate review, integration may change only the four already authorized Intro-05 paths.
+Candidate publication uses an exclusive same-directory stage, file fsync, no-replace hard
+link, byte re-read, and mandatory successful stage removal. The validator never writes the
+terminal. The coordinator-owned outer runner waits for the validator process to exit, captures
+bounded stdout/stderr and exit status, validates the complete attempt and candidate bytes,
+confirms zero candidate/terminal staging and no matching process, then atomically publishes
+terminal v5 through an exclusive same-directory stage and no-replace move. Terminal always
+uses keys `schema,status,passed,startedAt,finishedAt,exitCode,sourcePin,attempt,candidate,stdout,stderr,stagingFiles,residualProcesses,reason`.
+
+Only `exitCode=0`, a valid complete candidate, zero staging/process residue, and terminal
+`status='succeeded' / passed=true` form an admissible success. A post-claim failure yields a
+failed terminal when the outer runner can publish it; `attempt` alone, `attempt+stage`, or
+`attempt+candidate` without a valid success terminal are consumed failure states and never
+open integration. Same-permission deletion or Git-history rewriting is an explicit governance
+trust boundary, not a claimed filesystem property. Immediately after output audit, the
+coordinator commits one `F4E-R5-CONSUMED-V1` hash receipt in THREAD_LOG; the validator rejects
+that durable marker on every later invocation.
+
+Only after attempt, candidate, valid success terminal, process exit, and the committed
+consumption receipt receive independent byte, schema, replay, causal, admission, certificate,
+and state-machine review may integration change the four authorized Intro-05 paths.
 No live roster, persistence, UI, transition, sensory, icon, or Classic path opens in F4E-R5.
 
 ### Remaining material, curriculum, and presentation contract

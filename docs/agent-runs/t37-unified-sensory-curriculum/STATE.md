@@ -3042,3 +3042,24 @@ unstaged.
 - Exact next action: commit the four-document contract, generate only external validator-v5,
   freeze its bytes/hash and command, obtain the two reviews and green preflight, then run the
   sole production attempt. Intro-05 source remains closed until candidate audit passes.
+
+### F4E-R5 first contract/byte rejection and correction
+
+- Contract `61bd33b` is not execution authority. Independent docs QA reports
+  `P0/P1/P2/P3/GAP = 0/5/2/0/0`; the first 26,911-byte validator is rejected at
+  `0F4CA8...D543` with byte QA `0/2/2/0/1`. Neither preflight nor production ran, and
+  attempt/candidate/terminal remain absent.
+- The corrected validator is 35,284 bytes / SHA-256
+  `4BFCCB919DDD8C17D639293B9439E22F79B9840C8BB1E36985D8CCCBBFCBD950`.
+  It binds linear exact-four docs authority, fixed Node/direct-Git identities and environment,
+  all 16 captured HEAD Core blobs plus built-in transforms, the literal Temp namespace, and
+  one committed marker. Vite and working-tree execution are removed.
+- The corrected 19-key fixture schema is explicit. Hidden/anchor emptiness, replay-derived
+  rows, and both support hops on both routes are frozen. Reviews and preflight require
+  P0-P3/GAP all zero.
+- Candidate uses staged fsync/no-replace hard-link publication. The validator never writes
+  terminal; the outer owner writes it only after process exit and complete state validation.
+  Candidate without a valid success terminal is consumed failure. A committed consumption
+  receipt closes the deletion/retry governance boundary before source integration.
+- Next: commit this exact four-document correction, obtain two fresh static reviews, then one
+  no-write preflight. Production remains closed meanwhile.
