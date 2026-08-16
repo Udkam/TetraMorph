@@ -154,9 +154,16 @@ listen(form, 'submit', ((event: SubmitEvent) => {
   verdictOut.value = `本页临时记录：${value}；未持久化，也不构成接受。`;
 }) as EventListener);
 
-function state() {
+function liveState() {
   const selected = document.querySelector<HTMLInputElement>('input[name=verdict]:checked');
   return { instanceId, ready: ready && !disposed && !disposing, disposed, disposing, domRetired, enabled, pageEpoch, playCount, pairPhase, pairSettledCount, interactionLog: [...interactionLog], verdict: selected?.value ?? 'reject', pendingTimers: timers.size, listenerCount: listeners.length, renderer: renderer.state(), audio: audio.state(), fixture: renderer.fixtureState(), canvasCount: document.querySelectorAll('canvas').length, domCellCount: document.querySelectorAll('[data-cell]').length, qaGlobals: window.__R5B_TEST__ === api, error };
+}
+type AuditionState = ReturnType<typeof liveState>;
+let terminalSnapshot: AuditionState | null = null;
+function state(): AuditionState {
+  if (!terminalSnapshot) return liveState();
+  const currentAudio = audio.state();
+  return { ...terminalSnapshot, audio: { ...terminalSnapshot.audio, staleAssetCallbacksDropped: currentAudio.staleAssetCallbacksDropped } };
 }
 let disposePromise: Promise<void> | null = null;
 function dispose(_reason = 'destroy') {
@@ -179,6 +186,7 @@ function dispose(_reason = 'destroy') {
       delete window.render_game_to_text;
       delete window.advanceTime;
     }
+    terminalSnapshot = liveState();
   })();
   return disposePromise;
 }
