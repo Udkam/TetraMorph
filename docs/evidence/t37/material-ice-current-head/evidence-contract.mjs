@@ -113,6 +113,9 @@ const prescribedClientPath = join(homedir(), '.codex', 'skills', 'develop-web-ga
 const prescribedClientModulesPath = join(homedir(), '.codex', 'skills', 'develop-web-game', 'node_modules');
 /** @type {string | null} */
 let verifiedGitExecutable = null;
+// The committed semantic and browser audits intentionally retain exact DOM and
+// network observations and can exceed Node's 1 MiB child-process default.
+const GIT_OUTPUT_MAX_BUFFER = 64 * 1024 * 1024;
 
 /** @param {import('node:crypto').BinaryLike} value */
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
@@ -122,9 +125,13 @@ function requireVerifiedGit() {
   return verifiedGitExecutable;
 }
 /** @param {...string} args */
-export const runGitText = (...args) => execFileSync(requireVerifiedGit(), args, { cwd: repo, encoding: 'utf8' }).trim();
+export const runGitText = (...args) => execFileSync(requireVerifiedGit(), args, {
+  cwd: repo, encoding: 'utf8', maxBuffer: GIT_OUTPUT_MAX_BUFFER,
+}).trim();
 /** @param {...string} args */
-export const runGitBytes = (...args) => execFileSync(requireVerifiedGit(), args, { cwd: repo });
+export const runGitBytes = (...args) => execFileSync(requireVerifiedGit(), args, {
+  cwd: repo, maxBuffer: GIT_OUTPUT_MAX_BUFFER,
+});
 /** @param {Buffer} bytes @param {string} path */
 export const cleanGitObject = (bytes, path) => execFileSync(requireVerifiedGit(), ['hash-object', '--stdin', `--path=${path}`], {
   cwd: repo, input: bytes, encoding: 'utf8',
