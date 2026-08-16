@@ -40,6 +40,7 @@ const generatedNames = [
   'client-smoke/state-0.json', 'client-smoke/state-1.json', 'client-smoke/state-2.json',
   'r5a-desktop-impact.png', 'r5a-mobile.png', 'r5a-reduced-technical.png',
 ];
+const preReportGeneratedNames = generatedNames.filter((name) => name !== 'verification-report.json');
 const baseToContract = [
   'docs/CURRENT_TASK.md', 'docs/DESIGN.md',
   'docs/agent-runs/t37-unified-sensory-curriculum/STATE.md',
@@ -54,6 +55,7 @@ const rangePaths = (from, to) => git('diff', '--name-only', `${from}..${to}`).sp
 const manifestBytes = await readFile(join(root, 'manifest.json'));
 const manifest = JSON.parse(manifestBytes.toString('utf8'));
 const browserReport = JSON.parse(await readFile(join(root, 'browser-report.json'), 'utf8'));
+const verificationInputHead = git('rev-parse', 'HEAD');
 check(manifest.schema === 'tetramorph.t37.bomb-r5a-familiar-language-audition.v1', 'manifest schema');
 for (const [key, value] of Object.entries(expected).filter(([key]) => key.endsWith('Sha'))) {
   check(manifest.provenance[key] === value, `provenance ${key}`);
@@ -68,16 +70,25 @@ check(manifest.environment.sampleRate === 48_000 && manifest.environment.channel
   && manifest.environment.preRollFrames === 24_000 && manifest.environment.analysisFrames === 8_640, 'offline render window');
 check(manifest.environment.stemFormat === 'mono PCM16 WAV'
   && manifest.environment.stemBoundary.includes('pre-enabledGate'), 'pre-output stem boundary');
+check(JSON.stringify(sorted(manifest.pathContracts.sourceToPreReport))
+  === JSON.stringify(sorted(preReportGeneratedNames.map((name) => `${prefix}${name}`))), 'manifest pre-report generated allowlist');
+check(manifest.pathContracts.terminalReport === `${prefix}verification-report.json`, 'manifest terminal report path');
 
 git('merge-base', '--is-ancestor', expected.reviewRangeBaseSha, expected.contractAcceptedSha);
 git('merge-base', '--is-ancestor', expected.contractAcceptedSha, expected.authorizationSha);
 git('merge-base', '--is-ancestor', expected.authorizationSha, manifest.provenance.evidenceSourceHead);
+git('merge-base', '--is-ancestor', manifest.provenance.evidenceSourceHead, verificationInputHead);
 check(JSON.stringify(sorted(rangePaths(expected.reviewRangeBaseSha, expected.contractAcceptedSha))) === JSON.stringify(sorted(baseToContract)), 'review-to-contract paths');
 check(JSON.stringify(sorted(rangePaths(expected.contractAcceptedSha, expected.authorizationSha))) === JSON.stringify(sorted(contractToAuthorization)), 'contract-to-authorization paths');
 check(JSON.stringify(sorted(rangePaths(expected.authorizationSha, manifest.provenance.evidenceSourceHead)))
   === JSON.stringify(sorted(sourceNames.map((name) => `${prefix}${name}`))), 'authorization-to-source paths');
 check(rangePaths(expected.currentProductSourceSha, manifest.provenance.evidenceSourceHead)
   .filter((path) => path.startsWith('src/')).length === 0, 'product source tree unchanged');
+check(JSON.stringify(sorted(rangePaths(manifest.provenance.evidenceSourceHead, verificationInputHead)))
+  === JSON.stringify(sorted(preReportGeneratedNames.map((name) => `${prefix}${name}`))), 'source-to-pre-report exact generated paths');
+const dirtyInputs = git('status', '--short', '--',
+  ...[...sourceNames, ...preReportGeneratedNames].map((name) => `${prefix}${name}`));
+check(dirtyInputs.length === 0, 'source and pre-report inputs are committed and clean');
 
 for (const binding of manifest.sourceBindings) {
   const bytes = await readFile(join(repository, binding.path));
@@ -225,6 +236,7 @@ const report = {
   failures,
   manifestSha256: sha256(manifestBytes),
   evidenceSourceHead: manifest.provenance.evidenceSourceHead,
+  verificationInputHead,
   pinnedEnvironment: { playwright: expected.playwright, chromium: expected.chromium },
   metrics: liveMetrics,
   lifecycleScenarios: browserReport.lifecycle.length,

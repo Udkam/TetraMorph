@@ -53,6 +53,9 @@ const outputNames = [
   'client-smoke/state-0.json', 'client-smoke/state-1.json', 'client-smoke/state-2.json',
   'r5a-desktop-impact.png', 'r5a-mobile.png', 'r5a-reduced-technical.png',
 ];
+const preReportGeneratedNames = [
+  'assets/A.wav', 'assets/B.wav', 'assets/C.wav', 'manifest.json', ...outputNames,
+];
 
 const sorted = (values) => [...values].sort();
 function exactPaths(from, to, expected, label) {
@@ -167,6 +170,8 @@ const manifest = {
     baseToContract: baseToContractPaths,
     contractToAuthorization: contractToAuthorizationPaths,
     authorizationToSource: sourceNames.map((name) => `${prefix}${name}`),
+    sourceToPreReport: preReportGeneratedNames.map((name) => `${prefix}${name}`),
+    terminalReport: `${prefix}verification-report.json`,
   },
   humanGate: {
     status: 'OPEN',

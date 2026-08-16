@@ -32,8 +32,19 @@ node docs/evidence/t37/bomb-familiar-language-audition-r5a/render-candidates.mjs
 node docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-smoke.mjs http://127.0.0.1:4192/docs/evidence/t37/bomb-familiar-language-audition-r5a/
 node C:\Users\Alex Chen\.codex\skills\develop-web-game\scripts\web_game_playwright_client.js --url http://127.0.0.1:4192/docs/evidence/t37/bomb-familiar-language-audition-r5a/ --actions-file docs/evidence/t37/bomb-familiar-language-audition-r5a/client-actions.json --click-selector '[data-play="A"]' --iterations 3 --pause-ms 250 --screenshot-dir docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke
 node docs/evidence/t37/bomb-familiar-language-audition-r5a/write-manifest.mjs http://127.0.0.1:4192/docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.html
+```
+
+Commit exactly the fourteen pre-report generated paths declared by
+`manifest.pathContracts.sourceToPreReport`, with no source or unrelated path in that
+commit. From that clean pre-report HEAD, run:
+
+```text
 node docs/evidence/t37/bomb-familiar-language-audition-r5a/verify.mjs http://127.0.0.1:4192/docs/evidence/t37/bomb-familiar-language-audition-r5a/
 ```
+
+The verifier proves that the source head is its ancestor and that the intervening Git
+range is exactly those fourteen committed paths before it writes
+`verification-report.json`. Commit that terminal report by itself.
 
 Player review URL:
 
