@@ -37,11 +37,12 @@ const noRelevantListeners = (tracker) => Boolean(tracker?.listenerCounts)
 const activeRafs = (tracker) => Number.isInteger(tracker?.activeRafs) ? Number(tracker.activeRafs) : -1;
 /** @param {any} left @param {any} right */
 const deepEqual = (left, right) => JSON.stringify(left) === JSON.stringify(right);
-/** @param {any} tracker @returns {Array<{id: number|null, closed: boolean, closeCalls: number}>|null} */
+/** @param {any} tracker @returns {Array<{id: number|null, closed: boolean, closeCalls: number, state: string|null}>|null} */
 const contextRecords = (tracker) => Array.isArray(tracker?.contexts) ? tracker.contexts.map((/** @type {any} */ entry) => ({
   id: Number.isInteger(entry?.id) ? Number(entry.id) : null,
   closed: entry?.closed === true,
   closeCalls: Number.isInteger(entry?.closeCalls) ? Number(entry.closeCalls) : -1,
+  state: typeof entry?.state === 'string' ? entry.state : null,
 })) : null;
 /** @param {any} before @param {any} after */
 const sameContextRecords = (before, after) => contextRecords(before) !== null && deepEqual(contextRecords(before), contextRecords(after));
@@ -49,17 +50,51 @@ const sameContextRecords = (before, after) => contextRecords(before) !== null &&
 function closedContextSuccessors(before, after) {
   const baseline = contextRecords(before); const closed = contextRecords(after);
   return baseline !== null && closed !== null && closed.length === baseline.length
-    && closed.every((entry, index) => entry.id === baseline[index]?.id && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+    && closed.every((entry, index) => entry.id === baseline[index]?.id && baseline[index]?.closed === false
+      && baseline[index]?.state !== null && baseline[index]?.state !== 'closed' && baseline[index]?.closeCalls === 0
+      && entry.closed && entry.state === 'closed' && entry.closeCalls === 1);
 }
 /** @param {any} before @param {any} after */
 function exactReentryContexts(before, after) {
   const baseline = contextRecords(before); const reentry = contextRecords(after);
   if (baseline === null || reentry === null || reentry.length !== baseline.length + 1) return false;
   const oldClosed = reentry.slice(0, baseline.length).every((entry, index) => entry.id === baseline[index]?.id
-    && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+    && baseline[index]?.closed === false && baseline[index]?.state !== null && baseline[index]?.state !== 'closed' && baseline[index]?.closeCalls === 0
+    && entry.closed && entry.state === 'closed' && entry.closeCalls === 1);
   const fresh = reentry.at(-1);
   return oldClosed && fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
-    && !fresh.closed && fresh.closeCalls === 0;
+    && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0;
+}
+/** @param {any} oldOwner @returns {'same-owner'|'replacement'|'invalid'} */
+const deriveHmrContextBranch = (oldOwner) => oldOwner?.sameOwner === true ? 'same-owner'
+  : oldOwner?.sameOwner === false && oldOwner?.oldRenderer === 'retired' ? 'replacement' : 'invalid';
+/** @param {any} before @param {any} after @param {'same-owner'|'replacement'|'invalid'} branch */
+function exactHmrContexts(before, after, branch) {
+  const baseline = contextRecords(before); const result = contextRecords(after);
+  if (baseline === null || result === null || before?.liveContexts !== 1 || after?.liveContexts !== 1) return false;
+  if (branch === 'same-owner') return deepEqual(baseline, result);
+  if (branch !== 'replacement' || baseline.length < 1 || result.length !== baseline.length + 1) return false;
+  const oldLive = baseline.at(-1); const retired = result[baseline.length - 1]; const fresh = result.at(-1);
+  const unchangedPrefix = deepEqual(baseline.slice(0, -1), result.slice(0, baseline.length - 1));
+  const baselineLive = oldLive !== undefined && oldLive.id !== null && !oldLive.closed && oldLive.state !== null
+    && oldLive.state !== 'closed' && oldLive.closeCalls === 0
+    && baseline.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
+  const oldClosed = retired !== undefined && retired.id === oldLive?.id && retired.closed && retired.state === 'closed' && retired.closeCalls === 1;
+  const freshLive = fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
+    && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0
+    && result.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
+  return unchangedPrefix && baselineLive && oldClosed && freshLive;
+}
+/** @param {any} afterHmr @param {any} terminal */
+function exactTerminalContexts(afterHmr, terminal) {
+  const baseline = contextRecords(afterHmr); const result = contextRecords(terminal);
+  if (baseline === null || result === null || baseline.length < 1 || result.length !== baseline.length
+    || afterHmr?.liveContexts !== 1 || terminal?.liveContexts !== 0) return false;
+  const live = baseline.at(-1); const closed = result.at(-1);
+  const uniqueLastLive = live !== undefined && live.id !== null && !live.closed && live.state !== null && live.state !== 'closed'
+    && live.closeCalls === 0 && baseline.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
+  const exactClose = closed !== undefined && closed.id === live?.id && closed.closed && closed.state === 'closed' && closed.closeCalls === 1;
+  return uniqueLastLive && exactClose && deepEqual(baseline.slice(0, -1), result.slice(0, -1));
 }
 
 check(git('rev-parse', AUTH) === AUTH, 'authorization head missing');
@@ -179,11 +214,13 @@ const oldHmrOwner = await page.evaluate(() => {
   if (!sameOwner) { try { w.__MATERIAL_HMR_QA__.captureBoardPng(); } catch { oldRenderer = 'retired'; } }
   return { sameOwner, oldRenderer };
 });
+const hmrContextBranch = deriveHmrContextBranch(oldHmrOwner);
 check(hmrRequests.length >= 1, 'Vite delivered App HMR update');
 check(afterHmr.canvasCount === 1 && afterHmr.tracker?.liveContexts === 1, 'HMR leaves one Canvas and AudioContext');
 check(activeRafs(beforeHmr.tracker) >= 1 && activeRafs(afterHmr.tracker) === activeRafs(beforeHmr.tracker), 'HMR active RAFs exactly equal the live baseline');
 check(sameRelevantListeners(beforeHmr.tracker, afterHmr.tracker), 'HMR relevant listener set is exactly stable');
 check(oldHmrOwner.sameOwner || oldHmrOwner.oldRenderer === 'retired', 'HMR old renderer disposition');
+check(hmrContextBranch !== 'invalid' && exactHmrContexts(beforeHmr.tracker, afterHmr.tracker, hmrContextBranch), 'HMR exact branch-specific AudioContext history');
 
 await page.getByTestId('exit-game').click();
 await page.locator('.action-sheet__actions > .primary-action').click();
@@ -196,6 +233,7 @@ await page.waitForFunction(() => {
 });
 const terminal = await page.evaluate(() => /** @type {any} */ (window).__MATERIAL_TRACKER__.snapshot());
 check(terminal.canvases === 0 && terminal.liveContexts === 0 && activeRafs(terminal) === 0 && noRelevantListeners(terminal), 'post-HMR terminal cleanup');
+check(exactTerminalContexts(afterHmr.tracker, terminal), 'post-HMR terminal exact AudioContext closure');
 
 const iceBytes = gitBytes(BASE, ICE.path);
 const catalog = gitBytes(BASE, 'src/game/audio/audioAssetCatalog.ts').toString('utf8');
@@ -250,6 +288,14 @@ const lifecycleProof = {
     preferences: contextRecords(changedPreferences.tracker), exit: contextRecords(exited.tracker), reentry: contextRecords(reentered.tracker),
     hmrBaseline: contextRecords(beforeHmr.tracker), hmrAfter: contextRecords(afterHmr.tracker), terminal: contextRecords(terminal),
   },
+  hmrContexts: {
+    branch: hmrContextBranch, before: contextRecords(beforeHmr.tracker), after: contextRecords(afterHmr.tracker),
+    beforeLiveContexts: beforeHmr.tracker?.liveContexts, afterLiveContexts: afterHmr.tracker?.liveContexts,
+  },
+  terminalContexts: {
+    afterHmr: contextRecords(afterHmr.tracker), terminal: contextRecords(terminal),
+    afterHmrLiveContexts: afterHmr.tracker?.liveContexts, terminalLiveContexts: terminal.liveContexts,
+  },
 };
 const lifecycleAssertions = {
   realProductRoute: page.url().startsWith(origin.replace(/\/$/u, '')),
@@ -288,9 +334,12 @@ const lifecycleAssertions = {
   hmrRafsExact: activeRafs(afterHmr.tracker) === activeRafs(beforeHmr.tracker),
   hmrRafsNotDoubled: activeRafs(afterHmr.tracker) <= activeRafs(beforeHmr.tracker),
   hmrListenersExact: sameRelevantListeners(beforeHmr.tracker, afterHmr.tracker),
+  hmrContextBranchValid: hmrContextBranch !== 'invalid',
+  hmrContextsExact: exactHmrContexts(beforeHmr.tracker, afterHmr.tracker, hmrContextBranch),
   terminalOwnersClean: terminal.canvases === 0 && terminal.liveContexts === 0,
   terminalRafsZero: activeRafs(terminal) === 0,
   terminalListenersZero: noRelevantListeners(terminal),
+  terminalContextsExact: exactTerminalContexts(afterHmr.tracker, terminal),
 };
 for (const [label, passed] of Object.entries(lifecycleAssertions)) check(passed, `lifecycle assertion: ${label}`);
 

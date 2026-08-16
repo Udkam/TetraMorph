@@ -147,11 +147,12 @@ const noRelevantListeners = (tracker) => Boolean(tracker?.listenerCounts)
   && Object.values(relevantListeners(tracker)).every((count) => count === 0);
 /** @param {any} tracker */
 const activeRafs = (tracker) => Number.isInteger(tracker?.activeRafs) ? Number(tracker.activeRafs) : -1;
-/** @param {any} tracker @returns {Array<{id: number|null, closed: boolean, closeCalls: number}>|null} */
+/** @param {any} tracker @returns {Array<{id: number|null, closed: boolean, closeCalls: number, state: string|null}>|null} */
 const contextRecords = (tracker) => Array.isArray(tracker?.contexts) ? tracker.contexts.map((/** @type {any} */ entry) => ({
   id: Number.isInteger(entry?.id) ? Number(entry.id) : null,
   closed: entry?.closed === true,
   closeCalls: Number.isInteger(entry?.closeCalls) ? Number(entry.closeCalls) : -1,
+  state: typeof entry?.state === 'string' ? entry.state : null,
 })) : null;
 /** @param {any} before @param {any} after */
 const sameContextRecords = (before, after) => contextRecords(before) !== null && deepEqual(contextRecords(before), contextRecords(after));
@@ -159,17 +160,51 @@ const sameContextRecords = (before, after) => contextRecords(before) !== null &&
 function closedContextSuccessors(before, after) {
   const baseline = contextRecords(before); const closed = contextRecords(after);
   return baseline !== null && closed !== null && closed.length === baseline.length
-    && closed.every((entry, index) => entry.id === baseline[index]?.id && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+    && closed.every((entry, index) => entry.id === baseline[index]?.id && baseline[index]?.closed === false
+      && baseline[index]?.state !== null && baseline[index]?.state !== 'closed' && baseline[index]?.closeCalls === 0
+      && entry.closed && entry.state === 'closed' && entry.closeCalls === 1);
 }
 /** @param {any} before @param {any} after */
 function exactReentryContexts(before, after) {
   const baseline = contextRecords(before); const reentry = contextRecords(after);
   if (baseline === null || reentry === null || reentry.length !== baseline.length + 1) return false;
   const oldClosed = reentry.slice(0, baseline.length).every((entry, index) => entry.id === baseline[index]?.id
-    && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+    && baseline[index]?.closed === false && baseline[index]?.state !== null && baseline[index]?.state !== 'closed' && baseline[index]?.closeCalls === 0
+    && entry.closed && entry.state === 'closed' && entry.closeCalls === 1);
   const fresh = reentry.at(-1);
   return oldClosed && fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
-    && !fresh.closed && fresh.closeCalls === 0;
+    && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0;
+}
+/** @param {any} oldOwner @returns {'same-owner'|'replacement'|'invalid'} */
+const deriveHmrContextBranch = (oldOwner) => oldOwner?.sameOwner === true ? 'same-owner'
+  : oldOwner?.sameOwner === false && oldOwner?.oldRenderer === 'retired' ? 'replacement' : 'invalid';
+/** @param {any} before @param {any} after @param {'same-owner'|'replacement'|'invalid'} branch */
+function exactHmrContexts(before, after, branch) {
+  const baseline = contextRecords(before); const result = contextRecords(after);
+  if (baseline === null || result === null || before?.liveContexts !== 1 || after?.liveContexts !== 1) return false;
+  if (branch === 'same-owner') return deepEqual(baseline, result);
+  if (branch !== 'replacement' || baseline.length < 1 || result.length !== baseline.length + 1) return false;
+  const oldLive = baseline.at(-1); const retired = result[baseline.length - 1]; const fresh = result.at(-1);
+  const unchangedPrefix = deepEqual(baseline.slice(0, -1), result.slice(0, baseline.length - 1));
+  const baselineLive = oldLive !== undefined && oldLive.id !== null && !oldLive.closed && oldLive.state !== null
+    && oldLive.state !== 'closed' && oldLive.closeCalls === 0
+    && baseline.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
+  const oldClosed = retired !== undefined && retired.id === oldLive?.id && retired.closed && retired.state === 'closed' && retired.closeCalls === 1;
+  const freshLive = fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
+    && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0
+    && result.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
+  return unchangedPrefix && baselineLive && oldClosed && freshLive;
+}
+/** @param {any} afterHmr @param {any} terminal */
+function exactTerminalContexts(afterHmr, terminal) {
+  const baseline = contextRecords(afterHmr); const result = contextRecords(terminal);
+  if (baseline === null || result === null || baseline.length < 1 || result.length !== baseline.length
+    || afterHmr?.liveContexts !== 1 || terminal?.liveContexts !== 0) return false;
+  const live = baseline.at(-1); const closed = result.at(-1);
+  const uniqueLastLive = live !== undefined && live.id !== null && !live.closed && live.state !== null && live.state !== 'closed'
+    && live.closeCalls === 0 && baseline.filter((entry) => !entry.closed && entry.state !== 'closed').length === 1;
+  const exactClose = closed !== undefined && closed.id === live?.id && closed.closed && closed.state === 'closed' && closed.closeCalls === 1;
+  return uniqueLastLive && exactClose && deepEqual(baseline.slice(0, -1), result.slice(0, -1));
 }
 
 /** @param {any} value @param {string} label @param {string[]} errors */
@@ -192,6 +227,7 @@ function assertCleanObservations(observed, label, errors) {
 
 /** @param {any} browser */
 function browserLifecycleProof(browser) {
+  const hmrContextBranch = deriveHmrContextBranch(browser.hmr?.oldOwner);
   return {
     canvasOwners: {
       initial: { canvasCount: browser.initial?.canvasCount, canvases: browser.initial?.tracker?.canvases },
@@ -219,12 +255,21 @@ function browserLifecycleProof(browser) {
       preferences: contextRecords(browser.changedPreferences?.tracker), exit: contextRecords(browser.exited?.tracker), reentry: contextRecords(browser.reentered?.tracker),
       hmrBaseline: contextRecords(browser.hmr?.before?.tracker), hmrAfter: contextRecords(browser.hmr?.after?.tracker), terminal: contextRecords(browser.terminal),
     },
+    hmrContexts: {
+      branch: hmrContextBranch, before: contextRecords(browser.hmr?.before?.tracker), after: contextRecords(browser.hmr?.after?.tracker),
+      beforeLiveContexts: browser.hmr?.before?.tracker?.liveContexts, afterLiveContexts: browser.hmr?.after?.tracker?.liveContexts,
+    },
+    terminalContexts: {
+      afterHmr: contextRecords(browser.hmr?.after?.tracker), terminal: contextRecords(browser.terminal),
+      afterHmrLiveContexts: browser.hmr?.after?.tracker?.liveContexts, terminalLiveContexts: browser.terminal?.liveContexts,
+    },
   };
 }
 
 /** @param {any} browser */
 function browserLifecycleAssertions(browser) {
   const observations = browser.observations ?? {};
+  const hmrContextBranch = deriveHmrContextBranch(browser.hmr?.oldOwner);
   return {
     realProductRoute: typeof browser.pageUrl === 'string' && browser.pageUrl.startsWith(String(browser.origin).replace(/\/$/u, '')),
     observationsClean: Array.isArray(observations.consoleErrors) && observations.consoleErrors.length === 0
@@ -267,9 +312,12 @@ function browserLifecycleAssertions(browser) {
     hmrRafsExact: activeRafs(browser.hmr?.after?.tracker) === activeRafs(browser.hmr?.before?.tracker),
     hmrRafsNotDoubled: activeRafs(browser.hmr?.after?.tracker) <= activeRafs(browser.hmr?.before?.tracker),
     hmrListenersExact: sameRelevantListeners(browser.hmr?.before?.tracker, browser.hmr?.after?.tracker),
+    hmrContextBranchValid: hmrContextBranch !== 'invalid',
+    hmrContextsExact: exactHmrContexts(browser.hmr?.before?.tracker, browser.hmr?.after?.tracker, hmrContextBranch),
     terminalOwnersClean: browser.terminal?.canvases === 0 && browser.terminal?.liveContexts === 0,
     terminalRafsZero: activeRafs(browser.terminal) === 0,
     terminalListenersZero: noRelevantListeners(browser.terminal),
+    terminalContextsExact: exactTerminalContexts(browser.hmr?.after?.tracker, browser.terminal),
   };
 }
 /** @param {string} directory @param {string} [base] @returns {Promise<string[]>} */
