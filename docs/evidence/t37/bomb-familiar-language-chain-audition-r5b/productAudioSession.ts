@@ -229,7 +229,6 @@ export class ProductAudioSession {
       this.engine = null;
       this.variant = null;
       this.activeEngineOwnerId = 0;
-      this.assets = [];
       previous?.destroy();
       await Promise.all(this.contexts.map((context) => context.closePromise).filter((promise): promise is Promise<void> => !!promise));
       ok(this.liveContextCount() === 0, 'Previous variant context did not close before replacement.');
