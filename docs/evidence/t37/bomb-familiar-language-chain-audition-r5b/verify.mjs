@@ -13,6 +13,14 @@ const PRODUCT = '94957fd';
 const R5A_SOURCE = '9d30894';
 const R5A_OUTPUT = '99b47be';
 const R5A_REPORT = '4ce7ba3';
+const COORDINATOR_DETOUR = Object.freeze({
+  path: 'docs/agent-runs/t37-unified-sensory-curriculum/SURVIVAL-OPTIMIZATION-PROPOSAL.md',
+  addHead: '94e8b9b0b6480a974477d70e4ec7862a5064dfb2',
+  addParent: '4638d7c01d110a4ab6da404130dfc619af2579e0',
+  addGitObject: '28881be3fa887239ae3b01d16f8e58d9832ee05d',
+  revertHead: '97a4ddc9fc96a0b47d56b4a99c710fd119a62535',
+  revertParent: '94e8b9b0b6480a974477d70e4ec7862a5064dfb2',
+});
 const SOURCE = ['README.md', 'index.html', 'styles.css', 'fixture.ts', 'productAudioSession.ts', 'audition.ts', 'browser-smoke.mjs', 'client-actions.json', 'write-manifest.mjs', 'verify.mjs'];
 const OUTPUT = ['browser-report.json', 'r5b-desktop-normal-a.png', 'r5b-desktop-chain-a.png', 'r5b-mobile-chain-a.png', 'r5b-reduced-technical-a.png', 'client-smoke/shot-0.png', 'client-smoke/shot-1.png', 'client-smoke/shot-2.png', 'client-smoke/state-0.json', 'client-smoke/state-1.json', 'client-smoke/state-2.json'];
 const PRE_REPORT = [...OUTPUT, 'manifest.json'];
@@ -33,9 +41,9 @@ const REDUCED_BEATS = Array.from({ length: 20 }, (_, index) => 50 + index * 20);
 const HUMAN_STATUS = 'OPEN / NOT ACCEPTED — automated evidence is technical only';
 const BYTE_CONTRACT = Object.freeze({ text: 'UTF-8 no-BOM LF-only', png: 'binary-unfiltered', committedDomain: 'git blob', precommitDomain: 'validated raw worktree bytes', manifestSelfHash: 'excluded' });
 const TIMING = Object.freeze({ normalFrames: 19_200, fullChainFrames: 65_664, reducedChainFrames: 22_368, fullBeatStartsMs: FULL_BEATS, reducedBeatStartsMs: REDUCED_BEATS });
-const MANIFEST_KEYS = ['schema', 'generatedAt', 'provenance', 'pathContracts', 'countContracts', 'byteContract', 'timing', 'wav', 'sourceBindings', 'outputBindings', 'contractBindings', 'productBindings', 'r5aBindings'];
+const MANIFEST_KEYS = ['schema', 'generatedAt', 'provenance', 'historyDisclosure', 'pathContracts', 'countContracts', 'byteContract', 'timing', 'wav', 'sourceBindings', 'outputBindings', 'contractBindings', 'productBindings', 'r5aBindings'];
 const TERMINAL_KEYS = ['schema', 'generatedAt', 'passed', 'failures', 'checks', 'manifestSha256', 'evidenceSourceHead', 'generatedInputHead', 'pathContracts', 'humanStatus'];
-const BROWSER_KEYS = ['schema', 'generatedAt', 'passed', 'failures', 'initial', 'naturalPair', 'domRoutes', 'technical', 'sameContext', 'stemAssets', 'stopped', 'restarted', 'disabled', 'enabled', 'reducedState', 'mobileTerminal', 'desktopTerminal', 'races', 'variantRace', 'assetRequests', 'layout', 'consoleErrors', 'pageErrors', 'requestErrors'];
+const BROWSER_KEYS = ['schema', 'generatedAt', 'passed', 'failures', 'initial', 'naturalPair', 'domRoutes', 'technical', 'sameContext', 'stemAssets', 'stopped', 'restarted', 'disabled', 'enabled', 'reenabledReplay', 'reducedState', 'reducedTerminal', 'mobileTerminal', 'desktopTerminal', 'races', 'variantRace', 'assetRequests', 'layout', 'consoleErrors', 'pageErrors', 'requestErrors'];
 
 if (SOURCE.length !== 10 || PRE_REPORT.length !== 12 || TERMINAL.length !== 1 || CONTRACT.length !== 4 || R5A_SOURCE_PATHS.length !== 21 || R5A_OUTPUT_PATHS.length !== 14 || R5A_TERMINAL_PATHS.length !== 1) throw new Error('Independent frozen path-count contract drifted.');
 const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
@@ -80,6 +88,43 @@ function bindProduct(entry) {
   const object = git('rev-parse', `${PRODUCT}:${entry.path}`);
   if (entry.object && object !== entry.object) throw new Error(`Independent product tree drift: ${entry.path}`);
   return entry.kind === 'tree' ? { kind: 'tree', head: PRODUCT, path: entry.path, gitObject: object } : bindBlob(PRODUCT, entry.path);
+}
+function historyDisclosure(from, to, sourcePaths) {
+  git('merge-base', '--is-ancestor', from, to);
+  const rows = git('rev-list', '--reverse', '--parents', `${from}..${to}`).split(/\r?\n/u).filter(Boolean).map((line) => line.split(' '));
+  const touched = new Set();
+  for (const [commit, ...parents] of rows) {
+    if (parents.length !== 1) throw new Error(`Independent authorization history is not linear at ${commit}.`);
+    const changes = git('diff-tree', '--no-commit-id', '--name-status', '-r', commit).split(/\r?\n/u).filter(Boolean).map((line) => {
+      const [status, path, extra] = line.split('\t');
+      if (!status || !path || extra) throw new Error(`Independent unsupported history entry at ${commit}: ${line}`);
+      touched.add(path);
+      return { status, path };
+    });
+    if (commit === COORDINATOR_DETOUR.addHead) {
+      if (parents[0] !== COORDINATOR_DETOUR.addParent || !deepEqual(changes, [{ status: 'A', path: COORDINATOR_DETOUR.path }])) throw new Error('Independent coordinator add detour drifted.');
+    } else if (commit === COORDINATOR_DETOUR.revertHead) {
+      if (parents[0] !== COORDINATOR_DETOUR.revertParent || !deepEqual(changes, [{ status: 'D', path: COORDINATOR_DETOUR.path }])) throw new Error('Independent coordinator revert detour drifted.');
+    } else if (changes.some(({ path }) => !sourcePaths.includes(path))) {
+      throw new Error(`Independent unauthorized non-R5B path touched by ${commit}.`);
+    }
+  }
+  if (!rows.some(([commit]) => commit === COORDINATOR_DETOUR.addHead) || !rows.some(([commit]) => commit === COORDINATOR_DETOUR.revertHead)) throw new Error('Independent coordinator detour commits are absent from authorization history.');
+  if (!equalSet(touched, [...sourcePaths, COORDINATOR_DETOUR.path]) || exists(to, COORDINATOR_DETOUR.path)) throw new Error('Independent authorization touched-path/net-zero contract drifted.');
+  const added = blob(COORDINATOR_DETOUR.addHead, COORDINATOR_DETOUR.path);
+  text(added, `independent ${COORDINATOR_DETOUR.path}`);
+  if (git('rev-parse', `${COORDINATOR_DETOUR.addHead}:${COORDINATOR_DETOUR.path}`) !== COORDINATOR_DETOUR.addGitObject) throw new Error('Independent coordinator detour blob drifted.');
+  return {
+    range: `${from}..${to}`,
+    allowedSourcePrefix: prefix,
+    touchedPaths: [...sourcePaths, COORDINATOR_DETOUR.path],
+    disposition: 'disclosed net-zero coordinator detour; absent at source endpoint',
+    coordinatorDetour: {
+      path: COORDINATOR_DETOUR.path,
+      add: { head: COORDINATOR_DETOUR.addHead, parent: COORDINATOR_DETOUR.addParent, status: 'A', gitObject: COORDINATOR_DETOUR.addGitObject, sha256: sha(added), bytes: added.length },
+      revert: { head: COORDINATOR_DETOUR.revertHead, parent: COORDINATOR_DETOUR.revertParent, status: 'D' },
+    },
+  };
 }
 function decodeWav(bytes) {
   if (bytes.toString('ascii', 0, 4) !== 'RIFF' || bytes.toString('ascii', 8, 12) !== 'WAVE') throw new Error('WAV RIFF contract drift.');
@@ -152,12 +197,17 @@ const manifest = JSON.parse(manifestBytes.toString('utf8'));
 exactKeys(manifest, MANIFEST_KEYS, 'manifest');
 exactKeys(manifest.provenance, ['authorizationHead', 'evidenceSourceHead', 'productHead', 'r5a', 'writerBoundary', 'humanStatus'], 'manifest provenance');
 exactKeys(manifest.provenance.r5a, ['source', 'outputs', 'report'], 'manifest R5A provenance');
+exactKeys(manifest.historyDisclosure, ['range', 'allowedSourcePrefix', 'touchedPaths', 'disposition', 'coordinatorDetour'], 'manifest history disclosure');
+exactKeys(manifest.historyDisclosure.coordinatorDetour, ['path', 'add', 'revert'], 'manifest coordinator detour');
+exactKeys(manifest.historyDisclosure.coordinatorDetour.add, ['head', 'parent', 'status', 'gitObject', 'sha256', 'bytes'], 'manifest coordinator add');
+exactKeys(manifest.historyDisclosure.coordinatorDetour.revert, ['head', 'parent', 'status'], 'manifest coordinator revert');
 const sourceHead = manifest.provenance.evidenceSourceHead;
 const sourcePaths = SOURCE.map((path) => prefix + path);
 const prePaths = PRE_REPORT.map((path) => prefix + path);
 const terminalPaths = TERMINAL.map((path) => prefix + path);
 
 exactRange(AUTH, sourceHead, sourcePaths, 'authorization-to-source');
+const expectedHistoryDisclosure = historyDisclosure(AUTH, sourceHead, sourcePaths);
 exactRange(sourceHead, generated, prePaths, 'source-to-generated');
 exactTree(sourceHead, prefix, sourcePaths, 'source exact tree');
 exactTree(generated, prefix, [...sourcePaths, ...prePaths], 'generated exact tree');
@@ -173,9 +223,10 @@ check(canonicalIso(manifest.generatedAt), 'manifest canonical ISO generatedAt');
 check(manifest.provenance.authorizationHead === AUTH && manifest.provenance.evidenceSourceHead === sourceHead && manifest.provenance.productHead === PRODUCT, 'manifest exact primary heads');
 check(deepEqual(manifest.provenance.r5a, { source: R5A_SOURCE, outputs: R5A_OUTPUT, report: R5A_REPORT }), 'manifest exact R5A heads');
 check(manifest.provenance.writerBoundary === `${prefix}**` && manifest.provenance.humanStatus === 'OPEN / NOT ACCEPTED', 'manifest boundary/human OPEN');
-const expectedPathContracts = { source: sourcePaths, preReport: prePaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_CONTRACT.map(({ kind, path }) => ({ kind, path })), r5aSource: R5A_SOURCE_PATHS, r5aOutput: R5A_OUTPUT_PATHS, r5aTerminal: R5A_TERMINAL_PATHS };
+check(deepEqual(manifest.historyDisclosure, expectedHistoryDisclosure), 'manifest independently recomputed authorization history disclosure');
+const expectedPathContracts = { source: sourcePaths, authorizationTouched: expectedHistoryDisclosure.touchedPaths, preReport: prePaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_CONTRACT.map(({ kind, path }) => ({ kind, path })), r5aSource: R5A_SOURCE_PATHS, r5aOutput: R5A_OUTPUT_PATHS, r5aTerminal: R5A_TERMINAL_PATHS };
 check(deepEqual(manifest.pathContracts, expectedPathContracts), 'manifest exact path arrays');
-check(deepEqual(manifest.countContracts, { source: 10, preReport: 12, terminal: 1, contract: 4, r5aSource: 21, r5aOutput: 14, r5aTerminal: 1 }), 'manifest exact path counts');
+check(deepEqual(manifest.countContracts, { source: 10, authorizationTouched: 11, preReport: 12, terminal: 1, contract: 4, r5aSource: 21, r5aOutput: 14, r5aTerminal: 1 }), 'manifest exact path counts');
 check(deepEqual(manifest.byteContract, BYTE_CONTRACT), 'manifest complete byte/self-hash contract');
 check(deepEqual(manifest.timing, TIMING), 'manifest independent exact timing/beat contract');
 check(deepEqual(manifest.wav, WAV), 'manifest exact WAV hashes');
@@ -197,9 +248,9 @@ text(browserBytes, 'browser-report.json');
 const browser = JSON.parse(browserBytes.toString('utf8'));
 exactKeys(browser, BROWSER_KEYS, 'browser report');
 exactKeys(browser.races, ['stop', 'disable', 'pagehide', 'hmr'], 'browser races');
-exactKeys(browser.races.hmr, ['old', 'freshBefore', 'domBefore', 'oldAfter', 'freshAfter', 'domAfter'], 'browser HMR race');
+exactKeys(browser.races.hmr, ['old', 'freshBefore', 'domBefore', 'freshPrimeResult', 'freshPrimed', 'domPrimed', 'oldAfter', 'freshAfter', 'domAfter'], 'browser HMR race');
 exactKeys(browser.variantRace, ['initial', 'beforeRelease', 'results', 'samples', 'state', 'terminal'], 'browser variant race');
-exactKeys(browser.layout, ['desktop', 'mobile'], 'browser layout');
+exactKeys(browser.layout, ['desktop', 'mobile', 'reduced'], 'browser layout');
 exactKeys(browser.sameContext, ['full', 'reduced'], 'browser same-context proof');
 exactKeys(browser.stemAssets, ['A', 'B', 'C'], 'browser stem asset proof');
 check(browser.schema === 'tetramorph.t37.r5b-browser-proof.v2' && browser.passed === true && deepEqual(browser.failures, []), 'browser schema/pass/failures');
@@ -211,6 +262,7 @@ check(browser.initial.fixture.normalOutcome === 'blast' && browser.initial.fixtu
 check(deepEqual(browser.initial.fixture.fullBeatStartsMs, FULL_BEATS) && deepEqual(browser.initial.fixture.reducedBeatStartsMs, REDUCED_BEATS), 'browser shared timeline exact beats');
 check(browser.layout.desktop.overflow === false && browser.layout.desktop.minTarget >= 44 && browser.layout.desktop.canvas === 1, 'browser desktop no-overflow/44px/one Canvas layout');
 check(browser.layout.mobile.overflow === false && browser.layout.mobile.minTarget >= 44 && browser.layout.mobile.canvas === 1, 'browser mobile no-overflow/44px/one Canvas layout');
+check(browser.layout.reduced.overflow === false && browser.layout.reduced.minTarget >= 44 && browser.layout.reduced.canvas === 1, 'browser reduced no-overflow/44px/one Canvas layout');
 check(browser.naturalPair.pairPhase === 'settled' && browser.naturalPair.pairSettledCount >= 1 && browser.naturalPair.playCount === 2 && browser.naturalPair.renderer.settledCount >= 2 && browser.naturalPair.pendingTimers === 0 && browser.naturalPair.renderer.frameCallbacks === 0 && browser.naturalPair.audio.eventSources === 0, 'browser natural full pair settled');
 check(browser.naturalPair.audio.contextState === 'running' && browser.naturalPair.renderer.tickerOwners === 1 && browser.naturalPair.canvasCount === 1, 'browser gesture-running context/stable owners');
 verifyActiveOwners(browser.naturalPair, 'browser natural pair', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
@@ -250,7 +302,12 @@ check(browser.disabled.enabled === false && browser.disabled.audio.enabled === f
 verifyActiveOwners(browser.disabled, 'browser reusable disable', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
 check(browser.enabled.enabled === true && browser.enabled.audio.enabled === true, 'browser re-enable remains enabled');
 verifyActiveOwners(browser.enabled, 'browser re-enabled idle', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
+verifyActiveOwners(browser.reenabledReplay, 'browser re-enabled replay', { liveContexts: 1, eventSources: 1, pendingTimers: 0, frameCallbacks: 0 });
+verifyEvent(browser.reenabledReplay.audio.events.at(-1), 'A', 'normal', false);
+check(browser.reenabledReplay.playCount === browser.enabled.playCount + 1 && browser.reenabledReplay.audio.events.length === browser.enabled.audio.events.length + 1, 'browser re-enabled replay dispatches exactly one fresh event');
+check(browser.reenabledReplay.audio.contextsCreated === browser.enabled.audio.contextsCreated && browser.reenabledReplay.audio.activeEngineOwnerId === browser.enabled.audio.activeEngineOwnerId && browser.reenabledReplay.renderer.tickerIdentity === browser.enabled.renderer.tickerIdentity && browser.reenabledReplay.listenerCount === browser.enabled.listenerCount, 'browser re-enabled replay creates no duplicate owner');
 verifyActiveOwners(browser.reducedState, 'browser reduced technical', { liveContexts: 1, eventSources: 1, pendingTimers: 0, frameCallbacks: 0 });
+verifyTerminalOwners(browser.reducedTerminal, 'browser reduced destroy');
 verifyTerminalOwners(browser.mobileTerminal, 'browser mobile destroy');
 verifyTerminalOwners(browser.desktopTerminal, 'browser desktop destroy');
 for (const kind of ['stop', 'disable']) {
@@ -265,16 +322,18 @@ check(browser.races.hmr.old.playCount === 0 && browser.races.hmr.oldAfter.playCo
 verifyTerminalOwners(browser.races.hmr.old, 'browser delayed HMR old-before-release');
 verifyTerminalOwners(browser.races.hmr.oldAfter, 'browser delayed HMR old-after-release');
 verifyActiveOwners(browser.races.hmr.freshBefore, 'browser delayed HMR fresh-before-release', { liveContexts: 0, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
-verifyActiveOwners(browser.races.hmr.freshAfter, 'browser delayed HMR fresh-after-release', { liveContexts: 0, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
-check(browser.races.hmr.freshBefore.audio.contextsCreated === 0 && browser.races.hmr.freshAfter.audio.contextsCreated === 0, 'browser delayed HMR fresh sampled without masking prime');
-check(browser.races.hmr.freshBefore.instanceId === browser.races.hmr.freshAfter.instanceId && browser.races.hmr.freshBefore.renderer.tickerIdentity === browser.races.hmr.freshAfter.renderer.tickerIdentity && browser.races.hmr.freshBefore.ready === browser.races.hmr.freshAfter.ready && deepEqual(browser.races.hmr.domBefore, browser.races.hmr.domAfter), 'browser delayed HMR fresh identity/ticker/DOM/ready unchanged by old callback');
+verifyActiveOwners(browser.races.hmr.freshPrimed, 'browser delayed HMR fresh-primed', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
+verifyActiveOwners(browser.races.hmr.freshAfter, 'browser delayed HMR fresh-after-release', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
+check(browser.races.hmr.freshPrimeResult === true && browser.races.hmr.freshBefore.audio.contextsCreated === 0 && browser.races.hmr.freshPrimed.audio.contextsCreated === 1 && browser.races.hmr.freshAfter.audio.contextsCreated === 1, 'browser delayed HMR samples fresh before successful prime then proves one context');
+check(browser.races.hmr.freshBefore.instanceId === browser.races.hmr.freshPrimed.instanceId && browser.races.hmr.freshPrimed.instanceId === browser.races.hmr.freshAfter.instanceId && browser.races.hmr.freshPrimed.renderer.tickerIdentity === browser.races.hmr.freshAfter.renderer.tickerIdentity && browser.races.hmr.freshPrimed.ready === browser.races.hmr.freshAfter.ready && deepEqual(browser.races.hmr.domPrimed, browser.races.hmr.domAfter), 'browser delayed HMR late old callback cannot alter primed fresh identity/ticker/DOM/ready');
 
 const variantRace = browser.variantRace;
 check(variantRace.samples.length > 2 && variantRace.samples.every((sample) => sample.liveContexts <= 1 && sample.instanceId === variantRace.initial.instanceId && sample.ready === true), 'browser concurrent variant samples <=1 context/one ready instance');
 check(variantRace.beforeRelease.audio.liveContexts <= 1 && variantRace.state.audio.liveContexts === 1 && variantRace.state.audio.maxLiveContextsObserved <= 1 && variantRace.state.audio.pendingTransitions === 0 && variantRace.state.audio.variant === 'C', 'browser concurrent variant exclusive final C context');
-check(variantRace.state.audio.staleAssetCallbacksDropped >= 1 && deepEqual(variantRace.state.audio.assets, variantRace.beforeRelease.audio.assets), 'browser concurrent variant late asset cannot pollute audit state');
+check(variantRace.state.audio.staleAssetCallbacksDropped >= 2 && deepEqual(variantRace.state.audio.assets, variantRace.beforeRelease.audio.assets), 'browser concurrent variant late A/B assets cannot pollute audit state');
 check(variantRace.state.audio.assets.filter((asset) => asset.ownerId === variantRace.state.audio.activeEngineOwnerId && asset.assetId.startsWith('bombFamiliar')).length === 3, 'browser concurrent variant active owner has exact three stem audits');
-check(variantRace.results[0] === false && variantRace.results[2] === true && variantRace.state.audio.events.at(-1).variant === 'C', 'browser concurrent variant stale A suppressed/C dispatched');
+const variantRaceEvents = variantRace.state.audio.events.filter((event) => ['A', 'B', 'C'].includes(event.variant));
+check(variantRace.results[0] === false && variantRace.results[1] === false && variantRace.results[2] === true && variantRaceEvents.length === 1 && variantRaceEvents[0].variant === 'C', 'browser concurrent variant stale A/B suppressed and only C dispatched');
 verifyActiveOwners(variantRace.state, 'browser concurrent variant final', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
 verifyTerminalOwners(variantRace.terminal, 'browser concurrent variant terminal');
 check(['a', 'b', 'c'].every((variant) => browser.assetRequests.some((request) => request.includes(`bomb-familiar-${variant}`))), 'browser requested all A/B/C assets');

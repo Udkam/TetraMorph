@@ -106,10 +106,21 @@ async function delayedRace(browser, kind) {
       globalThis.__R5B_RACE_OLD__ = old;
       await import(`./audition.ts?race-hmr=${token}`);
       while (window.__R5B_READY__ !== true) await new Promise((resolve) => setTimeout(resolve, 10));
+      const freshBefore = window.__R5B_TEST__.getState();
+      const domBefore = {
+        bodyReady: document.body.dataset.ready,
+        status: document.querySelector('#status')?.textContent,
+        technical: document.querySelector('#technical')?.textContent,
+        canvas: document.querySelectorAll('canvas').length,
+      };
+      const freshPrimeResult = await window.__R5B_TEST__.prime('A');
       return {
         old: old.getState(),
-        freshBefore: window.__R5B_TEST__.getState(),
-        domBefore: {
+        freshBefore,
+        domBefore,
+        freshPrimeResult,
+        freshPrimed: window.__R5B_TEST__.getState(),
+        domPrimed: {
           bodyReady: document.body.dataset.ready,
           status: document.querySelector('#status')?.textContent,
           technical: document.querySelector('#technical')?.textContent,
@@ -154,8 +165,10 @@ async function delayedRace(browser, kind) {
     terminalOwners(result.old, 'delayed HMR old-before-release');
     terminalOwners(result.oldAfter, 'delayed HMR old-after-release');
     activeOwners(result.freshBefore, 'delayed HMR fresh-before-release', { liveContexts: 0, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
-    activeOwners(result.freshAfter, 'delayed HMR fresh-after-release', { liveContexts: 0, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
-    check(result.freshBefore.instanceId === result.freshAfter.instanceId && result.freshBefore.renderer.tickerIdentity === result.freshAfter.renderer.tickerIdentity && result.freshBefore.ready === result.freshAfter.ready && JSON.stringify(result.domBefore) === JSON.stringify(result.domAfter), 'delayed HMR late old callback cannot alter fresh identity/ticker/DOM/ready');
+    activeOwners(result.freshPrimed, 'delayed HMR fresh-primed', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
+    activeOwners(result.freshAfter, 'delayed HMR fresh-after-release', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
+    check(result.freshPrimeResult === true && result.freshBefore.audio.contextsCreated === 0 && result.freshPrimed.audio.contextsCreated === 1 && result.freshPrimed.audio.liveContexts === 1, 'delayed HMR samples fresh before successful prime then proves one fresh context');
+    check(result.freshBefore.instanceId === result.freshPrimed.instanceId && result.freshPrimed.instanceId === result.freshAfter.instanceId && result.freshPrimed.renderer.tickerIdentity === result.freshAfter.renderer.tickerIdentity && result.freshPrimed.ready === result.freshAfter.ready && JSON.stringify(result.domPrimed) === JSON.stringify(result.domAfter), 'delayed HMR late old callback cannot alter primed fresh identity/ticker/DOM/ready');
     await page.evaluate(() => window.__R5B_TEST__.dispose('race-finish'));
   }
   await page.close();
@@ -165,16 +178,28 @@ async function delayedRace(browser, kind) {
 async function concurrentVariantRace(browser) {
   const page = await open(browser, { width: 960, height: 820 });
   const initialState = await get(page);
-  let release;
-  let heldResolve;
-  const held = new Promise((resolve) => { heldResolve = resolve; });
-  const gate = new Promise((resolve) => { release = resolve; });
-  let intercepted = false;
+  let releaseA;
+  let releaseB;
+  let heldAResolve;
+  let heldBResolve;
+  const heldA = new Promise((resolve) => { heldAResolve = resolve; });
+  const heldB = new Promise((resolve) => { heldBResolve = resolve; });
+  const gateA = new Promise((resolve) => { releaseA = resolve; });
+  const gateB = new Promise((resolve) => { releaseB = resolve; });
+  let interceptedA = false;
+  let bRequestCount = 0;
   await page.route(/bomb-familiar-a\.wav/u, async (route) => {
-    if (intercepted) return route.continue();
-    intercepted = true;
-    heldResolve();
-    await gate;
+    if (interceptedA) return route.continue();
+    interceptedA = true;
+    heldAResolve();
+    await gateA;
+    await route.continue();
+  });
+  await page.route(/bomb-familiar-b\.wav/u, async (route) => {
+    bRequestCount += 1;
+    if (bRequestCount !== 2) return route.continue();
+    heldBResolve();
+    await gateB;
     await route.continue();
   });
   await page.evaluate(() => {
@@ -187,9 +212,12 @@ async function concurrentVariantRace(browser) {
     globalThis.__R5B_VARIANT_TIMER__ = setInterval(sample, 1);
   });
   const first = page.evaluate(() => window.__R5B_TEST__.playEvent('normal', 'A', false, true));
-  await held;
+  await heldA;
   const second = page.evaluate(() => window.__R5B_TEST__.playEvent('normal', 'B', false, true));
-  await page.waitForFunction(() => window.__R5B_TEST__.getState().audio.variant === 'B');
+  await Promise.all([
+    heldB,
+    page.waitForFunction(() => window.__R5B_TEST__.getState().audio.variant === 'B'),
+  ]);
   const third = page.evaluate(() => window.__R5B_TEST__.playEvent('normal', 'C', false, true));
   const thirdResult = await third;
   await page.waitForFunction(() => {
@@ -197,9 +225,10 @@ async function concurrentVariantRace(browser) {
     return state.audio.variant === 'C' && state.audio.pendingTransitions === 0 && state.audio.assets.filter((asset) => asset.ownerId === state.audio.activeEngineOwnerId).length === 6;
   });
   const beforeRelease = await get(page);
-  release();
+  releaseA();
+  releaseB();
   const results = [await first, await second, thirdResult];
-  await page.waitForFunction(() => window.__R5B_TEST__.getState().audio.staleAssetCallbacksDropped >= 1);
+  await page.waitForFunction(() => window.__R5B_TEST__.getState().audio.staleAssetCallbacksDropped >= 2);
   await page.waitForTimeout(500);
   const result = await page.evaluate(() => {
     clearInterval(globalThis.__R5B_VARIANT_TIMER__);
@@ -211,9 +240,10 @@ async function concurrentVariantRace(browser) {
   });
   check(result.samples.length > 2 && result.samples.every((sample) => sample.liveContexts <= 1 && sample.instanceId === initialState.instanceId && sample.ready), 'concurrent variant samples retain one ready instance and <=1 live context');
   check(result.state.audio.maxLiveContextsObserved <= 1 && result.state.audio.liveContexts === 1 && result.state.audio.pendingTransitions === 0 && result.state.audio.variant === 'C', 'concurrent variant final exclusive C owner');
-  check(result.state.audio.staleAssetCallbacksDropped >= 1 && JSON.stringify(result.state.audio.assets) === JSON.stringify(beforeRelease.audio.assets), 'concurrent variant drops late assets without audit-state pollution');
+  check(result.state.audio.staleAssetCallbacksDropped >= 2 && JSON.stringify(result.state.audio.assets) === JSON.stringify(beforeRelease.audio.assets), 'concurrent variant drops late A/B assets without audit-state pollution');
   check(result.state.audio.assets.filter((asset) => asset.ownerId === result.state.audio.activeEngineOwnerId && asset.assetId.startsWith('bombFamiliar')).length === 3, 'concurrent variant active owner audits all three stems');
-  check(results[0] === false && results[2] === true && result.state.audio.events.at(-1)?.variant === 'C', 'concurrent variant stale A suppressed and C dispatched');
+  const dispatched = result.state.audio.events.filter((event) => ['A', 'B', 'C'].includes(event.variant));
+  check(results[0] === false && results[1] === false && results[2] === true && dispatched.length === 1 && dispatched[0].variant === 'C', 'concurrent variant stale A/B suppressed and only C dispatched');
   activeOwners(result.state, 'concurrent variant final', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
   const terminal = await page.evaluate(async () => { const old = window.__R5B_TEST__; await old.dispose('variant-race'); return old.getState(); });
   terminalOwners(terminal, 'concurrent variant terminal');
@@ -308,6 +338,12 @@ await desktop.evaluate(() => window.__R5B_TEST__.enable());
 const enabled = await get(desktop);
 check(enabled.enabled && enabled.audio.enabled, 're-enable remains enabled');
 activeOwners(enabled, 're-enabled idle', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
+const reenabledReplay = await desktop.evaluate(async () => { await window.__R5B_TEST__.playEvent('normal', 'A', false, true); return window.__R5B_TEST__.getState(); });
+activeOwners(reenabledReplay, 're-enabled replay', { liveContexts: 1, eventSources: 1, pendingTimers: 0, frameCallbacks: 0 });
+proveEvent(reenabledReplay.audio.events.at(-1), reenabledReplay.fixture, 'A', 'normal', false);
+check(reenabledReplay.playCount === enabled.playCount + 1 && reenabledReplay.audio.events.length === enabled.audio.events.length + 1, 're-enabled replay dispatches exactly one fresh event');
+check(reenabledReplay.audio.contextsCreated === enabled.audio.contextsCreated && reenabledReplay.audio.activeEngineOwnerId === enabled.audio.activeEngineOwnerId && reenabledReplay.renderer.tickerIdentity === enabled.renderer.tickerIdentity && reenabledReplay.listenerCount === enabled.listenerCount, 're-enabled replay creates no duplicate context/Renderer/ticker/listeners');
+await desktop.evaluate(() => window.__R5B_TEST__.stop());
 
 const mobile = await open(browser, { width: 390, height: 844 });
 const mobileLayout = await layout(mobile);
@@ -319,11 +355,14 @@ terminalOwners(mobileTerminal, 'mobile destroy');
 await mobile.close();
 
 const reducedPage = await open(browser, { width: 1100, height: 900 }, 'reduce');
+const reducedLayout = await layout(reducedPage);
+check(!reducedLayout.overflow && reducedLayout.minTarget >= 44 && reducedLayout.canvas === 1, 'reduced layout/targets');
 const reducedState = await reducedPage.evaluate(async () => { await window.__R5B_TEST__.playEvent('chain', 'A', true, true); return window.__R5B_TEST__.getState(); });
 proveEvent(reducedState.audio.events.at(-1), reducedState.fixture, 'A', 'chain', true);
 activeOwners(reducedState, 'reduced technical', { liveContexts: 1, eventSources: 1, pendingTimers: 0, frameCallbacks: 0 });
 await reducedPage.screenshot({ path: join(root, 'r5b-reduced-technical-a.png'), fullPage: true });
-await reducedPage.evaluate(() => window.__R5B_TEST__.dispose('reduced'));
+const reducedTerminal = await reducedPage.evaluate(async () => { const old = window.__R5B_TEST__; await old.dispose('reduced'); return old.getState(); });
+terminalOwners(reducedTerminal, 'reduced destroy');
 await reducedPage.close();
 
 const races = {};
@@ -351,13 +390,15 @@ const report = {
   restarted,
   disabled,
   enabled,
+  reenabledReplay,
   reducedState,
+  reducedTerminal,
   mobileTerminal,
   desktopTerminal,
   races,
   variantRace,
   assetRequests: [...assetRequests],
-  layout: { desktop: desktopLayout, mobile: mobileLayout },
+  layout: { desktop: desktopLayout, mobile: mobileLayout, reduced: reducedLayout },
   consoleErrors,
   pageErrors,
   requestErrors,

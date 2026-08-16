@@ -13,6 +13,14 @@ const PRODUCT = '94957fd';
 const R5A_SOURCE = '9d30894';
 const R5A_OUTPUT = '99b47be';
 const R5A_REPORT = '4ce7ba3';
+const COORDINATOR_DETOUR = Object.freeze({
+  path: 'docs/agent-runs/t37-unified-sensory-curriculum/SURVIVAL-OPTIMIZATION-PROPOSAL.md',
+  addHead: '94e8b9b0b6480a974477d70e4ec7862a5064dfb2',
+  addParent: '4638d7c01d110a4ab6da404130dfc619af2579e0',
+  addGitObject: '28881be3fa887239ae3b01d16f8e58d9832ee05d',
+  revertHead: '97a4ddc9fc96a0b47d56b4a99c710fd119a62535',
+  revertParent: '94e8b9b0b6480a974477d70e4ec7862a5064dfb2',
+});
 const SOURCE = ['README.md', 'index.html', 'styles.css', 'fixture.ts', 'productAudioSession.ts', 'audition.ts', 'browser-smoke.mjs', 'client-actions.json', 'write-manifest.mjs', 'verify.mjs'];
 const OUTPUT = ['browser-report.json', 'r5b-desktop-normal-a.png', 'r5b-desktop-chain-a.png', 'r5b-mobile-chain-a.png', 'r5b-reduced-technical-a.png', 'client-smoke/shot-0.png', 'client-smoke/shot-1.png', 'client-smoke/shot-2.png', 'client-smoke/state-0.json', 'client-smoke/state-1.json', 'client-smoke/state-2.json'];
 const PRE_REPORT = [...OUTPUT, 'manifest.json'];
@@ -32,8 +40,8 @@ const FULL_BEATS = Array.from({ length: 20 }, (_, index) => 220 + index * 56);
 const REDUCED_BEATS = Array.from({ length: 20 }, (_, index) => 50 + index * 20);
 const BYTE_CONTRACT = Object.freeze({ text: 'UTF-8 no-BOM LF-only', png: 'binary-unfiltered', committedDomain: 'git blob', precommitDomain: 'validated raw worktree bytes', manifestSelfHash: 'excluded' });
 const TIMING = Object.freeze({ normalFrames: 19_200, fullChainFrames: 65_664, reducedChainFrames: 22_368, fullBeatStartsMs: FULL_BEATS, reducedBeatStartsMs: REDUCED_BEATS });
-const MANIFEST_KEYS = ['schema', 'generatedAt', 'provenance', 'pathContracts', 'countContracts', 'byteContract', 'timing', 'wav', 'sourceBindings', 'outputBindings', 'contractBindings', 'productBindings', 'r5aBindings'];
-const BROWSER_KEYS = ['schema', 'generatedAt', 'passed', 'failures', 'initial', 'naturalPair', 'domRoutes', 'technical', 'sameContext', 'stemAssets', 'stopped', 'restarted', 'disabled', 'enabled', 'reducedState', 'mobileTerminal', 'desktopTerminal', 'races', 'variantRace', 'assetRequests', 'layout', 'consoleErrors', 'pageErrors', 'requestErrors'];
+const MANIFEST_KEYS = ['schema', 'generatedAt', 'provenance', 'historyDisclosure', 'pathContracts', 'countContracts', 'byteContract', 'timing', 'wav', 'sourceBindings', 'outputBindings', 'contractBindings', 'productBindings', 'r5aBindings'];
+const BROWSER_KEYS = ['schema', 'generatedAt', 'passed', 'failures', 'initial', 'naturalPair', 'domRoutes', 'technical', 'sameContext', 'stemAssets', 'stopped', 'restarted', 'disabled', 'enabled', 'reenabledReplay', 'reducedState', 'reducedTerminal', 'mobileTerminal', 'desktopTerminal', 'races', 'variantRace', 'assetRequests', 'layout', 'consoleErrors', 'pageErrors', 'requestErrors'];
 
 if (SOURCE.length !== 10 || PRE_REPORT.length !== 12 || TERMINAL.length !== 1 || CONTRACT.length !== 4 || R5A_SOURCE_PATHS.length !== 21 || R5A_OUTPUT_PATHS.length !== 14 || R5A_TERMINAL_PATHS.length !== 1) throw new Error('Frozen path-count contract drifted.');
 const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
@@ -44,6 +52,7 @@ const equalSet = (left, right) => JSON.stringify(sorted(left)) === JSON.stringif
 const canonicalIso = (value) => { try { return typeof value === 'string' && new Date(value).toISOString() === value; } catch { return false; } };
 const range = (from, to) => git('diff', '--name-only', `${from}..${to}`).split(/\r?\n/u).filter(Boolean);
 const treePaths = (head, pathPrefix) => git('ls-tree', '-r', '--name-only', head, '--', pathPrefix).split(/\r?\n/u).filter(Boolean);
+const exists = (head, path) => { try { git('cat-file', '-e', `${head}:${path}`); return true; } catch { return false; } };
 function exactRange(from, to, expected, label) {
   git('merge-base', '--is-ancestor', from, to);
   const observed = range(from, to);
@@ -75,6 +84,43 @@ function bindProduct(entry) {
   if (entry.object && object !== entry.object) throw new Error(`Product tree drift: ${entry.path}`);
   return entry.kind === 'tree' ? { kind: 'tree', head: PRODUCT, path: entry.path, gitObject: object } : bindBlob(PRODUCT, entry.path);
 }
+function historyDisclosure(from, to, sourcePaths) {
+  git('merge-base', '--is-ancestor', from, to);
+  const rows = git('rev-list', '--reverse', '--parents', `${from}..${to}`).split(/\r?\n/u).filter(Boolean).map((line) => line.split(' '));
+  const touched = new Set();
+  for (const [commit, ...parents] of rows) {
+    if (parents.length !== 1) throw new Error(`Authorization history is not linear at ${commit}.`);
+    const changes = git('diff-tree', '--no-commit-id', '--name-status', '-r', commit).split(/\r?\n/u).filter(Boolean).map((line) => {
+      const [status, path, extra] = line.split('\t');
+      if (!status || !path || extra) throw new Error(`Unsupported history entry at ${commit}: ${line}`);
+      touched.add(path);
+      return { status, path };
+    });
+    if (commit === COORDINATOR_DETOUR.addHead) {
+      if (parents[0] !== COORDINATOR_DETOUR.addParent || JSON.stringify(changes) !== JSON.stringify([{ status: 'A', path: COORDINATOR_DETOUR.path }])) throw new Error('Coordinator add detour drifted.');
+    } else if (commit === COORDINATOR_DETOUR.revertHead) {
+      if (parents[0] !== COORDINATOR_DETOUR.revertParent || JSON.stringify(changes) !== JSON.stringify([{ status: 'D', path: COORDINATOR_DETOUR.path }])) throw new Error('Coordinator revert detour drifted.');
+    } else if (changes.some(({ path }) => !sourcePaths.includes(path))) {
+      throw new Error(`Unauthorized non-R5B path touched by ${commit}.`);
+    }
+  }
+  if (!rows.some(([commit]) => commit === COORDINATOR_DETOUR.addHead) || !rows.some(([commit]) => commit === COORDINATOR_DETOUR.revertHead)) throw new Error('Coordinator detour commits are absent from authorization history.');
+  if (!equalSet(touched, [...sourcePaths, COORDINATOR_DETOUR.path]) || exists(to, COORDINATOR_DETOUR.path)) throw new Error('Authorization touched-path/net-zero contract drifted.');
+  const added = blob(COORDINATOR_DETOUR.addHead, COORDINATOR_DETOUR.path);
+  text(added, COORDINATOR_DETOUR.path);
+  if (git('rev-parse', `${COORDINATOR_DETOUR.addHead}:${COORDINATOR_DETOUR.path}`) !== COORDINATOR_DETOUR.addGitObject) throw new Error('Coordinator detour blob drifted.');
+  return {
+    range: `${from}..${to}`,
+    allowedSourcePrefix: prefix,
+    touchedPaths: [...sourcePaths, COORDINATOR_DETOUR.path],
+    disposition: 'disclosed net-zero coordinator detour; absent at source endpoint',
+    coordinatorDetour: {
+      path: COORDINATOR_DETOUR.path,
+      add: { head: COORDINATOR_DETOUR.addHead, parent: COORDINATOR_DETOUR.addParent, status: 'A', gitObject: COORDINATOR_DETOUR.addGitObject, sha256: sha(added), bytes: added.length },
+      revert: { head: COORDINATOR_DETOUR.revertHead, parent: COORDINATOR_DETOUR.revertParent, status: 'D' },
+    },
+  };
+}
 
 const head = git('rev-parse', 'HEAD');
 const sourcePaths = SOURCE.map((path) => prefix + path);
@@ -82,6 +128,7 @@ const prePaths = PRE_REPORT.map((path) => prefix + path);
 const terminalPaths = TERMINAL.map((path) => prefix + path);
 exactRange(AUTH, head, sourcePaths, 'authorization-to-source');
 exactTree(head, prefix, sourcePaths, 'source tree');
+const disclosedHistory = historyDisclosure(AUTH, head, sourcePaths);
 exactRange(R5A_SOURCE, R5A_OUTPUT, R5A_OUTPUT_PATHS, 'R5A source-to-output');
 exactRange(R5A_OUTPUT, R5A_REPORT, R5A_TERMINAL_PATHS, 'R5A output-to-terminal');
 exactTree(R5A_SOURCE, r5aPrefix, R5A_SOURCE_PATHS, 'R5A source tree');
@@ -121,8 +168,9 @@ const manifest = {
   schema: 'tetramorph.t37.r5b-manifest.v2',
   generatedAt: new Date().toISOString(),
   provenance: { authorizationHead: AUTH, evidenceSourceHead: head, productHead: PRODUCT, r5a: { source: R5A_SOURCE, outputs: R5A_OUTPUT, report: R5A_REPORT }, writerBoundary: `${prefix}**`, humanStatus: 'OPEN / NOT ACCEPTED' },
-  pathContracts: { source: sourcePaths, preReport: prePaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_BINDINGS.map(({ kind, path }) => ({ kind, path })), r5aSource: R5A_SOURCE_PATHS, r5aOutput: R5A_OUTPUT_PATHS, r5aTerminal: R5A_TERMINAL_PATHS },
-  countContracts: { source: 10, preReport: 12, terminal: 1, contract: 4, r5aSource: 21, r5aOutput: 14, r5aTerminal: 1 },
+  historyDisclosure: disclosedHistory,
+  pathContracts: { source: sourcePaths, authorizationTouched: disclosedHistory.touchedPaths, preReport: prePaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_BINDINGS.map(({ kind, path }) => ({ kind, path })), r5aSource: R5A_SOURCE_PATHS, r5aOutput: R5A_OUTPUT_PATHS, r5aTerminal: R5A_TERMINAL_PATHS },
+  countContracts: { source: 10, authorizationTouched: 11, preReport: 12, terminal: 1, contract: 4, r5aSource: 21, r5aOutput: 14, r5aTerminal: 1 },
   byteContract: BYTE_CONTRACT,
   timing: TIMING,
   wav: WAV,
