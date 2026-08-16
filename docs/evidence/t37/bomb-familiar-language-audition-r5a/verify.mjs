@@ -23,6 +23,9 @@ const expected = {
   reviewRangeBaseSha: 'b11b7b552f1504094a94ccc5e21410a694bf2881',
   contractAcceptedSha: '8f29bb82f40fac00764d1be822875368f426145c',
   authorizationSha: '265b697a1707b89a128fdfe9f15b22076b02d587',
+  originalEvidenceSourceSha: '1646b1cbe5e809262ef3f06af98c8a775a94be6d',
+  supersededPreReportSha: '9b8cd1d920da2e3078aa634c60d644ea1f31e090',
+  revisionBaseSha: '476ec187ac04c4b758b9411871d1af07791dd1ff',
   currentProductSourceSha: 'b11b7b552f1504094a94ccc5e21410a694bf2881',
   playwright: '1.61.1',
   chromium: '149.0.7827.55',
@@ -41,6 +44,9 @@ const generatedNames = [
   'r5a-desktop-impact.png', 'r5a-mobile.png', 'r5a-reduced-technical.png',
 ];
 const preReportGeneratedNames = generatedNames.filter((name) => name !== 'verification-report.json');
+const revisionSourceNames = ['audition.ts', 'browser-smoke.mjs', 'verify.mjs', 'write-manifest.mjs'];
+const revisionPaths = [...revisionSourceNames, ...generatedNames]
+  .map((name) => `${prefix}${name}`);
 const baseToContract = [
   'docs/CURRENT_TASK.md', 'docs/DESIGN.md',
   'docs/agent-runs/t37-unified-sensory-curriculum/STATE.md',
@@ -56,7 +62,7 @@ const manifestBytes = await readFile(join(root, 'manifest.json'));
 const manifest = JSON.parse(manifestBytes.toString('utf8'));
 const browserReport = JSON.parse(await readFile(join(root, 'browser-report.json'), 'utf8'));
 const verificationInputHead = git('rev-parse', 'HEAD');
-check(manifest.schema === 'tetramorph.t37.bomb-r5a-familiar-language-audition.v1', 'manifest schema');
+check(manifest.schema === 'tetramorph.t37.bomb-r5a-familiar-language-audition.v2', 'manifest schema');
 for (const [key, value] of Object.entries(expected).filter(([key]) => key.endsWith('Sha'))) {
   check(manifest.provenance[key] === value, `provenance ${key}`);
 }
@@ -70,18 +76,39 @@ check(manifest.environment.sampleRate === 48_000 && manifest.environment.channel
   && manifest.environment.preRollFrames === 24_000 && manifest.environment.analysisFrames === 8_640, 'offline render window');
 check(manifest.environment.stemFormat === 'mono PCM16 WAV'
   && manifest.environment.stemBoundary.includes('pre-enabledGate'), 'pre-output stem boundary');
+check(manifest.provenance.revisionReason === 'P2 shared-dispose/HMR ownership race repair', 'revision reason');
+check(JSON.stringify(sorted(manifest.pathContracts.authorizationToOriginalSource))
+  === JSON.stringify(sorted(sourceNames.map((name) => `${prefix}${name}`))), 'manifest original source allowlist');
+check(JSON.stringify(sorted(manifest.pathContracts.originalSourceToSupersededPreReport))
+  === JSON.stringify(sorted(preReportGeneratedNames.map((name) => `${prefix}${name}`))), 'manifest superseded pre-report allowlist');
+check(JSON.stringify(manifest.pathContracts.supersededPreReportToRevisionBase)
+  === JSON.stringify([`${prefix}verification-report.json`]), 'manifest superseded report path');
+check(JSON.stringify(sorted(manifest.pathContracts.revisionBaseToSource))
+  === JSON.stringify(sorted(revisionPaths)), 'manifest revision source boundary');
 check(JSON.stringify(sorted(manifest.pathContracts.sourceToPreReport))
   === JSON.stringify(sorted(preReportGeneratedNames.map((name) => `${prefix}${name}`))), 'manifest pre-report generated allowlist');
 check(manifest.pathContracts.terminalReport === `${prefix}verification-report.json`, 'manifest terminal report path');
 
 git('merge-base', '--is-ancestor', expected.reviewRangeBaseSha, expected.contractAcceptedSha);
 git('merge-base', '--is-ancestor', expected.contractAcceptedSha, expected.authorizationSha);
-git('merge-base', '--is-ancestor', expected.authorizationSha, manifest.provenance.evidenceSourceHead);
+git('merge-base', '--is-ancestor', expected.authorizationSha, expected.originalEvidenceSourceSha);
+git('merge-base', '--is-ancestor', expected.originalEvidenceSourceSha, expected.supersededPreReportSha);
+git('merge-base', '--is-ancestor', expected.supersededPreReportSha, expected.revisionBaseSha);
+git('merge-base', '--is-ancestor', expected.revisionBaseSha, manifest.provenance.evidenceSourceHead);
 git('merge-base', '--is-ancestor', manifest.provenance.evidenceSourceHead, verificationInputHead);
 check(JSON.stringify(sorted(rangePaths(expected.reviewRangeBaseSha, expected.contractAcceptedSha))) === JSON.stringify(sorted(baseToContract)), 'review-to-contract paths');
 check(JSON.stringify(sorted(rangePaths(expected.contractAcceptedSha, expected.authorizationSha))) === JSON.stringify(sorted(contractToAuthorization)), 'contract-to-authorization paths');
-check(JSON.stringify(sorted(rangePaths(expected.authorizationSha, manifest.provenance.evidenceSourceHead)))
-  === JSON.stringify(sorted(sourceNames.map((name) => `${prefix}${name}`))), 'authorization-to-source paths');
+check(JSON.stringify(sorted(rangePaths(expected.authorizationSha, expected.originalEvidenceSourceSha)))
+  === JSON.stringify(sorted(sourceNames.map((name) => `${prefix}${name}`))), 'authorization-to-original-source paths');
+check(JSON.stringify(sorted(rangePaths(expected.originalEvidenceSourceSha, expected.supersededPreReportSha)))
+  === JSON.stringify(sorted(preReportGeneratedNames.map((name) => `${prefix}${name}`))), 'original-source-to-superseded-pre-report paths');
+check(JSON.stringify(rangePaths(expected.supersededPreReportSha, expected.revisionBaseSha))
+  === JSON.stringify([`${prefix}verification-report.json`]), 'superseded-pre-report-to-revision-base path');
+check(JSON.stringify(sorted(rangePaths(expected.revisionBaseSha, manifest.provenance.evidenceSourceHead)))
+  === JSON.stringify(sorted(revisionPaths)), 'revision-base-to-source paths');
+const sourceTreeFiles = git('ls-tree', '-r', '--name-only', manifest.provenance.evidenceSourceHead, '--', prefix)
+  .split(/\r?\n/u).filter(Boolean);
+check(!generatedNames.some((name) => sourceTreeFiles.includes(`${prefix}${name}`)), 'revised source head excludes generated outputs');
 check(rangePaths(expected.currentProductSourceSha, manifest.provenance.evidenceSourceHead)
   .filter((path) => path.startsWith('src/')).length === 0, 'product source tree unchanged');
 check(JSON.stringify(sorted(rangePaths(manifest.provenance.evidenceSourceHead, verificationInputHead)))
@@ -174,6 +201,7 @@ function terminalClean(value, expectedCanvasCount = 0) {
     && value.audio.activeSources === 0 && value.audio.pendingSources === 0 && value.audio.timers === 0;
 }
 check(browserReport.passed && browserReport.failures.length === 0, 'browser report passes');
+check(browserReport.schema === 'tetramorph.t37.bomb-r5a-browser-proof.v2', 'browser report schema');
 check(browserReport.consoleErrors.length === 0 && browserReport.pageErrors.length === 0 && browserReport.requestErrors.length === 0, 'browser report zero errors');
 check(browserReport.initial.audio.phase === 'cold' && browserReport.initial.playCount === 0
   && browserReport.initial.verdict === 'reject', 'browser no autoplay reject default');
@@ -190,10 +218,26 @@ for (const scenario of browserReport.lifecycle) {
   check(scenario.before.audio.phase === expectedPhase, `${scenario.method}/${scenario.entryState} entry state`);
   check(terminalClean(scenario.terminal, scenario.method === 'hmr' ? 1 : 0), `${scenario.method}/${scenario.entryState} terminal cleanup`);
   if (scenario.entryState === 'priming') check(scenario.terminal.audio.latePrimeIgnored >= 1, `${scenario.method} late-prime guard`);
-  if (scenario.method === 'hmr') check(scenario.fresh?.ready && scenario.fresh.canvasCount === 1
-    && scenario.fresh.renderer.ready && !scenario.fresh.renderer.disposed
-    && scenario.fresh.renderer.canvasCount === 1
-    && scenario.fresh.audio.phase === 'cold', `hmr/${scenario.entryState} fresh instance`);
+  if (scenario.method === 'hmr') {
+    check(scenario.fresh?.ready && scenario.fresh.canvasCount === 1
+      && scenario.fresh.renderer.ready && !scenario.fresh.renderer.disposed
+      && scenario.fresh.renderer.canvasCount === 1
+      && scenario.fresh.audio.phase === 'cold', `hmr/${scenario.entryState} fresh instance`);
+    check(scenario.hmrOverlap?.sharedDisposePromise && scenario.hmrOverlap.closeEntered
+      && !scenario.hmrOverlap.hotDisposeSettled && !scenario.hmrOverlap.importSettled
+      && scenario.hmrOverlap.importError === null
+      && scenario.hmrOverlap.currentInstanceId === scenario.before.instanceId
+      && scenario.hmrOverlap.old.disposing && !scenario.hmrOverlap.old.ready
+      && !scenario.hmrOverlap.globalReady && scenario.hmrOverlap.bodyReady === 'false', `hmr/${scenario.entryState} real overlap`);
+    check(scenario.hmrPostFresh?.hotDisposeSettled && scenario.hmrPostFresh.importSettled
+      && scenario.hmrPostFresh.importError === null
+      && scenario.hmrPostFresh.currentInstanceId === scenario.fresh.instanceId
+      && scenario.hmrPostFresh.globalReady && scenario.hmrPostFresh.bodyReady === 'true'
+      && scenario.hmrPostFresh.disabledStartButtons === 0 && scenario.hmrPostFresh.canvasCount === 1
+      && scenario.hmrPostFresh.old.disposed && !scenario.hmrPostFresh.old.ready
+      && scenario.hmrPostFresh.fresh.ready && !scenario.hmrPostFresh.fresh.disposed,
+    `hmr/${scenario.entryState} post-fresh ownership`);
+  }
 }
 check(lifecycleKeys.size === 12, 'browser lifecycle matrix uniqueness');
 

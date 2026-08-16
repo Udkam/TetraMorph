@@ -39,6 +39,7 @@ declare global {
       compare(reference: ReferenceId, id: CandidateId): Promise<void>;
       stop(): void;
       dispose(reason?: string): Promise<void>;
+      hotDispose(): Promise<void>;
     };
     render_game_to_text(): string;
     advanceTime(ms: number): void;
@@ -77,16 +78,17 @@ let lastCue: string | null = null;
 let playCount = 0;
 let disposed = false;
 let disposing = false;
+let disposePromise: Promise<void> | null = null;
 let pageReady = false;
 let lastError: string | null = null;
 let hostWidth = 0;
 
-const audio = new R5AAudioSession(() => updateUi());
-const renderer = new NormalBombRendererSession(host, () => updateUi());
+const audio = new R5AAudioSession(() => { if (ownsPageSurface()) updateUi(); });
+const renderer = new NormalBombRendererSession(host, () => { if (ownsPageSurface()) updateUi(); });
 
 const resizeObserver = new ResizeObserver(([entry]) => {
   hostWidth = Math.round(entry?.contentRect.width ?? host.clientWidth);
-  updateUi();
+  if (ownsPageSurface()) updateUi();
 });
 resizeObserver.observe(host);
 
@@ -109,7 +111,7 @@ function setBusy(busy: boolean): void {
 }
 
 function fail(error: unknown): void {
-  if (disposed) return;
+  if (disposed || disposing) return;
   lastError = error instanceof Error ? error.message : String(error);
   requestEpoch += 1;
   clearTimers();
@@ -129,6 +131,7 @@ function updateUi(): void {
     card.classList.toggle('active', card.dataset.candidateCard === render.activeCandidate);
   }
   if (disposed) phaseLabel.textContent = '页面实例已终止并释放';
+  else if (disposing) phaseLabel.textContent = '正在终止页面实例并释放资源…';
   else if (lastError) phaseLabel.textContent = `试听已停止：${lastError}`;
   else if (!pageReady) phaseLabel.textContent = '正在准备生产 Renderer…';
   else if (render.cleanupComplete) phaseLabel.textContent = '完整动画、粒子与回调已清理；可继续试听';
@@ -146,13 +149,15 @@ function updateUi(): void {
     `Timers ${sound.timers + pendingTimers.size}`,
     `Frame ${render.frameCallbackActive ? 1 : 0}`,
   ].join(' · ');
-  renderStatus.textContent = pageReady && !disposed ? '生产 Renderer 就绪' : disposed ? '已释放' : '正在准备';
-  livePill.classList.toggle('ready', pageReady && !disposed && !lastError);
-  document.body.dataset.ready = String(pageReady && !disposed);
+  renderStatus.textContent = pageReady && !disposed && !disposing ? '生产 Renderer 就绪' : disposed ? '已释放' : disposing ? '正在释放' : '正在准备';
+  livePill.classList.toggle('ready', pageReady && !disposed && !disposing && !lastError);
+  document.body.dataset.ready = String(pageReady && !disposed && !disposing);
   document.body.dataset.reviewState = lastError
     ? 'error'
     : disposed
       ? 'disposed'
+      : disposing
+        ? 'disposing'
       : render.activeCandidate
         ? 'running'
         : render.cleanupComplete
@@ -268,7 +273,7 @@ function getState() {
   const reasons = [...document.querySelectorAll<HTMLInputElement>('.reason-group input:checked')].map((input) => input.value);
   return {
     instanceId,
-    ready: pageReady && !disposed,
+    ready: pageReady && !disposed && !disposing,
     disposed,
     disposing,
     reviewState: document.body.dataset.reviewState,
@@ -289,24 +294,40 @@ function getState() {
   };
 }
 
-async function dispose(reason = 'dispose'): Promise<void> {
-  if (disposed || disposing) return;
-  disposing = true;
-  const before = getState();
-  requestEpoch += 1;
-  eventController.abort();
-  clearTimers();
-  resizeObserver.disconnect();
-  renderer.dispose();
-  await audio.dispose(reason);
-  disposed = true;
-  disposing = false;
-  pageReady = false;
-  window.__R5A_READY__ = false;
-  setBusy(true);
-  updateUi();
-  window.__R5A_TERMINAL_AUDIT__?.push({ instanceId, reason, before, after: getState() });
+function ownsPageSurface(): boolean {
+  return window.__R5A_TEST__?.getState().instanceId === instanceId;
 }
+
+function dispose(reason = 'dispose'): Promise<void> {
+  if (disposePromise) return disposePromise;
+  disposePromise = (async () => {
+    const before = getState();
+    disposing = true;
+    pageReady = false;
+    requestEpoch += 1;
+    eventController.abort();
+    clearTimers();
+    resizeObserver.disconnect();
+    renderer.dispose();
+    if (ownsPageSurface()) {
+      window.__R5A_READY__ = false;
+      setBusy(true);
+      updateUi();
+    }
+    await audio.dispose(reason);
+    disposed = true;
+    disposing = false;
+    if (ownsPageSurface()) {
+      window.__R5A_READY__ = false;
+      setBusy(true);
+      updateUi();
+    }
+    window.__R5A_TERMINAL_AUDIT__?.push({ instanceId, reason, before, after: getState() });
+  })();
+  return disposePromise;
+}
+
+const hotDispose = (): Promise<void> => dispose('vite-hmr');
 
 window.__R5A_TEST__ = Object.freeze({
   getState,
@@ -321,6 +342,7 @@ window.__R5A_TEST__ = Object.freeze({
   compare,
   stop,
   dispose,
+  hotDispose,
 });
 window.render_game_to_text = () => JSON.stringify({
   coordinateSystem: 'board x=0..9 left-to-right; visible y=20..39 top-to-bottom; playback begins at warning onset',
@@ -332,11 +354,12 @@ window.advanceTime = (ms) => {
   updateUi();
 };
 window.addEventListener('pagehide', () => { void dispose('pagehide'); }, { once: true, signal: eventController.signal });
-import.meta.hot?.dispose(() => { void dispose('vite-hmr'); });
+import.meta.hot?.dispose(hotDispose);
 
 renderer.init().then(() => {
-  if (disposed) return;
+  if (disposed || disposing) return;
   pageReady = true;
   window.__R5A_READY__ = true;
+  setBusy(false);
   updateUi();
 }).catch(fail);

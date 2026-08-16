@@ -17,6 +17,9 @@ const provenance = {
   reviewRangeBaseSha: 'b11b7b552f1504094a94ccc5e21410a694bf2881',
   contractAcceptedSha: '8f29bb82f40fac00764d1be822875368f426145c',
   authorizationSha: '265b697a1707b89a128fdfe9f15b22076b02d587',
+  originalEvidenceSourceSha: '1646b1cbe5e809262ef3f06af98c8a775a94be6d',
+  supersededPreReportSha: '9b8cd1d920da2e3078aa634c60d644ea1f31e090',
+  revisionBaseSha: '476ec187ac04c4b758b9411871d1af07791dd1ff',
   currentProductSourceSha: 'b11b7b552f1504094a94ccc5e21410a694bf2881',
 };
 const sourceNames = [
@@ -56,6 +59,10 @@ const outputNames = [
 const preReportGeneratedNames = [
   'assets/A.wav', 'assets/B.wav', 'assets/C.wav', 'manifest.json', ...outputNames,
 ];
+const allGeneratedNames = [...preReportGeneratedNames, 'verification-report.json'];
+const revisionSourceNames = ['audition.ts', 'browser-smoke.mjs', 'verify.mjs', 'write-manifest.mjs'];
+const revisionPaths = [...revisionSourceNames, ...allGeneratedNames]
+  .map((name) => `${prefix}${name}`);
 
 const sorted = (values) => [...values].sort();
 function exactPaths(from, to, expected, label) {
@@ -70,7 +77,19 @@ function exactPaths(from, to, expected, label) {
 const evidenceSourceHead = git('rev-parse', 'HEAD');
 exactPaths(provenance.reviewRangeBaseSha, provenance.contractAcceptedSha, baseToContractPaths, 'review-to-contract');
 exactPaths(provenance.contractAcceptedSha, provenance.authorizationSha, contractToAuthorizationPaths, 'contract-to-authorization');
-exactPaths(provenance.authorizationSha, evidenceSourceHead, sourceNames.map((name) => `${prefix}${name}`), 'authorization-to-source');
+exactPaths(provenance.authorizationSha, provenance.originalEvidenceSourceSha,
+  sourceNames.map((name) => `${prefix}${name}`), 'authorization-to-original-source');
+exactPaths(provenance.originalEvidenceSourceSha, provenance.supersededPreReportSha,
+  preReportGeneratedNames.map((name) => `${prefix}${name}`), 'original-source-to-superseded-pre-report');
+exactPaths(provenance.supersededPreReportSha, provenance.revisionBaseSha,
+  [`${prefix}verification-report.json`], 'superseded-pre-report-to-revision-base');
+exactPaths(provenance.revisionBaseSha, evidenceSourceHead, revisionPaths, 'revision-base-to-source');
+const sourceTreeFiles = git('ls-tree', '-r', '--name-only', evidenceSourceHead, '--', prefix)
+  .split(/\r?\n/u).filter(Boolean);
+const lingeringGenerated = allGeneratedNames
+  .map((name) => `${prefix}${name}`)
+  .filter((path) => sourceTreeFiles.includes(path));
+if (lingeringGenerated.length) throw new Error(`Revised source head still contains generated outputs: ${lingeringGenerated.join(', ')}`);
 const productChanges = git('diff', '--name-only', `${provenance.currentProductSourceSha}..${evidenceSourceHead}`, '--', 'src')
   .split(/\r?\n/u).filter(Boolean);
 if (productChanges.length) throw new Error(`Product source changed after the frozen snapshot: ${productChanges.join(', ')}`);
@@ -152,7 +171,7 @@ for (const name of outputNames) {
 }
 
 const manifest = {
-  schema: 'tetramorph.t37.bomb-r5a-familiar-language-audition.v1',
+  schema: 'tetramorph.t37.bomb-r5a-familiar-language-audition.v2',
   generatedAt: new Date().toISOString(),
   provenance: {
     ...provenance,
@@ -160,16 +179,23 @@ const manifest = {
     reviewRangeBaseTree: git('rev-parse', `${provenance.reviewRangeBaseSha}^{tree}`),
     contractAcceptedTree: git('rev-parse', `${provenance.contractAcceptedSha}^{tree}`),
     authorizationTree: git('rev-parse', `${provenance.authorizationSha}^{tree}`),
+    originalEvidenceSourceTree: git('rev-parse', `${provenance.originalEvidenceSourceSha}^{tree}`),
+    supersededPreReportTree: git('rev-parse', `${provenance.supersededPreReportSha}^{tree}`),
+    revisionBaseTree: git('rev-parse', `${provenance.revisionBaseSha}^{tree}`),
     currentProductSourceTree: git('rev-parse', `${provenance.currentProductSourceSha}^{tree}`),
     evidenceSourceTree: git('rev-parse', `${evidenceSourceHead}^{tree}`),
     writerBoundary: `${prefix}**`,
     productAudioChanged: false,
     normalOnly: true,
+    revisionReason: 'P2 shared-dispose/HMR ownership race repair',
   },
   pathContracts: {
     baseToContract: baseToContractPaths,
     contractToAuthorization: contractToAuthorizationPaths,
-    authorizationToSource: sourceNames.map((name) => `${prefix}${name}`),
+    authorizationToOriginalSource: sourceNames.map((name) => `${prefix}${name}`),
+    originalSourceToSupersededPreReport: preReportGeneratedNames.map((name) => `${prefix}${name}`),
+    supersededPreReportToRevisionBase: [`${prefix}verification-report.json`],
+    revisionBaseToSource: revisionPaths,
     sourceToPreReport: preReportGeneratedNames.map((name) => `${prefix}${name}`),
     terminalReport: `${prefix}verification-report.json`,
   },

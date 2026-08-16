@@ -243,9 +243,61 @@ async function lifecycleScenario(method, entryState) {
   }
   const before = await state(page);
   const oldInstanceId = before.instanceId;
+  let hmrOverlap = null;
+  let hmrPostFresh = null;
   if (method === 'hmr') {
-    await page.evaluate(() => { window.__R5A_OLD_TEST__ = window.__R5A_TEST__; });
-    await page.evaluate((token) => import(`./audition.ts?browser-smoke-hmr=${token}`), `${entryState}-${Date.now()}`);
+    await page.evaluate(() => {
+      const originalClose = AudioContext.prototype.close;
+      let releaseClose;
+      const closeGate = new Promise((resolve) => { releaseClose = resolve; });
+      window.__R5A_CLOSE_ENTERED__ = false;
+      window.__R5A_RELEASE_CLOSE__ = () => {
+        AudioContext.prototype.close = originalClose;
+        releaseClose();
+      };
+      AudioContext.prototype.close = async function delayedClose() {
+        window.__R5A_CLOSE_ENTERED__ = true;
+        await closeGate;
+        return originalClose.call(this);
+      };
+      window.__R5A_OLD_TEST__ = window.__R5A_TEST__;
+    });
+    await page.evaluate((token) => {
+      const oldTest = window.__R5A_OLD_TEST__;
+      const hotDisposePromise = oldTest.hotDispose();
+      const repeatedDisposePromise = oldTest.dispose('hmr-overlap-repeat');
+      window.__R5A_SHARED_DISPOSE_PROMISE__ = hotDisposePromise === repeatedDisposePromise;
+      window.__R5A_HOT_DISPOSE_SETTLED__ = false;
+      void hotDisposePromise.then(() => { window.__R5A_HOT_DISPOSE_SETTLED__ = true; });
+      window.__R5A_IMPORT_SETTLED__ = false;
+      window.__R5A_IMPORT_ERROR__ = null;
+      void import(`./audition.ts?browser-smoke-hmr=${token}`).then(
+        () => { window.__R5A_IMPORT_SETTLED__ = true; },
+        (error) => {
+          window.__R5A_IMPORT_ERROR__ = error instanceof Error ? error.message : String(error);
+          window.__R5A_IMPORT_SETTLED__ = true;
+        },
+      );
+    }, `${entryState}-${Date.now()}`);
+    await page.waitForFunction(() => window.__R5A_CLOSE_ENTERED__ === true
+      && window.__R5A_OLD_TEST__.getState().disposing === true);
+    hmrOverlap = await page.evaluate(() => ({
+      sharedDisposePromise: window.__R5A_SHARED_DISPOSE_PROMISE__,
+      hotDisposeSettled: window.__R5A_HOT_DISPOSE_SETTLED__,
+      importSettled: window.__R5A_IMPORT_SETTLED__,
+      importError: window.__R5A_IMPORT_ERROR__,
+      closeEntered: window.__R5A_CLOSE_ENTERED__,
+      currentInstanceId: window.__R5A_TEST__.getState().instanceId,
+      globalReady: window.__R5A_READY__,
+      bodyReady: document.body.dataset.ready,
+      disabledStartButtons: document.querySelectorAll('[data-starts-audio]:disabled').length,
+      old: window.__R5A_OLD_TEST__.getState(),
+    }));
+    if (releasePrime) {
+      releasePrime();
+      releasePrime = null;
+    }
+    await page.evaluate(() => window.__R5A_RELEASE_CLOSE__());
   } else if (method === 'pagehide') {
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
   } else {
@@ -255,7 +307,10 @@ async function lifecycleScenario(method, entryState) {
   let terminal;
   let fresh = null;
   if (method === 'hmr') {
-    await page.waitForFunction((id) => window.__R5A_READY__ === true
+    await page.waitForFunction((id) => window.__R5A_IMPORT_SETTLED__ === true
+      && window.__R5A_IMPORT_ERROR__ === null
+      && window.__R5A_HOT_DISPOSE_SETTLED__ === true
+      && window.__R5A_READY__ === true
       && window.__R5A_TEST__.getState().instanceId > id
       && document.querySelectorAll('canvas').length === 1, oldInstanceId, { timeout: 20_000 });
     if (entryState === 'priming') {
@@ -263,6 +318,19 @@ async function lifecycleScenario(method, entryState) {
     }
     terminal = await page.evaluate(() => window.__R5A_OLD_TEST__.getState());
     fresh = await state(page);
+    await page.waitForTimeout(100);
+    hmrPostFresh = await page.evaluate(() => ({
+      hotDisposeSettled: window.__R5A_HOT_DISPOSE_SETTLED__,
+      importSettled: window.__R5A_IMPORT_SETTLED__,
+      importError: window.__R5A_IMPORT_ERROR__,
+      currentInstanceId: window.__R5A_TEST__.getState().instanceId,
+      globalReady: window.__R5A_READY__,
+      bodyReady: document.body.dataset.ready,
+      disabledStartButtons: document.querySelectorAll('[data-starts-audio]:disabled').length,
+      canvasCount: document.querySelectorAll('canvas').length,
+      old: window.__R5A_OLD_TEST__.getState(),
+      fresh: window.__R5A_TEST__.getState(),
+    }));
   } else {
     await page.waitForFunction(() => window.__R5A_TEST__.getState().audio.phase === 'disposed');
     if (entryState === 'priming') {
@@ -277,8 +345,18 @@ async function lifecycleScenario(method, entryState) {
   if (fresh) check(fresh.ready && fresh.instanceId > oldInstanceId && fresh.canvasCount === 1
     && fresh.renderer.ready && !fresh.renderer.disposed && fresh.renderer.canvasCount === 1
     && fresh.audio.phase === 'cold' && fresh.terminalAuditCount >= 1, `${label} fresh instance`);
+  if (hmrOverlap) check(hmrOverlap.sharedDisposePromise && hmrOverlap.closeEntered
+    && !hmrOverlap.hotDisposeSettled && !hmrOverlap.importSettled && hmrOverlap.importError === null
+    && hmrOverlap.currentInstanceId === oldInstanceId && hmrOverlap.old.disposing && !hmrOverlap.old.ready
+    && !hmrOverlap.globalReady && hmrOverlap.bodyReady === 'false', `${label} real hot-dispose overlap`);
+  if (hmrPostFresh) check(hmrPostFresh.hotDisposeSettled && hmrPostFresh.importSettled
+    && hmrPostFresh.importError === null && hmrPostFresh.currentInstanceId === fresh.instanceId
+    && hmrPostFresh.globalReady && hmrPostFresh.bodyReady === 'true'
+    && hmrPostFresh.disabledStartButtons === 0 && hmrPostFresh.canvasCount === 1
+    && hmrPostFresh.old.disposed && !hmrPostFresh.old.ready
+    && hmrPostFresh.fresh.ready && !hmrPostFresh.fresh.disposed, `${label} old completion cannot pollute fresh instance`);
   await page.close();
-  return { method, entryState, before, terminal, fresh };
+  return { method, entryState, before, terminal, fresh, hmrOverlap, hmrPostFresh };
 }
 
 const lifecycle = [];
@@ -294,7 +372,7 @@ check(pageErrors.length === 0, `page errors: ${pageErrors.join(' | ')}`);
 check(requestErrors.length === 0, `request errors: ${requestErrors.join(' | ')}`);
 
 const report = {
-  schema: 'tetramorph.t37.bomb-r5a-browser-proof.v1',
+  schema: 'tetramorph.t37.bomb-r5a-browser-proof.v2',
   generatedAt: new Date().toISOString(),
   url: baseUrl,
   playwrightVersion,
