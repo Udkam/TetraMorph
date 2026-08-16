@@ -41,6 +41,14 @@ There is no clamp, normalization, compression, preview transcode, old `bomb` /
 `bomb-chain` recipe, noise layer, or fixed pulse. Renderer ownership, the presentation
 timeline, and Core stay frozen. Default A remains provisional rather than human accepted.
 
+R5B evidence hashes committed text from Git blob bytes, not checkout-dependent working-tree
+bytes. Every authored/generated text file is UTF-8 without BOM and LF-only; generation
+fails before commit on CRLF, BOM, or invalid UTF-8, while PNG is raw binary. Reusable stop,
+restart, and disable paths retain one ready AudioContext/Renderer/Canvas but must remove all
+event sources, timers, and frame callbacks without multiplying listeners. Terminal destroy,
+pagehide, and HMR close the old AudioContext, remove listeners, destroy the Renderer ticker,
+and remove its Canvas. HMR then proves exactly one fresh owner/context/Renderer/Canvas.
+
 Ice 2 remains the accepted runtime material: use the locally proven Ogg and local
 provenance. The original uploader WAV on the official page still requires login and is
 explicitly **OPEN**; it is not replaced with a preview transcode and does not block the

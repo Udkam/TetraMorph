@@ -115,9 +115,11 @@ and pulse path. The final diff is exactly the authorized 15 product/test paths. 
 suite (`544 passed / 15 skipped` in `56 passed / 2 skipped` files), and the 770-module
 build pass.
 
-Independent source/lifecycle review finds no product defect. Independent audio/provenance
-review reports `P0/P1/P2/P3/GAP = 0/0/0/1/1`: the P3 records that the authorized three
-logical claims were committed as four smaller checkpoints, with legacy retirement after
+Independent source/lifecycle review reports
+`P0/P1/P2/P3/automatic-GAP = 0/0/0/0/0`, with human listening separately open.
+Independent audio/provenance review reports `P0/P1/P2/P3/GAP = 0/0/0/1/1`: the P3
+records that the authorized three logical claims were committed as four smaller
+checkpoints, with legacy retirement after
 runtime routing instead of in the compositor checkpoint. The final tree stayed within the
 authorized boundary; after `02272d5` Bomb dispatch no longer reached the legacy route, and
 `94957fd` removed that implementation. This is accepted as a
@@ -145,9 +147,15 @@ only on subsequent events.
 The browser matrix covers desktop and 390x844 mobile, full/reduced motion, keyboard and
 44 px targets, replay/stop, disable/re-enable, restart, pagehide/HMR replacement, and
 destroy. It requires one Canvas while mounted, zero DOM board cells, zero overflow,
-zero console/page/request errors, no residual sources/timers/frame callbacks after each
-terminal path, and zero Canvas after disposal. Commit source first. The exact pre-report
-generated allowlist is `browser-report.json`, `r5b-desktop-normal-a.png`,
+zero console/page/request errors, and stable listener ownership. Reusable stop, restart,
+and disable must synchronously remove event-owned sources, timers, and frame callbacks;
+they intentionally retain one ready AudioContext, one Renderer/ticker owner, and one Canvas,
+and re-enable/replay must not duplicate any of them. Terminal destroy and pagehide must
+close the AudioContext, remove every page listener, destroy the Renderer ticker, clear
+timers/sources/callbacks, remove the Canvas, and remove instance-owned QA globals. HMR must
+prove that complete old-instance terminal state before installing exactly one fresh page
+owner, AudioContext, Renderer/ticker, Canvas, and listener set. Commit source first. The
+exact pre-report generated allowlist is `browser-report.json`, `r5b-desktop-normal-a.png`,
 `r5b-desktop-chain-a.png`, `r5b-mobile-chain-a.png`, `r5b-reduced-technical-a.png`,
 `client-smoke/shot-0.png`, `client-smoke/shot-1.png`, `client-smoke/shot-2.png`,
 `client-smoke/state-0.json`, `client-smoke/state-1.json`,
@@ -158,8 +166,19 @@ its own. Commit exactly that generated set second. Finally commit only
 `verification-report.json`; it binds the manifest SHA-256, the generated-input HEAD, and
 fresh recomputation of every manifest assertion. `write-manifest.mjs` and `verify.mjs`
 must enforce exact path equality for authorization-to-source, source-to-generated, and
-generated-to-terminal-report ranges. Automated evidence remains technical eligibility;
-the page is presented only in the final consolidated human review.
+generated-to-terminal-report ranges.
+
+All `.md`, `.html`, `.css`, `.ts`, `.mjs`, and `.json` evidence bytes are UTF-8 without
+BOM and LF-only; generation and verification fail on CRLF, BOM, or invalid UTF-8. PNG
+bytes are binary and unfiltered. Source/contract/product bindings are SHA-256 over
+`git show <head>:<path>` blob content. Before the generated commit, the manifest writer
+checks that each textual worktree output already satisfies the byte contract and hashes
+those raw bytes. The terminal verifier recomputes the same hashes from Git blobs at the
+recorded generated-input HEAD, proving that clean filters did not change them. It reads
+and hashes `manifest.json` from that same Git head; the report records that manifest
+SHA-256. Thus `core.autocrlf` and checkout EOL cannot redefine the evidence domain.
+Automated evidence remains technical eligibility; the page is presented only in the final
+consolidated human review.
 
 ## Active objective
 

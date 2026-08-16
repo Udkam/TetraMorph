@@ -10,6 +10,8 @@
   (`544 passed / 15 skipped`), and the 770-module build. Independent numeric recomputation
   confirms normal 400 ms, full row-39 chain 1368 ms, reduced chain 466 ms, finite unclipped
   samples, one source per event, and exact R5A asset bytes.
+- Source/lifecycle QA is `P0/P1/P2/P3/automatic-GAP = 0/0/0/0/0`; its separate human GAP
+  stays open. Audio/provenance QA is `0/0/0/1/1`, with the P3 and human GAP described below.
 - Audio/provenance QA records one P3 because three logical authorized claims became four
   small commits and retirement followed routing. The final 15-path tree is within scope;
   routing made the legacy branch unreachable before final retirement removed it. The
@@ -18,7 +20,8 @@
 - Product-backed R5B evidence is authorized only under
   `docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/**`. It must use real Core,
   production Renderer/AudioEngine, no copied WAVs, fail-closed defaults, complete lifecycle
-  proof, and defer its listening surface to the final consolidated review.
+  proof, Git-blob/UTF-8-LF hash semantics immune to checkout EOL, and defer its listening
+  surface to the final consolidated review.
 
 ## 2026-08-16 — T37 completion-first recovery and R5B source work opened
 

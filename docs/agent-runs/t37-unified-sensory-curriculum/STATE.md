@@ -2980,7 +2980,9 @@ unstaged.
   Renderer, App/styles, and the shared chain timeline remain frozen.
 - Final gates pass: focused tests; typecheck; `544 passed / 15 skipped` in
   `56 passed / 2 skipped` files; 770-module build with only the existing chunk warning.
-  Independent product/lifecycle review reports no defect. Audio/provenance QA reports
+  Independent product/lifecycle review reports
+  `P0/P1/P2/P3/automatic-GAP = 0/0/0/0/0` with human listening separately open.
+  Audio/provenance QA reports
   `P0/P1/P2/P3/GAP = 0/0/0/1/1`; its P3 is the disclosed four-commit realization of
   three logical checkpoints and the later retirement checkpoint. The final boundary is
   correct; after `02272d5` Bomb dispatch bypassed the legacy route, and `94957fd` removed
@@ -2997,8 +2999,12 @@ unstaged.
   proof, no autoplay, reject-all default, no persistence, and no product selector.
 - Browser proof must bind exact shared-plan beats/lengths, one mono buffer/source per
   event, finite unclipped samples, product-local asset requests, desktop/mobile layout,
-  keyboard and 44 px controls, one Canvas/zero DOM cells, and replay/stop/disable/restart/
-  pagehide/HMR/destroy cleanup with zero errors and terminal residue. Source remains the
+  keyboard and 44 px controls, one Canvas/zero DOM cells, and stable listener ownership.
+  Reusable stop/restart/disable removes event sources, timers, and callbacks while retaining
+  exactly one context/Renderer ticker/Canvas. Terminal pagehide/destroy additionally closes
+  context, removes listeners and QA globals, destroys ticker, and removes Canvas. HMR proves
+  the old terminal state and then exactly one fresh owner/context/Renderer/ticker/Canvas/
+  listener set. Source remains the
   exact ten-file allowlist. Generated output is exactly browser-report, four named
   screenshots (`r5b-desktop-normal-a`, `r5b-desktop-chain-a`, `r5b-mobile-chain-a`,
   `r5b-reduced-technical-a`), three numbered client-smoke shots, three matching states,
@@ -3006,6 +3012,11 @@ unstaged.
   terminal checkpoint contains only verification-report, which binds manifest hash and
   generated-input HEAD. Both scripts enforce exact equality for all three Git ranges.
   The human gate stays deferred to the final consolidated review.
+- Evidence text is UTF-8 no-BOM and LF-only; PNG is raw binary. Generation fails on byte
+  drift. Source and all committed bindings hash Git blob content. Pre-commit generated
+  hashes use already-validated raw LF worktree bytes; terminal verification recomputes
+  them and the manifest hash from the recorded generated-input Git blobs. This explicitly
+  removes `core.autocrlf` and checkout EOL from the evidence domain.
 - Unique next action: commit this docs disposition/authorization, obtain read-only docs
   QA, then let one evidence writer create only the source allowlist and stop before any
   generated output.
