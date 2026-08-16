@@ -84,28 +84,42 @@ function bindProduct(entry) {
   if (entry.object && object !== entry.object) throw new Error(`Product tree drift: ${entry.path}`);
   return entry.kind === 'tree' ? { kind: 'tree', head: PRODUCT, path: entry.path, gitObject: object } : bindBlob(PRODUCT, entry.path);
 }
-function historyDisclosure(from, to, sourcePaths) {
+function exactLinearHistory(from, to, expected, label, inspect = () => {}) {
   git('merge-base', '--is-ancestor', from, to);
   const rows = git('rev-list', '--reverse', '--parents', `${from}..${to}`).split(/\r?\n/u).filter(Boolean).map((line) => line.split(' '));
   const touched = new Set();
   for (const [commit, ...parents] of rows) {
-    if (parents.length !== 1) throw new Error(`Authorization history is not linear at ${commit}.`);
+    if (parents.length !== 1) throw new Error(`${label}: non-linear commit ${commit}.`);
     const changes = git('diff-tree', '--no-commit-id', '--name-status', '-r', commit).split(/\r?\n/u).filter(Boolean).map((line) => {
       const [status, path, extra] = line.split('\t');
-      if (!status || !path || extra) throw new Error(`Unsupported history entry at ${commit}: ${line}`);
+      if (!['A', 'M', 'D'].includes(status) || !path || extra) throw new Error(`${label}: unsupported history entry at ${commit}: ${line}`);
+      if (!expected.includes(path)) throw new Error(`${label}: unauthorized path ${path} at ${commit}.`);
       touched.add(path);
       return { status, path };
     });
-    if (commit === COORDINATOR_DETOUR.addHead) {
-      if (parents[0] !== COORDINATOR_DETOUR.addParent || JSON.stringify(changes) !== JSON.stringify([{ status: 'A', path: COORDINATOR_DETOUR.path }])) throw new Error('Coordinator add detour drifted.');
-    } else if (commit === COORDINATOR_DETOUR.revertHead) {
-      if (parents[0] !== COORDINATOR_DETOUR.revertParent || JSON.stringify(changes) !== JSON.stringify([{ status: 'D', path: COORDINATOR_DETOUR.path }])) throw new Error('Coordinator revert detour drifted.');
-    } else if (changes.some(({ path }) => !sourcePaths.includes(path))) {
-      throw new Error(`Unauthorized non-R5B path touched by ${commit}.`);
-    }
+    if (changes.length === 0) throw new Error(`${label}: empty commit ${commit}.`);
+    inspect(commit, parents[0], changes);
   }
-  if (!rows.some(([commit]) => commit === COORDINATOR_DETOUR.addHead) || !rows.some(([commit]) => commit === COORDINATOR_DETOUR.revertHead)) throw new Error('Coordinator detour commits are absent from authorization history.');
-  if (!equalSet(touched, [...sourcePaths, COORDINATOR_DETOUR.path]) || exists(to, COORDINATOR_DETOUR.path)) throw new Error('Authorization touched-path/net-zero contract drifted.');
+  if (!equalSet(touched, expected)) throw new Error(`${label}: touched-path union drifted.`);
+  return rows;
+}
+function historyDisclosure(from, to, sourcePaths) {
+  let sawAdd = false;
+  let sawRevert = false;
+  const expected = [...sourcePaths, COORDINATOR_DETOUR.path];
+  exactLinearHistory(from, to, expected, 'authorization history', (commit, parent, changes) => {
+    if (commit === COORDINATOR_DETOUR.addHead) {
+      sawAdd = true;
+      if (parent !== COORDINATOR_DETOUR.addParent || JSON.stringify(changes) !== JSON.stringify([{ status: 'A', path: COORDINATOR_DETOUR.path }])) throw new Error('Coordinator add detour drifted.');
+    } else if (commit === COORDINATOR_DETOUR.revertHead) {
+      sawRevert = true;
+      if (parent !== COORDINATOR_DETOUR.revertParent || JSON.stringify(changes) !== JSON.stringify([{ status: 'D', path: COORDINATOR_DETOUR.path }])) throw new Error('Coordinator revert detour drifted.');
+    } else if (changes.some(({ path }) => path === COORDINATOR_DETOUR.path)) {
+      throw new Error(`Coordinator detour touched by unauthorized commit ${commit}.`);
+    }
+  });
+  if (!sawAdd || !sawRevert) throw new Error('Coordinator detour commits are absent from authorization history.');
+  if (exists(to, COORDINATOR_DETOUR.path)) throw new Error('Authorization detour is not net-zero at the source endpoint.');
   const added = blob(COORDINATOR_DETOUR.addHead, COORDINATOR_DETOUR.path);
   text(added, COORDINATOR_DETOUR.path);
   if (git('rev-parse', `${COORDINATOR_DETOUR.addHead}:${COORDINATOR_DETOUR.path}`) !== COORDINATOR_DETOUR.addGitObject) throw new Error('Coordinator detour blob drifted.');
@@ -130,7 +144,9 @@ exactRange(AUTH, head, sourcePaths, 'authorization-to-source');
 exactTree(head, prefix, sourcePaths, 'source tree');
 const disclosedHistory = historyDisclosure(AUTH, head, sourcePaths);
 exactRange(R5A_SOURCE, R5A_OUTPUT, R5A_OUTPUT_PATHS, 'R5A source-to-output');
+exactLinearHistory(R5A_SOURCE, R5A_OUTPUT, R5A_OUTPUT_PATHS, 'R5A source-to-output history');
 exactRange(R5A_OUTPUT, R5A_REPORT, R5A_TERMINAL_PATHS, 'R5A output-to-terminal');
+exactLinearHistory(R5A_OUTPUT, R5A_REPORT, R5A_TERMINAL_PATHS, 'R5A output-to-terminal history');
 exactTree(R5A_SOURCE, r5aPrefix, R5A_SOURCE_PATHS, 'R5A source tree');
 exactTree(R5A_OUTPUT, r5aPrefix, [...R5A_SOURCE_PATHS, ...R5A_OUTPUT_PATHS], 'R5A output tree');
 exactTree(R5A_REPORT, r5aPrefix, [...R5A_SOURCE_PATHS, ...R5A_OUTPUT_PATHS, ...R5A_TERMINAL_PATHS], 'R5A terminal tree');

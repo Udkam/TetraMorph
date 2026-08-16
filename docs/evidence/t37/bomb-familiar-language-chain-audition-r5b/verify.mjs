@@ -89,28 +89,42 @@ function bindProduct(entry) {
   if (entry.object && object !== entry.object) throw new Error(`Independent product tree drift: ${entry.path}`);
   return entry.kind === 'tree' ? { kind: 'tree', head: PRODUCT, path: entry.path, gitObject: object } : bindBlob(PRODUCT, entry.path);
 }
-function historyDisclosure(from, to, sourcePaths) {
+function exactLinearHistory(from, to, expected, label, inspect = () => {}) {
   git('merge-base', '--is-ancestor', from, to);
   const rows = git('rev-list', '--reverse', '--parents', `${from}..${to}`).split(/\r?\n/u).filter(Boolean).map((line) => line.split(' '));
   const touched = new Set();
   for (const [commit, ...parents] of rows) {
-    if (parents.length !== 1) throw new Error(`Independent authorization history is not linear at ${commit}.`);
+    if (parents.length !== 1) throw new Error(`${label}: independent non-linear commit ${commit}.`);
     const changes = git('diff-tree', '--no-commit-id', '--name-status', '-r', commit).split(/\r?\n/u).filter(Boolean).map((line) => {
       const [status, path, extra] = line.split('\t');
-      if (!status || !path || extra) throw new Error(`Independent unsupported history entry at ${commit}: ${line}`);
+      if (!['A', 'M', 'D'].includes(status) || !path || extra) throw new Error(`${label}: independent unsupported history entry at ${commit}: ${line}`);
+      if (!expected.includes(path)) throw new Error(`${label}: independent unauthorized path ${path} at ${commit}.`);
       touched.add(path);
       return { status, path };
     });
-    if (commit === COORDINATOR_DETOUR.addHead) {
-      if (parents[0] !== COORDINATOR_DETOUR.addParent || !deepEqual(changes, [{ status: 'A', path: COORDINATOR_DETOUR.path }])) throw new Error('Independent coordinator add detour drifted.');
-    } else if (commit === COORDINATOR_DETOUR.revertHead) {
-      if (parents[0] !== COORDINATOR_DETOUR.revertParent || !deepEqual(changes, [{ status: 'D', path: COORDINATOR_DETOUR.path }])) throw new Error('Independent coordinator revert detour drifted.');
-    } else if (changes.some(({ path }) => !sourcePaths.includes(path))) {
-      throw new Error(`Independent unauthorized non-R5B path touched by ${commit}.`);
-    }
+    if (changes.length === 0) throw new Error(`${label}: independent empty commit ${commit}.`);
+    inspect(commit, parents[0], changes);
   }
-  if (!rows.some(([commit]) => commit === COORDINATOR_DETOUR.addHead) || !rows.some(([commit]) => commit === COORDINATOR_DETOUR.revertHead)) throw new Error('Independent coordinator detour commits are absent from authorization history.');
-  if (!equalSet(touched, [...sourcePaths, COORDINATOR_DETOUR.path]) || exists(to, COORDINATOR_DETOUR.path)) throw new Error('Independent authorization touched-path/net-zero contract drifted.');
+  if (!equalSet(touched, expected)) throw new Error(`${label}: independent touched-path union drifted.`);
+  return rows;
+}
+function historyDisclosure(from, to, sourcePaths) {
+  let sawAdd = false;
+  let sawRevert = false;
+  const expected = [...sourcePaths, COORDINATOR_DETOUR.path];
+  exactLinearHistory(from, to, expected, 'authorization history', (commit, parent, changes) => {
+    if (commit === COORDINATOR_DETOUR.addHead) {
+      sawAdd = true;
+      if (parent !== COORDINATOR_DETOUR.addParent || !deepEqual(changes, [{ status: 'A', path: COORDINATOR_DETOUR.path }])) throw new Error('Independent coordinator add detour drifted.');
+    } else if (commit === COORDINATOR_DETOUR.revertHead) {
+      sawRevert = true;
+      if (parent !== COORDINATOR_DETOUR.revertParent || !deepEqual(changes, [{ status: 'D', path: COORDINATOR_DETOUR.path }])) throw new Error('Independent coordinator revert detour drifted.');
+    } else if (changes.some(({ path }) => path === COORDINATOR_DETOUR.path)) {
+      throw new Error(`Independent coordinator detour touched by unauthorized commit ${commit}.`);
+    }
+  });
+  if (!sawAdd || !sawRevert) throw new Error('Independent coordinator detour commits are absent from authorization history.');
+  if (exists(to, COORDINATOR_DETOUR.path)) throw new Error('Independent authorization detour is not net-zero at the source endpoint.');
   const added = blob(COORDINATOR_DETOUR.addHead, COORDINATOR_DETOUR.path);
   text(added, `independent ${COORDINATOR_DETOUR.path}`);
   if (git('rev-parse', `${COORDINATOR_DETOUR.addHead}:${COORDINATOR_DETOUR.path}`) !== COORDINATOR_DETOUR.addGitObject) throw new Error('Independent coordinator detour blob drifted.');
@@ -190,6 +204,7 @@ if (terminalCommitted) {
   exactKeys(committedReport, TERMINAL_KEYS, 'terminal report');
   generated = committedReport.generatedInputHead;
   exactRange(generated, head, [reportPath], 'generated-to-terminal');
+  exactLinearHistory(generated, head, [reportPath], 'generated-to-terminal history');
 }
 const manifestBytes = blob(generated, prefix + 'manifest.json');
 text(manifestBytes, 'manifest blob');
@@ -209,11 +224,14 @@ const terminalPaths = TERMINAL.map((path) => prefix + path);
 exactRange(AUTH, sourceHead, sourcePaths, 'authorization-to-source');
 const expectedHistoryDisclosure = historyDisclosure(AUTH, sourceHead, sourcePaths);
 exactRange(sourceHead, generated, prePaths, 'source-to-generated');
+exactLinearHistory(sourceHead, generated, prePaths, 'source-to-generated history');
 exactTree(sourceHead, prefix, sourcePaths, 'source exact tree');
 exactTree(generated, prefix, [...sourcePaths, ...prePaths], 'generated exact tree');
 if (terminalCommitted) exactTree(head, prefix, [...sourcePaths, ...prePaths, ...terminalPaths], 'terminal exact tree');
 exactRange(R5A_SOURCE, R5A_OUTPUT, R5A_OUTPUT_PATHS, 'R5A source-to-output');
+exactLinearHistory(R5A_SOURCE, R5A_OUTPUT, R5A_OUTPUT_PATHS, 'R5A source-to-output history');
 exactRange(R5A_OUTPUT, R5A_REPORT, R5A_TERMINAL_PATHS, 'R5A output-to-terminal');
+exactLinearHistory(R5A_OUTPUT, R5A_REPORT, R5A_TERMINAL_PATHS, 'R5A output-to-terminal history');
 exactTree(R5A_SOURCE, r5aPrefix, R5A_SOURCE_PATHS, 'R5A source exact tree');
 exactTree(R5A_OUTPUT, r5aPrefix, [...R5A_SOURCE_PATHS, ...R5A_OUTPUT_PATHS], 'R5A output exact tree');
 exactTree(R5A_REPORT, r5aPrefix, [...R5A_SOURCE_PATHS, ...R5A_OUTPUT_PATHS, ...R5A_TERMINAL_PATHS], 'R5A terminal exact tree');
