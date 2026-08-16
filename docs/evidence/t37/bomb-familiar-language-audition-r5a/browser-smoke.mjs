@@ -273,6 +273,10 @@ for (const method of ['dispose', 'pagehide', 'hmr']) {
 }
 
 await desktop.evaluate(() => window.__R5A_TEST__.dispose('desktop-finish'));
+for (const page of [desktop, mobile, reduced]) {
+  await page.waitForLoadState('networkidle');
+  await page.close();
+}
 await browser.close();
 check(consoleErrors.length === 0, `console errors: ${consoleErrors.join(' | ')}`);
 check(pageErrors.length === 0, `page errors: ${pageErrors.join(' | ')}`);
