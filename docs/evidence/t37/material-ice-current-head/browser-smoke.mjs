@@ -149,7 +149,12 @@ check(sameRelevantListeners(restarted.before, restarted.after), 'restart relevan
 await page.getByTestId('open-settings').click();
 await page.getByTestId('theme-mineral-mist').click();
 await page.getByTestId('reduced-motion-toggle').click();
-await page.locator('.action-sheet__actions > .primary-action').click();
+const settingsSheet = page.getByTestId('settings-sheet');
+check(await settingsSheet.count() === 1, 'one settings sheet owns preference dismissal');
+await settingsSheet.waitFor({ state: 'visible' });
+const settingsDismiss = settingsSheet.locator('.settings-console__actions > .primary-action');
+check(await settingsDismiss.count() === 1, 'one settings-sheet primary dismissal action');
+await settingsDismiss.click();
 await page.waitForFunction(() => document.querySelector('.app')?.getAttribute('data-theme') === 'mineral-mist'
   && document.querySelector('.app')?.getAttribute('data-reduced-motion') === 'true');
 const changedPreferences = await snapshot(page);
