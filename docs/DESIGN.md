@@ -9275,3 +9275,22 @@ behavior change, and does not authorize v6.
 After focused and full automated gates plus independent all-zero QA, commit the infrastructure.
 Only then may a fresh docs-first v6 validator contract bind the new Core tree and adapter blob,
 new validator/candidate/attempt/terminal/staging schemas, and explicit runtime heap domain.
+
+### F4E-R6A accepted implementation receipt
+
+R6A is accepted as the two-commit source range `076d5b9..858fa88`: implementation commit
+`510f287ed6980b6d346b4fdb3f541600b3c58866` and pressure/equality evidence commit
+`858fa884c183cfbfc254cf8c67f1149478750a1c`. The four accepted SHA-256 values are:
+
+- `endgameRouteSearch.ts` — `E524B096A2C91441148AE1C22DADCB91CB20F029891EB5F05F835AF63006A51B`;
+- `endgameProofFrontierStore.test.ts` — `7BFAD393F2E762A892A0BD84359D5D76C41AC8B862F106F816BD810795F9A675`;
+- `endgame-disk-frontier.mjs` — `6651B346F1CE2A0C83B9311982382C215614D8B95E18C1C5D49A296A966B444A`;
+- `endgameDiskFrontier.test.mjs` — `4B73F8BF5D6F28B730557D38B30C38374AAD409D199BD46F79575531814C0D85`.
+
+Final gates pass: focused `44 passed / 2 exact skipped`, opt-in exact Intro-01 through
+Intro-04 `46/46`, typecheck, complete suite `588 passed / 17 skipped` in
+`58 passed / 2 skipped` files, production build, Node syntax, and diff check. Two fresh
+independent reviews each report `P0/P1/P2/P3/GAP = 0/0/0/0/0`; one independently reran
+the exact disk equality suite at `46/46`. No review or gate ran Intro-05. R6A changes no
+product behavior and grants no proof execution by itself. A separate v6 contract remains
+mandatory.

@@ -10253,3 +10253,16 @@ paths in this checkpoint.
 Run focused tests while editing; after the last source change run typecheck, the complete
 suite, and build once. Browser evidence is not applicable. Produce a bounded candidate SHA
 and independent all-zero QA before opening a separate docs-first v6 proof contract.
+
+### F4E-R6A accepted — next checkpoint is docs-only v6 authority
+
+R6A is closed at source `510f287` plus pressure/equality evidence `858fa88`. Final gates are
+focused `44/2`, opt-in exact Intro-01 through Intro-04 `46/46`, full suite
+`588 passed / 17 skipped`, typecheck, build, syntax, and diff check. Two independent reviews
+are both `P0/P1/P2/P3/GAP = 0/0/0/0/0`; neither ran Intro-05.
+
+The next slice is documentation only: define a fresh v6 namespace, bind the accepted Core
+and adapter blobs, freeze an explicit Node heap domain, and specify worker/outer stage and
+residue ownership. Do not create a v6 attempt, candidate, terminal, proof stage, or run an
+Intro-05 exact/partial search until that new contract and validator bytes have completed
+their own static and no-write reviews.

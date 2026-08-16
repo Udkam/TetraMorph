@@ -794,3 +794,17 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   omitted-count truncation sentinel. The sentinel and diagnostic flag are fatal and observable.
 - Next: commit this four-doc wording correction and obtain fresh all-zero confirmation. Source
   and proof execution remain closed.
+
+### F4E-R6A accepted source and evidence receipt
+
+- Contract terminal commit is `076d5b9`. Implementation `510f287` changes only the four
+  authorized source/test paths; `858fa88` adds only the two authorized test files needed to
+  physically prove the default 64 MiB/131072-record limits, real 4098-entry diagnostics, and
+  Intro-01 through Intro-04 memory-versus-disk equality.
+- Final coordinator results are focused `44 passed / 2 exact skipped`, typecheck, complete
+  suite `588 passed / 17 skipped` in `58 passed / 2 skipped` files, production build,
+  Node syntax, and diff check. The opt-in candidate run passes `46/46`.
+- Independent QA-1 and QA-2 each report `P0/P1/P2/P3/GAP = 0/0/0/0/0`. QA-2 independently
+  reran the exact disk suite at `46/46` in 142 seconds. Neither review executed Intro-05.
+- R6A is accepted and frozen. It does not authorize v6 production. Next is a separate
+  docs-first v6 contract binding these exact blobs and a fresh external namespace.

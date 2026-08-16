@@ -3155,3 +3155,19 @@ unstaged.
 R3 review A is all-zero; review B has only one P2 wording conflict between “every cleanup
 exception” and the bounded diagnostic array. R4 resolves it as at most 4098 normalized errors
 plus one mandatory omitted-count sentinel; truncation is fatal. No implementation has begun.
+
+### F4E-R6A implementation accepted
+
+- Accepted commits are `510f287` for the four-path implementation and `858fa88` for real
+  production-boundary pressure plus disk-equality evidence.
+- Final coordinator gates: focused `44 passed / 2 skipped`, full suite
+  `58 passed / 2 skipped` files and `588 passed / 17 skipped` tests, typecheck, build,
+  Node syntax, and diff check. Candidate opt-in evidence is `46/46`; independent QA-2
+  separately reran the same Intro-01 through Intro-04 disk suite at `46/46` in 142 seconds.
+- Independent Core and adapter reviews are each
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`. They close the exact semantics, 64 MiB/131072/4096
+  boundaries, 32-way merge, 4098 diagnostics, real Windows durability/cleanup, and complete
+  memory-versus-disk certificate/telemetry equality.
+- No gate ran Intro-05. V5 remains consumed; R6A is infrastructure, not a certificate.
+- Next action: author and review a distinct docs-first v6 validator/attempt/candidate/
+  terminal/stage contract with an explicit heap domain. Production remains closed.
