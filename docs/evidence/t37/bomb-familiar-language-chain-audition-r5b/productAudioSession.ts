@@ -40,6 +40,8 @@ export type EventAudit = {
 const STEM_ASSET: Readonly<Record<Variant, StemAssetId>> = Object.freeze({ A: 'bombFamiliarA', B: 'bombFamiliarB', C: 'bombFamiliarC' });
 const EXPECTED_WAV_BYTES = 17_324;
 const TOLERANCE = 1e-7;
+const PCM16_POSITIVE_SCALE = Math.fround(1 / 32_767);
+const PCM16_NEGATIVE_SCALE = Math.fround(1 / 32_768);
 function ok(value: unknown, message: string): asserts value { if (!value) throw new Error(message); }
 async function sha256(bytes: BufferSource): Promise<string> {
   return [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map((value) => value.toString(16).padStart(2, '0')).join('');
@@ -75,7 +77,11 @@ async function decodePcm16Wav(bytes: Uint8Array): Promise<WavProof> {
   ok(encoding === 1 && channels === 1 && sampleRate === BOMB_STEM_SAMPLE_RATE && bitsPerSample === 16 && dataOffset >= 0, 'Selected stem PCM16 contract drifted.');
   ok(dataBytes === BOMB_STEM_FRAMES * 2, 'Selected stem frame count drifted.');
   const samples = new Float32Array(BOMB_STEM_FRAMES);
-  for (let frame = 0; frame < samples.length; frame += 1) samples[frame] = view.getInt16(dataOffset + frame * 2, true) / 32_768;
+  for (let frame = 0; frame < samples.length; frame += 1) {
+    const pcm16 = view.getInt16(dataOffset + frame * 2, true);
+    const scale = pcm16 < 0 ? PCM16_NEGATIVE_SCALE : PCM16_POSITIVE_SCALE;
+    samples[frame] = Math.fround(pcm16 * scale);
+  }
   const checkpointFrames = [0, 1, 47, 511, 2_047, 4_319, 8_638, 8_639];
   const sampleCheckpoints = checkpointFrames.map((frame) => ({ frame, pcm16: view.getInt16(dataOffset + frame * 2, true), float: samples[frame]! }));
   return { encoding, channels, sampleRate, bitsPerSample, frames: samples.length, dataBytes, samples, pcm16Sha256: await sha256(bytes.slice(dataOffset, dataOffset + dataBytes)), sampleCheckpoints };

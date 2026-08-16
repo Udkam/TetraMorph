@@ -36,6 +36,8 @@ const R5A_SOURCE_PATHS = ['.gitattributes', 'README.md', 'audioSession.ts', 'aud
 const R5A_OUTPUT_PATHS = ['assets/A.wav', 'assets/B.wav', 'assets/C.wav', 'browser-report.json', 'client-smoke/shot-0.png', 'client-smoke/shot-1.png', 'client-smoke/shot-2.png', 'client-smoke/state-0.json', 'client-smoke/state-1.json', 'client-smoke/state-2.json', 'manifest.json', 'r5a-desktop-impact.png', 'r5a-mobile.png', 'r5a-reduced-technical.png'].map((path) => r5aPrefix + path);
 const R5A_TERMINAL_PATHS = [r5aPrefix + 'verification-report.json'];
 const WAV = Object.freeze({ A: 'be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254', B: 'b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc', C: 'ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6' });
+const PCM16_POSITIVE_SCALE = Math.fround(1 / 32_767);
+const PCM16_NEGATIVE_SCALE = Math.fround(1 / 32_768);
 const FULL_BEATS = Array.from({ length: 20 }, (_, index) => 220 + index * 56);
 const REDUCED_BEATS = Array.from({ length: 20 }, (_, index) => 50 + index * 20);
 const HUMAN_STATUS = 'OPEN / NOT ACCEPTED — automated evidence is technical only';
@@ -158,7 +160,11 @@ function decodeWav(bytes) {
   }
   if (!format || !data || format.encoding !== 1 || format.channels !== 1 || format.sampleRate !== 48_000 || format.bits !== 16 || data.length !== 17_280) throw new Error('PCM16 WAV shape drift.');
   const samples = new Float32Array(8_640);
-  for (let index = 0; index < samples.length; index += 1) samples[index] = data.readInt16LE(index * 2) / 32_768;
+  for (let index = 0; index < samples.length; index += 1) {
+    const pcm16 = data.readInt16LE(index * 2);
+    const scale = pcm16 < 0 ? PCM16_NEGATIVE_SCALE : PCM16_POSITIVE_SCALE;
+    samples[index] = Math.fround(pcm16 * scale);
+  }
   const checkpoints = [0, 1, 47, 511, 2_047, 4_319, 8_638, 8_639].map((frame) => ({ frame, pcm16: data.readInt16LE(frame * 2), float: samples[frame] }));
   return { samples, pcm16Sha256: sha(data), checkpoints };
 }
