@@ -1,0 +1,866 @@
+{
+  "schema": "tetramorph.t37.r5b-manifest.v2",
+  "generatedAt": "2026-08-16T09:12:30.760Z",
+  "provenance": {
+    "authorizationHead": "b611a71443288f74735d3878cd4805ea8521adfa",
+    "evidenceSourceHead": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+    "productHead": "94957fd",
+    "r5a": {
+      "source": "9d30894",
+      "outputs": "99b47be",
+      "report": "4ce7ba3"
+    },
+    "writerBoundary": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/**",
+    "humanStatus": "OPEN / NOT ACCEPTED"
+  },
+  "historyDisclosure": {
+    "range": "b611a71443288f74735d3878cd4805ea8521adfa..f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+    "allowedSourcePrefix": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/",
+    "touchedPaths": [
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/README.md",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/index.html",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/styles.css",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/fixture.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/productAudioSession.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/audition.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/browser-smoke.mjs",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-actions.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/write-manifest.mjs",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verify.mjs",
+      "docs/agent-runs/t37-unified-sensory-curriculum/SURVIVAL-OPTIMIZATION-PROPOSAL.md"
+    ],
+    "disposition": "disclosed net-zero coordinator detour; absent at source endpoint",
+    "coordinatorDetour": {
+      "path": "docs/agent-runs/t37-unified-sensory-curriculum/SURVIVAL-OPTIMIZATION-PROPOSAL.md",
+      "add": {
+        "head": "94e8b9b0b6480a974477d70e4ec7862a5064dfb2",
+        "parent": "4638d7c01d110a4ab6da404130dfc619af2579e0",
+        "status": "A",
+        "gitObject": "28881be3fa887239ae3b01d16f8e58d9832ee05d",
+        "sha256": "7e190a65377e65f5487fda6124bf6592e8f3e8d710e463e627ef864c214149f8",
+        "bytes": 8620
+      },
+      "revert": {
+        "head": "97a4ddc9fc96a0b47d56b4a99c710fd119a62535",
+        "parent": "94e8b9b0b6480a974477d70e4ec7862a5064dfb2",
+        "status": "D"
+      }
+    }
+  },
+  "pathContracts": {
+    "source": [
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/README.md",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/index.html",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/styles.css",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/fixture.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/productAudioSession.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/audition.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/browser-smoke.mjs",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-actions.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/write-manifest.mjs",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verify.mjs"
+    ],
+    "authorizationTouched": [
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/README.md",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/index.html",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/styles.css",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/fixture.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/productAudioSession.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/audition.ts",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/browser-smoke.mjs",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-actions.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/write-manifest.mjs",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verify.mjs",
+      "docs/agent-runs/t37-unified-sensory-curriculum/SURVIVAL-OPTIMIZATION-PROPOSAL.md"
+    ],
+    "preReport": [
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/browser-report.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-desktop-normal-a.png",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-desktop-chain-a.png",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-mobile-chain-a.png",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-reduced-technical-a.png",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/shot-0.png",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/shot-1.png",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/shot-2.png",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/state-0.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/state-1.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/state-2.json",
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/manifest.json"
+    ],
+    "terminal": [
+      "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verification-report.json"
+    ],
+    "contract": [
+      "docs/DESIGN.md",
+      "docs/CURRENT_TASK.md",
+      "docs/agent-runs/t37-unified-sensory-curriculum/STATE.md",
+      "docs/logs/CHANGELOG.md"
+    ],
+    "product": [
+      {
+        "kind": "tree",
+        "path": "src/game/core"
+      },
+      {
+        "kind": "tree",
+        "path": "src/game/audio"
+      },
+      {
+        "kind": "tree",
+        "path": "src/game/render"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/render/TetrisRenderer.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/animation/mutationChainTimeline.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/animation/mutationTimeline.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/design/mutationTokens.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/runtime/GameRuntime.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/platform/browserPlatform.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/audio/acceptedPlayback.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/audio/AudioEngine.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/audio/bombStemPlayback.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/game/audio/audioAssetCatalog.ts"
+      },
+      {
+        "kind": "blob",
+        "path": "src/assets/audio/t37/bomb-familiar-a.wav"
+      },
+      {
+        "kind": "blob",
+        "path": "src/assets/audio/t37/bomb-familiar-b.wav"
+      },
+      {
+        "kind": "blob",
+        "path": "src/assets/audio/t37/bomb-familiar-c.wav"
+      }
+    ],
+    "r5aSource": [
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/.gitattributes",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/README.md",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/audioSession.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/audition.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-smoke.mjs",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateContract.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateGraph.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-actions.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/index.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-candidates.mjs",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/signalMetrics.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/styles.css",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/verify.mjs",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/write-manifest.mjs"
+    ],
+    "r5aOutput": [
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/A.wav",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/B.wav",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/C.wav",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-report.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-0.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-1.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-2.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-0.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-1.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-2.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/manifest.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-desktop-impact.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-mobile.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-reduced-technical.png"
+    ],
+    "r5aTerminal": [
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/verification-report.json"
+    ]
+  },
+  "countContracts": {
+    "source": 10,
+    "authorizationTouched": 11,
+    "preReport": 12,
+    "terminal": 1,
+    "contract": 4,
+    "r5aSource": 21,
+    "r5aOutput": 14,
+    "r5aTerminal": 1
+  },
+  "byteContract": {
+    "text": "UTF-8 no-BOM LF-only",
+    "png": "binary-unfiltered",
+    "committedDomain": "git blob",
+    "precommitDomain": "validated raw worktree bytes",
+    "manifestSelfHash": "excluded"
+  },
+  "timing": {
+    "normalFrames": 19200,
+    "fullChainFrames": 65664,
+    "reducedChainFrames": 22368,
+    "fullBeatStartsMs": [
+      220,
+      276,
+      332,
+      388,
+      444,
+      500,
+      556,
+      612,
+      668,
+      724,
+      780,
+      836,
+      892,
+      948,
+      1004,
+      1060,
+      1116,
+      1172,
+      1228,
+      1284
+    ],
+    "reducedBeatStartsMs": [
+      50,
+      70,
+      90,
+      110,
+      130,
+      150,
+      170,
+      190,
+      210,
+      230,
+      250,
+      270,
+      290,
+      310,
+      330,
+      350,
+      370,
+      390,
+      410,
+      430
+    ]
+  },
+  "wav": {
+    "A": "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254",
+    "B": "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc",
+    "C": "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6"
+  },
+  "sourceBindings": [
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/README.md",
+      "gitObject": "3642c805edfa10803bcd29e42b5a551ff5e6acd3",
+      "sha256": "ba3fe1edfd814ac1ec7d8bde3e6a705b8435bc32762cdad67656159ae9ad9eaa",
+      "bytes": 1891
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/index.html",
+      "gitObject": "0d3a2fc8fff906c26d8597a8d07db14da803beca",
+      "sha256": "81fd5eb2889e19bc550a39d418e87acca4254f938f19bf248b898add40fe5a16",
+      "bytes": 2362
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/styles.css",
+      "gitObject": "6449d62ed4fa107334c648b760151d2396bc3125",
+      "sha256": "e73402bacd07bdfec64f4175e3a304c5e2b77fec073fdb4fe2b8f965127100eb",
+      "bytes": 2781
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/fixture.ts",
+      "gitObject": "6599a1c16802f415e90555db3534745d3e606f0e",
+      "sha256": "a66ecb8844647997ad14f02fe5dfa0214528415ebf2b3fc65ca0894f199e7387",
+      "bytes": 9388
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/productAudioSession.ts",
+      "gitObject": "35a10915a03c6a5649f9fa3d81c4c3cb1cc913e4",
+      "sha256": "0e0d5815ac4cbccebead9255fbfd894d0c34a8cf0a75698c1ad17f7e61947328",
+      "bytes": 21036
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/audition.ts",
+      "gitObject": "c465202ec504838ce99a476dac8dbf6b3d6ff65f",
+      "sha256": "4798a4e43243b9567f5ea3c44765863ae728cad188b4360f654e82bf7b8613a0",
+      "bytes": 8711
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/browser-smoke.mjs",
+      "gitObject": "5f7f86a5e1163673b5ec09609108cf99ca5b6291",
+      "sha256": "e4e722ef5d7eaead892ed9d086d7f9d7196f32f6389d078687225162279dfb96",
+      "bytes": 26614
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-actions.json",
+      "gitObject": "9877c891fa058cead91d509e6a1723e8a33309dc",
+      "sha256": "ef258447beefc474b164fc3c1b62d1085ad57d128bc7b2568462fc477f01e77b",
+      "bytes": 130
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/write-manifest.mjs",
+      "gitObject": "e6b3f30458c28333dae7bd252fa028f6954de212",
+      "sha256": "27c3f7ee7706d457ffd9be08f6b8fe268e0dcf86fe1c5982ee22d916fd1691b1",
+      "bytes": 16064
+    },
+    {
+      "kind": "blob",
+      "head": "f7f59d0e362a8048fa25dfdf2185697d5acafde3",
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/verify.mjs",
+      "gitObject": "e7678e5f46c9c8b1a2f74f857d69b2762654d15f",
+      "sha256": "9620cd30e970653006ec105515345ae6fe15416880d1674e598911186119f895",
+      "bytes": 38890
+    }
+  ],
+  "outputBindings": [
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/browser-report.json",
+      "sha256": "022a9f04aab00044bc9e552e4c670e174a5ff4e9bb4246014fc51509c2a5fa21",
+      "bytes": 797115
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-desktop-normal-a.png",
+      "sha256": "4d9c3a5641a24aba729603616ae40c9074c1fc04edc8d654dbf83030ec7fc296",
+      "bytes": 247287
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-desktop-chain-a.png",
+      "sha256": "ee1161fc05f5723a32f4847cc7f2defc1ba917ec806c5dd6f4e77325091a5bc1",
+      "bytes": 252636
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-mobile-chain-a.png",
+      "sha256": "887ed6571e0710273673c0f794ba81cd99e1fb8009b1a7858877c74339ccea0c",
+      "bytes": 172929
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/r5b-reduced-technical-a.png",
+      "sha256": "5c097e846c320474d65b0a3d07e68cda8b1283b6b3c8008400b14417f9063c57",
+      "bytes": 231338
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/shot-0.png",
+      "sha256": "1db91bd3e46830d5cc16d424a2323287d18ff981e5450c8a35bdfef17f1b3df3",
+      "bytes": 9876
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/shot-1.png",
+      "sha256": "1db91bd3e46830d5cc16d424a2323287d18ff981e5450c8a35bdfef17f1b3df3",
+      "bytes": 9876
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/shot-2.png",
+      "sha256": "1db91bd3e46830d5cc16d424a2323287d18ff981e5450c8a35bdfef17f1b3df3",
+      "bytes": 9876
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/state-0.json",
+      "sha256": "c38b8f3bd50d507baa5c831277f0a4f63c1a0d48dc57cc7bb1a060c00f572789",
+      "bytes": 1506
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/state-1.json",
+      "sha256": "c38b8f3bd50d507baa5c831277f0a4f63c1a0d48dc57cc7bb1a060c00f572789",
+      "bytes": 1506
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-chain-audition-r5b/client-smoke/state-2.json",
+      "sha256": "c38b8f3bd50d507baa5c831277f0a4f63c1a0d48dc57cc7bb1a060c00f572789",
+      "bytes": 1506
+    }
+  ],
+  "contractBindings": [
+    {
+      "kind": "blob",
+      "head": "b611a71443288f74735d3878cd4805ea8521adfa",
+      "path": "docs/DESIGN.md",
+      "gitObject": "6084febca34268d9a7095d7ccb2de09ba112088b",
+      "sha256": "9b5ab3f245eeaa339febfdba6e4d8faeea408e4e1e453c34723fe657f1c11b82",
+      "bytes": 599668
+    },
+    {
+      "kind": "blob",
+      "head": "b611a71443288f74735d3878cd4805ea8521adfa",
+      "path": "docs/CURRENT_TASK.md",
+      "gitObject": "06815b3512d9edfb5a50a382125f20447c7e7932",
+      "sha256": "1524485e2276183c0fcd467b772289f206fc912fb929d00d58f14a6fc1adb1aa",
+      "bytes": 690163
+    },
+    {
+      "kind": "blob",
+      "head": "b611a71443288f74735d3878cd4805ea8521adfa",
+      "path": "docs/agent-runs/t37-unified-sensory-curriculum/STATE.md",
+      "gitObject": "2b6ff1762e282e0940fed321c8e7060cdc0391d3",
+      "sha256": "bce1a7fac4140c78946d7f9d8d4b11f9d998c23b8303236431b597ba8a9ec906",
+      "bytes": 218452
+    },
+    {
+      "kind": "blob",
+      "head": "b611a71443288f74735d3878cd4805ea8521adfa",
+      "path": "docs/logs/CHANGELOG.md",
+      "gitObject": "9727b692af6568d2e58cdc3dad15fba9c4acf57a",
+      "sha256": "15dcc82f9f0b3aae0f66574e8dffdfd886d165d93aa84c5f731b01236b480d5d",
+      "bytes": 201948
+    }
+  ],
+  "productBindings": [
+    {
+      "kind": "tree",
+      "head": "94957fd",
+      "path": "src/game/core",
+      "gitObject": "e9b3a3ed0d001072f5291a8fc841c1849e4db44f"
+    },
+    {
+      "kind": "tree",
+      "head": "94957fd",
+      "path": "src/game/audio",
+      "gitObject": "7d7d562681f6682b7be9eb9c7bb8c3acb1852580"
+    },
+    {
+      "kind": "tree",
+      "head": "94957fd",
+      "path": "src/game/render",
+      "gitObject": "7248a4b568155510de575c60b8ae690c726d58f9"
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/game/render/TetrisRenderer.ts",
+      "gitObject": "a1b3ca8ef1b3fd1b4203f495336c51af5908e7da",
+      "sha256": "568470508de4ec32fdf7fba25307a3f102c5ab6936a7856b13a215b2d122bb65",
+      "bytes": 187271
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/animation/mutationChainTimeline.ts",
+      "gitObject": "29d9ce1d561fcff3469351b0e0c00b568605221c",
+      "sha256": "39476e566ab9dfad4ce3824730e37ef276d53469ce49beffe847ddf4d9ba5f2f",
+      "bytes": 2321
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/animation/mutationTimeline.ts",
+      "gitObject": "4f163694b25a06663cef7c35c6ec62e7a6028423",
+      "sha256": "55f5bb81781d029d964cbd9e2cf386f583afcf5979bb95b6db1564fd46ce171f",
+      "bytes": 5497
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/design/mutationTokens.ts",
+      "gitObject": "d76fe0cd381dd7c1f3c37c9a1bd12e4683913623",
+      "sha256": "86e0a1fa42050944f29243317f93f61ece7526e7414d169178a07dcb2829588a",
+      "bytes": 4068
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/game/runtime/GameRuntime.ts",
+      "gitObject": "094047c554bd3b8e65884dcb494583f08f8f5c2f",
+      "sha256": "367b7a06d07e4b93ca673d63a698117ca69cb315dd9c6263d785d6ea1d0816ad",
+      "bytes": 15309
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/platform/browserPlatform.ts",
+      "gitObject": "1963a890a27155532001755c70ba4389dde86e8a",
+      "sha256": "b8ea37663a98ebd9e247e2308e483d7200afc2963f3c925c989feadcf7784f38",
+      "bytes": 7071
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/game/audio/acceptedPlayback.ts",
+      "gitObject": "5f4dec7aa14097ab252066aa5ea01129b1b15c31",
+      "sha256": "dd9b673a439676d44bf134317202e8dc18e693e1a01a7b592441590c1d039704",
+      "bytes": 9431
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/game/audio/AudioEngine.ts",
+      "gitObject": "2e53dff4ec5db9333c83f9e530d5730ca1ba66a7",
+      "sha256": "0cacf55cf24c801a279ffa1847b0d76259819855f266fda187323d550232ac42",
+      "bytes": 21761
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/game/audio/bombStemPlayback.ts",
+      "gitObject": "0c2f126e8f8649ff54e4b1489a0dcdd25764ba53",
+      "sha256": "2bd4423067d2b913b17d424f2a64410ec9e624fab38158d82eaad0e5f37b1a8f",
+      "bytes": 4814
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/game/audio/audioAssetCatalog.ts",
+      "gitObject": "136fa8d342627d2811e3897f8c840ece50243dcf",
+      "sha256": "4def583f04332b745a8007023394ca6c215a456ca2c5e13dea8cfddc1f713c4b",
+      "bytes": 3743
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/assets/audio/t37/bomb-familiar-a.wav",
+      "gitObject": "dc276f9ceb47059b48caa62f1d952ae248c7cbb6",
+      "sha256": "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254",
+      "bytes": 17324
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/assets/audio/t37/bomb-familiar-b.wav",
+      "gitObject": "60ed1ea13c689f9e0b169c332afc5cb3ae1eeb3a",
+      "sha256": "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc",
+      "bytes": 17324
+    },
+    {
+      "kind": "blob",
+      "head": "94957fd",
+      "path": "src/assets/audio/t37/bomb-familiar-c.wav",
+      "gitObject": "3584615eeb2e78d087faabd522bfdf73d478e469",
+      "sha256": "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6",
+      "bytes": 17324
+    }
+  ],
+  "r5aBindings": [
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/.gitattributes",
+      "gitObject": "3eacc44b940401abb0899ee8c74833d35f56df1c",
+      "sha256": "9cc3c1d43066b4d775aade002995370ed102a44f3ffd5dee5bf97370f9ca449e",
+      "bytes": 134
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/README.md",
+      "gitObject": "5aa64fc60c48e692ad70c88febba89fc5253bf13",
+      "sha256": "6ee8b74dea9cc4bcfff164c1ea55d416ee3db552e35df01c3d1a9e6a07b44985",
+      "bytes": 4375
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/audioSession.ts",
+      "gitObject": "7d8f27833e58b4563ea7ec7ea58af07eef03046b",
+      "sha256": "bcb51d77e60421a4aeb0a380f787cea2e9d4473afd1a68e6bd1f3418788fba3a",
+      "bytes": 11807
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/audition.ts",
+      "gitObject": "937ffc78230529f8f9f337f26701d908cd20e5be",
+      "sha256": "2f206c393d1d32c9d2854e89cd46249e1bc3519f17fe95fb7db837c617ed07a2",
+      "bytes": 13243
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-smoke.mjs",
+      "gitObject": "db0ad6f02f0f8335df2fd837d0202f7f52064bbe",
+      "sha256": "79e934b083516c079194f31532515e7e2e99df8ee13de04cebd4e5a6da801d98",
+      "bytes": 26792
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateContract.ts",
+      "gitObject": "4686712fa9a07e676607d22d3f1a81db4b0e6a9c",
+      "sha256": "20eae967f6312a629c6f6e3d7cb914bd22bef72e3b46330e1abaff37120edcb9",
+      "bytes": 4845
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateGraph.ts",
+      "gitObject": "e6a01960ea30252379a926a70f0129b0488f25a5",
+      "sha256": "7eb0682d903d3fbd41a85dc8b7c56d6c4eb31a7ebf048cd060c34bfd70d82cba",
+      "bytes": 6432
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-actions.json",
+      "gitObject": "9b61a3bc7eeea98cd2b87618186c775318bfeb63",
+      "sha256": "21881031fe7e1d070bdb0f73e8091357757d9a4c100db5cf8f0283bbd857e5db",
+      "bytes": 129
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.html",
+      "gitObject": "2dfe4d303df1c51d6a7c26c95210b1da82762629",
+      "sha256": "99ad734a813538ff87b2632cb57647014194bb1e1cd471b3ecd965e7dd56141f",
+      "bytes": 333
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.ts",
+      "gitObject": "1804724897d76d21d400c3ae929d9c7849a20992",
+      "sha256": "f509d9838c31b92a7e092b1d5a7a03356c76b0896da9ae4d7efbd795be26dd82",
+      "bytes": 1935
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture.ts",
+      "gitObject": "d6746db90ce59e83044175d4b7cbed46cc4ab3c2",
+      "sha256": "7977cb127d13a050d637bf32c909fdc8c8ebbbd4800d2bab8710a2702620f72c",
+      "bytes": 9426
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/index.html",
+      "gitObject": "903e102d5c86fe6039aeb82e6541b9edda4bfd39",
+      "sha256": "46074e6adc10fa949a12dfbe0664bf5a06c9d7434435a046f2eb15bfe42b3e7b",
+      "bytes": 7373
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.html",
+      "gitObject": "372ab9ea7ec181d823dc5910a493b12721a9a58d",
+      "sha256": "9237a3c8e2968f4927065e3da64b5533ca8ca3db2fd606559f7df3435845db24",
+      "bytes": 360
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.ts",
+      "gitObject": "762d062629f97947202a5e3fc25765d02ff85083",
+      "sha256": "c50fe8283adb154dbad4368be0a694a74fcf7ca56695fe63c5e1315d6a45f5d8",
+      "bytes": 5494
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-candidates.mjs",
+      "gitObject": "e384ca93a37ccee296631645860ea3d18f76c646",
+      "sha256": "3bf4890cf4aa9d33f5b45e344fd35aa7f5db684b3c0afbe65c9a732928ca39da",
+      "bytes": 4984
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.html",
+      "gitObject": "29624e27250352f8fa3690ab8b5915482d329b6a",
+      "sha256": "5522e2d683d16ade5ad1dbc5141911a3bbb345edef3087dc7a56293da25c3afa",
+      "bytes": 393
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.ts",
+      "gitObject": "265394626ea0e76cdbd66e2238e0b02524f4e105",
+      "sha256": "e62e80420f1c7f7d57960fa37c2438eeff3691767e13e6e6829c056c3af9fc4a",
+      "bytes": 6922
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/signalMetrics.ts",
+      "gitObject": "aa4d7ce69491af4597e4105856aa57e378cf93fc",
+      "sha256": "2303204aac7042adfc601a1660aceabaf26f3ea05be17b60a69ff0253122fa00",
+      "bytes": 8523
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/styles.css",
+      "gitObject": "8e1b1abd604d4f0ccb316583f8f5824eec0e7b3b",
+      "sha256": "f4eb64f52c2c6331b0f80eee4c93bab8bee43f2bced9ba42f158036958a4c231",
+      "bytes": 9053
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/verify.mjs",
+      "gitObject": "1d0ead2dc97010f6a766693ec3032f82bc4b1cbf",
+      "sha256": "b741eb3312676e0bda9673e4f16fb8e2e764905547759c816ccf209a19b07498",
+      "bytes": 24099
+    },
+    {
+      "kind": "blob",
+      "head": "9d30894",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/write-manifest.mjs",
+      "gitObject": "13f325887548283a3e28e93d5f74455aeccbc920",
+      "sha256": "c52be37a6030d1e5de3a5953667cac38bc5173f15300921dbaaa89aa9ea11bdd",
+      "bytes": 13188
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/A.wav",
+      "gitObject": "dc276f9ceb47059b48caa62f1d952ae248c7cbb6",
+      "sha256": "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254",
+      "bytes": 17324
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/B.wav",
+      "gitObject": "60ed1ea13c689f9e0b169c332afc5cb3ae1eeb3a",
+      "sha256": "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc",
+      "bytes": 17324
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/C.wav",
+      "gitObject": "3584615eeb2e78d087faabd522bfdf73d478e469",
+      "sha256": "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6",
+      "bytes": 17324
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-report.json",
+      "gitObject": "d207181b118b62f24df4695eb5cc1ea47ade542d",
+      "sha256": "85aae174158a7bf63a87b95fcf71fbf1008b913e89faa9d9acac218b6c048944",
+      "bytes": 241767
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-0.png",
+      "gitObject": "a6e2cba470f884bbc1f33d09f722f6d8b6497e64",
+      "sha256": "85c912980d0c071063900cb15de70fb332f5269f2fba0552a5ba56cc0f2e5961",
+      "bytes": 9698
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-1.png",
+      "gitObject": "5aac5ef48a850f031642639585a7f7078a596aac",
+      "sha256": "d64cbdf2443cda458a716aac7ceaebdb15e6bfbf4cde6129408b71612344374a",
+      "bytes": 5886
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-2.png",
+      "gitObject": "e97263afc0e6d1fa1f86979b09f9c59dcdc008ff",
+      "sha256": "dc8ac93bdaa199521a50edadadf2d1a378205f9bbf1978e122ff8feecc41290c",
+      "bytes": 5500
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-0.json",
+      "gitObject": "b6db3c426990049976e556a666e24c5c89c18465",
+      "sha256": "927b2e2277dbb0226aba8048dfa2dc2ffd900729bc818f254171556290958cf9",
+      "bytes": 2121
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-1.json",
+      "gitObject": "d874e71e89ee69d701d62bdfdab5df6ebd49e29d",
+      "sha256": "7f3fcaf707a4eaa2b0ce2ca15e816ee5ac2966c55d3350a8cd711ef8f5a755c7",
+      "bytes": 2122
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-2.json",
+      "gitObject": "78a94e7873bc958818fb11405fcc585720ffecf3",
+      "sha256": "67d1a6f5e2e54d5718d25ea4a1906b3d572292d5e14dbfeb6bcae0142b2742fc",
+      "bytes": 2108
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/manifest.json",
+      "gitObject": "1bc20f51dc1df79e453bfe7a3f44b490f9df9967",
+      "sha256": "26981ae25b30afbf437fb2352330fe59cea9e67ac48ea8568f2b5a1025208e01",
+      "bytes": 42653
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-desktop-impact.png",
+      "gitObject": "07d759916dee414c9deec422329d65ebd38ee840",
+      "sha256": "db1c419db62b7866a1144c397a9d2f52551a632eb66495a95b1a619c4e3fef1d",
+      "bytes": 576596
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-mobile.png",
+      "gitObject": "578ac9617a001346ff361d759a7a23c8fbf9ce18",
+      "sha256": "d5bf59f3fa1cd970b0197df7ca3e8b42c4e76755b963795ddfde0497dd118b1c",
+      "bytes": 348322
+    },
+    {
+      "kind": "blob",
+      "head": "99b47be",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-reduced-technical.png",
+      "gitObject": "3ee1c2f15444d44f646c691157e508e7095de3f8",
+      "sha256": "331be25ff6383a142f127dd44e973951c0320e1cc9b8f5c54da2f8d6367c3586",
+      "bytes": 459064
+    },
+    {
+      "kind": "blob",
+      "head": "4ce7ba3",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/verification-report.json",
+      "gitObject": "667890761a20957dff260afc50f00afae60cc780",
+      "sha256": "b111c824befb60c3e3df2571e398f68063d2fd585190b64db4a463de91d01afe",
+      "bytes": 4709
+    }
+  ]
+}
