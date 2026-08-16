@@ -20,6 +20,7 @@ const provenance = {
   originalEvidenceSourceSha: '1646b1cbe5e809262ef3f06af98c8a775a94be6d',
   supersededPreReportSha: '9b8cd1d920da2e3078aa634c60d644ea1f31e090',
   revisionBaseSha: '476ec187ac04c4b758b9411871d1af07791dd1ff',
+  accessibilityRevisionBaseSha: 'db47e50667cc729e3f6df16bd7daaaca2e724d6f',
   currentProductSourceSha: 'b11b7b552f1504094a94ccc5e21410a694bf2881',
 };
 const sourceNames = [
@@ -60,8 +61,11 @@ const preReportGeneratedNames = [
   'assets/A.wav', 'assets/B.wav', 'assets/C.wav', 'manifest.json', ...outputNames,
 ];
 const allGeneratedNames = [...preReportGeneratedNames, 'verification-report.json'];
-const revisionSourceNames = ['audition.ts', 'browser-smoke.mjs', 'verify.mjs', 'write-manifest.mjs'];
+const revisionSourceNames = ['audition.ts', 'browser-smoke.mjs', 'styles.css', 'verify.mjs', 'write-manifest.mjs'];
 const revisionPaths = [...revisionSourceNames, ...allGeneratedNames]
+  .map((name) => `${prefix}${name}`);
+const accessibilityRevisionSourceNames = ['browser-smoke.mjs', 'styles.css', 'verify.mjs', 'write-manifest.mjs'];
+const accessibilityRevisionPaths = [...accessibilityRevisionSourceNames, ...allGeneratedNames]
   .map((name) => `${prefix}${name}`);
 
 const sorted = (values) => [...values].sort();
@@ -84,6 +88,8 @@ exactPaths(provenance.originalEvidenceSourceSha, provenance.supersededPreReportS
 exactPaths(provenance.supersededPreReportSha, provenance.revisionBaseSha,
   [`${prefix}verification-report.json`], 'superseded-pre-report-to-revision-base');
 exactPaths(provenance.revisionBaseSha, evidenceSourceHead, revisionPaths, 'revision-base-to-source');
+exactPaths(provenance.accessibilityRevisionBaseSha, evidenceSourceHead,
+  accessibilityRevisionPaths, 'accessibility-revision-base-to-source');
 const sourceTreeFiles = git('ls-tree', '-r', '--name-only', evidenceSourceHead, '--', prefix)
   .split(/\r?\n/u).filter(Boolean);
 const lingeringGenerated = allGeneratedNames
@@ -171,7 +177,7 @@ for (const name of outputNames) {
 }
 
 const manifest = {
-  schema: 'tetramorph.t37.bomb-r5a-familiar-language-audition.v2',
+  schema: 'tetramorph.t37.bomb-r5a-familiar-language-audition.v3',
   generatedAt: new Date().toISOString(),
   provenance: {
     ...provenance,
@@ -182,12 +188,13 @@ const manifest = {
     originalEvidenceSourceTree: git('rev-parse', `${provenance.originalEvidenceSourceSha}^{tree}`),
     supersededPreReportTree: git('rev-parse', `${provenance.supersededPreReportSha}^{tree}`),
     revisionBaseTree: git('rev-parse', `${provenance.revisionBaseSha}^{tree}`),
+    accessibilityRevisionBaseTree: git('rev-parse', `${provenance.accessibilityRevisionBaseSha}^{tree}`),
     currentProductSourceTree: git('rev-parse', `${provenance.currentProductSourceSha}^{tree}`),
     evidenceSourceTree: git('rev-parse', `${evidenceSourceHead}^{tree}`),
     writerBoundary: `${prefix}**`,
     productAudioChanged: false,
     normalOnly: true,
-    revisionReason: 'P2 shared-dispose/HMR ownership race repair',
+    revisionReason: 'P2 shared-dispose/HMR ownership race and P3 keyboard-focus proof repair',
   },
   pathContracts: {
     baseToContract: baseToContractPaths,
@@ -196,6 +203,7 @@ const manifest = {
     originalSourceToSupersededPreReport: preReportGeneratedNames.map((name) => `${prefix}${name}`),
     supersededPreReportToRevisionBase: [`${prefix}verification-report.json`],
     revisionBaseToSource: revisionPaths,
+    accessibilityRevisionBaseToSource: accessibilityRevisionPaths,
     sourceToPreReport: preReportGeneratedNames.map((name) => `${prefix}${name}`),
     terminalReport: `${prefix}verification-report.json`,
   },
@@ -237,6 +245,13 @@ const manifest = {
     scenarioCount: browserReport.lifecycle.length,
     entryStates: ['priming', 'pending', 'playing', 'idle'],
     terminalMethods: ['dispose', 'pagehide', 'hmr'],
+  },
+  accessibility: {
+    keyboardProof: browserReport.keyboardInput,
+    minimumControlHeightPx: {
+      desktop: browserReport.layout.desktop.minimumControlHeight,
+      mobile: browserReport.layout.mobile.minimumControlHeight,
+    },
   },
   sourceBindings,
   productionBindings,

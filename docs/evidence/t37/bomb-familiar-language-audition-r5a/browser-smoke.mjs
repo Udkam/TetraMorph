@@ -49,6 +49,49 @@ async function layout(page) {
   }));
 }
 
+async function inputControl(page, selector) {
+  return page.locator(selector).evaluate((input) => {
+    const span = input.nextElementSibling;
+    if (!(input instanceof HTMLInputElement) || !(span instanceof HTMLElement)) throw new Error('Input control structure drifted.');
+    const rect = span.getBoundingClientRect();
+    const style = getComputedStyle(span);
+    return {
+      value: input.value,
+      checked: input.checked,
+      active: document.activeElement === input,
+      focusVisible: input.matches(':focus-visible'),
+      span: {
+        outlineColor: style.outlineColor,
+        outlineStyle: style.outlineStyle,
+        outlineWidthPx: Number.parseFloat(style.outlineWidth),
+        outlineOffsetPx: Number.parseFloat(style.outlineOffset),
+        rect: {
+          x: rect.x + window.scrollX,
+          y: rect.y + window.scrollY,
+          width: rect.width,
+          height: rect.height,
+        },
+      },
+    };
+  });
+}
+
+async function recordControl(page) {
+  return page.locator('#record-verdict').evaluate((button) => ({
+    active: document.activeElement === button,
+    focusVisible: button.matches(':focus-visible'),
+    disabled: button.disabled,
+  }));
+}
+
+const stableRect = (before, after) => ['x', 'y', 'width', 'height']
+  .every((key) => near(before.span.rect[key], after.span.rect[key], 0.25));
+const visibleInputFocus = (value) => value.active && value.focusVisible
+  && value.span.outlineStyle === 'solid'
+  && value.span.outlineColor === 'rgb(255, 208, 116)'
+  && value.span.outlineWidthPx >= 3
+  && value.span.outlineOffsetPx >= 3;
+
 function scheduleExact(value) {
   return value?.lastSchedule
     && near(value.lastSchedule.audioStartAtSeconds - value.lastSchedule.scheduledFromSeconds, 0.22)
@@ -151,11 +194,65 @@ check(hardDropReference.lastCue === '参照 · Action A 硬降'
   && studioReference.playCount === hardDropReference.playCount + 1
   && studioReference.audio.currentCue === 'studio', 'complete reference controls');
 await desktop.locator('#stop-all').click();
-await desktop.locator('.choice-group label').filter({ has: desktop.locator('input[value="B"]') }).click();
-await desktop.locator('.reason-group label').filter({ has: desktop.locator('input[value="not-block-like"]') }).click();
-await desktop.locator('#record-verdict').click();
+const verdictBeforeKeyboard = await inputControl(desktop, 'input[name="verdict"][value="B"]');
+const reasonBeforeKeyboard = await inputControl(desktop, 'input[name="reason"][value="too-loud"]');
+await desktop.keyboard.press('Tab');
+const rejectKeyboardFocus = await inputControl(desktop, 'input[name="verdict"][value="reject"]');
+await desktop.keyboard.press('ArrowRight');
+await desktop.keyboard.press('ArrowRight');
+const verdictKeyboardFocus = await inputControl(desktop, 'input[name="verdict"][value="B"]');
+check(visibleInputFocus(rejectKeyboardFocus), 'reject radio projects visible keyboard focus');
+check(verdictKeyboardFocus.checked && visibleInputFocus(verdictKeyboardFocus)
+  && stableRect(verdictBeforeKeyboard, verdictKeyboardFocus), 'unselected verdict keyboard selection has stable visible focus');
+await desktop.keyboard.press('Tab');
+const reasonKeyboardFocus = await inputControl(desktop, 'input[name="reason"][value="too-loud"]');
+check(!reasonKeyboardFocus.checked && visibleInputFocus(reasonKeyboardFocus)
+  && stableRect(reasonBeforeKeyboard, reasonKeyboardFocus), 'unselected reason has stable visible keyboard focus');
+await desktop.keyboard.press('Space');
+const reasonKeyboardSelected = await inputControl(desktop, 'input[name="reason"][value="too-loud"]');
+check(reasonKeyboardSelected.checked && visibleInputFocus(reasonKeyboardSelected)
+  && stableRect(reasonBeforeKeyboard, reasonKeyboardSelected), 'reason Space selection preserves visible focus and layout');
+for (let index = 0; index < 7; index += 1) await desktop.keyboard.press('Tab');
+const recordKeyboardFocus = await recordControl(desktop);
+check(recordKeyboardFocus.active && recordKeyboardFocus.focusVisible && !recordKeyboardFocus.disabled, 'record button keyboard-ready');
+await desktop.keyboard.press('Enter');
 const selectedVerdict = await state(desktop);
-check(selectedVerdict.verdict === 'B' && selectedVerdict.reasons.includes('not-block-like'), 'optional verdict input');
+const selectedVerdictOutput = await desktop.locator('#verdict-output').evaluate((output) => output.value);
+check(selectedVerdict.verdict === 'B' && selectedVerdict.reasons.includes('too-loud')
+  && selectedVerdictOutput.includes('候选 B') && selectedVerdictOutput.includes('too-loud'), 'keyboard records optional verdict input');
+for (let index = 0; index < 7; index += 1) await desktop.keyboard.press('Shift+Tab');
+const reasonRestoreFocus = await inputControl(desktop, 'input[name="reason"][value="too-loud"]');
+check(reasonRestoreFocus.checked && visibleInputFocus(reasonRestoreFocus), 'reason remains keyboard-focused before restore');
+await desktop.keyboard.press('Space');
+await desktop.keyboard.press('Shift+Tab');
+await desktop.keyboard.press('ArrowLeft');
+await desktop.keyboard.press('ArrowLeft');
+const rejectRestoreFocus = await inputControl(desktop, 'input[name="verdict"][value="reject"]');
+check(rejectRestoreFocus.checked && visibleInputFocus(rejectRestoreFocus), 'keyboard restores reject verdict');
+await desktop.keyboard.press('Tab');
+for (let index = 0; index < 7; index += 1) await desktop.keyboard.press('Tab');
+const restoredRecordFocus = await recordControl(desktop);
+check(restoredRecordFocus.active && restoredRecordFocus.focusVisible && !restoredRecordFocus.disabled, 'restored record button keyboard-ready');
+await desktop.keyboard.press('Enter');
+const restoredVerdict = await state(desktop);
+const restoredVerdictOutput = await desktop.locator('#verdict-output').evaluate((output) => output.value);
+check(restoredVerdict.verdict === 'reject' && restoredVerdict.reasons.length === 0
+  && restoredVerdictOutput.includes('已记录：全部不通过'), 'keyboard restores and records default reject');
+const keyboardInput = {
+  verdictBeforeKeyboard,
+  reasonBeforeKeyboard,
+  rejectKeyboardFocus,
+  verdictKeyboardFocus,
+  reasonKeyboardFocus,
+  reasonKeyboardSelected,
+  recordKeyboardFocus,
+  selectedVerdictOutput,
+  reasonRestoreFocus,
+  rejectRestoreFocus,
+  restoredRecordFocus,
+  restoredVerdict,
+  restoredVerdictOutput,
+};
 await desktop.evaluate(() => window.__R5A_TEST__.dispose('desktop-finish'));
 await desktop.waitForTimeout(500);
 await desktop.close();
@@ -372,7 +469,7 @@ check(pageErrors.length === 0, `page errors: ${pageErrors.join(' | ')}`);
 check(requestErrors.length === 0, `request errors: ${requestErrors.join(' | ')}`);
 
 const report = {
-  schema: 'tetramorph.t37.bomb-r5a-browser-proof.v2',
+  schema: 'tetramorph.t37.bomb-r5a-browser-proof.v3',
   generatedAt: new Date().toISOString(),
   url: baseUrl,
   playwrightVersion,
@@ -391,6 +488,7 @@ const report = {
   hardDropReference,
   studioReference,
   selectedVerdict,
+  keyboardInput,
   mobileInitial,
   reducedFrames,
   reducedImpact,
