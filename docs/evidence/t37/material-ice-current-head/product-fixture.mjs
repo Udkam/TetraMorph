@@ -30,13 +30,40 @@ export function attachObservers(page, label = 'page') {
   const observed = { label, consoleErrors: [], pageErrors: [], requestErrors: [], requests: [], events: [] };
   let sequence = 0;
   let initialIceWindowOpen = true;
-  /** @param {string} kind @param {Record<string, any>} detail */
+  /** @param {string} kind @param {Record<string, any>} detail @returns {Record<string, any>} */
   const record = (kind, detail) => {
     const event = { sequence: ++sequence, kind, ...detail };
     observed.events.push(event);
     return event;
   };
+  /** @param {string} value */
+  const isAppUrl = (value) => {
+    try { return new URL(value).pathname === '/src/App.tsx'; } catch { return false; }
+  };
+  /** @param {import('playwright').Request} request */
+  const requestDetail = (request) => {
+    let mainFrame = false;
+    try { mainFrame = request.frame() === page.mainFrame(); } catch { mainFrame = false; }
+    return {
+      url: request.url(), method: request.method(), resourceType: request.resourceType(),
+      mainFrame, navigationRequest: request.isNavigationRequest(),
+    };
+  };
+  /** @type {WeakMap<import('playwright').Request, () => void>} */
+  const appRequestSettlers = new WeakMap();
   Object.defineProperty(observed, 'iceResponsePromises', { value: [], enumerable: false });
+  Object.defineProperty(observed, 'appResponsePromises', { value: [], enumerable: false });
+  Object.defineProperty(observed, 'appRequestFinishedPromises', { value: [], enumerable: false });
+  Object.defineProperty(observed, 'settleAppNetwork', {
+    enumerable: false,
+    value: async () => {
+      let priorCount = -1;
+      while (priorCount !== observed.appResponsePromises.length + observed.appRequestFinishedPromises.length) {
+        priorCount = observed.appResponsePromises.length + observed.appRequestFinishedPromises.length;
+        await Promise.all([...observed.appResponsePromises, ...observed.appRequestFinishedPromises]);
+      }
+    },
+  });
   Object.defineProperty(observed, 'freezeIceResponseWindow', {
     enumerable: false,
     value: async () => {
@@ -49,15 +76,26 @@ export function attachObservers(page, label = 'page') {
   });
   page.on('console', (message) => { if (message.type() === 'error') observed.consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => observed.pageErrors.push(error.message));
-  page.on('requestfailed', (request) => observed.requestErrors.push(`${request.method()} ${request.url()}: ${request.failure()?.errorText ?? 'failed'}`));
   page.on('request', (request) => {
-    let mainFrame = false;
-    try { mainFrame = request.frame() === page.mainFrame(); } catch { mainFrame = false; }
-    const detail = {
-      url: request.url(), method: request.method(), resourceType: request.resourceType(),
-      mainFrame, navigationRequest: request.isNavigationRequest(),
-    };
+    const detail = requestDetail(request);
     observed.requests.push(record('request', detail));
+    if (isAppUrl(request.url())) {
+      observed.appRequestFinishedPromises.push(new Promise((resolve) => appRequestSettlers.set(request, () => resolve(undefined))));
+    }
+  });
+  page.on('requestfinished', (request) => {
+    if (!isAppUrl(request.url())) return;
+    record('app-requestfinished', requestDetail(request));
+    appRequestSettlers.get(request)?.();
+    appRequestSettlers.delete(request);
+  });
+  page.on('requestfailed', (request) => {
+    const errorText = request.failure()?.errorText ?? 'failed';
+    observed.requestErrors.push(`${request.method()} ${request.url()}: ${errorText}`);
+    if (!isAppUrl(request.url())) return;
+    record('app-requestfailed', { ...requestDetail(request), errorText });
+    appRequestSettlers.get(request)?.();
+    appRequestSettlers.delete(request);
   });
   page.on('framenavigated', (frame) => {
     if (frame === page.mainFrame()) record('navigation', { url: frame.url(), mainFrame: true });
@@ -74,31 +112,40 @@ export function attachObservers(page, label = 'page') {
     }));
   });
   page.on('response', (response) => {
+    const request = response.request();
+    if (isAppUrl(response.url())) {
+      const appEvent = record('app-response', {
+        ...requestDetail(request), status: response.status(), contentType: response.headers()['content-type'] ?? null,
+        bodyEncoding: 'base64', bodyBase64: null,
+      });
+      observed.appResponsePromises.push(response.body().then((bytes) => {
+        appEvent.bodyBase64 = bytes.toString('base64');
+        return appEvent;
+      }).catch((error) => {
+        appEvent.bodyError = String(error);
+        return appEvent;
+      }));
+    }
     let parsed;
     try { parsed = new URL(response.url()); } catch { return; }
     if (parsed.pathname.split('/').at(-1) !== 'freeze-ice-cubes-hq.ogg') return;
-    const request = response.request();
     const redirectedFrom = request.redirectedFrom();
-    const responseEvent = record(initialIceWindowOpen ? 'ice-response' : 'ice-response-hmr', {
+    const captureWindow = initialIceWindowOpen ? 'initial-freeze' : 'hmr';
+    const metadata = {
       url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
       contentType: response.headers()['content-type'] ?? null,
       redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
-      captureWindow: initialIceWindowOpen ? 'initial-freeze' : 'hmr',
-    });
+      captureWindow, bodyEncoding: 'base64', body: null,
+    };
+    const responseEvent = record(initialIceWindowOpen ? 'ice-response' : 'ice-response-hmr', metadata);
     if (!initialIceWindowOpen) return;
-    observed.iceResponsePromises.push(response.body().then((bytes) => ({
-      sequence: responseEvent.sequence,
-      url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
-      contentType: response.headers()['content-type'] ?? null,
-      redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
-      bodyEncoding: 'base64', body: bytes.toString('base64'),
-    })).catch((error) => ({
-      sequence: responseEvent.sequence,
-      url: response.url(), status: response.status(), method: request.method(), resourceType: request.resourceType(),
-      contentType: response.headers()['content-type'] ?? null,
-      redirectedFrom: redirectedFrom ? { url: redirectedFrom.url(), method: redirectedFrom.method() } : null,
-      bodyEncoding: 'base64', body: null, bodyError: String(error),
-    })));
+    observed.iceResponsePromises.push(response.body().then((bytes) => {
+      responseEvent.body = bytes.toString('base64');
+      return { sequence: responseEvent.sequence, ...metadata, body: responseEvent.body };
+    }).catch((error) => {
+      responseEvent.bodyError = String(error);
+      return { sequence: responseEvent.sequence, ...metadata, bodyError: responseEvent.bodyError };
+    }));
   });
   return observed;
 }
