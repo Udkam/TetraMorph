@@ -9141,41 +9141,100 @@ This section supersedes older F4E next-action text. V5 is permanently consumed b
 audited default-heap failure recorded in `F4E-R5-CONSUMED-V1`; it produced no candidate
 and does not prove Intro-05 unsatisfiable. A v6 production attempt remains closed.
 
-Before v6, the renderer-independent exact certifier gains an optional frontier-store
-boundary. Core continues to own every proof decision in the same order: decode the full
+Before v6, the renderer-independent exact certifier gains this synchronous optional
+frontier-store boundary (names are normative):
+
+```ts
+interface EndgameProofFrontierLayer {
+  readonly size: number;
+  values(): Iterable<string>;
+  dispose(): void;
+}
+interface EndgameProofFrontierWriter {
+  add(key: string): void;
+  finish(): EndgameProofFrontierLayer;
+  abort(): void;
+}
+interface EndgameProofFrontierStore {
+  createInitial(key: string): EndgameProofFrontierLayer;
+  createNext(depth: number): EndgameProofFrontierWriter;
+  dispose(): void;
+}
+interface EndgameOptimalRouteCertificateOptions {
+  frontierStore?: EndgameProofFrontierStore;
+}
+```
+
+Both public certifiers keep their synchronous `Certificate | null` return and accept the
+options only as a final optional parameter. With no option they use the source-compatible
+in-memory store. Core imports neither the disk adapter nor any `node:*` module. A store is
+single-certificate/single-use: `createInitial` runs once; every layer's `values()` runs once
+and must yield exactly `size` records; `createNext(depth)` runs once per entered depth;
+`add` precedes one `finish`, while `abort` is idempotent and invalidates unfinished output.
+`finish` returns a valid zero-size layer when no key was emitted. Layer and store `dispose`
+are idempotent. Core owns these calls, closes the previous layer only after next-layer
+finalization, and preserves a primary proof exception plus every cleanup exception in an
+`AggregateError` (or an exactly equivalent multi-error value).
+
+Core continues to own every proof decision in the same order: decode the full
 11-segment canonical state key, apply the existing target-column-deficit lower bound,
 enumerate the complete public-control landing domain, reject any shorter win before child
 pruning, apply the same child bound, and emit the same complete key. The default store keeps
 the current in-memory behavior and every existing call remains source-compatible.
 
-The Node-only authoring adapter stores only full canonical ASCII keys. It may not use a
+The Node-only authoring adapter stores only full canonical printable-ASCII keys. It may not use a
 hash, board mask, target-row projection, probabilistic structure, or other lossy identity.
-It buffers a fixed 64 MiB raw-key budget, sorts and fully deduplicates each chunk, then
-performs a deterministic k-way full-byte merge into the next layer. Only a bounded chunk,
-one line per merge input, and bounded read/write buffers may be resident. Layer descriptors
-carry exact unique-key count; Core telemetry and certificate fields remain unchanged.
+Each record is `1..2048` ASCII bytes plus exactly one LF; CR, NUL, non-ASCII, blank records,
+missing terminal LF, truncated lines, and longer records are fatal. Empty layers are zero-byte
+files. Ordering is explicit unsigned-byte ordinal comparison, never locale, prefix, or hash
+comparison; every persisted run is strictly increasing and fully byte-deduplicated.
+
+One chunk holds at most `64 * 1024 * 1024` record bytes **including** each LF and at most
+`131072` records. The writer flushes *before* an added record would exceed either limit and
+rejects a single over-limit record. Sorting is in place with at most O(record-count) reference
+scratch; encoding/writing may not join a whole chunk into a second monolithic string or buffer.
+The fixed output buffer is at most 1 MiB.
+
+Chunk runs are merged with fan-in exactly 32 through deterministic numbered passes. At most
+32 input handles, one output handle, one `64 * 1024`-byte buffer per reader, one current record
+per reader, and the 1 MiB output buffer are open/resident. Each group output is fully flushed,
+closed, reopened, and checked for framing, strict order, and exact descriptor count before its
+inputs may be unlinked. Multi-pass and final merges use complete-byte equality for cross-run
+dedupe. Layer descriptors carry exact unique-key count; Core independently counts yielded
+records. Core telemetry and certificate fields remain unchanged.
 
 The injected lifecycle is fail-closed. Core disposes the current layer after the next layer
-is finalized and closes the entire store on success or exception. The adapter owns one
-caller-supplied, already-empty staging directory; exclusive creation, regular-file checks,
-ASCII/LF framing, exact count, deterministic names, complete write/flush/close handling,
-and recursive *enumeration* are mandatory. Cleanup deletes only exact files created under
-that verified directory. Any open/read/write/sort/merge/close/count/cleanup fault propagates,
-cannot yield a certificate, and must be observable to a later terminal owner as residue or
-an explicit cleanup failure.
+is finalized and closes the entire store on success or exception. The Node adapter receives
+one exact absent stage path beneath an existing caller-verified parent, creates it exclusively,
+rejects symlink/reparse/realpath drift under its honest-caller boundary, and keeps an exact
+created-file registry. Deterministic filesystem operations are injectable for fault tests.
+Every handle closes before unlink; cleanup unlinks only registered exact files, refuses any
+foreign directory entry, and removes only its now-empty exact stage directory without a
+recursive delete. A primary error and cleanup errors are preserved together; the adapter also
+returns a residue manifest when cleanup cannot complete. Any create/open/write/flush/read/
+sort/merge/close/count/enumerate/unlink/directory-remove fault propagates and cannot yield a
+certificate. Production v6 must independently bind the stage parent/path and rescan real
+residue after worker exit. Active same-permission path replacement or foreign-file injection is
+outside this infrastructure's honest-caller guarantee and remains a governance violation,
+not an authenticated filesystem claim.
 
 The infrastructure checkpoint is limited to:
 
 - `src/game/core/endgameRouteSearch.ts`;
-- one focused Core frontier-store test;
+- `src/game/core/endgameProofFrontierStore.test.ts`;
 - `scripts/endgame-disk-frontier.mjs`;
-- one focused Node adapter test.
+- `src/authoring/endgameDiskFrontier.test.mjs`.
 
 Acceptance requires old-versus-injected certificate equality for Intro-01 through Intro-04
 and small synthetic definitions, including every telemetry field; deterministic chunk-order
-and duplicate collapse; multi-chunk k-way merge; full-key collision adversaries; bounded
-buffer accounting; and injected create/write/read/merge/close/cleanup failures. No test or
-diagnostic may run Intro-05, a partial Intro-05 depth, or target-specific sampling. This is
+and duplicate collapse; more-than-32-run multi-pass merge; full-key/prefix/hash-collision
+adversaries; exact peak raw-record/count/handle/read/write-buffer accounting; invalid or
+unterminated framing; descriptor-count mismatch; and injected create/open/write/flush/read/
+merge/close/enumerate/unlink/directory-remove failures. Tests use both the injectable seam and
+the real Windows filesystem, including real handle/flush/close/rename-or-finalize/unlink order
+and a final absent stage directory. The Node test lives under `src/**` so current Vitest
+discovery executes it without a config change. No test or diagnostic may run Intro-05, a
+partial Intro-05 depth, or target-specific sampling. This is
 proof infrastructure only, has no gameplay, renderer, storage, audio, score, or browser
 behavior change, and does not authorize v6.
 

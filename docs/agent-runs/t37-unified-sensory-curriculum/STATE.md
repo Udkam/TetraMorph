@@ -3123,3 +3123,17 @@ unstaged.
   No Intro-05, partial-depth, or target-specific proof diagnostic is authorized.
 - Next action: commit and independently review this four-document contract, then implement
   only its four-path infrastructure boundary and complete automated gates. V6 remains closed.
+
+### F4E-R6A R1 contract rejection and R2 correction
+
+- R1 `c1b598d` is rejected at independent totals `0/2/1/0/0` and `0/2/3/0/1`.
+  It left merge fan-in/handles unbounded, named only two of four paths, omitted a complete
+  synchronous Store API, and under-specified record framing/budgets, error aggregation,
+  Windows cleanup, and the staging threat boundary. No infrastructure source was edited.
+- R2 freezes the synchronous single-use layer/writer/store lifecycle and optional final
+  certifier parameter; exact four paths; 2048-byte printable-ASCII LF-framed records;
+  64 MiB plus 131072-record chunks; 32-way multi-pass merge; 64 KiB readers; 1 MiB writer;
+  full ordinal-byte ordering/dedupe; post-close validation; exact registry cleanup; aggregate
+  diagnostics; injectable and real-Windows tests; and honest-caller staging governance.
+- Next: commit this four-doc correction and obtain two fresh all-zero contract reviews.
+  Implementation and v6 both remain closed.

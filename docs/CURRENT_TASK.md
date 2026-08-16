@@ -10238,10 +10238,13 @@ or repair v5 in place.
 
 The sole open implementation slice is the exact frontier-store infrastructure defined in
 `docs/DESIGN.md`. Add the optional Core store boundary, its source-compatible in-memory
-default, the Node-only 64 MiB external-sort/full-key-dedupe adapter, and focused equality,
-boundedness, and fault-cleanup tests. Do not run Intro-05 or any target-specific partial
-search. Do not edit Intro-05 definitions/fixtures, later curriculum, UI, audio, scoring,
-storage, or protected inherited paths in this checkpoint.
+default, the Node-only external-sort/full-key-dedupe adapter, and exact tests at
+`src/game/core/endgameProofFrontierStore.test.ts` and
+`src/authoring/endgameDiskFrontier.test.mjs`. The adapter freezes a 64 MiB / 131072-record
+chunk, 2048-byte record, 32-way multi-pass merge, 64 KiB reader, and 1 MiB writer boundary.
+Do not run Intro-05 or any target-specific partial search. Do not edit Intro-05 definitions/
+fixtures, later curriculum, Vite config, UI, audio, scoring, storage, or protected inherited
+paths in this checkpoint.
 
 Run focused tests while editing; after the last source change run typecheck, the complete
 suite, and build once. Browser evidence is not applicable. Produce a bounded candidate SHA

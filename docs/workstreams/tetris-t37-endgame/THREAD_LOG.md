@@ -756,3 +756,19 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
 - Next: commit these four governing documents, obtain independent all-zero contract review,
   implement the four-path infrastructure candidate, run focused plus final gates, and obtain
   independent source QA. A separate docs-first v6 contract is the only later proof authority.
+
+### F4E-R6A R1 rejection and R2 contract candidate
+
+- R1 `c1b598d` independent reviews reject implementation at
+  `P0/P1/P2/P3/GAP = 0/2/1/0/0` and `0/2/3/0/1`. No source implementation began.
+- R2 names the exact synchronous Store API and the two previously missing test paths. Existing
+  certifiers remain synchronous/source-compatible and Core never imports Node or the adapter.
+- Full-key storage now has precise ASCII/LF/2048-byte framing, 64 MiB and 131072-record chunk
+  limits, 32-way deterministic multi-pass merge, 64 KiB reader and 1 MiB writer limits, strict
+  output revalidation, descriptor recount, and complete-byte comparison.
+- Exact created-file registry cleanup closes handles before unlink, refuses foreign entries,
+  aggregates primary/cleanup failures, exposes residue, and is tested through injection plus
+  the real Windows filesystem. The honest-caller/same-permission staging boundary is explicit;
+  a later v6 terminal owner must bind and rescan its own namespace.
+- Next: commit only this four-document R2 correction and obtain two fresh all-zero reviews.
+  The four source paths and all proof execution remain closed meanwhile.
