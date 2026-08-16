@@ -3151,3 +3151,7 @@ unstaged.
   replace faults and preserves primary plus cleanup errors.
 - Next: commit the four R3 docs and obtain two fresh all-zero contract reviews. Source and v6
   remain closed until then.
+
+R3 review A is all-zero; review B has only one P2 wording conflict between “every cleanup
+exception” and the bounded diagnostic array. R4 resolves it as at most 4098 normalized errors
+plus one mandatory omitted-count sentinel; truncation is fatal. No implementation has begun.

@@ -10244,6 +10244,8 @@ external-sort/full-key-dedupe path, the Node-only immutable-run adapter, and exa
 chunk, 2048-byte record, at most 4096 chunks, 32-way multi-pass merge, 64 KiB reader, 1 MiB
 writer, and 4098-entry metadata/diagnostic boundary. Core exact-compares each persisted chunk
 and recomputed merge before releasing inputs; adapter `diagnostics()` remains observable.
+Cleanup aggregation retains at most 4098 normalized errors plus one mandatory truncation
+sentinel; truncation remains a hard failure.
 Do not run Intro-05 or any target-specific partial search. Do not edit Intro-05 definitions/
 fixtures, later curriculum, Vite config, UI, audio, scoring, storage, or protected inherited
 paths in this checkpoint.

@@ -9180,8 +9180,10 @@ A supplied store is single-certificate/single-use. Run `values()` is repeatable 
 and each iteration must yield exactly `size` strictly increasing full records. `write` precedes
 one `finish`; `abort`, Run `dispose`, and Store `dispose` are idempotent. `diagnostics()` remains
 callable after any failure/dispose and is the normative residue channel. Core preserves a
-primary proof exception plus every cleanup exception in `AggregateError` (or an exactly
-equivalent multi-error value) while the caller retains the Store for diagnostics.
+primary proof exception plus at most 4098 normalized cleanup exceptions in `AggregateError`
+(or an exactly equivalent multi-error value). If more occur, one mandatory truncation sentinel
+records the omitted count and `cleanupErrorsTruncated=true`; truncation is itself fatal. The
+caller retains the Store for diagnostics.
 
 Core continues to own every proof decision in the same order: decode the full
 11-segment canonical state key, apply the existing target-column-deficit lower bound,

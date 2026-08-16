@@ -786,3 +786,11 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   remains callable after dispose. Same-size omit/add/replace faults must all fail closed.
 - Next: commit this four-doc R3 correction and obtain two fresh all-zero reviews. No source or
   proof execution is open before that result.
+
+### F4E-R6A R3 split verdict and R4 wording correction
+
+- R3 review A is all-zero; review B reports only `P2 1`: cleanup errors were both promised in
+  full and capped at 4098. R4 retains at most 4098 normalized errors plus one mandatory
+  omitted-count truncation sentinel. The sentinel and diagnostic flag are fatal and observable.
+- Next: commit this four-doc wording correction and obtain fresh all-zero confirmation. Source
+  and proof execution remain closed.
