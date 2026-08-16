@@ -3,6 +3,101 @@
 > The current page-facing identity is the plain-text `TetraMorph`. Older `Tetra` and
 > `Tetris` headings below are retained only as historical contract provenance.
 
+## 2026-08-16 T37 — Completion-first supersession
+
+This section is the current product authority and supersedes every older T37 status,
+gate, resume instruction, and next action below. The player requests implementation of
+the complete bounded curriculum before one consolidated acceptance review. This removes
+interim human gates only: it does not remove acceptance. Every new or switchable choice
+remains provisional, automated QA is not human acceptance, and subjective work must not
+be described as accepted before the final review.
+
+### Adopted recovery head and R5A result
+
+- Recovery binds to repository head `4ce7ba3562459809158958b3178dd31a68c5cabd` and Core
+  tree `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`.
+- R5A's final linear record is source fix `54a3277`, source-only invalidation `9d30894`,
+  fourteen final outputs `99b47be`, and report-only proof `4ce7ba3`.
+- Final automated evidence is `204/204` verification checks, `537 passed / 15 skipped`, a
+  `770`-module build, UI QA `P0/P1/P2/P3 = 0/0/0/0`, and audio QA
+  `P0/P1/P2/P3 = 0/0/0/0` with human listening as the sole GAP. Port `4192` is clean.
+- Product keeps provisional default `A`. Tests may force `A`, `B`, or `C`; the product
+  exposes no UI or persistence choice. None of A/B/C is human accepted.
+
+### R5B — one frozen familiar-language Bomb contract
+
+R5B is first. It uses the three exact vendor stems already proved by R5A:
+
+- A: `be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254`.
+- B: `b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc`.
+- C: `ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6`.
+
+Normal Bomb plays one full stem at `220 ms`. Bomb-chain scheduling uses the frozen
+`mutationChainPresentationPlan` distinct beat starts: depth `0` plays one full stem and
+depth `> 0` plays one onset grain from that same stem. Full presentation is
+`84 ms / fade 28 ms / gain 0.11`; reduced presentation is
+`36 ms / fade 16 ms / gain 0.055`. Each event owns exactly one mono buffer and one source.
+There is no clamp, normalization, compression, preview transcode, old `bomb` /
+`bomb-chain` recipe, noise layer, or fixed pulse. Renderer ownership, the presentation
+timeline, and Core stay frozen. Default A remains provisional rather than human accepted.
+
+Ice 2 remains the accepted runtime material: use the locally proven Ogg and local
+provenance. The original uploader WAV on the official page still requires login and is
+explicitly **OPEN**; it is not replaced with a preview transcode and does not block the
+rest of the curriculum. Disclose it in the final report.
+
+### Remaining material, curriculum, and presentation contract
+
+1. **D2B motion.** After the final 46-level library is live, category release is
+   `120 ms`, settle is `180 ms`, and travel is at most `4 px`; detail transition is
+   `120 ms` and at most `3 px`. Reduced motion is at most `32 ms`, transform-free. D1
+   and D2A remain frozen. Preserve `44 px` targets, focus and history behavior, and
+   exactly one gameplay Canvas.
+2. **F4E-R5 Intro 05.** Run only the new external v5 validator/candidate/attempt/terminal
+   family, once. Old v1-v4 artifacts and old production search tools are banned. Two
+   independent byte/AST/no-spawn QA passes and a green preflight are required before the
+   one production attempt; failure consumes it. The schema-8 candidate must satisfy all
+   Intro-05 geometry, admission, route, release, and certificate invariants before the
+   four authorized source paths may change.
+3. **F5 curriculum.** Publish exactly `5 Intro / 25 Easy / 16 Hard`. Persistence v7 has
+   exactly `version`, `campaignRevision`, `completedLevelIds`, and
+   `bestLockedPieceCounts`. Canonical v7 has priority over v6 and a present but invalid or
+   failed source stops fallback. Preserve 38 compatible records, rebuild 8 with clear
+   progress, transfer nothing from the 4 retired levels, retain v6 for rollback, and
+   unlock Hard at certified optimum plus five. Certificates and codecs are proven while
+   non-live, followed by one atomic campaign flip and a retired-deep-link notice.
+4. **Line clear.** Core's `200 ms` rule, `300 ms` erase point, score ownership, and the
+   accepted Studio language stay frozen. Full-motion post-commit tails are
+   `+120/+240/+360/+480 ms`, producing totals `420/540/660/780 ms` for one through four
+   lines. Reduced tails are `+80/+100/+120/+140 ms`. Reward derives only from line count
+   and never changes score.
+5. **Falling Fold icon.** Create a connected, asymmetric, falling folded-surface
+   silhouette in deep blue with one warm seam, and ship actual favicon and Apple mask
+   assets. Do not use four quadrants, letters, commercial trade dress, or a logo imitation.
+   Final review may adjust this provisional direction.
+6. **Classic presets.** Implement last among product changes: Calm `1.00 -> 0.30`,
+   Relaxed `0.80 -> 0.20`, Standard `0.60 -> 0.08` as default, Swift
+   `0.40 -> 0.08`, and Expert `0.20 -> 0.08` seconds per cell. Cover all five ranking
+   domains plus keyboard, touch, copy, and storage. Migrate a legacy start/end pair to the
+   nearest preset by choice-index Manhattan distance, resolving ties toward the slower
+   preset.
+7. **Survival.** Produce an audit-only proposal. Survival is explicitly **NOT
+   IMPLEMENTED** and causes no product change in this slice.
+
+The eight F5 technique mappings are: `preserve-well / t5r-horizon-15` to Endgame
+31/45/46/49; `anchor-side-slip / t5r-drift-08` to 32/39;
+`build-support / t6r-keystone-20` to 33/35/44;
+`edge-to-centre / t5r-delta-07` to 36/38; `split-lanes / t5r-lattice-09` to 37;
+`avoid-hole / t3r-cascade-05` to 47; `clear-order / t6r-terrace-18` to 41/48; and
+`choose-gate / t5r-rift-10` to 50.
+
+### Completion and acceptance order
+
+The sole current order is R5B, Ice/material current-head proof, F4E/F5, D2B, line/icon,
+Classic as the last product change, Survival proposal, one final gate/browser/independent-QA
+pass, one consolidated human review, fixes, then push. No interim subjective result opens
+or closes a later stage. The next action is R5B implementation against the adopted head.
+
 ## 2026-08-12 T37 — Canonical Endgame namespace
 
 The product domain is now **残局** in Chinese and **Endgame** in English. The retired

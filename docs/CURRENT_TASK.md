@@ -1,6 +1,85 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
-Status: **BOMB R5A EVIDENCE AUTHORIZED / BOMB VISUAL + D1 HUMAN ACCEPTED / MATERIAL REVIEW + D2B + INTRO-05 SUCCESSOR PAUSED / SURVIVAL PROPOSAL PENDING**
+Status: **COMPLETION-FIRST IMPLEMENTATION ACTIVE / ALL NEW CHOICES PROVISIONAL / ONE CONSOLIDATED HUMAN REVIEW LAST**
+
+## 2026-08-16 authoritative completion-first task
+
+This block supersedes every older status, pause, gate, and next action in this append-only
+file. Implement the whole bounded curriculum, prove it once at the final candidate, then
+present one consolidated human acceptance review. Interim human gates are removed, but
+acceptance is not: automated checks cannot accept subjective work, switchable candidates
+remain provisional, and no early subjective result changes the execution order.
+
+The adopted recovery point is head `4ce7ba3562459809158958b3178dd31a68c5cabd`
+with Core tree `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`. R5A consists of source fix
+`54a3277`, source-only invalidation `9d30894`, fourteen final outputs `99b47be`, and
+report-only proof `4ce7ba3`. Its final gates are `204/204`, `537 passed / 15 skipped`,
+`770` modules, UI QA `P0-P3 = 0/0/0/0`, and audio QA `P0-P3 = 0/0/0/0` with only the
+human-listening GAP. Port `4192` is clean. Product default A is provisional; tests may
+force A/B/C, while UI and storage expose no choice.
+
+### Numbered implementation and acceptance requirements
+
+1. Implement all authorized stages before one consolidated acceptance. This changes only
+   interim human gates; it does not waive final acceptance. Treat new/default/switchable
+   choices as provisional and automated QA as non-human evidence.
+2. Preserve the exact R5A record and results above. Do not call default A human accepted
+   or add a product UI/storage selector for A/B/C.
+3. R5B uses vendor stem SHA-256 A
+   `be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254`, B
+   `b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc`, and C
+   `ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6`.
+   Normal Bomb uses the full stem at `220 ms`. Chain audio consumes frozen
+   `mutationChainPresentationPlan` distinct beat starts: depth 0 is full stem; later
+   depths are onset grains. Full is `84/28 ms` at gain `0.11`; reduced is `36/16 ms`
+   at gain `0.055`. Each event has one mono buffer and source. Do not clamp, normalize,
+   compress, transcode a preview, revive old bomb/bomb-chain/noise/fixed pulses, or change
+   Renderer, timeline, or Core.
+4. Keep accepted Ice 2 as the runtime Ogg with local provenance. The uploader's original
+   WAV on its official login-required page stays **OPEN**, is never substituted by a
+   preview transcode, does not block other work, and is disclosed in the final report.
+5. After the final 46-level library, D2B category release/settle is `120/180 ms` with at
+   most `4 px`; detail is `120 ms` with at most `3 px`; reduced is at most `32 ms` and
+   transform-free. Freeze D1/D2A and preserve `44 px` targets, focus, history, and one
+   Canvas.
+6. F4E-R5 is bound to the adopted head/Core tree. Use only external
+   `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v5.mjs`,
+   `...candidate-v5.json`, `...attempt-v5.json`, and `...terminal-v5.json`. Ban v1-v4
+   and old `tools/search-endgame-v3-tiling-first*.mjs`. Require two independent
+   byte/AST/no-spawn audits, green preflight, and one attempt; failure is consumed.
+   Intro 05 schema 8 must pass its complete frozen invariants before changing only
+   `src/game/core/endgameV3IntroDefinitions.ts`,
+   `docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-05.json`,
+   `src/game/core/endgameV3Intro05Exact.test.ts`, and
+   `src/game/core/endgameV3Intro04Exact.test.ts`.
+7. F5 publishes `5/25/16` and v7 fields exactly `version`, `campaignRevision`,
+   `completedLevelIds`, `bestLockedPieceCounts`. Source priority is canonical v7 then v6;
+   a first-present invalid/read-failed source stops fallback. Preserve 38 compatible
+   records, clear/rebuild 8, transfer nothing from retired 34/40/42/43, retain v6 rollback,
+   and set Hard to certified optimum plus five. Prove the non-live certificates/codecs,
+   then make one atomic flip with a retired-deep-link notice. Technique mapping is:
+   preserve-well/horizon to 31/45/46/49; anchor-side-slip/drift to 32/39;
+   build-support/keystone to 33/35/44; edge-to-centre/delta to 36/38;
+   split-lanes/lattice to 37; avoid-hole/cascade to 47; clear-order/terrace to 41/48;
+   choose-gate/rift to 50.
+8. Freeze Core `200 ms` and the existing erase at `300 ms`; freeze score ownership and
+   Studio audio. Add full tails
+   `120/240/360/480 ms` for totals `420/540/660/780 ms`; reduced tails are
+   `80/100/120/140 ms`. Derive reward only from line count and never change score.
+9. Falling Fold is one connected asymmetric falling folded-surface silhouette, deep blue
+   with a warm seam, shipped as real favicon and Apple mask. No four-quadrant mark,
+   letters, trade dress, or logo imitation; final review may adjust it.
+10. Classic presets are Calm `1.00 -> 0.30`, Relaxed `0.80 -> 0.20`, Standard
+    `0.60 -> 0.08` default, Swift `0.40 -> 0.08`, Expert `0.20 -> 0.08` seconds/cell.
+    Cover five ranking domains, keyboard, touch, copy, and storage. Legacy start/end pairs
+    migrate by choice-index Manhattan nearest with slower-preset tie-break.
+11. Survival is audit-only and explicitly **NOT IMPLEMENTED**; it changes no product.
+12. Execute R5B -> Ice/material current-head proof -> F4E/F5 -> D2B -> line/icon ->
+    Classic last product -> Survival proposal -> one final gates/browser/QA pass -> one
+    consolidated human review -> fixes -> push. Subjective work is never accepted early.
+
+**Current next action:** implement and prove R5B against the adopted recovery head without
+changing Core, Renderer, or the frozen presentation timeline.
 
 ## Active objective
 

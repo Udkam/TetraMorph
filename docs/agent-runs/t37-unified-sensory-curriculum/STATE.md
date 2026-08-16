@@ -2915,3 +2915,42 @@ F4E-R4I-COMMAND-CONTRACT-V1 validator=93952536898D055B793E52A7957C821A51C26C78B0
   evidence writer only under `docs/evidence/t37/bomb-familiar-language-audition-r5a/**`.
   It must first commit the exact source allowlist as `evidenceSourceHead`, then render and
   verify all outputs from that head. R5B, product audio, and paused workstreams remain closed.
+
+## 2026-08-16 completion-first recovery checkpoint — current authority
+
+This checkpoint supersedes every older pause, human-gate prerequisite, and unique next
+action in this append-only state. The player's current order is to implement the entire
+bounded target first and place all subjective acceptance at one final consolidated review.
+This is sequencing authority, not acceptance: automated checks never accept sound, motion,
+icon, material, or pacing choices, and all new defaults remain provisional/switchable.
+
+- Recovery head: `4ce7ba3562459809158958b3178dd31a68c5cabd`.
+- Frozen Core tree: `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`.
+- R5A final chain: keyboard source `54a3277`; source-only invalidation `9d30894`;
+  14 regenerated outputs `99b47be`; one report `4ce7ba3`.
+- R5A gates: browser/verification `204/204`; typecheck pass; `537 passed / 15 skipped`;
+  build 770 modules; UI/lifecycle QA P0-P3 all zero; audio/provenance QA P0-P3 all zero
+  with human listening as the sole open GAP. A/B/C WAV bytes are unchanged and independently
+  rebound. The evidence scope is clean and port 4192 has no listener.
+- Product policy: default A is provisional, tests may force A/B/C, and no UI/storage/URL
+  selector is allowed. R5B owns one complete stem at normal impact and one composed chain
+  event (complete d0 plus onset grains on later frozen distance beats) using the
+  `84/28/.11` full and `36/16/.055` reduced profiles. Renderer, Core, and chain timeline
+  are frozen; old Bomb recipes/noise/pulses remain prohibited.
+- Ice policy: runtime Ogg/local provenance stays accepted. The login-gated uploader WAV/hash
+  is still open, is never replaced by a preview transcode, does not block implementation,
+  and must be disclosed at final review.
+- Endgame policy: F4E-R5 binds this recovery/Core snapshot to new one-use v5 validator,
+  candidate, attempt, and terminal identities. All v1-v4 attempts and old tiling-first
+  production series remain consumed. F5 proves all 46 schema-8 certificates plus the v7
+  codec/migration while non-live, then flips the 5/25/16 roster atomically.
+- Remaining product order: R5B; material/Ice current-head proof; F4E/F5; D2B; line-clear
+  tails/reward; Falling Fold favicon/Apple assets; five Classic presets as the last product
+  change. Survival then receives an audit-only proposal explicitly marked NOT IMPLEMENTED.
+- Final order: one typecheck/full-suite/build/browser matrix, independent QA, one consolidated
+  human review, bounded corrections, exact documentation/changelog, then push.
+
+Current exact action: commit this five-document successor contract, obtain independent
+docs review, then authorize a single R5B product writer. Inherited T27 evidence,
+`docs/evidence/t27-r1-followup/**`, the handoff file, and `progress.md` remain untouched and
+unstaged.

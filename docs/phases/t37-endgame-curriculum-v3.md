@@ -301,3 +301,77 @@ conversion is failure-safe, Hard unlock relations derive from accepted Easy tech
 typecheck/full tests/build pass, one final browser pass proves both languages and persistence,
 and independent QA reports no open finding. Until then, completed sub-checkpoints remain
 bounded candidates rather than whole-stage acceptance.
+
+## 2026-08-16 F4E-R5 and F5 completion-first successor
+
+This section supersedes the earlier F4E execution authority and all old next-action text.
+It is bound to repository recovery head
+`4ce7ba3562459809158958b3178dd31a68c5cabd` and Core tree
+`e9b3a3ed0d001072f5291a8fc841c1849e4db44f`. The v1 default/8192 MiB runs, v2,
+v3, and v4 commands, validators, names, outputs, and retries are permanently consumed or
+rejected. The fixed-mask `tools/search-endgame-v3-tiling-first*.mjs` production series is
+also closed and is not an Intro-05 or Hard authoring entry point.
+
+F4E-R5 must use a newly materialized v5 family only:
+
+- validator `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v5.mjs`;
+- output `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v5.json`;
+- attempt `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v5.json`;
+- terminal `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v5.json`.
+
+Those four identities are one-use and initially absent. A new contract freezes current
+HEAD/Core blobs, runtime/tool identities, the inherited-dirt exclusion, terminal status,
+exit/termination reason, bounded stdout/stderr hashes and tails, final candidate/staging
+state, and the rule that success means atomic candidate publication, staging cleanup, and
+a normal validator exit. Two independent exact-byte/AST/no-spawn reviews and one green
+CPU/RAM/disk/process/path/Core preflight precede the sole production run. A failure consumes
+v5; it does not authorize a heap change, smaller domain, renamed retry, or reuse.
+
+The Intro-05 schema-8 payload retains the exact field order and hashing domains established
+by Intro-01 through Intro-04. It must independently reconstruct the eight zero-clear setup
+locks, 32 targets, four bottom-row gaps totaling eight, 54-way admission, two complete
+public-domain routes using Current/Next-1/Next-2 for their first three zero-release locks,
+two causal support hops per route, later positive releases totaling four rows, empty final
+state, deterministic lock/state/route hashes, and exhaustive rejection of every shorter
+depth. Hold, beam search, state caps, and a human-readable route without exact proof remain
+invalid. Only an independently accepted candidate opens the four-path Intro-05 source slice
+named in `docs/CURRENT_TASK.md`.
+
+F5 persistence is now frozen as:
+
+```ts
+type EndgameProgressV7 = Readonly<{
+  version: 7;
+  campaignRevision: 3;
+  completedLevelIds: readonly ActiveEndgameId[];
+  bestLockedPieceCounts: Readonly<Partial<Record<ActiveEndgameId, number>>>;
+}>;
+```
+
+Read priority is v7, then canonical v6; a present-but-invalid or read-failed higher-priority
+source stops fallback. The 38 unchanged boards preserve completion/best only when stable ID
+and frozen revision-2 behavior hash both match. The eight rebuilt boards clear completion
+and best. Retired 34/40/42/43 transfer nothing. Output follows the new 46-board order;
+best values are positive safe integers attached only to completed IDs. V6 remains as a
+rollback source and is not deleted. A v7 write is enabled only after strict tri-state
+readback and semantic equality.
+
+Intro and Easy are initially open. Each Hard has exactly one related Easy prerequisite at
+the prerequisite's certified optimum plus five locked pieces. The canonical mappings are:
+
+- `preserve-well / t5r-horizon-15` -> 31, 45, 46, 49;
+- `anchor-side-slip / t5r-drift-08` -> 32, 39;
+- `build-support / t6r-keystone-20` -> 33, 35, 44;
+- `edge-to-centre / t5r-delta-07` -> 36, 38;
+- `split-lanes / t5r-lattice-09` -> 37;
+- `avoid-hole / t3r-cascade-05` -> 47;
+- `clear-order / t6r-terrace-18` -> 41, 48;
+- `choose-gate / t5r-rift-10` -> 50.
+
+Definitions, every schema-8 certificate, the complete non-live registry, and the v7
+codec/migration are proven before one atomic product flip. The flip changes every roster,
+lesson/mastery/progress/migration/router/UI consumer together, removes any five-column band
+assumption incompatible with 46 entries, displays `落子数 / Pieces placed`, and routes the
+four retired deep links to an archived-level notice. No intermediate commit may expose a
+46-level UI with v6/revision2/10-20-20 semantics. D2B begins only after this final library
+is live; all human review remains deferred to the consolidated final gate.

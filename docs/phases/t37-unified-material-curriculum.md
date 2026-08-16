@@ -1,9 +1,61 @@
 # T37 — Unified Material Feedback and Puzzle Curriculum
 
-Status: **IN PROGRESS**
+Status: **COMPLETION-FIRST IMPLEMENTATION ACTIVE; CONSOLIDATED HUMAN REVIEW LAST**
 Base: `745edb0`
 Owner: coordinator
 Human audio acceptance owner: user
+
+## 2026-08-16 completion-first supersession
+
+This block supersedes older T37 pause rules, intermediate human gates, stage ordering,
+and non-goals that conflict with the player's later request to implement the complete
+bounded target before one consolidated review. It does not accept any subjective work:
+all new audio, motion, icon, and pacing choices remain provisional, and automated or
+independent QA cannot substitute for the final player review.
+
+The recovery head is `4ce7ba3562459809158958b3178dd31a68c5cabd`; the frozen Core
+tree is `e9b3a3ed0d001072f5291a8fc841c1849e4db44f`. Final R5A evidence is
+`54a3277` (keyboard-focus source repair), `9d30894` (source-only head after invalidating
+15 stale outputs), `99b47be` (exactly 14 regenerated outputs), and `4ce7ba3`
+(report only). The report passes `204/204`; typecheck, `537 passed / 15 skipped`, and the
+770-module build pass. Independent UI/lifecycle QA reports P0-P3 all zero; independent
+audio/provenance QA reports P0-P3 all zero with only the deliberately open human-listening
+GAP. Port 4192 is released. None of A/B/C is human accepted.
+
+R5B vendors the three byte-exact R5A stems and keeps A only as the provisional product
+default. Tests may force A/B/C, but no URL, Settings, storage, or runtime setter exposes a
+choice. Normal Bomb plays one complete stem at the real `220 ms` impact. Chain Bomb reads
+the distinct `beatStartsMs` from frozen `mutationChainPresentationPlan`: distance zero
+plays the complete stem, and later distances add only an onset grain from the same stem.
+Full grain/fade/gain is `84 ms / 28 ms / .11`; reduced is `36 ms / 16 ms / .055`.
+One deterministic mono event buffer and one BufferSource own the whole event. No clamp,
+normalization, compressor, old Bomb recipe, noise, fixed pulse, duplicate complete stem,
+Renderer change, timeline change, or Core change is allowed.
+
+The accepted Ice 2 runtime Ogg and local source record remain current. The official
+uploader page requires login for its original WAV, so the original bytes/hash stay OPEN;
+the preview may never be transcoded and relabelled as the original. This evidence gap does
+not block the remaining implementation and is disclosed at the consolidated review.
+
+After the final 46-level library, D2B owns only Endgame category/detail motion: category
+release/settle `120/180 ms` with travel at most `4 px`; detail `120 ms` and at most
+`3 px`; reduced at most `32 ms` and transform-free. D1 and D2A remain frozen, with
+44-pixel targets, visible focus, history continuity, and exactly one gameplay Canvas.
+
+The final experience slice preserves Core's 200 ms clear rule, the existing 300 ms erase,
+score, and accepted Studio audio. Full post-commit tails for 1/2/3/4 lines are
+`120/240/360/480 ms` for readable totals `420/540/660/780 ms`; reduced tails are
+`80/100/120/140 ms`. Reward tier derives only from the clear count and never changes
+score. The provisional site mark is Falling Fold: one connected asymmetric falling fold,
+deep-blue body and one warm seam, delivered at favicon and Apple-mask sizes without four
+equal panes, letters, copied trade dress, or logo imitation.
+
+Classic is the last product slice: Calm `1.00 -> .30`, Relaxed `.80 -> .20`, Standard
+`.60 -> .08` (default), Swift `.40 -> .08`, and Expert `.20 -> .08`, using existing
+exact choices. Each preset has its own ranking domain. Legacy pairs migrate to the nearest
+preset by Manhattan distance over the two choice indexes, with ties resolved to the slower
+preset. Survival receives a separately published audit/proposal explicitly labelled
+**NOT IMPLEMENTED** and makes no product change.
 
 ## Purpose
 
