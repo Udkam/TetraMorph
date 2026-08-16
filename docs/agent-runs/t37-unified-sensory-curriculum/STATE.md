@@ -3171,3 +3171,18 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - No gate ran Intro-05. V5 remains consumed; R6A is infrastructure, not a certificate.
 - Next action: author and review a distinct docs-first v6 validator/attempt/candidate/
   terminal/stage contract with an explicit heap domain. Production remains closed.
+
+### F4E-R6B v6 contract candidate
+
+- Base receipt is `7dc6b74`; accepted source remains Core tree `9628592`, route SHA-256
+  `E524B096...A51B`, and adapter SHA-256 `6651B346...444A`.
+- Fresh external names are validator/attempt/candidate/terminal `v6` plus exact absent
+  `t37-f4e-endgame-canonical-frontier-stage-v6`. V5 remains immutable consumed history.
+- Outer and worker freeze Node v24.12.0 with `--max-old-space-size=6144`; no-proof probing
+  observes `heap_size_limit=6643777536`. The worker must construct the accepted disk Store
+  and pass `{ runStore }`; default-Set fallback is forbidden.
+- Preflight is no-write/no-spawn and contains no exact or partial Intro-05 work. Attempt
+  existence consumes v6 permanently. Worker owns stage/candidate; outer owns attempt/terminal
+  and independently rescans stage, publication residue, and processes after close/reap.
+- Next: commit and obtain two all-zero contract reviews. All v6 paths and Intro-05 source
+  remain closed.

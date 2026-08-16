@@ -808,3 +808,17 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   reran the exact disk suite at `46/46` in 142 seconds. Neither review executed Intro-05.
 - R6A is accepted and frozen. It does not authorize v6 production. Next is a separate
   docs-first v6 contract binding these exact blobs and a fresh external namespace.
+
+### F4E-R6B v6 proof contract candidate
+
+- Base is accepted R6A receipt `7dc6b74`. The contract freezes Core/src trees, route and
+  disk-adapter blobs/hashes, the exact five-path v6 namespace, R5 clue semantics, schema-8
+  candidate, and immutable consumed-v5 predecessor descriptors.
+- Runtime is Node v24.12.0 with ordered `--disable-warning=ExperimentalWarning` and
+  `--max-old-space-size=6144`; observed heap limit is `6643777536` bytes. The worker must
+  call the exact certifier with the accepted `{ runStore }` and cannot fall back.
+- The sole preflight is no-write/no-spawn and forbids all Intro-05 exact/partial work. Outer
+  owns attempt/terminal; worker owns proof stage/candidate; both inspect real residue.
+  Attempt existence consumes v6 on all outcomes.
+- Next: commit and obtain two independent all-zero reviews of this four-doc contract. No v6
+  artifact, stage, validator execution, or Intro-05 source edit is authorized yet.

@@ -9294,3 +9294,125 @@ independent reviews each report `P0/P1/P2/P3/GAP = 0/0/0/0/0`; one independently
 the exact disk equality suite at `46/46`. No review or gate ran Intro-05. R6A changes no
 product behavior and grants no proof execution by itself. A separate v6 contract remains
 mandatory.
+
+## 2026-08-17 F4E-R6B — Intro-05 exact v6 proof contract
+
+This contract opens validator authoring only. Its base is the accepted R6A receipt
+`7dc6b74f26265fcb2be72b07e1b2c6296c983ea0`; v5 remains permanently consumed and is
+predecessor evidence, never a proof input or reusable namespace. Intro-05 geometry, 54-item
+admission set, two seven-lock route strings, support hops, target rows, and schema-8 output
+semantics remain exactly those frozen by R5. No fixture or product source is open yet.
+
+### Fixed source and external namespace
+
+The proof source envelope freezes `src` tree
+`6115144d171aa6305de1fdaca8abd7b145e2ca13`, Core tree
+`9628592aed3c66de1386bc45efdd4766fc5c29db`, route-search blob
+`51f446c12bb163de33b5c9b426c4254902f8c00b` at 62,640 bytes / SHA-256
+`E524B096A2C91441148AE1C22DADCB91CB20F029891EB5F05F835AF63006A51B`, and disk-adapter
+blob `bd95fa4ed24b931a46089df93efd0c80e7e7a162` at 18,852 bytes / SHA-256
+`6651B346F1CE2A0C83B9311982382C215614D8B95E18C1C5D49A296A966B444A`.
+The validator captures the sixteen Core modules and adapter only with direct `git show` from
+the bound commit. It may not import either from the worktree. A private loader accepts only
+captured relative Core imports; the adapter receives only its two exact built-ins, `node:fs`
+and `node:path`, with no general `nextResolve` or external loader delegation. Its exports must
+be exactly `ENDGAME_DISK_FRONTIER_LIMITS` and `createEndgameDiskFrontierStore`, and every
+limit must equal the accepted R6A values.
+
+The only v6 paths are:
+
+- validator `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v6.mjs`;
+- attempt `...\t37-f4e-endgame-canonical-attempt-v6.json`;
+- candidate `...\t37-f4e-endgame-canonical-candidate-v6.json`;
+- terminal `...\t37-f4e-endgame-canonical-terminal-v6.json`;
+- proof stage directory `...\t37-f4e-endgame-canonical-frontier-stage-v6`.
+
+The exact stage parent is the existing plain, non-reparse, realpath-stable
+`C:\Users\Alex Chen\AppData\Local\Temp`; the normalized stage must initially be absent.
+Candidate/terminal publication stages are their exact paths plus `.tmp-<runId>`. Every exact
+path and same-prefix residue is scanned before preflight, before production, after worker exit,
+and before terminal publication. Schemas are `t37-f4e-r6-validator-v1`,
+`t37-f4e-r6-preflight-v1`, `t37-f4e-r6-attempt-v1`, `t37-f4e-r6-candidate-v1`,
+`t37-f4e-r6-worker-result-v1`, `t37-f4e-r6-terminal-v1`, and nested
+`t37-f4e-r6-frontier-audit-v1`. The produced level stays fixture `schemaVersion: 8`.
+
+### Explicit runtime and ownership
+
+Both outer and worker use only `E:\Nodejs\node.exe` v24.12.0 with ordered runtime flags
+`--disable-warning=ExperimentalWarning --max-old-space-size=6144`; `NODE_OPTIONS` is absent
+and the existing exact `NODE_*` environment allowlist remains enforced. A no-proof probe fixes
+`v8.getHeapStatistics().heap_size_limit` at `6643777536` bytes. Source pin, attempt, worker
+result, and terminal all record the requested 6144 MiB and observed byte value; any drift is
+fatal. The outer worker spawn must put the two flags before the validator path.
+
+The outer process alone claims attempt before spawn and publishes terminal after observed
+worker close/reap. The worker alone creates the proof stage and publishes candidate. The
+32-byte random capability remains stdin-only; its SHA-256 is in the canonical attempt and
+run ID. Attempt keys are exactly `schema`, `runId`, `claimedAt`, `sourcePin`, `clue`,
+`parameters`, `outputPath`, `terminalPath`, `frontierStagePath`, and
+`workerCapabilitySha256`. Parameters bind the full-key storage strategy and 6144 MiB worker
+heap alongside the frozen target rows, difficulty, and lock bounds.
+
+The exact proof call is normative:
+
+```js
+const runStore = createEndgameDiskFrontierStore({ stagePath: paths.frontierStage });
+const certificate = certifyOptimalEndgameRouteForDefinition(
+  definition,
+  CLUE.primary,
+  { runStore },
+);
+```
+
+Omitting `{ runStore }`, substituting the default `Set` path, changing the store, or falling
+back after an adapter error is fatal. The worker accepts success only after Store diagnostics
+show no active run, residue, cleanup error, or truncation and a real filesystem scan shows the
+stage absent. The outer repeats the stage, publication-prefix, candidate, and residual-process
+checks independently after worker close. It never trusts diagnostics as a filesystem scan.
+
+### Preflight, candidate, and fail-closed publication
+
+The sole `--preflight` is no-write and no-spawn. Under the same Node flags and source pins it
+checks the complete v6 namespace absent; revalidates immutable v5 validator/attempt/terminal
+descriptors and absent v5 candidate; captures Core and adapter blobs; validates imports,
+exports, limits, heap, Git domain, linear four-document authority, stage parent and absence;
+and reruns only the frozen setup, admission, route replay, support, and hash validation with
+exact proof disabled. It must neither create a Store nor execute any Intro-05 exact, partial,
+sampled, or target-specific frontier.
+
+The worker candidate preserves every R5 schema-8 field and certificate telemetry, and adds a
+frontier audit binding adapter descriptor, Core limits, storage strategy, stage basename,
+empty final diagnostics, and `stagePresent: false`. Candidate publication is the existing
+exclusive stage/fsync/no-replace hard-link/reread/unlink sequence. It is valid only when the
+outer later publishes a canonical `passed: true` terminal that binds the same attempt and
+candidate after close/reap, zero stderr, bounded canonical stdout, post-proof source checks,
+zero stage/residue/process state, and no truncation. Failure terminal records the real bounded
+stage manifest, publication stages, runtime heap, transport state, and reason; it does not
+clean proof residue.
+
+Attempt existence permanently consumes v6 on every result or exception. A candidate without
+an independently audited successful terminal is invalid. No v6 artifact, stage, or failure
+residue may be deleted, repaired, renamed, or retried. Disk exhaustion, record/chunk/registry
+ceiling, adapter fault, heap drift, cleanup failure, or source drift therefore consumes the
+one production attempt fail-closed; none permits fallback.
+
+### Admission sequence
+
+1. Commit this four-document contract and obtain two independent all-zero contract reviews.
+2. Materialize only the external validator, freeze its bytes/SHA, syntax-check it, and obtain
+   two all-zero static byte/AST/no-spawn reviews. No validator mode may run.
+3. Commit the exact validator pin and copy-pasteable preflight/production commands in these
+   four documents; obtain two fresh all-zero reviews. Then add one THREAD_LOG-only final-HEAD
+   binding commit and review that binding twice.
+4. Run the no-write preflight exactly once. Two independent reviews must confirm its sole
+   canonical output and unchanged zero v6 namespace.
+5. With no intervening commit, run the production command exactly once. Audit outer exit,
+   immutable artifacts, real stage/residue/process state, schemas, hashes, route replay,
+   certificate and telemetry twice before writing a THREAD_LOG-only
+   `F4E-R6-CONSUMED-V1` receipt.
+6. Only an all-zero successful receipt opens the four Intro-05 integration paths. A failure
+   receipt closes v6 without changing the frozen definition.
+
+Until step 5, no command may execute Intro-05 through the exact certifier. Until step 6,
+`src/game/core/endgameV3Intro05.ts`, its test, authoring fixture, and workstream fixture remain
+closed.

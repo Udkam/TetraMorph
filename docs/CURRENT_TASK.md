@@ -10266,3 +10266,16 @@ and adapter blobs, freeze an explicit Node heap domain, and specify worker/outer
 residue ownership. Do not create a v6 attempt, candidate, terminal, proof stage, or run an
 Intro-05 exact/partial search until that new contract and validator bytes have completed
 their own static and no-write reviews.
+
+## Current checkpoint — F4E-R6B v6 contract review
+
+The v6 docs-first contract in `docs/DESIGN.md` is the only active slice. It binds accepted
+R6A receipt `7dc6b74`, Core tree `9628592`, route SHA-256 `E524B096...A51B`, adapter SHA-256
+`6651B346...444A`, a fresh fixed v6 external namespace, and Node v24.12.0 with explicit
+6144 MiB old-space / observed heap limit `6643777536` bytes.
+
+No v6 path may exist yet. No validator mode, Store creation, worker spawn, Intro-05 exact,
+partial, sampled, or target-specific search is authorized. First commit and independently
+review these four docs. Only an all-zero contract review opens external validator authoring;
+the validator itself still requires exact-byte static review, a later final-HEAD binding, and
+one no-write preflight before the sole production attempt.
