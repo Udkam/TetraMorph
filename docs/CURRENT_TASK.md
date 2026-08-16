@@ -10297,3 +10297,15 @@ test only.
 
 No v6 path exists and no validator authoring or execution is open. Commit these four R2 docs
 and obtain two fresh all-zero reviews first.
+
+### F4E-R6B R2 rejected — R3 contract review only
+
+R2 `5166f0e` is rejected by both decisive reviews at `0/2/2/0/0`. R3 fixes role-local PID
+exclusion, adds every process/publication truncation flag to terminal and receipt, uses
+line-anchored parsed markers, and defines a preclaim abort as zero-artifact/no-worker work that
+requires a new audited binding before replacement invocation but does not consume attempt.
+
+The later Intro-05 integration boundary is six paths. The two R6A equality tests join the
+original four only to change their hard-coded four-draft whole-array traversal into the exact
+first-four prefix; they may never execute or load Intro-05. No validator file or mutable v6
+artifact exists. Commit and independently review R3 before authoring begins.

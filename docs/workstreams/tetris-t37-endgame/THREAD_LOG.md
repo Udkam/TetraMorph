@@ -836,3 +836,14 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   Intro-04 accepted-prefix assertion.
 - Next: commit R2 and obtain two fresh all-zero contract reviews. Validator authoring and all
   proof execution remain closed.
+
+### F4E-R6B R2 rejection and R3 closure candidate
+
+- Decisive R2 reviews are both `P0/P1/P2/P3/GAP = 0/2/2/0/0`. No validator or v6 mutable
+  artifact exists; no proof ran.
+- R3 fixes role-local process exclusion, all missing list truncation flags, receipt descriptor
+  shapes, line-anchored canonical markers, and the zero-artifact preclaim-abort authority.
+- Later integration is exactly six paths: the prior four plus the Core and real-disk R6A
+  equality tests. Those two may only pin/iterate the accepted first-four prefix and remain
+  prohibited from fixture/proof 05.
+- Next: commit and obtain two fresh all-zero R3 reviews. Authoring and execution stay closed.

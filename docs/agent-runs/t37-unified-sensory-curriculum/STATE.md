@@ -3203,3 +3203,18 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Correct integration boundary is definitions, Intro-05 fixture, new exact test, and only the
   Intro-04 accepted-prefix assertion. Next: commit and independently re-review R2. Validator
   remains absent.
+
+### F4E-R6B R2 rejection and R3 correction
+
+- R2 `5166f0e` is rejected by two decisive reviews at `0/2/2/0/0`. Adding draft five would
+  break or misdirect two R6A equality tests, and process/publication truncation plus PID-role,
+  marker, and preclaim-abort shapes were incomplete.
+- R3 expands eventual integration from four to six paths solely to keep both R6A equality
+  suites frozen to the accepted first-four prefix. They cannot import fixture 05 or run its
+  proof.
+- Every scanner excludes self, then enforces role-specific parent/other-process rules.
+  Terminal/receipt/namespace now carry adjacent truncation flags; actual command/consumption
+  markers are line-anchored and parsed.
+- A zero-artifact preclaim abort blocks immediate reuse and requires a new audited binding;
+  only durable attempt claim consumes v6. Validator and all mutable paths remain absent.
+- Next: commit and obtain two fresh all-zero R3 reviews before authoring.

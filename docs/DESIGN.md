@@ -9575,3 +9575,57 @@ Only a successful audited consumption receipt opens exactly these four paths:
 `src/game/core/endgameV3Intro04Exact.test.ts`. The last may change only its fixed-total
 assertion to exact identity of the accepted first-four prefix. R2 next requires commit plus
 two fresh all-zero reviews; validator remains absent until then.
+
+### F4E-R6B R2 rejection and R3 closure correction
+
+R2 `5166f0e` closes every R1 issue but is not authoring authority. Two independent reviews
+both report `P0/P1/P2/P3/GAP = 0/2/2/0/0`; a third preliminary review was all-zero before
+the two newly discovered compatibility/schema defects were identified. This R3 section
+supersedes the affected R2 clauses.
+
+Every process scan first excludes its own current PID, never another role by name alone.
+Preflight and production outer then require zero other matching v6 processes. Worker requires
+exactly one other matching process and proves it is its direct parent outer with the expected
+command/source pin. Post-close outer again requires zero other matching process. Lists use
+normalized decimal PID plus bound role/image/command evidence and are capped fail-closed.
+
+The normative terminal order gains `residualProcessesTruncated` immediately after
+`residualProcesses`. `namespaceAudit` keys are exactly
+`validator,attemptPresent,candidatePresent,terminalPresent,frontierStagePresent,publicationStages,publicationStagesTruncated,matchingProcesses,matchingProcessesTruncated`.
+Terminal `frontierStage` keys are `path,present`; its frontier, publication, and residual
+lists each have their adjacent explicit truncation flag. Any flag is fatal.
+
+The canonical consumption receipt order is now exactly
+`head,srcTree,coreTree,validator,attempt,candidate,terminal,outerExitCode,frontierStage,publicationStages,publicationStagesTruncated,matchingProcesses,matchingProcessesTruncated,audit`.
+Validator is `path,bytes,sha256`; attempt is `path,present,bytes,sha256,runId`; candidate is
+`path,present,bytes,sha256,passed`; terminal is
+`path,present,bytes,sha256,status,passed`; absent optional values are null. Frontier stage
+remains `path,present,entries,entriesTruncated`. Both receipt list truncation flags must be
+false for any success claim.
+
+Marker detection is line-oriented, not substring counting. Before production, exactly one
+line must match `^F4E-R6-COMMAND-CONTRACT-V1 validator=[A-F0-9]{64}$` and zero lines may match
+`^F4E-R6-CONSUMED-V1 \{`. A consumption receipt is one complete canonical JSON object on the
+same marker line and is parsed/rebuilt before acceptance. Prose, inline code and schema names
+do not count as markers.
+
+The durable attempt remains the v6 consumption boundary. A production-mode invocation that
+fails before claim must have attempt/candidate/terminal/stage/publication residue and worker
+count all zero; it is a **preclaim abort**, not an attempt and not permission for an immediate
+retry. Two independent audits must first bind its exit/error and zero state in a
+THREAD_LOG-only `F4E-R6-PRECLAIM-ABORT-V1` checkpoint. That new HEAD needs two fresh binding
+reviews and a new single no-proof-worker preflight before one replacement invocation may be
+authorized. At most one invocation per bound HEAD may enter production mode, and at most one
+invocation across all heads may durably claim attempt. Once attempt exists, only the consumed
+receipt path applies and no retry is possible.
+
+Intro-05 integration opens six paths, not four. In addition to the four R2 paths, it opens
+`src/game/core/endgameProofFrontierStore.test.ts` and
+`src/authoring/endgameDiskFrontier.test.mjs`. Those two files may replace only their
+`length === 4`/whole-array traversal with an exact accepted first-four prefix assertion and
+iteration. They must remain named and structured as Intro-01 through Intro-04 equality tests,
+must never read fixture 05, and must never execute Intro-05. The complete six-path source
+slice remains bounded and no other R6A implementation/test path opens.
+
+R3 requires a fresh commit and two all-zero reviews. Validator authoring, all validator modes,
+Store creation, and every Intro-05 proof or source edit remain closed meanwhile.
