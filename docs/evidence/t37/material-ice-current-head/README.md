@@ -12,15 +12,20 @@ The browser contract keeps representation and lifecycle boundaries explicit. An 
 mtime touch requires byte-for-byte identical checkout content, fatal UTF-8 decoding,
 CRLF-to-LF canonical bytes equal to the frozen Git blob, and clean-filter object identity;
 mixed LF/CRLF checkout representation is therefore allowed but content drift is not.
-HMR accepts a fresh `200` transformed App response only when its weak ETag is independently
-recomputed from the captured response body with Vite's bundled `etag@1.8.1` algorithm,
-followed by either a fresh `200` or an ETag-bound `304` bootstrap response. A reload is
+HMR accepts a fresh `200` transformed App response only when the weak ETag's canonical
+hex length ends exactly at Vite's final inline-source-map marker, the suffix is a canonical
+base64 UTF-8 App sourcemap, and the ETag is independently recomputed from the captured
+pre-sourcemap entity with Vite's bundled `etag@1.8.1` algorithm. It is followed by either a
+fresh `200` or a `304` whose response ETag is correctly absent and whose request
+`If-None-Match` exactly equals the preceding fresh ETag. A reload is
 counted only when the frame event is bound to its exact main-frame document request;
 direct instrumentation of `History.prototype.replaceState` and `pushState` must observe
 exactly one route-preserving `replaceState`, bound to the reloaded document and its separate
-same-document navigation. The exposed History binding is drained to a stable tail without
-swallowing errors. The visible exit confirmation is armed for one trusted click, and that
-causal token is propagated through the View Transition callback into its exact `pushState`;
+same-document navigation in the real navigation-then-binding delivery order. The exposed
+History binding is drained to a stable tail without swallowing errors. The visible exit
+confirmation is armed for one trusted click; its target capture is claimed exactly once by
+`startViewTransition`, released at the post-React root bubble, and propagated through the
+View Transition callback into the immediately adjacent navigation-then-`pushState` pair;
 an exact `uiExitArm` cursor is frozen immediately before the click, so late HMR History cannot
 masquerade as the normal exit. Ice responses use four explicit phases: `initial-freeze`,
 `pre-hmr`, `hmr`, and `post-hmr`; only the two frozen initial responses are materialized as

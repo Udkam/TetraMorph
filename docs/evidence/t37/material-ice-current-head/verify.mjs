@@ -400,6 +400,30 @@ const isAppRequest = (event, expectedOrigin) => event?.kind === 'request' && isA
   && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch']);
 /** @param {Buffer} body */
 const viteWeakEtag = (body) => `W/"${body.length.toString(16)}-${createHash('sha1').update(body).digest('base64').substring(0, 27)}"`;
+const viteInlineSourceMapMarker = Buffer.from('\n//# sourceMappingURL=data:application/json;base64,', 'utf8');
+/** @param {Buffer} body @param {unknown} etag @returns {Buffer|null} */
+function exactViteEtagEntity(body, etag) {
+  if (!Buffer.isBuffer(body) || typeof etag !== 'string') return null;
+  const match = /^W\/"([1-9a-f][0-9a-f]*)-([A-Za-z0-9+/]{27})"$/u.exec(etag);
+  if (!match) return null;
+  const entityLength = Number.parseInt(match[1], 16);
+  if (!Number.isSafeInteger(entityLength) || entityLength <= 0 || entityLength >= body.length) return null;
+  const entity = body.subarray(0, entityLength);
+  if (!body.subarray(entityLength, entityLength + viteInlineSourceMapMarker.length).equals(viteInlineSourceMapMarker)) return null;
+  let encodedMap;
+  try { encodedMap = new TextDecoder('utf-8', { fatal: true }).decode(body.subarray(entityLength + viteInlineSourceMapMarker.length)); } catch { return null; }
+  const mapBytes = canonicalBase64(encodedMap);
+  if (mapBytes === null) return null;
+  let sourceMap;
+  try { sourceMap = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(mapBytes)); } catch { return null; }
+  if (!plainExactKeys(sourceMap, ['mappings', 'names', 'sources', 'version', 'sourcesContent'])
+    || sourceMap.version !== 3 || !deepEqual(sourceMap.sources, ['App.tsx'])
+    || !Array.isArray(sourceMap.names) || sourceMap.names.length !== 0
+    || typeof sourceMap.mappings !== 'string' || sourceMap.mappings.length === 0
+    || !Array.isArray(sourceMap.sourcesContent) || sourceMap.sourcesContent.length !== 1
+    || typeof sourceMap.sourcesContent[0] !== 'string') return null;
+  return viteWeakEtag(entity) === etag ? entity : null;
+}
 /** @param {any} event @param {string} expectedOrigin */
 function isFreshAppResponse(event, expectedOrigin) {
   const body = canonicalBase64(event?.bodyBase64);
@@ -407,7 +431,7 @@ function isFreshAppResponse(event, expectedOrigin) {
     && plainExactKeys(event, ['sequence', 'kind', 'requestId', 'url', 'method', 'resourceType', 'mainFrame', 'navigationRequest', 'ifNoneMatch',
       'status', 'contentType', 'etag', 'bodyDisposition', 'bodyEncoding', 'bodyBase64'])
     && event?.status === 200 && ['text/javascript', 'application/javascript'].includes(contentTypeEssence(event?.contentType) ?? '')
-    && body !== null && body.length > 0 && event?.etag === viteWeakEtag(body) && event?.bodyDisposition === 'captured'
+    && body !== null && exactViteEtagEntity(body, event?.etag) !== null && event?.bodyDisposition === 'captured'
     && event?.bodyEncoding === 'base64' && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyUnavailable')
     && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyError');
 }
@@ -417,7 +441,7 @@ const isNotModifiedAppResponse = (event, expectedOrigin) => event?.kind === 'app
     'status', 'contentType', 'etag', 'bodyDisposition', 'bodyEncoding', 'bodyBase64'])
   && event?.status === 304 && event?.contentType === null
   && typeof event?.ifNoneMatch === 'string' && event.ifNoneMatch.length > 0
-  && typeof event?.etag === 'string' && event.etag === event.ifNoneMatch
+  && event?.etag === null
   && event?.bodyDisposition === 'not-modified' && event?.bodyEncoding === null && event?.bodyBase64 === null
   && !Object.prototype.hasOwnProperty.call(event ?? {}, 'bodyError');
 /** @param {any} event @param {string} expectedOrigin */
@@ -640,8 +664,7 @@ function deriveHmrProof(hmr, expectedOrigin) {
     && (isFreshAppResponse(bootstrapTransfer.response, expectedOrigin)
       || (isNotModifiedAppResponse(bootstrapTransfer.response, expectedOrigin)
         && typeof preTransfer.response?.etag === 'string' && preTransfer.response.etag.length > 0
-        && bootstrapTransfer.request.ifNoneMatch === preTransfer.response.etag
-        && bootstrapTransfer.response.etag === preTransfer.response.etag));
+        && bootstrapTransfer.request.ifNoneMatch === preTransfer.response.etag));
   const sameDocumentNavigationExact = branch === 'document-reload'
     ? historyNamespaceExact && historyCalls.length === 1 && historyCalls[0]?.method === 'replaceState'
       && historyCalls[0]?.documentEpoch === afterEpoch && historyCalls[0]?.callId === 1
@@ -649,6 +672,7 @@ function deriveHmrProof(hmr, expectedOrigin) {
       && historyCalls[0]?.beforeUrl === hmr?.after?.navigation?.url && historyCalls[0]?.afterUrl === hmr?.after?.navigation?.url
       && sameDocumentNavigations.length === 1 && bootstrapTransfer?.finished?.sequence < historyCalls[0]?.sequence
       && bootstrapTransfer?.finished?.sequence < sameDocumentNavigations[0]?.sequence
+      && sameDocumentNavigations[0]?.sequence + 1 === historyCalls[0]?.sequence
       && sameDocumentNavigations[0]?.url === historyCalls[0]?.afterUrl
     : historyNamespaceExact && historyCalls.length === 0 && sameDocumentNavigations.length === 0;
   let eventOrderValid = false;
@@ -758,6 +782,7 @@ function exactUiExitHistory(browser) {
     && call.cause === 'ui-exit-confirm-click' && call.causeTransport === 'view-transition-callback'
     && call.documentEpoch === hmr?.after?.navigation?.epoch && call.callId === 2
     && call.beforeUrl === hmr?.after?.navigation?.url && historyUrlExact(call) && homeUrlExact
+    && navigation.sequence + 1 === call.sequence
     && navigation.url === call.afterUrl && navigation.mainFrame === true;
 }
 /** @param {any} hmr */
@@ -926,8 +951,10 @@ function runIndependentContractFixtures() {
     body: JSON.stringify({ type: 'update', updates: [{ type: 'js-update', path: '/src/App.tsx', acceptedPath: '/src/App.tsx' }] }) });
   const full = (sequence = 11) => ({ sequence, kind: 'websocket-frame', direction: 'received', encoding: 'utf8', url: wsUrl,
     body: JSON.stringify({ type: 'full-reload', path: '*' }) });
-  const appBody = Buffer.from('transformed App module');
-  const appEtag = viteWeakEtag(appBody);
+  const appEntity = Buffer.from('transformed App module');
+  const appSourceMap = Buffer.from(JSON.stringify({ mappings: 'AAAA', names: [], sources: ['App.tsx'], version: 3, sourcesContent: ['export const app = true;'] }), 'utf8');
+  const appBody = Buffer.concat([appEntity, viteInlineSourceMapMarker, Buffer.from(appSourceMap.toString('base64'), 'utf8')]);
+  const appEtag = viteWeakEtag(appEntity);
   const app = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared', /** @type {string|null} */ ifNoneMatch = null) => ({
     sequence, kind: 'request', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
     method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
@@ -941,7 +968,7 @@ function runIndependentContractFixtures() {
   const notModified = (/** @type {number} */ sequence, requestId = 102, suffix = '?t=shared', ifNoneMatch = appEtag) => ({
     sequence, kind: 'app-response', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
     method: 'GET', resourceType: 'script', mainFrame: true, navigationRequest: false, ifNoneMatch,
-    status: 304, contentType: null, etag: appEtag, bodyDisposition: 'not-modified', bodyEncoding: null, bodyBase64: null,
+    status: 304, contentType: null, etag: null, bodyDisposition: 'not-modified', bodyEncoding: null, bodyBase64: null,
   });
   const finished = (/** @type {number} */ sequence, requestId = 101, suffix = '?t=shared', /** @type {string|null} */ ifNoneMatch = null) => ({
     sequence, kind: 'app-requestfinished', requestId, url: `${normalizedOrigin}/src/App.tsx${suffix}`,
@@ -974,12 +1001,12 @@ function runIndependentContractFixtures() {
   const reload = {
     marker: { eventSequence: 10 },
     events: [update(11), app(12, 101), response(13, 101), finished(14, 101), full(15), doc(16), nav(17),
-      app(18, 102, '?t=shared', appEtag), notModified(19, 102), finished(20, 102, '?t=shared', appEtag), history(21), sameNav(22)],
+      app(18, 102, '?t=shared', appEtag), notModified(19, 102), finished(20, 102, '?t=shared', appEtag), sameNav(21), history(22)],
     before, after: snap(2, live(2), 'reload'),
     oldOwner: { ownerPresent: false, sameOwner: false, oldRenderer: 'unavailable', beforeIdentity: id(1, 10), ownerIdentity: null,
       currentIdentity: id(2, 10), probe: { target: null, targetIdentity: null, outcome: 'unavailable' } },
   };
-  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, 102), response(15, 102), finished(16, 102), history(17), sameNav(18)] };
+  const direct = { ...clone(reload), events: [full(11), doc(12), nav(13), app(14, 102), response(15, 102), finished(16, 102), sameNav(17), history(18)] };
   for (const [label, value] of [['same owner', same], ['replacement', replacement], ['fallback reload', reload], ['direct reload', direct]]) {
     assertFixture(deriveHmrProof(value, normalizedOrigin).passed, `valid HMR ${label}`);
   }
@@ -1028,30 +1055,45 @@ function runIndependentContractFixtures() {
   rawResponseKind.events[2] = { ...rawResponseKind.events[2], kind: 'response' };
   const freshBodyMismatch = clone(reload);
   freshBodyMismatch.events[2].bodyBase64 = Buffer.from('different transformed App module').toString('base64');
+  const fullWireEtag = clone(reload);
+  fullWireEtag.events[2].etag = viteWeakEtag(appBody);
+  const tamperedAppEntity = clone(reload);
+  { const bytes = Buffer.from(tamperedAppEntity.events[2].bodyBase64, 'base64'); bytes[0] ^= 1; tamperedAppEntity.events[2].bodyBase64 = bytes.toString('base64'); }
+  const wrongEtagBoundary = clone(reload);
+  wrongEtagBoundary.events[2].etag = viteWeakEtag(appBody.subarray(0, appEntity.length + 1));
+  const malformedAppMap = clone(reload);
+  malformedAppMap.events[2].bodyBase64 = Buffer.concat([appEntity, viteInlineSourceMapMarker, Buffer.from('bm90LWpzb24=', 'utf8')]).toString('base64');
   const initialNotModified = clone(reload);
   initialNotModified.events[1] = app(12, 101, '?t=shared', appEtag);
   initialNotModified.events[2] = notModified(13, 101);
   initialNotModified.events[3] = finished(14, 101, '?t=shared', appEtag);
   const bootstrapBody = clone(reload);
   bootstrapBody.events[8] = { ...bootstrapBody.events[8], bodyDisposition: 'captured', bodyEncoding: 'base64', bodyBase64: 'YQ==' };
+  const bootstrapForgedEtag = clone(reload);
+  bootstrapForgedEtag.events[8].etag = appEtag;
+  const bootstrapWrongCacheBridge = clone(reload);
+  bootstrapWrongCacheBridge.events = bootstrapWrongCacheBridge.events.map((/** @type {any} */ event) => event.requestId === 102
+    ? { ...event, ifNoneMatch: 'W/"1-AAAAAAAAAAAAAAAAAAAAAAAAAAA"' } : event);
   const bootstrapWrongUrl = clone(reload);
   bootstrapWrongUrl.events = bootstrapWrongUrl.events.map((/** @type {any} */ event) => event.requestId === 102
     ? { ...event, url: `${normalizedOrigin}/src/App.tsx?t=different` } : event);
   const missingBootstrapFinished = clone(reload);
   missingBootstrapFinished.events.splice(9, 1); missingBootstrapFinished.events[9].sequence = 20; missingBootstrapFinished.events[10].sequence = 21;
-  const missingSameDocument = clone(reload); missingSameDocument.events.pop();
+  const missingSameDocument = clone(reload); missingSameDocument.events.splice(10, 1); missingSameDocument.events[10].sequence = 21;
   const extraSameDocument = clone(reload); extraSameDocument.events.push(sameNav(23));
   const wrongDocumentBinding = clone(reload); wrongDocumentBinding.events[6].documentRequestId = 999;
   const unboundDocumentNavigation = clone(reload);
   unboundDocumentNavigation.events[6] = { sequence: 17, kind: 'unbound-navigation', url: route, mainFrame: true,
     pendingDocumentRequests: [{ requestId: 201, sequence: 16, url: route }] };
   const earlySameDocument = clone(reload);
-  const bootstrapFinished = earlySameDocument.events[9]; const mountHistory = earlySameDocument.events[10]; const historyNavigation = earlySameDocument.events[11];
+  const bootstrapFinished = earlySameDocument.events[9]; const historyNavigation = earlySameDocument.events[10]; const mountHistory = earlySameDocument.events[11];
   earlySameDocument.events.splice(9, 3, { ...historyNavigation, sequence: 20 }, { ...bootstrapFinished, sequence: 21 }, { ...mountHistory, sequence: 22 });
-  const missingHistory = clone(reload); missingHistory.events.splice(10, 1); missingHistory.events[10].sequence = 21;
-  const pushHistory = clone(reload); pushHistory.events[10].method = 'pushState';
-  const wrongHistoryEpoch = clone(reload); wrongHistoryEpoch.events[10].documentEpoch = 1;
-  const wrongHistoryArgument = clone(reload); wrongHistoryArgument.events[10].urlArgument = '/wrong';
+  const missingHistory = clone(reload); missingHistory.events.pop();
+  const pushHistory = clone(reload); pushHistory.events[11].method = 'pushState';
+  const wrongHistoryEpoch = clone(reload); wrongHistoryEpoch.events[11].documentEpoch = 1;
+  const wrongHistoryArgument = clone(reload); wrongHistoryArgument.events[11].urlArgument = '/wrong';
+  const reversedMountHistory = clone(reload);
+  reversedMountHistory.events.splice(10, 2, { ...reversedMountHistory.events[11], sequence: 21 }, { ...reversedMountHistory.events[10], sequence: 22 });
   const extraHistory = clone(reload); extraHistory.events.push(history(23, 'replaceState', 2, 2));
   const pollutedMountCause = clone(reload);
   Object.assign(pollutedMountCause.events.find((/** @type {any} */ event) => event.kind === 'history-call'), {
@@ -1099,8 +1141,14 @@ function runIndependentContractFixtures() {
     ['App namespace malformed raw URL', malformedAppUrl],
     ['App namespace raw response kind', rawResponseKind],
     ['fresh App body does not match ETag', freshBodyMismatch],
+    ['fresh App ETag incorrectly binds the full wire body', fullWireEtag],
+    ['fresh App entity is tampered under the original ETag', tamperedAppEntity],
+    ['fresh App ETag length does not end at the source-map boundary', wrongEtagBoundary],
+    ['fresh App inline source map is not valid JSON', malformedAppMap],
     ['initial App response is 304', initialNotModified],
     ['bootstrap 304 carries a body', bootstrapBody],
+    ['bootstrap 304 forges the cached ETag response header', bootstrapForgedEtag],
+    ['bootstrap If-None-Match does not bridge the fresh response ETag', bootstrapWrongCacheBridge],
     ['bootstrap 304 URL differs', bootstrapWrongUrl],
     ['bootstrap request missing finished', missingBootstrapFinished],
     ['missing mount same-document navigation', missingSameDocument],
@@ -1112,6 +1160,7 @@ function runIndependentContractFixtures() {
     ['pushState substituted for replaceState', pushHistory],
     ['replaceState wrong document epoch', wrongHistoryEpoch],
     ['replaceState argument does not resolve to observed URL', wrongHistoryArgument],
+    ['mount History binding precedes same-document navigation', reversedMountHistory],
     ['extra history call', extraHistory],
     ['mount replaceState carries UI-exit cause', pollutedMountCause],
     ['owner snapshot forged', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), beforeIdentity: id(1, 99) } }],
@@ -1142,25 +1191,29 @@ function runIndependentContractFixtures() {
   windowed.marker = { eventIndex: 10, eventSequence: 10, navigationArm: { eventIndex: 10, eventSequence: 10, url: route },
     endEventIndex: 22, endEventSequence: 22, uiExitArm: { eventIndex: 22, eventSequence: 22 } };
   const exactEvents = [...filler, ...clone(reload.events)];
-  const exitEvents = [...exactEvents, exitHistory(23), sameNav(24, home)];
+  const exitEvents = [...exactEvents, sameNav(23, home), exitHistory(24)];
   assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: windowed }), 'valid HMR eventEnd window');
   assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exitEvents }, hmr: windowed }),
     'allow normal route History after the frozen HMR History guard');
   const exitBrowser = { origin: normalizedOrigin, observations: { events: exitEvents }, hmr: windowed };
   assertFixture(exactUiExitHistory(exitBrowser), 'valid exact UI-exit History pair');
   assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: exactEvents } }), 'reject missing UI-exit History pair');
-  const wrongExitMethod = clone(exitEvents); wrongExitMethod[22].method = 'replaceState';
-  const wrongExitCallId = clone(exitEvents); wrongExitCallId[22].callId = 3;
-  const wrongExitUrl = clone(exitEvents); wrongExitUrl[22].afterUrl = `${normalizedOrigin}/wrong`;
-  const wrongExitCause = clone(exitEvents); wrongExitCause[22].cause = null;
-  const wrongExitTransport = clone(exitEvents); wrongExitTransport[22].causeTransport = 'direct-event';
-  const wrongExitArgument = clone(exitEvents); wrongExitArgument[22].urlArgument = './';
+  const wrongExitMethod = clone(exitEvents); wrongExitMethod[23].method = 'replaceState';
+  const wrongExitCallId = clone(exitEvents); wrongExitCallId[23].callId = 3;
+  const wrongExitUrl = clone(exitEvents); wrongExitUrl[23].afterUrl = `${normalizedOrigin}/wrong`;
+  const wrongExitCause = clone(exitEvents); wrongExitCause[23].cause = null;
+  const wrongExitTransport = clone(exitEvents); wrongExitTransport[23].causeTransport = 'direct-event';
+  const wrongExitArgument = clone(exitEvents); wrongExitArgument[23].urlArgument = './';
+  const reversedExitPair = [...exactEvents, exitHistory(23), sameNav(24, home)];
+  const separatedExitPair = [...exactEvents, sameNav(23, home), { sequence: 24, kind: 'fixture' }, exitHistory(25)];
   assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitMethod } }), 'reject UI-exit replaceState');
   assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitCallId } }), 'reject UI-exit callId drift');
   assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitUrl } }), 'reject UI-exit URL drift');
   assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitCause } }), 'reject UI-exit without trusted click cause');
   assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitTransport } }), 'reject UI-exit outside View Transition callback');
   assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitArgument } }), 'reject equivalent but noncanonical UI-exit URL argument');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: reversedExitPair } }), 'reject reversed UI-exit History delivery order');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: separatedExitPair } }), 'reject nonadjacent UI-exit History delivery');
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, doc(23)] }, hmr: windowed }), 'reject slow late reload after eventEnd');
   const lateMalformedApp = { ...response(23, 999), url: 'not-a-url:/src/App.tsx' };
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, lateMalformedApp] }, hmr: windowed }), 'reject late malformed App namespace event after eventEnd');
@@ -1244,7 +1297,7 @@ function runIndependentContractFixtures() {
   assertFixture(!(Date.parse(orderedTimes[2]) <= Date.parse(orderedTimes[1])), 'reject client timestamp inversion');
   return {
     iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + markerBindingRejects.length + 3,
-    hmrAccepted: 4, hmrRejected: hmrRejects.length + 20,
+    hmrAccepted: 4, hmrRejected: hmrRejects.length + 22,
     terminalAccepted: 1, terminalRejected: 4, envelopeAccepted: 3, envelopeRejected: 3,
   };
 }

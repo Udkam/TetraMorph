@@ -297,6 +297,10 @@ export async function installInstrumentation(page, settings, observed) {
     /** @type {{cause: string, transport: 'direct-event'|'view-transition-callback'}|null} */
     let activeHistoryCause = null;
     let uiExitClickArmed = false;
+    /** @type {Event|null} */
+    let uiExitClickEvent = null;
+    let uiExitTransitionClaimCount = 0;
+    let uiExitRootReleaseCount = 0;
     const uiExitHistoryCause = 'ui-exit-confirm-click';
     const nativeReplaceState = History.prototype.replaceState;
     const nativePushState = History.prototype.pushState;
@@ -329,6 +333,13 @@ export async function installInstrumentation(page, settings, observed) {
     if (typeof nativeStartViewTransition === 'function') {
       documentPrototype.startViewTransition = function trackedStartViewTransition(/** @type {any} */ callback) {
         const transitionCause = activeHistoryCause;
+        if (transitionCause?.cause === uiExitHistoryCause && transitionCause.transport === 'direct-event') {
+          uiExitTransitionClaimCount += 1;
+          if (uiExitTransitionClaimCount !== 1) {
+            historyBindingError = 'UI-exit click causality was claimed by more than one View Transition.';
+          }
+          activeHistoryCause = null;
+        }
         if (typeof callback !== 'function') return nativeStartViewTransition.call(this, callback);
         return nativeStartViewTransition.call(this, () => {
           const previousCause = activeHistoryCause;
@@ -411,23 +422,39 @@ export async function installInstrumentation(page, settings, observed) {
           await tail;
           if (tail === historyBindingTail) break;
         }
+        if (uiExitClickEvent !== null && (uiExitTransitionClaimCount !== 1 || uiExitRootReleaseCount !== 1 || activeHistoryCause !== null)) {
+          historyBindingError = 'UI-exit click causality did not close its exact capture, View Transition, and root-bubble lifecycle.';
+        }
         if (historyBindingError !== null) throw new Error(historyBindingError);
       },
       armUiExitClick: (/** @type {any} */ element) => {
+        const root = element instanceof HTMLElement ? element.closest('#root') : null;
         if (uiExitClickArmed || !(element instanceof HTMLElement)
-          || !element.matches('.action-sheet__actions > .primary-action')) {
+          || !element.matches('.action-sheet__actions > .primary-action')
+          || !(root instanceof HTMLElement) || root !== document.getElementById('root')) {
           throw new Error('UI-exit click causality may only be armed once on the visible primary confirmation.');
         }
         uiExitClickArmed = true;
-        element.addEventListener('click', (event) => {
-          if (!event.isTrusted || activeHistoryCause !== null) {
+        const releaseAtRoot = (/** @type {Event} */ event) => {
+          root.removeEventListener('click', releaseAtRoot);
+          uiExitRootReleaseCount += 1;
+          if (event !== uiExitClickEvent || uiExitRootReleaseCount !== 1
+            || uiExitTransitionClaimCount !== 1 || activeHistoryCause !== null) {
+            historyBindingError = 'UI-exit click causality was not released by the exact post-React root bubble.';
+          }
+        };
+        const captureAtTarget = (/** @type {Event} */ event) => {
+          element.removeEventListener('click', captureAtTarget, true);
+          if (!event.isTrusted || uiExitClickEvent !== null || activeHistoryCause !== null) {
             historyBindingError = 'UI-exit click causality was not a unique trusted browser event.';
             return;
           }
+          uiExitClickEvent = event;
           const directCause = { cause: uiExitHistoryCause, transport: /** @type {'direct-event'} */ ('direct-event') };
           activeHistoryCause = directCause;
-          queueMicrotask(() => { if (activeHistoryCause === directCause) activeHistoryCause = null; });
-        }, { capture: true, once: true });
+        };
+        root.addEventListener('click', releaseAtRoot);
+        element.addEventListener('click', captureAtTarget, true);
       },
       snapshot: () => {
         /** @type {Record<string, number>} */
