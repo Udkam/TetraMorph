@@ -18,10 +18,11 @@ followed by either a fresh `200` or an ETag-bound `304` bootstrap response. A re
 counted only when the frame event is bound to its exact main-frame document request;
 direct instrumentation of `History.prototype.replaceState` and `pushState` must observe
 exactly one route-preserving `replaceState`, bound to the reloaded document and its separate
-same-document navigation. The exposed History binding is drained without swallowing errors;
-an exact `uiExitArm` cursor is frozen after the exit confirmation opens and immediately before
-its route-changing confirmation, so extra History calls cannot hide after HMR while the normal
-exit remains allowed. Ice responses use four explicit phases: `initial-freeze`,
+same-document navigation. The exposed History binding is drained to a stable tail without
+swallowing errors. The visible exit confirmation is armed for one trusted click, and that
+causal token is propagated through the View Transition callback into its exact `pushState`;
+an exact `uiExitArm` cursor is frozen immediately before the click, so late HMR History cannot
+masquerade as the normal exit. Ice responses use four explicit phases: `initial-freeze`,
 `pre-hmr`, `hmr`, and `post-hmr`; only the two frozen initial responses are materialized as
 provenance bytes, while every later response must remain inside its recorded phase marker
 boundary and the Ice HMR phase markers must equal the primary HMR window markers.
@@ -30,7 +31,7 @@ boundary and the Ice HMR phase markers must equal the primary HMR window markers
 
 Run this from the repository root. It creates a unique npm cache below `$env:TEMP`,
 materializes only `typescript@7.0.2` and `@types/node@24.10.1`, verifies both fixed
-versions, locates that invocation's temporary `@types` root, and checks the exact seven
+versions, locates that invocation's temporary `@types` root, and checks the exact eight
 JavaScript sources. It does not modify `package.json`, the lockfile, or the repository
 dependency tree, and it does not use `skipLibCheck`.
 
@@ -69,6 +70,7 @@ try {
       (Join-Path $repoRoot 'docs\evidence\t37\material-ice-current-head\capture-semantic.mjs') `
       (Join-Path $repoRoot 'docs\evidence\t37\material-ice-current-head\capture-matrix.mjs') `
       (Join-Path $repoRoot 'docs\evidence\t37\material-ice-current-head\browser-smoke.mjs') `
+      (Join-Path $repoRoot 'docs\evidence\t37\material-ice-current-head\capture-client.mjs') `
       (Join-Path $repoRoot 'docs\evidence\t37\material-ice-current-head\write-manifest.mjs') `
       (Join-Path $repoRoot 'docs\evidence\t37\material-ice-current-head\verify.mjs')
     if ($LASTEXITCODE -ne 0) { throw 'Strict checkJs failed.' }
@@ -84,22 +86,27 @@ try {
 ## Coordinator-only generation
 
 The source writer must not run this sequence. Start from the committed source candidate with
-the exact 36 pre-manifest outputs absent. The shared runtime-input v2 preflight rejects HEAD,
-index, tracked, untracked, ignored, raw-source, clean-filter, frozen `src` tree, and external
-fixture drift. The in-repository generators run it both before capture and before writing; the
-generic prescribed client is bracketed by two byte-identical preflight attestations. From the
+the exact 37 pre-manifest outputs absent. The shared runtime-input v3 preflight rejects HEAD,
+index, tracked, untracked, ignored, raw-source, canonical product-byte, clean-filter, frozen
+`src` tree, product-root configuration, Node, repository dependencies, prescribed-client
+dependencies, Chromium, Git, environment injection, ancestor PostCSS configuration, public
+assets, and external fixture drift. Runtime records use portable locators and byte/version
+identities; no personal absolute path is persisted. Every in-repository generator checks its
+inputs at both ends; the prescribed-client wrapper additionally requires its prior output
+directory and attestation to be absent and persists byte-identical start/end attestations.
+From the
 repository root, use one exact owned Vite PID and an exception-safe cleanup boundary:
 
 ```powershell
 $port = 5193
 $origin = "http://127.0.0.1:$port"
 $repoRoot = (Resolve-Path '.').Path
-$nodePath = (Resolve-Path 'E:\Nodejs\node.exe').Path
+$nodePath = (Get-Command node.exe -CommandType Application).Source
 $existing = @(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue)
 if ($existing.Count -ne 0) { throw "Port $port is already owned by PID(s): $($existing.OwningProcess -join ',')." }
 
 $vite = Start-Process -FilePath $nodePath -WorkingDirectory $repoRoot -WindowStyle Hidden -PassThru -ArgumentList @(
-  'node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', "$port", '--strictPort'
+  'node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', "$port", '--strictPort', '--force'
 )
 try {
   $deadline = [DateTime]::UtcNow.AddSeconds(12)
@@ -125,12 +132,8 @@ try {
   node docs/evidence/t37/material-ice-current-head/browser-smoke.mjs $origin
   if ($LASTEXITCODE -ne 0) { throw 'Browser lifecycle capture failed.' }
 
-  $clientBindingBefore = node docs/evidence/t37/material-ice-current-head/evidence-contract.mjs --preflight
-  if ($LASTEXITCODE -ne 0) { throw 'Prescribed-client input preflight failed.' }
-  node "C:\Users\Alex Chen\.codex\skills\develop-web-game\scripts\web_game_playwright_client.js" --url "$origin/play/mutation" --iterations 3 --pause-ms 250 --screenshot-dir docs/evidence/t37/material-ice-current-head/client-smoke --actions-file docs/evidence/t37/material-ice-current-head/client-actions.json
+  node docs/evidence/t37/material-ice-current-head/capture-client.mjs $origin
   if ($LASTEXITCODE -ne 0) { throw 'Prescribed client failed.' }
-  $clientBindingAfter = node docs/evidence/t37/material-ice-current-head/evidence-contract.mjs --preflight
-  if ($LASTEXITCODE -ne 0 -or $clientBindingAfter -cne $clientBindingBefore) { throw 'Prescribed-client runtime input changed.' }
 
   node docs/evidence/t37/material-ice-current-head/write-manifest.mjs
   if ($LASTEXITCODE -ne 0) { throw 'Manifest writer failed.' }
@@ -155,9 +158,9 @@ try {
 }
 ```
 
-The client script path is quoted because the user-profile path contains a space. The `finally`
-block stops only the process started above and proves port `5193` free before review. Commit the
-exact 37-file pre-report set only after that release proof. Inspect all
+The wrapper executes the hash-bound external client without a shell. The `finally` block stops
+only the process started above and proves port `5193` free before review. Commit the exact
+38-file pre-report set only after that release proof. Inspect all
 26 principal frames plus the three prescribed-client frames; JSON alone is not visual
 acceptance. From the clean generated commit run:
 

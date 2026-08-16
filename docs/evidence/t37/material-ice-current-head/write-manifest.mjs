@@ -1,21 +1,21 @@
 // @ts-check
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-  AUTH, BASE, BYTE_CONTRACT, CONTRACT, HUMAN_STATUS, ICE, ITEMS, MATRIX_CASES, OUTPUT,
-  PRE_REPORT, PRODUCT_BINDINGS, PROFILE, SEEDS, SOURCE, STAGES, STAGE_E_ANCHORS,
-  TERMINAL, assertRuntimeInputBinding, prefix, repo, root,
+  AUTH, BASE, BYTE_CONTRACT, CLIENT, CONTRACT, HUMAN_STATUS, ICE, ITEMS, MATRIX_CASES, OUTPUT,
+  LEGACY_AUTH, LEGACY_SOURCE, LEGACY_SOURCE_HEAD, PRE_REPORT, PRODUCT_BINDINGS, PROFILE,
+  SEEDS, SOURCE, SOURCE_DELTA, STAGES, STAGE_E_ANCHORS, TERMINAL, assertRuntimeInputBinding,
+  prefix, runGitBytes, runGitText, root,
 } from './evidence-contract.mjs';
 import { assertItemSnapshot } from './product-fixture.mjs';
 
 /** @param {import('node:crypto').BinaryLike} bytes */
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 /** @param {...string} args */
-const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
+const git = (...args) => runGitText(...args);
 /** @param {...string} args */
-const gitRaw = (...args) => execFileSync('git', args, { cwd: repo });
+const gitRaw = (...args) => runGitBytes(...args);
 /** @param {string} head @param {string} path */
 const blob = (head, path) => gitRaw('show', `${head}:${path}`);
 /** @param {readonly string[]} values */
@@ -25,6 +25,8 @@ const equalSet = (left, right) => JSON.stringify(sorted(left)) === JSON.stringif
 /** @param {any} left @param {any} right */
 const deepEqual = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 const sourcePaths = SOURCE.map((path) => prefix + path);
+const legacySourcePaths = LEGACY_SOURCE.map((path) => prefix + path);
+const sourceDeltaPaths = SOURCE_DELTA.map((path) => prefix + path);
 const outputPaths = OUTPUT.map((path) => prefix + path);
 const preReportPaths = PRE_REPORT.map((path) => prefix + path);
 const terminalPaths = TERMINAL.map((path) => prefix + path);
@@ -50,7 +52,7 @@ async function files(directory, base = '') {
   return found;
 }
 
-/** @param {string} from @param {string} to @param {string[]} expected @param {string} label */
+/** @param {string} from @param {string} to @param {readonly string[]} expected @param {string} label */
 function exactRange(from, to, expected, label) {
   const actual = git('diff', '--name-only', `${from}..${to}`).split(/\r?\n/u).filter(Boolean);
   if (!equalSet(actual, expected)) throw new Error(`${label}: ${actual.join(',')}`);
@@ -80,7 +82,7 @@ function isFrozenC050(commit, parent, status, fromPath, toPath) {
     && git('rev-parse', `${commit}:${toPath}`) === FROZEN_C050.toBlob;
 }
 
-/** @param {string} from @param {string} to @param {string[]} allowed @param {string} label */
+/** @param {string} from @param {string} to @param {readonly string[]} allowed @param {string} label */
 function linearHistory(from, to, allowed, label) {
   const commits = git('rev-list', '--reverse', '--ancestry-path', `${from}..${to}`).split(/\r?\n/u).filter(Boolean);
   if (commits.length === 0) throw new Error(`${label}: empty`);
@@ -440,10 +442,12 @@ const isUnboundNavigation = (event) => event?.kind === 'unbound-navigation' && e
   && typeof event?.url === 'string' && Array.isArray(event?.pendingDocumentRequests) && event.pendingDocumentRequests.length > 0;
 /** @param {any} event */
 const isHistoryCall = (event) => event?.kind === 'history-call'
-  && plainExactKeys(event, ['sequence', 'kind', 'documentEpoch', 'callId', 'method', 'beforeUrl', 'afterUrl', 'urlArgument'])
+  && plainExactKeys(event, ['sequence', 'kind', 'documentEpoch', 'callId', 'method', 'beforeUrl', 'afterUrl', 'urlArgument', 'cause', 'causeTransport'])
   && Number.isInteger(event?.documentEpoch) && event.documentEpoch > 0 && Number.isInteger(event?.callId) && event.callId > 0
   && ['replaceState', 'pushState'].includes(event?.method) && typeof event?.beforeUrl === 'string' && typeof event?.afterUrl === 'string'
-  && (event?.urlArgument === null || typeof event?.urlArgument === 'string');
+  && (event?.urlArgument === null || typeof event?.urlArgument === 'string')
+  && ((event?.cause === null && event?.causeTransport === null)
+    || (event?.cause === 'ui-exit-confirm-click' && ['direct-event', 'view-transition-callback'].includes(event?.causeTransport)));
 /** @param {any} event */
 function historyUrlExact(event) {
   try {
@@ -628,7 +632,8 @@ function deriveHmrProof(hmr, expectedOrigin) {
         && bootstrapTransfer.response.etag === preTransfer.response.etag));
   const sameDocumentNavigationExact = branch === 'document-reload'
     ? historyNamespaceExact && historyCalls.length === 1 && historyCalls[0]?.method === 'replaceState'
-      && historyCalls[0]?.documentEpoch === afterEpoch && historyCalls[0]?.callId === 1 && historyUrlExact(historyCalls[0])
+      && historyCalls[0]?.documentEpoch === afterEpoch && historyCalls[0]?.callId === 1
+      && historyCalls[0]?.cause === null && historyCalls[0]?.causeTransport === null && historyUrlExact(historyCalls[0])
       && historyCalls[0]?.beforeUrl === hmr?.after?.navigation?.url && historyCalls[0]?.afterUrl === hmr?.after?.navigation?.url
       && sameDocumentNavigations.length === 1 && bootstrapTransfer?.finished?.sequence < historyCalls[0]?.sequence
       && bootstrapTransfer?.finished?.sequence < sameDocumentNavigations[0]?.sequence
@@ -718,6 +723,30 @@ function exactHmrEventWindow(browser) {
     && deepEqual(all.slice(marker.eventIndex, marker.endEventIndex), browser?.hmr?.events)
     && all.slice(marker.endEventIndex, uiExitArm.eventIndex).every((/** @type {any} */ event) => !isHistoryBoundaryEvent(event))
     && all.slice(marker.endEventIndex).every((/** @type {any} */ event) => !isRelevantHmrEvent(event, expectedOrigin));
+}
+/** @param {any} browser */
+function exactUiExitHistory(browser) {
+  const all = browser?.observations?.events; const hmr = browser?.hmr; const expectedOrigin = String(browser?.origin);
+  const armIndex = hmr?.marker?.uiExitArm?.eventIndex;
+  if (!Array.isArray(all) || !Number.isInteger(armIndex) || armIndex < 0 || armIndex > all.length) return false;
+  const tail = all.slice(armIndex);
+  const historyNamespace = tail.filter((/** @type {any} */ event) => event?.kind === 'history-call');
+  const sameDocumentNamespace = tail.filter((/** @type {any} */ event) => event?.kind === 'same-document-navigation');
+  const historyCalls = historyNamespace.filter(isHistoryCall);
+  const sameDocumentNavigations = sameDocumentNamespace.filter(isSameDocumentNavigation);
+  if (historyCalls.length !== 1 || historyCalls.length !== historyNamespace.length
+    || sameDocumentNavigations.length !== 1 || sameDocumentNavigations.length !== sameDocumentNamespace.length) return false;
+  const call = historyCalls[0]; const navigation = sameDocumentNavigations[0];
+  let homeUrlExact = false;
+  try {
+    const parsed = new URL(call.afterUrl);
+    homeUrlExact = parsed.origin === new URL(expectedOrigin).origin && parsed.pathname === '/' && parsed.search === '' && parsed.hash === '';
+  } catch { return false; }
+  return call.method === 'pushState' && call.urlArgument === '/'
+    && call.cause === 'ui-exit-confirm-click' && call.causeTransport === 'view-transition-callback'
+    && call.documentEpoch === hmr?.after?.navigation?.epoch && call.callId === 2
+    && call.beforeUrl === hmr?.after?.navigation?.url && historyUrlExact(call) && homeUrlExact
+    && navigation.url === call.afterUrl && navigation.mainFrame === true;
 }
 /** @param {any} hmr */
 function exactAppTouch(hmr) {
@@ -910,10 +939,15 @@ function runIndependentContractFixtures() {
     resourceType: 'document', mainFrame: true, navigationRequest: true, ifNoneMatch: null });
   const nav = (/** @type {number} */ sequence, requestId = 201) => ({ sequence, kind: 'document-navigation', url: route, mainFrame: true,
     documentRequestId: requestId, documentRequestSequence: sequence - 1 });
-  const history = (/** @type {number} */ sequence, method = 'replaceState', documentEpoch = 2, callId = 1, urlArgument = '/play/mutation') => ({
-    sequence, kind: 'history-call', documentEpoch, callId, method, beforeUrl: route, afterUrl: route, urlArgument,
+  const history = (/** @type {number} */ sequence, method = 'replaceState', documentEpoch = 2, callId = 1, urlArgument = '/play/mutation', cause = null, causeTransport = null) => ({
+    sequence, kind: 'history-call', documentEpoch, callId, method, beforeUrl: route, afterUrl: route, urlArgument, cause, causeTransport,
   });
   const sameNav = (/** @type {number} */ sequence, url = route) => ({ sequence, kind: 'same-document-navigation', url, mainFrame: true });
+  const home = `${normalizedOrigin}/`;
+  const exitHistory = (/** @type {number} */ sequence = 23) => ({
+    sequence, kind: 'history-call', documentEpoch: 2, callId: 2, method: 'pushState', beforeUrl: route, afterUrl: home, urlArgument: '/',
+    cause: 'ui-exit-confirm-click', causeTransport: 'view-transition-callback',
+  });
   const before = snap(1, live(1));
   const same = {
     marker: { eventSequence: 10 }, events: [update(11), app(12), response(13), finished(14)], before, after: snap(1, live(1)),
@@ -1007,6 +1041,10 @@ function runIndependentContractFixtures() {
   const wrongHistoryEpoch = clone(reload); wrongHistoryEpoch.events[10].documentEpoch = 1;
   const wrongHistoryArgument = clone(reload); wrongHistoryArgument.events[10].urlArgument = '/wrong';
   const extraHistory = clone(reload); extraHistory.events.push(history(23, 'replaceState', 2, 2));
+  const pollutedMountCause = clone(reload);
+  Object.assign(pollutedMountCause.events.find((/** @type {any} */ event) => event.kind === 'history-call'), {
+    cause: 'ui-exit-confirm-click', causeTransport: 'direct-event',
+  });
   /** @param {any} boardProbe */
   const withBoardProbe = (boardProbe) => {
     const value = clone(reload);
@@ -1063,6 +1101,7 @@ function runIndependentContractFixtures() {
     ['replaceState wrong document epoch', wrongHistoryEpoch],
     ['replaceState argument does not resolve to observed URL', wrongHistoryArgument],
     ['extra history call', extraHistory],
+    ['mount replaceState carries UI-exit cause', pollutedMountCause],
     ['owner snapshot forged', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), beforeIdentity: id(1, 99) } }],
     ['same renderer failed probe', { ...clone(same), oldOwner: { ...clone(same.oldOwner), oldRenderer: 'invalid',
       probe: { ...clone(same.oldOwner.probe), outcome: 'throws' } } }],
@@ -1091,9 +1130,25 @@ function runIndependentContractFixtures() {
   windowed.marker = { eventIndex: 10, eventSequence: 10, navigationArm: { eventIndex: 10, eventSequence: 10, url: route },
     endEventIndex: 22, endEventSequence: 22, uiExitArm: { eventIndex: 22, eventSequence: 22 } };
   const exactEvents = [...filler, ...clone(reload.events)];
+  const exitEvents = [...exactEvents, exitHistory(23), sameNav(24, home)];
   assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exactEvents }, hmr: windowed }), 'valid HMR eventEnd window');
-  assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, history(23, 'replaceState', 2, 2), sameNav(24)] }, hmr: windowed }),
+  assertFixture(exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: exitEvents }, hmr: windowed }),
     'allow normal route History after the frozen HMR History guard');
+  const exitBrowser = { origin: normalizedOrigin, observations: { events: exitEvents }, hmr: windowed };
+  assertFixture(exactUiExitHistory(exitBrowser), 'valid exact UI-exit History pair');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: exactEvents } }), 'reject missing UI-exit History pair');
+  const wrongExitMethod = clone(exitEvents); wrongExitMethod[22].method = 'replaceState';
+  const wrongExitCallId = clone(exitEvents); wrongExitCallId[22].callId = 3;
+  const wrongExitUrl = clone(exitEvents); wrongExitUrl[22].afterUrl = `${normalizedOrigin}/wrong`;
+  const wrongExitCause = clone(exitEvents); wrongExitCause[22].cause = null;
+  const wrongExitTransport = clone(exitEvents); wrongExitTransport[22].causeTransport = 'direct-event';
+  const wrongExitArgument = clone(exitEvents); wrongExitArgument[22].urlArgument = './';
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitMethod } }), 'reject UI-exit replaceState');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitCallId } }), 'reject UI-exit callId drift');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitUrl } }), 'reject UI-exit URL drift');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitCause } }), 'reject UI-exit without trusted click cause');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitTransport } }), 'reject UI-exit outside View Transition callback');
+  assertFixture(!exactUiExitHistory({ ...exitBrowser, observations: { events: wrongExitArgument } }), 'reject equivalent but noncanonical UI-exit URL argument');
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, doc(23)] }, hmr: windowed }), 'reject slow late reload after eventEnd');
   const lateMalformedApp = { ...response(23, 999), url: 'not-a-url:/src/App.tsx' };
   assertFixture(!exactHmrEventWindow({ origin: normalizedOrigin, observations: { events: [...exactEvents, lateMalformedApp] }, hmr: windowed }), 'reject late malformed App namespace event after eventEnd');
@@ -1159,10 +1214,26 @@ function runIndependentContractFixtures() {
   for (const [label, value] of [['empty checks', emptyChecks], ['extra key', extraKey], ['bad generatedAt', badTimestamp]]) {
     assertFixture(!exactCommittedTerminal(value, terminalExpected), `reject terminal ${label}`);
   }
+  const phaseDriftExpected = clone(terminalExpected);
+  phaseDriftExpected.checks.push({ label: 'rerun-only terminal chain', passed: true, detail: null });
+  assertFixture(!exactCommittedTerminal(committed, phaseDriftExpected), 'reject terminal expectation polluted by rerun-only checks');
+  const manifestKeys = ['schema', 'generatedAt', 'provenance', 'runtimeInput', 'humanStatus', 'pathContracts', 'countContracts',
+    'byteContract', 'stageEAnchors', 'iceContract', 'sourceBindings', 'outputBindings', 'contractBindings', 'productBindings', 'auditSummary'];
+  const clientKeys = ['schema', 'generatedAt', 'passed', 'origin', 'startedAt', 'finishedAt', 'invocation', 'runtimeInputBefore', 'runtimeInputAfter', 'outputs'];
+  const manifestEnvelope = Object.fromEntries(manifestKeys.map((key) => [key, null]));
+  const clientEnvelope = Object.fromEntries(clientKeys.map((key) => [key, null]));
+  assertFixture(plainExactKeys(manifestEnvelope, manifestKeys), 'valid manifest exact-key envelope');
+  assertFixture(plainExactKeys(clientEnvelope, clientKeys), 'valid client exact-key envelope');
+  assertFixture(!plainExactKeys({ ...manifestEnvelope, forged: true }, manifestKeys), 'reject manifest extra key');
+  assertFixture(!plainExactKeys({ ...clientEnvelope, failures: [] }, clientKeys), 'reject client contradictory extra key');
+  const orderedTimes = ['2026-08-16T00:00:00.000Z', '2026-08-16T00:00:01.000Z', '2026-08-16T00:00:02.000Z'];
+  assertFixture(orderedTimes.every(canonicalIso) && Date.parse(orderedTimes[0]) <= Date.parse(orderedTimes[1])
+    && Date.parse(orderedTimes[1]) <= Date.parse(orderedTimes[2]), 'valid client timestamp order');
+  assertFixture(!(Date.parse(orderedTimes[2]) <= Date.parse(orderedTimes[1])), 'reject client timestamp inversion');
   return {
     iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + markerBindingRejects.length + 3,
-    hmrAccepted: 4, hmrRejected: hmrRejects.length + 13,
-    terminalAccepted: 1, terminalRejected: 3,
+    hmrAccepted: 4, hmrRejected: hmrRejects.length + 20,
+    terminalAccepted: 1, terminalRejected: 4, envelopeAccepted: 3, envelopeRejected: 3,
   };
 }
 
@@ -1334,6 +1405,16 @@ function browserLifecycleAssertions(browser) {
     reentryContextsExact: exactReentryContexts(browser.changedPreferences?.tracker, browser.reentered?.tracker),
     reentryListenersExact: sameRelevantListeners(browser.changedPreferences?.tracker, browser.reentered?.tracker),
     hmrEventWindowExact: exactHmrEventWindow(browser),
+    uiExitHistoryExact: exactUiExitHistory(browser),
+    fullMotionExitPreparationExact: browser.hmr?.exitPreparation?.root?.reducedMotion === 'false'
+      && browser.hmr?.exitPreparation?.root?.theme === browser.hmr?.after?.root?.theme
+      && browser.hmr?.exitPreparation?.root?.language === browser.hmr?.after?.root?.language
+      && sameIdentity(browser.hmr?.exitPreparation?.tracker?.qaId, browser.hmr?.after?.tracker?.qaId)
+      && sameIdentity(browser.hmr?.exitPreparation?.tracker?.canvasId, browser.hmr?.after?.tracker?.canvasId)
+      && browser.hmr?.exitPreparation?.canvasCount === 1 && browser.hmr?.exitPreparation?.tracker?.canvases === 1
+      && activeRafs(browser.hmr?.exitPreparation?.tracker) === activeRafs(browser.hmr?.after?.tracker)
+      && sameContextRecords(browser.hmr?.exitPreparation?.tracker, browser.hmr?.after?.tracker)
+      && sameRelevantListeners(browser.hmr?.exitPreparation?.tracker, browser.hmr?.after?.tracker),
     iceHmrMarkerBindingExact: exactIceHmrMarkerBinding(browser.observations?.icePhaseMarkers, browser.hmr?.marker),
     hmrAppTouchExact: exactAppTouch(browser.hmr),
     hmrProofExact: deepEqual(browser.hmr?.proof, hmrProof),
@@ -1367,10 +1448,17 @@ function bind(head, entry) {
 
 const head = git('rev-parse', 'HEAD');
 const runtimeInput = assertRuntimeInputBinding(head);
-if (git('merge-base', '--is-ancestor', BASE, AUTH) !== '') throw new Error('R5B terminal is not the authorization parent.');
-if (git('merge-base', '--is-ancestor', AUTH, head) !== '') throw new Error('Authorization is not source ancestor.');
-exactRange(AUTH, head, sourcePaths, 'authorization-to-source exact range');
-const sourceCommits = linearHistory(AUTH, head, sourcePaths, 'authorization-to-source history');
+if (git('merge-base', '--is-ancestor', BASE, LEGACY_AUTH) !== '') throw new Error('R5B terminal is not the legacy authorization ancestor.');
+if (git('merge-base', '--is-ancestor', LEGACY_AUTH, LEGACY_SOURCE_HEAD) !== '') throw new Error('Legacy authorization is not the legacy source ancestor.');
+if (git('merge-base', '--is-ancestor', LEGACY_SOURCE_HEAD, AUTH) !== '') throw new Error('Legacy source is not the correction authorization ancestor.');
+if (git('merge-base', '--is-ancestor', AUTH, head) !== '') throw new Error('Correction authorization is not source ancestor.');
+exactRange(LEGACY_AUTH, LEGACY_SOURCE_HEAD, legacySourcePaths, 'legacy-authorization-to-source exact range');
+const legacySourceCommits = linearHistory(LEGACY_AUTH, LEGACY_SOURCE_HEAD, legacySourcePaths, 'legacy-authorization-to-source history');
+exactTree(LEGACY_SOURCE_HEAD, legacySourcePaths, 'legacy source exact tree');
+exactRange(LEGACY_SOURCE_HEAD, AUTH, CONTRACT, 'legacy-source-to-correction-authorization exact range');
+const correctionCommits = linearHistory(LEGACY_SOURCE_HEAD, AUTH, CONTRACT, 'legacy-source-to-correction-authorization history');
+exactRange(AUTH, head, sourceDeltaPaths, 'correction-authorization-to-source exact range');
+const sourceCommits = linearHistory(AUTH, head, sourceDeltaPaths, 'correction-authorization-to-source history');
 exactTree(head, sourcePaths, 'source exact tree');
 
 const actual = await files(root);
@@ -1397,6 +1485,12 @@ const semantic = JSON.parse(await readFile(join(root, 'material-semantic-audit.j
 const matrix = JSON.parse(await readFile(join(root, 'material-matrix-audit.json'), 'utf8'));
 const browser = JSON.parse(await readFile(join(root, 'browser-report.json'), 'utf8'));
 const ice = JSON.parse(await readFile(join(root, 'ice-provenance-audit.json'), 'utf8'));
+const client = JSON.parse(await readFile(join(root, 'client-attestation.json'), 'utf8'));
+if (!plainExactKeys(client, ['schema', 'generatedAt', 'passed', 'origin', 'startedAt', 'finishedAt', 'invocation', 'runtimeInputBefore', 'runtimeInputAfter', 'outputs'])
+  || !plainExactKeys(client.invocation, ['executable', 'args'])
+  || !Array.isArray(client.outputs) || !client.outputs.every((/** @type {any} */ entry) => plainExactKeys(entry, ['path', 'bytes', 'sha256']))) {
+  throw new Error('Prescribed-client attestation envelope is not exact.');
+}
 for (const [label, value, schema] of [
   ['semantic', semantic, 'tetramorph.t37.material-semantic.v2'],
   ['matrix', matrix, 'tetramorph.t37.material-matrix.v2'],
@@ -1454,14 +1548,42 @@ const recomputedIceChecks = [
 if (recomputedIceChecks.length === 0 || !deepEqual(ice.checks, recomputedIceChecks) || !ice.checks.every((/** @type {any} */ entry) => entry?.passed === true)) {
   throw new Error('Ice provenance checks are empty, forged, or differ from independent recomputation.');
 }
+const expectedClientArgs = [
+  runtimeInput.environment.prescribedClient.locator,
+  '--url', `${new URL(String(browser.origin)).origin}/play/mutation`,
+  '--iterations', '3', '--pause-ms', '250',
+  '--screenshot-dir', 'docs/evidence/t37/material-ice-current-head/client-smoke',
+  '--actions-file', 'docs/evidence/t37/material-ice-current-head/client-actions.json',
+];
+const expectedClientOutputs = [];
+for (const path of CLIENT) {
+  const bytes = await readFile(join(root, ...path.split('/')));
+  expectedClientOutputs.push({ path, bytes: bytes.length, sha256: sha(bytes) });
+  if (path.endsWith('.json')) {
+    const state = JSON.parse(text(bytes, path));
+    if (state?.mode !== 'sprint' || state?.screen !== 'game') throw new Error(`${path}: prescribed client state mismatch.`);
+  }
+}
+if (client.schema !== 'tetramorph.t37.material-client-attestation.v1' || client.passed !== true
+  || new Date(client.generatedAt).toISOString() !== client.generatedAt
+  || new Date(client.startedAt).toISOString() !== client.startedAt || new Date(client.finishedAt).toISOString() !== client.finishedAt
+  || Date.parse(client.finishedAt) < Date.parse(client.startedAt) || Date.parse(client.generatedAt) < Date.parse(client.finishedAt)
+  || client.origin !== new URL(String(browser.origin)).origin
+  || !deepEqual(client.invocation, { executable: runtimeInput.environment.node.locator, args: expectedClientArgs })
+  || !deepEqual(client.runtimeInputBefore, runtimeInput) || !deepEqual(client.runtimeInputAfter, runtimeInput)
+  || !deepEqual(client.outputs, expectedClientOutputs)) throw new Error('Prescribed-client persisted start/end attestation mismatch.');
 
 const manifest = {
   schema: 'tetramorph.t37.material-ice-manifest.v2', generatedAt: new Date().toISOString(),
-  provenance: { r5bTerminalBase: BASE, authorizationHead: AUTH, evidenceSourceHead: head, sourceCommits, productHead: BASE, writerBoundary: `${prefix}**` },
+  provenance: {
+    r5bTerminalBase: BASE, legacyAuthorizationHead: LEGACY_AUTH, legacySourceHead: LEGACY_SOURCE_HEAD,
+    legacySourceCommits, correctionAuthorizationHead: AUTH, correctionCommits,
+    evidenceSourceHead: head, sourceCommits, productHead: BASE, writerBoundary: `${prefix}**`,
+  },
   runtimeInput,
   humanStatus: HUMAN_STATUS,
   pathContracts: { source: sourcePaths, outputs: outputPaths, preReport: preReportPaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_BINDINGS },
-  countContracts: { source: 10, semanticPng: 20, matrixPng: 6, outputsBeforeManifest: 36, preReport: 37, terminal: 1 },
+  countContracts: { source: 11, semanticPng: 20, matrixPng: 6, outputsBeforeManifest: 37, preReport: 38, terminal: 1 },
   byteContract: BYTE_CONTRACT,
   stageEAnchors: STAGE_E_ANCHORS,
   iceContract: ICE,
@@ -1472,6 +1594,18 @@ const manifest = {
     browser: { schema: browser.schema, generatedAt: browser.generatedAt, passed: browser.passed, assertions: browser.assertions },
     ice: { schema: ice.schema, generatedAt: ice.generatedAt, passed: ice.passed, originalAcquisition: ice.originalAcquisition,
       runtimeClassification: recomputedIceClassification, catalog: expectedCatalog },
+    client: { schema: client.schema, generatedAt: client.generatedAt, passed: client.passed, startedAt: client.startedAt, finishedAt: client.finishedAt,
+      origin: client.origin, outputs: expectedClientOutputs },
   },
 };
+const runtimeInputAfter = assertRuntimeInputBinding(head);
+if (!deepEqual(runtimeInputAfter, runtimeInput)) throw new Error('Runtime input binding changed during manifest validation.');
+const finalOutputBindings = [];
+for (const relative of OUTPUT) {
+  const bytes = await readFile(join(root, relative));
+  if (!relative.endsWith('.png')) text(bytes, relative);
+  finalOutputBindings.push({ path: prefix + relative, sha256: sha(bytes), bytes: bytes.length });
+}
+if (!deepEqual(finalOutputBindings, outputBindings)
+  || !equalSet(await files(root), [...SOURCE, ...OUTPUT])) throw new Error('Pre-report output set changed before manifest write.');
 await writeFile(join(root, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');

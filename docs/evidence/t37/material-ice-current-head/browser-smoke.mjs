@@ -1,11 +1,13 @@
 // @ts-check
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import { readFileSync, statSync, utimesSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
-import { AUTH, BASE, HUMAN_STATUS, ICE, SEEDS, assertRuntimeInputBinding, repo, root } from './evidence-contract.mjs';
+import {
+  AUTH, BASE, HUMAN_STATUS, ICE, SEEDS, assertRuntimeInputBinding, cleanGitObject,
+  repo, runGitBytes, runGitText, root,
+} from './evidence-contract.mjs';
 import { advanceToActive, loadScenarios, openMutation, runActions, scenarioFor, snapshot } from './product-fixture.mjs';
 
 const origin = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : 'http://127.0.0.1:5193';
@@ -20,13 +22,11 @@ const check = (value, label) => { if (!value) failures.push(label); };
 /** @param {import('node:crypto').BinaryLike} bytes */
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 /** @param {...string} args */
-const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
+const git = (...args) => runGitText(...args);
 /** @param {string} head @param {string} path */
-const gitBytes = (head, path) => execFileSync('git', ['show', `${head}:${path}`], { cwd: repo });
+const gitBytes = (head, path) => runGitBytes('show', `${head}:${path}`);
 /** @param {Buffer} bytes */
-const cleanAppBlob = (bytes) => execFileSync('git', ['hash-object', '--stdin', '--path=src/App.tsx'], {
-  cwd: repo, input: bytes, encoding: 'utf8',
-}).trim();
+const cleanAppBlob = (bytes) => cleanGitObject(bytes, 'src/App.tsx');
 /** @param {Buffer} bytes */
 function canonicalAppBytes(bytes) {
   if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) throw new Error('src/App.tsx checkout has a UTF-8 BOM.');
@@ -374,10 +374,12 @@ const isUnboundNavigation = (event) => event?.kind === 'unbound-navigation' && e
   && typeof event?.url === 'string' && Array.isArray(event?.pendingDocumentRequests) && event.pendingDocumentRequests.length > 0;
 /** @param {any} event */
 const isHistoryCall = (event) => event?.kind === 'history-call'
-  && plainExactKeys(event, ['sequence', 'kind', 'documentEpoch', 'callId', 'method', 'beforeUrl', 'afterUrl', 'urlArgument'])
+  && plainExactKeys(event, ['sequence', 'kind', 'documentEpoch', 'callId', 'method', 'beforeUrl', 'afterUrl', 'urlArgument', 'cause', 'causeTransport'])
   && Number.isInteger(event?.documentEpoch) && event.documentEpoch > 0 && Number.isInteger(event?.callId) && event.callId > 0
   && ['replaceState', 'pushState'].includes(event?.method) && typeof event?.beforeUrl === 'string' && typeof event?.afterUrl === 'string'
-  && (event?.urlArgument === null || typeof event?.urlArgument === 'string');
+  && (event?.urlArgument === null || typeof event?.urlArgument === 'string')
+  && ((event?.cause === null && event?.causeTransport === null)
+    || (event?.cause === 'ui-exit-confirm-click' && ['direct-event', 'view-transition-callback'].includes(event?.causeTransport)));
 /** @param {any} event */
 function historyUrlExact(event) {
   try {
@@ -474,6 +476,29 @@ function exactHmrEventWindow(all, hmr, expectedOrigin) {
     && deepEqual(all.slice(marker.eventIndex, marker.endEventIndex), hmr?.events)
     && all.slice(marker.endEventIndex, uiExitArm.eventIndex).every((event) => !isHistoryBoundaryEvent(event))
     && all.slice(marker.endEventIndex).every((event) => !isRelevantHmrEvent(event, expectedOrigin));
+}
+/** @param {any[]} all @param {any} hmr @param {string} expectedOrigin */
+function exactUiExitHistory(all, hmr, expectedOrigin) {
+  const armIndex = hmr?.marker?.uiExitArm?.eventIndex;
+  if (!Array.isArray(all) || !Number.isInteger(armIndex) || armIndex < 0 || armIndex > all.length) return false;
+  const tail = all.slice(armIndex);
+  const historyNamespace = tail.filter((event) => event?.kind === 'history-call');
+  const sameDocumentNamespace = tail.filter((event) => event?.kind === 'same-document-navigation');
+  const historyCalls = historyNamespace.filter(isHistoryCall);
+  const sameDocumentNavigations = sameDocumentNamespace.filter(isSameDocumentNavigation);
+  if (historyCalls.length !== 1 || historyCalls.length !== historyNamespace.length
+    || sameDocumentNavigations.length !== 1 || sameDocumentNavigations.length !== sameDocumentNamespace.length) return false;
+  const call = historyCalls[0]; const navigation = sameDocumentNavigations[0];
+  let homeUrlExact = false;
+  try {
+    const parsed = new URL(call.afterUrl);
+    homeUrlExact = parsed.origin === new URL(expectedOrigin).origin && parsed.pathname === '/' && parsed.search === '' && parsed.hash === '';
+  } catch { return false; }
+  return call.method === 'pushState' && call.urlArgument === '/'
+    && call.cause === 'ui-exit-confirm-click' && call.causeTransport === 'view-transition-callback'
+    && call.documentEpoch === hmr?.after?.navigation?.epoch && call.callId === 2
+    && call.beforeUrl === hmr?.after?.navigation?.url && historyUrlExact(call) && homeUrlExact
+    && navigation.url === call.afterUrl && navigation.mainFrame === true;
 }
 /** @param {any} marker */
 const exactPhaseMarker = (marker) => plainExactKeys(marker, ['eventIndex', 'eventSequence'])
@@ -589,7 +614,8 @@ function deriveHmrProof(hmr, expectedOrigin) {
         && bootstrapTransfer.response.etag === preTransfer.response.etag));
   const sameDocumentNavigationExact = branch === 'document-reload'
     ? historyNamespaceExact && historyCalls.length === 1 && historyCalls[0]?.method === 'replaceState'
-      && historyCalls[0]?.documentEpoch === afterEpoch && historyCalls[0]?.callId === 1 && historyUrlExact(historyCalls[0])
+      && historyCalls[0]?.documentEpoch === afterEpoch && historyCalls[0]?.callId === 1
+      && historyCalls[0]?.cause === null && historyCalls[0]?.causeTransport === null && historyUrlExact(historyCalls[0])
       && historyCalls[0]?.beforeUrl === hmr?.after?.navigation?.url && historyCalls[0]?.afterUrl === hmr?.after?.navigation?.url
       && sameDocumentNavigations.length === 1 && bootstrapTransfer?.finished?.sequence < historyCalls[0]?.sequence
       && bootstrapTransfer?.finished?.sequence < sameDocumentNavigations[0]?.sequence
@@ -853,10 +879,15 @@ function runContractFixtures(assetBytes) {
     resourceType: 'document', mainFrame: true, navigationRequest: true, ifNoneMatch: null });
   const nav = (/** @type {number} */ sequence, requestId = 201) => ({ sequence, kind: 'document-navigation', url: route, mainFrame: true,
     documentRequestId: requestId, documentRequestSequence: sequence - 1 });
-  const history = (/** @type {number} */ sequence, method = 'replaceState', documentEpoch = 2, callId = 1, urlArgument = '/play/mutation') => ({
-    sequence, kind: 'history-call', documentEpoch, callId, method, beforeUrl: route, afterUrl: route, urlArgument,
+  const history = (/** @type {number} */ sequence, method = 'replaceState', documentEpoch = 2, callId = 1, urlArgument = '/play/mutation', cause = null, causeTransport = null) => ({
+    sequence, kind: 'history-call', documentEpoch, callId, method, beforeUrl: route, afterUrl: route, urlArgument, cause, causeTransport,
   });
   const sameNav = (/** @type {number} */ sequence, url = route) => ({ sequence, kind: 'same-document-navigation', url, mainFrame: true });
+  const home = `${normalizedOrigin}/`;
+  const exitHistory = (/** @type {number} */ sequence = 23) => ({
+    sequence, kind: 'history-call', documentEpoch: 2, callId: 2, method: 'pushState', beforeUrl: route, afterUrl: home, urlArgument: '/',
+    cause: 'ui-exit-confirm-click', causeTransport: 'view-transition-callback',
+  });
   const before = snap(1, live(1));
   const same = {
     marker: { eventSequence: 10 }, events: [update(11), app(12), response(13), finished(14)], before, after: snap(1, live(1)),
@@ -950,6 +981,10 @@ function runContractFixtures(assetBytes) {
   const wrongHistoryEpoch = clone(reload); wrongHistoryEpoch.events[10].documentEpoch = 1;
   const wrongHistoryArgument = clone(reload); wrongHistoryArgument.events[10].urlArgument = '/wrong';
   const extraHistory = clone(reload); extraHistory.events.push(history(23, 'replaceState', 2, 2));
+  const pollutedMountCause = clone(reload);
+  Object.assign(pollutedMountCause.events.find((/** @type {any} */ event) => event.kind === 'history-call'), {
+    cause: 'ui-exit-confirm-click', causeTransport: 'direct-event',
+  });
   /** @param {any} boardProbe */
   const withBoardProbe = (boardProbe) => {
     const value = clone(reload);
@@ -1006,6 +1041,7 @@ function runContractFixtures(assetBytes) {
     ['replaceState wrong document epoch', wrongHistoryEpoch],
     ['replaceState argument does not resolve to observed URL', wrongHistoryArgument],
     ['extra history call', extraHistory],
+    ['mount replaceState carries UI-exit cause', pollutedMountCause],
     ['owner snapshot forged', { ...clone(reload), oldOwner: { ...clone(reload.oldOwner), beforeIdentity: id(1, 99) } }],
     ['same renderer failed probe', { ...clone(same), oldOwner: { ...clone(same.oldOwner), oldRenderer: 'invalid',
       probe: { ...clone(same.oldOwner.probe), outcome: 'throws' } } }],
@@ -1034,9 +1070,24 @@ function runContractFixtures(assetBytes) {
   windowed.marker = { eventIndex: 10, eventSequence: 10, navigationArm: { eventIndex: 10, eventSequence: 10, url: route },
     endEventIndex: 22, endEventSequence: 22, uiExitArm: { eventIndex: 22, eventSequence: 22 } };
   const exactEvents = [...filler, ...clone(reload.events)];
+  const exitEvents = [...exactEvents, exitHistory(23), sameNav(24, home)];
   assertFixture(exactHmrEventWindow(exactEvents, windowed, normalizedOrigin), 'valid HMR eventEnd window');
-  assertFixture(exactHmrEventWindow([...exactEvents, history(23, 'replaceState', 2, 2), sameNav(24)], windowed, normalizedOrigin),
+  assertFixture(exactHmrEventWindow(exitEvents, windowed, normalizedOrigin),
     'allow normal route History after the frozen HMR History guard');
+  assertFixture(exactUiExitHistory(exitEvents, windowed, normalizedOrigin), 'valid exact UI-exit History pair');
+  assertFixture(!exactUiExitHistory(exactEvents, windowed, normalizedOrigin), 'reject missing UI-exit History pair');
+  const wrongExitMethod = clone(exitEvents); wrongExitMethod[22].method = 'replaceState';
+  const wrongExitCallId = clone(exitEvents); wrongExitCallId[22].callId = 3;
+  const wrongExitUrl = clone(exitEvents); wrongExitUrl[22].afterUrl = `${normalizedOrigin}/wrong`;
+  const wrongExitCause = clone(exitEvents); wrongExitCause[22].cause = null;
+  const wrongExitTransport = clone(exitEvents); wrongExitTransport[22].causeTransport = 'direct-event';
+  const wrongExitArgument = clone(exitEvents); wrongExitArgument[22].urlArgument = './';
+  assertFixture(!exactUiExitHistory(wrongExitMethod, windowed, normalizedOrigin), 'reject UI-exit replaceState');
+  assertFixture(!exactUiExitHistory(wrongExitCallId, windowed, normalizedOrigin), 'reject UI-exit callId drift');
+  assertFixture(!exactUiExitHistory(wrongExitUrl, windowed, normalizedOrigin), 'reject UI-exit URL drift');
+  assertFixture(!exactUiExitHistory(wrongExitCause, windowed, normalizedOrigin), 'reject UI-exit without trusted click cause');
+  assertFixture(!exactUiExitHistory(wrongExitTransport, windowed, normalizedOrigin), 'reject UI-exit outside View Transition callback');
+  assertFixture(!exactUiExitHistory(wrongExitArgument, windowed, normalizedOrigin), 'reject equivalent but noncanonical UI-exit URL argument');
   assertFixture(!exactHmrEventWindow([...exactEvents, doc(23)], windowed, normalizedOrigin), 'reject slow late reload after eventEnd');
   const lateMalformedApp = { ...response(23, 999), url: 'not-a-url:/src/App.tsx' };
   assertFixture(!exactHmrEventWindow([...exactEvents, lateMalformedApp], windowed, normalizedOrigin), 'reject late malformed App namespace event after eventEnd');
@@ -1111,10 +1162,26 @@ function runContractFixtures(assetBytes) {
   for (const [label, value] of [['empty checks', emptyChecks], ['extra key', extraKey], ['bad generatedAt', badTimestamp]]) {
     assertFixture(!exactCommittedTerminal(value, terminalExpected), `reject terminal ${label}`);
   }
+  const phaseDriftExpected = clone(terminalExpected);
+  phaseDriftExpected.checks.push({ label: 'rerun-only terminal chain', passed: true, detail: null });
+  assertFixture(!exactCommittedTerminal(committed, phaseDriftExpected), 'reject terminal expectation polluted by rerun-only checks');
+  const manifestKeys = ['schema', 'generatedAt', 'provenance', 'runtimeInput', 'humanStatus', 'pathContracts', 'countContracts',
+    'byteContract', 'stageEAnchors', 'iceContract', 'sourceBindings', 'outputBindings', 'contractBindings', 'productBindings', 'auditSummary'];
+  const clientKeys = ['schema', 'generatedAt', 'passed', 'origin', 'startedAt', 'finishedAt', 'invocation', 'runtimeInputBefore', 'runtimeInputAfter', 'outputs'];
+  const manifestEnvelope = Object.fromEntries(manifestKeys.map((key) => [key, null]));
+  const clientEnvelope = Object.fromEntries(clientKeys.map((key) => [key, null]));
+  assertFixture(plainExactKeys(manifestEnvelope, manifestKeys), 'valid manifest exact-key envelope');
+  assertFixture(plainExactKeys(clientEnvelope, clientKeys), 'valid client exact-key envelope');
+  assertFixture(!plainExactKeys({ ...manifestEnvelope, forged: true }, manifestKeys), 'reject manifest extra key');
+  assertFixture(!plainExactKeys({ ...clientEnvelope, failures: [] }, clientKeys), 'reject client contradictory extra key');
+  const orderedTimes = ['2026-08-16T00:00:00.000Z', '2026-08-16T00:00:01.000Z', '2026-08-16T00:00:02.000Z'];
+  assertFixture(orderedTimes.every(canonicalIso) && Date.parse(orderedTimes[0]) <= Date.parse(orderedTimes[1])
+    && Date.parse(orderedTimes[1]) <= Date.parse(orderedTimes[2]), 'valid client timestamp order');
+  assertFixture(!(Date.parse(orderedTimes[2]) <= Date.parse(orderedTimes[1])), 'reject client timestamp inversion');
   return {
     iceAccepted: 2, iceRejected: iceRejects.length + phaseRejects.length + markerBindingRejects.length + 3,
-    hmrAccepted: 4, hmrRejected: hmrRejects.length + 13,
-    terminalAccepted: 1, terminalRejected: 3,
+    hmrAccepted: 4, hmrRejected: hmrRejects.length + 20,
+    terminalAccepted: 1, terminalRejected: 4, envelopeAccepted: 3, envelopeRejected: 3,
   };
 }
 
@@ -1334,18 +1401,11 @@ const oldHmrOwner = { ...beforeHmrOwner, ...afterHmrOwner };
 await page.evaluate(() => /** @type {any} */ (window).__MATERIAL_TRACKER__.drainHistory());
 const eventEnd = observed.endHmrIceWindow();
 const hmrEvents = observed.events.slice(eventMarker.eventIndex, eventEnd.eventIndex);
-
-await page.getByTestId('exit-game').click();
-const exitConfirmation = page.locator('.action-sheet__actions > .primary-action');
-await exitConfirmation.waitFor({ state: 'visible' });
-await page.evaluate(() => /** @type {any} */ (window).__MATERIAL_TRACKER__.drainHistory());
-const uiExitArm = observed.armUiExitBoundary();
 /** @type {any} */
 const hmr = {
   before: beforeHmr,
   marker: {
     ...eventMarker, navigationArm, endEventIndex: eventEnd.eventIndex, endEventSequence: eventEnd.eventSequence,
-    uiExitArm,
   },
   events: hmrEvents,
   appTouch: {
@@ -1373,6 +1433,29 @@ check(sameRelevantListeners(beforeHmr.tracker, afterHmr.tracker), 'HMR relevant 
 check(hmrContextBranch !== 'invalid', 'HMR old renderer disposition is internally consistent');
 check(hmrContextBranch !== 'invalid' && exactHmrContexts(beforeHmr.tracker, afterHmr.tracker, hmrContextBranch), 'HMR exact branch-specific AudioContext history');
 
+await page.getByTestId('open-settings').click();
+await page.getByTestId('reduced-motion-toggle').click();
+const exitSettingsSheet = page.getByTestId('settings-sheet');
+await exitSettingsSheet.waitFor({ state: 'visible' });
+await exitSettingsSheet.locator('.settings-console__actions > .primary-action').click();
+await page.waitForFunction(() => document.querySelector('.app')?.getAttribute('data-reduced-motion') === 'false');
+const exitPreparation = await snapshot(page);
+hmr.exitPreparation = exitPreparation;
+check(exitPreparation.root?.reducedMotion === 'false' && exitPreparation.root?.theme === afterHmr.root?.theme
+  && exitPreparation.root?.language === afterHmr.root?.language, 'final exit restores full motion without changing theme or language');
+check(sameIdentity(exitPreparation.tracker?.qaId, afterHmr.tracker?.qaId)
+  && sameIdentity(exitPreparation.tracker?.canvasId, afterHmr.tracker?.canvasId)
+  && exitPreparation.canvasCount === 1 && exitPreparation.tracker?.canvases === 1
+  && activeRafs(exitPreparation.tracker) === activeRafs(afterHmr.tracker)
+  && sameContextRecords(exitPreparation.tracker, afterHmr.tracker)
+  && sameRelevantListeners(exitPreparation.tracker, afterHmr.tracker), 'full-motion exit preparation preserves the live owner set');
+
+await page.getByTestId('exit-game').click();
+const exitConfirmation = page.locator('.action-sheet__actions > .primary-action');
+await exitConfirmation.waitFor({ state: 'visible' });
+await exitConfirmation.evaluate((element) => /** @type {any} */ (window).__MATERIAL_TRACKER__.armUiExitClick(element));
+await page.evaluate(() => /** @type {any} */ (window).__MATERIAL_TRACKER__.drainHistory());
+hmr.marker.uiExitArm = observed.armUiExitBoundary();
 const exitNavigationPromise = page.waitForEvent('framenavigated', {
   predicate: (frame) => {
     if (frame !== page.mainFrame()) return false;
@@ -1397,9 +1480,26 @@ const terminal = await page.evaluate(() => /** @type {any} */ (window).__MATERIA
 check(terminal.canvases === 0 && terminal.liveContexts === 0 && activeRafs(terminal) === 0 && noRelevantListeners(terminal), 'post-HMR terminal cleanup');
 check(exactTerminalContexts(afterHmr.tracker, terminal), 'post-HMR terminal exact AudioContext closure');
 check(exactHmrEventWindow(observed.events, hmr, normalizedOrigin), 'no late App/HMR/reload/navigation event after the frozen HMR eventEnd');
+check(exactUiExitHistory(observed.events, hmr, normalizedOrigin), 'UI exit owns one exact pushState and same-document navigation after uiExitArm');
 check(exactInitialIceEventBinding(observed.events, rawIceResponses, observed.icePhaseMarkers), 'Ice raw responses bind every initial event metadata field');
 check(exactIcePhaseClassification(observed.events, observed.icePhaseMarkers), 'Ice response events obey the explicit initial/pre-HMR/HMR/post-HMR windows');
 check(exactIceHmrMarkerBinding(observed.icePhaseMarkers, hmr.marker), 'Ice HMR phase markers bind the unified HMR event window');
+
+const sealedPageUrl = page.url();
+const sealedBrowserVersion = browser.version();
+await ownedContext.close();
+ownedContext = null;
+await new Promise((resolveSeal) => setImmediate(resolveSeal));
+if (appTimesToRestore !== null) {
+  utimesSync(appTimesToRestore.path, appTimesToRestore.atime, appTimesToRestore.mtime);
+  appTimesToRestore = null;
+}
+const sealedObservationJson = JSON.stringify(observed);
+const runtimeInputAfter = assertRuntimeInputBinding(runtimeInput.evidenceSourceHead);
+if (JSON.stringify(runtimeInputAfter) !== JSON.stringify(runtimeInput)) throw new Error('Runtime input binding changed during browser capture.');
+await new Promise((resolvePreflightQueue) => setImmediate(resolvePreflightQueue));
+if (JSON.stringify(observed) !== sealedObservationJson) throw new Error('Browser observations changed after context close and final runtime preflight.');
+const sealedObservations = JSON.parse(sealedObservationJson);
 
 const iceBytes = gitBytes(BASE, ICE.path);
 const catalogBytes = gitBytes(BASE, catalogPath);
@@ -1412,9 +1512,9 @@ const provenanceChecks = [
   { label: 'runtime catalog own freezeIce descriptor/value', passed: exactRuntimeCatalog(runtimeCatalog) },
   { label: 'no original substitution', passed: ICE.originalSha256 === null && ICE.originalStatus === 'OPEN / login required' && ICE.substitutionAllowed === false },
   { label: 'runtime exact module-plus-asset pair', passed: runtimeIceClassification.passed },
-  { label: 'runtime Ice events bind materialized response metadata', passed: exactInitialIceEventBinding(observed.events, rawIceResponses, observed.icePhaseMarkers) },
-  { label: 'runtime Ice response phases are exact', passed: exactIcePhaseClassification(observed.events, observed.icePhaseMarkers) },
-  { label: 'runtime Ice phase markers bind HMR event window', passed: exactIceHmrMarkerBinding(observed.icePhaseMarkers, hmr.marker) },
+  { label: 'runtime Ice events bind materialized response metadata', passed: exactInitialIceEventBinding(sealedObservations.events, rawIceResponses, sealedObservations.icePhaseMarkers) },
+  { label: 'runtime Ice response phases are exact', passed: exactIcePhaseClassification(sealedObservations.events, sealedObservations.icePhaseMarkers) },
+  { label: 'runtime Ice phase markers bind HMR event window', passed: exactIceHmrMarkerBinding(sealedObservations.icePhaseMarkers, hmr.marker) },
 ];
 const iceProvenance = {
   schema: 'tetramorph.t37.ice-provenance.v2', generatedAt: new Date().toISOString(),
@@ -1424,7 +1524,7 @@ const iceProvenance = {
   product: { ...ICE, observedGitBlob: lsTree[2] ?? null, observedBytes: iceBytes.length, observedSha256: hash(iceBytes) },
   catalog: { path: catalogPath, gitBlob: catalogGitBlob, bytes: catalogBytes.length, sha256: hash(catalogBytes), runtime: runtimeCatalog },
   runtimeResponses: rawIceResponses,
-  runtimePhaseMarkers: observed.icePhaseMarkers,
+  runtimePhaseMarkers: sealedObservations.icePhaseMarkers,
   runtimeClassification: runtimeIceClassification,
   originalAcquisition: { filename: ICE.originalFilename, sha256: null, status: 'OPEN / login required', productOggIsOriginal: false, previewSubstitutionAllowed: false },
   humanStatus: HUMAN_STATUS,
@@ -1478,8 +1578,8 @@ const lifecycleProof = {
   },
 };
 const lifecycleAssertions = {
-  realProductRoute: page.url().startsWith(origin.replace(/\/$/u, '')),
-  observationsClean: observed.consoleErrors.length === 0 && observed.pageErrors.length === 0 && observed.requestErrors.length === 0,
+  realProductRoute: sealedPageUrl.startsWith(origin.replace(/\/$/u, '')),
+  observationsClean: sealedObservations.consoleErrors.length === 0 && sealedObservations.pageErrors.length === 0 && sealedObservations.requestErrors.length === 0,
   initialOwners: initial.canvasCount === 1 && initial.tracker?.canvases === 1 && initial.domCellCount === 0 && initial.tracker?.liveContexts === 1 && activeRafs(initial.tracker) >= 1,
   initialContextRecordExact: validContextSnapshot(initial.tracker) && contextRecords(initial.tracker)?.length === 1 && contextRecords(initial.tracker)?.[0]?.id !== null
     && contextRecords(initial.tracker)?.[0]?.closed === false && contextRecords(initial.tracker)?.[0]?.closeCalls === 0,
@@ -1508,8 +1608,17 @@ const lifecycleAssertions = {
   reentryRafsExact: activeRafs(reentered.tracker) === activeRafs(changedPreferences.tracker),
   reentryContextsExact: exactReentryContexts(changedPreferences.tracker, reentered.tracker),
   reentryListenersExact: sameRelevantListeners(changedPreferences.tracker, reentered.tracker),
-  hmrEventWindowExact: exactHmrEventWindow(observed.events, hmr, normalizedOrigin),
-  iceHmrMarkerBindingExact: exactIceHmrMarkerBinding(observed.icePhaseMarkers, hmr.marker),
+  hmrEventWindowExact: exactHmrEventWindow(sealedObservations.events, hmr, normalizedOrigin),
+  uiExitHistoryExact: exactUiExitHistory(sealedObservations.events, hmr, normalizedOrigin),
+  fullMotionExitPreparationExact: hmr.exitPreparation?.root?.reducedMotion === 'false'
+    && hmr.exitPreparation?.root?.theme === hmr.after?.root?.theme && hmr.exitPreparation?.root?.language === hmr.after?.root?.language
+    && sameIdentity(hmr.exitPreparation?.tracker?.qaId, hmr.after?.tracker?.qaId)
+    && sameIdentity(hmr.exitPreparation?.tracker?.canvasId, hmr.after?.tracker?.canvasId)
+    && hmr.exitPreparation?.canvasCount === 1 && hmr.exitPreparation?.tracker?.canvases === 1
+    && activeRafs(hmr.exitPreparation?.tracker) === activeRafs(hmr.after?.tracker)
+    && sameContextRecords(hmr.exitPreparation?.tracker, hmr.after?.tracker)
+    && sameRelevantListeners(hmr.exitPreparation?.tracker, hmr.after?.tracker),
+  iceHmrMarkerBindingExact: exactIceHmrMarkerBinding(sealedObservations.icePhaseMarkers, hmr.marker),
   hmrAppTouchExact: exactAppTouch(hmr),
   hmrProofExact: deepEqual(hmr.proof, deriveHmrProof(hmr, normalizedOrigin)),
   hmrDelivered: hmrProof.passed && hmrProof.branch === 'document-reload' && hmrProof.delivery === 'update-fallback-reload'
@@ -1532,15 +1641,12 @@ const lifecycleAssertions = {
 };
 for (const [label, passed] of Object.entries(lifecycleAssertions)) check(passed, `lifecycle assertion: ${label}`);
 
-const runtimeInputAfter = assertRuntimeInputBinding(runtimeInput.evidenceSourceHead);
-if (JSON.stringify(runtimeInputAfter) !== JSON.stringify(runtimeInput)) throw new Error('Runtime input binding changed during browser capture.');
-
 const report = {
   schema: 'tetramorph.t37.material-browser.v2', generatedAt: new Date().toISOString(),
-  origin, pageUrl: page.url(), browser: await browser.version(), runtimeInput, passed: failures.length === 0, failures,
+  origin, pageUrl: sealedPageUrl, browser: sealedBrowserVersion, runtimeInput, passed: failures.length === 0, failures,
   initial, afterFreeze, restarted, changedPreferences, exited, reentered,
   hmr,
-  terminal, observations: observed, lifecycleProof, assertions: lifecycleAssertions,
+  terminal, observations: sealedObservations, lifecycleProof, assertions: lifecycleAssertions,
   humanStatus: HUMAN_STATUS,
 };
 

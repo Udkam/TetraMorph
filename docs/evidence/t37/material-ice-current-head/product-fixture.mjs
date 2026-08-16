@@ -294,6 +294,10 @@ export async function installInstrumentation(page, settings, observed) {
     let historyBindingTail = Promise.resolve();
     /** @type {string|null} */
     let historyBindingError = null;
+    /** @type {{cause: string, transport: 'direct-event'|'view-transition-callback'}|null} */
+    let activeHistoryCause = null;
+    let uiExitClickArmed = false;
+    const uiExitHistoryCause = 'ui-exit-confirm-click';
     const nativeReplaceState = History.prototype.replaceState;
     const nativePushState = History.prototype.pushState;
     /** @param {'replaceState'|'pushState'} method @param {number} callId @param {string} beforeUrl @param {string} afterUrl @param {string|null} urlArgument */
@@ -303,7 +307,9 @@ export async function installInstrumentation(page, settings, observed) {
         historyBindingError = 'History QA binding is unavailable.';
         return;
       }
-      historyBindingTail = historyBindingTail.then(() => binding({ documentEpoch, callId, method, beforeUrl, afterUrl, urlArgument }))
+      const cause = activeHistoryCause?.cause ?? null;
+      const causeTransport = activeHistoryCause?.transport ?? null;
+      historyBindingTail = historyBindingTail.then(() => binding({ documentEpoch, callId, method, beforeUrl, afterUrl, urlArgument, cause, causeTransport }))
         .catch((error) => { historyBindingError = String(error); });
     };
     History.prototype.replaceState = function trackedReplaceState(data, unused, url) {
@@ -318,6 +324,19 @@ export async function installInstrumentation(page, settings, observed) {
       emitHistoryCall('pushState', callId, beforeUrl, window.location.href, url === undefined ? null : String(url));
       return result;
     };
+    const documentPrototype = /** @type {any} */ (Document.prototype);
+    const nativeStartViewTransition = documentPrototype.startViewTransition;
+    if (typeof nativeStartViewTransition === 'function') {
+      documentPrototype.startViewTransition = function trackedStartViewTransition(/** @type {any} */ callback) {
+        const transitionCause = activeHistoryCause;
+        if (typeof callback !== 'function') return nativeStartViewTransition.call(this, callback);
+        return nativeStartViewTransition.call(this, () => {
+          const previousCause = activeHistoryCause;
+          activeHistoryCause = transitionCause === null ? null : { cause: transitionCause.cause, transport: 'view-transition-callback' };
+          try { return callback(); } finally { activeHistoryCause = previousCause; }
+        });
+      };
+    }
     const NativeAudioContext = window.AudioContext ?? browserWindow.webkitAudioContext;
     if (NativeAudioContext) {
       const Wrapped = new Proxy(NativeAudioContext, {
@@ -387,8 +406,28 @@ export async function installInstrumentation(page, settings, observed) {
     /** @type {any} */ (window).__MATERIAL_TRACKER__ = {
       identity: scopedIdentity,
       drainHistory: async () => {
-        await historyBindingTail;
+        while (true) {
+          const tail = historyBindingTail;
+          await tail;
+          if (tail === historyBindingTail) break;
+        }
         if (historyBindingError !== null) throw new Error(historyBindingError);
+      },
+      armUiExitClick: (/** @type {any} */ element) => {
+        if (uiExitClickArmed || !(element instanceof HTMLElement)
+          || !element.matches('.action-sheet__actions > .primary-action')) {
+          throw new Error('UI-exit click causality may only be armed once on the visible primary confirmation.');
+        }
+        uiExitClickArmed = true;
+        element.addEventListener('click', (event) => {
+          if (!event.isTrusted || activeHistoryCause !== null) {
+            historyBindingError = 'UI-exit click causality was not a unique trusted browser event.';
+            return;
+          }
+          const directCause = { cause: uiExitHistoryCause, transport: /** @type {'direct-event'} */ ('direct-event') };
+          activeHistoryCause = directCause;
+          queueMicrotask(() => { if (activeHistoryCause === directCause) activeHistoryCause = null; });
+        }, { capture: true, once: true });
       },
       snapshot: () => {
         /** @type {Record<string, number>} */
