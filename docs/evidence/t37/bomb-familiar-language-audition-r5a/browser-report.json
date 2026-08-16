@@ -1,0 +1,7178 @@
+{
+  "schema": "tetramorph.t37.bomb-r5a-browser-proof.v1",
+  "generatedAt": "2026-08-16T05:15:20.522Z",
+  "url": "http://127.0.0.1:4192/docs/evidence/t37/bomb-familiar-language-audition-r5a/",
+  "playwrightVersion": "1.61.1",
+  "browserVersion": "149.0.7827.55",
+  "passed": true,
+  "failures": [],
+  "warmup": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "cold",
+    "lastCue": null,
+    "playCount": 0,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": null,
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 0,
+      "reviewElapsedMs": 0,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "cold",
+      "ready": false,
+      "primed": false,
+      "contextState": "none",
+      "currentCue": null,
+      "activeSources": 0,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 0,
+      "completedCues": 0,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 0,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": []
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "initial": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "cold",
+    "lastCue": null,
+    "playCount": 0,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": null,
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 0,
+      "reviewElapsedMs": 0,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "cold",
+      "ready": false,
+      "primed": false,
+      "contextState": "none",
+      "currentCue": null,
+      "activeSources": 0,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 0,
+      "completedCues": 0,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 0,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": []
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "pendingA": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "running",
+    "lastCue": "候选 A",
+    "playCount": 1,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "A",
+      "reducedMotion": false,
+      "visualStartedAtMs": 1104.2000000001863,
+      "visualAudioClockSeconds": 0,
+      "scheduledFromSeconds": 0,
+      "audioStartAtSeconds": 0.22,
+      "audioOffsetMs": 220
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 16.59999999999991,
+      "reviewElapsedMs": 16.59999999999991,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": "A",
+      "frameCallbackActive": true,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": {
+        "item": "bomb",
+        "elapsedMs": 16.59999999999991,
+        "durationMs": 620,
+        "phases": [
+          {
+            "id": "warning",
+            "active": true,
+            "complete": false,
+            "progress": 0.1383333333333326,
+            "value": 0.36023882870370194
+          },
+          {
+            "id": "pulse",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 2.220446049250313e-16
+          },
+          {
+            "id": "impact",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          },
+          {
+            "id": "shockwave",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          }
+        ],
+        "particlesEmitted": false,
+        "triggerColumns": [
+          8,
+          9
+        ]
+      }
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "pending",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "A",
+      "activeSources": 1,
+      "pendingSources": 1,
+      "pendingCandidates": [
+        {
+          "cue": "A",
+          "startAt": 0.22
+        }
+      ],
+      "timers": 1,
+      "canceledBeforeStart": 0,
+      "completedCues": 0,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 2,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "switchedB": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "running",
+    "lastCue": "候选 B",
+    "playCount": 2,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "B",
+      "reducedMotion": false,
+      "visualStartedAtMs": 1171.7000000001863,
+      "visualAudioClockSeconds": 0.072,
+      "scheduledFromSeconds": 0.072,
+      "audioStartAtSeconds": 0.292,
+      "audioOffsetMs": 219.99999999999997
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 50,
+      "reviewElapsedMs": 50,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": "B",
+      "frameCallbackActive": true,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": {
+        "item": "bomb",
+        "elapsedMs": 50,
+        "durationMs": 620,
+        "phases": [
+          {
+            "id": "warning",
+            "active": true,
+            "complete": false,
+            "progress": 0.4166666666666667,
+            "value": 0.8015046296296298
+          },
+          {
+            "id": "pulse",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 2.220446049250313e-16
+          },
+          {
+            "id": "impact",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          },
+          {
+            "id": "shockwave",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          }
+        ],
+        "particlesEmitted": false,
+        "triggerColumns": [
+          8,
+          9
+        ]
+      }
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "pending",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "B",
+      "activeSources": 1,
+      "pendingSources": 1,
+      "pendingCandidates": [
+        {
+          "cue": "B",
+          "startAt": 0.292
+        }
+      ],
+      "timers": 1,
+      "canceledBeforeStart": 1,
+      "completedCues": 0,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 4,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "activeB": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "running",
+    "lastCue": "候选 B",
+    "playCount": 2,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "B",
+      "reducedMotion": false,
+      "visualStartedAtMs": 1171.7000000001863,
+      "visualAudioClockSeconds": 0.072,
+      "scheduledFromSeconds": 0.072,
+      "audioStartAtSeconds": 0.292,
+      "audioOffsetMs": 219.99999999999997
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 266.60000000000014,
+      "reviewElapsedMs": 266.60000000000014,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": "B",
+      "frameCallbackActive": true,
+      "canvasCount": 1,
+      "activeParticles": 72,
+      "cleanupComplete": false,
+      "mutationActivation": {
+        "item": "bomb",
+        "elapsedMs": 266.60000000000014,
+        "durationMs": 620,
+        "phases": [
+          {
+            "id": "warning",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          },
+          {
+            "id": "pulse",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          },
+          {
+            "id": "impact",
+            "active": true,
+            "complete": false,
+            "progress": 0.33285714285714385,
+            "value": 0.03687853352769713
+          },
+          {
+            "id": "shockwave",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          }
+        ],
+        "particlesEmitted": true,
+        "triggerColumns": [
+          8,
+          9
+        ]
+      }
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "playing",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "B",
+      "activeSources": 1,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 1,
+      "completedCues": 0,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 4,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "reusableStop": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "ready",
+    "lastCue": "候选 B（已停止）",
+    "playCount": 2,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "B",
+      "reducedMotion": false,
+      "visualStartedAtMs": 1171.7000000001863,
+      "visualAudioClockSeconds": 0.072,
+      "scheduledFromSeconds": 0.072,
+      "audioStartAtSeconds": 0.292,
+      "audioOffsetMs": 219.99999999999997
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 0,
+      "reviewElapsedMs": 0,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "ready",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": null,
+      "activeSources": 0,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 1,
+      "completedCues": 1,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 5,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1580.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 1618.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 1618.4000000003725
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "desktopImpact": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "running",
+    "lastCue": "候选 A",
+    "playCount": 3,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "A",
+      "reducedMotion": false,
+      "visualStartedAtMs": 1682.4000000003725,
+      "visualAudioClockSeconds": 0.5813333333333334,
+      "scheduledFromSeconds": 0.5813333333333334,
+      "audioStartAtSeconds": 0.8013333333333333,
+      "audioOffsetMs": 219.99999999999997
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 220.00999999999996,
+      "reviewElapsedMs": 220.00999999999996,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": "A",
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 72,
+      "cleanupComplete": false,
+      "mutationActivation": {
+        "item": "bomb",
+        "elapsedMs": 220.00999999999996,
+        "durationMs": 620,
+        "phases": [
+          {
+            "id": "warning",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          },
+          {
+            "id": "pulse",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          },
+          {
+            "id": "impact",
+            "active": true,
+            "complete": false,
+            "progress": 0.00007142857142830345,
+            "value": 3.644314868763647e-13
+          },
+          {
+            "id": "shockwave",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          }
+        ],
+        "particlesEmitted": true,
+        "triggerColumns": [
+          8,
+          9
+        ]
+      }
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "pending",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "A",
+      "activeSources": 1,
+      "pendingSources": 1,
+      "pendingCandidates": [
+        {
+          "cue": "A",
+          "startAt": 0.8013333333333333
+        }
+      ],
+      "timers": 1,
+      "canceledBeforeStart": 1,
+      "completedCues": 1,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 7,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1580.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 1618.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 1618.4000000003725
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1684.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1684.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1684.4000000003725
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "naturalCompletion": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "complete",
+    "lastCue": "候选 A",
+    "playCount": 3,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "A",
+      "reducedMotion": false,
+      "visualStartedAtMs": 1682.4000000003725,
+      "visualAudioClockSeconds": 0.5813333333333334,
+      "scheduledFromSeconds": 0.5813333333333334,
+      "audioStartAtSeconds": 0.8013333333333333,
+      "audioOffsetMs": 219.99999999999997
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 620,
+      "reviewElapsedMs": 1470.000000000001,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": true,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "ready",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": null,
+      "activeSources": 0,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 1,
+      "completedCues": 2,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 7,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1580.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 1618.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 1618.4000000003725
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1684.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1684.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1684.4000000003725
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1917.7000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 2080.7999999998137
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "studioComparison": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "running",
+    "lastCue": "候选 C",
+    "playCount": 5,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "C",
+      "reducedMotion": false,
+      "visualStartedAtMs": 3099.2999999998137,
+      "visualAudioClockSeconds": 1.992,
+      "scheduledFromSeconds": 1.992,
+      "audioStartAtSeconds": 2.212,
+      "audioOffsetMs": 220.0000000000002
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 16.59999999999991,
+      "reviewElapsedMs": 16.59999999999991,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": "C",
+      "frameCallbackActive": true,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": {
+        "item": "bomb",
+        "elapsedMs": 16.59999999999991,
+        "durationMs": 620,
+        "phases": [
+          {
+            "id": "warning",
+            "active": true,
+            "complete": false,
+            "progress": 0.1383333333333326,
+            "value": 0.36023882870370194
+          },
+          {
+            "id": "pulse",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 2.220446049250313e-16
+          },
+          {
+            "id": "impact",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          },
+          {
+            "id": "shockwave",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          }
+        ],
+        "particlesEmitted": false,
+        "triggerColumns": [
+          8,
+          9
+        ]
+      }
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "pending",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "C",
+      "activeSources": 1,
+      "pendingSources": 1,
+      "pendingCandidates": [
+        {
+          "cue": "C",
+          "startAt": 2.212
+        }
+      ],
+      "timers": 1,
+      "canceledBeforeStart": 1,
+      "completedCues": 3,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 11,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1580.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 1618.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 1618.4000000003725
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1684.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1684.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1684.4000000003725
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1917.7000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 2080.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 2735.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 2735.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 2736.5
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 2784.2000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "reference-complete",
+          "atMs": 2982.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 3100.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 3100.5
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 3100.5999999996275
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "hardDropReference": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "playing",
+    "lastCue": "参照 · Action A 硬降",
+    "playCount": 6,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "C",
+      "reducedMotion": false,
+      "visualStartedAtMs": 3099.2999999998137,
+      "visualAudioClockSeconds": 1.992,
+      "scheduledFromSeconds": 1.992,
+      "audioStartAtSeconds": 2.212,
+      "audioOffsetMs": 220.0000000000002
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 0,
+      "reviewElapsedMs": 0,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "playing",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "hard-drop",
+      "activeSources": 2,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 2,
+      "completedCues": 3,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 14,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1580.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 1618.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 1618.4000000003725
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1684.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1684.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1684.4000000003725
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1917.7000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 2080.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 2735.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 2735.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 2736.5
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 2784.2000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "reference-complete",
+          "atMs": 2982.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 3100.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 3100.5
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 3100.5999999996275
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 3272.0999999996275
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 3272.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 3452.4000000003725
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 3452.5999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 3453.7000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 3503.4000000003725
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "studioReference": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "playing",
+    "lastCue": "参照 · Studio 完整单行",
+    "playCount": 7,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "C",
+      "reducedMotion": false,
+      "visualStartedAtMs": 3099.2999999998137,
+      "visualAudioClockSeconds": 1.992,
+      "scheduledFromSeconds": 1.992,
+      "audioStartAtSeconds": 2.212,
+      "audioOffsetMs": 220.0000000000002
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 0,
+      "reviewElapsedMs": 0,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "playing",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "studio",
+      "activeSources": 1,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 2,
+      "completedCues": 4,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 16,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1580.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 1618.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 1618.4000000003725
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1684.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1684.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1684.4000000003725
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1917.7000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 2080.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 2735.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 2735.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 2736.5
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 2784.2000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "reference-complete",
+          "atMs": 2982.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 3100.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 3100.5
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 3100.5999999996275
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 3272.0999999996275
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 3272.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 3452.4000000003725
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 3452.5999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 3453.7000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 3503.4000000003725
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "reference-complete",
+          "atMs": 3584.5999999996275
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 3687.9000000003725
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 3688
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 3688.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 3720.2999999998137
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "selectedVerdict": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "ready",
+    "lastCue": "参照 · Studio 完整单行（已停止）",
+    "playCount": 7,
+    "verdict": "B",
+    "reasons": [
+      "not-block-like"
+    ],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "C",
+      "reducedMotion": false,
+      "visualStartedAtMs": 3099.2999999998137,
+      "visualAudioClockSeconds": 1.992,
+      "scheduledFromSeconds": 1.992,
+      "audioStartAtSeconds": 2.212,
+      "audioOffsetMs": 220.0000000000002
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 0,
+      "reviewElapsedMs": 0,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "ready",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": null,
+      "activeSources": 0,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 2,
+      "completedCues": 4,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 17,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 1033.9000000003725
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 1103.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1111.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1111.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1111.7999999998137
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1175
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1175.0999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1175.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1431.5999999996275
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1580.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 1618.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 1618.4000000003725
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1684.2000000001863
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1684.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1684.4000000003725
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1917.7000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 2080.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 2735.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 2735.7000000001863
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 2736.5
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 2784.2000000001863
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "reference-complete",
+          "atMs": 2982.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 3100.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 3100.5
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 3100.5999999996275
+        },
+        {
+          "from": "pending",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 3272.0999999996275
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 3272.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 3452.4000000003725
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 3452.5999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 3453.7000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 3503.4000000003725
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "reference-complete",
+          "atMs": 3584.5999999996275
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "reference-switch",
+          "atMs": 3687.9000000003725
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "reference-switch-complete",
+          "atMs": 3688
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "reference-scheduled",
+          "atMs": 3688.2000000001863
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "reference-start",
+          "atMs": 3720.2999999998137
+        },
+        {
+          "from": "playing",
+          "to": "stopping",
+          "reason": "page-stop",
+          "atMs": 3924.2999999998137
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "page-stop-complete",
+          "atMs": 3924.5
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "mobileInitial": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "cold",
+    "lastCue": null,
+    "playCount": 0,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 250,
+    "lastSchedule": null,
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": false,
+      "elapsedMs": 0,
+      "reviewElapsedMs": 0,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "cold",
+      "ready": false,
+      "primed": false,
+      "contextState": "none",
+      "currentCue": null,
+      "activeSources": 0,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 0,
+      "completedCues": 0,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 0,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": []
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "reducedFrames": [
+    {
+      "atMs": 0,
+      "sha256": "42a46cfc673978b448478653c4ce45e00b865300570312df96d534341da1eb3d",
+      "renderer": {
+        "ready": true,
+        "disposed": false,
+        "reducedMotion": true,
+        "elapsedMs": 0,
+        "reviewElapsedMs": 0,
+        "impactMs": 220,
+        "durationMs": 620,
+        "reviewDurationMs": 1470,
+        "activeCandidate": "C",
+        "frameCallbackActive": false,
+        "canvasCount": 1,
+        "activeParticles": 0,
+        "cleanupComplete": false,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 0,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": true,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 2.220446049250313e-16
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            8,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "atMs": 219,
+      "sha256": "42a46cfc673978b448478653c4ce45e00b865300570312df96d534341da1eb3d",
+      "renderer": {
+        "ready": true,
+        "disposed": false,
+        "reducedMotion": true,
+        "elapsedMs": 218.99999999999997,
+        "reviewElapsedMs": 218.99999999999997,
+        "impactMs": 220,
+        "durationMs": 620,
+        "reviewDurationMs": 1470,
+        "activeCandidate": "C",
+        "frameCallbackActive": false,
+        "canvasCount": 1,
+        "activeParticles": 0,
+        "cleanupComplete": false,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 218.99999999999997,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "pulse",
+              "active": true,
+              "complete": false,
+              "progress": 0.9899999999999998,
+              "value": 1.00016745642
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            8,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "atMs": 220.01,
+      "sha256": "42a46cfc673978b448478653c4ce45e00b865300570312df96d534341da1eb3d",
+      "renderer": {
+        "ready": true,
+        "disposed": false,
+        "reducedMotion": true,
+        "elapsedMs": 220.00999999999996,
+        "reviewElapsedMs": 220.00999999999996,
+        "impactMs": 220,
+        "durationMs": 620,
+        "reviewDurationMs": 1470,
+        "activeCandidate": "C",
+        "frameCallbackActive": false,
+        "canvasCount": 1,
+        "activeParticles": 0,
+        "cleanupComplete": false,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 220.00999999999996,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "impact",
+              "active": true,
+              "complete": false,
+              "progress": 0.00007142857142830345,
+              "value": 3.644314868763647e-13
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            8,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "atMs": 619,
+      "sha256": "42a46cfc673978b448478653c4ce45e00b865300570312df96d534341da1eb3d",
+      "renderer": {
+        "ready": true,
+        "disposed": false,
+        "reducedMotion": true,
+        "elapsedMs": 619,
+        "reviewElapsedMs": 619,
+        "impactMs": 220,
+        "durationMs": 620,
+        "reviewDurationMs": 1470,
+        "activeCandidate": "C",
+        "frameCallbackActive": false,
+        "canvasCount": 1,
+        "activeParticles": 0,
+        "cleanupComplete": false,
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 619,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "impact",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "shockwave",
+              "active": true,
+              "complete": false,
+              "progress": 0.9961538461538462,
+              "value": 0.999999943104233
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            8,
+            9
+          ]
+        }
+      }
+    }
+  ],
+  "reducedImpact": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "running",
+    "lastCue": "候选 C · reduced technical",
+    "playCount": 3,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "C",
+      "reducedMotion": true,
+      "visualStartedAtMs": 1718.699999999255,
+      "visualAudioClockSeconds": 0.8106666666666666,
+      "scheduledFromSeconds": 0.8106666666666666,
+      "audioStartAtSeconds": 1.0306666666666666,
+      "audioOffsetMs": 219.99999999999997
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": true,
+      "elapsedMs": 220.00999999999996,
+      "reviewElapsedMs": 220.00999999999996,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": "C",
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": false,
+      "mutationActivation": {
+        "item": "bomb",
+        "elapsedMs": 220.00999999999996,
+        "durationMs": 620,
+        "phases": [
+          {
+            "id": "warning",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          },
+          {
+            "id": "pulse",
+            "active": false,
+            "complete": true,
+            "progress": 1,
+            "value": 1
+          },
+          {
+            "id": "impact",
+            "active": true,
+            "complete": false,
+            "progress": 0.00007142857142830345,
+            "value": 3.644314868763647e-13
+          },
+          {
+            "id": "shockwave",
+            "active": false,
+            "complete": false,
+            "progress": 0,
+            "value": 0
+          }
+        ],
+        "particlesEmitted": true,
+        "triggerColumns": [
+          8,
+          9
+        ]
+      }
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "pending",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": "C",
+      "activeSources": 1,
+      "pendingSources": 1,
+      "pendingCandidates": [
+        {
+          "cue": "C",
+          "startAt": 1.0306666666666666
+        }
+      ],
+      "timers": 1,
+      "canceledBeforeStart": 0,
+      "completedCues": 1,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 6,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 854.2999999998137
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 922.8999999994412
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 928.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 928.5999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 928.8999999994412
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1158.5
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1326.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1346.7999999998137
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1346.8999999994412
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1347
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1570.8999999994412
+        },
+        {
+          "from": "playing",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1721.0999999996275
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1721.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1721.3999999994412
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "reducedCompletion": {
+    "instanceId": 1,
+    "ready": true,
+    "disposed": false,
+    "disposing": false,
+    "reviewState": "complete",
+    "lastCue": "候选 C · reduced technical",
+    "playCount": 4,
+    "verdict": "reject",
+    "reasons": [],
+    "pendingTimers": 0,
+    "hostWidth": 310,
+    "lastSchedule": {
+      "candidate": "C",
+      "reducedMotion": true,
+      "visualStartedAtMs": 1999,
+      "visualAudioClockSeconds": 1.0906666666666667,
+      "scheduledFromSeconds": 1.0906666666666667,
+      "audioStartAtSeconds": 1.3106666666666666,
+      "audioOffsetMs": 219.99999999999997
+    },
+    "renderer": {
+      "ready": true,
+      "disposed": false,
+      "reducedMotion": true,
+      "elapsedMs": 620,
+      "reviewElapsedMs": 1470.0000000000016,
+      "impactMs": 220,
+      "durationMs": 620,
+      "reviewDurationMs": 1470,
+      "activeCandidate": null,
+      "frameCallbackActive": false,
+      "canvasCount": 1,
+      "activeParticles": 0,
+      "cleanupComplete": true,
+      "mutationActivation": null
+    },
+    "fixture": {
+      "clearRows": [
+        39
+      ],
+      "previewOutcome": "blast",
+      "bombOutcome": "blast",
+      "blastRows": [
+        38,
+        39
+      ],
+      "participatingBombCount": 1,
+      "triggerCells": [
+        {
+          "x": 8,
+          "y": 38
+        },
+        {
+          "x": 9,
+          "y": 38
+        },
+        {
+          "x": 8,
+          "y": 39
+        },
+        {
+          "x": 9,
+          "y": 39
+        }
+      ],
+      "hasChainOriginCarrierId": false,
+      "hasChainOriginCells": false,
+      "hasChainTriggerRows": false,
+      "boardWidth": 10,
+      "boardHeight": 40,
+      "visibleStartRow": 20
+    },
+    "audio": {
+      "phase": "ready",
+      "ready": true,
+      "primed": true,
+      "contextState": "running",
+      "currentCue": null,
+      "activeSources": 0,
+      "pendingSources": 0,
+      "pendingCandidates": [],
+      "timers": 0,
+      "canceledBeforeStart": 0,
+      "completedCues": 2,
+      "latePrimeIgnored": 0,
+      "terminalEpoch": 0,
+      "playbackEpoch": 8,
+      "disposedReason": null,
+      "closed": false,
+      "error": null,
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "priming",
+          "reason": "prime-start",
+          "atMs": 854.2999999998137
+        },
+        {
+          "from": "priming",
+          "to": "ready",
+          "reason": "prime-complete",
+          "atMs": 922.8999999994412
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 928.5
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 928.5999999996275
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 928.8999999994412
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1158.5
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 1326.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1346.7999999998137
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1346.8999999994412
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1347
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1570.8999999994412
+        },
+        {
+          "from": "playing",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 1721.0999999996275
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 1721.2999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 1721.3999999994412
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 1946.3999999994412
+        },
+        {
+          "from": "playing",
+          "to": "stopping",
+          "reason": "candidate-switch",
+          "atMs": 2000.699999999255
+        },
+        {
+          "from": "stopping",
+          "to": "ready",
+          "reason": "candidate-switch-complete",
+          "atMs": 2000.7999999998137
+        },
+        {
+          "from": "ready",
+          "to": "pending",
+          "reason": "candidate-scheduled",
+          "atMs": 2000.8999999994412
+        },
+        {
+          "from": "pending",
+          "to": "playing",
+          "reason": "candidate-impact",
+          "atMs": 2230.899999999441
+        },
+        {
+          "from": "playing",
+          "to": "ready",
+          "reason": "candidate-complete",
+          "atMs": 2403
+        }
+      ]
+    },
+    "canvasCount": 1,
+    "domCellCount": 0,
+    "terminalAuditCount": 0,
+    "error": null
+  },
+  "reducedStatic": true,
+  "metrics": {
+    "candidates": {
+      "A": {
+        "id": "A",
+        "stemSha256": "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254",
+        "stemFrames": 8640,
+        "leftRightIdentical": true,
+        "firstNonZeroFrame": 290,
+        "lastNonZeroFrame": 4223,
+        "activityMs": 81.9375,
+        "lastNonZeroMs": 87.97916666666667,
+        "peak": 0.16862548887729645,
+        "peakFrame": 696,
+        "peakTimeMs": 14.5,
+        "attackMs": 4.208333333333333,
+        "energy": 8.281425168689367,
+        "rms": 0.03095962343784435,
+        "maxRms10Ms": 0.09923766640747847,
+        "maxRms50Ms": 0.058740910171763715,
+        "energyEnd99Ms": 36.041666666666664,
+        "below120Percent": 1.8620271440805414,
+        "atOrAbove2000Percent": 0.0008532171044772598
+      },
+      "B": {
+        "id": "B",
+        "stemSha256": "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc",
+        "stemFrames": 8640,
+        "leftRightIdentical": true,
+        "firstNonZeroFrame": 291,
+        "lastNonZeroFrame": 6465,
+        "activityMs": 128.625,
+        "lastNonZeroMs": 134.6875,
+        "peak": 0.1650361567735672,
+        "peakFrame": 1088,
+        "peakTimeMs": 22.666666666666668,
+        "attackMs": 12.020833333333334,
+        "energy": 6.804602535359356,
+        "rms": 0.02806367292228183,
+        "maxRms10Ms": 0.07645769072769802,
+        "maxRms50Ms": 0.0435154810054972,
+        "energyEnd99Ms": 101.5625,
+        "below120Percent": 0.004852767312326916,
+        "atOrAbove2000Percent": 0.21900787999851687
+      },
+      "C": {
+        "id": "C",
+        "stemSha256": "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6",
+        "stemFrames": 8640,
+        "leftRightIdentical": true,
+        "firstNonZeroFrame": 291,
+        "lastNonZeroFrame": 3430,
+        "activityMs": 65.39583333333333,
+        "lastNonZeroMs": 71.45833333333333,
+        "peak": 0.16863062977790833,
+        "peakFrame": 642,
+        "peakTimeMs": 13.375,
+        "attackMs": 5.9375,
+        "energy": 6.2688570526876335,
+        "rms": 0.026936261041129735,
+        "maxRms10Ms": 0.08891446535844169,
+        "maxRms50Ms": 0.05109918513712096,
+        "energyEnd99Ms": 43.145833333333336,
+        "below120Percent": 0.00009612034474768864,
+        "atOrAbove2000Percent": 0.0011548243601930412
+      }
+    },
+    "references": {
+      "hardDrop": {
+        "peak": 0.1721820831298828,
+        "peakFrame": 696,
+        "peakTimeMs": 14.5,
+        "attackMs": 4.208333333333333,
+        "energy": 5.9194233516420365,
+        "rms": 0.026174767305118255,
+        "maxRms10Ms": 0.10294098511235064,
+        "maxRms50Ms": 0.049662208502910636,
+        "energyEnd99Ms": 33,
+        "below120Percent": 0.7313302080996068,
+        "atOrAbove2000Percent": 0.0004402076684850378,
+        "leftRightIdentical": true
+      },
+      "studioOneLine": {
+        "peak": 0.33915090560913086,
+        "peakFrame": 557,
+        "peakTimeMs": 11.604166666666666,
+        "attackMs": 4.020833333333333,
+        "energy": 28.56565644931765,
+        "rms": 0.05749965423539121,
+        "maxRms10Ms": 0.1664618230050343,
+        "maxRms50Ms": 0.08457650897751288,
+        "energyEnd99Ms": 90.60416666666667,
+        "below120Percent": 0.0009794210826801935,
+        "atOrAbove2000Percent": 0.22226762115662163,
+        "leftRightIdentical": true
+      }
+    },
+    "peakSpreadDb": 0.18714720735390783,
+    "energyCeiling": 12.085911267610427,
+    "failures": [],
+    "graph": {
+      "actionMaster": 1.85,
+      "actionCompressor": {
+        "threshold": -4,
+        "knee": 6,
+        "ratio": 3,
+        "attack": 0.003,
+        "release": 0.12
+      },
+      "studioCompressor": {
+        "threshold": -10,
+        "knee": 10,
+        "ratio": 4,
+        "attack": 0.003,
+        "release": 0.12
+      },
+      "mutationBus": 0.96,
+      "candidateEffects": 1,
+      "candidateMaster": 1.85,
+      "candidateTrim": {
+        "A": 0.9793104026564039,
+        "B": 0.4452,
+        "C": 0.8625147192924494
+      },
+      "enabledGate": 1,
+      "outputVolume": 1,
+      "output": 0.78
+    }
+  },
+  "lifecycle": [
+    {
+      "method": "dispose",
+      "entryState": "priming",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "priming",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "priming",
+          "ready": false,
+          "primed": false,
+          "contextState": "running",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 1052.7999999998137
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 1,
+          "terminalEpoch": 1,
+          "playbackEpoch": 1,
+          "disposedReason": "explicit-test",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 1052.7999999998137
+            },
+            {
+              "from": "priming",
+              "to": "stopping",
+              "reason": "explicit-test-terminal",
+              "atMs": 1179
+            },
+            {
+              "from": "stopping",
+              "to": "priming",
+              "reason": "explicit-test-terminal-complete",
+              "atMs": 1179.0999999996275
+            },
+            {
+              "from": "priming",
+              "to": "disposed",
+              "reason": "explicit-test-complete",
+              "atMs": 1179.5
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "dispose",
+      "entryState": "pending",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "running",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 959.5999999996275,
+          "visualAudioClockSeconds": 0.010666666666666666,
+          "scheduledFromSeconds": 0.010666666666666666,
+          "audioStartAtSeconds": 0.23066666666666666,
+          "audioOffsetMs": 220
+        },
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 99.90000000000009,
+          "reviewElapsedMs": 99.90000000000009,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": "A",
+          "frameCallbackActive": true,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": {
+            "item": "bomb",
+            "elapsedMs": 99.90000000000009,
+            "durationMs": 620,
+            "phases": [
+              {
+                "id": "warning",
+                "active": true,
+                "complete": false,
+                "progress": 0.8325000000000008,
+                "value": 0.9953005781250001
+              },
+              {
+                "id": "pulse",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 2.220446049250313e-16
+              },
+              {
+                "id": "impact",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              },
+              {
+                "id": "shockwave",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              }
+            ],
+            "particlesEmitted": false,
+            "triggerColumns": [
+              8,
+              9
+            ]
+          }
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "pending",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": "A",
+          "activeSources": 1,
+          "pendingSources": 1,
+          "pendingCandidates": [
+            {
+              "cue": "A",
+              "startAt": 0.23066666666666666
+            }
+          ],
+          "timers": 1,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 2,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 880.8999999994412
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 959
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 965
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 965.0999999996275
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 965.2999999998137
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 959.5999999996275,
+          "visualAudioClockSeconds": 0.010666666666666666,
+          "scheduledFromSeconds": 0.010666666666666666,
+          "audioStartAtSeconds": 0.23066666666666666,
+          "audioOffsetMs": 220
+        },
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 133.29999999999995,
+          "reviewElapsedMs": 133.29999999999995,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 1,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 3,
+          "disposedReason": "explicit-test",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 880.8999999994412
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 959
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 965
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 965.0999999996275
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 965.2999999998137
+            },
+            {
+              "from": "pending",
+              "to": "stopping",
+              "reason": "explicit-test-terminal",
+              "atMs": 1097.7999999998137
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "explicit-test-terminal-complete",
+              "atMs": 1097.8999999994412
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "explicit-test-complete",
+              "atMs": 1098.0999999996275
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "dispose",
+      "entryState": "playing",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "running",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 920.2000000001863,
+          "visualAudioClockSeconds": 0.032,
+          "scheduledFromSeconds": 0.032,
+          "audioStartAtSeconds": 0.252,
+          "audioOffsetMs": 220
+        },
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 283.2999999999999,
+          "reviewElapsedMs": 283.2999999999999,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": "A",
+          "frameCallbackActive": true,
+          "canvasCount": 1,
+          "activeParticles": 72,
+          "cleanupComplete": false,
+          "mutationActivation": {
+            "item": "bomb",
+            "elapsedMs": 283.2999999999999,
+            "durationMs": 620,
+            "phases": [
+              {
+                "id": "warning",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "pulse",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "impact",
+                "active": true,
+                "complete": false,
+                "progress": 0.4521428571428564,
+                "value": 0.09243299453352724
+              },
+              {
+                "id": "shockwave",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              }
+            ],
+            "particlesEmitted": true,
+            "triggerColumns": [
+              8,
+              9
+            ]
+          }
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "playing",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": "A",
+          "activeSources": 1,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 2,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 839.2000000001863
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 919.8999999994412
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 925.7999999998137
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 925.8999999994412
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 926.2000000001863
+            },
+            {
+              "from": "pending",
+              "to": "playing",
+              "reason": "candidate-impact",
+              "atMs": 1175.5
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 920.2000000001863,
+          "visualAudioClockSeconds": 0.032,
+          "scheduledFromSeconds": 0.032,
+          "audioStartAtSeconds": 0.252,
+          "audioOffsetMs": 220
+        },
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 299.8999999999998,
+          "reviewElapsedMs": 299.8999999999998,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 3,
+          "disposedReason": "explicit-test",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 839.2000000001863
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 919.8999999994412
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 925.7999999998137
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 925.8999999994412
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 926.2000000001863
+            },
+            {
+              "from": "pending",
+              "to": "playing",
+              "reason": "candidate-impact",
+              "atMs": 1175.5
+            },
+            {
+              "from": "playing",
+              "to": "stopping",
+              "reason": "explicit-test-terminal",
+              "atMs": 1228.7000000001863
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "explicit-test-terminal-complete",
+              "atMs": 1228.7999999998137
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "explicit-test-complete",
+              "atMs": 1229.2000000001863
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "dispose",
+      "entryState": "idle",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "ready",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "ready",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 837.9000000003725
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 919.2999999998137
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 1,
+          "disposedReason": "explicit-test",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 837.9000000003725
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 919.2999999998137
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "explicit-test-terminal",
+              "atMs": 996.4000000003725
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "explicit-test-terminal-complete",
+              "atMs": 996.5
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "explicit-test-complete",
+              "atMs": 996.7999999998137
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "pagehide",
+      "entryState": "priming",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "priming",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "priming",
+          "ready": false,
+          "primed": false,
+          "contextState": "running",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 990.9000000003725
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 1,
+          "terminalEpoch": 1,
+          "playbackEpoch": 1,
+          "disposedReason": "pagehide",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 990.9000000003725
+            },
+            {
+              "from": "priming",
+              "to": "stopping",
+              "reason": "pagehide-terminal",
+              "atMs": 1110.5
+            },
+            {
+              "from": "stopping",
+              "to": "priming",
+              "reason": "pagehide-terminal-complete",
+              "atMs": 1110.5999999996275
+            },
+            {
+              "from": "priming",
+              "to": "disposed",
+              "reason": "pagehide-complete",
+              "atMs": 1111
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "pagehide",
+      "entryState": "pending",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "running",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 831.7999999998137,
+          "visualAudioClockSeconds": 0.06133333333333333,
+          "scheduledFromSeconds": 0.06133333333333333,
+          "audioStartAtSeconds": 0.2813333333333333,
+          "audioOffsetMs": 220
+        },
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 66.59999999999991,
+          "reviewElapsedMs": 66.59999999999991,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": "A",
+          "frameCallbackActive": true,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": {
+            "item": "bomb",
+            "elapsedMs": 66.59999999999991,
+            "durationMs": 620,
+            "phases": [
+              {
+                "id": "warning",
+                "active": true,
+                "complete": false,
+                "progress": 0.5549999999999993,
+                "value": 0.9118788749999995
+              },
+              {
+                "id": "pulse",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 2.220446049250313e-16
+              },
+              {
+                "id": "impact",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              },
+              {
+                "id": "shockwave",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              }
+            ],
+            "particlesEmitted": false,
+            "triggerColumns": [
+              8,
+              9
+            ]
+          }
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "pending",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": "A",
+          "activeSources": 1,
+          "pendingSources": 1,
+          "pendingCandidates": [
+            {
+              "cue": "A",
+              "startAt": 0.2813333333333333
+            }
+          ],
+          "timers": 1,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 2,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 762
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 831.5999999996275
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 835.7000000001863
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 835.9000000003725
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 836
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 831.7999999998137,
+          "visualAudioClockSeconds": 0.06133333333333333,
+          "scheduledFromSeconds": 0.06133333333333333,
+          "audioStartAtSeconds": 0.2813333333333333,
+          "audioOffsetMs": 220
+        },
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 83.29999999999995,
+          "reviewElapsedMs": 83.29999999999995,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 1,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 3,
+          "disposedReason": "pagehide",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 762
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 831.5999999996275
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 835.7000000001863
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 835.9000000003725
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 836
+            },
+            {
+              "from": "pending",
+              "to": "stopping",
+              "reason": "pagehide-terminal",
+              "atMs": 933.4000000003725
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "pagehide-terminal-complete",
+              "atMs": 933.5
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "pagehide-complete",
+              "atMs": 933.7000000001863
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "pagehide",
+      "entryState": "playing",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "running",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 821,
+          "visualAudioClockSeconds": 0.072,
+          "scheduledFromSeconds": 0.072,
+          "audioStartAtSeconds": 0.292,
+          "audioOffsetMs": 219.99999999999997
+        },
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 266.7,
+          "reviewElapsedMs": 266.7,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": "A",
+          "frameCallbackActive": true,
+          "canvasCount": 1,
+          "activeParticles": 72,
+          "cleanupComplete": false,
+          "mutationActivation": {
+            "item": "bomb",
+            "elapsedMs": 266.7,
+            "durationMs": 620,
+            "phases": [
+              {
+                "id": "warning",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "pulse",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "impact",
+                "active": true,
+                "complete": false,
+                "progress": 0.33357142857142846,
+                "value": 0.03711645881924194
+              },
+              {
+                "id": "shockwave",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              }
+            ],
+            "particlesEmitted": true,
+            "triggerColumns": [
+              8,
+              9
+            ]
+          }
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "playing",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": "A",
+          "activeSources": 1,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 2,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 747.8999999994412
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 820.7000000001863
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 825
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 825
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 825.2000000001863
+            },
+            {
+              "from": "pending",
+              "to": "playing",
+              "reason": "candidate-impact",
+              "atMs": 1078.2000000001863
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 821,
+          "visualAudioClockSeconds": 0.072,
+          "scheduledFromSeconds": 0.072,
+          "audioStartAtSeconds": 0.292,
+          "audioOffsetMs": 219.99999999999997
+        },
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 299.8999999999998,
+          "reviewElapsedMs": 299.8999999999998,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 3,
+          "disposedReason": "pagehide",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 747.8999999994412
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 820.7000000001863
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 825
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 825
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 825.2000000001863
+            },
+            {
+              "from": "pending",
+              "to": "playing",
+              "reason": "candidate-impact",
+              "atMs": 1078.2000000001863
+            },
+            {
+              "from": "playing",
+              "to": "stopping",
+              "reason": "pagehide-terminal",
+              "atMs": 1122.7000000001863
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "pagehide-terminal-complete",
+              "atMs": 1122.7000000001863
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "pagehide-complete",
+              "atMs": 1123.0999999996275
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "pagehide",
+      "entryState": "idle",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "ready",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "ready",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 768.5
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 837.2999999998137
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 0,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 1,
+          "disposedReason": "pagehide",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 768.5
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 837.2999999998137
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "pagehide-terminal",
+              "atMs": 908.5
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "pagehide-terminal-complete",
+              "atMs": 908.5999999996275
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "pagehide-complete",
+              "atMs": 908.8999999994412
+            }
+          ]
+        },
+        "canvasCount": 0,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": null
+    },
+    {
+      "method": "hmr",
+      "entryState": "priming",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "priming",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "priming",
+          "ready": false,
+          "primed": false,
+          "contextState": "running",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 957.9000000003725
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 1,
+          "terminalEpoch": 1,
+          "playbackEpoch": 1,
+          "disposedReason": "hmr-replace",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 957.9000000003725
+            },
+            {
+              "from": "priming",
+              "to": "stopping",
+              "reason": "hmr-replace-terminal",
+              "atMs": 1190.4000000003725
+            },
+            {
+              "from": "stopping",
+              "to": "priming",
+              "reason": "hmr-replace-terminal-complete",
+              "atMs": 1190.4000000003725
+            },
+            {
+              "from": "priming",
+              "to": "disposed",
+              "reason": "hmr-replace-complete",
+              "atMs": 1190.7999999998137
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": {
+        "instanceId": 2,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "disposed",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "cold",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": []
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      }
+    },
+    {
+      "method": "hmr",
+      "entryState": "pending",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "running",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 813.5,
+          "visualAudioClockSeconds": 0.072,
+          "scheduledFromSeconds": 0.072,
+          "audioStartAtSeconds": 0.292,
+          "audioOffsetMs": 219.99999999999997
+        },
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 83.30000000000007,
+          "reviewElapsedMs": 83.30000000000007,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": "A",
+          "frameCallbackActive": true,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": {
+            "item": "bomb",
+            "elapsedMs": 83.30000000000007,
+            "durationMs": 620,
+            "phases": [
+              {
+                "id": "warning",
+                "active": true,
+                "complete": false,
+                "progress": 0.6941666666666673,
+                "value": 0.9713941765046298
+              },
+              {
+                "id": "pulse",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 2.220446049250313e-16
+              },
+              {
+                "id": "impact",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              },
+              {
+                "id": "shockwave",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              }
+            ],
+            "particlesEmitted": false,
+            "triggerColumns": [
+              8,
+              9
+            ]
+          }
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "pending",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": "A",
+          "activeSources": 1,
+          "pendingSources": 1,
+          "pendingCandidates": [
+            {
+              "cue": "A",
+              "startAt": 0.292
+            }
+          ],
+          "timers": 1,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 2,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 741.5999999996275
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 813.2999999998137
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 817.9000000003725
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 818.0999999996275
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 818.2000000001863
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "cold",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 813.5,
+          "visualAudioClockSeconds": 0.072,
+          "scheduledFromSeconds": 0.072,
+          "audioStartAtSeconds": 0.292,
+          "audioOffsetMs": 219.99999999999997
+        },
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 233.30000000000007,
+          "reviewElapsedMs": 233.30000000000007,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 3,
+          "disposedReason": "hmr-replace",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 741.5999999996275
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 813.2999999998137
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 817.9000000003725
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 818.0999999996275
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 818.2000000001863
+            },
+            {
+              "from": "pending",
+              "to": "stopping",
+              "reason": "hmr-replace-terminal",
+              "atMs": 1054.7000000001863
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "hmr-replace-terminal-complete",
+              "atMs": 1054.7000000001863
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "hmr-replace-complete",
+              "atMs": 1054.9000000003725
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": {
+        "instanceId": 2,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "cold",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "cold",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": []
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      }
+    },
+    {
+      "method": "hmr",
+      "entryState": "playing",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "running",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 866.5999999996275,
+          "visualAudioClockSeconds": 0.072,
+          "scheduledFromSeconds": 0.072,
+          "audioStartAtSeconds": 0.292,
+          "audioOffsetMs": 219.99999999999997
+        },
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 250,
+          "reviewElapsedMs": 250,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": "A",
+          "frameCallbackActive": true,
+          "canvasCount": 1,
+          "activeParticles": 72,
+          "cleanupComplete": false,
+          "mutationActivation": {
+            "item": "bomb",
+            "elapsedMs": 250,
+            "durationMs": 620,
+            "phases": [
+              {
+                "id": "warning",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "pulse",
+                "active": false,
+                "complete": true,
+                "progress": 1,
+                "value": 1
+              },
+              {
+                "id": "impact",
+                "active": true,
+                "complete": false,
+                "progress": 0.21428571428571427,
+                "value": 0.009839650145772594
+              },
+              {
+                "id": "shockwave",
+                "active": false,
+                "complete": false,
+                "progress": 0,
+                "value": 0
+              }
+            ],
+            "particlesEmitted": true,
+            "triggerColumns": [
+              8,
+              9
+            ]
+          }
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "playing",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": "A",
+          "activeSources": 1,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 2,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 797.5
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 866.2000000001863
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 871.3999999994412
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 871.3999999994412
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 871.5999999996275
+            },
+            {
+              "from": "pending",
+              "to": "playing",
+              "reason": "candidate-impact",
+              "atMs": 1114
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "cold",
+        "lastCue": "候选 A",
+        "playCount": 1,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": {
+          "candidate": "A",
+          "reducedMotion": false,
+          "visualStartedAtMs": 866.5999999996275,
+          "visualAudioClockSeconds": 0.072,
+          "scheduledFromSeconds": 0.072,
+          "audioStartAtSeconds": 0.292,
+          "audioOffsetMs": 219.99999999999997
+        },
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 416.7000000000001,
+          "reviewElapsedMs": 416.7000000000001,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 1,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 3,
+          "disposedReason": "hmr-replace",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 797.5
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 866.2000000001863
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "candidate-switch",
+              "atMs": 871.3999999994412
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "candidate-switch-complete",
+              "atMs": 871.3999999994412
+            },
+            {
+              "from": "ready",
+              "to": "pending",
+              "reason": "candidate-scheduled",
+              "atMs": 871.5999999996275
+            },
+            {
+              "from": "pending",
+              "to": "playing",
+              "reason": "candidate-impact",
+              "atMs": 1114
+            },
+            {
+              "from": "playing",
+              "to": "ready",
+              "reason": "candidate-complete",
+              "atMs": 1270.2000000001863
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "hmr-replace-terminal",
+              "atMs": 1297.0999999996275
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "hmr-replace-terminal-complete",
+              "atMs": 1297.0999999996275
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "hmr-replace-complete",
+              "atMs": 1297.2999999998137
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": {
+        "instanceId": 2,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "cold",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "cold",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": []
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      }
+    },
+    {
+      "method": "hmr",
+      "entryState": "idle",
+      "before": {
+        "instanceId": 1,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "ready",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "ready",
+          "ready": true,
+          "primed": true,
+          "contextState": "running",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 825.3999999994412
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 898.8999999994412
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 0,
+        "error": null
+      },
+      "terminal": {
+        "instanceId": 1,
+        "ready": false,
+        "disposed": true,
+        "disposing": false,
+        "reviewState": "cold",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": false,
+          "disposed": true,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "disposed",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 1,
+          "playbackEpoch": 1,
+          "disposedReason": "hmr-replace",
+          "closed": true,
+          "error": null,
+          "transitions": [
+            {
+              "from": "cold",
+              "to": "priming",
+              "reason": "prime-start",
+              "atMs": 825.3999999994412
+            },
+            {
+              "from": "priming",
+              "to": "ready",
+              "reason": "prime-complete",
+              "atMs": 898.8999999994412
+            },
+            {
+              "from": "ready",
+              "to": "stopping",
+              "reason": "hmr-replace-terminal",
+              "atMs": 1077.3999999994412
+            },
+            {
+              "from": "stopping",
+              "to": "ready",
+              "reason": "hmr-replace-terminal-complete",
+              "atMs": 1077.3999999994412
+            },
+            {
+              "from": "ready",
+              "to": "disposed",
+              "reason": "hmr-replace-complete",
+              "atMs": 1077.7999999998137
+            }
+          ]
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      },
+      "fresh": {
+        "instanceId": 2,
+        "ready": true,
+        "disposed": false,
+        "disposing": false,
+        "reviewState": "cold",
+        "lastCue": null,
+        "playCount": 0,
+        "verdict": "reject",
+        "reasons": [],
+        "pendingTimers": 0,
+        "hostWidth": 310,
+        "lastSchedule": null,
+        "renderer": {
+          "ready": true,
+          "disposed": false,
+          "reducedMotion": false,
+          "elapsedMs": 0,
+          "reviewElapsedMs": 0,
+          "impactMs": 220,
+          "durationMs": 620,
+          "reviewDurationMs": 1470,
+          "activeCandidate": null,
+          "frameCallbackActive": false,
+          "canvasCount": 1,
+          "activeParticles": 0,
+          "cleanupComplete": false,
+          "mutationActivation": null
+        },
+        "fixture": {
+          "clearRows": [
+            39
+          ],
+          "previewOutcome": "blast",
+          "bombOutcome": "blast",
+          "blastRows": [
+            38,
+            39
+          ],
+          "participatingBombCount": 1,
+          "triggerCells": [
+            {
+              "x": 8,
+              "y": 38
+            },
+            {
+              "x": 9,
+              "y": 38
+            },
+            {
+              "x": 8,
+              "y": 39
+            },
+            {
+              "x": 9,
+              "y": 39
+            }
+          ],
+          "hasChainOriginCarrierId": false,
+          "hasChainOriginCells": false,
+          "hasChainTriggerRows": false,
+          "boardWidth": 10,
+          "boardHeight": 40,
+          "visibleStartRow": 20
+        },
+        "audio": {
+          "phase": "cold",
+          "ready": false,
+          "primed": false,
+          "contextState": "none",
+          "currentCue": null,
+          "activeSources": 0,
+          "pendingSources": 0,
+          "pendingCandidates": [],
+          "timers": 0,
+          "canceledBeforeStart": 0,
+          "completedCues": 0,
+          "latePrimeIgnored": 0,
+          "terminalEpoch": 0,
+          "playbackEpoch": 0,
+          "disposedReason": null,
+          "closed": false,
+          "error": null,
+          "transitions": []
+        },
+        "canvasCount": 1,
+        "domCellCount": 0,
+        "terminalAuditCount": 1,
+        "error": null
+      }
+    }
+  ],
+  "layout": {
+    "desktop": {
+      "overflow": false,
+      "canvasCount": 1,
+      "comparisonCount": 6,
+      "minimumControlHeight": 44,
+      "visibleText": "T37 · BOMB R5A · NORMAL ONLY\n\n让 Bomb 说游戏自己的语言\n\n这轮只听正常 Bomb，并沿用已经熟悉的游戏反馈语言。请在完整动画 1× 下判断声音是否有清楚的方块崩落感，又不会像真实爆炸一样吓人。\n\n页面只帮助对比，不替你下结论\n自动检查约束响度、频段、220 ms 对齐、字节一致与生命周期清理。\n\nPRODUCTION RENDERER\n\n正常 Bomb · 完整动画 1×\n生产 Renderer 就绪\n220 ms\n请选择 A、B 或 C 开始\n0 ms\n\nFROZEN REFERENCES\n\n先听完整参照\n\n参照使用产品冻结的完整图，不是候选中的局部片段。\n\nACTION A\n硬降（完整）\nSTUDIO\n单行消除（完整）\n\nNEUTRAL CHOICES\n\n逐个听正常 Bomb\nA\n正常 Bomb\n动画 + A\n硬降 → A\nStudio → A\nB\n正常 Bomb\n动画 + B\n硬降 → B\nStudio → B\nC\n正常 Bomb\n动画 + C\n硬降 → C\nStudio → C\n停止声音与回放\n\nHUMAN INPUT\n\n记录本轮正常 Bomb 感受\n\n默认保持“全部不通过”。这里的记录只供后续汇总，不会自动改动产品或打开连锁音效。\n\n选择一个结果\n全部不通过\nA\nB\nC\n可选：听感标签（不绑定设计结论）\n太响\n太闷\n太尖\n太长\n太像音符\n不像方块\n时机不对\n记录本页选择\n尚未记录；当前默认全部不通过。\nR5A 仅含正常 Bomb；没有连锁候选，也没有改动产品音频。\nInstance 1 · Canvas 1 · Audio cold · Sources 0 · Timers 0 · Frame 0"
+    },
+    "mobile": {
+      "overflow": false,
+      "canvasCount": 1,
+      "comparisonCount": 6,
+      "minimumControlHeight": 44,
+      "visibleText": "T37 · BOMB R5A · NORMAL ONLY\n\n让 Bomb 说\n游戏自己的语言\n\n这轮只听正常 Bomb，并沿用已经熟悉的游戏反馈语言。请在完整动画 1× 下判断声音是否有清楚的方块崩落感，又不会像真实爆炸一样吓人。\n\n页面只帮助对比，不替你下结论\n自动检查约束响度、频段、220 ms 对齐、字节一致与生命周期清理。\n\nPRODUCTION RENDERER\n\n正常 Bomb · 完整动画 1×\n生产 Renderer 就绪\n220 ms\n请选择 A、B 或 C 开始\n0 ms\n\nFROZEN REFERENCES\n\n先听完整参照\n\n参照使用产品冻结的完整图，不是候选中的局部片段。\n\nACTION A\n硬降（完整）\nSTUDIO\n单行消除（完整）\n\nNEUTRAL CHOICES\n\n逐个听正常 Bomb\nA\n正常 Bomb\n动画 + A\n硬降 → A\nStudio → A\nB\n正常 Bomb\n动画 + B\n硬降 → B\nStudio → B\nC\n正常 Bomb\n动画 + C\n硬降 → C\nStudio → C\n停止声音与回放\n\nHUMAN INPUT\n\n记录本轮正常 Bomb 感受\n\n默认保持“全部不通过”。这里的记录只供后续汇总，不会自动改动产品或打开连锁音效。\n\n选择一个结果\n全部不通过\nA\nB\nC\n可选：听感标签（不绑定设计结论）\n太响\n太闷\n太尖\n太长\n太像音符\n不像方块\n时机不对\n记录本页选择\n尚未记录；当前默认全部不通过。\nR5A 仅含正常 Bomb；没有连锁候选，也没有改动产品音频。\nInstance 1 · Canvas 1 · Audio cold · Sources 0 · Timers 0 · Frame 0"
+    }
+  },
+  "screenshots": {
+    "desktop": {
+      "file": "r5a-desktop-impact.png"
+    },
+    "mobile": {
+      "file": "r5a-mobile.png"
+    },
+    "reduced": {
+      "file": "r5a-reduced-technical.png"
+    }
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "requestErrors": []
+}

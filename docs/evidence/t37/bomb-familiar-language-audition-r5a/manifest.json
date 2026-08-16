@@ -1,0 +1,622 @@
+{
+  "schema": "tetramorph.t37.bomb-r5a-familiar-language-audition.v1",
+  "generatedAt": "2026-08-16T05:16:25.284Z",
+  "provenance": {
+    "reviewRangeBaseSha": "b11b7b552f1504094a94ccc5e21410a694bf2881",
+    "contractAcceptedSha": "8f29bb82f40fac00764d1be822875368f426145c",
+    "authorizationSha": "265b697a1707b89a128fdfe9f15b22076b02d587",
+    "currentProductSourceSha": "b11b7b552f1504094a94ccc5e21410a694bf2881",
+    "evidenceSourceHead": "1646b1cbe5e809262ef3f06af98c8a775a94be6d",
+    "reviewRangeBaseTree": "53a6bf5399b630af7635dc32bee224c4fbe2c19b",
+    "contractAcceptedTree": "9a7c83bd926c979575f5240ae9c1534ef8aefaf3",
+    "authorizationTree": "2b9b088f7702db8df035c5c48f4011a665113204",
+    "currentProductSourceTree": "53a6bf5399b630af7635dc32bee224c4fbe2c19b",
+    "evidenceSourceTree": "7ef698b1dca985513a1a459c566f5fa59a367b69",
+    "writerBoundary": "docs/evidence/t37/bomb-familiar-language-audition-r5a/**",
+    "productAudioChanged": false,
+    "normalOnly": true
+  },
+  "pathContracts": {
+    "baseToContract": [
+      "docs/CURRENT_TASK.md",
+      "docs/DESIGN.md",
+      "docs/agent-runs/t37-unified-sensory-curriculum/STATE.md",
+      "docs/phases/t37-unified-material-curriculum.md"
+    ],
+    "contractToAuthorization": [
+      "docs/CURRENT_TASK.md",
+      "docs/agent-runs/t37-unified-sensory-curriculum/STATE.md",
+      "docs/logs/CHANGELOG.md"
+    ],
+    "authorizationToSource": [
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/.gitattributes",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/README.md",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateContract.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateGraph.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-candidates.mjs",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/audioSession.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/signalMetrics.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/audition.ts",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/index.html",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/styles.css",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-smoke.mjs",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-actions.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/write-manifest.mjs",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/verify.mjs"
+    ],
+    "sourceToPreReport": [
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/A.wav",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/B.wav",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/C.wav",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/manifest.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-report.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-0.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-1.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-2.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-0.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-1.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-2.json",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-desktop-impact.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-mobile.png",
+      "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-reduced-technical.png"
+    ],
+    "terminalReport": "docs/evidence/t37/bomb-familiar-language-audition-r5a/verification-report.json"
+  },
+  "humanGate": {
+    "status": "OPEN",
+    "defaultVerdict": "reject-all",
+    "candidates": [
+      "A",
+      "B",
+      "C"
+    ],
+    "automaticAcceptanceForbidden": true,
+    "blocksSubsequentCoordinatorWork": false
+  },
+  "environment": {
+    "playwright": "1.61.1",
+    "chromium": "149.0.7827.55",
+    "sampleRate": 48000,
+    "channelsRendered": 2,
+    "preRollFrames": 24000,
+    "analysisFrames": 8640,
+    "stemFormat": "mono PCM16 WAV",
+    "stemBoundary": "post-owned-compressors-and-candidate-trim / pre-enabledGate-and-output"
+  },
+  "candidatesContract": {
+    "labels": [
+      "A",
+      "B",
+      "C"
+    ],
+    "sourceReservations": {
+      "A": 4,
+      "B": 3,
+      "C": 1
+    },
+    "trims": {
+      "A": 0.9793104026564039,
+      "B": 0.4452,
+      "C": 0.8625147192924494
+    },
+    "A": {
+      "atoms": [
+        "hard-drop@0ms pan0",
+        "lock@9ms pan0",
+        "move@18ms pan0"
+      ],
+      "branch": "Action master 1.85 -> Action compressor"
+    },
+    "B": {
+      "atoms": [
+        "hard-drop@0ms pan0",
+        "Studio excerpt@12ms pan0"
+      ],
+      "studio": {
+        "rate": 1.18,
+        "targetPeak": 0.5,
+        "maxDurationMs": 117,
+        "fadeMs": 21.06,
+        "stopAfterEndMs": 6
+      },
+      "branch": "Action and Studio compressors -> sum"
+    },
+    "C": {
+      "layer": {
+        "instrument": "countdown-knock",
+        "duration": 0.07,
+        "gain": 0.25,
+        "attack": 0.006,
+        "release": 0.24,
+        "frequency": 440,
+        "brightness": 0.2,
+        "spread": 1,
+        "seed": 1414345526,
+        "endFrequency": "omitted"
+      },
+      "branch": "mutation .96 -> effects 1 -> master 1.85 -> Action compressor"
+    },
+    "auditionGraph": {
+      "stemSource": 1,
+      "enabledGate": 1,
+      "outputVolume": 1,
+      "output": 0.78
+    }
+  },
+  "timing": {
+    "visualImpactMs": 220,
+    "rendererDurationMs": 620,
+    "rendererReviewDurationMs": 1470,
+    "fullMotionTasteSurface": "1x",
+    "reducedMotionTechnicalOnly": true
+  },
+  "metrics": {
+    "candidates": {
+      "A": {
+        "id": "A",
+        "stemSha256": "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254",
+        "stemFrames": 8640,
+        "leftRightIdentical": true,
+        "firstNonZeroFrame": 290,
+        "lastNonZeroFrame": 4223,
+        "activityMs": 81.9375,
+        "lastNonZeroMs": 87.97916666666667,
+        "peak": 0.16862548887729645,
+        "peakFrame": 696,
+        "peakTimeMs": 14.5,
+        "attackMs": 4.208333333333333,
+        "energy": 8.281425168689367,
+        "rms": 0.03095962343784435,
+        "maxRms10Ms": 0.09923766640747847,
+        "maxRms50Ms": 0.058740910171763715,
+        "energyEnd99Ms": 36.041666666666664,
+        "below120Percent": 1.8620271440805414,
+        "atOrAbove2000Percent": 0.0008532171044772598
+      },
+      "B": {
+        "id": "B",
+        "stemSha256": "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc",
+        "stemFrames": 8640,
+        "leftRightIdentical": true,
+        "firstNonZeroFrame": 291,
+        "lastNonZeroFrame": 6465,
+        "activityMs": 128.625,
+        "lastNonZeroMs": 134.6875,
+        "peak": 0.1650361567735672,
+        "peakFrame": 1088,
+        "peakTimeMs": 22.666666666666668,
+        "attackMs": 12.020833333333334,
+        "energy": 6.804602535359356,
+        "rms": 0.02806367292228183,
+        "maxRms10Ms": 0.07645769072769802,
+        "maxRms50Ms": 0.0435154810054972,
+        "energyEnd99Ms": 101.5625,
+        "below120Percent": 0.004852767312326916,
+        "atOrAbove2000Percent": 0.21900787999851687
+      },
+      "C": {
+        "id": "C",
+        "stemSha256": "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6",
+        "stemFrames": 8640,
+        "leftRightIdentical": true,
+        "firstNonZeroFrame": 291,
+        "lastNonZeroFrame": 3430,
+        "activityMs": 65.39583333333333,
+        "lastNonZeroMs": 71.45833333333333,
+        "peak": 0.16863062977790833,
+        "peakFrame": 642,
+        "peakTimeMs": 13.375,
+        "attackMs": 5.9375,
+        "energy": 6.2688570526876335,
+        "rms": 0.026936261041129735,
+        "maxRms10Ms": 0.08891446535844169,
+        "maxRms50Ms": 0.05109918513712096,
+        "energyEnd99Ms": 43.145833333333336,
+        "below120Percent": 0.00009612034474768864,
+        "atOrAbove2000Percent": 0.0011548243601930412
+      }
+    },
+    "references": {
+      "hardDrop": {
+        "peak": 0.1721820831298828,
+        "peakFrame": 696,
+        "peakTimeMs": 14.5,
+        "attackMs": 4.208333333333333,
+        "energy": 5.9194233516420365,
+        "rms": 0.026174767305118255,
+        "maxRms10Ms": 0.10294098511235064,
+        "maxRms50Ms": 0.049662208502910636,
+        "energyEnd99Ms": 33,
+        "below120Percent": 0.7313302080996068,
+        "atOrAbove2000Percent": 0.0004402076684850378,
+        "leftRightIdentical": true
+      },
+      "studioOneLine": {
+        "peak": 0.33915090560913086,
+        "peakFrame": 557,
+        "peakTimeMs": 11.604166666666666,
+        "attackMs": 4.020833333333333,
+        "energy": 28.56565644931765,
+        "rms": 0.05749965423539121,
+        "maxRms10Ms": 0.1664618230050343,
+        "maxRms50Ms": 0.08457650897751288,
+        "energyEnd99Ms": 90.60416666666667,
+        "below120Percent": 0.0009794210826801935,
+        "atOrAbove2000Percent": 0.22226762115662163,
+        "leftRightIdentical": true
+      }
+    },
+    "peakSpreadDb": 0.18714720735390783,
+    "energyCeiling": 12.085911267610427,
+    "failures": [],
+    "graph": {
+      "actionMaster": 1.85,
+      "actionCompressor": {
+        "threshold": -4,
+        "knee": 6,
+        "ratio": 3,
+        "attack": 0.003,
+        "release": 0.12
+      },
+      "studioCompressor": {
+        "threshold": -10,
+        "knee": 10,
+        "ratio": 4,
+        "attack": 0.003,
+        "release": 0.12
+      },
+      "mutationBus": 0.96,
+      "candidateEffects": 1,
+      "candidateMaster": 1.85,
+      "candidateTrim": {
+        "A": 0.9793104026564039,
+        "B": 0.4452,
+        "C": 0.8625147192924494
+      },
+      "enabledGate": 1,
+      "outputVolume": 1,
+      "output": 0.78
+    }
+  },
+  "lifecycle": {
+    "scenarioCount": 12,
+    "entryStates": [
+      "priming",
+      "pending",
+      "playing",
+      "idle"
+    ],
+    "terminalMethods": [
+      "dispose",
+      "pagehide",
+      "hmr"
+    ]
+  },
+  "sourceBindings": [
+    {
+      "role": "r5a-source:.gitattributes",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/.gitattributes",
+      "sha256": "9cc3c1d43066b4d775aade002995370ed102a44f3ffd5dee5bf97370f9ca449e"
+    },
+    {
+      "role": "r5a-source:README.md",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/README.md",
+      "sha256": "6ee8b74dea9cc4bcfff164c1ea55d416ee3db552e35df01c3d1a9e6a07b44985"
+    },
+    {
+      "role": "r5a-source:candidateContract.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateContract.ts",
+      "sha256": "20eae967f6312a629c6f6e3d7cb914bd22bef72e3b46330e1abaff37120edcb9"
+    },
+    {
+      "role": "r5a-source:candidateGraph.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/candidateGraph.ts",
+      "sha256": "7eb0682d903d3fbd41a85dc8b7c56d6c4eb31a7ebf048cd060c34bfd70d82cba"
+    },
+    {
+      "role": "r5a-source:render-harness.html",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.html",
+      "sha256": "5522e2d683d16ade5ad1dbc5141911a3bbb345edef3087dc7a56293da25c3afa"
+    },
+    {
+      "role": "r5a-source:render-harness.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-harness.ts",
+      "sha256": "e62e80420f1c7f7d57960fa37c2438eeff3691767e13e6e6829c056c3af9fc4a"
+    },
+    {
+      "role": "r5a-source:render-candidates.mjs",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/render-candidates.mjs",
+      "sha256": "3bf4890cf4aa9d33f5b45e344fd35aa7f5db684b3c0afbe65c9a732928ca39da"
+    },
+    {
+      "role": "r5a-source:audioSession.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/audioSession.ts",
+      "sha256": "bcb51d77e60421a4aeb0a380f787cea2e9d4473afd1a68e6bd1f3418788fba3a"
+    },
+    {
+      "role": "r5a-source:signalMetrics.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/signalMetrics.ts",
+      "sha256": "2303204aac7042adfc601a1660aceabaf26f3ea05be17b60a69ff0253122fa00"
+    },
+    {
+      "role": "r5a-source:metric-harness.html",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.html",
+      "sha256": "9237a3c8e2968f4927065e3da64b5533ca8ca3db2fd606559f7df3435845db24"
+    },
+    {
+      "role": "r5a-source:metric-harness.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/metric-harness.ts",
+      "sha256": "c50fe8283adb154dbad4368be0a694a74fcf7ca56695fe63c5e1315d6a45f5d8"
+    },
+    {
+      "role": "r5a-source:fixture.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture.ts",
+      "sha256": "7977cb127d13a050d637bf32c909fdc8c8ebbbd4800d2bab8710a2702620f72c"
+    },
+    {
+      "role": "r5a-source:fixture-harness.html",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.html",
+      "sha256": "99ad734a813538ff87b2632cb57647014194bb1e1cd471b3ecd965e7dd56141f"
+    },
+    {
+      "role": "r5a-source:fixture-harness.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/fixture-harness.ts",
+      "sha256": "f509d9838c31b92a7e092b1d5a7a03356c76b0896da9ae4d7efbd795be26dd82"
+    },
+    {
+      "role": "r5a-source:audition.ts",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/audition.ts",
+      "sha256": "a64b2cff78fc5ed6b2238c5280e1cb2af3b887e29525ec9636b985cc086c36a9"
+    },
+    {
+      "role": "r5a-source:index.html",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/index.html",
+      "sha256": "46074e6adc10fa949a12dfbe0664bf5a06c9d7434435a046f2eb15bfe42b3e7b"
+    },
+    {
+      "role": "r5a-source:styles.css",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/styles.css",
+      "sha256": "ba02e4da2cce8064246595c5c717063451654cf14cf05a274cdd632b638ec200"
+    },
+    {
+      "role": "r5a-source:browser-smoke.mjs",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-smoke.mjs",
+      "sha256": "c0891cd81cdc50c047f898cc61c9ae0ec18e81e575e51f03d3b401dd16fe3176"
+    },
+    {
+      "role": "r5a-source:client-actions.json",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-actions.json",
+      "sha256": "21881031fe7e1d070bdb0f73e8091357757d9a4c100db5cf8f0283bbd857e5db"
+    },
+    {
+      "role": "r5a-source:write-manifest.mjs",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/write-manifest.mjs",
+      "sha256": "5b4ef188ae026cecbf0fd22c13fe1c69a2d5e820896e5f669f4a22366461c347"
+    },
+    {
+      "role": "r5a-source:verify.mjs",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/verify.mjs",
+      "sha256": "c3db6289d60d633ac10f99934fe99b3b42df1d2700dc01f22e00cb62fd3d644b"
+    }
+  ],
+  "productionBindings": [
+    {
+      "role": "production:src/game/core/index.ts",
+      "path": "src/game/core/index.ts",
+      "gitBlob": "0f545236900a7ef820ee1b30460921dc24103c50",
+      "sha256": "eb1fc907463ea2c98b0431b1d3ff8a14e780b6f9512d2b78f89c1423f490b04e"
+    },
+    {
+      "role": "production:src/game/render/TetrisRenderer.ts",
+      "path": "src/game/render/TetrisRenderer.ts",
+      "gitBlob": "a1b3ca8ef1b3fd1b4203f495336c51af5908e7da",
+      "sha256": "23dea2aa06e773582648539b4d89a923073b22f6e984c1e7b37362cbaaa3af3c"
+    },
+    {
+      "role": "production:src/animation/mutationTimeline.ts",
+      "path": "src/animation/mutationTimeline.ts",
+      "gitBlob": "4f163694b25a06663cef7c35c6ec62e7a6028423",
+      "sha256": "55f5bb81781d029d964cbd9e2cf386f583afcf5979bb95b6db1564fd46ce171f"
+    },
+    {
+      "role": "production:src/design/mutationTokens.ts",
+      "path": "src/design/mutationTokens.ts",
+      "gitBlob": "d76fe0cd381dd7c1f3c37c9a1bd12e4683913623",
+      "sha256": "86e0a1fa42050944f29243317f93f61ece7526e7414d169178a07dcb2829588a"
+    },
+    {
+      "role": "production:src/game/audio/acceptedPlayback.ts",
+      "path": "src/game/audio/acceptedPlayback.ts",
+      "gitBlob": "5f4dec7aa14097ab252066aa5ea01129b1b15c31",
+      "sha256": "dd9b673a439676d44bf134317202e8dc18e693e1a01a7b592441590c1d039704"
+    },
+    {
+      "role": "production:src/game/audio/audioGesture.ts",
+      "path": "src/game/audio/audioGesture.ts",
+      "gitBlob": "b7bed6489872340a11321f6358b2600c6e9b5f69",
+      "sha256": "8b5818a3f5a98b3622f7815fdcd2bf0e8f2b6c885ada6ede2b17159fb0de2ae7"
+    },
+    {
+      "role": "production:src/game/audio/audioAssetCatalog.ts",
+      "path": "src/game/audio/audioAssetCatalog.ts",
+      "gitBlob": "14bbaaf6a63c7ff22823e1d8522b56770e242ba7",
+      "sha256": "ee1f5d40a531d9a7fe4676883c513844005375c67d0499476341af90578e03ae"
+    },
+    {
+      "role": "production:src/assets/audio/t37/studio-progress-step.ogg",
+      "path": "src/assets/audio/t37/studio-progress-step.ogg",
+      "gitBlob": "9f1f7555b88e5aff4ea3cdef91226770574049b6",
+      "sha256": "f3f02d93d22fc0d1d046674510cfff98235f4df8cc839b13c6da23bf6ea97b0c"
+    }
+  ],
+  "contractBindings": [
+    {
+      "commit": "8f29bb82f40fac00764d1be822875368f426145c",
+      "path": "docs/CURRENT_TASK.md",
+      "gitBlob": "05ea815c4f79d99c6db2b0f06a77b4bbb583fcf0"
+    },
+    {
+      "commit": "8f29bb82f40fac00764d1be822875368f426145c",
+      "path": "docs/DESIGN.md",
+      "gitBlob": "5d88ae68e3532179d61459b2898df65b3da4a486"
+    },
+    {
+      "commit": "8f29bb82f40fac00764d1be822875368f426145c",
+      "path": "docs/agent-runs/t37-unified-sensory-curriculum/STATE.md",
+      "gitBlob": "77f18ab72232a7fdb4f2c8db2478bdd1d0718692"
+    },
+    {
+      "commit": "8f29bb82f40fac00764d1be822875368f426145c",
+      "path": "docs/phases/t37-unified-material-curriculum.md",
+      "gitBlob": "f560dbdf302d7acf90d35a90270710fcba9ac67e"
+    },
+    {
+      "commit": "265b697a1707b89a128fdfe9f15b22076b02d587",
+      "path": "docs/CURRENT_TASK.md",
+      "gitBlob": "f030179f35671ab50a55fdab28c40d6d05e83237"
+    },
+    {
+      "commit": "265b697a1707b89a128fdfe9f15b22076b02d587",
+      "path": "docs/agent-runs/t37-unified-sensory-curriculum/STATE.md",
+      "gitBlob": "db29fb7e64149529ce8afb61d56fbcb94ebc8033"
+    },
+    {
+      "commit": "265b697a1707b89a128fdfe9f15b22076b02d587",
+      "path": "docs/logs/CHANGELOG.md",
+      "gitBlob": "a751d4a5597e678d41126bed5eb76e09eb8b6a63"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "A",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/A.wav",
+      "sha256": "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254",
+      "bytes": 17324,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 8640,
+      "firstNonZeroFrame": 290,
+      "lastNonZeroFrame": 4223,
+      "activityMs": 81.9375,
+      "lastNonZeroMs": 87.97916666666667,
+      "renderProof": {
+        "runHashes": [
+          "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254",
+          "be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254"
+        ],
+        "deterministic": true,
+        "leftRightIdentical": true,
+        "reservedSources": 4,
+        "scheduledSources": 4
+      }
+    },
+    {
+      "id": "B",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/B.wav",
+      "sha256": "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc",
+      "bytes": 17324,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 8640,
+      "firstNonZeroFrame": 291,
+      "lastNonZeroFrame": 6465,
+      "activityMs": 128.625,
+      "lastNonZeroMs": 134.6875,
+      "renderProof": {
+        "runHashes": [
+          "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc",
+          "b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc"
+        ],
+        "deterministic": true,
+        "leftRightIdentical": true,
+        "reservedSources": 3,
+        "scheduledSources": 3
+      }
+    },
+    {
+      "id": "C",
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/C.wav",
+      "sha256": "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6",
+      "bytes": 17324,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 8640,
+      "firstNonZeroFrame": 291,
+      "lastNonZeroFrame": 3430,
+      "activityMs": 65.39583333333333,
+      "lastNonZeroMs": 71.45833333333333,
+      "renderProof": {
+        "runHashes": [
+          "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6",
+          "ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6"
+        ],
+        "deterministic": true,
+        "leftRightIdentical": true,
+        "reservedSources": 1,
+        "scheduledSources": 1
+      }
+    }
+  ],
+  "evidenceOutputs": [
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/browser-report.json",
+      "sha256": "25c2ce7bf42661eb903eee2900982ddc3531588f9a4f9b004aa1c96755d16c91",
+      "bytes": 186316
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-0.png",
+      "sha256": "f49931bab5441af3480be68234ed755da89974b00bcc3f4e402e82ed1919b7a9",
+      "bytes": 9598
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-1.png",
+      "sha256": "10b805ae5d47a8e90e64d2ac2a2d595833f035159745d1b455fc6a589d68d2d1",
+      "bytes": 6129
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/shot-2.png",
+      "sha256": "dc8ac93bdaa199521a50edadadf2d1a378205f9bbf1978e122ff8feecc41290c",
+      "bytes": 5500
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-0.json",
+      "sha256": "e3582a68f7133e816a1d450cff66a0bf82226b2024da66958114b2b3e53a5719",
+      "bytes": 2159
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-1.json",
+      "sha256": "1e5e9cca641d0bae37356a8d3a4140d32f856620b3aed19e391ecf42e0806884",
+      "bytes": 2160
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/client-smoke/state-2.json",
+      "sha256": "48f36e7a419b979da9115f84100077c0bdf5fb1bb05846b41e3384dcbbec5ae8",
+      "bytes": 2146
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-desktop-impact.png",
+      "sha256": "db1c419db62b7866a1144c397a9d2f52551a632eb66495a95b1a619c4e3fef1d",
+      "bytes": 576596
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-mobile.png",
+      "sha256": "d5bf59f3fa1cd970b0197df7ca3e8b42c4e76755b963795ddfde0497dd118b1c",
+      "bytes": 348322
+    },
+    {
+      "path": "docs/evidence/t37/bomb-familiar-language-audition-r5a/r5a-reduced-technical.png",
+      "sha256": "331be25ff6383a142f127dd44e973951c0320e1cc9b8f5c54da2f8d6367c3586",
+      "bytes": 459064
+    }
+  ]
+}
