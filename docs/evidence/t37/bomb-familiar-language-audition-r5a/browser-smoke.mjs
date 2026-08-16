@@ -147,6 +147,9 @@ await desktop.locator('.reason-group label').filter({ has: desktop.locator('inpu
 await desktop.locator('#record-verdict').click();
 const selectedVerdict = await state(desktop);
 check(selectedVerdict.verdict === 'B' && selectedVerdict.reasons.includes('not-block-like'), 'optional verdict input');
+await desktop.evaluate(() => window.__R5A_TEST__.dispose('desktop-finish'));
+await desktop.waitForTimeout(500);
+await desktop.close();
 
 const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
 observe(mobile, 'mobile');
@@ -158,6 +161,8 @@ check(!mobileLayout.overflow && mobileLayout.canvasCount === 1 && mobileLayout.m
 const mobileImagePath = join(root, 'r5a-mobile.png');
 await mobile.screenshot({ path: mobileImagePath, fullPage: true });
 await mobile.evaluate(() => window.__R5A_TEST__.dispose('mobile-finish'));
+await mobile.waitForTimeout(500);
+await mobile.close();
 
 const reduced = await browser.newPage({ viewport: { width: 1100, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
 observe(reduced, 'reduced');
@@ -182,6 +187,8 @@ const reducedCompletion = await state(reduced);
 check(reducedCompletion.renderer.cleanupComplete && !reducedCompletion.renderer.frameCallbackActive
   && reducedCompletion.audio.phase === 'ready' && reducedCompletion.audio.activeSources === 0, 'reduced completion cleanup');
 await reduced.evaluate(() => window.__R5A_TEST__.dispose('reduced-finish'));
+await reduced.waitForTimeout(500);
+await reduced.close();
 
 const metricPage = await browser.newPage();
 observe(metricPage, 'metrics');
@@ -272,12 +279,6 @@ for (const method of ['dispose', 'pagehide', 'hmr']) {
   }
 }
 
-await desktop.evaluate(() => window.__R5A_TEST__.dispose('desktop-finish'));
-await Promise.all([desktop, mobile, reduced].map((page) => page.waitForTimeout(500)));
-for (const page of [desktop, mobile, reduced]) {
-  await page.waitForLoadState('networkidle');
-  await page.close();
-}
 await browser.close();
 check(consoleErrors.length === 0, `console errors: ${consoleErrors.join(' | ')}`);
 check(pageErrors.length === 0, `page errors: ${pageErrors.join(' | ')}`);
