@@ -78,6 +78,15 @@ const browserVersion = browser.version();
 check(playwrightVersion === expectedPlaywright, `Playwright version ${playwrightVersion}`);
 check(browserVersion === expectedChromium, `Chromium version ${browserVersion}`);
 
+const warmup = await browser.newPage({ viewport: { width: 900, height: 760 } });
+observe(warmup, 'warmup');
+await ready(warmup);
+const warmupState = await state(warmup);
+check(warmupState.ready && warmupState.canvasCount === 1 && warmupState.audio.phase === 'cold', 'cold server warmup is clean');
+await warmup.evaluate(() => window.__R5A_TEST__.dispose('warmup-finish'));
+await warmup.waitForTimeout(1_000);
+await warmup.close();
+
 const desktop = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
 observe(desktop, 'desktop');
 await ready(desktop);
@@ -292,6 +301,7 @@ const report = {
   browserVersion,
   passed: failures.length === 0,
   failures,
+  warmup: warmupState,
   initial,
   pendingA,
   switchedB,
