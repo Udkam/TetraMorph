@@ -10279,3 +10279,21 @@ partial, sampled, or target-specific search is authorized. First commit and inde
 review these four docs. Only an all-zero contract review opens external validator authoring;
 the validator itself still requires exact-byte static review, a later final-HEAD binding, and
 one no-write preflight before the sole production attempt.
+
+### F4E-R6B R1 rejected — R2 contract review only
+
+R1 `e72c2e3` is rejected at independent totals `0/2/1/0/0`, `0/4/3/0/0`, and
+`0/4/2/0/0`. R2 in `docs/DESIGN.md` separates the exact present validator from the absent
+mutable namespace, expands all absolute paths, freezes the complete CLI/worker grammar and
+canonical shapes, permits only hardened Git subprocesses during preflight, and requires full
+production revalidation before attempt plus after worker.
+
+Attempt now has exclusive durable claim semantics; candidate and terminal share exact
+no-replace publication; worker transport is bounded at 4 MiB plus a 4096-byte tail; successful
+protocol cleanup is distinct from immutable final/failure evidence. The R6 source pin binds
+the honest-coordinator/no-same-permission-forgery boundary. The exact eventual integration
+paths are the existing Intro definitions, new Intro-05 fixture/test, and the Intro-04 prefix
+test only.
+
+No v6 path exists and no validator authoring or execution is open. Commit these four R2 docs
+and obtain two fresh all-zero reviews first.

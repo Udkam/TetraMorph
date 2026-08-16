@@ -822,3 +822,17 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   Attempt existence consumes v6 on all outcomes.
 - Next: commit and obtain two independent all-zero reviews of this four-doc contract. No v6
   artifact, stage, validator execution, or Intro-05 source edit is authorized yet.
+
+### F4E-R6B R1 rejection and R2 executable contract
+
+- R1 `e72c2e3` is rejected by three reviews at `0/2/1/0/0`, `0/4/3/0/0`, and
+  `0/4/2/0/0`. No v6 path was created and no validator mode or Intro-05 search ran.
+- R2 separates the exact validator control path from the absent mutable namespace, freezes
+  absolute paths, ordered CLI/worker argv, complete source checks before attempt/around proof,
+  durable attempt claim, no-replace candidate/terminal, bounded transport, exact schema and
+  receipt shapes, controlled success cleanup, and immutable failure evidence.
+- The source pin explicitly records the honest-coordinator/no-same-permission-forgery boundary.
+  Correct source integration remains exactly definitions, Intro-05 fixture/test, and the
+  Intro-04 accepted-prefix assertion.
+- Next: commit R2 and obtain two fresh all-zero contract reviews. Validator authoring and all
+  proof execution remain closed.

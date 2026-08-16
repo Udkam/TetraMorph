@@ -3186,3 +3186,20 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   and independently rescans stage, publication residue, and processes after close/reap.
 - Next: commit and obtain two all-zero contract reviews. All v6 paths and Intro-05 source
   remain closed.
+
+### F4E-R6B R1 rejection and R2 correction
+
+- R1 `e72c2e3` is rejected at `0/2/1/0/0`, `0/4/3/0/0`, and `0/4/2/0/0`.
+  Validator-versus-empty-namespace, unconditional no-spawn, production TOCTOU, atomic claim,
+  success cleanup, worker transport, schema, threat-boundary, and wrong integration-path
+  defects block authoring.
+- R2 freezes five full absolute paths while separating the present exact validator from the
+  absent mutable namespace; exact ordered public/worker argv; full production/worker/post
+  revalidation; durable attempt and no-replace candidate/terminal; 4 MiB/4096-byte bounded
+  streams; exact canonical shapes/run ID/receipt; and the honest-coordinator boundary.
+- Only hardened Git subprocesses are allowed during preflight; proof worker and every
+  Intro-05 exact/partial search remain forbidden. Successful owned cleanup is required;
+  final artifacts and failure residue are immutable after outcome.
+- Correct integration boundary is definitions, Intro-05 fixture, new exact test, and only the
+  Intro-04 accepted-prefix assertion. Next: commit and independently re-review R2. Validator
+  remains absent.

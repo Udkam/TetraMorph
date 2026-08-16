@@ -9416,3 +9416,162 @@ one production attempt fail-closed; none permits fallback.
 Until step 5, no command may execute Intro-05 through the exact certifier. Until step 6,
 `src/game/core/endgameV3Intro05.ts`, its test, authoring fixture, and workstream fixture remain
 closed.
+
+### F4E-R6B R1 rejection and R2 executable correction
+
+R1 `e72c2e3` does not authorize validator authoring. Independent reviews report
+`P0/P1/P2/P3/GAP = 0/2/1/0/0`, `0/4/3/0/0`, and `0/4/2/0/0`. This R2 section
+supersedes every conflicting R1 phrase while retaining R1 as rejected history.
+
+#### Exact paths and namespace states
+
+The validator control path is exactly
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v6.mjs`.
+It is absent during contract review, then must be present, regular, immutable by governance,
+and exact-byte/hash-bound for static review, preflight, and production. The mutable namespace
+is separate and consists exactly of:
+
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v6.json`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v6.json`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v6.json`;
+- `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-frontier-stage-v6`;
+- every directory entry whose name starts exactly with
+  `t37-f4e-endgame-canonical-candidate-v6.json.tmp-` or
+  `t37-f4e-endgame-canonical-terminal-v6.json.tmp-`.
+
+Preflight requires the exact validator present and the entire mutable namespace absent.
+Production repeats that complete check immediately before attempt claim. The worker checks
+attempt present and immutable, candidate/terminal/publication residue absent, and proof stage
+absent before it creates the Store. Successful protocol-internal cleanup must remove only
+registered run files, the exact proof stage, and the candidate/terminal `.tmp-<runId>` that
+the same invocation created. Once the invocation determines its outcome, every final artifact
+and every remaining failure residue is immutable evidence and may not be manually deleted,
+repaired, renamed, or reused.
+
+Process scans exclude only the currently executing outer validator PID. Preflight and the
+production outer require no other matching v6 validator/worker process; the worker requires
+only its exact parent outer; the outer after close requires no worker or other matching PID.
+
+#### Exact CLI and process grammar
+
+After the validator path, exactly zero or one leading mode token is allowed:
+`--preflight`, `--worker`, or no token for production. `--preflight` and `--worker` are
+mutually exclusive. It is followed by these required key/value pairs in this exact order,
+with no duplicate, missing, positional, or extra token:
+
+```text
+--root <root>
+--output <candidate>
+--attempt <attempt>
+--terminal <terminal>
+--frontier-stage <frontierStage>
+--expect-repo-base <base>
+--expect-src-tree <srcTree>
+--expect-core-tree <coreTree>
+--expect-route-blob <routeBlob>
+--expect-adapter-blob <adapterBlob>
+--expect-adapter-sha <adapterSha256>
+--expect-validator-sha <validatorSha256>
+--expect-head <head>
+```
+
+Root is exactly `E:\Proj\reproduction-tetris`. All five paths and root must equal the
+absolute values frozen here; base is
+`7dc6b74f26265fcb2be72b07e1b2c6296c983ea0`,
+and the tree/blob/hash arguments equal the full R1 values. Only validator SHA and final HEAD
+remain placeholders until the later pin/binding checkpoints. The public preflight and
+production commands are exactly `E:\Nodejs\node.exe`, the two frozen runtime flags, the
+absolute validator path, the appropriate public mode, then this ordered grammar. The sole
+worker is started with `spawn` directly, `shell:false`, `windowsHide:true`, exact
+stdin/stdout/stderr pipes and exact environment, using the same Node path/flags/validator,
+`--worker`, and identical ordered pairs. Exactly one worker may be started.
+
+`--worker` requires the outer-owned attempt plus exactly 32 capability bytes on stdin. It
+re-hashes capability, revalidates the complete attempt, validator, source envelope, runtime,
+stage and output namespace before proof, then revalidates them after proof and immediately
+before publication. A direct/manual worker remains a governance violation and cannot satisfy
+the honest outer capability continuity without the exact attempt.
+
+The later command-pin line is exactly
+`F4E-R6-COMMAND-CONTRACT-V1 validator=<64 uppercase hexadecimal SHA-256>` and must occur once
+across the four authority documents at bound HEAD. `F4E-R6-CONSUMED-V1 ` must occur zero
+times before execution. Validator static review happens before the marker exists; no mode may
+run until a committed marker and final HEAD have both passed their own reviews.
+
+“No-spawn preflight” is retired wording. Preflight must not spawn a proof worker and must not
+run proof, but may execute only the exact hardened Git subprocesses required to read bound
+objects/history/config. Production re-executes the complete v5-hardened executable,
+environment, Git-domain, history, authority, predecessor, source/blob/worktree, validator,
+heap, stage-parent/reparse, namespace, and process checks immediately before attempt claim.
+The worker repeats the proof-relevant subset before and after proof; outer repeats the full
+set after observed close/reap and before terminal publication. A green preflight or unchanged
+HEAD never substitutes for these production checks.
+
+#### Durable claim, bounded transport, and exact shapes
+
+Attempt is canonical JSON plus one LF written with exclusive `wx`, complete write, file
+`fsync`, close, exact reread and descriptor/identity check. The fixed Windows runtime makes
+no directory-fsync claim. Its existence is the consumption boundary. Candidate and terminal both use exclusive
+same-directory `.tmp-<runId>`, complete write, `fsync`, close, no-replace hard-link, final
+reread equality, then unlink only their owned temp and verify it absent. A terminal is never
+published before observed worker close/reap. A synchronous pre-child spawn failure can leave
+attempt-only consumed evidence; inability to prove close/reap forbids terminal rather than
+inventing a lifecycle.
+
+Each worker stream retains at most 4 MiB for parsing while incrementally recording total
+bytes and SHA-256 plus only a 4096-byte tail. First overflow drops the parse buffer, sets
+`exceededOutputLimit`, requests kill once, records kill/error results, and still waits for
+`close`. Child, stdin, stdout, stderr, kill and close states are all terminal fields. Success
+requires zero stderr and stdout equal to exactly one canonical worker-result JSON value.
+
+Canonical top-level key order is normative:
+
+- `sourcePin`: `root,head,governanceBoundary,srcTree,coreTree,descendantPaths,gitProofDomain,authority,validator,adapter,proofStorage,frontierStage,runtime`;
+- `preflight`: `schema,passed,sourcePin,namespaceAudit,coreManifest,loadedCorePaths,adapterManifest,definition,validation`;
+- `attempt`: `schema,runId,claimedAt,sourcePin,clue,parameters,outputPath,terminalPath,frontierStagePath,workerCapabilitySha256`;
+- `candidate`: `schema,passed,sourcePin,validatorSchema,clue,definition,fixture,validation,coreManifest,loadedCorePaths,frontierAudit,certificateAudit,attempt`;
+- `frontierAudit`: `schema,proofStorage,adapter,limits,stagePath,diagnostics,stagePresent`;
+- `worker-result`: `schema,status,candidate,attempt,frontierAudit,runtimeHeap`;
+- `terminal`: `schema,status,passed,startedAt,finishedAt,exitCode,signal,sourcePin,attempt,candidate,workerLifecycle,stdout,stderr,frontierStage,frontierResidue,frontierResidueTruncated,publicationStages,publicationStagesTruncated,residualProcesses,runtimeHeap,reason`.
+
+`sourcePin.adapter` keys are `path,gitBlob,bytes,sha256,exports,limits`;
+`sourcePin.frontierStage` keys are `path,parent`; `runtimeHeap` keys are
+`requestedOldSpaceMiB,heapSizeLimitBytes`; diagnostics keys remain
+`activeRuns,residue,residueTruncated,cleanupErrors,cleanupErrorsTruncated`. Namespace,
+frontier-residue, publication-stage and process lists contain at most 4098 normalized
+2048-byte strings plus an explicit truncation flag; truncation is fatal. Stream records keep
+the v5 order `bytes,sha256,boundedTailBase64,truncated,exceededOutputLimit`.
+
+The 24-lowercase-hex run ID is exactly the first 24 hex characters of SHA-256 over UTF-8
+`sourcePin.head NUL sourcePin.validator.sha256 NUL claimedAt NUL workerCapabilitySha256 NUL
+frontierStagePath`. Descriptor keys remain `path,bytes,sha256`. All nested shapes are rebuilt
+and canonical-compared, not accepted by permissive parsing.
+
+Attempt `outputPath` and `terminalPath` are the exact basenames; `frontierStagePath` is the
+full normalized absolute stage path. Frontier-audit `stagePath` is the exact stage basename.
+
+The eventual `F4E-R6-CONSUMED-V1` canonical receipt keys are exactly
+`head,srcTree,coreTree,validator,attempt,candidate,terminal,outerExitCode,frontierStage,publicationStages,matchingProcesses,audit`.
+Candidate and terminal use fixed `path,present,bytes,sha256,status,passed` keys with nulls when
+absent; attempt additionally records `runId`. Frontier stage uses
+`path,present,entries,entriesTruncated`. The validator rejects any committed R6 consumed marker
+before preflight or production. Two independent output audits precede the one receipt commit.
+
+#### Threat boundary and integration paths
+
+`sourcePin.governanceBoundary` is exactly
+`honest-coordinator-no-same-permission-artifact-forgery-v1`. Capability, descriptors, rescans,
+leases and source checks provide honest-coordinator continuity and fail-closed drift detection;
+they are not same-user authentication. Same-permission create/delete/replace, manual worker,
+forged terminal, executable/object/config/path rebind, and post-check mutation are governance
+violations outside the claim. Administrator/kernel compromise, volume remapping and runtime
+DLL replacement are excluded; denial of service remains possible. The validator must not
+claim stronger protection.
+
+Only a successful audited consumption receipt opens exactly these four paths:
+`src/game/core/endgameV3IntroDefinitions.ts`,
+`docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-05.json`,
+`src/game/core/endgameV3Intro05Exact.test.ts`, and
+`src/game/core/endgameV3Intro04Exact.test.ts`. The last may change only its fixed-total
+assertion to exact identity of the accepted first-four prefix. R2 next requires commit plus
+two fresh all-zero reviews; validator remains absent until then.
