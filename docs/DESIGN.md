@@ -9736,3 +9736,59 @@ after proof authority is consumed.
 
 R5 requires a fresh four-document commit and two all-zero reviews. Validator authoring and all
 execution remain closed until then.
+
+### F4E-R6B frozen validator command-pin candidate
+
+R5 is accepted at 27d1fff0d0540f584fc33ada77dc83705579eed6. The external validator is
+frozen at
+C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v6.mjs:
+89,769 bytes, SHA-256
+7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311,
+strict UTF-8 without BOM, LF-only, and one trailing LF. Its sole syntax check exited zero
+without output. Two independent static reviews each report
+P0/P1/P2/P3/GAP = 0/0/0/0/0; neither invoked Node, imported the validator, created a Store,
+or ran preflight, worker, production, Intro-05, or any exact search.
+
+F4E-R6-COMMAND-CONTRACT-V1 validator=7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311
+
+The fixed coordinator process-gate payload is the following one-line UTF-16LE Base64 value.
+It decodes to the already frozen 1,062-byte ASCII/LF source with SHA-256
+06645CCADA1DD038E4CF78A6DD4FEBD169DE4AE51076880EDF1F383B51F1556A.
+The exact child argv is -NoLogo -NoProfile -NonInteractive -EncodedCommand followed by this
+single value:
+
+    JABFAHIAcgBvAHIAQQBjAHQAaQBvAG4AUAByAGUAZgBlAHIAZQBuAGMAZQAgAD0AIAAnAFMAdABvAHAAJwAKACQAbgBlAGUAZABsAGUAIAA9ACAAJwB0ADMANwAtAGYANABlAC0AZQBuAGQAZwBhAG0AZQAtAGMAYQBuAG8AbgBpAGMAYQBsAC0AdgBhAGwAaQBkAGEAdABlAC0AdgA2AC4AbQBqAHMAJwAKACQAbQBhAHQAYwBoAGUAcwAgAD0AIABAACgARwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIAAtAEMAbABhAHMAcwBOAGEAbQBlACAAVwBpAG4AMwAyAF8AUAByAG8AYwBlAHMAcwAgAHwAIABXAGgAZQByAGUALQBPAGIAagBlAGMAdAAgAHsAIABbAHMAdAByAGkAbgBnAF0AJABfAC4AQwBvAG0AbQBhAG4AZABMAGkAbgBlACAALQBsAGkAawBlACAAKAAnACoAJwAgACsAIAAkAG4AZQBlAGQAbABlACAAKwAgACcAKgAnACkAIAB9ACAAfAAgAFMAbwByAHQALQBPAGIAagBlAGMAdAAgAFAAcgBvAGMAZQBzAHMASQBkACkACgAkAGUAbgB0AHIAaQBlAHMAIAA9ACAAQAAoACQAbQBhAHQAYwBoAGUAcwAgAHwAIABTAGUAbABlAGMAdAAtAE8AYgBqAGUAYwB0ACAALQBGAGkAcgBzAHQAIAAyADUANgAgAHwAIABGAG8AcgBFAGEAYwBoAC0ATwBiAGoAZQBjAHQAIAB7AAoAIAAgACQAbgBhAG0AZQAgAD0AIABbAHMAdAByAGkAbgBnAF0AJABfAC4ATgBhAG0AZQAKACAAIAAkAGkAbQBhAGcAZQAgAD0AIABbAHMAdAByAGkAbgBnAF0AJABfAC4ARQB4AGUAYwB1AHQAYQBiAGwAZQBQAGEAdABoAAoAIAAgACQAYwBvAG0AbQBhAG4AZAAgAD0AIABbAHMAdAByAGkAbgBnAF0AJABfAC4AQwBvAG0AbQBhAG4AZABMAGkAbgBlAAoAIAAgAFsAbwByAGQAZQByAGUAZABdAEAAewAKACAAIAAgACAAcABpAGQAIAA9ACAAWwBpAG4AdABdACQAXwAuAFAAcgBvAGMAZQBzAHMASQBkAAoAIAAgACAAIABwAGEAcgBlAG4AdABQAGkAZAAgAD0AIABbAGkAbgB0AF0AJABfAC4AUABhAHIAZQBuAHQAUAByAG8AYwBlAHMAcwBJAGQACgAgACAAIAAgAG4AYQBtAGUAIAA9ACAAaQBmACAAKAAkAG4AYQBtAGUALgBMAGUAbgBnAHQAaAAgAC0AbABlACAAMQAyADgAKQAgAHsAIAAkAG4AYQBtAGUAIAB9ACAAZQBsAHMAZQAgAHsAIAAkAG4AYQBtAGUALgBTAHUAYgBzAHQAcgBpAG4AZwAoADAALAAgADEAMgA4ACkAIAB9AAoAIAAgACAAIABuAGEAbQBlAFQAcgB1AG4AYwBhAHQAZQBkACAAPQAgACQAbgBhAG0AZQAuAEwAZQBuAGcAdABoACAALQBnAHQAIAAxADIAOAAKACAAIAAgACAAZQB4AGUAYwB1AHQAYQBiAGwAZQBQAGEAdABoACAAPQAgAGkAZgAgACgAJABpAG0AYQBnAGUALgBMAGUAbgBnAHQAaAAgAC0AbABlACAANQAxADIAKQAgAHsAIAAkAGkAbQBhAGcAZQAgAH0AIABlAGwAcwBlACAAewAgACQAaQBtAGEAZwBlAC4AUwB1AGIAcwB0AHIAaQBuAGcAKAAwACwAIAA1ADEAMgApACAAfQAKACAAIAAgACAAZQB4AGUAYwB1AHQAYQBiAGwAZQBQAGEAdABoAFQAcgB1AG4AYwBhAHQAZQBkACAAPQAgACQAaQBtAGEAZwBlAC4ATABlAG4AZwB0AGgAIAAtAGcAdAAgADUAMQAyAAoAIAAgACAAIABjAG8AbQBtAGEAbgBkAEwAaQBuAGUAIAA9ACAAaQBmACAAKAAkAGMAbwBtAG0AYQBuAGQALgBMAGUAbgBnAHQAaAAgAC0AbABlACAANQAxADIAKQAgAHsAIAAkAGMAbwBtAG0AYQBuAGQAIAB9ACAAZQBsAHMAZQAgAHsAIAAkAGMAbwBtAG0AYQBuAGQALgBTAHUAYgBzAHQAcgBpAG4AZwAoADAALAAgADUAMQAyACkAIAB9AAoAIAAgACAAIABjAG8AbQBtAGEAbgBkAEwAaQBuAGUAVAByAHUAbgBjAGEAdABlAGQAIAA9ACAAJABjAG8AbQBtAGEAbgBkAC4ATABlAG4AZwB0AGgAIAAtAGcAdAAgADUAMQAyAAoAIAAgAH0ACgB9ACkACgAkAHIAZQBzAHUAbAB0ACAAPQAgAFsAbwByAGQAZQByAGUAZABdAEAAewAgAGUAbgB0AHIAaQBlAHMAIAA9ACAAJABlAG4AdAByAGkAZQBzADsAIAB0AHIAdQBuAGMAYQB0AGUAZAAgAD0AIAAkAG0AYQB0AGMAaABlAHMALgBDAG8AdQBuAHQAIAAtAGcAdAAgADIANQA2ACAAfQAKAFsAQwBvAG4AcwBvAGwAZQBdADoAOgBPAHUAdAAuAFcAcgBpAHQAZQAoACgAQwBvAG4AdgBlAHIAdABUAG8ALQBKAHMAbwBuACAALQBJAG4AcAB1AHQATwBiAGoAZQBjAHQAIAAkAHIAZQBzAHUAbAB0ACAALQBDAG8AbQBwAHIAZQBzAHMAIAAtAEQAZQBwAHQAaAAgADQAKQApAAoA
+
+For the later audited gate, the exact invocation form is:
+
+    $processGatePayload = '<the exact Base64 value above>'
+    & 'C:\Program Files\PowerShell\7\pwsh.exe' -NoLogo -NoProfile -NonInteractive -EncodedCommand $processGatePayload
+
+The exact common public validator arguments are:
+
+    $v6Args = @(
+      '--root', 'E:\Proj\reproduction-tetris',
+      '--output', 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-candidate-v6.json',
+      '--attempt', 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-attempt-v6.json',
+      '--terminal', 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-terminal-v6.json',
+      '--frontier-stage', 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-frontier-stage-v6',
+      '--expect-repo-base', '7dc6b74f26265fcb2be72b07e1b2c6296c983ea0',
+      '--expect-src-tree', '6115144d171aa6305de1fdaca8abd7b145e2ca13',
+      '--expect-core-tree', '9628592aed3c66de1386bc45efdd4766fc5c29db',
+      '--expect-route-blob', '51f446c12bb163de33b5c9b426c4254902f8c00b',
+      '--expect-adapter-blob', 'bd95fa4ed24b931a46089df93efd0c80e7e7a162',
+      '--expect-adapter-sha', '6651B346F1CE2A0C83B9311982382C215614D8B95E18C1C5D49A296A966B444A',
+      '--expect-validator-sha', '7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311',
+      '--expect-head', '<FINAL_QA_BINDING_HEAD>'
+    )
+
+After the later THREAD_LOG-only binding replaces the final placeholder at invocation time,
+the sole preflight and production forms are respectively:
+
+    & 'E:\Nodejs\node.exe' '--disable-warning=ExperimentalWarning' '--max-old-space-size=6144' 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v6.mjs' '--preflight' @v6Args
+    & 'E:\Nodejs\node.exe' '--disable-warning=ExperimentalWarning' '--max-old-space-size=6144' 'C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v6.mjs' @v6Args
+
+This checkpoint opens no execution. Commit these exact four authority documents and obtain
+two fresh all-zero exact-byte/command reviews. Then add one THREAD_LOG-only static-QA
+disposition/final-binding commit and review its exact resulting HEAD twice. Only that accepted
+binding opens the first process gate and the sole preflight.

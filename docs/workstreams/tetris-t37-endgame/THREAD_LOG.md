@@ -866,3 +866,21 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   audited strict-ancestor abort markers for replacement bindings and durable attempt as the
   only technical consumption boundary.
 - Next: commit and obtain two all-zero R5 reviews. Authoring/execution remain closed.
+
+### F4E-R6B frozen validator static-QA and command-pin candidate
+
+- R5 governing HEAD is 27d1fff0d0540f584fc33ada77dc83705579eed6.
+- Validator
+  C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-v6.mjs is
+  89,769 bytes / SHA-256
+  7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311,
+  UTF-8 without BOM, LF-only, and one trailing LF. Its sole syntax check passed.
+- QA-A and QA-B independently read the complete 2,020-line source and each report
+  P0/P1/P2/P3/GAP = 0/0/0/0/0. They close ordered CLI, frozen source/runtime/predecessor,
+  linear authority, private loaders, forced disk Store injection, candidate reconstruction,
+  bounded transport, close/reap, atomic publication, stage/residue, and R5 governance.
+- Neither review invoked Node/import, any validator mode, Store creation, Intro-05, or exact
+  search. Mutable v6 state and publication residue remain absent.
+- This four-doc candidate pins the one validator marker, the exact public CLI, and exact
+  PowerShell/CIM encoded process gate. Commit and review the exact range twice. Only then may
+  one THREAD_LOG-only final-HEAD binding be added and reviewed twice; execution remains closed.

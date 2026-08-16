@@ -3242,3 +3242,18 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Replacement validators still parse strict-ancestor abort markers and bind the same validator;
   durable attempt remains the sole global consumption claim. All paths remain absent.
 - Next: commit and obtain two all-zero reviews before authoring.
+
+### F4E-R6B frozen v6 validator and command pin
+
+- Governing R5 HEAD is 27d1fff0d0540f584fc33ada77dc83705579eed6.
+- External validator identity is 89,769 bytes /
+  7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311,
+  strict UTF-8, no BOM, LF-only, one tail LF. The sole syntax check passed.
+- Static QA-A and QA-B each report P0/P1/P2/P3/GAP = 0/0/0/0/0 and authorize only
+  command-pin. Neither ran a validator mode, Store, or Intro-05.
+- DESIGN freezes the unique command marker, exact ordered CLI, validator/source pins, and the
+  PowerShell/CIM gate's exact encoded payload. Attempt/candidate/terminal/frontier/publication
+  residue remain zero.
+- Next action: exact four-doc command-pin commit and two fresh reviews, then a
+  THREAD_LOG-only final-HEAD binding plus two reviews. No process gate or validator mode is
+  authorized before that sequence completes.

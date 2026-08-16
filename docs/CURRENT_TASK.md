@@ -10330,3 +10330,17 @@ on that same HEAD before the later marker exists. R5 labels the per-HEAD single 
 honest-coordinator governance and removes that overclaim; replacement HEADs still parse and
 validate prior abort markers, while durable attempt remains the unique technical consumption
 boundary. Commit and re-review R5 before authoring.
+
+### F4E-R6B validator frozen — command-pin review only
+
+- R5 is accepted at 27d1fff0d0540f584fc33ada77dc83705579eed6.
+- The exact external v6 validator is 89,769 bytes / SHA-256
+  7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311,
+  UTF-8 without BOM, LF-only, one trailing LF. Its only execution was the authorized syntax
+  check, which exited zero with no output.
+- Two independent static reviews are each P0/P1/P2/P3/GAP = 0/0/0/0/0. They did not run
+  Node/import, any validator mode, Store creation, Intro-05, or exact search.
+- The exact command marker, public CLI, and fixed 1,062-byte process-gate payload now live
+  only in the DESIGN command-pin section. The v6 mutable namespace remains fully absent.
+- Commit and independently review this exact four-document pin. Then create and twice review
+  one THREAD_LOG-only final-HEAD binding. Preflight and production remain closed meanwhile.
