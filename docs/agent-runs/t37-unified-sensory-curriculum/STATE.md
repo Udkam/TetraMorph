@@ -2954,3 +2954,20 @@ Current exact action: commit this five-document successor contract, obtain indep
 docs review, then authorize a single R5B product writer. Inherited T27 evidence,
 `docs/evidence/t27-r1-followup/**`, the handoff file, and `progress.md` remain untouched and
 unstaged.
+
+### R5B writer authorization
+
+- Contract `6c0c87d` is independently accepted for implementation with
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`; its parent is `4ce7ba3`, its diff is exactly five docs,
+  `src/**` is unchanged, and the frozen Core tree was independently recomputed.
+- One product writer owns only three sequential claims: exact R5A WAV/catalog admission;
+  pure full/reduced single-buffer Bomb event composition plus old Bomb recipe/pulse
+  retirement; AudioEngine/GameRuntime routing and tests.
+- The writer may not change Core, Renderer, `mutationChainTimeline*`, UI/storage, R5A
+  evidence, changelog, or inherited dirty paths. Non-Bomb `scheduleRecoveredNoisePuff`
+  behavior remains available; only the old Bomb-chain pulse path is retired.
+- Default A remains provisional. The A/B/C constructor seam is test/evidence-only and is
+  not a user setting. No automated result records human acceptance.
+- Current exact action: finish the three green source checkpoints, run the one final
+  typecheck/full-suite/build set after the last source edit, then stop for independent
+  source QA before opening product-backed R5B evidence.

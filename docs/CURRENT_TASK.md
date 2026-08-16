@@ -81,6 +81,28 @@ force A/B/C, while UI and storage expose no choice.
 **Current next action:** implement and prove R5B against the adopted recovery head without
 changing Core, Renderer, or the frozen presentation timeline.
 
+### 2026-08-16 R5B product-writer authorization
+
+Completion-first contract `6c0c87d` changes exactly the five governing documents. Its
+independent review reports `P0/P1/P2/P3/GAP = 0/0/0/0/0`, confirms the declared Core tree,
+and finds no premature human-acceptance claim. One R5B writer is now authorized to make
+three bounded product checkpoints, in order:
+
+1. **Runtime stems/catalog:** the three exact R5A WAVs, `audioAssetCatalog.ts`, and its
+   direct test.
+2. **Pure event compositor/palette retirement:** new `bombStemPlayback.ts` and test;
+   remove only the old Bomb/Bomb-chain recipes and chain-pulse helper/tests from
+   `audioPalette*` and `candidatePlayback*`. Preserve non-Bomb air playback.
+3. **Runtime routing:** `AudioEngine.ts`/test and `GameRuntime.ts`/test. Default A is
+   constructor-frozen and provisional; a constructor-only A/B/C test seam is permitted.
+   Reduced-motion changes affect only subsequent Bomb events.
+
+Each source checkpoint must run its focused tests and typecheck before commit. After the
+last source edit, run one full suite and one build. Do not edit Core, Renderer,
+`mutationChainTimeline*`, UI, Settings, storage, R5A evidence, changelog, or inherited
+dirty paths. Product evidence opens only after the complete source range is independently
+reviewable; the writer does not push or claim human acceptance.
+
 ## Active objective
 
 ### 2026-08-15 Bomb R4A rejection and R5A familiar-language contract

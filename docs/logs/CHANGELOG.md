@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-16 — T37 completion-first recovery and R5B source work opened
+
+- The player's latest sequencing instruction defers all subjective review to one final
+  consolidated gate. Contract `6c0c87d` supersedes older intermediate human blockers while
+  explicitly leaving every new choice provisional; independent docs QA reports
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`.
+- R5A's final evidence chain is `54a3277` / `9d30894` / `99b47be` / `4ce7ba3`.
+  Verification passes `204/204`; typecheck, `537 passed / 15 skipped`, and the 770-module
+  build pass. Independent UI/lifecycle and audio/provenance reviews report no P0-P3
+  finding. Human listening remains open and no candidate is accepted.
+- R5B source work is authorized as three bounded checkpoints: admit the byte-exact A/B/C
+  stems, compose normal/chain events as one mono buffer/source without old Bomb recipes,
+  then route the provisional constructor-frozen default A through AudioEngine/GameRuntime.
+  Core, Renderer, the shared chain timeline, UI/storage, and all accepted anchors remain
+  frozen.
+- Ice original-WAV provenance remains a disclosed login-gated evidence gap. The remaining
+  implementation order is material proof, F4E-R5/F5, D2B, line-clear tiers, Falling Fold,
+  five Classic presets, and the explicitly unimplemented Survival proposal before final
+  gates and consolidated player review.
+
 ## 2026-08-14 — T37 Bomb R3 stylized audio contract opened
 
 - The player accepts the complete full-motion `1x` Bomb visual and the D1 Settled
