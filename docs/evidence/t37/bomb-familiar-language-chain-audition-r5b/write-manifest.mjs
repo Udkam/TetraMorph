@@ -90,7 +90,7 @@ function exactLinearHistory(from, to, expected, label, inspect = () => {}) {
   const touched = new Set();
   for (const [commit, ...parents] of rows) {
     if (parents.length !== 1) throw new Error(`${label}: non-linear commit ${commit}.`);
-    const changes = git('diff-tree', '--no-commit-id', '--name-status', '-r', commit).split(/\r?\n/u).filter(Boolean).map((line) => {
+    const changes = git('diff-tree', '--no-commit-id', '--name-status', '--find-renames=50%', '--find-copies=50%', '--find-copies-harder', '-l0', '-r', commit).split(/\r?\n/u).filter(Boolean).map((line) => {
       const [status, path, extra] = line.split('\t');
       if (!['A', 'M', 'D'].includes(status) || !path || extra) throw new Error(`${label}: unsupported history entry at ${commit}: ${line}`);
       if (!expected.includes(path)) throw new Error(`${label}: unauthorized path ${path} at ${commit}.`);
@@ -98,6 +98,8 @@ function exactLinearHistory(from, to, expected, label, inspect = () => {}) {
       return { status, path };
     });
     if (changes.length === 0) throw new Error(`${label}: empty commit ${commit}.`);
+    const statuses = new Set(changes.map(({ status }) => status));
+    if (statuses.has('A') && statuses.has('D')) throw new Error(`${label}: mixed add/delete commit ${commit}.`);
     inspect(commit, parents[0], changes);
   }
   if (!equalSet(touched, expected)) throw new Error(`${label}: touched-path union drifted.`);
