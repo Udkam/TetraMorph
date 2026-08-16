@@ -51,11 +51,27 @@ function range(from, to) { return git('diff', '--name-only', `${from}..${to}`).s
 function tree(head) { return git('ls-tree', '-r', '--name-only', head, '--', prefix).split(/\r?\n/u).filter(Boolean); }
 /** @param {string} head @param {string} path */
 function exists(head, path) { try { git('cat-file', '-e', `${head}:${path}`); return true; } catch { return false; } }
+const FROZEN_C050 = Object.freeze({
+  commit: 'bcdfe9a94ba0b59141d09a5654ca56c6de787b5c',
+  parent: '3eb110f546e84c5003c9d2eaa73dfa0f8f9986e9',
+  status: 'C050',
+  fromPath: 'docs/evidence/t37/bomb-familiar-language-audition-r5a/.gitattributes',
+  fromBlob: '3eacc44b940401abb0899ee8c74833d35f56df1c',
+  toPath: 'docs/evidence/t37/material-ice-current-head/.gitattributes',
+  toBlob: '94afc642601372e041806b12a5fcea82dac719b7',
+});
+/** @param {string} commit @param {string} parent @param {string} status @param {string} fromPath @param {string} toPath */
+function isFrozenC050(commit, parent, status, fromPath, toPath) {
+  return commit === FROZEN_C050.commit && parent === FROZEN_C050.parent && status === FROZEN_C050.status
+    && fromPath === FROZEN_C050.fromPath && toPath === FROZEN_C050.toPath
+    && git('rev-parse', `${parent}:${fromPath}`) === FROZEN_C050.fromBlob
+    && git('rev-parse', `${commit}:${toPath}`) === FROZEN_C050.toBlob;
+}
 /** @param {string} from @param {string} to @param {string[]} allowed @param {string} label */
 function linearHistory(from, to, allowed, label) {
   const commits = git('rev-list', '--reverse', '--ancestry-path', `${from}..${to}`).split(/\r?\n/u).filter(Boolean);
   const touched = new Set(); const allowedSet = new Set(allowed); const historyErrors = [];
-  let expectedParent = from;
+  let expectedParent = from; let frozenCopyCount = 0;
   if (commits.length === 0) historyErrors.push('empty range');
   for (const commit of commits) {
     const parents = git('rev-list', '--parents', '-n', '1', commit).split(/\s+/u);
@@ -65,7 +81,7 @@ function linearHistory(from, to, allowed, label) {
     }
     const fields = gitRaw(
       'diff-tree', '--no-commit-id', '--name-status', '-r', '-z',
-      '--find-renames=50%', '--find-copies=50%', parents[1], commit,
+      '--find-renames=50%', '--find-copies=50%', '--find-copies-harder', parents[1], commit,
     ).toString('utf8').split('\0');
     if (fields.pop() !== '' || fields.length === 0) {
       historyErrors.push(`empty or malformed commit ${commit}`);
@@ -77,7 +93,12 @@ function linearHistory(from, to, allowed, label) {
       const status = fields[index++];
       if (/^[RC]\d+$/u.test(status)) {
         const fromPath = fields[index++]; const toPath = fields[index++];
-        historyErrors.push(!fromPath || !toPath ? `malformed ${status} ${commit}` : `forbidden ${status} ${fromPath} -> ${toPath}`);
+        if (!fromPath || !toPath) historyErrors.push(`malformed ${status} ${commit}`);
+        else if (isFrozenC050(commit, parents[1], status, fromPath, toPath)) {
+          frozenCopyCount += 1;
+          if (frozenCopyCount !== 1 || !allowedSet.has(toPath)) historyErrors.push('invalid frozen C050 normalization');
+          touched.add(toPath);
+        } else historyErrors.push(`forbidden ${status} ${fromPath} -> ${toPath}`);
         continue;
       }
       const path = fields[index++];
@@ -88,6 +109,8 @@ function linearHistory(from, to, allowed, label) {
     }
     expectedParent = commit;
   }
+  const expectedFrozenCopyCount = commits.includes(FROZEN_C050.commit) ? 1 : 0;
+  if (frozenCopyCount !== expectedFrozenCopyCount) historyErrors.push(`frozen C050 count ${frozenCopyCount} != ${expectedFrozenCopyCount}`);
   if (expectedParent !== to) historyErrors.push(`endpoint ${expectedParent} != ${to}`);
   if (!equalSet([...touched], allowed)) historyErrors.push(`touched ${sorted([...touched]).join(',')}`);
   check(historyErrors.length === 0, label, { commits, touched: sorted([...touched]), historyErrors });
@@ -124,6 +147,30 @@ const noRelevantListeners = (tracker) => Boolean(tracker?.listenerCounts)
   && Object.values(relevantListeners(tracker)).every((count) => count === 0);
 /** @param {any} tracker */
 const activeRafs = (tracker) => Number.isInteger(tracker?.activeRafs) ? Number(tracker.activeRafs) : -1;
+/** @param {any} tracker @returns {Array<{id: number|null, closed: boolean, closeCalls: number}>|null} */
+const contextRecords = (tracker) => Array.isArray(tracker?.contexts) ? tracker.contexts.map((/** @type {any} */ entry) => ({
+  id: Number.isInteger(entry?.id) ? Number(entry.id) : null,
+  closed: entry?.closed === true,
+  closeCalls: Number.isInteger(entry?.closeCalls) ? Number(entry.closeCalls) : -1,
+})) : null;
+/** @param {any} before @param {any} after */
+const sameContextRecords = (before, after) => contextRecords(before) !== null && deepEqual(contextRecords(before), contextRecords(after));
+/** @param {any} before @param {any} after */
+function closedContextSuccessors(before, after) {
+  const baseline = contextRecords(before); const closed = contextRecords(after);
+  return baseline !== null && closed !== null && closed.length === baseline.length
+    && closed.every((entry, index) => entry.id === baseline[index]?.id && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+}
+/** @param {any} before @param {any} after */
+function exactReentryContexts(before, after) {
+  const baseline = contextRecords(before); const reentry = contextRecords(after);
+  if (baseline === null || reentry === null || reentry.length !== baseline.length + 1) return false;
+  const oldClosed = reentry.slice(0, baseline.length).every((entry, index) => entry.id === baseline[index]?.id
+    && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+  const fresh = reentry.at(-1);
+  return oldClosed && fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
+    && !fresh.closed && fresh.closeCalls === 0;
+}
 
 /** @param {any} value @param {string} label @param {string[]} errors */
 function assertTextState(value, label, errors) {
@@ -146,6 +193,17 @@ function assertCleanObservations(observed, label, errors) {
 /** @param {any} browser */
 function browserLifecycleProof(browser) {
   return {
+    canvasOwners: {
+      initial: { canvasCount: browser.initial?.canvasCount, canvases: browser.initial?.tracker?.canvases },
+      restartBefore: { canvasCount: browser.restarted?.before?.canvasCount, canvases: browser.restarted?.before?.canvases },
+      restartAfter: { canvasCount: browser.restarted?.after?.canvasCount, canvases: browser.restarted?.after?.canvases },
+      preferences: { canvasCount: browser.changedPreferences?.canvasCount, canvases: browser.changedPreferences?.tracker?.canvases },
+      exit: { canvases: browser.exited?.tracker?.canvases },
+      reentry: { canvasCount: browser.reentered?.canvasCount, canvases: browser.reentered?.tracker?.canvases },
+      hmrBaseline: { canvasCount: browser.hmr?.before?.canvasCount, canvases: browser.hmr?.before?.tracker?.canvases },
+      hmrAfter: { canvasCount: browser.hmr?.after?.canvasCount, canvases: browser.hmr?.after?.tracker?.canvases },
+      terminal: { canvases: browser.terminal?.canvases },
+    },
     activeRafs: {
       initial: activeRafs(browser.initial?.tracker), restartBefore: activeRafs(browser.restarted?.before), restartAfter: activeRafs(browser.restarted?.after),
       preferences: activeRafs(browser.changedPreferences?.tracker), exit: activeRafs(browser.exited?.tracker), reentry: activeRafs(browser.reentered?.tracker),
@@ -155,6 +213,11 @@ function browserLifecycleProof(browser) {
       initial: relevantListeners(browser.initial?.tracker), restartBefore: relevantListeners(browser.restarted?.before), restartAfter: relevantListeners(browser.restarted?.after),
       preferences: relevantListeners(browser.changedPreferences?.tracker), exit: relevantListeners(browser.exited?.tracker), reentry: relevantListeners(browser.reentered?.tracker),
       hmrBaseline: relevantListeners(browser.hmr?.before?.tracker), hmrAfter: relevantListeners(browser.hmr?.after?.tracker), terminal: relevantListeners(browser.terminal),
+    },
+    contexts: {
+      initial: contextRecords(browser.initial?.tracker), restartBefore: contextRecords(browser.restarted?.before), restartAfter: contextRecords(browser.restarted?.after),
+      preferences: contextRecords(browser.changedPreferences?.tracker), exit: contextRecords(browser.exited?.tracker), reentry: contextRecords(browser.reentered?.tracker),
+      hmrBaseline: contextRecords(browser.hmr?.before?.tracker), hmrAfter: contextRecords(browser.hmr?.after?.tracker), terminal: contextRecords(browser.terminal),
     },
   };
 }
@@ -167,19 +230,35 @@ function browserLifecycleAssertions(browser) {
     observationsClean: Array.isArray(observations.consoleErrors) && observations.consoleErrors.length === 0
       && Array.isArray(observations.pageErrors) && observations.pageErrors.length === 0
       && Array.isArray(observations.requestErrors) && observations.requestErrors.length === 0,
-    initialOwners: browser.initial?.canvasCount === 1 && browser.initial?.domCellCount === 0 && browser.initial?.tracker?.liveContexts === 1 && activeRafs(browser.initial?.tracker) >= 1,
+    initialOwners: browser.initial?.canvasCount === 1 && browser.initial?.tracker?.canvases === 1 && browser.initial?.domCellCount === 0
+      && browser.initial?.tracker?.liveContexts === 1 && activeRafs(browser.initial?.tracker) >= 1,
+    initialContextRecordExact: contextRecords(browser.initial?.tracker)?.length === 1 && contextRecords(browser.initial?.tracker)?.[0]?.id !== null
+      && contextRecords(browser.initial?.tracker)?.[0]?.closed === false && contextRecords(browser.initial?.tracker)?.[0]?.closeCalls === 0,
     restartOwnersExact: browser.restarted?.before?.qaId === browser.restarted?.after?.qaId && browser.restarted?.before?.canvasId === browser.restarted?.after?.canvasId
-      && browser.restarted?.before?.contexts?.at(-1)?.id === browser.restarted?.after?.contexts?.at(-1)?.id && browser.restarted?.after?.liveContexts === 1,
+      && browser.restarted?.after?.liveContexts === 1,
+    restartCanvasesExact: browser.restarted?.before?.canvasCount === 1 && browser.restarted?.before?.canvases === 1
+      && browser.restarted?.after?.canvasCount === 1 && browser.restarted?.after?.canvases === 1,
+    restartRafsExact: activeRafs(browser.restarted?.before) >= 1 && activeRafs(browser.restarted?.after) === activeRafs(browser.restarted?.before),
+    restartContextsExact: sameContextRecords(browser.restarted?.before, browser.restarted?.after),
     restartListenersExact: sameRelevantListeners(browser.restarted?.before, browser.restarted?.after),
     preferencesOwnersExact: browser.changedPreferences?.tracker?.qaId === browser.initial?.tracker?.qaId && browser.changedPreferences?.tracker?.canvasId === browser.initial?.tracker?.canvasId
-      && browser.changedPreferences?.tracker?.contexts?.at(-1)?.id === browser.initial?.tracker?.contexts?.at(-1)?.id && browser.changedPreferences?.tracker?.liveContexts === 1,
+      && browser.changedPreferences?.tracker?.liveContexts === 1,
+    preferencesCanvasesExact: browser.changedPreferences?.canvasCount === 1 && browser.changedPreferences?.tracker?.canvases === 1,
+    preferencesRafsExact: activeRafs(browser.changedPreferences?.tracker) === activeRafs(browser.restarted?.after)
+      && activeRafs(browser.changedPreferences?.tracker) === activeRafs(browser.initial?.tracker),
+    preferencesContextsExact: sameContextRecords(browser.restarted?.after, browser.changedPreferences?.tracker)
+      && sameContextRecords(browser.initial?.tracker, browser.changedPreferences?.tracker),
     preferencesListenersExact: sameRelevantListeners(browser.initial?.tracker, browser.changedPreferences?.tracker),
     exitOwnersClean: browser.exited?.oldRendererRetired === true && browser.exited?.tracker?.canvases === 0 && browser.exited?.tracker?.liveContexts === 0
       && browser.exited?.qaPresent === false && browser.exited?.textHook === false,
     exitRafsZero: activeRafs(browser.exited?.tracker) === 0,
     exitListenersZero: noRelevantListeners(browser.exited?.tracker),
+    exitContextsClosedExact: closedContextSuccessors(browser.changedPreferences?.tracker, browser.exited?.tracker),
     reentryOwnersFresh: browser.reentered?.tracker?.qaId !== browser.initial?.tracker?.qaId && browser.reentered?.tracker?.canvasId !== browser.initial?.tracker?.canvasId
-      && browser.reentered?.tracker?.liveContexts === 1 && browser.reentered?.tracker?.contexts?.slice(0, -1).every((/** @type {any} */ entry) => entry.closed),
+      && browser.reentered?.tracker?.liveContexts === 1,
+    reentryCanvasesExact: browser.reentered?.canvasCount === 1 && browser.reentered?.tracker?.canvases === 1,
+    reentryRafsExact: activeRafs(browser.reentered?.tracker) === activeRafs(browser.changedPreferences?.tracker),
+    reentryContextsExact: exactReentryContexts(browser.changedPreferences?.tracker, browser.reentered?.tracker),
     reentryListenersExact: sameRelevantListeners(browser.changedPreferences?.tracker, browser.reentered?.tracker),
     hmrDelivered: Array.isArray(browser.hmr?.requests) && browser.hmr.requests.length >= 1,
     hmrOwnersBound: browser.hmr?.after?.canvasCount === 1 && browser.hmr?.after?.tracker?.liveContexts === 1

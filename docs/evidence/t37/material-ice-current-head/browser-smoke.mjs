@@ -35,6 +35,32 @@ const noRelevantListeners = (tracker) => Boolean(tracker?.listenerCounts)
   && Object.values(relevantListeners(tracker)).every((count) => count === 0);
 /** @param {any} tracker */
 const activeRafs = (tracker) => Number.isInteger(tracker?.activeRafs) ? Number(tracker.activeRafs) : -1;
+/** @param {any} left @param {any} right */
+const deepEqual = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+/** @param {any} tracker @returns {Array<{id: number|null, closed: boolean, closeCalls: number}>|null} */
+const contextRecords = (tracker) => Array.isArray(tracker?.contexts) ? tracker.contexts.map((/** @type {any} */ entry) => ({
+  id: Number.isInteger(entry?.id) ? Number(entry.id) : null,
+  closed: entry?.closed === true,
+  closeCalls: Number.isInteger(entry?.closeCalls) ? Number(entry.closeCalls) : -1,
+})) : null;
+/** @param {any} before @param {any} after */
+const sameContextRecords = (before, after) => contextRecords(before) !== null && deepEqual(contextRecords(before), contextRecords(after));
+/** @param {any} before @param {any} after */
+function closedContextSuccessors(before, after) {
+  const baseline = contextRecords(before); const closed = contextRecords(after);
+  return baseline !== null && closed !== null && closed.length === baseline.length
+    && closed.every((entry, index) => entry.id === baseline[index]?.id && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+}
+/** @param {any} before @param {any} after */
+function exactReentryContexts(before, after) {
+  const baseline = contextRecords(before); const reentry = contextRecords(after);
+  if (baseline === null || reentry === null || reentry.length !== baseline.length + 1) return false;
+  const oldClosed = reentry.slice(0, baseline.length).every((entry, index) => entry.id === baseline[index]?.id
+    && entry.closed && entry.closeCalls === (baseline[index]?.closeCalls ?? -2) + 1);
+  const fresh = reentry.at(-1);
+  return oldClosed && fresh !== undefined && fresh.id !== null && !baseline.some(({ id }) => id === fresh.id)
+    && !fresh.closed && fresh.closeCalls === 0;
+}
 
 check(git('rev-parse', AUTH) === AUTH, 'authorization head missing');
 check(git('rev-parse', BASE) === BASE, 'R5B terminal base missing');
@@ -51,8 +77,9 @@ const { page, context, observed } = opened;
 await page.keyboard.press('ArrowLeft');
 await page.waitForTimeout(100);
 const initial = await snapshot(page);
-check(initial.canvasCount === 1 && initial.domCellCount === 0, 'initial product ownership');
-check(initial.tracker?.liveContexts === 1, 'initial live AudioContext');
+check(initial.canvasCount === 1 && initial.tracker?.canvases === 1 && initial.domCellCount === 0, 'initial product ownership');
+check(initial.tracker?.liveContexts === 1 && contextRecords(initial.tracker)?.length === 1
+  && contextRecords(initial.tracker)?.[0]?.closed === false && contextRecords(initial.tracker)?.[0]?.closeCalls === 0, 'initial exact AudioContext record');
 check(initial.tracker?.activeRafs >= 1, 'initial renderer/ticker frame activity');
 
 const freeze = scenarioFor(scenarios, 'freeze');
@@ -67,14 +94,18 @@ check(runtimeIceResponses[0]?.status === 200 && runtimeIceResponses[0]?.sha256 =
 
 const restarted = await page.evaluate(() => {
   const w = /** @type {any} */ (window);
-  const before = w.__MATERIAL_TRACKER__.snapshot();
+  const tracked = () => ({ ...w.__MATERIAL_TRACKER__.snapshot(), canvasCount: document.querySelectorAll('canvas').length });
+  const before = tracked();
   w.__TETRAMORPH_QA__.restart();
   w.__TETRAMORPH_QA__.start();
   w.__TETRAMORPH_QA__.setFrozen(true);
-  return { before, after: w.__MATERIAL_TRACKER__.snapshot(), state: w.__TETRAMORPH_QA__.getState() };
+  return { before, after: tracked(), state: w.__TETRAMORPH_QA__.getState() };
 });
 check(restarted.before.qaId === restarted.after.qaId && restarted.before.canvasId === restarted.after.canvasId, 'restart reuses runtime and Canvas');
-check(restarted.before.contexts.at(-1)?.id === restarted.after.contexts.at(-1)?.id && restarted.after.liveContexts === 1, 'restart reuses AudioContext');
+check(restarted.before.canvasCount === 1 && restarted.before.canvases === 1
+  && restarted.after.canvasCount === 1 && restarted.after.canvases === 1, 'restart exact Canvas ownership');
+check(activeRafs(restarted.before) >= 1 && activeRafs(restarted.after) === activeRafs(restarted.before), 'restart active RAFs exactly match baseline');
+check(restarted.after.liveContexts === 1 && sameContextRecords(restarted.before, restarted.after), 'restart creates no AudioContext and preserves closed records');
 check(sameRelevantListeners(restarted.before, restarted.after), 'restart relevant listener set is exactly stable');
 
 await page.getByTestId('open-settings').click();
@@ -85,7 +116,11 @@ await page.waitForFunction(() => document.querySelector('.app')?.getAttribute('d
   && document.querySelector('.app')?.getAttribute('data-reduced-motion') === 'true');
 const changedPreferences = await snapshot(page);
 check(changedPreferences.tracker?.qaId === initial.tracker?.qaId && changedPreferences.tracker?.canvasId === initial.tracker?.canvasId, 'theme/motion reuse runtime and Canvas');
-check(changedPreferences.tracker?.contexts.at(-1)?.id === initial.tracker?.contexts.at(-1)?.id && changedPreferences.tracker?.liveContexts === 1, 'theme/motion reuse AudioContext');
+check(changedPreferences.canvasCount === 1 && changedPreferences.tracker?.canvases === 1, 'theme/motion exact Canvas ownership');
+check(activeRafs(changedPreferences.tracker) === activeRafs(restarted.after)
+  && activeRafs(changedPreferences.tracker) === activeRafs(initial.tracker), 'theme/motion active RAFs exactly match baseline');
+check(changedPreferences.tracker?.liveContexts === 1 && sameContextRecords(restarted.after, changedPreferences.tracker)
+  && sameContextRecords(initial.tracker, changedPreferences.tracker), 'theme/motion creates no AudioContext and preserves closed records');
 check(sameRelevantListeners(initial.tracker, changedPreferences.tracker), 'theme/motion relevant listener set is exactly stable');
 
 await page.evaluate(() => { const w = /** @type {any} */ (window); w.__MATERIAL_EXIT_QA__ = w.__TETRAMORPH_QA__; });
@@ -110,6 +145,7 @@ check(exited.tracker.canvases === 0 && exited.tracker.liveContexts === 0 && exit
 check(!exited.qaPresent && !exited.textHook, 'UI exit retires QA hooks');
 check(activeRafs(exited.tracker) === 0, 'UI exit retires every tracked RAF');
 check(noRelevantListeners(exited.tracker), 'UI exit retires every relevant listener');
+check(closedContextSuccessors(changedPreferences.tracker, exited.tracker), 'UI exit closes each baseline AudioContext exactly once');
 
 await page.getByTestId('enter-sprint').click();
 await page.getByTestId('game-screen').waitFor({ state: 'visible' });
@@ -120,8 +156,9 @@ await page.keyboard.press('ArrowLeft');
 await page.waitForTimeout(100);
 const reentered = await snapshot(page);
 check(reentered.tracker?.qaId !== initial.tracker?.qaId && reentered.tracker?.canvasId !== initial.tracker?.canvasId, 're-entry owns fresh runtime and Canvas');
-check(reentered.tracker?.liveContexts === 1 && reentered.tracker?.contexts.length >= 2
-  && reentered.tracker?.contexts.slice(0, -1).every((/** @type {any} */ entry) => entry.closed), 're-entry owns one fresh AudioContext');
+check(reentered.canvasCount === 1 && reentered.tracker?.canvases === 1, 're-entry exact Canvas ownership');
+check(activeRafs(reentered.tracker) === activeRafs(changedPreferences.tracker), 're-entry active RAFs exactly match baseline');
+check(reentered.tracker?.liveContexts === 1 && exactReentryContexts(changedPreferences.tracker, reentered.tracker), 're-entry adds exactly one AudioContext after exact old-context closure');
 check(sameRelevantListeners(reentered.tracker, changedPreferences.tracker), 're-entry restores the exact relevant listener set');
 
 await page.evaluate(() => { const w = /** @type {any} */ (window); w.__MATERIAL_HMR_QA__ = w.__TETRAMORPH_QA__; });
@@ -187,6 +224,17 @@ const iceProvenance = {
 if (!iceProvenance.passed) failures.push(...iceProvenance.failures.map((value) => `Ice provenance: ${value}`));
 
 const lifecycleProof = {
+  canvasOwners: {
+    initial: { canvasCount: initial.canvasCount, canvases: initial.tracker?.canvases },
+    restartBefore: { canvasCount: restarted.before.canvasCount, canvases: restarted.before.canvases },
+    restartAfter: { canvasCount: restarted.after.canvasCount, canvases: restarted.after.canvases },
+    preferences: { canvasCount: changedPreferences.canvasCount, canvases: changedPreferences.tracker?.canvases },
+    exit: { canvases: exited.tracker.canvases },
+    reentry: { canvasCount: reentered.canvasCount, canvases: reentered.tracker?.canvases },
+    hmrBaseline: { canvasCount: beforeHmr.canvasCount, canvases: beforeHmr.tracker?.canvases },
+    hmrAfter: { canvasCount: afterHmr.canvasCount, canvases: afterHmr.tracker?.canvases },
+    terminal: { canvases: terminal.canvases },
+  },
   activeRafs: {
     initial: activeRafs(initial.tracker), restartBefore: activeRafs(restarted.before), restartAfter: activeRafs(restarted.after),
     preferences: activeRafs(changedPreferences.tracker), exit: activeRafs(exited.tracker), reentry: activeRafs(reentered.tracker),
@@ -197,22 +245,42 @@ const lifecycleProof = {
     preferences: relevantListeners(changedPreferences.tracker), exit: relevantListeners(exited.tracker), reentry: relevantListeners(reentered.tracker),
     hmrBaseline: relevantListeners(beforeHmr.tracker), hmrAfter: relevantListeners(afterHmr.tracker), terminal: relevantListeners(terminal),
   },
+  contexts: {
+    initial: contextRecords(initial.tracker), restartBefore: contextRecords(restarted.before), restartAfter: contextRecords(restarted.after),
+    preferences: contextRecords(changedPreferences.tracker), exit: contextRecords(exited.tracker), reentry: contextRecords(reentered.tracker),
+    hmrBaseline: contextRecords(beforeHmr.tracker), hmrAfter: contextRecords(afterHmr.tracker), terminal: contextRecords(terminal),
+  },
 };
 const lifecycleAssertions = {
   realProductRoute: page.url().startsWith(origin.replace(/\/$/u, '')),
   observationsClean: observed.consoleErrors.length === 0 && observed.pageErrors.length === 0 && observed.requestErrors.length === 0,
-  initialOwners: initial.canvasCount === 1 && initial.domCellCount === 0 && initial.tracker?.liveContexts === 1 && activeRafs(initial.tracker) >= 1,
+  initialOwners: initial.canvasCount === 1 && initial.tracker?.canvases === 1 && initial.domCellCount === 0 && initial.tracker?.liveContexts === 1 && activeRafs(initial.tracker) >= 1,
+  initialContextRecordExact: contextRecords(initial.tracker)?.length === 1 && contextRecords(initial.tracker)?.[0]?.id !== null
+    && contextRecords(initial.tracker)?.[0]?.closed === false && contextRecords(initial.tracker)?.[0]?.closeCalls === 0,
   restartOwnersExact: restarted.before.qaId === restarted.after.qaId && restarted.before.canvasId === restarted.after.canvasId
-    && restarted.before.contexts.at(-1)?.id === restarted.after.contexts.at(-1)?.id && restarted.after.liveContexts === 1,
+    && restarted.after.liveContexts === 1,
+  restartCanvasesExact: restarted.before.canvasCount === 1 && restarted.before.canvases === 1
+    && restarted.after.canvasCount === 1 && restarted.after.canvases === 1,
+  restartRafsExact: activeRafs(restarted.before) >= 1 && activeRafs(restarted.after) === activeRafs(restarted.before),
+  restartContextsExact: sameContextRecords(restarted.before, restarted.after),
   restartListenersExact: sameRelevantListeners(restarted.before, restarted.after),
   preferencesOwnersExact: changedPreferences.tracker?.qaId === initial.tracker?.qaId && changedPreferences.tracker?.canvasId === initial.tracker?.canvasId
-    && changedPreferences.tracker?.contexts.at(-1)?.id === initial.tracker?.contexts.at(-1)?.id && changedPreferences.tracker?.liveContexts === 1,
+    && changedPreferences.tracker?.liveContexts === 1,
+  preferencesCanvasesExact: changedPreferences.canvasCount === 1 && changedPreferences.tracker?.canvases === 1,
+  preferencesRafsExact: activeRafs(changedPreferences.tracker) === activeRafs(restarted.after)
+    && activeRafs(changedPreferences.tracker) === activeRafs(initial.tracker),
+  preferencesContextsExact: sameContextRecords(restarted.after, changedPreferences.tracker)
+    && sameContextRecords(initial.tracker, changedPreferences.tracker),
   preferencesListenersExact: sameRelevantListeners(initial.tracker, changedPreferences.tracker),
   exitOwnersClean: exited.oldRendererRetired && exited.tracker.canvases === 0 && exited.tracker.liveContexts === 0 && !exited.qaPresent && !exited.textHook,
   exitRafsZero: activeRafs(exited.tracker) === 0,
   exitListenersZero: noRelevantListeners(exited.tracker),
+  exitContextsClosedExact: closedContextSuccessors(changedPreferences.tracker, exited.tracker),
   reentryOwnersFresh: reentered.tracker?.qaId !== initial.tracker?.qaId && reentered.tracker?.canvasId !== initial.tracker?.canvasId
-    && reentered.tracker?.liveContexts === 1 && reentered.tracker?.contexts.slice(0, -1).every((/** @type {any} */ entry) => entry.closed),
+    && reentered.tracker?.liveContexts === 1,
+  reentryCanvasesExact: reentered.canvasCount === 1 && reentered.tracker?.canvases === 1,
+  reentryRafsExact: activeRafs(reentered.tracker) === activeRafs(changedPreferences.tracker),
+  reentryContextsExact: exactReentryContexts(changedPreferences.tracker, reentered.tracker),
   reentryListenersExact: sameRelevantListeners(changedPreferences.tracker, reentered.tracker),
   hmrDelivered: hmrRequests.length >= 1,
   hmrOwnersBound: afterHmr.canvasCount === 1 && afterHmr.tracker?.liveContexts === 1 && (oldHmrOwner.sameOwner || oldHmrOwner.oldRenderer === 'retired'),
