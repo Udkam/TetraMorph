@@ -28,6 +28,12 @@ const R5A_SOURCE_PATHS = ['.gitattributes', 'README.md', 'audioSession.ts', 'aud
 const R5A_OUTPUT_PATHS = ['assets/A.wav', 'assets/B.wav', 'assets/C.wav', 'browser-report.json', 'client-smoke/shot-0.png', 'client-smoke/shot-1.png', 'client-smoke/shot-2.png', 'client-smoke/state-0.json', 'client-smoke/state-1.json', 'client-smoke/state-2.json', 'manifest.json', 'r5a-desktop-impact.png', 'r5a-mobile.png', 'r5a-reduced-technical.png'].map((path) => r5aPrefix + path);
 const R5A_TERMINAL_PATHS = [r5aPrefix + 'verification-report.json'];
 const WAV = Object.freeze({ A: 'be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254', B: 'b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc', C: 'ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6' });
+const FULL_BEATS = Array.from({ length: 20 }, (_, index) => 220 + index * 56);
+const REDUCED_BEATS = Array.from({ length: 20 }, (_, index) => 50 + index * 20);
+const BYTE_CONTRACT = Object.freeze({ text: 'UTF-8 no-BOM LF-only', png: 'binary-unfiltered', committedDomain: 'git blob', precommitDomain: 'validated raw worktree bytes', manifestSelfHash: 'excluded' });
+const TIMING = Object.freeze({ normalFrames: 19_200, fullChainFrames: 65_664, reducedChainFrames: 22_368, fullBeatStartsMs: FULL_BEATS, reducedBeatStartsMs: REDUCED_BEATS });
+const MANIFEST_KEYS = ['schema', 'generatedAt', 'provenance', 'pathContracts', 'countContracts', 'byteContract', 'timing', 'wav', 'sourceBindings', 'outputBindings', 'contractBindings', 'productBindings', 'r5aBindings'];
+const BROWSER_KEYS = ['schema', 'generatedAt', 'passed', 'failures', 'initial', 'naturalPair', 'domRoutes', 'technical', 'sameContext', 'stemAssets', 'stopped', 'restarted', 'disabled', 'enabled', 'reducedState', 'mobileTerminal', 'desktopTerminal', 'races', 'variantRace', 'assetRequests', 'layout', 'consoleErrors', 'pageErrors', 'requestErrors'];
 
 if (SOURCE.length !== 10 || PRE_REPORT.length !== 12 || TERMINAL.length !== 1 || CONTRACT.length !== 4 || R5A_SOURCE_PATHS.length !== 21 || R5A_OUTPUT_PATHS.length !== 14 || R5A_TERMINAL_PATHS.length !== 1) throw new Error('Frozen path-count contract drifted.');
 const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
@@ -35,6 +41,7 @@ const blob = (head, path) => execFileSync('git', ['show', `${head}:${path}`], { 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const sorted = (values) => [...values].sort();
 const equalSet = (left, right) => JSON.stringify(sorted(left)) === JSON.stringify(sorted(right));
+const canonicalIso = (value) => { try { return typeof value === 'string' && new Date(value).toISOString() === value; } catch { return false; } };
 const range = (from, to) => git('diff', '--name-only', `${from}..${to}`).split(/\r?\n/u).filter(Boolean);
 const treePaths = (head, pathPrefix) => git('ls-tree', '-r', '--name-only', head, '--', pathPrefix).split(/\r?\n/u).filter(Boolean);
 function exactRange(from, to, expected, label) {
@@ -104,8 +111,11 @@ for (const [index, variant] of ['A', 'B', 'C'].entries()) {
   if (bytes.length !== 17_324 || sha(bytes) !== WAV[variant]) throw new Error(`${variant} WAV byte/hash drift.`);
   if (productBindings.at(-(3 - index)).path !== path) throw new Error(`${variant} product binding order drift.`);
 }
-const browser = JSON.parse((await readFile(join(root, 'browser-report.json'))).toString('utf8'));
-if (browser.schema !== 'tetramorph.t37.r5b-browser-proof.v2' || !browser.passed || browser.failures.length !== 0) throw new Error('Browser report failed or has wrong schema.');
+const browserBytes = await readFile(join(root, 'browser-report.json'));
+text(browserBytes, 'browser-report.json');
+const browser = JSON.parse(browserBytes.toString('utf8'));
+if (!equalSet(Object.keys(browser), BROWSER_KEYS) || !canonicalIso(browser.generatedAt) || browser.schema !== 'tetramorph.t37.r5b-browser-proof.v2' || !browser.passed || browser.failures.length !== 0) throw new Error('Browser report failed its exact schema/time/pass contract.');
+if (JSON.stringify(browser.initial.fixture.fullBeatStartsMs) !== JSON.stringify(FULL_BEATS) || JSON.stringify(browser.initial.fixture.reducedBeatStartsMs) !== JSON.stringify(REDUCED_BEATS)) throw new Error('Browser shared beat timing drifted.');
 
 const manifest = {
   schema: 'tetramorph.t37.r5b-manifest.v2',
@@ -113,8 +123,8 @@ const manifest = {
   provenance: { authorizationHead: AUTH, evidenceSourceHead: head, productHead: PRODUCT, r5a: { source: R5A_SOURCE, outputs: R5A_OUTPUT, report: R5A_REPORT }, writerBoundary: `${prefix}**`, humanStatus: 'OPEN / NOT ACCEPTED' },
   pathContracts: { source: sourcePaths, preReport: prePaths, terminal: terminalPaths, contract: CONTRACT, product: PRODUCT_BINDINGS.map(({ kind, path }) => ({ kind, path })), r5aSource: R5A_SOURCE_PATHS, r5aOutput: R5A_OUTPUT_PATHS, r5aTerminal: R5A_TERMINAL_PATHS },
   countContracts: { source: 10, preReport: 12, terminal: 1, contract: 4, r5aSource: 21, r5aOutput: 14, r5aTerminal: 1 },
-  byteContract: { text: 'UTF-8 no-BOM LF-only', png: 'binary-unfiltered', committedDomain: 'git blob', precommitDomain: 'validated raw worktree bytes', manifestSelfHash: 'excluded' },
-  timing: { normalFrames: 19_200, fullChainFrames: 65_664, reducedChainFrames: 22_368, fullBeatStartsMs: browser.initial.fixture.fullBeatStartsMs, reducedBeatStartsMs: browser.initial.fixture.reducedBeatStartsMs },
+  byteContract: BYTE_CONTRACT,
+  timing: TIMING,
   wav: WAV,
   sourceBindings,
   outputBindings,
@@ -122,6 +132,7 @@ const manifest = {
   productBindings,
   r5aBindings,
 };
+if (!equalSet(Object.keys(manifest), MANIFEST_KEYS) || !canonicalIso(manifest.generatedAt)) throw new Error('Generated manifest exact keys/time contract drifted.');
 const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`);
 text(manifestBytes, 'manifest.json');
 await writeFile(join(root, 'manifest.json'), manifestBytes);

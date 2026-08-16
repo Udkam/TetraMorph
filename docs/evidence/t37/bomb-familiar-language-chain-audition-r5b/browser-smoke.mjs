@@ -155,7 +155,7 @@ async function delayedRace(browser, kind) {
     terminalOwners(result.oldAfter, 'delayed HMR old-after-release');
     activeOwners(result.freshBefore, 'delayed HMR fresh-before-release', { liveContexts: 0, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
     activeOwners(result.freshAfter, 'delayed HMR fresh-after-release', { liveContexts: 0, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
-    check(result.freshBefore.instanceId === result.freshAfter.instanceId && result.freshBefore.ready === result.freshAfter.ready && JSON.stringify(result.domBefore) === JSON.stringify(result.domAfter), 'delayed HMR late old callback cannot alter fresh identity/DOM/ready');
+    check(result.freshBefore.instanceId === result.freshAfter.instanceId && result.freshBefore.renderer.tickerIdentity === result.freshAfter.renderer.tickerIdentity && result.freshBefore.ready === result.freshAfter.ready && JSON.stringify(result.domBefore) === JSON.stringify(result.domAfter), 'delayed HMR late old callback cannot alter fresh identity/ticker/DOM/ready');
     await page.evaluate(() => window.__R5B_TEST__.dispose('race-finish'));
   }
   await page.close();
@@ -293,7 +293,10 @@ const stemAssets = Object.fromEntries(['A', 'B', 'C'].map((variant) => {
 const stopped = await desktop.evaluate(() => { window.__R5B_TEST__.stop(); return window.__R5B_TEST__.getState(); });
 activeOwners(stopped, 'reusable stop', { liveContexts: 1, eventSources: 0, pendingTimers: 0, frameCallbacks: 0 });
 await desktop.evaluate(() => { void window.__R5B_TEST__.restart(); });
-await desktop.waitForFunction(() => window.__R5B_TEST__.getState().pairPhase === 'normal');
+await desktop.waitForFunction(() => {
+  const state = window.__R5B_TEST__.getState();
+  return state.pairPhase === 'normal' && state.audio.liveContexts === 1 && state.audio.eventSources === 1 && state.pendingTimers === 1 && state.renderer.frameCallbacks === 1;
+});
 const restarted = await get(desktop);
 check(restarted.pairPhase === 'normal', 'restart enters normal phase');
 activeOwners(restarted, 'restarted', { liveContexts: 1, eventSources: 1, pendingTimers: 1, frameCallbacks: 1 });
