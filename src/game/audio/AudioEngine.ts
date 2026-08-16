@@ -8,8 +8,9 @@ import {
   type GestureVoice,
 } from './audioGesture';
 import { audioCue, type CandidateAudioCueId } from './audioPalette';
-import { scheduleChainPropagationPulses, scheduleRecoveredNoisePuff } from './candidatePlayback';
+import { scheduleRecoveredNoisePuff } from './candidatePlayback';
 import { T37_AUDIO_ASSETS, type T37AudioAssetId } from './audioAssetCatalog';
+import { composeBombEventSamples, scheduleBombEventBuffer } from './bombStemPlayback';
 import {
   ACCEPTED_OUTPUT_GAIN,
   ACTION_A_CONTRACT,
@@ -27,6 +28,13 @@ import {
 
 type MutationActivation = Extract<GameEvent, { type: 'mutation-activated' }>;
 export type AcceptedAudioAssetLoader = (url: string) => Promise<ArrayBuffer>;
+export type BombStemVariant = 'A' | 'B' | 'C';
+export const PRODUCT_BOMB_STEM_VARIANT: BombStemVariant = 'A';
+
+export interface AudioEngineOptions {
+  /** Constructor-only audition seam. Product code always uses PRODUCT_BOMB_STEM_VARIANT. */
+  readonly forceBombStemVariantForTest?: BombStemVariant;
+}
 
 const MOVE_CUE_MIN_INTERVAL_MS = 60;
 const SOFT_DROP_CUE_MIN_INTERVAL_MS = 52;
@@ -45,6 +53,11 @@ const AUDIO_BUS_GAINS: Readonly<Record<AudioBus, number>> = Object.freeze({
   mutation: 0.96,
   ambient: 0.14,
   ui: 0.7,
+});
+const BOMB_STEM_ASSET: Readonly<Record<BombStemVariant, T37AudioAssetId>> = Object.freeze({
+  A: 'bombFamiliarA',
+  B: 'bombFamiliarB',
+  C: 'bombFamiliarC',
 });
 
 function configureCompressor(
@@ -77,6 +90,7 @@ export class AudioEngine {
   private buses: Partial<Record<AudioBus, GainNode>> = {};
   private enabled = true;
   private volume = 1;
+  private reducedMotion = false;
   private destroyed = false;
   private lastMoveAt = Number.NEGATIVE_INFINITY;
   private lastSoftDropAt = Number.NEGATIVE_INFINITY;
@@ -90,7 +104,12 @@ export class AudioEngine {
   constructor(
     private readonly platform: BrowserPlatform = browserPlatform,
     private readonly assetLoader: AcceptedAudioAssetLoader = fetchAcceptedAudioAsset,
-  ) {}
+    options: AudioEngineOptions = {},
+  ) {
+    this.bombStemVariant = options.forceBombStemVariantForTest ?? PRODUCT_BOMB_STEM_VARIANT;
+  }
+
+  private readonly bombStemVariant: BombStemVariant;
 
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
@@ -108,6 +127,8 @@ export class AudioEngine {
     this.volume = Math.max(0, Math.min(1, Number.isFinite(volume) ? volume : 1));
     this.applyOutputGain();
   }
+
+  setReducedMotion(reducedMotion: boolean): void { this.reducedMotion = reducedMotion; }
 
   getVolume(): number { return this.volume; }
   isEnabled(): boolean { return this.enabled; }
@@ -470,51 +491,49 @@ export class AudioEngine {
     for (const event of activations) {
       if (event.item === 'freeze') {
         this.playIce(0, startAt);
+      } else if (event.item === 'bomb') {
+        const plan = event.bombOutcome === 'chain-clear'
+          ? mutationChainPresentationPlan(event.chainTriggerRows, this.reducedMotion)
+          : null;
+        this.playBomb(plan?.beatStartsMs ?? [220], startAt);
       } else {
         const id: CandidateAudioCueId = event.item === 'collapse'
           ? 'supergravity'
-          : event.item === 'bomb'
-            ? event.bombOutcome === 'chain-clear' ? 'bomb-chain' : 'bomb'
-            : event.multiplierFactor === 4 ? 'multiplier-4' : 'multiplier-2';
-        this.playCandidateCue(
-          id,
-          0,
-          startAt,
-          event.item === 'bomb' && event.bombOutcome === 'chain-clear' ? 1 : 0,
-        );
-        if (event.item === 'bomb' && event.bombOutcome === 'chain-clear') {
-          this.playChainPropagation(event, startAt);
-        }
+          : event.multiplierFactor === 4 ? 'multiplier-4' : 'multiplier-2';
+        this.playCandidateCue(id, 0, startAt);
       }
       const durationMs = event.item === 'bomb' && event.bombOutcome === 'chain-clear'
-        ? mutationChainPresentationPlan(event.chainTriggerRows).durationMs
+        ? mutationChainPresentationPlan(event.chainTriggerRows, this.reducedMotion).durationMs
         : MUTATION_VFX_TOKENS[event.item].animation.activationMs;
       startAt += durationMs / 1_000;
     }
     this.mutationTimelineTailAt = startAt;
   }
 
-  private playChainPropagation(
-    event: Extract<MutationActivation, { item: 'bomb'; bombOutcome: 'chain-clear' }>,
+  private playBomb(
+    beatStartsMs: readonly number[],
     startAt: number,
   ): void {
     const context = this.context;
-    const destination = this.buses.mutation;
-    if (!context || !destination) return;
-    const plan = mutationChainPresentationPlan(event.chainTriggerRows);
-    if (this.activeVoices.size >= MAX_EFFECT_VOICES) return;
-    scheduleChainPropagationPulses(
-      context,
-      destination,
-      {
+    const destination = this.enabledGate;
+    const buffer = this.acceptedBuffers.get(BOMB_STEM_ASSET[this.bombStemVariant]);
+    if (
+      !context || !destination || !buffer || !this.enabled || this.destroyed
+      || this.activeVoices.size >= MAX_EFFECT_VOICES
+    ) return;
+    try {
+      const samples = composeBombEventSamples({
+        samples: buffer.getChannelData(0),
+        sampleRate: buffer.sampleRate,
+        channels: buffer.numberOfChannels,
+      }, { beatStartsMs, reducedMotion: this.reducedMotion });
+      scheduleBombEventBuffer(context, destination, samples, {
         startAt,
-        beatOffsetsSeconds: plan.beatStartsMs.map((startMs) => startMs / 1_000),
-        gain: .036,
-        gainBoost: ACTION_A_CONTRACT.voiceGainBoost,
-        gainCeiling: ACTION_A_CONTRACT.voiceGainCeiling,
         ...this.voiceHooks(true),
-      },
-    );
+      });
+    } catch {
+      // A malformed or undecodable provisional stem fails closed to silence.
+    }
   }
 
   private stopMutationCue(): void {

@@ -117,6 +117,7 @@ export class GameRuntime {
     this.onState = options.onState;
     this.audio.setEnabled(options.audioEnabled ?? true);
     this.audio.setVolume(options.audioVolume ?? 1);
+    this.audio.setReducedMotion(options.reducedMotion ?? false);
     this.audio.setAmbientTheme(options.visualTheme ?? DEFAULT_VISUAL_THEME);
   }
 
@@ -245,6 +246,7 @@ export class GameRuntime {
 
   setReducedMotion(reducedMotion: boolean): void {
     this.renderer.setOptions({ reducedMotion });
+    this.audio.setReducedMotion(reducedMotion);
   }
 
   setVisualTheme(visualTheme: VisualThemeId): void {

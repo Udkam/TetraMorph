@@ -28,6 +28,7 @@ const audioPrime = vi.hoisted(() => vi.fn());
 const audioPlayEntryCountdown = vi.hoisted(() => vi.fn());
 const audioPlayEntryCountdownResolve = vi.hoisted(() => vi.fn());
 const audioSetVolume = vi.hoisted(() => vi.fn());
+const audioSetReducedMotion = vi.hoisted(() => vi.fn());
 const audioSetAmbientTheme = vi.hoisted(() => vi.fn());
 const audioDestroy = vi.hoisted(() => vi.fn());
 const rendererDestroy = vi.hoisted(() => vi.fn());
@@ -36,6 +37,7 @@ vi.mock('../audio/AudioEngine', () => ({
   AudioEngine: class {
     setEnabled(): void {}
     setVolume(volume: number): void { audioSetVolume(volume); }
+    setReducedMotion(reducedMotion: boolean): void { audioSetReducedMotion(reducedMotion); }
     setAmbientTheme(theme: string): void { audioSetAmbientTheme(theme); }
     prime(): Promise<void> { return Promise.resolve(audioPrime()); }
     playEntryCountdown(digit: 3 | 2 | 1): void { audioPlayEntryCountdown(digit); }
@@ -321,13 +323,18 @@ describe('GameRuntime public state boundary', () => {
   });
 
   it('updates reduced motion in place without rebuilding runtime state', () => {
-    const runtime = new GameRuntime({ seed: 123, audioEnabled: false });
+    audioSetReducedMotion.mockClear();
+    const runtime = new GameRuntime({ seed: 123, audioEnabled: false, reducedMotion: true });
     const before = runtime.getState();
     rendererSetOptions.mockClear();
 
-    runtime.setReducedMotion(true);
+    expect(audioSetReducedMotion).toHaveBeenCalledWith(true);
+    audioSetReducedMotion.mockClear();
 
-    expect(rendererSetOptions).toHaveBeenCalledWith({ reducedMotion: true });
+    runtime.setReducedMotion(false);
+
+    expect(rendererSetOptions).toHaveBeenCalledWith({ reducedMotion: false });
+    expect(audioSetReducedMotion).toHaveBeenCalledWith(false);
     expect(runtime.getState()).toBe(before);
   });
 

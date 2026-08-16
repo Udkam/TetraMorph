@@ -102,6 +102,7 @@ class FakeCompressor extends FakeNode {
 const oscillators: FakeOscillator[] = [];
 const gains: FakeGain[] = [];
 const bufferSources: FakeBufferSource[] = [];
+const createdBuffers: FakeAudioBuffer[] = [];
 const filters: FakeBiquadFilter[] = [];
 const compressors: FakeCompressor[] = [];
 const panners: FakeStereoPanner[] = [];
@@ -114,6 +115,9 @@ class FakeAudioContext {
   state: AudioContextState = 'running';
   readonly sampleRate = 48_000;
   readonly destination = {} as AudioDestinationNode;
+  private localDecodeCalls = 0;
+
+  constructor(private readonly validBombStems = true) {}
 
   createGain(): GainNode {
     const node = new FakeGain();
@@ -136,7 +140,9 @@ class FakeAudioContext {
     return node as unknown as StereoPannerNode;
   }
   createBuffer(_channels: number, frames: number, sampleRate = this.sampleRate): AudioBuffer {
-    return new FakeAudioBuffer(frames, sampleRate) as unknown as AudioBuffer;
+    const buffer = new FakeAudioBuffer(frames, sampleRate);
+    createdBuffers.push(buffer);
+    return buffer as unknown as AudioBuffer;
   }
   createBufferSource(): AudioBufferSourceNode {
     const node = new FakeBufferSource();
@@ -150,6 +156,10 @@ class FakeAudioContext {
   }
   async decodeAudioData(): Promise<AudioBuffer> {
     decodeCalls += 1;
+    this.localDecodeCalls += 1;
+    if (this.validBombStems && this.localDecodeCalls >= 4) {
+      return new FakeAudioBuffer(8_640, 48_000, 1, (this.localDecodeCalls - 3) / 10) as unknown as AudioBuffer;
+    }
     return new FakeAudioBuffer(96_000, 48_000, 2, 0.5) as unknown as AudioBuffer;
   }
   async resume(): Promise<void> { this.state = 'running'; }
@@ -211,6 +221,7 @@ beforeEach(() => {
   oscillators.length = 0;
   gains.length = 0;
   bufferSources.length = 0;
+  createdBuffers.length = 0;
   filters.length = 0;
   compressors.length = 0;
   panners.length = 0;
@@ -225,8 +236,8 @@ describe('AudioEngine accepted production contract', () => {
     const audio = audioFor();
     await audio.prime();
 
-    expect(loadAsset).toHaveBeenCalledTimes(3);
-    expect(decodeCalls).toBe(3);
+    expect(loadAsset).toHaveBeenCalledTimes(6);
+    expect(decodeCalls).toBe(6);
     expect(compressors).toHaveLength(3);
     expect(compressors.map((node) => ({
       threshold: node.threshold.value,
@@ -427,72 +438,62 @@ describe('AudioEngine accepted production contract', () => {
     });
   });
 
-  it('routes the complete deterministic Bomb body and pressure contract through production', async () => {
+  it('routes a normal Bomb as one direct stem source with its audible body at 220 ms', async () => {
     const audio = audioFor();
     await audio.prime();
     audio.play([mutation('bomb')]);
 
-    expect(oscillators).toHaveLength(3);
-    expect(oscillators.map((node) => node.frequency.setValues[0])).toEqual([
-      { value: 74, time: 0 },
-      { value: 111, time: 0.22 },
-      { value: 55, time: 0.235 },
-    ]);
-    expect(oscillators[1]?.frequency.exponential[0]).toEqual({ value: 48, time: 0.44 });
-    expect(oscillators[2]?.frequency.exponential[0]).toEqual({ value: 42, time: 0.49 });
-    expect(oscillators.map((node) => node.starts[0])).toEqual([0, 0.22, 0.235]);
-    expect(oscillators.map((node) => Number(node.stops[0]?.toFixed(3)))).toEqual([0.23, 0.45, 0.5]);
+    expect(oscillators).toHaveLength(0);
+    expect(filters).toHaveLength(0);
     expect(bufferSources).toHaveLength(1);
-    expect(bufferSources[0]?.starts[0]).toEqual({ time: 0.22, offset: undefined, duration: undefined });
-    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.35);
-    expect(filters).toHaveLength(1);
-    expect(filters[0]?.type).toBe('lowpass');
-    expect(filters[0]?.frequency.setValues[0]).toEqual({ value: 880, time: 0.22 });
-    expect(filters[0]?.Q.setValues[0]).toEqual({ value: 0.55, time: 0.22 });
-    expect(gains.at(-1)?.gain.exponential[0]).toEqual({ value: 0.17 * 1.45, time: 0.224 });
+    expect(bufferSources[0]?.starts[0]).toEqual({ time: 0, offset: undefined, duration: undefined });
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.4);
+    expect(bufferSources[0]?.connections[0]).toBe(gains[1]);
+    expect(createdBuffers).toHaveLength(1);
+    expect(createdBuffers[0]?.length).toBe(19_200);
+    expect(createdBuffers[0]?.getChannelData(0)[10_559]).toBe(0);
+    expect(createdBuffers[0]?.getChannelData(0)[10_570]).toBeCloseTo(0.1);
   });
 
-  it('uses one deeper chain-clear explosion body distinct from the normal Bomb cue', async () => {
-    const audio = audioFor();
-    await audio.prime();
-    audio.play([chainClearMutation()]);
-
-    expect(oscillators).toHaveLength(4);
-    expect(oscillators.slice(0, 3).map((node) => node.frequency.setValues[0])).toEqual([
-      { value: 58, time: 0 },
-      { value: 91, time: 0.11 },
-      { value: 43, time: 0.12 },
-    ]);
-    expect(bufferSources).toHaveLength(2);
-    expect(filters.map((filter) => filter.frequency.setValues[0]?.value)).toEqual([1_050, 460]);
-    const propagation = oscillators[3]!;
-    expect(propagation.starts).toEqual([0]);
-    expect(propagation.frequency.setValues[0]?.time).toBeCloseTo(.22);
-    expect(propagation.frequency.setValues[1]?.time).toBeCloseTo(.276);
-    expect(propagation.frequency.setValues).toHaveLength(20);
-    expect(propagation.frequency.setValues.at(-1)?.time).toBeCloseTo(1.284);
-  });
-
-  it('starts chained item cues only after the first Bomb propagation finishes', async () => {
+  it('composes the full row-39 chain into one 1368 ms source and preserves its 1504 ms tail', async () => {
     const audio = audioFor();
     await audio.prime();
     audio.play([chainClearMutation(), mutation('freeze')]);
 
-    const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
-    expect(ice?.starts[0]).toEqual({ time: 1.504, offset: 0.19375, duration: 0.44 });
+    expect(oscillators).toHaveLength(0);
+    expect(filters).toHaveLength(0);
+    expect(bufferSources).toHaveLength(2);
+    expect(bufferSources[0]?.starts[0]?.time).toBe(0);
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(1.368);
+    expect(createdBuffers[0]?.length).toBe(65_664);
+    expect(bufferSources[1]?.starts[0]).toEqual({ time: 1.504, offset: 0.19375, duration: 0.44 });
   });
 
-  it('reserves one voice for chain propagation when the global voice budget is saturated', async () => {
+  it('uses the reduced 466 ms chain source while keeping the shared 520 ms tail', async () => {
     const audio = audioFor();
     await audio.prime();
-    for (let index = 0; index < 11; index += 1) {
-      audio.play([{ type: 'clear-started', rows: [39] }]);
+    audio.setReducedMotion(true);
+    audio.play([chainClearMutation(), mutation('freeze')]);
+
+    expect(createdBuffers[0]?.length).toBe(22_368);
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.466);
+    const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
+    expect(ice?.starts[0]).toEqual({ time: 0.52, offset: 0.19375, duration: 0.44 });
+  });
+
+  it('keeps A as product default and exposes B/C only through the constructor test seam', async () => {
+    const peaks: number[] = [];
+    for (const variant of ['A', 'B', 'C'] as const) {
+      const context = new FakeAudioContext();
+      const audio = new AudioEngine(platformFor(context), loadAsset, {
+        forceBombStemVariantForTest: variant,
+      });
+      await audio.prime();
+      audio.play([mutation('bomb')]);
+      peaks.push(createdBuffers.at(-1)?.getChannelData(0)[10_570] ?? 0);
+      audio.destroy();
     }
-    const beforeChain = oscillators.length;
-    audio.play([chainClearMutation()]);
-    expect(oscillators.length - beforeChain).toBe(4);
-    expect(oscillators.at(-1)?.frequency.setValues).toHaveLength(20);
-    expect(sourceCount()).toBeLessThanOrEqual(16);
+    expect(peaks.map((peak) => Number(peak.toFixed(3)))).toEqual([0.1, 0.2, 0.3]);
   });
 
   it('pins every layer of one clear or Bomb event to one moving AudioContext clock read', async () => {
@@ -517,11 +518,18 @@ describe('AudioEngine accepted production contract', () => {
     expect(bufferSources.map((node) => node.starts[0]?.time)).toEqual([4, 4.06, 4.12, 4.18]);
 
     audio.play([mutation('bomb')]);
-    const bombStarts = oscillators.slice(-3).map((node) => node.starts[0] ?? 0);
-    const bombOrigin = bombStarts[0]!;
-    expect(bombStarts.map((start) => Number((start - bombOrigin).toFixed(3)))).toEqual([0, 0.22, 0.235]);
-    expect(bufferSources.at(-1)?.starts[0]?.time).toBeCloseTo(bombOrigin + 0.22);
-    expect(filters.at(-1)?.frequency.setValues[0]?.time).toBeCloseTo(bombOrigin + 0.22);
+    const bombSource = bufferSources.at(-1)!;
+    expect(bombSource.starts[0]?.time).toBeCloseTo(4.011);
+    expect(createdBuffers.at(-1)?.getChannelData(0)[10_570]).toBeCloseTo(0.1);
+  });
+
+  it('fails closed to silence when the decoded Bomb asset violates its stem contract', async () => {
+    const audio = audioFor(new FakeAudioContext(false));
+    await audio.prime();
+    audio.play([mutation('bomb')]);
+    expect(bufferSources).toHaveLength(0);
+    expect(oscillators).toHaveLength(0);
+    expect(filters).toHaveLength(0);
   });
 
   it('lets Ice own a resolution frame without stacking hard-drop, lock, or clear sounds', async () => {
@@ -564,8 +572,8 @@ describe('AudioEngine accepted production contract', () => {
     const audio = audioFor();
     audio.setAmbientTheme('deep-tide');
     await Promise.all([audio.prime(), audio.prime(), audio.prime()]);
-    expect(loadAsset).toHaveBeenCalledTimes(3);
-    expect(decodeCalls).toBe(3);
+    expect(loadAsset).toHaveBeenCalledTimes(6);
+    expect(decodeCalls).toBe(6);
     expect(sourceCount()).toBe(0);
     audio.setAmbientTheme('mineral-mist');
     expect(sourceCount()).toBe(0);
@@ -620,7 +628,6 @@ describe('AudioEngine accepted production contract', () => {
   });
 
   it('keeps recovered-candidate voice accounting consistent with the engine', () => {
-    expect(audioCue('bomb').tones.length + (audioCue('bomb').air?.length ?? 0)).toBe(4);
     expect(audioCue('supergravity').tones).toHaveLength(2);
     expect(audioCue('multiplier-4').tones).toHaveLength(6);
   });
