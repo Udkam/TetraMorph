@@ -107,6 +107,53 @@ export interface EndgameOptimalRouteCertificate {
   replay: EndgameRouteReplay;
 }
 
+/** One immutable, repeatably readable run used by the exact proof frontier. */
+export interface EndgameProofRun {
+  readonly id: string;
+  readonly size: number;
+  values(): Iterable<string>;
+  dispose(): void;
+}
+
+/** A synchronous sink for one already ordered and deduplicated proof run. */
+export interface EndgameProofRunWriter {
+  write(key: string): void;
+  finish(): EndgameProofRun;
+  abort(): void;
+}
+
+export interface EndgameProofRunStoreDiagnostics {
+  readonly activeRuns: readonly string[];
+  readonly residue: readonly string[];
+  readonly residueTruncated: boolean;
+  readonly cleanupErrors: readonly string[];
+  readonly cleanupErrorsTruncated: boolean;
+}
+
+/**
+ * Low-level immutable-run persistence. Sorting, deduplication, grouping, merging, and
+ * every proof decision remain owned by Core.
+ */
+export interface EndgameProofRunStore {
+  createRun(id: string): EndgameProofRunWriter;
+  diagnostics(): EndgameProofRunStoreDiagnostics;
+  dispose(): void;
+}
+
+export interface EndgameOptimalRouteCertificateOptions {
+  runStore?: EndgameProofRunStore;
+}
+
+const PROOF_RUN_RECORD_MAX_BYTES = 2048;
+const PROOF_RUN_CHUNK_MAX_BYTES = 64 * 1024 * 1024;
+const PROOF_RUN_CHUNK_MAX_RECORDS = 131_072;
+const PROOF_RUN_CHUNK_MAX_COUNT = 4096;
+const PROOF_RUN_MERGE_FAN_IN = 32;
+const PROOF_RUN_METADATA_MAX_COUNT = 4098;
+const PROOF_RUN_CLEANUP_ERROR_MAX_COUNT = 4098;
+const PROOF_RUN_ERROR_MAX_BYTES = 2048;
+const PROOF_RUN_ID_MAX_BYTES = 96;
+
 function tokenCommand(token: string): GameCommand {
   switch (token) {
     case 'S': return { type: 'start' };
@@ -618,6 +665,666 @@ export function endgameRouteLockLowerBound(state: GameState): number {
   return Math.ceil(deficit / 4);
 }
 
+type EndgameProofRunLimits = Readonly<{
+  recordMaxBytes: number;
+  chunkMaxBytes: number;
+  chunkMaxRecords: number;
+  chunkMaxCount: number;
+  mergeFanIn: number;
+  metadataMaxCount: number;
+}>;
+
+const ENDGAME_PROOF_RUN_LIMITS: EndgameProofRunLimits = Object.freeze({
+  recordMaxBytes: PROOF_RUN_RECORD_MAX_BYTES,
+  chunkMaxBytes: PROOF_RUN_CHUNK_MAX_BYTES,
+  chunkMaxRecords: PROOF_RUN_CHUNK_MAX_RECORDS,
+  chunkMaxCount: PROOF_RUN_CHUNK_MAX_COUNT,
+  mergeFanIn: PROOF_RUN_MERGE_FAN_IN,
+  metadataMaxCount: PROOF_RUN_METADATA_MAX_COUNT,
+});
+
+type TrackedProofRun = Readonly<{ expectedId: string; run: EndgameProofRun }>;
+
+type EndgameProofRunOwner = {
+  readonly store: EndgameProofRunStore;
+  readonly limits: EndgameProofRunLimits;
+  readonly active: Set<TrackedProofRun>;
+  readonly activeIds: Set<string>;
+  pendingWriters: number;
+};
+
+type CleanupErrorCollector = {
+  readonly errors: Error[];
+  omitted: number;
+};
+
+function proofRunError(message: string): Error {
+  return new Error(`Invalid Endgame proof run: ${message}.`);
+}
+
+function ordinalByteCompare(left: string, right: string): number {
+  const bound = Math.min(left.length, right.length);
+  for (let index = 0; index < bound; index += 1) {
+    const difference = left.charCodeAt(index) - right.charCodeAt(index);
+    if (difference !== 0) return difference;
+  }
+  return left.length - right.length;
+}
+
+function proofRunRecordBytes(key: string, limit: number): number {
+  if (key.length === 0) throw proofRunError('records cannot be blank');
+  if (key.length > limit) throw proofRunError(`record exceeds ${limit} bytes`);
+  for (let index = 0; index < key.length; index += 1) {
+    const code = key.charCodeAt(index);
+    if (code < 0x20 || code > 0x7e) {
+      throw proofRunError('records must contain printable ASCII only');
+    }
+  }
+  return key.length + 1;
+}
+
+function proofRunId(depth: number, pass: number, group: number): string {
+  if (![depth, pass, group].every((value) => Number.isSafeInteger(value) && value >= 0)) {
+    throw proofRunError('run ordinals must be non-negative safe integers');
+  }
+  const id = `d${String(depth).padStart(4, '0')}-p${String(pass).padStart(4, '0')}-g${String(group).padStart(4, '0')}`;
+  if (id.length > PROOF_RUN_ID_MAX_BYTES || !/^[\x20-\x7e]+$/.test(id)) {
+    throw proofRunError(`run id exceeds ${PROOF_RUN_ID_MAX_BYTES} printable ASCII bytes`);
+  }
+  return id;
+}
+
+function normalizeProofRunError(error: unknown): string {
+  const raw = error instanceof Error
+    ? `${error.name}: ${error.message}`
+    : typeof error === 'string'
+      ? error
+      : String(error);
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(raw);
+  if (bytes.length <= PROOF_RUN_ERROR_MAX_BYTES) return raw;
+  const suffix = '...[truncated]';
+  const suffixBytes = encoder.encode(suffix);
+  let retainedLength = PROOF_RUN_ERROR_MAX_BYTES - suffixBytes.length;
+  let result = `${new TextDecoder().decode(bytes.slice(0, retainedLength))}${suffix}`;
+  while (encoder.encode(result).length > PROOF_RUN_ERROR_MAX_BYTES) {
+    retainedLength -= 1;
+    result = `${new TextDecoder().decode(bytes.slice(0, retainedLength))}${suffix}`;
+  }
+  return result;
+}
+
+function createCleanupCollector(): CleanupErrorCollector {
+  return { errors: [], omitted: 0 };
+}
+
+function collectCleanupError(collector: CleanupErrorCollector, error: unknown): void {
+  if (collector.omitted > 0) {
+    collector.omitted += 1;
+  } else if (collector.errors.length < PROOF_RUN_CLEANUP_ERROR_MAX_COUNT) {
+    collector.errors.push(new Error(normalizeProofRunError(error)));
+  } else {
+    collector.errors.pop();
+    collector.omitted = 2;
+  }
+}
+
+function collectOmittedCleanupErrors(collector: CleanupErrorCollector, count: number): void {
+  if (collector.omitted === 0 && collector.errors.length === PROOF_RUN_CLEANUP_ERROR_MAX_COUNT) {
+    collector.errors.pop();
+    collector.omitted = 1;
+  }
+  collector.omitted += Number.isSafeInteger(count) && count > 0 ? count : 1;
+}
+
+function cleanupErrorsWithSentinel(collector: CleanupErrorCollector): readonly Error[] {
+  if (collector.omitted === 0) return collector.errors;
+  return [
+    ...collector.errors,
+    new Error(`Endgame proof cleanup errors truncated; omitted ${collector.omitted}.`),
+  ];
+}
+
+function throwProofRunFailure(primary: unknown, collector: CleanupErrorCollector): never {
+  const primaryError = primary instanceof Error ? primary : new Error(normalizeProofRunError(primary));
+  const cleanup = cleanupErrorsWithSentinel(collector);
+  if (cleanup.length === 0) throw primaryError;
+  throw new AggregateError([primaryError, ...cleanup], primaryError.message);
+}
+
+function assertProofRunDescriptor(run: EndgameProofRun, expectedId: string): void {
+  if (run.id !== expectedId) throw proofRunError(`store returned id ${JSON.stringify(run.id)} for ${expectedId}`);
+  if (!Number.isSafeInteger(run.size) || run.size < 0) {
+    throw proofRunError(`${expectedId} has an invalid size descriptor`);
+  }
+}
+
+function registerProofRun(owner: EndgameProofRunOwner, id: string, run: EndgameProofRun): TrackedProofRun {
+  if (owner.active.size + owner.pendingWriters >= owner.limits.metadataMaxCount) {
+    throw proofRunError(`active metadata exceeds ${owner.limits.metadataMaxCount} entries`);
+  }
+  if (owner.activeIds.has(id)) throw proofRunError(`duplicate deterministic run id ${id}`);
+  const tracked = Object.freeze({ expectedId: id, run });
+  owner.active.add(tracked);
+  owner.activeIds.add(id);
+  assertProofRunDescriptor(run, id);
+  return tracked;
+}
+
+function disposeTrackedProofRun(owner: EndgameProofRunOwner, tracked: TrackedProofRun): void {
+  tracked.run.dispose();
+  owner.active.delete(tracked);
+  owner.activeIds.delete(tracked.expectedId);
+}
+
+function closeIterator(iterator: Iterator<string>, collector: CleanupErrorCollector): void {
+  try {
+    iterator.return?.();
+  } catch (error) {
+    collectCleanupError(collector, error);
+  }
+}
+
+function verifyProofRunAgainstRecords(
+  tracked: TrackedProofRun,
+  expected: readonly string[],
+  limits: EndgameProofRunLimits,
+): void {
+  assertProofRunDescriptor(tracked.run, tracked.expectedId);
+  if (tracked.run.size !== expected.length) {
+    throw proofRunError(`${tracked.expectedId} size ${tracked.run.size} does not match ${expected.length}`);
+  }
+  const iterator = tracked.run.values()[Symbol.iterator]();
+  const cleanup = createCleanupCollector();
+  let completed = false;
+  let primary: unknown;
+  let hasPrimary = false;
+  try {
+    for (let index = 0; index < expected.length; index += 1) {
+      const item = iterator.next();
+      if (item.done) throw proofRunError(`${tracked.expectedId} omitted record ${index}`);
+      proofRunRecordBytes(item.value, limits.recordMaxBytes);
+      if (item.value !== expected[index]) {
+        throw proofRunError(`${tracked.expectedId} changed record ${index}`);
+      }
+    }
+    if (!iterator.next().done) throw proofRunError(`${tracked.expectedId} added records`);
+    completed = true;
+  } catch (error) {
+    primary = error;
+    hasPrimary = true;
+  } finally {
+    if (!completed) closeIterator(iterator, cleanup);
+  }
+  if (hasPrimary) throwProofRunFailure(primary, cleanup);
+  if (cleanup.errors.length > 0 || cleanup.omitted > 0) {
+    throwProofRunFailure(proofRunError(`${tracked.expectedId} readback failed`), cleanup);
+  }
+}
+
+function* verifiedProofRunValues(
+  tracked: TrackedProofRun,
+  limits: EndgameProofRunLimits,
+): Generator<string, void, undefined> {
+  assertProofRunDescriptor(tracked.run, tracked.expectedId);
+  let count = 0;
+  let previous: string | null = null;
+  for (const value of tracked.run.values()) {
+    proofRunRecordBytes(value, limits.recordMaxBytes);
+    if (previous !== null && ordinalByteCompare(previous, value) >= 0) {
+      throw proofRunError(`${tracked.expectedId} is not strictly increasing at record ${count}`);
+    }
+    if (count >= tracked.run.size) throw proofRunError(`${tracked.expectedId} added records`);
+    previous = value;
+    count += 1;
+    yield value;
+  }
+  if (count !== tracked.run.size) {
+    throw proofRunError(`${tracked.expectedId} yielded ${count} records for size ${tracked.run.size}`);
+  }
+}
+
+function persistProofRun(
+  owner: EndgameProofRunOwner,
+  id: string,
+  produce: (write: (key: string) => void) => number,
+): TrackedProofRun {
+  if (owner.active.size + owner.pendingWriters >= owner.limits.metadataMaxCount) {
+    throw proofRunError(`active metadata exceeds ${owner.limits.metadataMaxCount} entries`);
+  }
+  if (owner.activeIds.has(id)) throw proofRunError(`duplicate deterministic run id ${id}`);
+  owner.pendingWriters += 1;
+  let writer: EndgameProofRunWriter | null = null;
+  let finished = false;
+  try {
+    writer = owner.store.createRun(id);
+    const expectedSize = produce((key) => {
+      proofRunRecordBytes(key, owner.limits.recordMaxBytes);
+      writer!.write(key);
+    });
+    const run = writer.finish();
+    finished = true;
+    owner.pendingWriters -= 1;
+    const tracked = registerProofRun(owner, id, run);
+    if (run.size !== expectedSize) {
+      throw proofRunError(`${id} size ${run.size} does not match written count ${expectedSize}`);
+    }
+    return tracked;
+  } catch (primary) {
+    if (owner.pendingWriters > 0) owner.pendingWriters -= 1;
+    const cleanup = createCleanupCollector();
+    if (writer && !finished) {
+      try {
+        writer.abort();
+      } catch (error) {
+        collectCleanupError(cleanup, error);
+      }
+    }
+    throwProofRunFailure(primary, cleanup);
+  }
+}
+
+function sortAndDedupeProofChunk(chunk: string[]): void {
+  chunk.sort(ordinalByteCompare);
+  let output = 0;
+  for (const value of chunk) {
+    if (output === 0 || value !== chunk[output - 1]) {
+      chunk[output] = value;
+      output += 1;
+    }
+  }
+  chunk.length = output;
+}
+
+function* mergedProofRunValues(
+  inputs: readonly TrackedProofRun[],
+  limits: EndgameProofRunLimits,
+): Generator<string, void, undefined> {
+  type Cursor = { iterator: Iterator<string>; current: string | null; count: number; run: TrackedProofRun };
+  const cursors: Cursor[] = [];
+  const cleanup = createCleanupCollector();
+  const advance = (cursor: Cursor): void => {
+    const item = cursor.iterator.next();
+    if (item.done) {
+      if (cursor.count !== cursor.run.run.size) {
+        throw proofRunError(`${cursor.run.expectedId} yielded ${cursor.count} records for size ${cursor.run.run.size}`);
+      }
+      cursor.current = null;
+      return;
+    }
+    proofRunRecordBytes(item.value, limits.recordMaxBytes);
+    if (cursor.current !== null && ordinalByteCompare(cursor.current, item.value) >= 0) {
+      throw proofRunError(`${cursor.run.expectedId} is not strictly increasing`);
+    }
+    if (cursor.count >= cursor.run.run.size) throw proofRunError(`${cursor.run.expectedId} added records`);
+    cursor.current = item.value;
+    cursor.count += 1;
+  };
+  let primary: unknown;
+  let hasPrimary = false;
+  try {
+    for (const run of inputs) {
+      assertProofRunDescriptor(run.run, run.expectedId);
+      const cursor: Cursor = {
+        iterator: run.run.values()[Symbol.iterator](),
+        current: null,
+        count: 0,
+        run,
+      };
+      cursors.push(cursor);
+      advance(cursor);
+    }
+    while (cursors.some((cursor) => cursor.current !== null)) {
+      let next: string | null = null;
+      for (const cursor of cursors) {
+        if (cursor.current !== null && (next === null || ordinalByteCompare(cursor.current, next) < 0)) {
+          next = cursor.current;
+        }
+      }
+      if (next === null) break;
+      yield next;
+      for (const cursor of cursors) {
+        if (cursor.current === next) advance(cursor);
+      }
+    }
+  } catch (error) {
+    primary = error;
+    hasPrimary = true;
+  } finally {
+    for (const cursor of cursors) closeIterator(cursor.iterator, cleanup);
+    if (!hasPrimary && (cleanup.errors.length > 0 || cleanup.omitted > 0)) {
+      throwProofRunFailure(proofRunError('merge input cleanup failed'), cleanup);
+    }
+  }
+  if (hasPrimary) throwProofRunFailure(primary, cleanup);
+}
+
+function verifyMergedProofRun(
+  inputs: readonly TrackedProofRun[],
+  output: TrackedProofRun,
+  limits: EndgameProofRunLimits,
+): void {
+  const expected = mergedProofRunValues(inputs, limits);
+  const actual = output.run.values()[Symbol.iterator]();
+  const cleanup = createCleanupCollector();
+  let count = 0;
+  let previous: string | null = null;
+  let completed = false;
+  let primary: unknown;
+  let hasPrimary = false;
+  try {
+    for (const value of expected) {
+      const item = actual.next();
+      if (item.done) throw proofRunError(`${output.expectedId} omitted merged record ${count}`);
+      proofRunRecordBytes(item.value, limits.recordMaxBytes);
+      if (item.value !== value) throw proofRunError(`${output.expectedId} changed merged record ${count}`);
+      if (previous !== null && ordinalByteCompare(previous, item.value) >= 0) {
+        throw proofRunError(`${output.expectedId} is not strictly increasing`);
+      }
+      previous = item.value;
+      count += 1;
+    }
+    if (!actual.next().done) throw proofRunError(`${output.expectedId} added merged records`);
+    if (count !== output.run.size) {
+      throw proofRunError(`${output.expectedId} yielded ${count} records for size ${output.run.size}`);
+    }
+    completed = true;
+  } catch (error) {
+    primary = error;
+    hasPrimary = true;
+  } finally {
+    if (!completed) {
+      closeIterator(expected, cleanup);
+      closeIterator(actual, cleanup);
+    }
+  }
+  if (hasPrimary) throwProofRunFailure(primary, cleanup);
+  if (cleanup.errors.length > 0 || cleanup.omitted > 0) {
+    throwProofRunFailure(proofRunError(`${output.expectedId} merge readback failed`), cleanup);
+  }
+}
+
+function mergeProofRuns(
+  owner: EndgameProofRunOwner,
+  depth: number,
+  initialRuns: readonly TrackedProofRun[],
+): TrackedProofRun {
+  if (initialRuns.length === 0) {
+    const empty = persistProofRun(owner, proofRunId(depth, 0, 0), () => 0);
+    verifyProofRunAgainstRecords(empty, [], owner.limits);
+    return empty;
+  }
+  let runs = [...initialRuns];
+  let pass = 1;
+  while (runs.length > 1) {
+    const outputs: TrackedProofRun[] = [];
+    for (let start = 0, group = 0; start < runs.length; start += owner.limits.mergeFanIn, group += 1) {
+      const inputs = runs.slice(start, start + owner.limits.mergeFanIn);
+      if (inputs.length === 1) {
+        for (const _value of verifiedProofRunValues(inputs[0]!, owner.limits)) {
+          // A one-run tail is revalidated and carried without rewriting it.
+        }
+        outputs.push(inputs[0]!);
+        continue;
+      }
+      const id = proofRunId(depth, pass, group);
+      const output = persistProofRun(owner, id, (write) => {
+        let count = 0;
+        for (const value of mergedProofRunValues(inputs, owner.limits)) {
+          write(value);
+          count += 1;
+        }
+        return count;
+      });
+      verifyMergedProofRun(inputs, output, owner.limits);
+      for (const input of inputs) disposeTrackedProofRun(owner, input);
+      outputs.push(output);
+    }
+    runs = outputs;
+    pass += 1;
+  }
+  return runs[0]!;
+}
+
+function createProofLayerBuilder(
+  owner: EndgameProofRunOwner,
+  depth: number,
+): Readonly<{ add(key: string): void; finish(): TrackedProofRun }> {
+  let chunk: string[] = [];
+  let chunkBytes = 0;
+  const runs: TrackedProofRun[] = [];
+  let closed = false;
+  const flush = (): void => {
+    if (chunk.length === 0) return;
+    if (runs.length >= owner.limits.chunkMaxCount) {
+      throw proofRunError(`layer exceeds ${owner.limits.chunkMaxCount} chunk runs`);
+    }
+    sortAndDedupeProofChunk(chunk);
+    const source = chunk;
+    const run = persistProofRun(owner, proofRunId(depth, 0, runs.length), (write) => {
+      for (const value of source) write(value);
+      return source.length;
+    });
+    verifyProofRunAgainstRecords(run, source, owner.limits);
+    runs.push(run);
+    chunk = [];
+    chunkBytes = 0;
+  };
+  return Object.freeze({
+    add(key: string): void {
+      if (closed) throw proofRunError('cannot add to a finished layer');
+      const bytes = proofRunRecordBytes(key, owner.limits.recordMaxBytes);
+      if (bytes > owner.limits.chunkMaxBytes) {
+        throw proofRunError(`single record exceeds ${owner.limits.chunkMaxBytes}-byte chunk limit`);
+      }
+      if (
+        chunk.length > 0
+        && (chunkBytes + bytes > owner.limits.chunkMaxBytes
+          || chunk.length + 1 > owner.limits.chunkMaxRecords)
+      ) flush();
+      chunk.push(key);
+      chunkBytes += bytes;
+    },
+    finish(): TrackedProofRun {
+      if (closed) throw proofRunError('layer is already finished');
+      closed = true;
+      flush();
+      return mergeProofRuns(owner, depth, runs);
+    },
+  });
+}
+
+function cleanupProofRunOwner(owner: EndgameProofRunOwner): CleanupErrorCollector {
+  const collector = createCleanupCollector();
+  for (const tracked of [...owner.active].reverse()) {
+    try {
+      disposeTrackedProofRun(owner, tracked);
+    } catch (error) {
+      collectCleanupError(collector, error);
+    }
+  }
+  try {
+    owner.store.dispose();
+  } catch (error) {
+    collectCleanupError(collector, error);
+  }
+  try {
+    const diagnostics = owner.store.diagnostics();
+    if (diagnostics.activeRuns.length > 0) {
+      collectCleanupError(collector, proofRunError(`store retained active runs: ${diagnostics.activeRuns.join(',')}`));
+    }
+    if (diagnostics.residue.length > 0) {
+      collectCleanupError(collector, proofRunError(`store retained residue: ${diagnostics.residue.join(',')}`));
+    }
+    if (diagnostics.residueTruncated) {
+      collectCleanupError(collector, proofRunError('store residue diagnostics were truncated'));
+    }
+    if (diagnostics.cleanupErrorsTruncated) {
+      let sentinel: string | undefined;
+      for (let index = diagnostics.cleanupErrors.length - 1; index >= 0; index -= 1) {
+        const message = diagnostics.cleanupErrors[index]!;
+        if (/omitted\s+\d+/i.test(message)) {
+          sentinel = message;
+          break;
+        }
+      }
+      for (const error of diagnostics.cleanupErrors) {
+        if (error !== sentinel) collectCleanupError(collector, error);
+      }
+      const omitted = sentinel ? Number(/omitted\s+(\d+)/i.exec(sentinel)?.[1]) : 1;
+      collectOmittedCleanupErrors(collector, omitted);
+    } else {
+      for (const error of diagnostics.cleanupErrors) collectCleanupError(collector, error);
+    }
+  } catch (error) {
+    collectCleanupError(collector, error);
+  }
+  return collector;
+}
+
+function withProofRunStore<T>(
+  store: EndgameProofRunStore,
+  limits: EndgameProofRunLimits,
+  work: (owner: EndgameProofRunOwner) => T,
+): T {
+  const owner: EndgameProofRunOwner = {
+    store,
+    limits,
+    active: new Set(),
+    activeIds: new Set(),
+    pendingWriters: 0,
+  };
+  let result: T;
+  try {
+    result = work(owner);
+  } catch (primary) {
+    throwProofRunFailure(primary, cleanupProofRunOwner(owner));
+  }
+  const cleanup = cleanupProofRunOwner(owner);
+  if (cleanup.errors.length > 0 || cleanup.omitted > 0) {
+    throwProofRunFailure(proofRunError('store cleanup failed after a completed proof'), cleanup);
+  }
+  return result;
+}
+
+function testProofRunLimits(overrides: Partial<EndgameProofRunLimits>): EndgameProofRunLimits {
+  const limits = { ...ENDGAME_PROOF_RUN_LIMITS, ...overrides };
+  for (const [name, value] of Object.entries(limits)) {
+    if (!Number.isSafeInteger(value) || value <= 0) throw proofRunError(`${name} test limit is invalid`);
+  }
+  if (limits.mergeFanIn < 2 || limits.mergeFanIn > PROOF_RUN_MERGE_FAN_IN) {
+    throw proofRunError(`test merge fan-in must be 2..${PROOF_RUN_MERGE_FAN_IN}`);
+  }
+  return Object.freeze(limits);
+}
+
+/** @internal Bounded low-level matrix seam; it never invokes an Endgame search. */
+export const ENDGAME_PROOF_FRONTIER_STORE_TESTING = Object.freeze({
+  limits: ENDGAME_PROOF_RUN_LIMITS,
+  ordinalByteCompare,
+  persist(
+    records: Iterable<string>,
+    store: EndgameProofRunStore,
+    overrides: Partial<EndgameProofRunLimits> = {},
+  ): readonly string[] {
+    const limits = testProofRunLimits(overrides);
+    return withProofRunStore(store, limits, (owner) => {
+      const layer = createProofLayerBuilder(owner, 0);
+      for (const record of records) layer.add(record);
+      const run = layer.finish();
+      return Object.freeze([...verifiedProofRunValues(run, limits)]);
+    });
+  },
+});
+
+function certifyOptimalEndgameRouteWithRunStore(
+  definition: EndgameDefinition,
+  candidateCommandStream: string,
+  runStore: EndgameProofRunStore,
+): EndgameOptimalRouteCertificate | null {
+  return withProofRunStore(runStore, ENDGAME_PROOF_RUN_LIMITS, (owner) => {
+    const levelId = definition.id;
+    const replay = replayEndgameRouteForDefinition(definition, candidateCommandStream);
+    if (replay.state.status !== 'finished' || replay.state.endgameCompletion !== 'finished' || replay.locks.length <= 0) {
+      throw new Error(`Optimal Endgame candidate must be a completed public-command replay: ${levelId}.`);
+    }
+    const optimalLocks = replay.locks.length;
+    const canonicalStart = dispatch(createEndgameInitialState(definition), { type: 'start' }).state;
+    if (!isActive(canonicalStart)) return null;
+    const initialStateHash = stateHash(canonicalStart);
+    const started = withoutUndoHistory(canonicalStart);
+    const proofContext = createProofFrontierContext(started);
+    const firstLayer = createProofLayerBuilder(owner, 0);
+    firstLayer.add(proofFrontierStateKey(started, proofContext));
+    let frontier = firstLayer.finish();
+    const exhaustedDepths: EndgameOptimalRouteDepthRecord[] = [];
+
+    for (let depth = 0; depth < optimalLocks - 1 && frontier.run.size > 0; depth += 1) {
+      assertProofRunDescriptor(frontier.run, frontier.expectedId);
+      const frontierStates = frontier.run.size;
+      let transitions = 0;
+      let boundPrunes = 0;
+      const nextFrontier = createProofLayerBuilder(owner, depth + 1);
+      for (const parentKey of verifiedProofRunValues(frontier, owner.limits)) {
+        const parent = decodeProofFrontierStateKey(parentKey, proofContext);
+        if (depth + endgameRouteLockLowerBound(parent) >= optimalLocks) {
+          boundPrunes += 1;
+          continue;
+        }
+        for (const landing of exhaustiveEndgameLandings(parent)) {
+          transitions += 1;
+          if (landing.state.status === 'finished') {
+            throw new Error(`Endgame ${levelId} has a shorter route than the ${optimalLocks}-lock candidate.`);
+          }
+          if (!isActive(landing.state)) continue;
+          const nextDepth = depth + 1;
+          if (nextDepth >= optimalLocks - 1) continue;
+          if (nextDepth + endgameRouteLockLowerBound(landing.state) >= optimalLocks) {
+            boundPrunes += 1;
+            continue;
+          }
+          nextFrontier.add(proofFrontierStateKey(landing.state, proofContext));
+        }
+      }
+      const finalizedNextFrontier = nextFrontier.finish();
+      exhaustedDepths.push(Object.freeze({
+        lockedPieces: depth,
+        frontierStates,
+        transitions,
+        boundPrunes,
+      }));
+      disposeTrackedProofRun(owner, frontier);
+      frontier = finalizedNextFrontier;
+    }
+
+    const frozenExhaustedDepths = Object.freeze(exhaustedDepths);
+    const exhaustedFrontierWidths = Object.freeze(frozenExhaustedDepths.map((record) => (
+      record.frontierStates
+    )));
+    const exploredStateCount = frozenExhaustedDepths.reduce((total, record) => (
+      total + record.frontierStates
+    ), 0);
+    const transitionCount = frozenExhaustedDepths.reduce((total, record) => (
+      total + record.transitions
+    ), 0);
+    const deficitBoundPrunes = frozenExhaustedDepths.reduce((total, record) => (
+      total + record.boundPrunes
+    ), 0);
+
+    return Object.freeze({
+      levelId,
+      optimalLocks,
+      exhaustedDepths: frozenExhaustedDepths,
+      exhaustedFrontierWidths,
+      exploredStateCount,
+      transitionCount,
+      deficitBoundPrunes,
+      initialStateHash,
+      replay,
+    });
+  });
+}
+
 /**
  * Certifies a supplied winning route as optimal. All public-control landing states that
  * could finish with fewer locks are traversed; the only pruning rule is the proved
@@ -627,14 +1334,19 @@ export function endgameRouteLockLowerBound(state: GameState): number {
 export function certifyOptimalEndgameRoute(
   levelId: EndgameId,
   candidateCommandStream: string,
+  options: EndgameOptimalRouteCertificateOptions = {},
 ): EndgameOptimalRouteCertificate | null {
-  return certifyOptimalEndgameRouteForDefinition(getEndgameDefinition(levelId), candidateCommandStream);
+  return certifyOptimalEndgameRouteForDefinition(getEndgameDefinition(levelId), candidateCommandStream, options);
 }
 
 export function certifyOptimalEndgameRouteForDefinition(
   definition: EndgameDefinition,
   candidateCommandStream: string,
+  options: EndgameOptimalRouteCertificateOptions = {},
 ): EndgameOptimalRouteCertificate | null {
+  if (options.runStore) {
+    return certifyOptimalEndgameRouteWithRunStore(definition, candidateCommandStream, options.runStore);
+  }
   const levelId = definition.id;
   const replay = replayEndgameRouteForDefinition(definition, candidateCommandStream);
   if (replay.state.status !== 'finished' || replay.state.endgameCompletion !== 'finished' || replay.locks.length <= 0) {
