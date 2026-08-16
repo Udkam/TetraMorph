@@ -156,6 +156,9 @@ const contextRecords = (tracker) => Array.isArray(tracker?.contexts) ? tracker.c
 })) : null;
 /** @param {any} before @param {any} after */
 const sameContextRecords = (before, after) => contextRecords(before) !== null && deepEqual(contextRecords(before), contextRecords(after));
+/** @param {any} reentry @param {any} beforeHmr */
+const exactPreHmrContextContinuity = (reentry, beforeHmr) => reentry?.liveContexts === 1 && beforeHmr?.liveContexts === 1
+  && sameContextRecords(reentry, beforeHmr);
 /** @param {any} before @param {any} after */
 function closedContextSuccessors(before, after) {
   const baseline = contextRecords(before); const closed = contextRecords(after);
@@ -176,7 +179,7 @@ function exactReentryContexts(before, after) {
     && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0;
 }
 /** @param {any} oldOwner @returns {'same-owner'|'replacement'|'invalid'} */
-const deriveHmrContextBranch = (oldOwner) => oldOwner?.sameOwner === true ? 'same-owner'
+const deriveHmrContextBranch = (oldOwner) => oldOwner?.sameOwner === true && oldOwner?.oldRenderer === 'active' ? 'same-owner'
   : oldOwner?.sameOwner === false && oldOwner?.oldRenderer === 'retired' ? 'replacement' : 'invalid';
 /** @param {any} before @param {any} after @param {'same-owner'|'replacement'|'invalid'} branch */
 function exactHmrContexts(before, after, branch) {
@@ -259,6 +262,10 @@ function browserLifecycleProof(browser) {
       branch: hmrContextBranch, before: contextRecords(browser.hmr?.before?.tracker), after: contextRecords(browser.hmr?.after?.tracker),
       beforeLiveContexts: browser.hmr?.before?.tracker?.liveContexts, afterLiveContexts: browser.hmr?.after?.tracker?.liveContexts,
     },
+    preHmrContexts: {
+      reentry: contextRecords(browser.reentered?.tracker), beforeHmr: contextRecords(browser.hmr?.before?.tracker),
+      reentryLiveContexts: browser.reentered?.tracker?.liveContexts, beforeHmrLiveContexts: browser.hmr?.before?.tracker?.liveContexts,
+    },
     terminalContexts: {
       afterHmr: contextRecords(browser.hmr?.after?.tracker), terminal: contextRecords(browser.terminal),
       afterHmrLiveContexts: browser.hmr?.after?.tracker?.liveContexts, terminalLiveContexts: browser.terminal?.liveContexts,
@@ -312,6 +319,7 @@ function browserLifecycleAssertions(browser) {
     hmrRafsExact: activeRafs(browser.hmr?.after?.tracker) === activeRafs(browser.hmr?.before?.tracker),
     hmrRafsNotDoubled: activeRafs(browser.hmr?.after?.tracker) <= activeRafs(browser.hmr?.before?.tracker),
     hmrListenersExact: sameRelevantListeners(browser.hmr?.before?.tracker, browser.hmr?.after?.tracker),
+    preHmrContextsExact: exactPreHmrContextContinuity(browser.reentered?.tracker, browser.hmr?.before?.tracker),
     hmrContextBranchValid: hmrContextBranch !== 'invalid',
     hmrContextsExact: exactHmrContexts(browser.hmr?.before?.tracker, browser.hmr?.after?.tracker, hmrContextBranch),
     terminalOwnersClean: browser.terminal?.canvases === 0 && browser.terminal?.liveContexts === 0,

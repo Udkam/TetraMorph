@@ -46,6 +46,9 @@ const contextRecords = (tracker) => Array.isArray(tracker?.contexts) ? tracker.c
 })) : null;
 /** @param {any} before @param {any} after */
 const sameContextRecords = (before, after) => contextRecords(before) !== null && deepEqual(contextRecords(before), contextRecords(after));
+/** @param {any} reentry @param {any} beforeHmr */
+const exactPreHmrContextContinuity = (reentry, beforeHmr) => reentry?.liveContexts === 1 && beforeHmr?.liveContexts === 1
+  && sameContextRecords(reentry, beforeHmr);
 /** @param {any} before @param {any} after */
 function closedContextSuccessors(before, after) {
   const baseline = contextRecords(before); const closed = contextRecords(after);
@@ -66,7 +69,7 @@ function exactReentryContexts(before, after) {
     && !fresh.closed && fresh.state !== null && fresh.state !== 'closed' && fresh.closeCalls === 0;
 }
 /** @param {any} oldOwner @returns {'same-owner'|'replacement'|'invalid'} */
-const deriveHmrContextBranch = (oldOwner) => oldOwner?.sameOwner === true ? 'same-owner'
+const deriveHmrContextBranch = (oldOwner) => oldOwner?.sameOwner === true && oldOwner?.oldRenderer === 'active' ? 'same-owner'
   : oldOwner?.sameOwner === false && oldOwner?.oldRenderer === 'retired' ? 'replacement' : 'invalid';
 /** @param {any} before @param {any} after @param {'same-owner'|'replacement'|'invalid'} branch */
 function exactHmrContexts(before, after, branch) {
@@ -198,6 +201,7 @@ check(sameRelevantListeners(reentered.tracker, changedPreferences.tracker), 're-
 
 await page.evaluate(() => { const w = /** @type {any} */ (window); w.__MATERIAL_HMR_QA__ = w.__TETRAMORPH_QA__; });
 const beforeHmr = await snapshot(page);
+check(exactPreHmrContextContinuity(reentered.tracker, beforeHmr.tracker), 're-entry to HMR-before exact AudioContext continuity');
 const requestMarker = observed.requests.length;
 const appPath = join(repo, 'src/App.tsx');
 const beforeStat = statSync(appPath);
@@ -219,7 +223,7 @@ check(hmrRequests.length >= 1, 'Vite delivered App HMR update');
 check(afterHmr.canvasCount === 1 && afterHmr.tracker?.liveContexts === 1, 'HMR leaves one Canvas and AudioContext');
 check(activeRafs(beforeHmr.tracker) >= 1 && activeRafs(afterHmr.tracker) === activeRafs(beforeHmr.tracker), 'HMR active RAFs exactly equal the live baseline');
 check(sameRelevantListeners(beforeHmr.tracker, afterHmr.tracker), 'HMR relevant listener set is exactly stable');
-check(oldHmrOwner.sameOwner || oldHmrOwner.oldRenderer === 'retired', 'HMR old renderer disposition');
+check(hmrContextBranch !== 'invalid', 'HMR old renderer disposition is internally consistent');
 check(hmrContextBranch !== 'invalid' && exactHmrContexts(beforeHmr.tracker, afterHmr.tracker, hmrContextBranch), 'HMR exact branch-specific AudioContext history');
 
 await page.getByTestId('exit-game').click();
@@ -292,6 +296,10 @@ const lifecycleProof = {
     branch: hmrContextBranch, before: contextRecords(beforeHmr.tracker), after: contextRecords(afterHmr.tracker),
     beforeLiveContexts: beforeHmr.tracker?.liveContexts, afterLiveContexts: afterHmr.tracker?.liveContexts,
   },
+  preHmrContexts: {
+    reentry: contextRecords(reentered.tracker), beforeHmr: contextRecords(beforeHmr.tracker),
+    reentryLiveContexts: reentered.tracker?.liveContexts, beforeHmrLiveContexts: beforeHmr.tracker?.liveContexts,
+  },
   terminalContexts: {
     afterHmr: contextRecords(afterHmr.tracker), terminal: contextRecords(terminal),
     afterHmrLiveContexts: afterHmr.tracker?.liveContexts, terminalLiveContexts: terminal.liveContexts,
@@ -334,6 +342,7 @@ const lifecycleAssertions = {
   hmrRafsExact: activeRafs(afterHmr.tracker) === activeRafs(beforeHmr.tracker),
   hmrRafsNotDoubled: activeRafs(afterHmr.tracker) <= activeRafs(beforeHmr.tracker),
   hmrListenersExact: sameRelevantListeners(beforeHmr.tracker, afterHmr.tracker),
+  preHmrContextsExact: exactPreHmrContextContinuity(reentered.tracker, beforeHmr.tracker),
   hmrContextBranchValid: hmrContextBranch !== 'invalid',
   hmrContextsExact: exactHmrContexts(beforeHmr.tracker, afterHmr.tracker, hmrContextBranch),
   terminalOwnersClean: terminal.canvases === 0 && terminal.liveContexts === 0,
