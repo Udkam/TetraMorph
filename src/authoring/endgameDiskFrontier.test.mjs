@@ -2,11 +2,19 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import intro01 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-01.json';
+import intro02 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-02.json';
+import intro03 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-03.json';
+import intro04 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-04.json';
 import {
   ENDGAME_DISK_FRONTIER_LIMITS,
   createEndgameDiskFrontierStore,
 } from '../../scripts/endgame-disk-frontier.mjs';
-import { ENDGAME_PROOF_FRONTIER_STORE_TESTING } from '../game/core/endgameRouteSearch.ts';
+import { ENDGAME_V3_INTRO_DRAFTS } from '../game/core/endgameV3IntroDefinitions.ts';
+import {
+  ENDGAME_PROOF_FRONTIER_STORE_TESTING,
+  certifyOptimalEndgameRouteForDefinition,
+} from '../game/core/endgameRouteSearch.ts';
 
 function temporaryStage(label) {
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), `tetramorph-${label}-`));
@@ -184,6 +192,76 @@ describe('Node Endgame disk frontier adapter', () => {
     releaseParent(parent, stage);
   });
 
+  it('enforces the physical 4098-file registry and bounded cleanup diagnostics', () => {
+    const { parent, stage } = temporaryStage('registry4098');
+    let unlinkFaultsRemaining = 0;
+    let readdirFaultsRemaining = 0;
+    const store = createEndgameDiskFrontierStore({
+      stagePath: stage,
+      fs: {
+        unlinkSync(...args) {
+          if (unlinkFaultsRemaining > 0) {
+            unlinkFaultsRemaining -= 1;
+            const error = new Error(`injected unlink boundary fault ${unlinkFaultsRemaining}`);
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.unlinkSync(...args);
+        },
+        readdirSync(...args) {
+          if (readdirFaultsRemaining > 0) {
+            readdirFaultsRemaining -= 1;
+            const error = new Error(`injected readdir boundary fault ${readdirFaultsRemaining}`);
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.readdirSync(...args);
+        },
+      },
+    });
+    expect(ENDGAME_DISK_FRONTIER_LIMITS.registryMaxEntries).toBe(4098);
+    expect(ENDGAME_DISK_FRONTIER_LIMITS.diagnosticMaxEntries).toBe(4098);
+    for (let index = 0; index < ENDGAME_DISK_FRONTIER_LIMITS.registryMaxEntries; index += 1) {
+      store.createRun(`boundary-${String(index).padStart(4, '0')}`).finish();
+    }
+    expect(() => store.createRun('boundary-4098')).toThrow('created-file registry exceeds 4098');
+    const atCapacity = store.diagnostics();
+    expect(atCapacity.activeRuns).toHaveLength(4098);
+    expect(atCapacity.residue).toHaveLength(4098);
+    expect(atCapacity.residue[0]).toBe('.');
+    expect(atCapacity.residueTruncated).toBe(true);
+    expect(atCapacity.cleanupErrors).toEqual([]);
+
+    unlinkFaultsRemaining = 4098;
+    readdirFaultsRemaining = 4;
+    let cleanupRejected = false;
+    try {
+      store.dispose();
+    } catch (error) {
+      cleanupRejected = true;
+      expect(error).toBeInstanceOf(AggregateError);
+    }
+    expect(cleanupRejected).toBe(true);
+    for (let index = 0; index < 3; index += 1) store.diagnostics();
+    const truncated = store.diagnostics();
+    expect(truncated.activeRuns).toHaveLength(4098);
+    expect(truncated.residue).toHaveLength(4098);
+    expect(truncated.residueTruncated).toBe(true);
+    expect(truncated.cleanupErrors).toHaveLength(4098);
+    expect(truncated.cleanupErrorsTruncated).toBe(true);
+    expect(truncated.cleanupErrors.at(-1)).toContain('omitted 5');
+
+    expect(unlinkFaultsRemaining).toBe(0);
+    expect(readdirFaultsRemaining).toBe(0);
+    store.dispose();
+    const cleaned = store.diagnostics();
+    expect(cleaned.activeRuns).toEqual([]);
+    expect(cleaned.residue).toEqual([]);
+    expect(cleaned.cleanupErrors).toHaveLength(4098);
+    expect(cleaned.cleanupErrorsTruncated).toBe(true);
+    releaseParent(parent, stage);
+  }, 300_000);
+
   it('rejects invalid direct records before any bytes are persisted', () => {
     const { parent, stage } = temporaryStage('framing');
     const store = createEndgameDiskFrontierStore({ stagePath: stage });
@@ -315,4 +393,33 @@ describe('Node Endgame disk frontier adapter', () => {
     store.dispose();
     releaseParent(parent, stage);
   });
+});
+
+const RUN_EXACT = process.env.ENDGAME_EXACT_CERTIFICATES === '1';
+
+describe.runIf(RUN_EXACT)('Node disk frontier exact Intro-01 through Intro-04 equality', () => {
+  it('matches default certificates and telemetry with one clean stage per case and no Intro-05', () => {
+    const fixtures = [intro01, intro02, intro03, intro04];
+    expect(ENDGAME_V3_INTRO_DRAFTS).toHaveLength(4);
+    for (const [index, definition] of ENDGAME_V3_INTRO_DRAFTS.entries()) {
+      const route = fixtures[index].optimalRoute;
+      const baseline = certifyOptimalEndgameRouteForDefinition(definition, route);
+      const { parent, stage } = temporaryStage(`exact-${index + 1}`);
+      const store = createEndgameDiskFrontierStore({ stagePath: stage });
+      const injected = certifyOptimalEndgameRouteForDefinition(
+        definition,
+        route,
+        { runStore: store },
+      );
+      expect(injected, definition.id).toEqual(baseline);
+      expect(store.diagnostics(), definition.id).toEqual({
+        activeRuns: [],
+        residue: [],
+        residueTruncated: false,
+        cleanupErrors: [],
+        cleanupErrorsTruncated: false,
+      });
+      releaseParent(parent, stage);
+    }
+  }, 1_200_000);
 });

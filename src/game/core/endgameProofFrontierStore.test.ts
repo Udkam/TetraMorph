@@ -15,12 +15,16 @@ import {
 } from './endgameRouteSearch';
 
 type RunTransform = (id: string, values: readonly string[], read: number) => readonly string[];
+type CompletedMemoryRun = Readonly<{ id: string; records: number; recordBytes: number }>;
 
 class MemoryRunStore implements EndgameProofRunStore {
   private readonly runs = new Map<string, MemoryRun>();
+  private readonly completed: CompletedMemoryRun[] = [];
   private readonly cleanupErrors: string[];
   private readonly transform: RunTransform;
   private readonly sizeDelta: number;
+  private activeWriters = 0;
+  private peakDescriptors = 0;
   private closed = false;
 
   constructor(options: {
@@ -38,6 +42,8 @@ class MemoryRunStore implements EndgameProofRunStore {
     if (this.runs.has(id)) throw new Error(`duplicate ${id}`);
     const values: string[] = [];
     let state: 'open' | 'finished' | 'aborted' = 'open';
+    this.activeWriters += 1;
+    this.updatePeakDescriptors();
     return {
       write(key: string): void {
         if (state !== 'open') throw new Error('writer closed');
@@ -46,21 +52,39 @@ class MemoryRunStore implements EndgameProofRunStore {
       finish: (): EndgameProofRun => {
         if (state !== 'open') throw new Error('writer closed');
         state = 'finished';
+        this.activeWriters -= 1;
+        const frozenValues = Object.freeze(values);
+        this.completed.push(Object.freeze({
+          id,
+          records: frozenValues.length,
+          recordBytes: frozenValues.reduce((total, value) => total + value.length + 1, 0),
+        }));
         const run = new MemoryRun(
           id,
-          values,
-          values.length + this.sizeDelta,
+          frozenValues,
+          frozenValues.length + this.sizeDelta,
           this.transform,
-          () => this.runs.delete(id),
+          () => {
+            this.runs.delete(id);
+          },
         );
         this.runs.set(id, run);
+        this.updatePeakDescriptors();
         return run;
       },
-      abort(): void {
+      abort: (): void => {
         if (state === 'aborted' || state === 'finished') return;
         state = 'aborted';
+        this.activeWriters -= 1;
       },
     };
+  }
+
+  snapshot(): Readonly<{ completed: readonly CompletedMemoryRun[]; peakDescriptors: number }> {
+    return Object.freeze({
+      completed: Object.freeze([...this.completed]),
+      peakDescriptors: this.peakDescriptors,
+    });
   }
 
   diagnostics(): EndgameProofRunStoreDiagnostics {
@@ -76,6 +100,10 @@ class MemoryRunStore implements EndgameProofRunStore {
   dispose(): void {
     this.closed = true;
     for (const run of [...this.runs.values()]) run.dispose();
+  }
+
+  private updatePeakDescriptors(): void {
+    this.peakDescriptors = Math.max(this.peakDescriptors, this.runs.size + this.activeWriters);
   }
 }
 
@@ -94,7 +122,8 @@ class MemoryRun implements EndgameProofRun {
   values(): Iterable<string> {
     if (this.disposed) throw new Error(`disposed ${this.id}`);
     this.reads += 1;
-    return Object.freeze([...this.transform(this.id, this.records, this.reads)]);
+    const transformed = this.transform(this.id, this.records, this.reads);
+    return Object.isFrozen(transformed) ? transformed : Object.freeze([...transformed]);
   }
 
   dispose(): void {
@@ -112,6 +141,12 @@ function java31Hash(value: string): number {
   return [...value].reduce((hash, character) => ((hash * 31) + character.charCodeAt(0)) | 0, 0);
 }
 
+function fixedAsciiRecord(index: number, length: number): string {
+  const prefix = `r${index.toString(36).padStart(7, '0')}:`;
+  if (prefix.length > length) throw new Error(`Record prefix ${prefix} exceeds ${length}.`);
+  return `${prefix}${String.fromCharCode(65 + (index % 26)).repeat(length - prefix.length)}`;
+}
+
 const oneRecordChunks = Object.freeze({ chunkMaxBytes: 6, chunkMaxRecords: 1 });
 
 describe('Endgame proof frontier Core-owned runs', () => {
@@ -127,6 +162,70 @@ describe('Endgame proof frontier Core-owned runs', () => {
     expect(ENDGAME_PROOF_FRONTIER_STORE_TESTING.ordinalByteCompare('a', 'aa')).toBeLessThan(0);
     expect(ENDGAME_PROOF_FRONTIER_STORE_TESTING.ordinalByteCompare('Z', 'a')).toBeLessThan(0);
   });
+
+  it('flushes before one record crosses the exact production 64 MiB raw-record boundary', () => {
+    const limits = ENDGAME_PROOF_FRONTIER_STORE_TESTING.limits;
+    expect(limits.chunkMaxBytes).toBe(64 * 1024 * 1024);
+    expect(limits.recordMaxBytes).toBe(2048);
+    const fullRecordBytes = limits.recordMaxBytes + 1;
+    const fullRecords = Math.floor(limits.chunkMaxBytes / fullRecordBytes);
+    const remainderBytes = limits.chunkMaxBytes - (fullRecords * fullRecordBytes);
+    expect({ fullRecords, remainderBytes }).toEqual({ fullRecords: 32752, remainderBytes: 16 });
+    const overflow = 'overflow-after-byte-cap';
+    function* input(): Generator<string> {
+      for (let index = 0; index < fullRecords; index += 1) {
+        yield fixedAsciiRecord(index, limits.recordMaxBytes);
+      }
+      yield fixedAsciiRecord(fullRecords, remainderBytes - 1);
+      yield overflow;
+    }
+
+    const store = new MemoryRunStore();
+    const output = ENDGAME_PROOF_FRONTIER_STORE_TESTING.persist(input(), store);
+    expect(output).toHaveLength(fullRecords + 2);
+    const chunks = store.snapshot().completed.filter(({ id }) => id.includes('-p0000-'));
+    expect(chunks).toEqual([
+      {
+        id: 'd0000-p0000-g0000',
+        records: fullRecords + 1,
+        recordBytes: limits.chunkMaxBytes,
+      },
+      {
+        id: 'd0000-p0000-g0001',
+        records: 1,
+        recordBytes: overflow.length + 1,
+      },
+    ]);
+    expect(store.snapshot().peakDescriptors).toBe(3);
+  }, 120_000);
+
+  it('flushes before the 131073rd record at the exact production count boundary', () => {
+    const limits = ENDGAME_PROOF_FRONTIER_STORE_TESTING.limits;
+    expect(limits.chunkMaxRecords).toBe(131_072);
+    function* input(): Generator<string> {
+      for (let index = 0; index <= limits.chunkMaxRecords; index += 1) {
+        yield `c${String(index).padStart(6, '0')}`;
+      }
+    }
+
+    const store = new MemoryRunStore();
+    const output = ENDGAME_PROOF_FRONTIER_STORE_TESTING.persist(input(), store);
+    expect(output).toHaveLength(limits.chunkMaxRecords + 1);
+    const chunks = store.snapshot().completed.filter(({ id }) => id.includes('-p0000-'));
+    expect(chunks).toEqual([
+      {
+        id: 'd0000-p0000-g0000',
+        records: limits.chunkMaxRecords,
+        recordBytes: limits.chunkMaxRecords * 8,
+      },
+      {
+        id: 'd0000-p0000-g0001',
+        records: 1,
+        recordBytes: 8,
+      },
+    ]);
+    expect(store.snapshot().peakDescriptors).toBe(3);
+  }, 120_000);
 
   it.each([0, 1, 31, 32, 33])('handles %i one-record chunks including the 32-way boundary', (count) => {
     const input = [...records(count)].reverse();
