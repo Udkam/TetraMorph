@@ -475,8 +475,10 @@ function isRelevantHmrEvent(event, expectedOrigin) {
 function exactInitialIceEventBinding(events, responses, markerSequence) {
   const initial = events.filter((event) => event?.kind === 'ice-response');
   const late = events.filter((event) => event?.kind === 'ice-response-hmr');
-  const fields = ['url', 'status', 'method', 'resourceType', 'contentType', 'redirectedFrom', 'captureWindow', 'bodyEncoding', 'body'];
+  const fields = ['requestId', 'url', 'status', 'method', 'resourceType', 'contentType', 'redirectedFrom', 'captureWindow', 'bodyEncoding', 'body'];
   return initial.length === 2 && responses.length === 2 && initial.every((event, index) => event.sequence === responses[index]?.sequence
+    && Number.isInteger(event?.requestId) && event.requestId > 0
+    && Number.isInteger(responses[index]?.requestId) && responses[index].requestId > 0
     && fields.every((field) => deepEqual(event?.[field], responses[index]?.[field]))
     && Object.prototype.hasOwnProperty.call(event, 'bodyError') === Object.prototype.hasOwnProperty.call(responses[index] ?? {}, 'bodyError')
     && (!Object.prototype.hasOwnProperty.call(event, 'bodyError') || event.bodyError === responses[index]?.bodyError)
@@ -639,9 +641,9 @@ function runIndependentContractFixtures() {
   const sourceMapBase64 = Buffer.from(JSON.stringify(sourceMap)).toString('base64');
   /** @type {any[]} */
   const goodIce = [
-    { sequence: 1, url: `${iceUrl}?import&url`, status: 200, method: 'GET', resourceType: 'script', contentType: 'text/javascript; charset=utf-8',
+    { sequence: 1, requestId: 1, url: `${iceUrl}?import&url`, status: 200, method: 'GET', resourceType: 'script', contentType: 'text/javascript; charset=utf-8',
       redirectedFrom: null, captureWindow: 'initial-freeze', bodyEncoding: 'base64', body: Buffer.from(moduleSource).toString('base64') },
-    { sequence: 2, url: iceUrl, status: 200, method: 'GET', resourceType: 'fetch', contentType: 'audio/ogg; charset=binary',
+    { sequence: 2, requestId: 2, url: iceUrl, status: 200, method: 'GET', resourceType: 'fetch', contentType: 'audio/ogg; charset=binary',
       redirectedFrom: null, captureWindow: 'initial-freeze', bodyEncoding: 'base64', body: assetBytes.toString('base64') },
   ];
   assertFixture(classifyIceResponses(goodIce, normalizedOrigin).passed, 'valid Ice pair');
@@ -695,6 +697,8 @@ function runIndependentContractFixtures() {
   assertFixture(exactInitialIceEventBinding(iceEvents, goodIce, 50), 'valid Ice event binding');
   const contradictoryIce = clone(iceEvents); contradictoryIce[0].contentType = 'audio/ogg';
   assertFixture(!exactInitialIceEventBinding(contradictoryIce, goodIce, 50), 'reject Ice event metadata contradiction');
+  const contradictoryIceRequestId = clone(iceEvents); contradictoryIceRequestId[0].requestId = 999;
+  assertFixture(!exactInitialIceEventBinding(contradictoryIceRequestId, goodIce, 50), 'reject Ice event requestId contradiction');
 
   const id = (/** @type {number} */ epoch, /** @type {number} */ value) => ({ epoch, id: value });
   const tracker = (/** @type {number} */ epoch, /** @type {any[]} */ contexts, /** @type {any[]} */ events, qa = 10, canvas = 20) => ({
@@ -902,7 +906,7 @@ function runIndependentContractFixtures() {
     assertFixture(!exactCommittedTerminal(value, terminalExpected), `reject terminal ${label}`);
   }
   return {
-    iceAccepted: 2, iceRejected: iceRejects.length + 2,
+    iceAccepted: 2, iceRejected: iceRejects.length + 3,
     hmrAccepted: 4, hmrRejected: hmrRejects.length + 3,
     terminalAccepted: 1, terminalRejected: 3,
   };
