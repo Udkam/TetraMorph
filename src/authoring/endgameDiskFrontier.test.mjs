@@ -134,6 +134,151 @@ function trackedResumableFs(events) {
   };
 }
 
+function manifestPublicationFs(events) {
+  const descriptors = new Map();
+  const openCalls = [];
+  let fault = null;
+  const label = (filePath) => path.basename(String(filePath));
+  const fail = (operation, detail) => {
+    if (!fault || fault.operation !== operation || fault.remaining <= 0
+      || (fault.match && !fault.match(detail))) return false;
+    fault.remaining -= 1;
+    const error = new Error(`injected manifest ${operation} fault`);
+    error.code = fault.code;
+    if (fault.after) fault.after(detail, error);
+    throw error;
+  };
+  return {
+    seam: {
+      openSync(filePath, flags, ...args) {
+        const detail = {
+          filePath: String(filePath), name: label(filePath), flags: String(flags), mode: args[0],
+        };
+        fail('openSync', detail);
+        const descriptor = fs.openSync(filePath, flags, ...args);
+        descriptors.set(descriptor, detail);
+        openCalls.push(detail);
+        events.push(`open:${detail.name}:${detail.flags}`);
+        return descriptor;
+      },
+      writeSync(descriptor, buffer, offset, length, position) {
+        const detail = { descriptor, record: descriptors.get(descriptor), buffer, offset, length, position };
+        fail('writeSync', detail);
+        const requested = fault?.operation === 'shortWrite' && fault.remaining > 0
+          && (!fault.match || fault.match(detail)) ? Math.max(1, Math.floor(length / 2)) : length;
+        if (requested !== length) fault.remaining -= 1;
+        events.push(`write:${detail.record?.name}:${requested}`);
+        return fs.writeSync(descriptor, buffer, offset, requested, position);
+      },
+      fsyncSync(descriptor) {
+        const detail = { descriptor, record: descriptors.get(descriptor) };
+        fail('fsyncSync', detail);
+        events.push(`fsync:${detail.record?.name}`);
+        return fs.fsyncSync(descriptor);
+      },
+      closeSync(descriptor) {
+        const detail = { descriptor, record: descriptors.get(descriptor) };
+        fail('closeSync', detail);
+        const result = fs.closeSync(descriptor);
+        descriptors.delete(descriptor);
+        events.push(`close:${detail.record?.name}:${detail.record?.flags}`);
+        return result;
+      },
+      readSync(descriptor, ...args) {
+        const detail = { descriptor, record: descriptors.get(descriptor), length: args[2], position: args[3] };
+        fail('readSync', detail);
+        events.push(`read:${detail.record?.name}:${detail.length}`);
+        return fs.readSync(descriptor, ...args);
+      },
+      lstatSync(filePath, ...args) {
+        const detail = { filePath: String(filePath), name: label(filePath) };
+        fail('lstatSync', detail);
+        events.push(`lstat:${detail.name}`);
+        return fs.lstatSync(filePath, ...args);
+      },
+      linkSync(source, finalPath) {
+        const detail = { source: String(source), finalPath: String(finalPath), sourceName: label(source), finalName: label(finalPath) };
+        fail('linkSync', detail);
+        events.push(`link:${detail.sourceName}>${detail.finalName}`);
+        return fs.linkSync(source, finalPath);
+      },
+      unlinkSync(filePath) {
+        const detail = { filePath: String(filePath), name: label(filePath) };
+        fail('unlinkSync', detail);
+        events.push(`unlink:${detail.name}`);
+        return fs.unlinkSync(filePath);
+      },
+      readdirSync(filePath, ...args) {
+        const detail = { filePath: String(filePath), name: label(filePath) };
+        fail('readdirSync', detail);
+        events.push(`readdir:${detail.name}`);
+        return fs.readdirSync(filePath, ...args);
+      },
+      utimesSync(filePath, ...args) {
+        const detail = { filePath: String(filePath), name: label(filePath) };
+        fail('utimesSync', detail);
+        events.push(`stamp:${detail.name}`);
+        return fs.utimesSync(filePath, ...args);
+      },
+    },
+    arm(operation, { match = null, failures = 1, code = 'EIO', after = null } = {}) {
+      fault = { operation, match, remaining: failures, code, after };
+    },
+    clearFault() { fault = null; },
+    openCalls() { return openCalls.map((entry) => ({ ...entry })); },
+    openHandles() { return descriptors.size; },
+    forceCloseAll() {
+      for (const descriptor of descriptors.keys()) {
+        try { fs.closeSync(descriptor); } catch { /* Test-only process-exit cleanup. */ }
+      }
+      descriptors.clear();
+    },
+  };
+}
+
+function manifestFaultAfterLink(tracked, operation, options = {}) {
+  return {
+    ...tracked.seam,
+    linkSync(...args) {
+      const result = tracked.seam.linkSync(...args);
+      if (path.basename(String(args[0])).startsWith('manifest-g')) {
+        tracked.arm(operation, options);
+      }
+      return result;
+    },
+  };
+}
+
+function manifestActionAfterAliasContraction(tracked, action) {
+  let manifestLinked = false;
+  let postlinkStamps = 0;
+  return {
+    ...tracked.seam,
+    linkSync(...args) {
+      const result = tracked.seam.linkSync(...args);
+      if (path.basename(String(args[0])).startsWith('manifest-g')) manifestLinked = true;
+      return result;
+    },
+    utimesSync(...args) {
+      const result = tracked.seam.utimesSync(...args);
+      if (manifestLinked) {
+        postlinkStamps += 1;
+        if (postlinkStamps === 2) action();
+      }
+      return result;
+    },
+  };
+}
+
+function replaceExactManifestObject(filePath) {
+  const replacementPath = `${filePath}.race-replacement`;
+  const bytes = fs.readFileSync(filePath);
+  fs.writeFileSync(replacementPath, bytes, { flag: 'wx', mode: 0o600 });
+  fs.unlinkSync(filePath);
+  fs.linkSync(replacementPath, filePath);
+  fs.unlinkSync(replacementPath);
+}
+
 function countedResumableInventoryFs() {
   const counts = { fstatSync: 0, lstatSync: 0, readdirSync: 0, realpathSync: 0 };
   const seam = {};
@@ -363,6 +508,29 @@ function coveredUnitAppendPlan(testing, label) {
     transitionsDelta: 1, boundPrunesDelta: 0, nextRun: unitRun,
   }), manifestCandidate(unitRun, unitDescriptor), manifestTotals(8));
   return { state, plan, unitDescriptor };
+}
+
+function resumableOwnerByteLength(testing, ownerId = 'owner-A') {
+  return Buffer.byteLength(`${testing.canonicalJson({ schema: 't37-f4e-r7-owner-v1', ownerId })}\n`, 'utf8');
+}
+
+function preparedSeedManifest(testing, label) {
+  const state = testing.createManifestState();
+  const frontier = Object.freeze({ token: label });
+  const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+  const plan = testing.planManifestTransition(state, Object.freeze({
+    transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+  }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+  return { state, plan, token: testing.prepareManifestTransitionCommit(state, plan) };
+}
+
+function forceReleaseManifestStage(parent, stage, tracked = null) {
+  tracked?.forceCloseAll?.();
+  if (fs.existsSync(stage)) {
+    for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
+    fs.rmdirSync(stage);
+  }
+  fs.rmdirSync(parent);
 }
 
 describe('R7 resumable disk frontier primitives', () => {
@@ -918,6 +1086,627 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(state.nextRuns).toEqual([unitDescriptor]);
     expect(state.activeIds.has(unitDescriptor.id)).toBe(true);
     expect(state.parentOffset).toBe(1);
+  });
+
+  it('publishes only private prepared manifest bytes in the exact clean hard-link order', () => {
+    const { parent, stage } = temporaryStage('r7-manifest-publish-clean');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    const state = testing.createManifestState();
+    const frontier = Object.freeze({ token: 'publisher-private-seed' });
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const plan = testing.planManifestTransition(state, Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+    }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+    const expectedBytes = Buffer.from(plan.manifestBytes);
+    const token = testing.prepareManifestTransitionCommit(state, plan);
+    plan.manifestBytes.fill(0x58);
+    const exported = testing.preparedManifestTransitionBytes(token);
+    exported.fill(0x59);
+    const result = testing.publishPreparedManifest(store, state, token);
+    const finalPath = path.join(stage, 'manifest-g00000.json');
+    const partPath = `${finalPath}.part`;
+
+    expect(result).toEqual(expect.objectContaining({
+      tip: plan.tip, advanceAllowed: true, clean: true,
+    }));
+    expect(state).toEqual(expect.objectContaining({ generation: 0, tip: plan.tip }));
+    expect(fs.readFileSync(finalPath)).toEqual(expectedBytes);
+    expect(tracked.openCalls()).toContainEqual(expect.objectContaining({
+      name: 'manifest-g00000.json.part', flags: 'wx', mode: 0o600,
+    }));
+    expect(fs.existsSync(partPath)).toBe(false);
+    expect(tracked.openHandles()).toBe(0);
+    const manifestEvents = events.filter((event) => event.includes('manifest-g00000'));
+    expect(manifestEvents.findIndex((event) => event === 'open:manifest-g00000.json.part:wx'))
+      .toBeLessThan(manifestEvents.findIndex((event) => event.startsWith('write:manifest-g00000.json.part:')));
+    expect(manifestEvents.findIndex((event) => event === 'fsync:manifest-g00000.json.part'))
+      .toBeLessThan(manifestEvents.findIndex((event) => event === 'link:manifest-g00000.json.part>manifest-g00000.json'));
+    expect(manifestEvents.findIndex((event) => event === 'link:manifest-g00000.json.part>manifest-g00000.json'))
+      .toBeLessThan(manifestEvents.findIndex((event) => event === 'unlink:manifest-g00000.json.part'));
+    expect(events.filter((event) => event.startsWith('readdir:'))).toEqual([]);
+    expect(() => testing.publishPreparedManifest(store, state, token)).toThrow('not owned');
+
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('finishes a short-write-safe manifest publication without changing the sealed bytes', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-short-write');
+    const expectedBytes = testing.preparedManifestTransitionBytes(prepared.token);
+    const { parent, stage } = temporaryStage('r7-manifest-short-write');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('shortWrite', {
+      failures: 4,
+      match: (detail) => detail.record?.name === 'manifest-g00000.json.part',
+    });
+
+    expect(testing.publishPreparedManifest(store, prepared.state, prepared.token).clean).toBe(true);
+    expect(fs.readFileSync(path.join(stage, 'manifest-g00000.json'))).toEqual(expectedBytes);
+    expect(events.filter((event) => event.startsWith('write:manifest-g00000.json.part:')).length)
+      .toBeGreaterThan(1);
+    expect(tracked.openHandles()).toBe(0);
+
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('cleans only its owned part when the manifest link fails before commit', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-link-failure');
+    const { parent, stage } = temporaryStage('r7-manifest-link-failure');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('linkSync', {
+      match: (detail) => detail.finalName === 'manifest-g00000.json',
+    });
+    const before = manifestStateBytes(testing, prepared.state);
+
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+    expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(false);
+    expect(events).toContain('unlink:manifest-g00000.json.part');
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow('not owned');
+
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('applies once but suspends with both aliases after a lost successful link result', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-link-lost-result');
+    const expectedBytes = testing.preparedManifestTransitionBytes(prepared.token);
+    const { parent, stage } = temporaryStage('r7-manifest-link-lost-result');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('linkSync', {
+      match: (detail) => detail.finalName === 'manifest-g00000.json',
+      after: (detail) => fs.linkSync(detail.source, detail.finalPath),
+    });
+
+    const result = testing.publishPreparedManifest(store, prepared.state, prepared.token);
+    expect(result).toEqual(expect.objectContaining({
+      tip: prepared.plan.tip, advanceAllowed: false, clean: false,
+    }));
+    expect(prepared.state).toEqual(expect.objectContaining({ generation: 0, tip: prepared.plan.tip }));
+    expect(fs.readFileSync(path.join(stage, 'manifest-g00000.json'))).toEqual(expectedBytes);
+    expect(fs.readFileSync(path.join(stage, 'manifest-g00000.json.part'))).toEqual(expectedBytes);
+    expect(fs.lstatSync(path.join(stage, 'manifest-g00000.json'), { bigint: true }).ino)
+      .toBe(fs.lstatSync(path.join(stage, 'manifest-g00000.json.part'), { bigint: true }).ino);
+    expect(result.diagnostics.cleanupErrors.some((entry) => entry.includes('injected manifest linkSync fault')))
+      .toBe(true);
+    expect(result.diagnostics.residue).toContain('manifest-g00000.json.part');
+    expect(result.diagnostics.residue).not.toContain('manifest-g00000.json');
+    expect(() => store.loadCheckpoint()).toThrow('suspended');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it('keeps both paths and requires reopen when a manifest link result cannot be authenticated', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-link-ambiguous');
+    const { parent, stage } = temporaryStage('r7-manifest-link-ambiguous');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('linkSync', {
+      match: (detail) => detail.finalName === 'manifest-g00000.json',
+      after: (detail) => {
+        fs.linkSync(detail.source, detail.finalPath);
+        tracked.arm('lstatSync', {
+          match: (next) => next.name === 'manifest-g00000.json',
+        });
+      },
+    });
+    const before = manifestStateBytes(testing, prepared.state);
+
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow('reopen the Store');
+    expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(true);
+    expect(events.some((event) => event.startsWith('unlink:manifest-g00000'))).toBe(false);
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow('suspended');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it.each(['normal result', 'lost result'])(
+    'never adopts an exact-byte replacement part inode after a %s link',
+    (outcome) => {
+      const prepared = preparedSeedManifest(testing, `publisher-replaced-part-${outcome}`);
+      const { parent, stage } = temporaryStage(`r7-manifest-replaced-part-${outcome}`);
+      const events = [];
+      const tracked = manifestPublicationFs(events);
+      const replacingSeam = {
+        ...tracked.seam,
+        linkSync(source, finalPath) {
+          if (outcome === 'normal result'
+            && path.basename(String(source)).startsWith('manifest-g')) {
+            replaceExactManifestObject(String(source));
+          }
+          return tracked.seam.linkSync(source, finalPath);
+        },
+      };
+      const store = createResumableEndgameDiskFrontierStore({
+        stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: replacingSeam,
+      });
+      events.length = 0;
+      if (outcome === 'lost result') {
+        tracked.arm('linkSync', {
+          match: (detail) => detail.finalName === 'manifest-g00000.json',
+          after: (detail) => {
+            replaceExactManifestObject(detail.source);
+            fs.linkSync(detail.source, detail.finalPath);
+          },
+        });
+      }
+      const before = manifestStateBytes(testing, prepared.state);
+
+      if (outcome === 'normal result') {
+        expect(testing.publishPreparedManifest(store, prepared.state, prepared.token))
+          .toEqual(expect.objectContaining({
+            tip: prepared.plan.tip, advanceAllowed: false, clean: false,
+          }));
+        expect(prepared.state).toEqual(expect.objectContaining({ generation: 0, tip: prepared.plan.tip }));
+      } else {
+        expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token))
+          .toThrow('reopen the Store');
+        expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+      }
+      expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+      expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(true);
+      expect(events).not.toContain('unlink:manifest-g00000.json');
+      expect(events).not.toContain('unlink:manifest-g00000.json.part');
+      expect(() => store.loadCheckpoint()).toThrow('suspended');
+
+      forceReleaseManifestStage(parent, stage, tracked);
+    },
+  );
+
+  it('treats a vanished EEXIST final collision as terminal after exact part cleanup', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-vanished-final-collision');
+    const { parent, stage } = temporaryStage('r7-manifest-vanished-final-collision');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('linkSync', {
+      code: 'EEXIST', match: (detail) => detail.finalName === 'manifest-g00000.json',
+    });
+    const before = manifestStateBytes(testing, prepared.state);
+
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+    expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(false);
+    expect(events).toContain('unlink:manifest-g00000.json.part');
+    expect(() => store.loadCheckpoint()).toThrow('suspended');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it('never overwrites or unlinks a racing final collision and only cleans its owned part', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-final-collision');
+    const expectedBytes = testing.preparedManifestTransitionBytes(prepared.token);
+    const { parent, stage } = temporaryStage('r7-manifest-final-collision');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('linkSync', {
+      code: 'EEXIST',
+      match: (detail) => detail.finalName === 'manifest-g00000.json',
+      after: (detail) => fs.writeFileSync(detail.finalPath, expectedBytes, { flag: 'wx', mode: 0o600 }),
+    });
+    const before = manifestStateBytes(testing, prepared.state);
+
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+    expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+    expect(fs.readFileSync(path.join(stage, 'manifest-g00000.json'))).toEqual(expectedBytes);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(false);
+    expect(events).toContain('unlink:manifest-g00000.json.part');
+    expect(events).not.toContain('unlink:manifest-g00000.json');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it('never deletes a racing foreign part collision', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-part-collision');
+    const { parent, stage } = temporaryStage('r7-manifest-part-collision');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('openSync', {
+      code: 'EEXIST',
+      match: (detail) => detail.name === 'manifest-g00000.json.part',
+      after: (detail) => fs.writeFileSync(detail.filePath, 'foreign-part', { flag: 'wx', mode: 0o600 }),
+    });
+    const before = manifestStateBytes(testing, prepared.state);
+
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+    expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+    expect(fs.readFileSync(path.join(stage, 'manifest-g00000.json.part'), 'utf8')).toBe('foreign-part');
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(events).not.toContain('unlink:manifest-g00000.json.part');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it('suspends without probing or deleting after a part open has an unknown result', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-part-open-unknown');
+    const { parent, stage } = temporaryStage('r7-manifest-part-open-unknown');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm('openSync', {
+      code: 'EIO',
+      match: (detail) => detail.name === 'manifest-g00000.json.part',
+      after: (detail) => fs.writeFileSync(detail.filePath, 'unknown-open-part', { flag: 'wx', mode: 0o600 }),
+    });
+    const before = manifestStateBytes(testing, prepared.state);
+
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+    expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+    expect(fs.readFileSync(path.join(stage, 'manifest-g00000.json.part'), 'utf8')).toBe('unknown-open-part');
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(events).not.toContain('unlink:manifest-g00000.json.part');
+    expect(() => store.loadCheckpoint()).toThrow('suspended');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it('returns the target tip without throwing or rolling back when apply fails after link', () => {
+    const prepared = preparedSeedManifest(testing, 'publisher-postlink-apply');
+    const { parent, stage } = temporaryStage('r7-manifest-postlink-apply');
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    Object.freeze(prepared.state);
+
+    const result = testing.publishPreparedManifest(store, prepared.state, prepared.token);
+    expect(result).toEqual(expect.objectContaining({
+      tip: prepared.plan.tip, advanceAllowed: false, clean: false,
+    }));
+    expect(prepared.state).toEqual(expect.objectContaining({ generation: -1, tip: null }));
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(true);
+    expect(events.some((event) => event.startsWith('unlink:manifest-g00000'))).toBe(false);
+    expect(result.diagnostics.residue).toContain('manifest-g00000.json.part');
+    expect(result.diagnostics.residue).not.toContain('manifest-g00000.json');
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow('suspended');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it.each([
+    ['linked part lstat', 'lstatSync', (detail) => detail.name === 'manifest-g00000.json.part', false],
+    ['linked part open', 'openSync', (detail) => detail.name === 'manifest-g00000.json.part'
+      && detail.flags === 'r', false],
+    ['linked part read', 'readSync', (detail) => detail.record?.name === 'manifest-g00000.json.part', false],
+    ['linked part close', 'closeSync', (detail) => detail.record?.name === 'manifest-g00000.json.part'
+      && detail.record.flags === 'r', true],
+    ['linked final lstat', 'lstatSync', (detail) => detail.name === 'manifest-g00000.json', false],
+    ['linked final open', 'openSync', (detail) => detail.name === 'manifest-g00000.json'
+      && detail.flags === 'r', false],
+    ['linked final read', 'readSync', (detail) => detail.record?.name === 'manifest-g00000.json', false],
+    ['linked final close', 'closeSync', (detail) => detail.record?.name === 'manifest-g00000.json'
+      && detail.record.flags === 'r', true],
+    ['final registration stamp', 'utimesSync', () => true, false],
+    ['part alias unlink', 'unlinkSync', (detail) => detail.name === 'manifest-g00000.json.part', false],
+  ])('fails soft after commit at %s and never unlinks the final', (label, operation, match, pendingClose) => {
+    const prepared = preparedSeedManifest(testing, `publisher-postlink-${label}`);
+    const { parent, stage } = temporaryStage(`r7-manifest-postlink-${label}`);
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: manifestFaultAfterLink(tracked, operation, { match }),
+    });
+    events.length = 0;
+
+    const result = testing.publishPreparedManifest(store, prepared.state, prepared.token);
+    expect(result).toEqual(expect.objectContaining({
+      tip: prepared.plan.tip, advanceAllowed: false, clean: false,
+    }));
+    expect(prepared.state).toEqual(expect.objectContaining({ generation: 0, tip: prepared.plan.tip }));
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(true);
+    expect(events).not.toContain('unlink:manifest-g00000.json');
+    expect(result.diagnostics.residue).toContain('manifest-g00000.json.part');
+    expect(result.diagnostics.residue).not.toContain('manifest-g00000.json');
+    expect(tracked.openHandles()).toBe(pendingClose ? 1 : 0);
+    expect(store.suspend().closeFailed).toBe(false);
+    expect(tracked.openHandles()).toBe(0);
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it.each([
+    ['linked part', (detail) => detail.record?.name === 'manifest-g00000.json.part'
+      && detail.record.flags === 'r'],
+    ['linked final', (detail) => detail.record?.name === 'manifest-g00000.json'
+      && detail.record.flags === 'r'],
+  ])('preserves a persistent %s close marker when suspend cannot drain it', (label, match) => {
+    const prepared = preparedSeedManifest(testing, `publisher-persistent-close-${label}`);
+    const { parent, stage } = temporaryStage(`r7-manifest-persistent-close-${label}`);
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: manifestFaultAfterLink(tracked, 'closeSync', { match, failures: 2 }),
+    });
+    events.length = 0;
+
+    const result = testing.publishPreparedManifest(store, prepared.state, prepared.token);
+    expect(result).toEqual(expect.objectContaining({ advanceAllowed: false, clean: false }));
+    expect(tracked.openHandles()).toBe(1);
+    expect(store.suspend().closeFailed).toBe(true);
+    expect(tracked.openHandles()).toBe(1);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+    expect(events).not.toContain('unlink:manifest-g00000.json');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it.each([
+    ['one-shot', 1, 0, false],
+    ['persistent', 2, 1, true],
+  ])('direct dispose drains a %s terminal manifest close before teardown', (
+    label, failures, remainingHandles, closeFailed,
+  ) => {
+    const prepared = preparedSeedManifest(testing, `publisher-dispose-close-${label}`);
+    const { parent, stage } = temporaryStage(`r7-manifest-dispose-close-${label}`);
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: manifestFaultAfterLink(tracked, 'closeSync', {
+        failures,
+        match: (detail) => detail.record?.name === 'manifest-g00000.json.part'
+          && detail.record.flags === 'r',
+      }),
+    });
+    events.length = 0;
+
+    expect(testing.publishPreparedManifest(store, prepared.state, prepared.token))
+      .toEqual(expect.objectContaining({ advanceAllowed: false, clean: false }));
+    expect(tracked.openHandles()).toBe(1);
+    let disposalError = null;
+    try { store.dispose(); } catch (error) { disposalError = error; }
+    expect(disposalError).not.toBeNull();
+    expect(tracked.openHandles()).toBe(remainingHandles);
+    expect(disposalError?.r7CloseFailed === true).toBe(closeFailed);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it.each([
+    ['bounded lstat', (tracked, finalPath) => tracked.arm('lstatSync', {
+      match: (detail) => detail.name === path.basename(finalPath),
+    }), null],
+    ['canonical hash', (tracked, finalPath) => fs.writeFileSync(finalPath, 'corrupt-final'), 'corrupt-final'],
+    ['object identity', (tracked, finalPath) => {
+      const bytes = fs.readFileSync(finalPath);
+      fs.unlinkSync(finalPath);
+      fs.writeFileSync(finalPath, bytes, { flag: 'wx', mode: 0o600 });
+    }, null],
+  ])('fails soft at contracted-final %s after the part is already absent', (label, action, finalText) => {
+    const prepared = preparedSeedManifest(testing, `publisher-contracted-${label}`);
+    const { parent, stage } = temporaryStage(`r7-manifest-contracted-${label}`);
+    const finalPath = path.join(stage, 'manifest-g00000.json');
+    const partPath = `${finalPath}.part`;
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: manifestActionAfterAliasContraction(tracked, () => action(tracked, finalPath)),
+    });
+    events.length = 0;
+
+    const result = testing.publishPreparedManifest(store, prepared.state, prepared.token);
+    expect(result).toEqual(expect.objectContaining({
+      tip: prepared.plan.tip, advanceAllowed: false, clean: false,
+    }));
+    expect(prepared.state).toEqual(expect.objectContaining({ generation: 0, tip: prepared.plan.tip }));
+    expect(fs.existsSync(partPath)).toBe(false);
+    expect(fs.existsSync(finalPath)).toBe(true);
+    if (finalText !== null) expect(fs.readFileSync(finalPath, 'utf8')).toBe(finalText);
+    expect(events).not.toContain('unlink:manifest-g00000.json');
+    expect(result.diagnostics.residue).not.toContain('manifest-g00000.json.part');
+    expect(result.diagnostics.residue).not.toContain('manifest-g00000.json');
+
+    forceReleaseManifestStage(parent, stage, tracked);
+  });
+
+  it.each([
+    ['namespace', (bytes, ownerBytes) => ({ pass: { maximumNamespaceEntries: 3 }, fail: { maximumNamespaceEntries: 2 } })],
+    ['manifest bytes', (bytes, ownerBytes) => ({ pass: { manifestBytes: bytes }, fail: { manifestBytes: bytes - 1 } })],
+    ['retained bytes', (bytes, ownerBytes) => ({ pass: { retainedManifestBytes: bytes * 2 }, fail: { retainedManifestBytes: bytes * 2 - 1 } })],
+    ['auxiliary bytes', (bytes, ownerBytes) => ({
+      pass: { auxiliaryBytes: ownerBytes + bytes * 2 },
+      fail: { auxiliaryBytes: ownerBytes + bytes * 2 - 1 },
+    })],
+    ['manifest count', (bytes, ownerBytes) => ({ pass: { maximumManifests: 1 }, fail: { maximumManifests: 0 } })],
+  ])('admits %s at equality and rejects plus one before a manifest path opens', (label, limitsFor) => {
+    const makePrepared = (suffix) => {
+      const state = testing.createManifestState();
+      const frontier = Object.freeze({ token: `admission-${label}-${suffix}` });
+      const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+      const plan = testing.planManifestTransition(state, Object.freeze({
+        transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+      }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+      return { state, plan, token: testing.prepareManifestTransitionCommit(state, plan) };
+    };
+    const ownerBytes = resumableOwnerByteLength(testing);
+    const probe = makePrepared('sizing');
+    const candidateBytes = testing.preparedManifestTransitionBytes(probe.token).length;
+    const matrix = limitsFor(candidateBytes, ownerBytes);
+
+    for (const [verdict, limits] of Object.entries(matrix)) {
+      const prepared = verdict === 'pass' ? probe : makePrepared(verdict);
+      const { parent, stage } = temporaryStage(`r7-manifest-admit-${label}-${verdict}`);
+      const events = [];
+      const tracked = manifestPublicationFs(events);
+      const store = createResumableEndgameDiskFrontierStore({
+        stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam, limits,
+      });
+      events.length = 0;
+      const before = manifestStateBytes(testing, prepared.state);
+      if (verdict === 'pass') {
+        expect(testing.publishPreparedManifest(store, prepared.state, prepared.token).clean).toBe(true);
+        expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+      } else {
+        expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+        expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+        expect(events.some((event) => event.includes('manifest-g00000'))).toBe(false);
+        expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+        expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(false);
+        expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow('not owned');
+      }
+      store.dispose();
+      releaseParent(parent, stage);
+    }
+  });
+
+  it.each([
+    ['generation', (state) => { state.generation = 41; }],
+    ['tip', (state) => { state.tip = { generation: 0, manifestSha256: 'C'.repeat(64) }; }],
+  ])('uses claim as the last prelink gate after manifest I/O %s drift', (label, drift) => {
+    const prepared = preparedSeedManifest(testing, `publisher-io-${label}-drift`);
+    const { parent, stage } = temporaryStage(`r7-manifest-io-${label}-drift`);
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    let drifted = false;
+    const seam = {
+      ...tracked.seam,
+      writeSync(...args) {
+        const result = tracked.seam.writeSync(...args);
+        if (!drifted && events.at(-1)?.startsWith('write:manifest-g00000.json.part:')) {
+          drifted = true;
+          drift(prepared.state);
+        }
+        return result;
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    events.length = 0;
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token))
+      .toThrow('base state is stale');
+    expect(drifted).toBe(true);
+    expect(prepared.state.generation).toBe(label === 'generation' ? 41 : -1);
+    expect(prepared.state.tip).toEqual(label === 'tip'
+      ? { generation: 0, manifestSha256: 'C'.repeat(64) }
+      : null);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(false);
+    expect(events.some((event) => event.startsWith('link:manifest-g00000'))).toBe(false);
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow('not owned');
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it.each([
+    ['open', 'openSync', (detail) => detail.name === 'manifest-g00000.json.part', false],
+    ['write', 'writeSync', (detail) => detail.record?.name === 'manifest-g00000.json.part', false],
+    ['fsync', 'fsyncSync', (detail) => detail.record?.name === 'manifest-g00000.json.part', false],
+    ['writer close', 'closeSync', (detail) => detail.record?.name === 'manifest-g00000.json.part'
+      && detail.record.flags === 'wx', true],
+    ['part lstat authentication', 'lstatSync', (detail) => detail.name === 'manifest-g00000.json.part', true],
+    ['part read', 'readSync', (detail) => detail.record?.name === 'manifest-g00000.json.part', false],
+    ['reader close', 'closeSync', (detail) => detail.record?.name === 'manifest-g00000.json.part'
+      && detail.record.flags === 'r', true],
+    ['stage stamp', 'utimesSync', () => true, false],
+  ])('fails closed at prelink manifest %s without creating a final', (label, operation, match, partRemains) => {
+    const prepared = preparedSeedManifest(testing, `publisher-prelink-${label}`);
+    const { parent, stage } = temporaryStage(`r7-manifest-prelink-${label}`);
+    const events = [];
+    const tracked = manifestPublicationFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    events.length = 0;
+    tracked.arm(operation, { match });
+    const before = manifestStateBytes(testing, prepared.state);
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+    expect(manifestStateBytes(testing, prepared.state)).toBe(before);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(partRemains);
+    expect(events.some((event) => event.startsWith('link:manifest-g00000'))).toBe(false);
+    expect(() => testing.publishPreparedManifest(store, prepared.state, prepared.token)).toThrow();
+    if (partRemains) {
+      const suspended = store.suspend();
+      if (label.includes('close')) {
+        expect(suspended.closeFailed).toBe(false);
+        expect(tracked.openHandles()).toBe(0);
+        expect(fs.existsSync(path.join(stage, 'manifest-g00000.json.part'))).toBe(false);
+      }
+      forceReleaseManifestStage(parent, stage, tracked);
+    } else {
+      store.dispose();
+      releaseParent(parent, stage);
+    }
   });
 
   it('commits all 4,096 unit runs in place without iterating or replacing growing collections', () => {

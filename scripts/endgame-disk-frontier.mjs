@@ -47,6 +47,7 @@ const R7_MANIFEST_PLAN_HASH_LABEL = 'T37-F4E-R7-MANIFEST-PLAN-V1';
 const R7_MANIFEST_PLAN_SNAPSHOTS = new WeakMap();
 const R7_PREPARED_MANIFEST_TRANSITIONS = new WeakMap();
 const R7_PENDING_MANIFEST_TRANSITIONS = new WeakMap();
+const R7_RESUMABLE_STORE_INTERNALS = new WeakMap();
 const R7_MANIFEST_STATES = new WeakSet();
 const R7_OWNED_CANDIDATE_INDEX_PROBES = new WeakMap();
 const R7_AUTHORIZATION_BUCKET_VISIT_PROBES = new WeakMap();
@@ -344,6 +345,7 @@ export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
   preparedManifestTransitionBytes: preparedResumableManifestTransitionBytes,
   claimPreparedManifestTransitionCommit: claimPreparedResumableManifestTransitionCommit,
   applyPreparedManifestTransition: applyPreparedResumableManifestTransition,
+  publishPreparedManifest: publishPreparedResumableManifest,
   commitManifestTransition: commitResumableManifestTransition,
   descriptorHash: resumableDescriptorHash,
   runSetHash: resumableRunSetHash,
@@ -2297,6 +2299,25 @@ function applyPreparedResumableManifestTransition(token) {
   return state;
 }
 
+function discardPreparedResumableManifestTransition(token) {
+  const prepared = token && typeof token === 'object'
+    ? R7_PREPARED_MANIFEST_TRANSITIONS.get(token)
+    : undefined;
+  if (prepared === undefined) return;
+  R7_PREPARED_MANIFEST_TRANSITIONS.delete(token);
+  if (R7_PENDING_MANIFEST_TRANSITIONS.get(prepared.state) === token) {
+    R7_PENDING_MANIFEST_TRANSITIONS.delete(prepared.state);
+  }
+}
+
+function publishPreparedResumableManifest(store, state, token) {
+  const internals = store && typeof store === 'object'
+    ? R7_RESUMABLE_STORE_INTERNALS.get(store)
+    : undefined;
+  if (internals === undefined) throw frontierError('prepared manifest publication requires a resumable Store');
+  return internals.publishPreparedManifest(state, token);
+}
+
 function commitResumableManifestTransition(state, plan) {
   const token = prepareResumableManifestTransitionCommit(state, plan);
   claimPreparedResumableManifestTransitionCommit(state, token);
@@ -2646,6 +2667,8 @@ export function createResumableEndgameDiskFrontierStore(options) {
     throw failure;
   }
   let invalidated = false;
+  let manifestPublicationTerminal = false;
+  let manifestPublicationTerminalReason = null;
   let viewOutstanding = false;
   let disposed = false;
   let suspendCloseFailed = false;
@@ -3411,7 +3434,274 @@ export function createResumableEndgameDiskFrontierStore(options) {
     });
   };
   const requireLive = () => {
+    if (manifestPublicationTerminal) {
+      throw frontierError(`resumable Store is suspended after ${manifestPublicationTerminalReason}`);
+    }
     if (invalidated || disposed) throw frontierError('resumable Store is suspended or disposed');
+  };
+  const manifestPublicationDiagnostics = (extraResidue = [], authoritativeNames = []) => {
+    const current = diagnostics();
+    if (extraResidue.length === 0 && authoritativeNames.length === 0) return current;
+    const authoritative = new Set(authoritativeNames);
+    const completeResidue = ['.', ...new Set([
+      ...current.residue.filter((entry) => entry !== '.' && !authoritative.has(entry)),
+      ...extraResidue,
+    ])];
+    const residue = completeResidue.slice(0, ENDGAME_DISK_FRONTIER_LIMITS.diagnosticMaxEntries);
+    return Object.freeze({
+      ...current,
+      residue: Object.freeze(residue),
+      residueTruncated: current.residueTruncated || completeResidue.length > residue.length,
+    });
+  };
+  const terminateManifestPublication = (reason, error, inventoryIsInvalid = true) => {
+    manifestPublicationTerminal = true;
+    if (manifestPublicationTerminalReason === null) manifestPublicationTerminalReason = reason;
+    if (blockedReason === null) blockedReason = reason;
+    if (error !== null) recordCleanupError(error);
+    if (error?.r7CloseFailed === true || descriptorTracker.size() > 0) suspendCloseFailed = true;
+    if (inventoryIsInvalid) markInventoryInvalid();
+    stageSentinelArmed = false;
+    viewOutstanding = false;
+  };
+  const assertPreparedManifestBytes = (record, bytes, label) => {
+    if (!Buffer.isBuffer(bytes) || bytes.length > limits.manifestBytes
+      || sha256Upper(bytes) !== record.sealed.tip.manifestSha256) {
+      throw frontierError(`${label} bytes do not match the prepared manifest tip`);
+    }
+    const parsed = parseCanonicalLfBytes(bytes);
+    if (canonicalizeJson(parsed) !== canonicalizeJson(record.sealed.manifest)) {
+      throw frontierError(`${label} bytes are not the prepared canonical manifest`);
+    }
+  };
+  const publishPreparedManifest = (state, token) => {
+    requireLive();
+    const prepared = token && typeof token === 'object'
+      ? R7_PREPARED_MANIFEST_TRANSITIONS.get(token)
+      : undefined;
+    if (prepared === undefined) throw frontierError('prepared manifest transition is not owned by this adapter');
+    if (prepared.state !== state) {
+      throw frontierError('prepared manifest transition belongs to a different state instance');
+    }
+    if (prepared.phase !== 'prepared' || R7_PENDING_MANIFEST_TRANSITIONS.get(state) !== token) {
+      throw frontierError('prepared manifest transition is not available for publication');
+    }
+    const manifestBytes = Buffer.from(prepared.manifestBytes);
+    const targetTip = prepared.sealed.tip;
+    const generationToken = paddedManifestToken(prepared.targetGeneration, 5);
+    const finalName = `manifest-g${generationToken}.json`;
+    const partName = `${finalName}.part`;
+    const finalPath = path.join(stagePath, finalName);
+    const partPath = path.join(stagePath, partName);
+    let descriptor = null;
+    let partOpenAttempted = false;
+    let openedPart = false;
+    let committed = false;
+    let committedLinkError = null;
+    let partReleased = false;
+    let partContracted = false;
+    let ownedPartIdentity = null;
+
+    const burnToken = () => discardPreparedResumableManifestTransition(token);
+    const cleanOwnedPart = (primary) => {
+      const cleanup = [];
+      if (descriptor !== null && descriptorTracker.hasDescriptor(descriptor)
+        && primary?.r7CloseFailed !== true) {
+        try {
+          descriptorTracker.close(descriptor);
+          descriptor = null;
+        } catch (error) { cleanup.push(error); }
+      }
+      const ownership = ownedFiles.get(partPath);
+      if (ownership !== undefined) {
+        try {
+          unlinkOwnedFile(partPath, ownership.identity, () => {
+            orphanOwnedPaths.delete(partPath);
+            partReleased = true;
+          });
+        } catch (error) {
+          cleanup.push(error);
+          orphanOwnedPaths.set(partPath, ownership.identity);
+        }
+      }
+      return cleanup;
+    };
+    const failPrecommit = (primary, terminal = false) => {
+      burnToken();
+      const cleanup = cleanOwnedPart(primary);
+      const failure = aggregatePropagatingR7Close(primary, cleanup, 'Manifest publication failed before commit.');
+      if (terminal || cleanup.length > 0 || openedPart && !partReleased) {
+        terminateManifestPublication(
+          terminal ? 'manifest-publication-collision' : 'precommit-owned-residue',
+          failure,
+        );
+      }
+      throw failure;
+    };
+    const failUnknownLink = (primary, observations = []) => {
+      burnToken();
+      const failure = aggregatePropagatingR7Close(
+        primary,
+        observations,
+        'Manifest link outcome is unknown; reopen the Store.',
+      );
+      terminateManifestPublication('manifest-link-outcome-unknown', failure);
+      const reopen = frontierError(`manifest link outcome is unknown; reopen the Store (${normalizeDiagnostic(failure)})`);
+      if (failure?.r7CloseFailed === true) markR7CloseFailed(reopen);
+      throw reopen;
+    };
+    const postcommitResult = (error) => {
+      terminateManifestPublication('postcommit-manifest-residue', error);
+      return Object.freeze({
+        tip: targetTip,
+        diagnostics: manifestPublicationDiagnostics(partContracted ? [] : [partName], [finalName]),
+        advanceAllowed: false,
+        clean: false,
+      });
+    };
+
+    try {
+      assertPreparedManifestBytes(prepared, manifestBytes, 'private');
+      ensureInventoryCurrent('manifest publication', true);
+      if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
+      if (prepared.targetGeneration >= limits.maximumManifests) {
+        throw frontierError(`manifest generation exceeds the ${limits.maximumManifests}-manifest limit`);
+      }
+      if (inventory.entries.has(partName) || inventory.entries.has(finalName)) {
+        throw frontierError('manifest publication path already exists in the authenticated inventory');
+      }
+      admitNamespacePeak(inventory.namespaceEntries, 2, limits.maximumNamespaceEntries);
+      const twiceManifestBytes = manifestBytes.length * 2;
+      if (inventory.retainedManifestBytes + twiceManifestBytes > limits.retainedManifestBytes) {
+        throw frontierError('retained manifest bytes exceed the limit at the two-alias peak');
+      }
+      if (inventory.retainedManifestBytes + inventory.ownerAndIndexBytes + twiceManifestBytes
+        > limits.auxiliaryBytes) {
+        throw frontierError('auxiliary bytes exceed the limit at the two-alias manifest peak');
+      }
+      partOpenAttempted = true;
+      descriptor = descriptorTracker.open(partPath, 'wx', 0o600, 'manifest-part-write');
+      openedPart = true;
+      ownedPartIdentity = authenticateOpenedOwnedFile(descriptor, partPath);
+      registerOwnedFile(partPath, ownedPartIdentity, true);
+      writeAllProofBytes(fs, descriptor, manifestBytes);
+      growOwnedFile(partPath, manifestBytes.length);
+      fs.fsyncSync(descriptor);
+      descriptorTracker.close(descriptor);
+      descriptor = null;
+      const verifiedPart = readBoundedProofFile(
+        fs, partPath, limits.manifestBytes, descriptorTracker, 'manifest-part-readback',
+      );
+      assertPreparedManifestBytes(prepared, verifiedPart.bytes, 'manifest part');
+      if (!sameProofFileObject(ownedPartIdentity, verifiedPart.identity)) {
+        throw frontierError('manifest part identity changed after its owned open');
+      }
+      updateOwnedFile(partPath, verifiedPart.identity, false);
+      ownedPartIdentity = verifiedPart.identity;
+    } catch (error) {
+      failPrecommit(error, error?.code === 'EEXIST' || (partOpenAttempted && !openedPart));
+    }
+
+    try {
+      claimPreparedResumableManifestTransitionCommit(state, token);
+    } catch (error) {
+      failPrecommit(error);
+    }
+
+    try {
+      fs.linkSync(partPath, finalPath);
+      committed = true;
+    } catch (linkError) {
+      let linkedPart;
+      let linkedFinal;
+      try {
+        linkedPart = readBoundedProofFile(
+          fs, partPath, limits.manifestBytes, descriptorTracker, 'manifest-link-result-part-readback',
+        );
+        assertPreparedManifestBytes(prepared, linkedPart.bytes, 'manifest linked part');
+      } catch (error) {
+        failUnknownLink(linkError, [error]);
+      }
+      try {
+        linkedFinal = readBoundedProofFile(
+          fs, finalPath, limits.manifestBytes, descriptorTracker, 'manifest-link-result-final-readback',
+        );
+      } catch (error) {
+        if (isMissing(error)) failPrecommit(linkError, linkError?.code === 'EEXIST');
+        failUnknownLink(linkError, [error]);
+      }
+      try {
+        assertPreparedManifestBytes(prepared, linkedFinal.bytes, 'manifest linked final');
+      } catch (error) {
+        failUnknownLink(linkError, [error]);
+      }
+      if (!sameProofFileObject(ownedPartIdentity, linkedPart.identity)) {
+        failUnknownLink(linkError, [frontierError('manifest linked part no longer has its prelink owned identity')]);
+      }
+      if (!sameProofFileObject(linkedPart.identity, linkedFinal.identity)) {
+        failPrecommit(linkError, true);
+      }
+      committed = true;
+      committedLinkError = linkError;
+    }
+
+    if (!committed) throw frontierError('manifest publication did not reach a commit decision');
+    try {
+      applyPreparedResumableManifestTransition(token);
+    } catch (error) {
+      return postcommitResult(committedLinkError === null
+        ? error
+        : aggregatePropagatingR7Close(
+          error, [committedLinkError], 'Manifest transition apply failed after a lost link result.',
+        ));
+    }
+    if (committedLinkError !== null) return postcommitResult(committedLinkError);
+
+    try {
+      const linkedPart = readBoundedProofFile(
+        fs, partPath, limits.manifestBytes, descriptorTracker, 'manifest-linked-part-readback',
+      );
+      const linkedFinal = readBoundedProofFile(
+        fs, finalPath, limits.manifestBytes, descriptorTracker, 'manifest-final-readback',
+      );
+      assertPreparedManifestBytes(prepared, linkedPart.bytes, 'manifest linked part');
+      assertPreparedManifestBytes(prepared, linkedFinal.bytes, 'manifest final');
+      if (!sameProofFileObject(ownedPartIdentity, linkedPart.identity)) {
+        throw frontierError('manifest linked part no longer has its prelink owned identity');
+      }
+      if (!sameProofFileIdentity(linkedPart.identity, linkedFinal.identity)) {
+        throw frontierError('manifest part/final hard-link aliases disagree');
+      }
+      updateOwnedFile(partPath, linkedPart.identity, false);
+      registerOwnedFile(finalPath, linkedFinal.identity, false);
+      if (descriptorTracker.hasPath(partPath)) {
+        throw markR7CloseFailed(frontierError('refusing manifest alias contraction with a pending part close'));
+      }
+      unlinkOwnedFile(partPath, linkedPart.identity);
+      try {
+        fs.lstatSync(partPath);
+        throw frontierError('manifest part survived alias contraction');
+      } catch (error) {
+        if (!isMissing(error)) throw error;
+      }
+      partContracted = true;
+      const contractedFinal = readBoundedProofFile(
+        fs, finalPath, limits.manifestBytes, descriptorTracker, 'manifest-contracted-final-readback',
+      );
+      assertPreparedManifestBytes(prepared, contractedFinal.bytes, 'contracted manifest final');
+      if (!sameProofFileObject(linkedFinal.identity, contractedFinal.identity)) {
+        throw frontierError('manifest final identity drift after alias contraction');
+      }
+      updateOwnedFile(finalPath, contractedFinal.identity, false);
+      return Object.freeze({
+        tip: targetTip,
+        diagnostics: manifestPublicationDiagnostics(),
+        advanceAllowed: true,
+        clean: true,
+      });
+    } catch (error) {
+      return postcommitResult(error);
+    }
   };
   const loadCheckpoint = () => {
     requireLive();
@@ -3423,7 +3713,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
   const suspend = () => {
     if (!invalidated) {
       suspendCloseFailed = false;
-      try { ensureInventoryCurrent('suspend'); } catch { /* Suspend still owns bounded cleanup. */ }
+      if (!manifestPublicationTerminal) {
+        try { ensureInventoryCurrent('suspend'); } catch { /* Suspend still owns bounded cleanup. */ }
+      }
       const pendingCloseFailures = descriptorTracker.drain();
       if (pendingCloseFailures.length > 0) suspendCloseFailed = true;
       for (const error of cleanupOrphanOwnedPaths()) {
@@ -3457,7 +3749,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
   const dispose = () => {
     if (disposed) return;
     let primary = null;
-    if (!invalidated) {
+    if (!invalidated && !manifestPublicationTerminal) {
       try { ensureInventoryCurrent('Store disposal', true); } catch (error) { primary = error; }
     }
     const cleanup = [];
@@ -3540,6 +3832,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
     releaseCheckpointRun() { requireLive(); throw frontierError('no committed run is loaded'); },
     suspend,
   });
+  R7_RESUMABLE_STORE_INTERNALS.set(store, Object.freeze({ publishPreparedManifest }));
   R7_AUTHORIZATION_BUCKET_VISIT_PROBES.set(store, () => authorizationBucketVisits);
   return store;
 }
