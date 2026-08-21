@@ -3310,7 +3310,7 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   equality across every boundary; typecheck; full suite; build; syntax; two source reviews.
   R7B external authority remains closed until R7A is accepted.
 
-### F4E-R7A R1/R2/R3 rejection and R4 correction
+### F4E-R7A R1/R2/R3/R4 rejection and R5 correction
 
 - R1 `b697625` review is `0/3/2/0/0`: range reads could remain quadratic; early-empty
   completion was missing; 4,098 physical entries could not hold 4,096 run/index pairs;
@@ -3340,4 +3340,10 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   hard-link no-replace commit, and three exact owned-residue classes.
 - Default QA now includes a real 4,096-input 32-way merge at no more than 4,098 Core slots
   with all old bytes retained until commit and working-ID/residue checks.
-- Next: commit/review only the four R4 docs. Source and external R7 remain closed.
+- R4 `fdb815b` is rejected at `0/2/2/0/0`, `0/2/0/0/0`, and `0/2/2/0/1`: one-lock
+  completion, max-unit metadata, authenticated tip, alias counts, incomplete parts, suspend
+  faults, depth width, and owner identity scope remained open.
+- R5 adds zero-decision completion; 4,095-release/4,096-chunk unit QA; nullable expected tips;
+  by-name hard-link accounting; every incomplete owned subset; nonthrowing suspend results;
+  five-digit depths; and same-open owner identity only.
+- Next: commit/review only the four R5 docs. Source and external R7 remain closed.

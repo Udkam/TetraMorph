@@ -9883,14 +9883,17 @@ the range or substitute a self-consistent size.
 The production parent unit is exactly 65,536 keys, with 0..4,096 units inclusive. Existing
 2,048-byte record, 64 MiB/131,072-record chunk, 32-way merge, and 4,098 active Core-run
 metadata/cleanup-error limits remain. The persistent adapter has separate exact limits:
-32,768 immutable generation manifests, 49,152 total namespace entries, 96 GiB
+32,768 immutable generation manifests, 49,152 total namespace names (every hard-link alias
+and every part counts separately even when identities match), 96 GiB
 (103,079,215,104 bytes) of run data referenced by the latest checkpoint, 96 GiB of
 uncommitted working run data, 192 GiB (206,158,430,208 bytes) of all recognized physical run
 data including superseded cleanup residue, and 1 GiB (1,073,741,824 bytes) total for owner,
 manifest, and index files. The auxiliary total is split into two independently enforced,
-equality-inclusive halves: all committed/recognized-part manifest bytes are at most
-536,870,912, while the owner plus all active, working, and recognized-residue index bytes are
-at most 536,870,912. Every canonical manifest is at most 16,384 bytes including its single
+equality-inclusive halves: all committed/recognized-part manifest bytes counted per namespace
+name are at most 536,870,912, while the owner plus all active, working, and
+recognized-residue index bytes, also counted per name, are at most 536,870,912. Run-data
+physical bytes are counted once per file identity while names remain separately bounded.
+Every canonical manifest is at most 16,384 bytes including its single
 terminal LF; every owner or index file is at most 65,536 bytes. Equality to every bound is
 allowed. Creating the 4,097th unit or
 32,769th manifest, adding the 49,153rd entry, or exceeding a byte bound fails before the next
@@ -9910,35 +9913,55 @@ A searching checkpoint is
 ` boundPrunes:number; exhaustedDepths:readonly EndgameOptimalRouteDepthRecord[] }>`.
 A complete checkpoint is
 `Readonly<{ kind:'complete'; generation:number; binding:EndgameProofResumeBinding;`
-` reason:'empty-frontier'|'final-depth';`
+` reason:'empty-frontier'|'final-depth'|'zero-decision-depth';`
 ` exhaustedDepths:readonly EndgameOptimalRouteDepthRecord[] }>`.
 Their union is `EndgameProofCheckpoint`.
+
+`EndgameProofTip` is exactly
+`Readonly<{ generation:number; manifestSha256:string }>` with generation `0..32767` and a
+64-uppercase-hex hash of that generation manifest's exact bytes including LF. It is
+caller-authenticated continuation state, not inferred trust.
 
 `EndgameProofCheckpointRunStore extends EndgameProofRunStore` with exact additions:
 
 - `loadCheckpoint(): Readonly<{ checkpoint:EndgameProofCheckpoint|null;`
-  ` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>`;
+  ` tip:EndgameProofTip|null; diagnostics:EndgameProofRunStoreDiagnostics;`
+  ` advanceAllowed:boolean }>`;
 - `publishCheckpoint(transition:'seed'|'unit'|'layer'|'complete',`
   ` checkpoint:EndgameProofCheckpoint): Readonly<{ checkpoint:EndgameProofCheckpoint;`
-  ` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>`;
+  ` tip:EndgameProofTip; diagnostics:EndgameProofRunStoreDiagnostics;`
+  ` advanceAllowed:boolean }>`;
 - `releaseCheckpointRun(run:EndgameProofRun): void`, which invalidates one loaded committed
   Core object and releases its metadata slot but cannot unlink or alter the latest
-  manifest-referenced run/index bytes;
-- `suspend(): void`, idempotently closing handles while retaining the latest checkpoint and
-  referenced bytes; inherited `dispose()` remains explicit final teardown after later
-  candidate/terminal authority, never ordinary pause/interruption.
+  manifest-referenced run/index bytes. The released object remains a descriptor token accepted
+  only in the immediately following `publishCheckpoint`; `values()`/`dispose()` then fail.
+  The next `loadCheckpoint()` rehydrates fresh live objects from the committed descriptors;
+- `suspend(): Readonly<{ diagnostics:EndgameProofRunStoreDiagnostics;`
+  ` closeFailed:boolean }>`, idempotently attempting every close and retaining the latest
+  checkpoint/referenced bytes. It never throws, never masks an existing primary, and never
+  reclassifies a committed generation as uncommitted. `closeFailed:true` forbids reuse of that
+  Store object and requires process exit/reopen. Inherited `dispose()` remains explicit final
+  teardown after later candidate/terminal authority, never ordinary pause/interruption;
+  fixture tests alone may dispose their isolated temporary stores.
 
 `advanceOptimalEndgameRouteProof(levelId,candidateCommandStream,store)` and
 `advanceOptimalEndgameRouteProofForDefinition(definition,candidateCommandStream,store)` each
 return null only where the existing certifier returns null, otherwise exactly
 `Readonly<{ status:'searching'; generation:number; depth:number; parentOffset:number;`
-` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>` or
+` tip:EndgameProofTip; diagnostics:EndgameProofRunStoreDiagnostics;`
+` advanceAllowed:boolean }>` or
 `Readonly<{ status:'complete'; generation:number; certificate:EndgameOptimalRouteCertificate;`
-` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>`.
-They perform one transition and never call `suspend()` or `dispose()`; the caller owns one
+` tip:EndgameProofTip; diagnostics:EndgameProofRunStoreDiagnostics;`
+` advanceAllowed:boolean }>` or
+`Readonly<{ status:'blocked'; generation:number|null; tip:EndgameProofTip|null;`
+` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:false }>`.
+Every nonblocked searching/complete call performs one transition; blocked returns perform
+none. They never call `suspend()` or `dispose()`; the caller owns one
 `suspend()` in its pause/exit `finally`. Every advance closes transient readers/writers before
-returning. `advanceAllowed:false` returns only after a committed checkpoint with recognized
-cleanup residue and forbids another advance; malformed/ambiguous state throws.
+returning. A load with recognized residue returns `status:'blocked'` without writing; this may
+be `checkpoint:null,tip:null` after an interrupted generation-0 precommit. A committed
+publication may also return searching/complete with `advanceAllowed:false`. Either form
+forbids another advance; malformed/ambiguous state throws.
 
 A searching checkpoint binds schema, generation, level/route/optimal-lock/start identity,
 depth, parent offset, last processed parent key, current frontier, accumulated next-unit
@@ -9964,9 +9987,11 @@ The seed `stateDelta` exact keys are
 `binding,depth,parentOffset,lastProcessedParentKey,transitions,boundPrunes`; unit keys are
 `depth,parentOffset,lastProcessedParentKey,transitionsDelta,boundPrunesDelta`; layer keys are
 `completedDepth,nextDepth`; and complete keys are `completedDepth,reason`, where reason is
-`empty-frontier` or `final-depth`. Seed values describe the initial searching state; unit
-values are safe scalar increments/new cursor; layer appends exactly one depth record then
-resets the next layer cursor/counters by rule; complete appends exactly one depth record. No
+`empty-frontier`, `final-depth`, or `zero-decision-depth`. `completedDepth` is the exact depth
+record except it is null only for `zero-decision-depth`. Seed values describe the initial
+searching state; unit values are safe scalar increments/new cursor; layer appends exactly one depth record then
+resets the next layer cursor/counters by rule; complete appends one record unless it is the
+zero-decision case. No
 delta repeats the completed-depth prefix, active run list, accumulated unit-run list, or any
 earlier descriptor.
 
@@ -10016,19 +10041,26 @@ The fixed-shape `resourceTotalsBeforeManifest` exact keys are
 `retainedManifestBytes,ownerAndIndexBytes,namespaceEntries`. They record the projected
 postcommit active-run total plus observed pre-manifest values for every other category. This
 is a historical precommit receipt, not trusted current inventory; the adapter serializes
-once, adds the candidate's exact byte length and namespace entry, and applies every limit
-before publication.
+once from totals that exclude both candidate manifest names/bytes. Before creating the part it
+prospectively adds exactly two namespace names and, for by-name manifest accounting, twice the
+candidate byte length; equality is tested after that addition. Every owner/run/index
+hard-link performs the analogous pre-part two-name check and, once index bytes are known, the
+two-name byte check before its final link. This avoids self-reference and ensures a failed
+part unlink remains within, never one beyond, the namespace and auxiliary bounds.
 
 One `advance...` call performs exactly one durable transition:
 
 1. With no checkpoint it replays the candidate, derives the canonical binding and one-key
    depth-0 frontier, publishes generation 0, and returns.
+   If `optimalLocks === 1`, the next advance publishes generation 1 complete with reason
+   `zero-decision-depth`, null `completedDepth`, and an empty exhausted-depth prefix without
+   enumerating a landing.
 2. With an incomplete layer it processes the next Core-derived range, never splitting a
    parent's complete landing domain. It decodes and re-keys every parent, applies the existing
    parent deficit lower bound first, and fully enumerates every public landing only for each
    non-pruned parent. It throws on every shorter win, safe-counts transitions/prunes, writes
    a unit run named
-   `r7-u-dNNNN-nNNNNNNNN-gNNNNN` outside final decision depth, and publishes the next
+   `r7-u-dNNNNN-nNNNNNNNN-gNNNNN` outside final decision depth, and publishes the next
    generation. A final-depth unit writes no next run.
 3. When a layer is covered, it requires `[0, frontier.size)` exactly once with no gap,
    overlap, duplicate, missing tail, wrong depth/cursor, or wrong run shape. Core performs
@@ -10046,13 +10078,14 @@ The last unit of any layer always publishes a searching checkpoint with
 `parentOffset === frontier.size`. It never also merges or completes. A subsequent
 `advance...` call publishes exactly one layer or complete generation, preserving distinct
 kill boundaries after the final unit and after layer/complete publication. Committed
-resumable IDs are `r7-f-dNNNN-gNNNNN` for seed/layer frontiers and
-`r7-u-dNNNN-nNNNNNNNN-gNNNNN` for unit runs. Internal unit chunk/merge IDs are
-`r7w-u-gNNNNN-dNNNN-nNNNNNNNN-pNNNN-hNNNN`; internal layer merge IDs are
-`r7w-l-gNNNNN-dNNNN-pNNNN-hNNNN`. `d` is depth, `n` is the zero-based unit ordinal,
+resumable IDs are `r7-f-dNNNNN-gNNNNN` for seed/layer frontiers and
+`r7-u-dNNNNN-nNNNNNNNN-gNNNNN` for unit runs. Internal unit chunk/merge IDs are
+`r7w-u-gNNNNN-dNNNNN-nNNNNNNNN-pNNNN-hNNNN`; internal layer merge IDs are
+`r7w-l-gNNNNN-dNNNNN-pNNNN-hNNNN`. `d` is depth, `n` is the zero-based unit ordinal,
 `g` is manifest generation, `p` is merge pass (`0000` for raw chunks), and `h` is chunk/group
-ordinal; depth/pass/group are `0000..4095`, unit is `00000000..00004095`, and generation is
-`00000..32767`. Every singleton tail is read/re-keyed into the next deterministic ID rather
+ordinal; depth is `00000..32767`, pass/group are `0000..4095`, unit is
+`00000000..00004095`, and generation is `00000..32767`. Every singleton tail is
+read/re-keyed into the next deterministic ID rather
 than carried under an old working ID. Prefixes make committed, working, and unchanged
 one-shot `dNNNN-pNNNN-gNNNN` grammars disjoint; overflow or collision fails before creation.
 
@@ -10068,12 +10101,16 @@ certifier.
 `createEndgameDiskFrontierStore` and its initially-absent/cleanup semantics stay unchanged.
 The adapter adds
 `createResumableEndgameDiskFrontierStore(options): EndgameProofCheckpointRunStore`, where
-options has exact production keys `stagePath,mode,ownerId`, mode is `create` or `resume`,
-stagePath is exact/absolute/normalized, and ownerId is 1..128 printable ASCII bytes. Tests
-alone may additionally provide `fs` and smaller `limits`. Create requires the stage absent;
-resume requires it present. Immutable `owner.json` has exact canonical keys `schema,ownerId`
-with schema `t37-f4e-r7-owner-v1`, is created exclusive and fsynced, and is at most 65,536
-bytes; resume requires exact bytes and identity.
+create options have exact production keys `stagePath,mode,ownerId` and resume options add
+required `expectedTip:EndgameProofTip|null`; mode is `create` or `resume`, stagePath is
+exact/absolute/normalized, and ownerId is 1..128 printable ASCII bytes. Tests alone may
+additionally provide `fs` and smaller `limits`. Create requires the stage absent; resume
+requires it present. Immutable `owner.json` has exact canonical keys `schema,ownerId`
+with schema `t37-f4e-r7-owner-v1`, is at most 65,536 bytes, and is published from exclusive
+`owner.json.part` through the same fsync/no-replace-link/final-verify/part-unlink sequence.
+Resume reconstructs and compares its exact canonical bytes, then requires lstat/open/
+fstat identity stability within that validation. No historical cross-process owner inode/time
+identity is persisted or claimed.
 
 The resumable store uses owner, generation manifests, run files, and run indexes only beneath
 that stage. The 4,098 limit still bounds Core-active runs and cleanup errors; the separate
@@ -10102,8 +10139,13 @@ bytes including LF and is retained immutably through the final candidate audit. 
 the complete canonical generation `0..highest` sequence once in order, validates each
 constant-size delta/hash link, applies the run-set rule, appends at most one depth record,
 recomputes `checkpointStateSha256`, and reconstructs the highest active descriptors. It may
-not rescan a manifest prefix for each generation. A gap, fork, rollback, duplicate, malformed
-delta, state-hash mismatch, or 32,769th manifest is fatal. Only the highest manifest's
+not rescan a manifest prefix for each generation. Resume requires the chain to contain the
+caller's exact `expectedTip` generation/hash when nonnull; a shorter chain or mismatch is
+authenticated rollback and fatal, while a valid extension beyond that tip is accepted and
+returns its new highest tip. Deletion of a never-externally-recorded post-tip tail is not
+claimed detectable and remains outside R7A's honest-coordinator boundary. A gap, fork,
+duplicate, malformed delta, state-hash mismatch, or 32,769th manifest is fatal. Only the
+highest manifest's
 reconstructed runs must remain active. A committed later manifest may supersede prior
 frontier/unit runs, and only those exact descriptors may be reclaimed after commit;
 historical manifests remain valid audit receipts even after their run files are gone.
@@ -10119,7 +10161,17 @@ diagnostics after the no-replace link. Once that link succeeds, final-path verif
 part unlink, or superseded-file cleanup failure is captured in diagnostics with
 `advanceAllowed:false`; it cannot be thrown or reported as an uncommitted generation.
 
-Loaded latest-checkpoint runs use logical release, not physical disposal. At a 4,096-unit
+Loaded latest-checkpoint runs use logical release, not physical disposal. At the last unit
+start, the frontier plus 4,095 accumulated units occupy 4,096 Core slots. After adapter
+validation, Core immediately releases those 4,095 next-run objects as descriptor tokens,
+retains only the frontier for its ranged read, and builds the new unit. At the exact
+4,096-chunk unit-builder boundary, frontier plus chunks reaches 4,097 and the first merge
+output reaches at most 4,098; consumed working chunks are ordinarily disposed. Core releases
+the frontier after the range and publishes the released prior tokens plus the one new unit
+run. `publishCheckpoint` accepts released tokens only at their exact prior-checkpoint
+positions; substitution/reorder is fatal. The next load rehydrates them.
+
+At a 4,096-unit
 layer start, the frontier plus 4,096 units occupy 4,097 Core metadata slots. Core first calls
 `releaseCheckpointRun(frontier)`, then after each committed input is fully revalidated and
 consumed releases that object; the adapter retains every old run/index byte until the new
@@ -10129,16 +10181,23 @@ old/working bytes remain governed by the separate 192 GiB and namespace limits. 
 commit does the adapter reclaim the exact old descriptors selected by the manifest delta.
 
 Same-call failure before the manifest link attempts identity-bound cleanup only for working
-files created by that call. On resume, an unreferenced grammar-valid paired working run/index
-final and/or its same-identity part, or a final-absent manifest part, is
-`precommit-owned-residue`; a final-present same-identity manifest part is
+files created by that call. A missing/invalid owner final with only its owned part is
+`pre-owner-residue`; an exact owner final plus same-identity part is `owner-alias-residue`.
+Both return `checkpoint:null,tip:null,advanceAllowed:false` and are never proof authority.
+After a clean owner, any bounded subset of exact grammar-valid unreferenced
+working/committed-ID run or index parts/finals—including a lone newly opened part before its
+pair exists—or a final-absent manifest part is `precommit-owned-residue`. Parts need not be
+complete or parseable and are never proof input; conflicting duplicate names/identities remain
+ambiguous. A final-present same-identity manifest part is
 `postcommit-manifest-alias-residue`; and exact run/index descriptors referenced by an older
 but superseded manifest are
 `postcommit-superseded-residue`. The first leaves the prior generation authoritative; the
-latter two leave the new generation authoritative. All three set `advanceAllowed:false` and
+latter two leave the new generation authoritative. With no prior manifest, the first returns
+`checkpoint:null,tip:null,advanceAllowed:false`; otherwise all three retain the authoritative
+tip and set `advanceAllowed:false`. They
 remain untouched pending later exact cleanup authority. A mismatched hard link, final/part
-byte or identity disagreement, unpaired run/index, unknown name, ambiguous descriptor, or
-foreign entry is fatal, not recognized residue.
+byte or identity disagreement, unknown name, ambiguous descriptor, or foreign entry is fatal,
+not recognized residue.
 
 This mechanism claims recovery from process/conversation interruption, not power-loss
 durability beyond the explicit file fsync and atomic/no-replace boundaries. A mutable
@@ -10150,7 +10209,8 @@ Core tests use synthetic domains and, only in the existing opt-in exact gate, In
 Intro-04. They compare uninterrupted memory, existing one-shot disk, and resumable execution
 reopened after seed, every unit, every layer merge, and complete-checkpoint publication.
 Canonical certificate and complete telemetry bytes must match. Synthetic cases include an
-early empty frontier and a final-depth parent pruned by the existing lower bound.
+early empty frontier, a final-depth parent pruned by the existing lower bound, and an
+`optimalLocks === 1` zero-decision certificate with no exhausted depth record.
 
 Fault matrices cover unaligned/range/count/order drift, gap/overlap/duplicate/tail loss,
 unsafe counter addition, same-size omit/add/replace/reorder, corrupt/truncated run/index/
@@ -10159,7 +10219,10 @@ conflict, manifest-before-run, interruption before/after manifest link and befor
 foreign/ambiguous residue, and every open/write/fsync/close/read/link/unlink/cleanup seam. Tests
 also cover repeated late-range reads without prefix I/O, final short and exact-multiple
 terminal offsets, 4,096/4,097 units, post-commit reopen with successful/failed cleanup, and
-limit-minus-one/equal/plus-one for every byte, entry, and generation bound. A default-limit
+limit-minus-one/equal/plus-one for every byte, entry, and generation bound. This includes
+part/final coexistence at 49,151/49,152 names, depth 32,767/32,768, expected-tip
+shorter/equal/extended chains, and suspend faults both behind a precommit primary and after a
+committed success. A default-limit
 reachability test serializes and replays 32,768 retained canonical deltas, including one full
 4,096-unit layer and its layer transition, proves each delta is constant-size and at most
 16,384 bytes, proves their cumulative bytes are at most 536,870,912, and proves the
@@ -10168,9 +10231,12 @@ the 1 GiB total. The test operates on metadata/minimal legal runs and does not e
 production proof. Tests prove the four source paths contain no v6 path or runtime artifact
 dependency.
 
-The default-limit matrix additionally performs a real synthetic 4,096-input, 32-way
-multi-pass layer merge. It asserts Core metadata peaks at no more than 4,098, every working
-ID is unique and in grammar, every committed old byte survives until the manifest link,
+The default-limit matrix additionally performs a real synthetic unit build with 4,095
+accumulated committed units and 4,096 chunks, followed by a real 4,096-input, 32-way
+multi-pass layer merge. These two count/ID/lifecycle tests use the fixture-only one-record
+chunk size while retaining production chunk-count, fan-in, unit-count, and metadata limits;
+they do not allocate 256 GiB. They assert Core metadata peaks at no more than 4,098, every
+working ID is unique and in grammar, every committed old byte survives until the manifest link,
 interrupted working residue is classified exactly, and only postcommit selected descriptors
 become reclaimable. Separate fault cases cover no-replace collision and every part/final
 identity combination.
@@ -10182,7 +10248,7 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1/R2/R3 rejection and R4 correction
+### F4E-R7A R1/R2/R3/R4 rejection and R5 correction
 
 R1 `b697625` is rejected at independent
 `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
@@ -10199,4 +10265,10 @@ R3 `c0c03f2` is rejected by three independent reviews at `0/4/1/0/0`, `0/2/0/0/0
 proof, incremental descriptor/depth commitments, exact nested binding/checkpoint/descriptor
 hash shapes, exact public API/results and caller lifecycle, collision-free committed/working
 IDs, no-replace hard-link manifest publication, and exhaustive owned-part recovery classes.
-Commit and independently review this four-document R4 before implementation.
+
+R4 `fdb815b` is rejected at `0/2/2/0/0`, `0/2/0/0/0`, and `0/2/2/0/1`. R5 adds the
+zero-decision one-lock completion, exact-max unit-builder release/rehydration proof,
+caller-authenticated expected tips with an honest undetectable-tail boundary, per-name
+hard-link capacity accounting, every incomplete precommit subset, nonthrowing suspend fault
+ownership, five-digit depth IDs, and same-open-only owner identity. Commit and independently
+review this four-document R5 before implementation.

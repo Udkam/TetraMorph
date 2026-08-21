@@ -10411,7 +10411,7 @@ or execute Intro-05. After the candidate, run focused tests, typecheck, full sui
 syntax, one opt-in four-intro equality pass, and two independent all-zero reviews. Only an
 accepted R7A source receipt opens docs-first R7B runner/validator authority.
 
-### F4E-R7A R1/R2/R3 rejected — R4 contract review only
+### F4E-R7A R1/R2/R3/R4 rejected — R5 contract review only
 
 R1 `b697625` is rejected at `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 requires indexed
 range reads with no prefix scan; an early-empty complete checkpoint matching the current
@@ -10458,5 +10458,17 @@ postcommit same-identity manifest aliases, and postcommit superseded files have 
 classifications; they preserve the authoritative old/new generation, set
 `advanceAllowed:false`, and await later exact cleanup. Mismatch/ambiguity remains fatal.
 
+R4 `fdb815b` is rejected at `0/2/2/0/0`, `0/2/0/0/0`, and `0/2/2/0/1`. R5 adds a
+`zero-decision-depth` completion with null depth record for one-lock candidates; before the
+last unit build it logically releases 4,095 prior units and proves a real 4,096-chunk build
+plus 4,096-input layer merge within 4,098 slots.
+
+Resume now requires a caller-authenticated nullable expected tip and returns the current tip;
+only rollback below that recorded tip is claimed detectable. Hard-link aliases/parts count as
+separate namespace names and auxiliary bytes, with the part already in precommit totals.
+Every grammar-valid incomplete precommit subset, including a lone part at generation zero,
+returns blocked without proof use. Suspend never throws or masks a primary. Depth IDs are
+five digits and owner identity is same-validation stability, not historical inode trust.
+
 No source or external R7 path is open. Commit and obtain two fresh all-zero reviews of the
-four-document R4 correction before assigning either Core or adapter implementation.
+four-document R5 correction before assigning either Core or adapter implementation.

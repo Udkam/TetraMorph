@@ -984,7 +984,7 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   Then one writer may implement only the four source/test paths, run all named gates, and
   produce a bounded candidate for two source reviews. External R7B authority remains closed.
 
-### F4E-R7A R1/R2/R3 rejected and R4 contract candidate
+### F4E-R7A R1/R2/R3/R4 rejected and R5 contract candidate
 
 - R1 `b697625` is rejected at `0/3/2/0/0`. No source, Store, external path, or proof ran.
 - R2 closes indexed late-range complexity, early-empty completion, parent-bound ordering,
@@ -1010,5 +1010,10 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   classes with `advanceAllowed:false`.
 - The maximal matrix now executes a synthetic 4,096-input 32-way merge and proves metadata,
   byte-retention, working-ID, no-replace, and residue invariants without production proof.
-- Next: commit these four R4 docs and obtain two fresh independent all-zero reviews. The four
+- R4 `fdb815b` is rejected at `0/2/2/0/0`, `0/2/0/0/0`, and `0/2/2/0/1` for the one-lock,
+  max-unit, tip, alias-count, incomplete-part, suspend, depth, and owner-identity edges.
+- R5 defines zero-decision completion, exact-max unit release/rehydration, authenticated
+  nullable tips, per-name alias accounting, all incomplete owned subsets, nonthrowing suspend,
+  five-digit depths, and same-open owner validation. Its maximal QA covers both unit and layer.
+- Next: commit these four R5 docs and obtain two fresh independent all-zero reviews. The four
   source paths remain closed meanwhile.
