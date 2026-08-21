@@ -1096,5 +1096,6 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   with `advanceAllowed:false` and zero writes; null/searching remains blocked.
 - Lost-result QA crosses manifest alias, data-only, index-only, mixed halves, and combined
   residue, then caller suspend; every case preserves tip and creates no generation.
-- Next: commit these four R11 docs and obtain at least two fresh independent all-zero reviews.
-  Source, external paths, proof execution, and Intro-05 remain closed.
+- R11 `a8607fd` receives three independent `0/0/0/0/0` reviews and is accepted.
+- Next: authorize disjoint Core/test and adapter/test writers for only the four named R7A
+  source paths. External paths, production Store/proof, R7B, and Intro-05 remain closed.

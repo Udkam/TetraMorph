@@ -10601,5 +10601,10 @@ zero cleanup/publication/write; caller suspend consumes the view. Tests cross co
 loss with manifest alias, data-only, index-only, mixed halves, and alias-plus-halves, while the
 same searching residue remains blocked.
 
-**Current next action:** commit and obtain at least two fresh independent all-zero reviews of
-the four-document R11 contract. Core and adapter implementation remain closed until that gate.
+R11 `a8607fd` receives three fresh independent `0/0/0/0/0` reviews and is accepted.
+
+**Current next action:** implement R7A only in `src/game/core/endgameRouteSearch.ts`,
+`src/game/core/endgameProofFrontierStore.test.ts`, `scripts/endgame-disk-frontier.mjs`, and
+`src/authoring/endgameDiskFrontier.test.mjs`. Keep Core and adapter ownership disjoint, preserve
+memory/one-shot compatibility, and run the exact focused/max/fault gates before the final suite.
+No external R7 path, production Store/proof, R7B, or Intro-05 is authorized.

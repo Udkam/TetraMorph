@@ -3428,4 +3428,6 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   certificate/tip, `advanceAllowed:false`, and zero writes. Null/searching residue stays blocked.
 - Tests cross complete result loss with alias, data-only, index-only, mixed halves, and their
   combination; caller suspend consumes the view.
-- Next: commit/review only the four R11 docs. Source and all external R7 paths remain closed.
+- R11 `a8607fd` receives three independent `0/0/0/0/0` reviews and is accepted.
+- Next: two disjoint writers may implement only the named Core/test and adapter/test path pairs.
+  External R7 paths, production proof, R7B, and Intro-05 remain closed.

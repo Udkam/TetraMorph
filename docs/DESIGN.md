@@ -10474,3 +10474,9 @@ rule could still downgrade a complete authority to blocked. R11 makes recognized
 residue complete-aware: complete returns the identical proof with `advanceAllowed:false` and
 zero writes, while null/searching remains blocked, with all alias/half cleanup seams crossed in
 tests. Commit and independently review this four-document R11 before implementation.
+
+R11 `a8607fd` receives three fresh independent
+`P0/P1/P2/P3/GAP = 0/0/0/0/0` reviews and is accepted. R7A implementation is now authorized
+only in the four source/test paths named above. External R7 paths, a production Store or proof,
+R7B, and Intro-05 remain closed until the source candidate passes every focused/full gate and
+two independent source reviews.
