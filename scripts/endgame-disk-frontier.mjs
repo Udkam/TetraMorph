@@ -45,6 +45,8 @@ const R7_DEPTHS_EMPTY_HASH = canonicalHash('T37-F4E-R7-DEPTHS-EMPTY-V1', []);
 const R7_CHECKPOINT_STATE_HASH_LABEL = 'T37-F4E-R7-CHECKPOINT-STATE-V1';
 const R7_MANIFEST_PLAN_HASH_LABEL = 'T37-F4E-R7-MANIFEST-PLAN-V1';
 const R7_MANIFEST_PLAN_SNAPSHOTS = new WeakMap();
+const R7_PREPARED_MANIFEST_TRANSITIONS = new WeakMap();
+const R7_PENDING_MANIFEST_TRANSITIONS = new WeakMap();
 const R7_MANIFEST_STATES = new WeakSet();
 const R7_OWNED_CANDIDATE_INDEX_PROBES = new WeakMap();
 const R7_AUTHORIZATION_BUCKET_VISIT_PROBES = new WeakMap();
@@ -338,6 +340,10 @@ export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
   assertExactPublishedIndexBytes,
   createManifestState: createResumableManifestState,
   planManifestTransition: planResumableManifestTransition,
+  prepareManifestTransitionCommit: prepareResumableManifestTransitionCommit,
+  preparedManifestTransitionBytes: preparedResumableManifestTransitionBytes,
+  claimPreparedManifestTransitionCommit: claimPreparedResumableManifestTransitionCommit,
+  applyPreparedManifestTransition: applyPreparedResumableManifestTransition,
   commitManifestTransition: commitResumableManifestTransition,
   descriptorHash: resumableDescriptorHash,
   runSetHash: resumableRunSetHash,
@@ -1886,6 +1892,7 @@ function planResumableManifestTransition(state, publication, candidate, resource
     commitment: canonicalHash(R7_MANIFEST_PLAN_HASH_LABEL, sealed),
     sealed,
     state,
+    baseGeneration: state.generation,
     consumed: false,
   });
   return plan;
@@ -2143,7 +2150,13 @@ function prepareManifestUnitApplication(state, sealed) {
   if (activeSize >= RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits + 1) {
     throw frontierError('manifest active run set cannot grow beyond the frontier plus 4096 unit runs');
   }
-  return Object.freeze({ nextRuns: state.nextRuns, activeIds: state.activeIds, descriptor });
+  return Object.freeze({
+    nextRuns: state.nextRuns,
+    activeIds: state.activeIds,
+    descriptor,
+    descriptorArguments: Object.freeze([descriptor]),
+    idArguments: Object.freeze([descriptor.id]),
+  });
 }
 
 function applyManifestUnitScalars(state, sealed) {
@@ -2165,28 +2178,139 @@ function applyManifestUnitScalars(state, sealed) {
   state.reason = patch.reason;
 }
 
-function commitResumableManifestTransition(state, plan) {
+function applyManifestStateReplacement(state, replacement) {
+  state.tip = replacement.tip;
+  state.binding = replacement.binding;
+  state.bindingSha256 = replacement.bindingSha256;
+  state.kind = replacement.kind;
+  state.generation = replacement.generation;
+  state.depth = replacement.depth;
+  state.parentOffset = replacement.parentOffset;
+  state.lastProcessedParentKey = replacement.lastProcessedParentKey;
+  state.transitions = replacement.transitions;
+  state.boundPrunes = replacement.boundPrunes;
+  state.frontierDescriptor = replacement.frontierDescriptor;
+  state.nextRuns = replacement.nextRuns;
+  state.activeIds = replacement.activeIds;
+  state.activeRunBytes = replacement.activeRunBytes;
+  state.nextRunsSha256 = replacement.nextRunsSha256;
+  state.completedDepths = replacement.completedDepths;
+  state.completedDepthsSha256 = replacement.completedDepthsSha256;
+  state.completedTotals = replacement.completedTotals;
+  state.reason = replacement.reason;
+}
+
+function manifestTipsMatch(left, right) {
+  return (left === null && right === null)
+    || (left !== null && right !== null
+      && left.generation === right.generation
+      && left.manifestSha256 === right.manifestSha256);
+}
+
+function prepareResumableManifestTransitionCommit(state, plan) {
   if (!state || typeof state !== 'object' || !plan || typeof plan !== 'object') {
     throw frontierError('manifest state and plan are required');
   }
-  const snapshot = validateManifestPlanForCommit(state, plan);
-  if (snapshot.sealed.patch.transition === 'unit') {
-    const append = prepareManifestUnitApplication(state, snapshot.sealed);
-    snapshot.consumed = true;
-    R7_MANIFEST_PLAN_SNAPSHOTS.delete(plan);
-    if (append !== null) {
-      Reflect.apply(R7_NATIVE_ARRAY_PUSH, append.nextRuns, [append.descriptor]);
-      Reflect.apply(R7_NATIVE_SET_ADD, append.activeIds, [append.descriptor.id]);
-    }
-    applyManifestUnitScalars(state, snapshot.sealed);
-    return state;
+  if (R7_PENDING_MANIFEST_TRANSITIONS.has(state)) {
+    throw frontierError('manifest state already has a prepared transition');
   }
-  const replacement = prepareManifestStateReplacement(state, snapshot.sealed);
+  const snapshot = validateManifestPlanForCommit(state, plan);
+  const expectedBaseGeneration = snapshot.sealed.baseTip === null
+    ? -1
+    : snapshot.sealed.baseTip.generation;
+  if (snapshot.baseGeneration !== expectedBaseGeneration
+    || state.generation !== snapshot.baseGeneration
+    || snapshot.sealed.tip.generation !== expectedBaseGeneration + 1) {
+    throw frontierError('manifest plan base generation is stale');
+  }
+  const application = snapshot.sealed.patch.transition === 'unit'
+    ? Object.freeze({ kind: 'unit', append: prepareManifestUnitApplication(state, snapshot.sealed) })
+    : Object.freeze({ kind: 'replacement', replacement: prepareManifestStateReplacement(state, snapshot.sealed) });
+  const token = Object.freeze(Object.create(null));
+  R7_PREPARED_MANIFEST_TRANSITIONS.set(token, {
+    state,
+    baseTip: snapshot.sealed.baseTip,
+    baseGeneration: state.generation,
+    targetGeneration: snapshot.sealed.tip.generation,
+    sealed: snapshot.sealed,
+    application,
+    manifestBytes: Buffer.from(snapshot.manifestBytes),
+    phase: 'prepared',
+  });
+  R7_PENDING_MANIFEST_TRANSITIONS.set(state, token);
   snapshot.consumed = true;
   R7_MANIFEST_PLAN_SNAPSHOTS.delete(plan);
-  for (const key of R7_MANIFEST_STATE_KEYS) state[key] = replacement[key];
+  return token;
+}
+
+function preparedResumableManifestTransitionBytes(token) {
+  const prepared = token && typeof token === 'object'
+    ? R7_PREPARED_MANIFEST_TRANSITIONS.get(token)
+    : undefined;
+  if (!prepared) throw frontierError('prepared manifest transition is not owned by this adapter');
+  return Buffer.from(prepared.manifestBytes);
+}
+
+function claimPreparedResumableManifestTransitionCommit(state, token) {
+  if (!state || typeof state !== 'object' || !token || typeof token !== 'object') {
+    throw frontierError('manifest state and prepared transition are required');
+  }
+  const prepared = R7_PREPARED_MANIFEST_TRANSITIONS.get(token);
+  if (!prepared) throw frontierError('prepared manifest transition is not owned by this adapter');
+  if (prepared.state !== state) {
+    throw frontierError('prepared manifest transition belongs to a different state instance');
+  }
+  if (R7_PENDING_MANIFEST_TRANSITIONS.get(state) !== token) {
+    throw frontierError('prepared manifest transition lost its exclusive state claim');
+  }
+  if (prepared.phase !== 'prepared') throw frontierError('prepared manifest transition was already claimed');
+  if (state.generation !== prepared.baseGeneration || !manifestTipsMatch(state.tip, prepared.baseTip)) {
+    R7_PREPARED_MANIFEST_TRANSITIONS.delete(token);
+    R7_PENDING_MANIFEST_TRANSITIONS.delete(state);
+    throw frontierError('prepared manifest transition base state is stale');
+  }
+  prepared.phase = 'claimed';
+  return token;
+}
+
+function applyPreparedResumableManifestTransition(token) {
+  if (!token || typeof token !== 'object') throw frontierError('prepared manifest transition is required');
+  const prepared = R7_PREPARED_MANIFEST_TRANSITIONS.get(token);
+  if (!prepared) throw frontierError('prepared manifest transition is not owned by this adapter');
+  if (prepared.phase !== 'claimed') throw frontierError('prepared manifest transition must be claimed before apply');
+  const { state } = prepared;
+  if (R7_PENDING_MANIFEST_TRANSITIONS.get(state) !== token) {
+    throw frontierError('prepared manifest transition lost its exclusive state claim');
+  }
+  R7_PREPARED_MANIFEST_TRANSITIONS.delete(token);
+  R7_PENDING_MANIFEST_TRANSITIONS.delete(state);
+  if (prepared.application.kind === 'unit') {
+    const { append } = prepared.application;
+    if (append !== null) {
+      Reflect.apply(R7_NATIVE_ARRAY_PUSH, append.nextRuns, append.descriptorArguments);
+      Reflect.apply(R7_NATIVE_SET_ADD, append.activeIds, append.idArguments);
+    }
+    applyManifestUnitScalars(state, prepared.sealed);
+    return state;
+  }
+  applyManifestStateReplacement(state, prepared.application.replacement);
   return state;
 }
+
+function commitResumableManifestTransition(state, plan) {
+  const token = prepareResumableManifestTransitionCommit(state, plan);
+  claimPreparedResumableManifestTransitionCommit(state, token);
+  return applyPreparedResumableManifestTransition(token);
+}
+
+/*
+ * The filesystem publisher prepares and claims before its no-replace manifest link, writes
+ * only prepared.manifestBytes, and calls the claimed-token apply path immediately after it.
+ * All schema, hash, quota, collection, and replacement allocation failures therefore occur
+ * before the link. Claim is the last O(1) state/tip freshness check. The remaining native
+ * mutations deliberately have no rollback: once the link exists, the new generation is
+ * authoritative.
+ */
 
 function admitNamespacePeak(current, addition, maximum) {
   assertSafeNonnegativeInteger(current, 'current namespace entries');

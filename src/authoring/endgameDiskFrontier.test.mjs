@@ -672,6 +672,254 @@ describe('R7 resumable disk frontier primitives', () => {
 
   });
 
+  it('prepares a private manifest byte/application token without mutating state', () => {
+    const state = testing.createManifestState();
+    const otherState = testing.createManifestState();
+    const frontier = Object.freeze({ token: 'prepared-seed' });
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const plan = testing.planManifestTransition(state, Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+    }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+    const expectedManifestBytes = Buffer.from(plan.manifestBytes);
+    const before = manifestStateBytes(testing, state);
+    const nextRunsIdentity = state.nextRuns;
+    const activeIdsIdentity = state.activeIds;
+    const token = testing.prepareManifestTransitionCommit(state, plan);
+
+    expect(Object.isFrozen(token)).toBe(true);
+    expect(manifestStateBytes(testing, state)).toBe(before);
+    expect(state.nextRuns).toBe(nextRunsIdentity);
+    expect(state.activeIds).toBe(activeIdsIdentity);
+    expect(testing.preparedManifestTransitionBytes(token)).toEqual(expectedManifestBytes);
+    expect(() => testing.prepareManifestTransitionCommit(state, plan)).toThrow('already has');
+    expect(manifestStateBytes(testing, state)).toBe(before);
+
+    plan.manifestBytes.fill(0x58);
+    plan.manifest.stateDelta.binding.levelId = 'poisoned-after-prepare';
+    const exportedBytes = testing.preparedManifestTransitionBytes(token);
+    exportedBytes.fill(0x59);
+    expect(testing.preparedManifestTransitionBytes(token)).toEqual(expectedManifestBytes);
+    expect(() => testing.claimPreparedManifestTransitionCommit(otherState, token))
+      .toThrow('different state instance');
+    expect(() => testing.applyPreparedManifestTransition(token)).toThrow('must be claimed');
+    testing.claimPreparedManifestTransitionCommit(state, token);
+    expect(() => testing.claimPreparedManifestTransitionCommit(state, token)).toThrow('already claimed');
+    testing.applyPreparedManifestTransition(token);
+    expect(state.tip).toEqual(plan.tip);
+    expect(state.binding.levelId).toBe('t3r-test');
+    const applied = manifestStateBytes(testing, state);
+    expect(() => testing.applyPreparedManifestTransition(token)).toThrow('not owned');
+    expect(manifestStateBytes(testing, state)).toBe(applied);
+    expect(() => testing.preparedManifestTransitionBytes(token)).toThrow('not owned');
+  });
+
+  it('admits only one prepared transition per state and rejects the losing plan before commit', () => {
+    const state = testing.createManifestState();
+    const frontier = Object.freeze({ token: 'prepared-race' });
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const publication = Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+    });
+    const winnerPlan = testing.planManifestTransition(
+      state, publication, manifestCandidate(frontier, descriptor), manifestTotals(8),
+    );
+    const loserPlan = testing.planManifestTransition(
+      state, publication, manifestCandidate(frontier, descriptor), manifestTotals(8),
+    );
+    const winner = testing.prepareManifestTransitionCommit(state, winnerPlan);
+    const before = manifestStateBytes(testing, state);
+    expect(() => testing.prepareManifestTransitionCommit(state, loserPlan)).toThrow('already has');
+    expect(manifestStateBytes(testing, state)).toBe(before);
+    testing.claimPreparedManifestTransitionCommit(state, winner);
+    testing.applyPreparedManifestTransition(winner);
+    const committed = manifestStateBytes(testing, state);
+    expect(() => testing.prepareManifestTransitionCommit(state, loserPlan)).toThrow('base tip is stale');
+    expect(manifestStateBytes(testing, state)).toBe(committed);
+  });
+
+  it('binds prepare to the planning-time state generation and permits retry after repair', () => {
+    const state = testing.createManifestState();
+    const frontier = Object.freeze({ token: 'generation-bound-seed' });
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const plan = testing.planManifestTransition(state, Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+    }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+    const before = manifestStateBytes(testing, state);
+    state.generation = 41;
+    expect(() => testing.prepareManifestTransitionCommit(state, plan)).toThrow('base generation is stale');
+    state.generation = -1;
+    expect(manifestStateBytes(testing, state)).toBe(before);
+    const token = testing.prepareManifestTransitionCommit(state, plan);
+    testing.claimPreparedManifestTransitionCommit(state, token);
+    testing.applyPreparedManifestTransition(token);
+    expect(state.generation).toBe(0);
+
+    const unitRun = Object.freeze({ token: 'generation-bound-unit' });
+    const unitDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 0, null, null);
+    const unit = testing.planManifestTransition(state, Object.freeze({
+      transition: 'unit', previousTip: state.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: unitRun,
+    }), manifestCandidate(unitRun, unitDescriptor), manifestTotals(8));
+    state.generation = 99;
+    expect(() => testing.prepareManifestTransitionCommit(state, unit)).toThrow('base generation is stale');
+    state.generation = 0;
+    const unitToken = testing.prepareManifestTransitionCommit(state, unit);
+    testing.claimPreparedManifestTransitionCommit(state, unitToken);
+    testing.applyPreparedManifestTransition(unitToken);
+    expect(state.generation).toBe(1);
+  });
+
+  it('leaves a failed direct prepare unconsumed and retryable after collection repair', () => {
+    const { state, plan } = coveredUnitAppendPlan(testing, 'direct-prepare-retry');
+    const original = state.nextRuns;
+    const before = manifestStateBytes(testing, state);
+    state.nextRuns = Object.freeze([]);
+    expect(() => testing.prepareManifestTransitionCommit(state, plan)).toThrow('must remain extensible');
+    state.nextRuns = original;
+    expect(manifestStateBytes(testing, state)).toBe(before);
+    const token = testing.prepareManifestTransitionCommit(state, plan);
+    testing.claimPreparedManifestTransitionCommit(state, token);
+    testing.applyPreparedManifestTransition(token);
+    expect(state.generation).toBe(1);
+  });
+
+  it('rejects tip hash and tip generation drift during prepare without consuming the plan', () => {
+    for (const mutateTip of [
+      (tip) => ({ ...tip, manifestSha256: 'B'.repeat(64) }),
+      (tip) => ({ ...tip, generation: tip.generation + 1 }),
+    ]) {
+      const { state, plan } = coveredUnitAppendPlan(testing, 'direct-tip-drift');
+      const originalTip = state.tip;
+      const before = manifestStateBytes(testing, state);
+      state.tip = mutateTip(originalTip);
+      expect(() => testing.prepareManifestTransitionCommit(state, plan)).toThrow('base tip is stale');
+      state.tip = originalTip;
+      expect(manifestStateBytes(testing, state)).toBe(before);
+      const token = testing.prepareManifestTransitionCommit(state, plan);
+      testing.claimPreparedManifestTransitionCommit(state, token);
+      testing.applyPreparedManifestTransition(token);
+      expect(state.generation).toBe(1);
+    }
+  });
+
+  it('burns an owning prepared token when generation or tip drifts before its precommit claim', () => {
+    for (const mutateState of [
+      (state) => { state.generation += 1; },
+      (state) => { state.tip = { ...state.tip, manifestSha256: 'B'.repeat(64) }; },
+      (state) => {
+        state.generation += 1;
+        state.tip = { ...state.tip, generation: state.tip.generation + 1 };
+      },
+    ]) {
+      const { state, plan } = coveredUnitAppendPlan(testing, 'claimed-state-drift');
+      const originalTip = state.tip;
+      const originalGeneration = state.generation;
+      const before = manifestStateBytes(testing, state);
+      const token = testing.prepareManifestTransitionCommit(state, plan);
+      mutateState(state);
+      expect(() => testing.claimPreparedManifestTransitionCommit(state, token))
+        .toThrow('base state is stale');
+      state.tip = originalTip;
+      state.generation = originalGeneration;
+      expect(manifestStateBytes(testing, state)).toBe(before);
+      expect(() => testing.claimPreparedManifestTransitionCommit(state, token)).toThrow('not owned');
+    }
+  });
+
+  it('consumes a prepared token before an unexpected apply failure and never replays it', () => {
+    const { state, plan, unitDescriptor } = coveredUnitAppendPlan(testing, 'apply-fail-stop');
+    const token = testing.prepareManifestTransitionCommit(state, plan);
+    testing.claimPreparedManifestTransitionCommit(state, token);
+    Object.freeze(state.nextRuns);
+    expect(() => testing.applyPreparedManifestTransition(token)).toThrow();
+    expect(state.nextRuns).not.toContain(unitDescriptor);
+    expect(state.generation).toBe(0);
+    expect(() => testing.applyPreparedManifestTransition(token)).toThrow('not owned');
+    expect(state.nextRuns).not.toContain(unitDescriptor);
+    expect(state.generation).toBe(0);
+  });
+
+  it('prepares final-unit-without-run, final-depth complete, and zero-decision complete', () => {
+    const finalState = testing.createManifestState();
+    const finalFrontier = Object.freeze({ token: 'prepared-final-seed' });
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const finalSeed = testing.planManifestTransition(finalState, Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(2), frontier: finalFrontier,
+    }), manifestCandidate(finalFrontier, descriptor), manifestTotals(8));
+    testing.commitManifestTransition(finalState, finalSeed);
+    const finalUnit = testing.planManifestTransition(finalState, Object.freeze({
+      transition: 'unit', previousTip: finalState.tip, parentOffset: 1,
+      lastProcessedParentKey: 'ROOT', transitionsDelta: 1, boundPrunesDelta: 0, nextRun: null,
+    }), null, manifestTotals(8));
+    const beforeFinalUnit = manifestStateBytes(testing, finalState);
+    const finalUnitToken = testing.prepareManifestTransitionCommit(finalState, finalUnit);
+    expect(manifestStateBytes(testing, finalState)).toBe(beforeFinalUnit);
+    testing.claimPreparedManifestTransitionCommit(finalState, finalUnitToken);
+    testing.applyPreparedManifestTransition(finalUnitToken);
+    expect(finalState.nextRuns).toEqual([]);
+    expect(finalState.parentOffset).toBe(1);
+    const completedDepth = Object.freeze({
+      lockedPieces: 0, frontierStates: 1, transitions: 1, boundPrunes: 0,
+    });
+    const finalComplete = testing.planManifestTransition(finalState, Object.freeze({
+      transition: 'complete', previousTip: finalState.tip, completedDepth, reason: 'final-depth',
+    }), null, manifestTotals(0));
+    const finalCompleteToken = testing.prepareManifestTransitionCommit(finalState, finalComplete);
+    testing.claimPreparedManifestTransitionCommit(finalState, finalCompleteToken);
+    testing.applyPreparedManifestTransition(finalCompleteToken);
+    expect(finalState).toEqual(expect.objectContaining({ kind: 'complete', reason: 'final-depth' }));
+
+    const zeroState = testing.createManifestState();
+    const zeroFrontier = Object.freeze({ token: 'prepared-zero-seed' });
+    const zeroSeed = testing.planManifestTransition(zeroState, Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(1), frontier: zeroFrontier,
+    }), manifestCandidate(zeroFrontier, descriptor), manifestTotals(8));
+    testing.commitManifestTransition(zeroState, zeroSeed);
+    const zeroComplete = testing.planManifestTransition(zeroState, Object.freeze({
+      transition: 'complete', previousTip: zeroState.tip,
+      completedDepth: null, reason: 'zero-decision-depth',
+    }), null, manifestTotals(0));
+    const zeroToken = testing.prepareManifestTransitionCommit(zeroState, zeroComplete);
+    testing.claimPreparedManifestTransitionCommit(zeroState, zeroToken);
+    testing.applyPreparedManifestTransition(zeroToken);
+    expect(zeroState).toEqual(expect.objectContaining({
+      kind: 'complete', reason: 'zero-decision-depth', completedDepths: [],
+    }));
+  });
+
+  it.each(['layer', 'complete'])('keeps prepared %s application equivalent to the legacy wrapper', (transition) => {
+    const preparedCase = coveredManifestPlan(testing, transition, `prepared-${transition}`);
+    const wrappedCase = coveredManifestPlan(testing, transition, `prepared-${transition}`);
+    expect(manifestStateBytes(testing, preparedCase.state))
+      .toBe(manifestStateBytes(testing, wrappedCase.state));
+    const before = manifestStateBytes(testing, preparedCase.state);
+    const token = testing.prepareManifestTransitionCommit(preparedCase.state, preparedCase.plan);
+    expect(manifestStateBytes(testing, preparedCase.state)).toBe(before);
+    testing.claimPreparedManifestTransitionCommit(preparedCase.state, token);
+    testing.applyPreparedManifestTransition(token);
+    testing.commitManifestTransition(wrappedCase.state, wrappedCase.plan);
+    expect(manifestStateBytes(testing, preparedCase.state))
+      .toBe(manifestStateBytes(testing, wrappedCase.state));
+  });
+
+  it('prepares a unit append in O(1) and applies from its sealed snapshot', () => {
+    const { state, plan, unitDescriptor } = coveredUnitAppendPlan(testing, 'prepared-unit');
+    const nextRunsIdentity = state.nextRuns;
+    const activeIdsIdentity = state.activeIds;
+    const before = manifestStateBytes(testing, state);
+    const token = testing.prepareManifestTransitionCommit(state, plan);
+    expect(manifestStateBytes(testing, state)).toBe(before);
+    plan.manifestBytes.fill(0x5a);
+    plan.patch.parentOffset = 999;
+    testing.claimPreparedManifestTransitionCommit(state, token);
+    testing.applyPreparedManifestTransition(token);
+    expect(state.nextRuns).toBe(nextRunsIdentity);
+    expect(state.activeIds).toBe(activeIdsIdentity);
+    expect(state.nextRuns).toEqual([unitDescriptor]);
+    expect(state.activeIds.has(unitDescriptor.id)).toBe(true);
+    expect(state.parentOffset).toBe(1);
+  });
+
   it('commits all 4,096 unit runs in place without iterating or replacing growing collections', () => {
     const state = testing.createManifestState();
     const seedRun = Object.freeze({ token: 'constant-unit-seed' });
