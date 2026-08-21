@@ -12,8 +12,10 @@ import {
   type EndgameProofCheckpoint,
   type EndgameProofCheckpointPublication,
   type EndgameProofCheckpointRunStore,
+  type EndgameProofResumeBinding,
   type EndgameProofRun,
   type EndgameProofRunRange,
+  type EndgameProofSearchingCheckpoint,
   type EndgameProofRunStore,
   type EndgameProofRunStoreDiagnostics,
   type EndgameProofRunWriter,
@@ -201,8 +203,188 @@ class MemoryCheckpointRunStore extends MemoryRunStore implements EndgameProofChe
   }
 }
 
+type StoredRun = Readonly<{ id: string; records: readonly string[] }>;
+type StoredCheckpoint =
+  | Readonly<{
+      kind: 'searching'; generation: number; binding: EndgameProofResumeBinding;
+      depth: number; parentOffset: number; lastProcessedParentKey: string | null;
+      frontier: StoredRun; nextRuns: readonly StoredRun[]; transitions: number; boundPrunes: number;
+      exhaustedDepths: readonly Readonly<{ lockedPieces: number; frontierStates: number; transitions: number; boundPrunes: number }>[];
+    }>
+  | Readonly<{
+      kind: 'complete'; generation: number; binding: EndgameProofResumeBinding;
+      reason: 'empty-frontier' | 'final-depth' | 'zero-decision-depth';
+      exhaustedDepths: readonly Readonly<{ lockedPieces: number; frontierStates: number; transitions: number; boundPrunes: number }>[];
+    }>;
+
+class EvolvingMemoryCheckpointRunStore extends MemoryRunStore implements EndgameProofCheckpointRunStore {
+  readonly publications: EndgameProofCheckpointPublication[] = [];
+  readonly publicationLiveViewCounts: number[] = [];
+  readonly collectionRanges: { startIndex: number; endIndex: number }[] = [];
+  private checkpoint: StoredCheckpoint | null = null;
+  private tip: EndgameProofTip | null = null;
+  private viewOutstanding = false;
+  private readonly liveViewRuns = new Set<EndgameProofRun>();
+  private readonly liveCollectionRuns = new Set<EndgameProofRun>();
+  suspendCount = 0;
+
+  loadCheckpoint(): ReturnType<EndgameProofCheckpointRunStore['loadCheckpoint']> {
+    if (this.viewOutstanding) throw new Error('checkpoint view already outstanding');
+    if (this.checkpoint === null) {
+      return Object.freeze({ checkpoint: null, tip: null, diagnostics: this.diagnostics(), advanceAllowed: true });
+    }
+    this.viewOutstanding = true;
+    if (this.checkpoint.kind === 'complete') {
+      return Object.freeze({
+        checkpoint: Object.freeze({ ...this.checkpoint }),
+        tip: this.tip,
+        diagnostics: this.diagnostics(),
+        advanceAllowed: true,
+      });
+    }
+    const stored = this.checkpoint;
+    const frontier = this.openViewRun(stored.frontier, false);
+    const nextRuns = Object.freeze({
+      count: stored.nextRuns.length,
+      open: (range: { startIndex: number; endIndex: number }): readonly EndgameProofRun[] => {
+        if (this.liveCollectionRuns.size > 0) throw new Error('collection member still live');
+        if (range.startIndex < 0 || range.startIndex >= range.endIndex
+          || range.endIndex > stored.nextRuns.length || range.endIndex - range.startIndex > 32) {
+          throw new Error('invalid collection range');
+        }
+        this.collectionRanges.push(Object.freeze({ ...range }));
+        return Object.freeze(stored.nextRuns.slice(range.startIndex, range.endIndex).map((run) => (
+          this.openViewRun(run, true)
+        )));
+      },
+    });
+    return Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: stored.generation, binding: stored.binding,
+        depth: stored.depth, parentOffset: stored.parentOffset,
+        lastProcessedParentKey: stored.lastProcessedParentKey,
+        frontier, nextRuns, transitions: stored.transitions, boundPrunes: stored.boundPrunes,
+        exhaustedDepths: stored.exhaustedDepths,
+      }),
+      tip: this.tip,
+      diagnostics: this.diagnostics(),
+      advanceAllowed: true,
+    });
+  }
+
+  publishCheckpoint(publication: EndgameProofCheckpointPublication): ReturnType<EndgameProofCheckpointRunStore['publishCheckpoint']> {
+    const generation = publication.previousTip === null ? 0 : publication.previousTip.generation + 1;
+    if ((publication.previousTip === null) !== (this.tip === null)
+      || (publication.previousTip && (publication.previousTip.generation !== this.tip?.generation
+        || publication.previousTip.manifestSha256 !== this.tip.manifestSha256))) {
+      throw new Error('previous tip mismatch');
+    }
+    if (publication.transition === 'seed') {
+      if (this.checkpoint !== null || generation !== 0) throw new Error('invalid seed');
+      this.checkpoint = Object.freeze({
+        kind: 'searching', generation, binding: publication.binding,
+        depth: 0, parentOffset: 0, lastProcessedParentKey: null,
+        frontier: this.consumeWorkingRun(publication.frontier), nextRuns: Object.freeze([]),
+        transitions: 0, boundPrunes: 0, exhaustedDepths: Object.freeze([]),
+      });
+    } else {
+      if (this.checkpoint?.kind !== 'searching') throw new Error('searching checkpoint required');
+      const previous = this.checkpoint;
+      if (publication.transition === 'unit') {
+        const nextRuns = publication.nextRun
+          ? Object.freeze([...previous.nextRuns, this.consumeWorkingRun(publication.nextRun)])
+          : previous.nextRuns;
+        this.checkpoint = Object.freeze({
+          ...previous, generation, parentOffset: publication.parentOffset,
+          lastProcessedParentKey: publication.lastProcessedParentKey,
+          nextRuns,
+          transitions: previous.transitions + publication.transitionsDelta,
+          boundPrunes: previous.boundPrunes + publication.boundPrunesDelta,
+        });
+      } else if (publication.transition === 'layer') {
+        this.checkpoint = Object.freeze({
+          kind: 'searching', generation, binding: previous.binding, depth: previous.depth + 1,
+          parentOffset: 0, lastProcessedParentKey: null,
+          frontier: this.consumeWorkingRun(publication.nextFrontier), nextRuns: Object.freeze([]),
+          transitions: 0, boundPrunes: 0,
+          exhaustedDepths: Object.freeze([...previous.exhaustedDepths, publication.completedDepth]),
+        });
+      } else {
+        this.checkpoint = Object.freeze({
+          kind: 'complete', generation, binding: previous.binding, reason: publication.reason,
+          exhaustedDepths: publication.completedDepth
+            ? Object.freeze([...previous.exhaustedDepths, publication.completedDepth])
+            : previous.exhaustedDepths,
+        });
+      }
+    }
+    this.publicationLiveViewCounts.push(this.liveViewRuns.size);
+    this.invalidateView();
+    this.publications.push(publication);
+    this.tip = Object.freeze({ generation, manifestSha256: generation.toString(16).toUpperCase().padStart(64, '0') });
+    return Object.freeze({ tip: this.tip, diagnostics: this.diagnostics(), advanceAllowed: true });
+  }
+
+  releaseCheckpointRun(run: EndgameProofRun): void {
+    if (!this.liveViewRuns.has(run)) throw new Error(`foreign view run ${run.id}`);
+    run.dispose();
+  }
+
+  suspend(): ReturnType<EndgameProofCheckpointRunStore['suspend']> {
+    this.suspendCount += 1;
+    this.invalidateView();
+    return Object.freeze({ diagnostics: this.diagnostics(), closeFailed: false });
+  }
+
+  private consumeWorkingRun(run: EndgameProofRun): StoredRun {
+    const records = Object.freeze([...run.values()]);
+    if (records.length !== run.size) throw new Error(`working run ${run.id} size mismatch`);
+    const stored = Object.freeze({ id: run.id, records });
+    run.dispose();
+    return stored;
+  }
+
+  private openViewRun(stored: StoredRun, collectionMember: boolean): EndgameProofRun {
+    let run!: MemoryRun;
+    run = new MemoryRun(stored.id, stored.records, stored.records.length, (_id, values) => values, () => {
+      this.liveViewRuns.delete(run);
+      this.liveCollectionRuns.delete(run);
+    });
+    this.liveViewRuns.add(run);
+    if (collectionMember) this.liveCollectionRuns.add(run);
+    return run;
+  }
+
+  private invalidateView(): void {
+    for (const run of [...this.liveViewRuns]) run.dispose();
+    this.liveViewRuns.clear();
+    this.liveCollectionRuns.clear();
+    this.viewOutstanding = false;
+  }
+}
+
 function records(count: number): readonly string[] {
   return Object.freeze(Array.from({ length: count }, (_, index) => `k${String(index).padStart(4, '0')}`));
+}
+
+function runResumableCertificate(definition: EndgameDefinition, route: string): Readonly<{
+  certificate: NonNullable<ReturnType<typeof certifyOptimalEndgameRouteForDefinition>>;
+  store: EvolvingMemoryCheckpointRunStore;
+}> {
+  const store = new EvolvingMemoryCheckpointRunStore();
+  try {
+    for (let generation = 0; generation <= 32_767; generation += 1) {
+      const result = advanceOptimalEndgameRouteProofForDefinition(definition, route, store);
+      if (result === null) throw new Error('resumable fixture unexpectedly returned null');
+      if (result.status === 'blocked' || !result.advanceAllowed) {
+        throw new Error('resumable memory fixture unexpectedly blocked');
+      }
+      if (result.status === 'complete') return Object.freeze({ certificate: result.certificate, store });
+    }
+    throw new Error('resumable proof exceeded the generation domain');
+  } finally {
+    store.suspend();
+  }
 }
 
 function java31Hash(value: string): number {
@@ -569,6 +751,65 @@ describe('Endgame proof frontier Core-owned runs', () => {
     });
     expect(frontier.ranges).toEqual([{ startOrdinal: 0, endOrdinal: 1 }]);
     expect(completeStore.createRunCount).toBe(0);
+
+    const fullLoop = runResumableCertificate(definition, route);
+    expect(fullLoop.certificate).toEqual(certifyOptimalEndgameRouteForDefinition(definition, route));
+    expect(fullLoop.store.publications.map(({ transition }) => transition)).toEqual(['seed', 'complete']);
+    expect(fullLoop.store.publicationLiveViewCounts).toEqual([0, 0]);
+    expect(fullLoop.store.suspendCount).toBe(1);
+  });
+
+  it('fails closed on generation, depth, and counter plus/minus-one checkpoint drift', () => {
+    const definition = ENDGAME_V3_INTRO_DRAFTS[0]!;
+    const route = intro01.optimalRoute;
+    const diagnostics = Object.freeze({
+      activeRuns: Object.freeze([]), residue: Object.freeze([]), residueTruncated: false,
+      cleanupErrors: Object.freeze([]), cleanupErrorsTruncated: false,
+    });
+    const seedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null, tip: null, diagnostics, advanceAllowed: true,
+    }));
+    advanceOptimalEndgameRouteProofForDefinition(definition, route, seedStore);
+    const seed = seedStore.publications[0]!;
+    if (seed.transition !== 'seed') throw new Error('expected seed publication');
+    const makeCheckpoint = (options: Readonly<{
+      generation: number; depth: number; frontierDepth: number; parentOffset?: number;
+      transitions?: number; boundPrunes?: number;
+    }>): EndgameProofSearchingCheckpoint => Object.freeze({
+      kind: 'searching', generation: options.generation, binding: seed.binding, depth: options.depth,
+      parentOffset: options.parentOffset ?? 0,
+      lastProcessedParentKey: options.parentOffset ? seed.binding.initialFrontierKey : null,
+      frontier: new MemoryRun(
+        `r7-f-d${String(options.frontierDepth).padStart(5, '0')}-g00000`,
+        [seed.binding.initialFrontierKey], 1, (_id, values) => values, () => {},
+      ),
+      nextRuns: Object.freeze({
+        count: options.parentOffset ? 1 : 0,
+        open: () => { throw new Error('drift must fail before collection open'); },
+      }),
+      transitions: options.transitions ?? 0,
+      boundPrunes: options.boundPrunes ?? 0,
+      exhaustedDepths: Object.freeze(Array.from({ length: options.depth }, (_, lockedPieces) => Object.freeze({
+        lockedPieces, frontierStates: 1, transitions: 0, boundPrunes: 0,
+      }))),
+    });
+    for (const checkpoint of [
+      makeCheckpoint({ generation: 1, depth: 0, frontierDepth: 0 }),
+      makeCheckpoint({ generation: 0, depth: 0, frontierDepth: 0, parentOffset: 1 }),
+      makeCheckpoint({ generation: 0, depth: 1, frontierDepth: 0 }),
+      makeCheckpoint({ generation: 0, depth: 0, frontierDepth: 1 }),
+      makeCheckpoint({ generation: 0, depth: 0, frontierDepth: 0, transitions: 1 }),
+      makeCheckpoint({ generation: 0, depth: 0, frontierDepth: 0, boundPrunes: -1 }),
+    ]) {
+      const store = new MemoryCheckpointRunStore(Object.freeze({
+        checkpoint,
+        tip: Object.freeze({ generation: checkpoint.generation, manifestSha256: '5'.repeat(64) }),
+        diagnostics,
+        advanceAllowed: true,
+      }));
+      expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, store)).toThrow();
+      expect(store.publications).toEqual([]);
+    }
   });
 
   it('sorts by unsigned bytes, collapses only full-key duplicates, and preserves prefixes', () => {
@@ -658,11 +899,14 @@ describe('Endgame proof frontier Core-owned runs', () => {
   });
 
   it('performs the complete 4096-run boundary and rejects the 4097th run', () => {
+    const boundaryStore = new MemoryRunStore();
     expect(ENDGAME_PROOF_FRONTIER_STORE_TESTING.persist(
       records(4096),
-      new MemoryRunStore(),
+      boundaryStore,
       oneRecordChunks,
     )).toEqual(records(4096));
+    expect(boundaryStore.snapshot().peakDescriptors).toBe(4097);
+    expect(boundaryStore.snapshot().peakDescriptors + 1).toBe(4098);
     expect(() => ENDGAME_PROOF_FRONTIER_STORE_TESTING.persist(
       records(4097),
       new MemoryRunStore(),
@@ -823,6 +1067,13 @@ describe.runIf(RUN_EXACT)('Endgame proof frontier Intro-01 through Intro-04 equa
         { runStore: new MemoryRunStore() },
       );
       expect(injected).toEqual(memory);
+      const resumable = runResumableCertificate(definition, route);
+      expect(resumable.certificate).toEqual(memory);
+      expect(resumable.store.suspendCount).toBe(1);
+      expect(resumable.store.publicationLiveViewCounts.every((count) => count === 0)).toBe(true);
+      expect(resumable.store.collectionRanges.every(({ startIndex, endIndex }) => (
+        endIndex > startIndex && endIndex - startIndex <= 32
+      ))).toBe(true);
     }
 
     const source = ENDGAME_V3_INTRO_DRAFTS[1]!;
@@ -839,6 +1090,7 @@ describe.runIf(RUN_EXACT)('Endgame proof frontier Intro-01 through Intro-04 equa
       { runStore: new MemoryRunStore() },
     );
     expect(injected).toEqual(memory);
+    expect(runResumableCertificate(synthetic, intro02.optimalRoute).certificate).toEqual(memory);
     expect(injected?.levelId).toBe(ENDGAME_V3_INTRO_DRAFTS[0]!.id);
     expect(injected?.initialStateHash).not.toBe(intro02.initialStateHash);
   }, 1_200_000);
