@@ -10585,5 +10585,21 @@ advance: it recomputes and returns the identical certificate/generation/tip with
 manifest, or write. The caller's final `suspend()` consumes that complete view. Tests interrupt
 after complete commit but before result observation and assert zero new I/O authority.
 
+The former R10 review next action is superseded by the R11 disposition below. Core and adapter
+implementation remain closed.
+
+### F4E-R7A R10 rejected — R11 complete-aware residue result
+
+R10 `042d9c8` receives two `0/0/0/0/0` reviews but is rejected at
+`P0/P1/P2/P3/GAP = 0/1/0/0/1`: the broad recognized-residue rule could still downgrade an
+authoritative complete checkpoint to blocked.
+
+R11 keeps null/searching residue blocked. When the highest checkpoint is complete and only
+recognized postcommit manifest-alias and/or superseded-file residue exists, reopen instead
+returns the identical certificate/generation/tip with diagnostics, `advanceAllowed:false`, and
+zero cleanup/publication/write; caller suspend consumes the view. Tests cross complete result
+loss with manifest alias, data-only, index-only, mixed halves, and alias-plus-halves, while the
+same searching residue remains blocked.
+
 **Current next action:** commit and obtain at least two fresh independent all-zero reviews of
-the four-document R10 contract. Core and adapter implementation remain closed until that gate.
+the four-document R11 contract. Core and adapter implementation remain closed until that gate.

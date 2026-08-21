@@ -1085,5 +1085,16 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Loaded-complete recovery returns the existing certificate/generation/tip with no publication
   or write; caller suspend consumes the view. A postcommit lost-result test proves no new
   manifest.
-- Next: commit these four R10 docs and obtain at least two fresh independent all-zero reviews.
+- The former R10 review next action is superseded by R11 below. Source, external paths, proof
+  execution, and Intro-05 remain closed.
+
+### F4E-R7A R10 rejected and R11 contract candidate
+
+- R10 `042d9c8` receives two `0/0/0/0/0` reviews but is rejected at `0/1/0/0/1`: complete
+  authority could still be downgraded by the broad recognized-residue rule.
+- R11 makes recognized postcommit residue complete-aware. Complete returns the same proof/tip
+  with `advanceAllowed:false` and zero writes; null/searching remains blocked.
+- Lost-result QA crosses manifest alias, data-only, index-only, mixed halves, and combined
+  residue, then caller suspend; every case preserves tip and creates no generation.
+- Next: commit these four R11 docs and obtain at least two fresh independent all-zero reviews.
   Source, external paths, proof execution, and Intro-05 remain closed.

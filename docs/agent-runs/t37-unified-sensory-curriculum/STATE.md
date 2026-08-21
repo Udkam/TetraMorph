@@ -3417,4 +3417,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   49,148 peaks at 49,152; 49,149 rejects before a run path. No-run publication reserves two.
 - A loaded complete checkpoint returns the same certificate/tip without publication or write;
   caller suspend consumes the view. A lost-result reopen test proves zero new generation.
-- Next: commit/review only the four R10 docs. Source and all external R7 paths remain closed.
+- The former R10 review next action is superseded by R11 below. Source and all external R7
+  paths remain closed.
+
+### F4E-R7A R10 rejection and R11 complete-aware residue correction
+
+- R10 `042d9c8` receives two `0/0/0/0/0` reviews but is rejected at `0/1/0/0/1`: broad
+  residue handling could still hide an authoritative complete result behind blocked.
+- R11 returns a complete checkpoint with recognized postcommit alias/half residue as the same
+  certificate/tip, `advanceAllowed:false`, and zero writes. Null/searching residue stays blocked.
+- Tests cross complete result loss with alias, data-only, index-only, mixed halves, and their
+  combination; caller suspend consumes the view.
+- Next: commit/review only the four R11 docs. Source and all external R7 paths remain closed.

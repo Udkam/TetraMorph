@@ -10020,10 +10020,14 @@ interruption after the complete manifest commits but before its first result is 
 complete view remains outstanding until the caller's required `suspend()`. Advance functions
 never call `suspend()` or `dispose()` themselves; the caller owns one
 `suspend()` in its pause/exit `finally`. Every advance closes transient readers/writers before
-returning. A load with recognized residue returns `status:'blocked'` without writing; this may
-be `checkpoint:null,tip:null` after an interrupted generation-0 precommit. A committed
-publication may also return searching/complete with `advanceAllowed:false`. Either form
-forbids another advance; malformed/ambiguous state throws.
+returning. A null or searching checkpoint with recognized residue returns `status:'blocked'`
+without writing; this may be `checkpoint:null,tip:null` after an interrupted generation-0
+precommit. If the authoritative highest checkpoint is complete and its only residue is a
+recognized postcommit manifest alias and/or superseded-file subset, the zero-transition path
+instead returns `status:'complete'` with the identical certificate/generation/tip,
+`advanceAllowed:false`, diagnostics, and no cleanup or write. A same-call committed publication
+may likewise return searching/complete with `advanceAllowed:false`. These false forms forbid a
+later proof transition; malformed/ambiguous state throws.
 
 A searching checkpoint binds schema, generation, level/route/optimal-lock/start identity,
 depth, parent offset, last processed parent key, current frontier, the opaque accumulated
@@ -10313,7 +10317,9 @@ is accepted because its cleanup succeeded. Manifest-alias and superseded subsets
 and are reported together. Precommit residue leaves the prior generation authoritative; both
 postcommit classes leave the new generation authoritative. With no prior manifest, the first returns
 `checkpoint:null,tip:null,advanceAllowed:false`; otherwise all three retain the authoritative
-tip and set `advanceAllowed:false`. They
+tip and set `advanceAllowed:false`. A null/searching authority therefore loads blocked. A
+complete highest authority with only either/both postcommit classes remains a loadable complete
+view and follows the zero-transition result rule above; it is not downgraded to blocked. They
 remain untouched pending later exact cleanup authority. A mismatched hard link, final/part
 byte or identity disagreement, unknown name, ambiguous descriptor, or foreign entry is fatal,
 not recognized residue. Both data and index finals for every descriptor active in the highest
@@ -10333,7 +10339,11 @@ early empty frontier, a final-depth parent pruned by the existing lower bound, a
 `optimalLocks === 1` zero-decision certificate with no exhausted depth record.
 They also interrupt after the complete manifest link but before the result is observed, reopen,
 and prove the identical certificate/generation/tip returns with zero publication call, zero new
-manifest or other write, and caller `suspend()` consuming the complete view.
+manifest or other write, and caller `suspend()` consuming the complete view. This is crossed
+with every postcommit cleanup seam: same-identity manifest alias, only superseded data, only
+superseded index, mixed halves, and alias plus halves. Each returns the same complete result
+with `advanceAllowed:false`, unchanged tip, zero cleanup/publish/write, and final suspend;
+searching versions of the same recognized residue remain blocked.
 
 Fault matrices cover unaligned/range/count/order drift, gap/overlap/duplicate/tail loss,
 unsafe counter addition, same-size omit/add/replace/reorder, corrupt/truncated run/index/
@@ -10402,7 +10412,7 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1/R2/R3/R4/R5/R6/R7/R8/R9 rejection and R10 correction
+### F4E-R7A R1/R2/R3/R4/R5/R6/R7/R8/R9/R10 rejection and R11 correction
 
 R1 `b697625` is rejected at independent
 `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
@@ -10457,5 +10467,10 @@ R9 `f176a5b` is rejected by two reviews at `0/1/0/0/1`: separately admitted two-
 could exceed the namespace cap when aliases overlap, and a reopened complete checkpoint lacked
 a zero-transition result-recovery path. R10 admits an added-run generation at its four-name
 peak (three inside the run/index subphase) and mandates alias contraction order; it also makes loaded-complete recovery
-the sole zero-transition success with no publication/write and caller-owned suspend. Commit and
-independently review this four-document R10 before implementation.
+the sole zero-transition success with no publication/write and caller-owned suspend.
+
+R10 `042d9c8` receives two all-zero reviews but is rejected at `0/1/0/0/1`: its broad residue
+rule could still downgrade a complete authority to blocked. R11 makes recognized postcommit
+residue complete-aware: complete returns the identical proof with `advanceAllowed:false` and
+zero writes, while null/searching remains blocked, with all alias/half cleanup seams crossed in
+tests. Commit and independently review this four-document R11 before implementation.
