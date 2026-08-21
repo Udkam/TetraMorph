@@ -8,6 +8,8 @@ import intro03 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endg
 import intro04 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-04.json';
 import {
   ENDGAME_DISK_FRONTIER_LIMITS,
+  RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS,
+  RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING,
   createEndgameDiskFrontierStore,
 } from '../../scripts/endgame-disk-frontier.mjs';
 import { ENDGAME_V3_INTRO_DRAFTS } from '../game/core/endgameV3IntroDefinitions.ts';
@@ -127,6 +129,70 @@ function retryCleanup(store, writer, run) {
     }
   }
 }
+
+describe('R7 resumable disk frontier primitives', () => {
+  const testing = RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING;
+
+  it('freezes the production resource limits and canonical UTF-8 object ordering', () => {
+    expect(RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS).toEqual(expect.objectContaining({
+      parentUnitKeys: 65_536,
+      maximumUnits: 4_096,
+      maximumManifests: 32_768,
+      maximumNamespaceEntries: 49_152,
+      latestCheckpointRunBytes: 103_079_215_104,
+      uncommittedWorkingRunBytes: 103_079_215_104,
+      recognizedPhysicalRunBytes: 206_158_430_208,
+      retainedManifestBytes: 536_870_912,
+      ownerAndIndexBytes: 536_870_912,
+      auxiliaryBytes: 1_073_741_824,
+      manifestBytes: 16_384,
+      ownerOrIndexBytes: 65_536,
+    }));
+    expect(testing.canonicalJson({ z: 1, a: [true, null, { b: 2, A: 1 }] }))
+      .toBe('{"a":[true,null,{"A":1,"b":2}],"z":1}');
+    expect(() => testing.canonicalJson({ value: 1.5 })).toThrow('safe integers');
+    expect(() => testing.canonicalJson({ value: undefined })).toThrow('unsupported');
+    const cycle = {};
+    cycle.self = cycle;
+    expect(() => testing.canonicalJson(cycle)).toThrow('cycles');
+  });
+
+  it('separates canonical labeled hashes from exact manifest-byte hashes', () => {
+    const value = { schema: 'example', generation: 0 };
+    const canonical = testing.canonicalJson(value);
+    const labeled = testing.canonicalHash('T37-F4E-R7-TEST-V1', value);
+    const manifest = testing.sha256Upper(Buffer.from(`${canonical}\n`, 'utf8'));
+    expect(labeled).toMatch(testing.hashPattern);
+    expect(manifest).toMatch(testing.hashPattern);
+    expect(labeled).not.toBe(manifest);
+    expect(testing.canonicalHash('T37-F4E-R7-TEST-V1', value)).toBe(labeled);
+  });
+
+  it('computes all formula-reachable index cap vectors without materializing records', () => {
+    expect(testing.indexLayout(0)).toEqual({ entryCount: 1, indexBytes: 32 });
+    expect(testing.indexLayout(536_477_697)).toEqual({ entryCount: 8_188, indexBytes: 65_528 });
+    expect(testing.indexLayout(536_543_233)).toEqual({ entryCount: 8_189, indexBytes: 65_536 });
+    expect(testing.indexLayout(536_608_769)).toEqual({ entryCount: 8_190, indexBytes: 65_544 });
+  });
+
+  it('round-trips the exact binary index and maps aligned and final-short ranges', () => {
+    const size = 65_537;
+    const encoded = testing.encodeIndex(size, [0, 8, 13]);
+    expect(encoded.subarray(0, 8).toString('ascii')).toBe('T37R7I1\n');
+    expect(encoded.length).toBe(48);
+    const decoded = testing.decodeIndex(encoded);
+    expect(decoded).toEqual({ size, offsets: [0, 8, 13] });
+    expect(testing.rangeByteOffsets(decoded, { startOrdinal: 0, endOrdinal: 65_536 }))
+      .toEqual({ startOffset: 0, endOffset: 8 });
+    expect(testing.rangeByteOffsets(decoded, { startOrdinal: 65_536, endOrdinal: 65_537 }))
+      .toEqual({ startOffset: 8, endOffset: 13 });
+    expect(testing.rangeByteOffsets(decoded, { startOrdinal: 65_537, endOrdinal: 65_537 }))
+      .toEqual({ startOffset: 13, endOffset: 13 });
+    expect(() => testing.validateRange(size, { startOrdinal: 1, endOrdinal: 65_536 }))
+      .toThrow('align');
+    expect(() => testing.decodeIndex(Buffer.concat([encoded, Buffer.from([0])]))).toThrow('inconsistent');
+  });
+});
 
 describe('Node Endgame disk frontier adapter', () => {
   it('persists empty and nonempty immutable LF runs with repeatable exact reads', () => {

@@ -1,4 +1,5 @@
 import * as nativeFs from 'node:fs';
+import { createHash } from 'node:crypto';
 import * as path from 'node:path';
 
 export const ENDGAME_DISK_FRONTIER_LIMITS = Object.freeze({
@@ -10,6 +11,175 @@ export const ENDGAME_DISK_FRONTIER_LIMITS = Object.freeze({
   diagnosticMessageMaxBytes: 2048,
   runIdMaxBytes: 96,
   stagePathMaxCodeUnits: 512,
+});
+
+export const RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS = Object.freeze({
+  parentUnitKeys: 65_536,
+  maximumUnits: 4_096,
+  maximumManifests: 32_768,
+  maximumNamespaceEntries: 49_152,
+  latestCheckpointRunBytes: 96 * 1024 ** 3,
+  uncommittedWorkingRunBytes: 96 * 1024 ** 3,
+  recognizedPhysicalRunBytes: 192 * 1024 ** 3,
+  retainedManifestBytes: 512 * 1024 ** 2,
+  ownerAndIndexBytes: 512 * 1024 ** 2,
+  auxiliaryBytes: 1024 ** 3,
+  manifestBytes: 16_384,
+  ownerOrIndexBytes: 65_536,
+  collectionOpenRuns: 32,
+  ownerIdBytes: 128,
+});
+
+const R7_INDEX_MAGIC = Buffer.from('T37R7I1\n', 'ascii');
+const R7_INDEX_STRIDE = RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.parentUnitKeys;
+const R7_INDEX_HEADER_BYTES = 24;
+const R7_HASH_PATTERN = /^[0-9A-F]{64}$/;
+
+function assertSafeNonnegativeInteger(value, label) {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw frontierError(`${label} must be a safe nonnegative integer`);
+  }
+}
+
+function canonicalizeJson(value, ancestors = new Set()) {
+  if (value === null || typeof value === 'boolean' || typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'number') {
+    if (!Number.isSafeInteger(value)) throw frontierError('canonical JSON numbers must be safe integers');
+    return String(value);
+  }
+  if (typeof value !== 'object') throw frontierError('canonical JSON contains an unsupported value');
+  if (ancestors.has(value)) throw frontierError('canonical JSON cannot contain cycles');
+  ancestors.add(value);
+  try {
+    if (Array.isArray(value)) {
+      return `[${value.map((entry) => canonicalizeJson(entry, ancestors)).join(',')}]`;
+    }
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null) {
+      throw frontierError('canonical JSON objects must be plain records');
+    }
+    const keys = Object.keys(value).sort(ordinalByteCompare);
+    return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalizeJson(value[key], ancestors)}`).join(',')}}`;
+  } finally {
+    ancestors.delete(value);
+  }
+}
+
+function sha256Upper(bytes) {
+  return createHash('sha256').update(bytes).digest('hex').toUpperCase();
+}
+
+function canonicalHash(label, value) {
+  if (typeof label !== 'string' || label.length === 0 || label.includes('\0')) {
+    throw frontierError('canonical hash label must be a nonempty NUL-free string');
+  }
+  return sha256Upper(Buffer.from(`${label}\0${canonicalizeJson(value)}`, 'utf8'));
+}
+
+function resumableIndexLayout(size) {
+  assertSafeNonnegativeInteger(size, 'run size');
+  const entryCount = size === 0 ? 1 : Math.floor((size - 1) / R7_INDEX_STRIDE) + 2;
+  const indexBytes = R7_INDEX_HEADER_BYTES + 8 * entryCount;
+  if (!Number.isSafeInteger(entryCount) || !Number.isSafeInteger(indexBytes)) {
+    throw frontierError('run index layout exceeds safe integer range');
+  }
+  return Object.freeze({ entryCount, indexBytes });
+}
+
+function validateIndexOffsets(size, offsets) {
+  const { entryCount, indexBytes } = resumableIndexLayout(size);
+  if (!Array.isArray(offsets) || offsets.length !== entryCount) {
+    throw frontierError(`run index requires exactly ${entryCount} offsets`);
+  }
+  let previous = -1;
+  for (const [index, offset] of offsets.entries()) {
+    assertSafeNonnegativeInteger(offset, `run index offset ${index}`);
+    if (index === 0 && offset !== 0) throw frontierError('run index must begin at byte offset 0');
+    if (index > 0 && offset <= previous) throw frontierError('run index offsets must be strictly increasing');
+    previous = offset;
+  }
+  if (size === 0 && offsets[0] !== 0) throw frontierError('empty run index must contain only offset 0');
+  return { entryCount, indexBytes };
+}
+
+function encodeResumableRunIndex(size, offsets) {
+  const { entryCount, indexBytes } = validateIndexOffsets(size, offsets);
+  const buffer = Buffer.alloc(indexBytes);
+  R7_INDEX_MAGIC.copy(buffer, 0);
+  buffer.writeBigUInt64LE(BigInt(size), 8);
+  buffer.writeUInt32LE(R7_INDEX_STRIDE, 16);
+  buffer.writeUInt32LE(entryCount, 20);
+  offsets.forEach((offset, index) => buffer.writeBigUInt64LE(BigInt(offset), R7_INDEX_HEADER_BYTES + 8 * index));
+  return buffer;
+}
+
+function decodeResumableRunIndex(bytes) {
+  const buffer = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
+  if (buffer.length < R7_INDEX_HEADER_BYTES || !buffer.subarray(0, 8).equals(R7_INDEX_MAGIC)) {
+    throw frontierError('run index has invalid magic or is truncated');
+  }
+  const sizeBig = buffer.readBigUInt64LE(8);
+  if (sizeBig > BigInt(Number.MAX_SAFE_INTEGER)) throw frontierError('run index size exceeds safe integer range');
+  const size = Number(sizeBig);
+  if (buffer.readUInt32LE(16) !== R7_INDEX_STRIDE) throw frontierError('run index has invalid stride');
+  const declaredCount = buffer.readUInt32LE(20);
+  const layout = resumableIndexLayout(size);
+  if (declaredCount !== layout.entryCount || buffer.length !== layout.indexBytes) {
+    throw frontierError('run index count or byte length is inconsistent');
+  }
+  const offsets = [];
+  for (let index = 0; index < declaredCount; index += 1) {
+    const offsetBig = buffer.readBigUInt64LE(R7_INDEX_HEADER_BYTES + 8 * index);
+    if (offsetBig > BigInt(Number.MAX_SAFE_INTEGER)) throw frontierError('run index offset exceeds safe integer range');
+    offsets.push(Number(offsetBig));
+  }
+  validateIndexOffsets(size, offsets);
+  return Object.freeze({ size, offsets: Object.freeze(offsets) });
+}
+
+function validateResumableRunRange(size, range) {
+  assertSafeNonnegativeInteger(size, 'run size');
+  if (!range || typeof range !== 'object') throw frontierError('run range is required');
+  const { startOrdinal, endOrdinal } = range;
+  assertSafeNonnegativeInteger(startOrdinal, 'range startOrdinal');
+  assertSafeNonnegativeInteger(endOrdinal, 'range endOrdinal');
+  if (startOrdinal > endOrdinal || endOrdinal > size) throw frontierError('run range is out of bounds');
+  if (startOrdinal !== size && startOrdinal % R7_INDEX_STRIDE !== 0) {
+    throw frontierError(`run range start must align to ${R7_INDEX_STRIDE}`);
+  }
+  if (endOrdinal !== size && endOrdinal % R7_INDEX_STRIDE !== 0) {
+    throw frontierError(`run range end must align to ${R7_INDEX_STRIDE} unless it is the final short range`);
+  }
+  return Object.freeze({ startOrdinal, endOrdinal });
+}
+
+function resumableRangeByteOffsets(index, range) {
+  const parsed = index && Array.isArray(index.offsets)
+    ? index
+    : decodeResumableRunIndex(index);
+  const validated = validateResumableRunRange(parsed.size, range);
+  const offsetFor = (ordinal) => {
+    if (ordinal === parsed.size) return parsed.offsets.at(-1);
+    return parsed.offsets[ordinal / R7_INDEX_STRIDE];
+  };
+  return Object.freeze({
+    startOffset: offsetFor(validated.startOrdinal),
+    endOffset: offsetFor(validated.endOrdinal),
+  });
+}
+
+export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
+  canonicalJson: canonicalizeJson,
+  canonicalHash,
+  sha256Upper,
+  hashPattern: R7_HASH_PATTERN,
+  indexLayout: resumableIndexLayout,
+  encodeIndex: encodeResumableRunIndex,
+  decodeIndex: decodeResumableRunIndex,
+  validateRange: validateResumableRunRange,
+  rangeByteOffsets: resumableRangeByteOffsets,
 });
 
 const DEFAULT_FS = Object.freeze({
