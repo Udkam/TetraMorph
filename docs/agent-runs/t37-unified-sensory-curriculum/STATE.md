@@ -3288,3 +3288,24 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next exact sequence: four-doc clarification commit; two all-zero contract reviews; two
   read-only output audits; THREAD_LOG-only consumed receipt; two exact-marker reviews. No
   successor contract, Intro-05 source, or proof execution opens before that closure.
+
+### F4E-R7A resumable proof infrastructure candidate
+
+- V6 closes at consumed receipt `109f785d0833643e45197fae26538a226a4051d3`, accepted by
+  two exact-marker reviews at `0/0/0/0/0`. Its validator/attempt/stage remain immutable and
+  cannot enter R7 runtime, argv, adapter, checkpoint, fixture, or proof input.
+- All six reserved external R7 paths are absent. This slice is repository-only and opens no
+  validator mode, production Store, task/runner, Intro-05, or curriculum source.
+- Exact implementation boundary is four paths: Core route search, its frontier Store test,
+  Node disk adapter, and its authoring test. Existing memory/one-shot disk behavior is frozen.
+- New behavior is authoring-only: exact ranged reads; fixed 65,536-parent units; canonical
+  seed/unit/layer/complete generations; full range coverage; final-depth exhaustion without
+  output; safe telemetry; and canonical equality to uninterrupted certificates.
+- Adapter behavior is persistent immutable checkpoints: exact owner, complete run/index
+  hashes and offsets, manifest-last commit, strict resume/identity verification, suspend
+  without deletion, and no broad or ambiguous cleanup.
+- Per layer the production bounds are 4,096 units and 96 GiB committed run bytes. Exceeding
+  either closes the infrastructure step without a certificate or unsatisfiable claim.
+- Required QA: focused range/coverage/fault tests; Intro-01..04 memory/one-shot/resumable
+  equality across every boundary; typecheck; full suite; build; syntax; two source reviews.
+  R7B external authority remains closed until R7A is accepted.

@@ -10374,3 +10374,38 @@ audits. Only those audits may authorize one THREAD_LOG-only `F4E-R6-CONSUMED-V1`
 followed by two exact-marker reviews. Preserve every v6 artifact and stage byte unchanged.
 Intro-05 proof/source, all later curriculum work, and any successor execution remain closed
 until the consumed receipt is accepted.
+
+## Current checkpoint — F4E-R7A resumable exact-proof infrastructure
+
+Consumed v6 receipt `109f785d0833643e45197fae26538a226a4051d3` has two independent
+all-zero exact-marker reviews. V6 is closed permanently. Its retained 9.15 GB run remains
+immutable evidence/capacity context and is forbidden as R7 proof input.
+
+R7A is a fresh repository-only infrastructure slice. The six reserved external R7 paths are
+all absent and must remain absent. No validator, runner, task, attempt, checkpoint, Store, or
+Intro-05 proof may execute. Implement only:
+
+- `src/game/core/endgameRouteSearch.ts`;
+- `src/game/core/endgameProofFrontierStore.test.ts`;
+- `scripts/endgame-disk-frontier.mjs`;
+- `src/authoring/endgameDiskFrontier.test.mjs`.
+
+Preserve the existing memory and one-shot disk certifiers. Add exact ranged run reads and a
+separate checkpoint Store used by `advanceOptimalEndgameRouteProof*`. Each call publishes
+one seed, fixed 65,536-parent unit, layer merge, or complete generation. Core owns every
+decode, landing, lower-bound decision, full-key output, range-coverage rule, merge, safe
+counter, and certificate reconstruction. The final decision depth still exhausts every
+landing while producing no next run.
+
+The Node adapter adds an independent resumable factory with owner binding, full run/index
+hashes, fixed ordinal offsets, manifest-last atomic publication, strict reopen/identity
+checks, suspend-without-delete, and bounded fail-closed diagnostics. Production limits are
+4,096 units and 96 GiB committed run bytes per layer; reaching them is infrastructure
+failure only, never a partial proof.
+
+Focused tests compare uninterrupted memory, current one-shot disk, and interruption/resume
+at seed/unit/layer/complete boundaries for Intro-01 through Intro-04, plus corruption,
+coverage, range, index, identity, owner, residue, and filesystem-fault matrices. Do not load
+or execute Intro-05. After the candidate, run focused tests, typecheck, full suite, build,
+syntax, one opt-in four-intro equality pass, and two independent all-zero reviews. Only an
+accepted R7A source receipt opens docs-first R7B runner/validator authority.

@@ -9835,3 +9835,141 @@ descriptor, and recovery process gate. Only then may one THREAD_LOG-only
 `audit` field reports those two real audit totals. Two later exact-marker/commit reviews close
 the receipt before any docs-first successor is opened. Until that sequence finishes, the
 consumed marker remains absent and all Intro-05 source and proof work remains closed.
+
+## 2026-08-21 F4E-R7A — resumable exact-proof infrastructure contract
+
+V6 is closed by accepted receipt `109f785d0833643e45197fae26538a226a4051d3`. Its
+attempt and 9,151,727,935-byte frontier remain immutable consumed-failure evidence. No R7
+source, validator, runner, manifest, argument, Store, fixture, test, or checkpoint may open,
+copy, link, parse, count, seed from, or otherwise use a v6 artifact as proof input. The only
+permitted reuse is the committed receipt descriptor and aggregate timing/size as a non-proof
+capacity clue.
+
+R7 is a fresh generation, not a v6 retry. These future external paths are reserved and
+currently absent:
+
+- validator `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-r7-canonical-validate.mjs`;
+- runner `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-r7-runner.ps1`;
+- attempt `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-r7-attempt.json`;
+- owned root `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-r7-run`;
+- candidate `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-r7-candidate.json`;
+- terminal `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-r7-terminal.json`.
+
+R7A creates none of them. It opens exactly four repository paths:
+
+- `src/game/core/endgameRouteSearch.ts`;
+- `src/game/core/endgameProofFrontierStore.test.ts`;
+- `scripts/endgame-disk-frontier.mjs`;
+- `src/authoring/endgameDiskFrontier.test.mjs`.
+
+No definition, fixture, Intro-05 exact test, curriculum, UI, persistence, audio, Renderer,
+Vite, or other script path opens. The current in-memory certifier, injected one-shot disk
+certifier, and `EndgameOptimalRouteCertificate` shape remain source- and behavior-compatible.
+Core imports no Node API.
+
+### Core checkpoint API and exact work units
+
+`EndgameProofRun.values()` remains the full-run default and gains an optional immutable
+`{ startOrdinal, endOrdinal }` half-open range. Core requires safe integers,
+`0 <= startOrdinal <= endOrdinal <= size`, fixed-unit alignment except the final short
+range, exact yielded count, printable full keys, and strict order. The adapter may seek with
+an authenticated byte-offset index, but it cannot choose the range or substitute a
+self-consistent size.
+
+The production parent unit is exactly 65,536 keys, with at most 4,096 units and 96 GiB of
+committed run bytes per layer. Existing 2,048-byte record, 64 MiB/131,072-record chunk,
+32-way merge, and 4,098-entry metadata/diagnostic limits remain. A limit breach is an
+infrastructure failure with no certificate; it never truncates, samples, beams, hashes state
+identity, or proves that a route is absent. Tests alone may inject smaller limits.
+
+The new authoring-only interfaces are `EndgameProofCheckpointRunStore` plus
+`advanceOptimalEndgameRouteProof` and
+`advanceOptimalEndgameRouteProofForDefinition`. The checkpoint Store is separate from the
+existing one-shot Store and adds:
+
+- `loadCheckpoint()`, returning null or the highest complete canonical generation with live
+  immutable run objects;
+- `publishCheckpoint()`, atomically publishing exactly current generation plus one; failure
+  before the manifest commit throws, while a successful manifest commit may not later be
+  reported as failure;
+- `suspend()`, closing handles while retaining the latest checkpoint and referenced runs;
+- existing `dispose()` only for explicit final teardown after later candidate/terminal
+  authority, never for ordinary checkpoint, pause, or process interruption.
+
+A searching checkpoint binds schema, generation, level/route/optimal-lock/start identity,
+depth, parent offset, last processed parent key, current frontier, accumulated next-unit
+runs, safe transition/prune counters, and completed depth records. A complete checkpoint
+binds the same proof identity and all completed depth records. Serialized adapter manifests
+contain immutable descriptors, not JavaScript object identity.
+
+One `advance...` call performs exactly one durable transition:
+
+1. With no checkpoint it replays the candidate, derives the canonical binding and one-key
+   depth-0 frontier, publishes generation 0, and returns.
+2. With an incomplete layer it processes the next Core-derived range, never splitting a
+   parent's complete landing domain. It decodes and re-keys every parent, applies only the
+   existing deficit lower bound, enumerates every public landing, throws on every shorter
+   win, safe-counts transitions/prunes, writes a unit run named
+   `dNNNN-uNNNNNNNN-pNNNN-gNNNN`, and publishes the next generation.
+3. When a layer is covered, it requires `[0, frontier.size)` exactly once with no gap,
+   overlap, duplicate, missing tail, wrong depth/cursor, or wrong run shape. Core performs
+   the existing deterministic full-key merge and complete omit/add/replace readback, then
+   publishes the next layer before old frontier/unit reclamation.
+4. At depth `optimalLocks - 2` every unit still decodes and exhausts its full landing domain
+   to exclude a shorter win, but produces no next run. Complete coverage publishes a complete
+   checkpoint before the certificate is returned.
+5. Loading a complete checkpoint recomputes definition/candidate binding and reconstructs,
+   rather than trusting a serialized replay or GameState, the ordinary immutable certificate.
+
+Every resume revalidates the candidate replay, initial hash/key, definition binding,
+generation/depth/cursor, completed-depth prefix, all safe counters, current frontier and
+next-run descriptors, full key framing/order/count, offset index, last-parent cursor, and
+decode/re-key identity before extending. Any drift fails closed; it never falls back to a
+fresh seed. Canonical certificate bytes and all telemetry must equal the uninterrupted
+certifier.
+
+### Persistent Node adapter
+
+`createEndgameDiskFrontierStore` and its initially-absent/cleanup semantics stay unchanged.
+The adapter adds `createResumableEndgameDiskFrontierStore` with `mode: 'create' | 'resume'`,
+an exact absolute stage, and an immutable owner ID.
+
+The resumable store uses owner, generation manifests, run files, and run indexes only beneath
+that stage. Each run is printable ASCII/LF and strictly increasing. Its index records byte
+offset 0, every 65,536th ordinal, and the terminal byte offset. Run and index are fully
+re-read, counted, SHA-256 bound, and file-identity checked before a canonical manifest is
+written as an exclusive `.part`, flushed, fsynced, closed, re-read, then atomically renamed.
+That manifest rename is the sole checkpoint commit boundary.
+
+Resume selects only the highest complete contiguous generation, revalidates owner, real
+paths, non-reparse plain files, dev/ino/file ID, bytes, hashes, offsets, first/last boundaries,
+and every referenced run. Unknown entries, generation gaps/conflicts, truncation, ambiguous
+orphans, or unauthorized partials fail closed. A later R7B recovery authority may list exact
+owned residue for cleanup; R7A does not authorize automatic broad deletion. After a new
+manifest commits, cleanup failure is diagnostic residue and cannot revoke the committed
+generation or silently delete committed files.
+
+This mechanism claims recovery from process/conversation interruption, not power-loss
+durability beyond the explicit file fsync and atomic/no-replace boundaries. A mutable
+heartbeat or process lease is never proof authority.
+
+### R7A proof obligations
+
+Core tests use synthetic domains and, only in the existing opt-in exact gate, Intro-01 through
+Intro-04. They compare uninterrupted memory, existing one-shot disk, and resumable execution
+reopened after seed, every unit, every layer merge, and complete-checkpoint publication.
+Canonical certificate and complete telemetry bytes must match.
+
+Fault matrices cover unaligned/range/count/order drift, gap/overlap/duplicate/tail loss,
+unsafe counter addition, same-size omit/add/replace/reorder, corrupt/truncated run/index/
+manifest, offset swap, binding/cursor/generation drift, reparse/path/file-ID drift, owner
+conflict, manifest-before-run, interruption before/after manifest rename and before cleanup,
+foreign/ambiguous residue, and every open/write/fsync/close/read/rename/cleanup seam. Tests
+also prove the four source paths contain no v6 path or runtime artifact dependency.
+
+After the last source edit, run focused suites, one typecheck, one complete suite, one build,
+Node syntax, and one opt-in Intro-01 through Intro-04 resumable equality pass. Two independent
+source/behavior reviews must be all-zero. Only then may a separate four-document R7B contract
+bind source blobs and define the external schemas, detached Task Scheduler runner,
+same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
+production attempt. R7A runs no Intro-05 work.

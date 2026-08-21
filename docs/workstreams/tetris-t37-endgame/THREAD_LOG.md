@@ -964,3 +964,22 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   not retry, resume, rename, repair, clean, or use the retained run as successor proof input.
   This marker opens no Intro-05 source. Two exact-marker/commit reviews must accept this sole
   receipt before a fresh docs-first successor can open.
+
+### F4E-R7A fresh resumable infrastructure contract candidate
+
+- Receipt `109f785` received two independent all-zero exact-marker reviews and permanently
+  closes v6. The retained frontier is immutable failure evidence and a capacity clue only;
+  every R7 source/runtime path is forbidden from opening or deriving proof data from it.
+- The six reserved R7 external paths are absent. R7A creates none and authorizes no
+  validator, scheduled task, runner, attempt, checkpoint, production Store, or Intro-05.
+- The exact source boundary is `endgameRouteSearch.ts`, its frontier Store test,
+  `endgame-disk-frontier.mjs`, and its authoring test. Existing certifiers stay compatible.
+- Core gains a separate exact advance/checkpoint path with 65,536-parent units, range and
+  cursor validation, complete coverage, deterministic merge, final-depth no-output
+  exhaustion, safe counters, and canonical certificate/telemetry equality.
+- The Node adapter persists Core-produced generations through owner-bound run/index hashes,
+  exact ordinal offsets, manifest-last atomic publication, stable identity, suspend without
+  deletion, and bounded diagnostics. Unknown or ambiguous residue fails closed.
+- Next: commit these four authority docs and obtain two independent all-zero contract reviews.
+  Then one writer may implement only the four source/test paths, run all named gates, and
+  produce a bounded candidate for two source reviews. External R7B authority remains closed.
