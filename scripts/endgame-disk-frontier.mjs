@@ -1,6 +1,7 @@
 import * as nativeFs from 'node:fs';
 import { createHash } from 'node:crypto';
 import * as path from 'node:path';
+import { types as nativeTypes } from 'node:util';
 
 export const ENDGAME_DISK_FRONTIER_LIMITS = Object.freeze({
   recordMaxBytes: 2048,
@@ -34,6 +35,28 @@ const R7_INDEX_MAGIC = Buffer.from('T37R7I1\n', 'ascii');
 const R7_INDEX_STRIDE = RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.parentUnitKeys;
 const R7_INDEX_HEADER_BYTES = 24;
 const R7_HASH_PATTERN = /^[0-9A-F]{64}$/;
+const R7_DECIMAL_PATTERN = /^(?:0|[1-9][0-9]*)$/u;
+const R7_MANIFEST_SCHEMA = 't37-f4e-r7-checkpoint-delta-v1';
+const R7_BINDING_HASH_LABEL = 'T37-F4E-R7-BINDING-V1';
+const R7_DESCRIPTOR_HASH_LABEL = 'T37-F4E-R7-RUN-DESCRIPTOR-V1';
+const R7_RUN_SET_HASH_LABEL = 'T37-F4E-R7-RUN-SET-V1';
+const R7_NEXT_RUNS_EMPTY_HASH = canonicalHash('T37-F4E-R7-NEXT-RUNS-EMPTY-V1', []);
+const R7_DEPTHS_EMPTY_HASH = canonicalHash('T37-F4E-R7-DEPTHS-EMPTY-V1', []);
+const R7_CHECKPOINT_STATE_HASH_LABEL = 'T37-F4E-R7-CHECKPOINT-STATE-V1';
+const R7_MANIFEST_PLAN_HASH_LABEL = 'T37-F4E-R7-MANIFEST-PLAN-V1';
+const R7_MANIFEST_PLAN_SNAPSHOTS = new WeakMap();
+const R7_MANIFEST_STATES = new WeakSet();
+const R7_NATIVE_ARRAY_PUSH = Array.prototype.push;
+const R7_NATIVE_IS_PROXY = nativeTypes.isProxy;
+const R7_NATIVE_SET_ADD = Set.prototype.add;
+const R7_NATIVE_SET_HAS = Set.prototype.has;
+const R7_NATIVE_SET_SIZE = Object.getOwnPropertyDescriptor(Set.prototype, 'size').get;
+const R7_MANIFEST_STATE_KEYS = Object.freeze([
+  'tip', 'binding', 'bindingSha256', 'kind', 'generation', 'depth', 'parentOffset',
+  'lastProcessedParentKey', 'transitions', 'boundPrunes', 'frontierDescriptor', 'nextRuns',
+  'activeIds', 'activeRunBytes', 'nextRunsSha256', 'completedDepths', 'completedDepthsSha256',
+  'completedTotals', 'reason',
+]);
 
 function assertSafeNonnegativeInteger(value, label) {
   if (!Number.isSafeInteger(value) || value < 0) {
@@ -311,6 +334,13 @@ export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
   admitNamespacePeak,
   admitCandidateIndex,
   assertExactPublishedIndexBytes,
+  createManifestState: createResumableManifestState,
+  planManifestTransition: planResumableManifestTransition,
+  commitManifestTransition: commitResumableManifestTransition,
+  descriptorHash: resumableDescriptorHash,
+  runSetHash: resumableRunSetHash,
+  validateDescriptor: validateResumableRunDescriptor,
+  validateRunChanges: validateResumableRunChanges,
 });
 
 const RESUMABLE_DEFAULT_FS = Object.freeze({
@@ -1026,6 +1056,864 @@ function classifyResumableRunId(id) {
   return Object.freeze({ committed: false, generation });
 }
 
+function assertExactRecord(value, expectedKeys, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw frontierError(`${label} must be a plain record`);
+  }
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) {
+    throw frontierError(`${label} must be a plain record`);
+  }
+  const ownKeys = Reflect.ownKeys(value);
+  if (ownKeys.some((key) => typeof key !== 'string')) throw frontierError(`${label} has non-string keys`);
+  const actual = ownKeys.map(String).sort(ordinalByteCompare);
+  const expected = [...expectedKeys].sort(ordinalByteCompare);
+  if (actual.length !== expected.length || actual.some((key, index) => key !== expected[index])) {
+    throw frontierError(`${label} must have exact keys ${expectedKeys.join(',')}`);
+  }
+  for (const key of actual) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (!descriptor?.enumerable || !Object.hasOwn(descriptor, 'value')) {
+      throw frontierError(`${label}.${key} must be an enumerable data property`);
+    }
+  }
+  return value;
+}
+
+function assertSafeManifestInteger(value, label, maximum = Number.MAX_SAFE_INTEGER) {
+  assertSafeNonnegativeInteger(value, label);
+  if (value > maximum) throw frontierError(`${label} exceeds ${maximum}`);
+  return value;
+}
+
+function addSafeManifestInteger(base, delta, label) {
+  assertSafeNonnegativeInteger(base, `${label} base`);
+  assertSafeNonnegativeInteger(delta, `${label} delta`);
+  const result = base + delta;
+  if (!Number.isSafeInteger(result)) throw frontierError(`${label} exceeds the safe integer domain`);
+  return result;
+}
+
+function validateResumableManifestTip(tip, label = 'checkpoint tip') {
+  assertExactRecord(tip, ['generation', 'manifestSha256'], label);
+  assertSafeManifestInteger(tip.generation, `${label} generation`, 32_767);
+  if (typeof tip.manifestSha256 !== 'string' || !R7_HASH_PATTERN.test(tip.manifestSha256)) {
+    throw frontierError(`${label} hash is invalid`);
+  }
+  return tip;
+}
+
+function validateResumableBinding(binding) {
+  assertExactRecord(binding, [
+    'schema', 'levelId', 'candidateCommandStream', 'optimalLocks', 'initialStateHash', 'initialFrontierKey',
+  ], 'proof binding');
+  if (binding.schema !== 't37-f4e-r7-proof-binding-v1') throw frontierError('proof binding schema is invalid');
+  for (const key of ['levelId', 'candidateCommandStream', 'initialStateHash']) {
+    if (typeof binding[key] !== 'string') throw frontierError(`proof binding ${key} must be a string`);
+  }
+  if (binding.levelId.length === 0 || binding.initialStateHash.length === 0) {
+    throw frontierError('proof binding identities cannot be empty');
+  }
+  assertSafeManifestInteger(binding.optimalLocks, 'proof binding optimalLocks', 32_768);
+  if (binding.optimalLocks === 0) throw frontierError('proof binding optimalLocks must be positive');
+  encodeRecord(binding.initialFrontierKey, null);
+  return binding;
+}
+
+function validateResumableDepthRecord(record, expectedDepth = null) {
+  assertExactRecord(record, ['lockedPieces', 'frontierStates', 'transitions', 'boundPrunes'], 'completed depth');
+  assertSafeManifestInteger(record.lockedPieces, 'completed depth lockedPieces', 32_767);
+  assertSafeManifestInteger(record.frontierStates, 'completed depth frontierStates');
+  if (record.frontierStates === 0) throw frontierError('completed depth frontierStates must be positive');
+  assertSafeManifestInteger(record.transitions, 'completed depth transitions');
+  assertSafeManifestInteger(record.boundPrunes, 'completed depth boundPrunes');
+  if (expectedDepth !== null && record.lockedPieces !== expectedDepth) {
+    throw frontierError(`completed depth lockedPieces must equal ${expectedDepth}`);
+  }
+  return record;
+}
+
+function validateResumableIdentity(identity, label) {
+  assertExactRecord(identity, ['dev', 'ino', 'size', 'mtimeNs', 'ctimeNs'], label);
+  for (const key of ['dev', 'ino', 'size', 'mtimeNs', 'ctimeNs']) {
+    if (typeof identity[key] !== 'string' || !R7_DECIMAL_PATTERN.test(identity[key])) {
+      throw frontierError(`${label}.${key} must be a canonical nonnegative decimal string`);
+    }
+  }
+  return identity;
+}
+
+function validateResumableRunDescriptor(descriptor) {
+  assertExactRecord(descriptor, [
+    'id', 'size', 'dataFile', 'dataBytes', 'dataSha256', 'indexFile', 'indexBytes', 'indexSha256',
+    'firstKey', 'lastKey', 'dataIdentity', 'indexIdentity',
+  ], 'run descriptor');
+  const classification = classifyResumableRunId(descriptor.id);
+  if (!classification.committed) throw frontierError('run descriptor id must be committed');
+  assertSafeManifestInteger(descriptor.size, 'run descriptor size');
+  assertSafeManifestInteger(descriptor.dataBytes, 'run descriptor dataBytes');
+  assertSafeManifestInteger(descriptor.indexBytes, 'run descriptor indexBytes');
+  if (descriptor.indexBytes > RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.ownerOrIndexBytes) {
+    throw frontierError('run descriptor indexBytes exceeds 65536');
+  }
+  if (descriptor.dataFile !== `${descriptor.id}.run` || descriptor.indexFile !== `${descriptor.id}.idx`) {
+    throw frontierError('run descriptor basenames do not match its id');
+  }
+  if (descriptor.indexBytes !== resumableIndexLayout(descriptor.size).indexBytes) {
+    throw frontierError('run descriptor indexBytes does not match its exact layout');
+  }
+  for (const key of ['dataSha256', 'indexSha256']) {
+    if (typeof descriptor[key] !== 'string' || !R7_HASH_PATTERN.test(descriptor[key])) {
+      throw frontierError(`run descriptor ${key} is invalid`);
+    }
+  }
+  validateResumableIdentity(descriptor.dataIdentity, 'run descriptor dataIdentity');
+  validateResumableIdentity(descriptor.indexIdentity, 'run descriptor indexIdentity');
+  if (descriptor.dataIdentity.size !== String(descriptor.dataBytes)
+    || descriptor.indexIdentity.size !== String(descriptor.indexBytes)) {
+    throw frontierError('run descriptor identity size does not match descriptor bytes');
+  }
+  if (descriptor.size === 0) {
+    if (descriptor.firstKey !== null || descriptor.lastKey !== null || descriptor.dataBytes !== 0) {
+      throw frontierError('empty run descriptor boundaries/bytes are invalid');
+    }
+  } else {
+    if (descriptor.dataBytes === 0) throw frontierError('nonempty run descriptor dataBytes must be positive');
+    encodeRecord(descriptor.firstKey, null);
+    encodeRecord(descriptor.lastKey, null);
+    if (ordinalByteCompare(descriptor.firstKey, descriptor.lastKey) > 0) {
+      throw frontierError('run descriptor key boundaries are reversed');
+    }
+  }
+  return descriptor;
+}
+
+function resumableDescriptorHash(descriptor) {
+  return canonicalHash(R7_DESCRIPTOR_HASH_LABEL, validateResumableRunDescriptor(descriptor));
+}
+
+function resumableRunSetHash(descriptors) {
+  if (!Array.isArray(descriptors)) throw frontierError('run descriptor set must be an array');
+  const ordered = [...descriptors].map(validateResumableRunDescriptor)
+    .sort((left, right) => ordinalByteCompare(left.id, right.id));
+  for (let index = 1; index < ordered.length; index += 1) {
+    if (ordered[index - 1].id === ordered[index].id) throw frontierError(`duplicate run descriptor id ${ordered[index].id}`);
+  }
+  return canonicalHash(R7_RUN_SET_HASH_LABEL, ordered.map(resumableDescriptorHash));
+}
+
+function validateResumableRunChanges(runChanges) {
+  assertExactRecord(runChanges, ['add', 'removeRule', 'removeSetSha256'], 'runChanges');
+  if (!Array.isArray(runChanges.add) || runChanges.add.length > 1) {
+    throw frontierError('runChanges.add must be a zero-or-one descriptor array');
+  }
+  if (runChanges.add.length === 1) validateResumableRunDescriptor(runChanges.add[0]);
+  if (!['none', 'current-frontier-and-next-runs', 'all-active-proof-runs'].includes(runChanges.removeRule)) {
+    throw frontierError('runChanges.removeRule is invalid');
+  }
+  if (typeof runChanges.removeSetSha256 !== 'string' || !R7_HASH_PATTERN.test(runChanges.removeSetSha256)) {
+    throw frontierError('runChanges.removeSetSha256 is invalid');
+  }
+  return runChanges;
+}
+
+function validateResumableResourceTotals(totals, expectedLatestCheckpointRunBytes) {
+  assertExactRecord(totals, [
+    'latestCheckpointRunBytes', 'uncommittedWorkingRunBytes', 'recognizedPhysicalRunBytes',
+    'retainedManifestBytes', 'ownerAndIndexBytes', 'namespaceEntries',
+  ], 'resourceTotalsBeforeManifest');
+  for (const key of [
+    'latestCheckpointRunBytes', 'uncommittedWorkingRunBytes', 'recognizedPhysicalRunBytes',
+    'retainedManifestBytes', 'ownerAndIndexBytes', 'namespaceEntries',
+  ]) assertSafeManifestInteger(totals[key], `resourceTotalsBeforeManifest ${key}`);
+  if (totals.latestCheckpointRunBytes !== expectedLatestCheckpointRunBytes) {
+    throw frontierError('resourceTotalsBeforeManifest latestCheckpointRunBytes is not the projected active total');
+  }
+  return Object.freeze({ ...totals });
+}
+
+function detachedCanonicalValue(value) {
+  return parseStrictCanonicalJson(canonicalizeJson(value));
+}
+
+function freezeCanonicalTree(value) {
+  if (value && typeof value === 'object') {
+    for (const child of Object.values(value)) freezeCanonicalTree(child);
+    Object.freeze(value);
+  }
+  return value;
+}
+
+function manifestPlanEnvelope(plan) {
+  return {
+    baseTip: plan.baseTip,
+    manifest: plan.manifest,
+    projection: plan.projection,
+    tip: plan.tip,
+    patch: plan.patch,
+    addedDescriptor: plan.addedDescriptor,
+    removedDescriptors: plan.removedDescriptors,
+  };
+}
+
+function createResumableManifestState() {
+  const state = {
+    tip: null,
+    binding: null,
+    bindingSha256: null,
+    kind: null,
+    generation: -1,
+    depth: null,
+    parentOffset: null,
+    lastProcessedParentKey: null,
+    transitions: null,
+    boundPrunes: null,
+    frontierDescriptor: null,
+    nextRuns: [],
+    activeIds: new Set(),
+    activeRunBytes: 0,
+    nextRunsSha256: R7_NEXT_RUNS_EMPTY_HASH,
+    completedDepths: [],
+    completedDepthsSha256: R7_DEPTHS_EMPTY_HASH,
+    completedTotals: { frontierStates: 0, transitions: 0, boundPrunes: 0 },
+    reason: null,
+  };
+  R7_MANIFEST_STATES.add(state);
+  return state;
+}
+
+function assertWritableManifestState(state) {
+  if (!R7_MANIFEST_STATES.has(state)) throw frontierError('manifest state was not created by this adapter');
+  assertExactRecord(state, R7_MANIFEST_STATE_KEYS, 'manifest state');
+  if (Object.getPrototypeOf(state) !== Object.prototype) throw frontierError('manifest state prototype changed');
+  for (const key of R7_MANIFEST_STATE_KEYS) {
+    if (Object.getOwnPropertyDescriptor(state, key)?.writable !== true) {
+      throw frontierError(`manifest state ${key} must remain a writable data property`);
+    }
+  }
+  if (!Array.isArray(state.nextRuns) || R7_NATIVE_IS_PROXY(state.nextRuns)
+    || Object.getPrototypeOf(state.nextRuns) !== Array.prototype
+    || !Array.isArray(state.completedDepths) || R7_NATIVE_IS_PROXY(state.completedDepths)
+    || Object.getPrototypeOf(state.completedDepths) !== Array.prototype
+    || !(state.activeIds instanceof Set) || R7_NATIVE_IS_PROXY(state.activeIds)
+    || Object.getPrototypeOf(state.activeIds) !== Set.prototype) {
+    throw frontierError('manifest state collections are invalid');
+  }
+  try { Reflect.apply(R7_NATIVE_SET_SIZE, state.activeIds, []); }
+  catch { throw frontierError('manifest state activeIds must be a native Set'); }
+  assertExactRecord(
+    state.completedTotals, ['frontierStates', 'transitions', 'boundPrunes'], 'manifest completed totals',
+  );
+  for (const key of ['frontierStates', 'transitions', 'boundPrunes']) {
+    assertSafeManifestInteger(state.completedTotals[key], `manifest completed total ${key}`);
+  }
+  return state;
+}
+
+function assertManifestCandidate(candidate, publicationRun, expectedId) {
+  assertExactRecord(candidate, ['run', 'descriptor'], 'manifest run candidate');
+  if (candidate.run !== publicationRun) throw frontierError('manifest run candidate ownership mismatch');
+  const descriptor = validateResumableRunDescriptor(candidate.descriptor);
+  if (descriptor.id !== expectedId) throw frontierError(`manifest run candidate id must be ${expectedId}`);
+  return descriptor;
+}
+
+function assertNoManifestCandidate(candidate) {
+  if (candidate !== null) throw frontierError('a no-run manifest transition cannot consume a run candidate');
+}
+
+function assertPreviousManifestTip(state, tip) {
+  validateResumableManifestTip(tip, 'publication previousTip');
+  if (state.tip === null || tip.generation !== state.tip.generation
+    || tip.manifestSha256 !== state.tip.manifestSha256) {
+    throw frontierError('publication previousTip does not match the authenticated tip');
+  }
+}
+
+function paddedManifestToken(value, width) {
+  return String(value).padStart(width, '0');
+}
+
+function expectedFrontierRunId(depth, generation) {
+  return `r7-f-d${paddedManifestToken(depth, 5)}-g${paddedManifestToken(generation, 5)}`;
+}
+
+function expectedUnitRunId(depth, unit, generation) {
+  return `r7-u-d${paddedManifestToken(depth, 5)}-n${paddedManifestToken(unit, 8)}-g${paddedManifestToken(generation, 5)}`;
+}
+
+function assertCompletedDepthMatchesState(state, record) {
+  validateResumableDepthRecord(record, state.depth);
+  if (record.frontierStates !== state.frontierDescriptor.size || record.transitions !== state.transitions
+    || record.boundPrunes !== state.boundPrunes) {
+    throw frontierError('completed depth does not match the searching checkpoint totals');
+  }
+  for (const key of ['frontierStates', 'transitions', 'boundPrunes']) {
+    addSafeManifestInteger(state.completedTotals[key], record[key], `completed ${key} total`);
+  }
+  return record;
+}
+
+function assertPublicationRecord(publication) {
+  if (!publication || typeof publication !== 'object' || Array.isArray(publication)) {
+    throw frontierError('checkpoint publication must be a plain record');
+  }
+  const transition = publication.transition;
+  const keys = {
+    seed: ['transition', 'previousTip', 'binding', 'frontier'],
+    unit: ['transition', 'previousTip', 'parentOffset', 'lastProcessedParentKey', 'transitionsDelta', 'boundPrunesDelta', 'nextRun'],
+    layer: ['transition', 'previousTip', 'completedDepth', 'nextFrontier'],
+    complete: ['transition', 'previousTip', 'completedDepth', 'reason'],
+  }[transition];
+  if (!keys) throw frontierError('checkpoint publication transition is invalid');
+  return assertExactRecord(publication, keys, `${transition} checkpoint publication`);
+}
+
+function planResumableManifestTransition(state, publication, candidate, resourceTotalsBeforeManifest) {
+  assertWritableManifestState(state);
+  assertPublicationRecord(publication);
+  const { transition } = publication;
+  const emptyRunSetSha256 = resumableRunSetHash([]);
+  let generation;
+  let binding;
+  let bindingSha256;
+  let stateDelta;
+  let addDescriptor = null;
+  let removedDescriptors = [];
+  let removeRule = 'none';
+  let nextRunsSha256 = state.nextRunsSha256;
+  let nextRunCount = state.nextRuns.length;
+  let completedDepthsSha256 = state.completedDepthsSha256;
+  let completedDepthCount = state.completedDepths.length;
+  let projectedActiveRunBytes;
+  let projection;
+  let patch;
+
+  if (transition === 'seed') {
+    if (state.tip !== null || state.kind !== null) throw frontierError('seed requires an empty checkpoint state');
+    if (publication.previousTip !== null) throw frontierError('seed previousTip must be null');
+    binding = validateResumableBinding(publication.binding);
+    bindingSha256 = canonicalHash(R7_BINDING_HASH_LABEL, binding);
+    generation = 0;
+    addDescriptor = assertManifestCandidate(candidate, publication.frontier, expectedFrontierRunId(0, 0));
+    if (addDescriptor.size !== 1 || addDescriptor.firstKey !== binding.initialFrontierKey
+      || addDescriptor.lastKey !== binding.initialFrontierKey) {
+      throw frontierError('seed frontier descriptor does not match the one-key binding frontier');
+    }
+    projectedActiveRunBytes = addDescriptor.dataBytes;
+    stateDelta = Object.freeze({ binding, depth: 0, parentOffset: 0, lastProcessedParentKey: null, transitions: 0, boundPrunes: 0 });
+    projection = Object.freeze({
+      kind: 'searching', generation, bindingSha256, depth: 0, parentOffset: 0,
+      lastProcessedParentKey: null, transitions: 0, boundPrunes: 0,
+      frontierDescriptorSha256: resumableDescriptorHash(addDescriptor), nextRunsSha256,
+      nextRunCount, completedDepthsSha256, completedDepthCount,
+    });
+    patch = Object.freeze({
+      transition, kind: 'searching', generation, binding, bindingSha256, depth: 0, parentOffset: 0,
+      lastProcessedParentKey: null, transitions: 0, boundPrunes: 0, frontierDescriptor: addDescriptor,
+      appendedNextDescriptor: null, resetNextRuns: true, appendedDepth: null, nextRunsSha256,
+      completedDepthsSha256, activeRunBytes: projectedActiveRunBytes, reason: null,
+    });
+  } else {
+    if (state.tip === null || state.kind !== 'searching') throw frontierError(`${transition} requires a searching checkpoint`);
+    assertPreviousManifestTip(state, publication.previousTip);
+    generation = state.generation + 1;
+    assertSafeManifestInteger(generation, 'next manifest generation', 32_767);
+    binding = state.binding;
+    bindingSha256 = state.bindingSha256;
+    const finalDecisionDepth = binding.optimalLocks > 1 && state.depth === binding.optimalLocks - 2;
+
+    if (transition === 'unit') {
+      if (binding.optimalLocks === 1 || state.parentOffset >= state.frontierDescriptor.size) {
+        throw frontierError('unit requires an incomplete searchable frontier');
+      }
+      const expectedOffset = Math.min(
+        state.frontierDescriptor.size,
+        addSafeManifestInteger(state.parentOffset, RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.parentUnitKeys, 'unit parentOffset'),
+      );
+      if (publication.parentOffset !== expectedOffset) throw frontierError(`unit parentOffset must equal ${expectedOffset}`);
+      encodeRecord(publication.lastProcessedParentKey, null);
+      if (state.lastProcessedParentKey !== null
+        && ordinalByteCompare(state.lastProcessedParentKey, publication.lastProcessedParentKey) >= 0) {
+        throw frontierError('unit lastProcessedParentKey must advance');
+      }
+      if (expectedOffset === state.frontierDescriptor.size
+        && publication.lastProcessedParentKey !== state.frontierDescriptor.lastKey) {
+        throw frontierError('unit terminal cursor must equal the frontier lastKey');
+      }
+      assertSafeManifestInteger(publication.transitionsDelta, 'unit transitionsDelta');
+      assertSafeManifestInteger(publication.boundPrunesDelta, 'unit boundPrunesDelta');
+      const transitions = addSafeManifestInteger(state.transitions, publication.transitionsDelta, 'transition counter');
+      const boundPrunes = addSafeManifestInteger(state.boundPrunes, publication.boundPrunesDelta, 'bound-prune counter');
+      addSafeManifestInteger(state.completedTotals.transitions, transitions, 'search transition total');
+      addSafeManifestInteger(state.completedTotals.boundPrunes, boundPrunes, 'search bound-prune total');
+      addSafeManifestInteger(state.completedTotals.frontierStates, state.frontierDescriptor.size, 'search frontier-state total');
+      const unit = Math.floor(state.parentOffset / RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.parentUnitKeys);
+      assertSafeManifestInteger(unit, 'unit ordinal', RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits - 1);
+      if (finalDecisionDepth) {
+        if (publication.nextRun !== null) throw frontierError('final-decision unit nextRun must be null');
+        assertNoManifestCandidate(candidate);
+      } else {
+        if (publication.nextRun === null) throw frontierError('non-final unit nextRun cannot be null');
+        addDescriptor = assertManifestCandidate(candidate, publication.nextRun, expectedUnitRunId(state.depth, unit, generation));
+        if (Reflect.apply(R7_NATIVE_SET_HAS, state.activeIds, [addDescriptor.id])) {
+          throw frontierError(`duplicate active run id ${addDescriptor.id}`);
+        }
+        nextRunCount += 1;
+        if (nextRunCount > RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits) {
+          throw frontierError('next run count exceeds 4096');
+        }
+        nextRunsSha256 = canonicalHash('T37-F4E-R7-NEXT-RUNS-STEP-V1', {
+          previousSha256: state.nextRunsSha256,
+          descriptorSha256: resumableDescriptorHash(addDescriptor),
+        });
+      }
+      projectedActiveRunBytes = addSafeManifestInteger(
+        state.activeRunBytes, addDescriptor?.dataBytes ?? 0, 'latest checkpoint run bytes',
+      );
+      stateDelta = Object.freeze({
+        depth: state.depth, parentOffset: publication.parentOffset,
+        lastProcessedParentKey: publication.lastProcessedParentKey,
+        transitionsDelta: publication.transitionsDelta, boundPrunesDelta: publication.boundPrunesDelta,
+      });
+      projection = Object.freeze({
+        kind: 'searching', generation, bindingSha256, depth: state.depth,
+        parentOffset: publication.parentOffset, lastProcessedParentKey: publication.lastProcessedParentKey,
+        transitions, boundPrunes, frontierDescriptorSha256: resumableDescriptorHash(state.frontierDescriptor),
+        nextRunsSha256, nextRunCount, completedDepthsSha256, completedDepthCount,
+      });
+      patch = Object.freeze({
+        transition, kind: 'searching', generation, binding, bindingSha256, depth: state.depth,
+        parentOffset: publication.parentOffset, lastProcessedParentKey: publication.lastProcessedParentKey,
+        transitions, boundPrunes, frontierDescriptor: state.frontierDescriptor,
+        appendedNextDescriptor: addDescriptor, resetNextRuns: false, appendedDepth: null,
+        nextRunsSha256, completedDepthsSha256, activeRunBytes: projectedActiveRunBytes, reason: null,
+      });
+    } else if (transition === 'layer') {
+      if (state.parentOffset !== state.frontierDescriptor.size || finalDecisionDepth) {
+        throw frontierError('layer requires complete coverage before the final decision depth');
+      }
+      const completedDepth = assertCompletedDepthMatchesState(state, publication.completedDepth);
+      addDescriptor = assertManifestCandidate(
+        candidate, publication.nextFrontier, expectedFrontierRunId(state.depth + 1, generation),
+      );
+      if (addDescriptor.size === 0) throw frontierError('layer nextFrontier must be nonempty');
+      removedDescriptors = [state.frontierDescriptor, ...state.nextRuns];
+      removeRule = 'current-frontier-and-next-runs';
+      nextRunsSha256 = R7_NEXT_RUNS_EMPTY_HASH;
+      nextRunCount = 0;
+      completedDepthsSha256 = canonicalHash('T37-F4E-R7-DEPTHS-STEP-V1', {
+        previousSha256: state.completedDepthsSha256, record: completedDepth,
+      });
+      completedDepthCount += 1;
+      projectedActiveRunBytes = addDescriptor.dataBytes;
+      stateDelta = Object.freeze({ completedDepth, nextDepth: state.depth + 1 });
+      projection = Object.freeze({
+        kind: 'searching', generation, bindingSha256, depth: state.depth + 1, parentOffset: 0,
+        lastProcessedParentKey: null, transitions: 0, boundPrunes: 0,
+        frontierDescriptorSha256: resumableDescriptorHash(addDescriptor), nextRunsSha256,
+        nextRunCount, completedDepthsSha256, completedDepthCount,
+      });
+      patch = Object.freeze({
+        transition, kind: 'searching', generation, binding, bindingSha256, depth: state.depth + 1,
+        parentOffset: 0, lastProcessedParentKey: null, transitions: 0, boundPrunes: 0,
+        frontierDescriptor: addDescriptor, appendedNextDescriptor: null, resetNextRuns: true,
+        appendedDepth: completedDepth, nextRunsSha256, completedDepthsSha256,
+        activeRunBytes: projectedActiveRunBytes, reason: null,
+      });
+    } else {
+      assertNoManifestCandidate(candidate);
+      const { completedDepth, reason } = publication;
+      if (!['empty-frontier', 'final-depth', 'zero-decision-depth'].includes(reason)) {
+        throw frontierError('complete reason is invalid');
+      }
+      if (reason === 'zero-decision-depth') {
+        if (completedDepth !== null || binding.optimalLocks !== 1 || state.generation !== 0
+          || state.depth !== 0 || state.parentOffset !== 0 || state.frontierDescriptor.size !== 1
+          || state.nextRuns.length !== 0 || state.transitions !== 0 || state.boundPrunes !== 0) {
+          throw frontierError('zero-decision completion requires the canonical seed state and null depth');
+        }
+      } else {
+        if (completedDepth === null || state.parentOffset !== state.frontierDescriptor.size) {
+          throw frontierError('nonzero completion requires a fully covered completed depth');
+        }
+        assertCompletedDepthMatchesState(state, completedDepth);
+        if ((reason === 'final-depth') !== finalDecisionDepth) {
+          throw frontierError('complete reason does not match the decision depth');
+        }
+        if (reason === 'empty-frontier' && state.nextRuns.some((descriptor) => descriptor.size !== 0)) {
+          throw frontierError('empty-frontier completion requires every accumulated next run to be empty');
+        }
+        completedDepthsSha256 = canonicalHash('T37-F4E-R7-DEPTHS-STEP-V1', {
+          previousSha256: state.completedDepthsSha256, record: completedDepth,
+        });
+        completedDepthCount += 1;
+      }
+      removedDescriptors = [state.frontierDescriptor, ...state.nextRuns];
+      removeRule = 'all-active-proof-runs';
+      projectedActiveRunBytes = 0;
+      stateDelta = Object.freeze({ completedDepth, reason });
+      projection = Object.freeze({
+        kind: 'complete', generation, bindingSha256, reason, completedDepthsSha256, completedDepthCount,
+      });
+      patch = Object.freeze({
+        transition, kind: 'complete', generation, binding, bindingSha256, depth: null,
+        parentOffset: null, lastProcessedParentKey: null, transitions: null, boundPrunes: null,
+        frontierDescriptor: null, appendedNextDescriptor: null, resetNextRuns: true,
+        appendedDepth: completedDepth, nextRunsSha256, completedDepthsSha256,
+        activeRunBytes: projectedActiveRunBytes, reason,
+      });
+    }
+  }
+
+  const runChanges = Object.freeze({
+    add: Object.freeze(addDescriptor === null ? [] : [addDescriptor]),
+    removeRule,
+    removeSetSha256: removeRule === 'none' ? emptyRunSetSha256 : resumableRunSetHash(removedDescriptors),
+  });
+  validateResumableRunChanges(runChanges);
+  const totals = validateResumableResourceTotals(resourceTotalsBeforeManifest, projectedActiveRunBytes);
+  const checkpointStateSha256 = canonicalHash(R7_CHECKPOINT_STATE_HASH_LABEL, projection);
+  const manifest = Object.freeze({
+    schema: R7_MANIFEST_SCHEMA,
+    generation,
+    previousManifestSha256: transition === 'seed' ? null : state.tip.manifestSha256,
+    transition,
+    bindingSha256,
+    stateDelta,
+    runChanges,
+    checkpointStateSha256,
+    resourceTotalsBeforeManifest: totals,
+  });
+  assertExactRecord(manifest, [
+    'schema', 'generation', 'previousManifestSha256', 'transition', 'bindingSha256', 'stateDelta',
+    'runChanges', 'checkpointStateSha256', 'resourceTotalsBeforeManifest',
+  ], 'checkpoint manifest');
+  const detached = detachedCanonicalValue({
+    baseTip: state.tip,
+    manifest,
+    projection,
+    patch,
+    addedDescriptor: addDescriptor,
+    removedDescriptors,
+  });
+  const manifestBytes = Buffer.from(`${canonicalizeJson(detached.manifest)}\n`, 'utf8');
+  if (manifestBytes.length > RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.manifestBytes) {
+    throw frontierError(`checkpoint manifest exceeds ${RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.manifestBytes} bytes`);
+  }
+  const plan = Object.freeze({
+    ...detached,
+    manifestBytes,
+    tip: { generation, manifestSha256: sha256Upper(manifestBytes) },
+  });
+  const sealed = freezeCanonicalTree(detachedCanonicalValue(manifestPlanEnvelope(plan)));
+  R7_MANIFEST_PLAN_SNAPSHOTS.set(plan, {
+    manifestBytes: Buffer.from(manifestBytes),
+    commitment: canonicalHash(R7_MANIFEST_PLAN_HASH_LABEL, sealed),
+    sealed,
+    state,
+    consumed: false,
+  });
+  return plan;
+}
+
+function validateManifestPlanForCommit(state, plan) {
+  assertExactRecord(plan, [
+    'baseTip', 'manifest', 'manifestBytes', 'projection', 'tip', 'patch', 'addedDescriptor', 'removedDescriptors',
+  ], 'manifest plan');
+  const snapshot = R7_MANIFEST_PLAN_SNAPSHOTS.get(plan);
+  if (!snapshot) throw frontierError('manifest plan is not owned by this adapter');
+  if (snapshot.consumed) throw frontierError('manifest plan was already consumed');
+  if (snapshot.state !== state) throw frontierError('manifest plan belongs to a different state instance');
+  assertWritableManifestState(state);
+  if (!Buffer.isBuffer(plan.manifestBytes) || !plan.manifestBytes.equals(snapshot.manifestBytes)) {
+    throw frontierError('manifest plan bytes changed after planning');
+  }
+  const parsedManifest = parseCanonicalLfBytes(plan.manifestBytes);
+  if (canonicalizeJson(parsedManifest) !== canonicalizeJson(plan.manifest)) {
+    throw frontierError('manifest plan bytes do not match its manifest');
+  }
+  let currentCommitment;
+  try { currentCommitment = canonicalHash(R7_MANIFEST_PLAN_HASH_LABEL, manifestPlanEnvelope(plan)); }
+  catch { throw frontierError('manifest plan canonical snapshot changed after planning'); }
+  if (currentCommitment !== snapshot.commitment) {
+    throw frontierError('manifest plan canonical snapshot changed after planning');
+  }
+
+  const { manifest, projection, patch } = plan;
+  assertExactRecord(manifest, [
+    'schema', 'generation', 'previousManifestSha256', 'transition', 'bindingSha256', 'stateDelta',
+    'runChanges', 'checkpointStateSha256', 'resourceTotalsBeforeManifest',
+  ], 'checkpoint manifest');
+  if (manifest.schema !== R7_MANIFEST_SCHEMA || manifest.transition !== patch.transition
+    || manifest.generation !== patch.generation || manifest.bindingSha256 !== patch.bindingSha256) {
+    throw frontierError('manifest plan header does not match its patch');
+  }
+  assertSafeManifestInteger(manifest.generation, 'manifest generation', 32_767);
+  validateResumableManifestTip(plan.tip, 'manifest plan tip');
+  if (plan.tip.generation !== manifest.generation
+    || plan.tip.manifestSha256 !== sha256Upper(plan.manifestBytes)) {
+    throw frontierError('manifest plan tip does not authenticate its exact bytes');
+  }
+  assertExactRecord(patch, [
+    'transition', 'kind', 'generation', 'binding', 'bindingSha256', 'depth', 'parentOffset',
+    'lastProcessedParentKey', 'transitions', 'boundPrunes', 'frontierDescriptor',
+    'appendedNextDescriptor', 'resetNextRuns', 'appendedDepth', 'nextRunsSha256',
+    'completedDepthsSha256', 'activeRunBytes', 'reason',
+  ], 'manifest patch');
+  validateResumableBinding(patch.binding);
+  if (canonicalHash(R7_BINDING_HASH_LABEL, patch.binding) !== patch.bindingSha256) {
+    throw frontierError('manifest patch binding commitment is invalid');
+  }
+  const projectionKeys = projection.kind === 'searching' ? [
+    'kind', 'generation', 'bindingSha256', 'depth', 'parentOffset', 'lastProcessedParentKey',
+    'transitions', 'boundPrunes', 'frontierDescriptorSha256', 'nextRunsSha256', 'nextRunCount',
+    'completedDepthsSha256', 'completedDepthCount',
+  ] : [
+    'kind', 'generation', 'bindingSha256', 'reason', 'completedDepthsSha256', 'completedDepthCount',
+  ];
+  if (projection.kind !== 'searching' && projection.kind !== 'complete') {
+    throw frontierError('manifest checkpoint projection kind is invalid');
+  }
+  assertExactRecord(projection, projectionKeys, 'manifest checkpoint projection');
+  if (projection.kind !== patch.kind || projection.generation !== patch.generation
+    || projection.bindingSha256 !== patch.bindingSha256
+    || projection.completedDepthsSha256 !== patch.completedDepthsSha256) {
+    throw frontierError('manifest checkpoint projection does not match its patch');
+  }
+  if (manifest.checkpointStateSha256 !== canonicalHash(R7_CHECKPOINT_STATE_HASH_LABEL, projection)) {
+    throw frontierError('manifest checkpoint projection commitment is invalid');
+  }
+  validateResumableRunChanges(manifest.runChanges);
+  if (!Array.isArray(plan.removedDescriptors)) throw frontierError('manifest removed descriptors must be an array');
+  const expectedRemoveSet = resumableRunSetHash(plan.removedDescriptors);
+  if (manifest.runChanges.removeSetSha256 !== expectedRemoveSet) {
+    throw frontierError('manifest removed descriptor commitment is invalid');
+  }
+  if (plan.addedDescriptor === null) {
+    if (manifest.runChanges.add.length !== 0) throw frontierError('manifest unexpectedly serializes an added descriptor');
+  } else {
+    validateResumableRunDescriptor(plan.addedDescriptor);
+    if (manifest.runChanges.add.length !== 1
+      || canonicalizeJson(manifest.runChanges.add[0]) !== canonicalizeJson(plan.addedDescriptor)) {
+      throw frontierError('manifest added descriptor commitment is invalid');
+    }
+  }
+  const patchAddedDescriptor = patch.transition === 'unit' ? patch.appendedNextDescriptor
+    : patch.transition === 'complete' ? null : patch.frontierDescriptor;
+  if (canonicalizeJson(patchAddedDescriptor) !== canonicalizeJson(plan.addedDescriptor)) {
+    throw frontierError('manifest added descriptor does not match its state patch');
+  }
+  const expectedRemovedDescriptors = ['layer', 'complete'].includes(patch.transition)
+    ? [state.frontierDescriptor, ...state.nextRuns] : [];
+  if (canonicalizeJson(plan.removedDescriptors) !== canonicalizeJson(expectedRemovedDescriptors)) {
+    throw frontierError('manifest removed descriptors do not match the prior state');
+  }
+  if (patch.resetNextRuns !== (patch.transition !== 'unit')) {
+    throw frontierError('manifest next-run reset does not match its transition');
+  }
+  validateResumableResourceTotals(manifest.resourceTotalsBeforeManifest, patch.activeRunBytes);
+
+  const currentTip = state.tip;
+  if ((currentTip === null) !== (plan.baseTip === null)
+    || (currentTip !== null && (currentTip.generation !== plan.baseTip.generation
+      || currentTip.manifestSha256 !== plan.baseTip.manifestSha256))) {
+    throw frontierError('manifest plan base tip is stale');
+  }
+  const expectedPrevious = plan.baseTip?.manifestSha256 ?? null;
+  if (manifest.previousManifestSha256 !== expectedPrevious
+    || manifest.generation !== (plan.baseTip === null ? 0 : plan.baseTip.generation + 1)) {
+    throw frontierError('manifest generation link does not match its base tip');
+  }
+  const expectedRemoveRule = patch.transition === 'layer' ? 'current-frontier-and-next-runs'
+    : patch.transition === 'complete' ? 'all-active-proof-runs' : 'none';
+  if (manifest.runChanges.removeRule !== expectedRemoveRule
+    || (expectedRemoveRule === 'none' && plan.removedDescriptors.length !== 0)) {
+    throw frontierError('manifest removal rule does not match its transition');
+  }
+  if (patch.transition === 'seed') {
+    assertExactRecord(manifest.stateDelta, [
+      'binding', 'depth', 'parentOffset', 'lastProcessedParentKey', 'transitions', 'boundPrunes',
+    ], 'seed stateDelta');
+    if (canonicalizeJson(manifest.stateDelta.binding) !== canonicalizeJson(patch.binding)
+      || manifest.stateDelta.depth !== patch.depth || manifest.stateDelta.parentOffset !== patch.parentOffset
+      || manifest.stateDelta.lastProcessedParentKey !== patch.lastProcessedParentKey
+      || manifest.stateDelta.transitions !== patch.transitions
+      || manifest.stateDelta.boundPrunes !== patch.boundPrunes) throw frontierError('seed stateDelta does not match its patch');
+  } else if (patch.transition === 'unit') {
+    assertExactRecord(manifest.stateDelta, [
+      'depth', 'parentOffset', 'lastProcessedParentKey', 'transitionsDelta', 'boundPrunesDelta',
+    ], 'unit stateDelta');
+    if (manifest.stateDelta.depth !== patch.depth || manifest.stateDelta.parentOffset !== patch.parentOffset
+      || manifest.stateDelta.lastProcessedParentKey !== patch.lastProcessedParentKey
+      || addSafeManifestInteger(state.transitions, manifest.stateDelta.transitionsDelta, 'commit transition counter') !== patch.transitions
+      || addSafeManifestInteger(state.boundPrunes, manifest.stateDelta.boundPrunesDelta, 'commit bound-prune counter') !== patch.boundPrunes) {
+      throw frontierError('unit stateDelta does not match its patch');
+    }
+  } else if (patch.transition === 'layer') {
+    assertExactRecord(manifest.stateDelta, ['completedDepth', 'nextDepth'], 'layer stateDelta');
+    if (canonicalizeJson(manifest.stateDelta.completedDepth) !== canonicalizeJson(patch.appendedDepth)
+      || manifest.stateDelta.nextDepth !== patch.depth) throw frontierError('layer stateDelta does not match its patch');
+  } else {
+    assertExactRecord(manifest.stateDelta, ['completedDepth', 'reason'], 'complete stateDelta');
+    if (canonicalizeJson(manifest.stateDelta.completedDepth) !== canonicalizeJson(patch.appendedDepth)
+      || manifest.stateDelta.reason !== patch.reason) throw frontierError('complete stateDelta does not match its patch');
+  }
+  if (projection.kind === 'searching') {
+    const expectedNextRunCount = patch.resetNextRuns ? 0
+      : state.nextRuns.length + (patch.appendedNextDescriptor === null ? 0 : 1);
+    const expectedCompletedDepthCount = state.completedDepths.length + (patch.appendedDepth === null ? 0 : 1);
+    if (patch.frontierDescriptor === null
+      || projection.depth !== patch.depth || projection.parentOffset !== patch.parentOffset
+      || projection.lastProcessedParentKey !== patch.lastProcessedParentKey
+      || projection.transitions !== patch.transitions || projection.boundPrunes !== patch.boundPrunes
+      || projection.frontierDescriptorSha256 !== resumableDescriptorHash(patch.frontierDescriptor)
+      || projection.nextRunsSha256 !== patch.nextRunsSha256
+      || projection.nextRunCount !== expectedNextRunCount
+      || projection.completedDepthCount !== expectedCompletedDepthCount) {
+      throw frontierError('searching projection does not match its patch');
+    }
+  } else {
+    const expectedCompletedDepthCount = state.completedDepths.length + (patch.appendedDepth === null ? 0 : 1);
+    if (projection.reason !== patch.reason || projection.completedDepthCount !== expectedCompletedDepthCount) {
+      throw frontierError('complete projection does not match its patch');
+    }
+  }
+  return snapshot;
+}
+
+function prepareManifestStateReplacement(state, sealed) {
+  const { patch } = sealed;
+  if (patch.transition === 'unit') throw frontierError('unit transitions require in-place collection application');
+  if (!patch.resetNextRuns || patch.appendedNextDescriptor !== null) {
+    throw frontierError('replacement transitions must reset nextRuns without an appended unit descriptor');
+  }
+  let completedDepths = state.completedDepths;
+  let completedTotals = state.completedTotals;
+  if (patch.transition === 'seed') {
+    completedDepths = [];
+    completedTotals = { frontierStates: 0, transitions: 0, boundPrunes: 0 };
+  } else if (patch.appendedDepth !== null) {
+    completedDepths = [...state.completedDepths, patch.appendedDepth];
+    completedTotals = {};
+    for (const key of ['frontierStates', 'transitions', 'boundPrunes']) {
+      completedTotals[key] = addSafeManifestInteger(
+        state.completedTotals[key], patch.appendedDepth[key], `committed ${key} total`,
+      );
+    }
+  }
+  const nextRuns = [];
+  const activeIds = new Set(patch.frontierDescriptor === null ? [] : [patch.frontierDescriptor.id]);
+  return {
+    tip: sealed.tip,
+    binding: patch.binding,
+    bindingSha256: patch.bindingSha256,
+    kind: patch.kind,
+    generation: patch.generation,
+    depth: patch.depth,
+    parentOffset: patch.parentOffset,
+    lastProcessedParentKey: patch.lastProcessedParentKey,
+    transitions: patch.transitions,
+    boundPrunes: patch.boundPrunes,
+    frontierDescriptor: patch.frontierDescriptor,
+    nextRuns,
+    activeIds,
+    activeRunBytes: patch.activeRunBytes,
+    nextRunsSha256: patch.nextRunsSha256,
+    completedDepths,
+    completedDepthsSha256: patch.completedDepthsSha256,
+    completedTotals,
+    reason: patch.reason,
+  };
+}
+
+function prepareManifestUnitApplication(state, sealed) {
+  const { patch } = sealed;
+  if (patch.transition !== 'unit' || patch.resetNextRuns || patch.appendedDepth !== null) {
+    throw frontierError('manifest unit patch shape is invalid');
+  }
+  const activeSize = Reflect.apply(R7_NATIVE_SET_SIZE, state.activeIds, []);
+  assertSafeManifestInteger(activeSize, 'manifest active run count');
+  assertSafeManifestInteger(state.nextRuns.length, 'manifest next run count',
+    RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits);
+  const descriptor = patch.appendedNextDescriptor;
+  if (descriptor !== null) {
+    if (!Object.isExtensible(state.nextRuns)) {
+      throw frontierError('manifest nextRuns must remain extensible for a unit append');
+    }
+    const lengthDescriptor = Object.getOwnPropertyDescriptor(state.nextRuns, 'length');
+    if (!lengthDescriptor || lengthDescriptor.value !== state.nextRuns.length
+      || lengthDescriptor.writable !== true || lengthDescriptor.enumerable !== false
+      || lengthDescriptor.configurable !== false) {
+      throw frontierError('manifest nextRuns length must remain a writable native array length');
+    }
+    const prospectiveKey = String(state.nextRuns.length);
+    for (let owner = state.nextRuns; owner !== null; owner = Object.getPrototypeOf(owner)) {
+      if (Object.getOwnPropertyDescriptor(owner, prospectiveKey)) {
+        throw frontierError(`manifest nextRuns prospective index ${prospectiveKey} is blocked`);
+      }
+    }
+    if (state.nextRuns.length >= RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits) {
+      throw frontierError('manifest nextRuns cannot append beyond 4096 unit runs');
+    }
+    if (Reflect.apply(R7_NATIVE_SET_HAS, state.activeIds, [descriptor.id])) {
+      throw frontierError(`duplicate committed active run id ${descriptor.id}`);
+    }
+  }
+  if (state.frontierDescriptor === null
+    || !Reflect.apply(R7_NATIVE_SET_HAS, state.activeIds, [state.frontierDescriptor.id])
+    || activeSize !== state.nextRuns.length + 1) {
+    throw frontierError('manifest active run set does not match the current frontier and next-run count');
+  }
+  if (descriptor === null) return null;
+  if (activeSize >= RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits + 1) {
+    throw frontierError('manifest active run set cannot grow beyond the frontier plus 4096 unit runs');
+  }
+  return Object.freeze({ nextRuns: state.nextRuns, activeIds: state.activeIds, descriptor });
+}
+
+function applyManifestUnitScalars(state, sealed) {
+  const { patch } = sealed;
+  state.tip = sealed.tip;
+  state.binding = patch.binding;
+  state.bindingSha256 = patch.bindingSha256;
+  state.kind = patch.kind;
+  state.generation = patch.generation;
+  state.depth = patch.depth;
+  state.parentOffset = patch.parentOffset;
+  state.lastProcessedParentKey = patch.lastProcessedParentKey;
+  state.transitions = patch.transitions;
+  state.boundPrunes = patch.boundPrunes;
+  state.frontierDescriptor = patch.frontierDescriptor;
+  state.activeRunBytes = patch.activeRunBytes;
+  state.nextRunsSha256 = patch.nextRunsSha256;
+  state.completedDepthsSha256 = patch.completedDepthsSha256;
+  state.reason = patch.reason;
+}
+
+function commitResumableManifestTransition(state, plan) {
+  if (!state || typeof state !== 'object' || !plan || typeof plan !== 'object') {
+    throw frontierError('manifest state and plan are required');
+  }
+  const snapshot = validateManifestPlanForCommit(state, plan);
+  if (snapshot.sealed.patch.transition === 'unit') {
+    const append = prepareManifestUnitApplication(state, snapshot.sealed);
+    snapshot.consumed = true;
+    R7_MANIFEST_PLAN_SNAPSHOTS.delete(plan);
+    if (append !== null) {
+      Reflect.apply(R7_NATIVE_ARRAY_PUSH, append.nextRuns, [append.descriptor]);
+      Reflect.apply(R7_NATIVE_SET_ADD, append.activeIds, [append.descriptor.id]);
+    }
+    applyManifestUnitScalars(state, snapshot.sealed);
+    return state;
+  }
+  const replacement = prepareManifestStateReplacement(state, snapshot.sealed);
+  snapshot.consumed = true;
+  R7_MANIFEST_PLAN_SNAPSHOTS.delete(plan);
+  for (const key of R7_MANIFEST_STATE_KEYS) state[key] = replacement[key];
+  return state;
+}
+
 function admitNamespacePeak(current, addition, maximum) {
   assertSafeNonnegativeInteger(current, 'current namespace entries');
   assertSafeNonnegativeInteger(addition, 'namespace peak addition');
@@ -1189,11 +2077,7 @@ function publishResumableOwner(fs, stagePath, ownerBytes, limits) {
 }
 
 function validateResumableTip(tip) {
-  if (!tip || typeof tip !== 'object' || !Number.isSafeInteger(tip.generation)
-    || tip.generation < 0 || tip.generation >= RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumManifests
-    || typeof tip.manifestSha256 !== 'string' || !R7_HASH_PATTERN.test(tip.manifestSha256)) {
-    throw frontierError('expectedTip is invalid');
-  }
+  validateResumableManifestTip(tip, 'expectedTip');
 }
 
 /**

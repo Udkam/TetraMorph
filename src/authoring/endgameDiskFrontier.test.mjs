@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { types as nativeTypes } from 'node:util';
 import { describe, expect, it } from 'vitest';
 import intro01 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-01.json';
 import intro02 from '../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-02.json';
@@ -178,6 +179,129 @@ function retryCleanup(store, writer, run) {
   }
 }
 
+function manifestBinding(optimalLocks = 3) {
+  return Object.freeze({
+    schema: 't37-f4e-r7-proof-binding-v1',
+    levelId: 't3r-test',
+    candidateCommandStream: 'SHT',
+    optimalLocks,
+    initialStateHash: '1234abcd',
+    initialFrontierKey: 'ROOT',
+  });
+}
+
+function manifestIdentity(size, ino) {
+  return Object.freeze({ dev: '1', ino: String(ino), size: String(size), mtimeNs: '3', ctimeNs: '4' });
+}
+
+function manifestDescriptor(id, size, firstKey, lastKey, dataBytes = size === 0 ? 0 : 8) {
+  const entryCount = size === 0 ? 1 : Math.floor((size - 1) / 65_536) + 2;
+  const indexBytes = 24 + 8 * entryCount;
+  return Object.freeze({
+    id,
+    size,
+    dataFile: `${id}.run`,
+    dataBytes,
+    dataSha256: 'A'.repeat(64),
+    indexFile: `${id}.idx`,
+    indexBytes,
+    indexSha256: 'B'.repeat(64),
+    firstKey,
+    lastKey,
+    dataIdentity: manifestIdentity(dataBytes, 10 + id.length),
+    indexIdentity: manifestIdentity(indexBytes, 20 + id.length),
+  });
+}
+
+function manifestTotals(latestCheckpointRunBytes, overrides = {}) {
+  return Object.freeze({
+    latestCheckpointRunBytes,
+    uncommittedWorkingRunBytes: 0,
+    recognizedPhysicalRunBytes: latestCheckpointRunBytes,
+    retainedManifestBytes: 0,
+    ownerAndIndexBytes: 64,
+    namespaceEntries: 1,
+    ...overrides,
+  });
+}
+
+function manifestCandidate(run, descriptor) {
+  return Object.freeze({ run, descriptor });
+}
+
+function manifestStateBytes(testing, state) {
+  return testing.canonicalJson({
+    tip: state.tip,
+    binding: state.binding,
+    bindingSha256: state.bindingSha256,
+    kind: state.kind,
+    generation: state.generation,
+    depth: state.depth,
+    parentOffset: state.parentOffset,
+    lastProcessedParentKey: state.lastProcessedParentKey,
+    transitions: state.transitions,
+    boundPrunes: state.boundPrunes,
+    frontierDescriptor: state.frontierDescriptor,
+    nextRuns: state.nextRuns,
+    activeIds: [...state.activeIds].sort(),
+    activeRunBytes: state.activeRunBytes,
+    nextRunsSha256: state.nextRunsSha256,
+    completedDepths: state.completedDepths,
+    completedDepthsSha256: state.completedDepthsSha256,
+    completedTotals: state.completedTotals,
+    reason: state.reason,
+  });
+}
+
+function coveredManifestPlan(testing, transition, label) {
+  const state = testing.createManifestState();
+  const binding = manifestBinding(3);
+  const frontier = Object.freeze({ token: `${label}-seed` });
+  const frontierDescriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+  const seed = testing.planManifestTransition(state, Object.freeze({
+    transition: 'seed', previousTip: null, binding, frontier,
+  }), manifestCandidate(frontier, frontierDescriptor), manifestTotals(8));
+  testing.commitManifestTransition(state, seed);
+  const unitRun = Object.freeze({ token: `${label}-unit` });
+  const unitDescriptor = manifestDescriptor(
+    'r7-u-d00000-n00000000-g00001', transition === 'layer' ? 1 : 0,
+    transition === 'layer' ? 'NEXT' : null, transition === 'layer' ? 'NEXT' : null,
+  );
+  const unit = testing.planManifestTransition(state, Object.freeze({
+    transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+    transitionsDelta: 3, boundPrunesDelta: 1, nextRun: unitRun,
+  }), manifestCandidate(unitRun, unitDescriptor), manifestTotals(8 + unitDescriptor.dataBytes));
+  testing.commitManifestTransition(state, unit);
+  const completedDepth = Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 3, boundPrunes: 1 });
+  if (transition === 'complete') {
+    return { state, plan: testing.planManifestTransition(state, Object.freeze({
+      transition: 'complete', previousTip: unit.tip, completedDepth, reason: 'empty-frontier',
+    }), null, manifestTotals(0)) };
+  }
+  const nextFrontier = Object.freeze({ token: `${label}-layer` });
+  const nextDescriptor = manifestDescriptor('r7-f-d00001-g00002', 1, 'A', 'A');
+  return { state, plan: testing.planManifestTransition(state, Object.freeze({
+    transition: 'layer', previousTip: unit.tip, completedDepth, nextFrontier,
+  }), manifestCandidate(nextFrontier, nextDescriptor), manifestTotals(8)) };
+}
+
+function coveredUnitAppendPlan(testing, label) {
+  const state = testing.createManifestState();
+  const frontier = Object.freeze({ token: `${label}-seed` });
+  const frontierDescriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+  const seed = testing.planManifestTransition(state, Object.freeze({
+    transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+  }), manifestCandidate(frontier, frontierDescriptor), manifestTotals(8));
+  testing.commitManifestTransition(state, seed);
+  const unitRun = Object.freeze({ token: `${label}-unit` });
+  const unitDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 0, null, null);
+  const plan = testing.planManifestTransition(state, Object.freeze({
+    transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+    transitionsDelta: 1, boundPrunesDelta: 0, nextRun: unitRun,
+  }), manifestCandidate(unitRun, unitDescriptor), manifestTotals(8));
+  return { state, plan, unitDescriptor };
+}
+
 describe('R7 resumable disk frontier primitives', () => {
   const testing = RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING;
 
@@ -214,6 +338,617 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(manifest).toMatch(testing.hashPattern);
     expect(labeled).not.toBe(manifest);
     expect(testing.canonicalHash('T37-F4E-R7-TEST-V1', value)).toBe(labeled);
+  });
+
+  it('plans and commits the exact seed/unit/layer/complete delta chain without repeating prefixes', () => {
+    const state = testing.createManifestState();
+    const binding = manifestBinding(3);
+    const seedRun = Object.freeze({ token: 'seed' });
+    const seedDescriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const seed = testing.planManifestTransition(state, Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedRun,
+    }), manifestCandidate(seedRun, seedDescriptor), manifestTotals(seedDescriptor.dataBytes));
+    expect(Object.keys(seed.manifest).sort()).toEqual([
+      'bindingSha256', 'checkpointStateSha256', 'generation', 'previousManifestSha256',
+      'resourceTotalsBeforeManifest', 'runChanges', 'schema', 'stateDelta', 'transition',
+    ]);
+    expect(Object.keys(seed.manifest.stateDelta).sort()).toEqual([
+      'binding', 'boundPrunes', 'depth', 'lastProcessedParentKey', 'parentOffset', 'transitions',
+    ]);
+    expect(seed.manifest.runChanges.add).toEqual([seedDescriptor]);
+    expect(seed.manifest.previousManifestSha256).toBeNull();
+    expect(seed.tip.manifestSha256).toBe(testing.sha256Upper(seed.manifestBytes));
+    expect(seed.manifestBytes.at(-1)).toBe(0x0a);
+    testing.commitManifestTransition(state, seed);
+
+    const unitRun = Object.freeze({ token: 'unit-0' });
+    const unitDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 0, null, null);
+    const unit = testing.planManifestTransition(state, Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+      transitionsDelta: 5, boundPrunesDelta: 1, nextRun: unitRun,
+    }), manifestCandidate(unitRun, unitDescriptor), manifestTotals(seedDescriptor.dataBytes));
+    const expectedNextRuns = testing.canonicalHash('T37-F4E-R7-NEXT-RUNS-STEP-V1', {
+      previousSha256: testing.canonicalHash('T37-F4E-R7-NEXT-RUNS-EMPTY-V1', []),
+      descriptorSha256: testing.descriptorHash(unitDescriptor),
+    });
+    expect(Object.keys(unit.manifest.stateDelta).sort()).toEqual([
+      'boundPrunesDelta', 'depth', 'lastProcessedParentKey', 'parentOffset', 'transitionsDelta',
+    ]);
+    expect(unit.manifest.previousManifestSha256).toBe(seed.tip.manifestSha256);
+    expect(unit.projection.nextRunsSha256).toBe(expectedNextRuns);
+    expect(unit.projection.nextRunCount).toBe(1);
+    testing.commitManifestTransition(state, unit);
+
+    const layerRun = Object.freeze({ token: 'frontier-1' });
+    const layerDescriptor = manifestDescriptor('r7-f-d00001-g00002', 2, 'A', 'B');
+    const depth0 = Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 5, boundPrunes: 1 });
+    const layer = testing.planManifestTransition(state, Object.freeze({
+      transition: 'layer', previousTip: unit.tip, completedDepth: depth0, nextFrontier: layerRun,
+    }), manifestCandidate(layerRun, layerDescriptor), manifestTotals(layerDescriptor.dataBytes));
+    expect(Object.keys(layer.manifest.stateDelta).sort()).toEqual(['completedDepth', 'nextDepth']);
+    expect(layer.manifest.runChanges.removeRule).toBe('current-frontier-and-next-runs');
+    expect(layer.manifest.runChanges.removeSetSha256)
+      .toBe(testing.runSetHash([unitDescriptor, seedDescriptor]));
+    expect(layer.projection.nextRunsSha256)
+      .toBe(testing.canonicalHash('T37-F4E-R7-NEXT-RUNS-EMPTY-V1', []));
+    expect(layer.projection.completedDepthsSha256).toBe(testing.canonicalHash('T37-F4E-R7-DEPTHS-STEP-V1', {
+      previousSha256: testing.canonicalHash('T37-F4E-R7-DEPTHS-EMPTY-V1', []), record: depth0,
+    }));
+    testing.commitManifestTransition(state, layer);
+
+    const finalUnit = testing.planManifestTransition(state, Object.freeze({
+      transition: 'unit', previousTip: layer.tip, parentOffset: 2, lastProcessedParentKey: 'B',
+      transitionsDelta: 7, boundPrunesDelta: 2, nextRun: null,
+    }), null, manifestTotals(layerDescriptor.dataBytes));
+    expect(finalUnit.manifest.runChanges.add).toEqual([]);
+    expect(finalUnit.projection.nextRunCount).toBe(0);
+    testing.commitManifestTransition(state, finalUnit);
+
+    const depth1 = Object.freeze({ lockedPieces: 1, frontierStates: 2, transitions: 7, boundPrunes: 2 });
+    const complete = testing.planManifestTransition(state, Object.freeze({
+      transition: 'complete', previousTip: finalUnit.tip, completedDepth: depth1, reason: 'final-depth',
+    }), null, manifestTotals(0));
+    expect(Object.keys(complete.manifest.stateDelta).sort()).toEqual(['completedDepth', 'reason']);
+    expect(complete.manifest.runChanges.add).toEqual([]);
+    expect(complete.manifest.runChanges.removeRule).toBe('all-active-proof-runs');
+    expect(complete.manifest.runChanges.removeSetSha256).toBe(testing.runSetHash([layerDescriptor]));
+    expect(complete.projection.completedDepthCount).toBe(2);
+    expect(complete.manifestBytes.toString('utf8')).not.toContain('"lockedPieces":0');
+    expect(complete.manifestBytes.length).toBeLessThan(4_000);
+    expect(complete.manifest.checkpointStateSha256)
+      .toBe(testing.canonicalHash('T37-F4E-R7-CHECKPOINT-STATE-V1', complete.projection));
+    testing.commitManifestTransition(state, complete);
+    expect(state).toEqual(expect.objectContaining({ kind: 'complete', generation: 4, reason: 'final-depth' }));
+    expect(state.completedDepths).toEqual([depth0, depth1]);
+  });
+
+  it('rejects noncanonical shapes, unsafe deltas, stale tips, and foreign run candidates before publication', () => {
+    const emptySetHash = testing.runSetHash([]);
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    for (const add of [null, descriptor, [descriptor, descriptor]]) {
+      expect(() => testing.validateRunChanges({ add, removeRule: 'none', removeSetSha256: emptySetHash }))
+        .toThrow('zero-or-one descriptor array');
+    }
+    expect(testing.validateRunChanges({ add: [descriptor], removeRule: 'none', removeSetSha256: emptySetHash }).add)
+      .toEqual([descriptor]);
+    expect(() => testing.runSetHash([descriptor, descriptor])).toThrow('duplicate run descriptor id');
+    expect(() => testing.validateDescriptor({
+      ...descriptor, dataIdentity: { ...descriptor.dataIdentity, ino: '01' },
+    })).toThrow('canonical nonnegative decimal string');
+    expect(() => testing.validateDescriptor({ ...descriptor, extra: true })).toThrow('exact keys');
+    expect(() => testing.validateDescriptor(manifestDescriptor(
+      'r7-f-d00000-g00000', 536_608_769, 'A', 'B', 1,
+    ))).toThrow('exceeds 65536');
+    expect(() => testing.validateDescriptor({
+      ...descriptor, dataBytes: 0, dataIdentity: manifestIdentity(0, 99),
+    })).toThrow('dataBytes must be positive');
+
+    const state = testing.createManifestState();
+    const binding = manifestBinding(3);
+    const seedRun = Object.freeze({ token: 'seed' });
+    const publication = Object.freeze({ transition: 'seed', previousTip: null, binding, frontier: seedRun });
+    expect(() => testing.planManifestTransition(
+      state, { ...publication, extra: true }, manifestCandidate(seedRun, descriptor), manifestTotals(8),
+    )).toThrow('exact keys');
+    expect(() => testing.planManifestTransition(
+      state, publication, manifestCandidate(Object.freeze({ token: 'foreign' }), descriptor), manifestTotals(8),
+    )).toThrow('ownership mismatch');
+    expect(() => testing.planManifestTransition(
+      state, { ...publication, binding: { ...binding, extra: true } },
+      manifestCandidate(seedRun, descriptor), manifestTotals(8),
+    )).toThrow('exact keys');
+    const seed = testing.planManifestTransition(state, publication, manifestCandidate(seedRun, descriptor), manifestTotals(8));
+    testing.commitManifestTransition(state, seed);
+
+    const unitRun = Object.freeze({ token: 'unit' });
+    const unitDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 0, null, null);
+    const unitPublication = Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: unitRun,
+    });
+    expect(() => testing.planManifestTransition(state, {
+      ...unitPublication, previousTip: { generation: 0, manifestSha256: 'C'.repeat(64) },
+    }, manifestCandidate(unitRun, unitDescriptor), manifestTotals(8))).toThrow('authenticated tip');
+    expect(() => testing.planManifestTransition(
+      state,
+      unitPublication,
+      manifestCandidate(unitRun, manifestDescriptor('r7-u-d00000-n00000000-g00002', 0, null, null)),
+      manifestTotals(8),
+    )).toThrow('candidate id');
+    state.transitions = Number.MAX_SAFE_INTEGER;
+    expect(() => testing.planManifestTransition(
+      state, unitPublication, manifestCandidate(unitRun, unitDescriptor), manifestTotals(8),
+    )).toThrow('safe integer domain');
+    state.transitions = 0;
+    const unit = testing.planManifestTransition(
+      state, unitPublication, manifestCandidate(unitRun, unitDescriptor), manifestTotals(8),
+    );
+    testing.commitManifestTransition(state, unit);
+    const layerRun = Object.freeze({ token: 'layer' });
+    const layerDescriptor = manifestDescriptor('r7-f-d00001-g00002', 1, 'A', 'A');
+    expect(() => testing.planManifestTransition(state, Object.freeze({
+      transition: 'layer', previousTip: unit.tip,
+      completedDepth: Object.freeze({ lockedPieces: 0, frontierStates: 2, transitions: 1, boundPrunes: 0 }),
+      nextFrontier: layerRun,
+    }), manifestCandidate(layerRun, layerDescriptor), manifestTotals(8))).toThrow('does not match');
+
+    state.generation = 32_767;
+    state.tip = Object.freeze({ generation: 32_767, manifestSha256: unit.tip.manifestSha256 });
+    expect(() => testing.planManifestTransition(state, Object.freeze({
+      transition: 'layer', previousTip: state.tip,
+      completedDepth: Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 1, boundPrunes: 0 }),
+      nextFrontier: layerRun,
+    }), manifestCandidate(layerRun, layerDescriptor), manifestTotals(8))).toThrow('32767');
+  });
+
+  it('enforces the exact 16,384-byte canonical manifest boundary after one serialization', () => {
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const planSeed = (candidateCommandStream) => {
+      const state = testing.createManifestState();
+      const binding = { ...manifestBinding(3), candidateCommandStream };
+      const frontier = Object.freeze({ token: `manifest-${candidateCommandStream.length}` });
+      return testing.planManifestTransition(state, Object.freeze({
+        transition: 'seed', previousTip: null, binding, frontier,
+      }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+    };
+    const base = planSeed('');
+    const padding = RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.manifestBytes - base.manifestBytes.length;
+    expect(padding).toBeGreaterThan(0);
+    expect(planSeed('X'.repeat(padding)).manifestBytes.length)
+      .toBe(RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.manifestBytes);
+    expect(() => planSeed('X'.repeat(padding + 1))).toThrow('exceeds 16384 bytes');
+  });
+
+  it('authenticates a detached plan snapshot before any commit-state mutation', () => {
+    const newPlan = () => {
+      const state = testing.createManifestState();
+      const binding = { ...manifestBinding(3) };
+      const descriptor = JSON.parse(JSON.stringify(
+        manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT'),
+      ));
+      const frontier = Object.freeze({ token: 'snapshot-seed' });
+      const plan = testing.planManifestTransition(state, Object.freeze({
+        transition: 'seed', previousTip: null, binding, frontier,
+      }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+      return { state, binding, descriptor, plan };
+    };
+    for (const mutate of [
+      (plan) => { plan.manifestBytes[0] ^= 1; },
+      (plan) => { plan.manifest.stateDelta.binding.levelId = 'tampered-binding'; },
+      (plan) => { plan.manifest.runChanges.add[0].dataSha256 = 'C'.repeat(64); },
+      (plan) => { plan.manifest.stateDelta.depth = 1; },
+      (plan) => { plan.patch.depth = 1; },
+    ]) {
+      const { state, plan } = newPlan();
+      const before = manifestStateBytes(testing, state);
+      mutate(plan);
+      expect(() => testing.commitManifestTransition(state, plan)).toThrow();
+      expect(manifestStateBytes(testing, state)).toBe(before);
+    }
+
+    const detached = newPlan();
+    detached.binding.levelId = 'mutated-caller-binding';
+    detached.descriptor.dataSha256 = 'D'.repeat(64);
+    testing.commitManifestTransition(detached.state, detached.plan);
+    expect(detached.state.binding.levelId).toBe('t3r-test');
+    expect(detached.state.frontierDescriptor.dataSha256).toBe('A'.repeat(64));
+  });
+
+  it('binds each manifest plan to one originating state and consumes it exactly once', () => {
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const seedPlan = (state, label) => {
+      const frontier = Object.freeze({ token: label });
+      return testing.planManifestTransition(state, Object.freeze({
+        transition: 'seed', previousTip: null, binding: manifestBinding(3), frontier,
+      }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+    };
+
+    const first = testing.createManifestState();
+    const second = testing.createManifestState();
+    const firstPlan = seedPlan(first, 'state-bound-seed');
+    const firstBefore = manifestStateBytes(testing, first);
+    const secondBefore = manifestStateBytes(testing, second);
+    expect(() => testing.commitManifestTransition(second, firstPlan)).toThrow('different state instance');
+    expect(manifestStateBytes(testing, first)).toBe(firstBefore);
+    expect(manifestStateBytes(testing, second)).toBe(secondBefore);
+    testing.commitManifestTransition(first, firstPlan);
+    const committedOnce = manifestStateBytes(testing, first);
+    expect(() => testing.commitManifestTransition(first, firstPlan)).toThrow('not owned');
+    expect(manifestStateBytes(testing, first)).toBe(committedOnce);
+
+    const nextRun = Object.freeze({ token: 'state-bound-unit' });
+    const nextDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 0, null, null);
+    const nextPlan = testing.planManifestTransition(first, Object.freeze({
+      transition: 'unit', previousTip: first.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun,
+    }), manifestCandidate(nextRun, nextDescriptor), manifestTotals(8));
+    const reconstructed = {
+      ...first,
+      tip: { ...first.tip },
+      binding: JSON.parse(JSON.stringify(first.binding)),
+      frontierDescriptor: JSON.parse(JSON.stringify(first.frontierDescriptor)),
+      nextRuns: first.nextRuns.map((entry) => JSON.parse(JSON.stringify(entry))),
+      activeIds: new Set(first.activeIds),
+      completedDepths: first.completedDepths.map((entry) => ({ ...entry })),
+      completedTotals: { ...first.completedTotals },
+    };
+    expect(manifestStateBytes(testing, reconstructed)).toBe(manifestStateBytes(testing, first));
+    const originalBeforeCloneAttempt = manifestStateBytes(testing, first);
+    const cloneBefore = manifestStateBytes(testing, reconstructed);
+    expect(() => testing.commitManifestTransition(reconstructed, nextPlan)).toThrow('different state instance');
+    expect(manifestStateBytes(testing, first)).toBe(originalBeforeCloneAttempt);
+    expect(manifestStateBytes(testing, reconstructed)).toBe(cloneBefore);
+
+    const shared = testing.createManifestState();
+    const winner = seedPlan(shared, 'winner');
+    const stale = seedPlan(shared, 'stale');
+    testing.commitManifestTransition(shared, winner);
+    const afterWinner = manifestStateBytes(testing, shared);
+    expect(() => testing.commitManifestTransition(shared, stale)).toThrow('base tip is stale');
+    expect(manifestStateBytes(testing, shared)).toBe(afterWinner);
+
+  });
+
+  it('commits all 4,096 unit runs in place without iterating or replacing growing collections', () => {
+    const state = testing.createManifestState();
+    const seedRun = Object.freeze({ token: 'constant-unit-seed' });
+    const seedDescriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const seed = testing.planManifestTransition(state, Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(4), frontier: seedRun,
+    }), manifestCandidate(seedRun, seedDescriptor), manifestTotals(8));
+    testing.commitManifestTransition(state, seed);
+
+    const depthZeroRun = Object.freeze({ token: 'constant-unit-depth-zero' });
+    const depthZeroDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 1, 'WIDE', 'WIDE');
+    const depthZeroUnit = testing.planManifestTransition(state, Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: depthZeroRun,
+    }), manifestCandidate(depthZeroRun, depthZeroDescriptor), manifestTotals(16));
+    testing.commitManifestTransition(state, depthZeroUnit);
+
+    const wideRun = Object.freeze({ token: 'constant-unit-wide-frontier' });
+    const wideSize = 65_536 * 4_096;
+    const wideDescriptor = manifestDescriptor('r7-f-d00001-g00002', wideSize, 'K0000', 'K4095');
+    const layer = testing.planManifestTransition(state, Object.freeze({
+      transition: 'layer', previousTip: depthZeroUnit.tip,
+      completedDepth: Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 1, boundPrunes: 0 }),
+      nextFrontier: wideRun,
+    }), manifestCandidate(wideRun, wideDescriptor), manifestTotals(8));
+    testing.commitManifestTransition(state, layer);
+
+    const nextRunsIdentity = state.nextRuns;
+    const activeIdsIdentity = state.activeIds;
+    const prefixIteration = () => { throw new Error('growing manifest collection was iterated'); };
+    Object.defineProperty(nextRunsIdentity, Symbol.iterator, { value: prefixIteration, configurable: true });
+    Object.defineProperty(activeIdsIdentity, Symbol.iterator, { value: prefixIteration, configurable: true });
+    let tip = layer.tip;
+    try {
+      for (let unit = 0; unit < 4_096; unit += 1) {
+        const generation = unit + 3;
+        const key = `K${String(unit).padStart(4, '0')}`;
+        const run = Object.freeze({ token: `constant-unit-${unit}` });
+        const descriptor = manifestDescriptor(
+          `r7-u-d00001-n${String(unit).padStart(8, '0')}-g${String(generation).padStart(5, '0')}`,
+          0, null, null,
+        );
+        const plan = testing.planManifestTransition(state, Object.freeze({
+          transition: 'unit', previousTip: tip, parentOffset: (unit + 1) * 65_536,
+          lastProcessedParentKey: key, transitionsDelta: 1, boundPrunesDelta: 0, nextRun: run,
+        }), manifestCandidate(run, descriptor), manifestTotals(8));
+        testing.commitManifestTransition(state, plan);
+        tip = plan.tip;
+      }
+    } finally {
+      delete nextRunsIdentity[Symbol.iterator];
+      delete activeIdsIdentity[Symbol.iterator];
+    }
+    expect(state.nextRuns).toBe(nextRunsIdentity);
+    expect(state.activeIds).toBe(activeIdsIdentity);
+    expect(state.nextRuns).toHaveLength(4_096);
+    expect(state.activeIds.size).toBe(4_097);
+    expect(state.parentOffset).toBe(wideSize);
+    expect(state.lastProcessedParentKey).toBe('K4095');
+  }, 30_000);
+
+  it('admits final-decision unit 4,096 and rejects unit 4,097 before candidate or state changes', () => {
+    const state = testing.createManifestState();
+    const seedRun = Object.freeze({ token: 'final-unit-boundary-seed' });
+    const seedDescriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const seed = testing.planManifestTransition(state, Object.freeze({
+      transition: 'seed', previousTip: null, binding: manifestBinding(2), frontier: seedRun,
+    }), manifestCandidate(seedRun, seedDescriptor), manifestTotals(8));
+    testing.commitManifestTransition(state, seed);
+
+    const parentUnitKeys = RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.parentUnitKeys;
+    const maximumUnits = RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits;
+    const wideDescriptor = manifestDescriptor(
+      'r7-f-d00000-g00000', parentUnitKeys * (maximumUnits + 1), 'K0000', 'K4096',
+    );
+    state.frontierDescriptor = wideDescriptor;
+    state.activeRunBytes = wideDescriptor.dataBytes;
+    state.parentOffset = parentUnitKeys * (maximumUnits - 1);
+    state.lastProcessedParentKey = 'K4094';
+
+    const allowed = testing.planManifestTransition(state, Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: parentUnitKeys * maximumUnits,
+      lastProcessedParentKey: 'K4095', transitionsDelta: 1, boundPrunesDelta: 0, nextRun: null,
+    }), null, manifestTotals(wideDescriptor.dataBytes));
+    expect(allowed.manifest.runChanges.add).toEqual([]);
+    testing.commitManifestTransition(state, allowed);
+    expect(state.parentOffset).toBe(parentUnitKeys * maximumUnits);
+
+    const beforeRejected = manifestStateBytes(testing, state);
+    const untouchedCandidate = Object.freeze({ token: 'must-not-be-consumed' });
+    expect(() => testing.planManifestTransition(state, Object.freeze({
+      transition: 'unit', previousTip: allowed.tip, parentOffset: parentUnitKeys * (maximumUnits + 1),
+      lastProcessedParentKey: 'K4096', transitionsDelta: 1, boundPrunesDelta: 0, nextRun: null,
+    }), untouchedCandidate, manifestTotals(wideDescriptor.dataBytes))).toThrow('unit ordinal exceeds 4095');
+    expect(manifestStateBytes(testing, state)).toBe(beforeRejected);
+    expect(untouchedCandidate).toEqual({ token: 'must-not-be-consumed' });
+  });
+
+  it('rejects every predictable unit-append collection hazard before consume and reuses the same plan after repair', () => {
+    const hazards = [
+      ['frozen', () => Object.freeze([]), 'must remain extensible'],
+      ['nonextensible', () => Object.preventExtensions([]), 'must remain extensible'],
+      ['readonly-length', () => {
+        const array = [];
+        Object.defineProperty(array, 'length', { writable: false });
+        return array;
+      }, 'length must remain a writable native array length'],
+    ];
+    for (const [label, unsafeArray, message] of hazards) {
+      const { state, plan } = coveredUnitAppendPlan(testing, label);
+      const original = state.nextRuns;
+      const before = manifestStateBytes(testing, state);
+      state.nextRuns = unsafeArray();
+      expect(() => testing.commitManifestTransition(state, plan)).toThrow(message);
+      state.nextRuns = original;
+      expect(manifestStateBytes(testing, state)).toBe(before);
+      testing.commitManifestTransition(state, plan);
+      expect(state.generation).toBe(1);
+    }
+
+    const blocked = coveredUnitAppendPlan(testing, 'blocked-index');
+    const blockedBefore = manifestStateBytes(testing, blocked.state);
+    const prospectiveIndex = '0';
+    const priorDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, prospectiveIndex);
+    let blockedError = null;
+    try {
+      Object.defineProperty(Array.prototype, prospectiveIndex, {
+        value: null, writable: true, enumerable: false, configurable: true,
+      });
+      try { testing.commitManifestTransition(blocked.state, blocked.plan); }
+      catch (error) { blockedError = error; }
+    } finally {
+      if (priorDescriptor) Object.defineProperty(Array.prototype, prospectiveIndex, priorDescriptor);
+      else delete Array.prototype[prospectiveIndex];
+    }
+    expect(blockedError?.message).toContain('prospective index 0 is blocked');
+    expect(manifestStateBytes(testing, blocked.state)).toBe(blockedBefore);
+    testing.commitManifestTransition(blocked.state, blocked.plan);
+    expect(blocked.state.generation).toBe(1);
+  });
+
+  it('rechecks the native active-run Set and duplicate id before consuming a unit plan', () => {
+    const duplicate = coveredUnitAppendPlan(testing, 'duplicate-active-id');
+    const beforeDuplicate = manifestStateBytes(testing, duplicate.state);
+    duplicate.state.activeIds.add(duplicate.unitDescriptor.id);
+    expect(() => testing.commitManifestTransition(duplicate.state, duplicate.plan))
+      .toThrow('duplicate committed active run id');
+    duplicate.state.activeIds.delete(duplicate.unitDescriptor.id);
+    expect(manifestStateBytes(testing, duplicate.state)).toBe(beforeDuplicate);
+    testing.commitManifestTransition(duplicate.state, duplicate.plan);
+    expect(duplicate.state.activeIds.has(duplicate.unitDescriptor.id)).toBe(true);
+
+    const native = coveredUnitAppendPlan(testing, 'native-active-set');
+    const original = native.state.activeIds;
+    native.state.activeIds = new Proxy(original, {});
+    expect(() => testing.commitManifestTransition(native.state, native.plan)).toThrow('collections are invalid');
+    native.state.activeIds = original;
+    testing.commitManifestTransition(native.state, native.plan);
+    expect(native.state.generation).toBe(1);
+  });
+
+  it('uses the load-time isProxy intrinsic before consuming a unit plan', () => {
+    const { state, plan } = coveredUnitAppendPlan(testing, 'cached-is-proxy');
+    const originalNextRuns = state.nextRuns;
+    const originalIsProxy = nativeTypes.isProxy;
+    const beforeTip = state.tip;
+    let trapCalls = 0;
+    const hostileNextRuns = new Proxy(originalNextRuns, {
+      set() {
+        trapCalls += 1;
+        throw new Error('hostile nextRuns append trap');
+      },
+    });
+    let commitError = null;
+    try {
+      nativeTypes.isProxy = () => false;
+      state.nextRuns = hostileNextRuns;
+      try { testing.commitManifestTransition(state, plan); }
+      catch (error) { commitError = error; }
+    } finally {
+      state.nextRuns = originalNextRuns;
+      nativeTypes.isProxy = originalIsProxy;
+    }
+    expect(commitError?.message).toContain('manifest state collections are invalid');
+    expect(trapCalls).toBe(0);
+    expect(state.tip).toBe(beforeTip);
+    expect(state.generation).toBe(0);
+    testing.commitManifestTransition(state, plan);
+    expect(state.generation).toBe(1);
+  });
+
+  it.each(['layer', 'complete'])('atomically replaces frozen nonempty collections for %s commit', (transition) => {
+    const { state, plan } = coveredManifestPlan(testing, transition, `frozen-${transition}`);
+    expect(state.nextRuns).toHaveLength(1);
+    const oldNextRuns = state.nextRuns;
+    const oldCompletedDepths = state.completedDepths;
+    const oldActiveIds = state.activeIds;
+    const oldCompletedTotals = state.completedTotals;
+    Object.freeze(oldNextRuns);
+    Object.freeze(oldCompletedDepths);
+    Object.freeze(oldActiveIds);
+    Object.freeze(oldCompletedTotals);
+    testing.commitManifestTransition(state, plan);
+    expect(state.nextRuns).not.toBe(oldNextRuns);
+    expect(state.nextRuns).toEqual([]);
+    expect(state.completedDepths).not.toBe(oldCompletedDepths);
+    expect(state.completedDepths).toHaveLength(1);
+    expect(state.activeIds).not.toBe(oldActiveIds);
+    expect(state.completedTotals).not.toBe(oldCompletedTotals);
+    expect(oldNextRuns).toHaveLength(1);
+    expect(oldCompletedDepths).toEqual([]);
+  });
+
+  it.each([
+    ['layer', 'nextRuns'],
+    ['complete', 'completedDepths'],
+  ])('rejects nonwritable state before %s commit without partial pollution', (transition, key) => {
+    const { state, plan } = coveredManifestPlan(testing, transition, `readonly-${transition}`);
+    const originalDescriptor = Object.getOwnPropertyDescriptor(state, key);
+    Object.defineProperty(state, key, { ...originalDescriptor, writable: false });
+    const before = manifestStateBytes(testing, state);
+    expect(() => testing.commitManifestTransition(state, plan)).toThrow('must remain a writable data property');
+    expect(manifestStateBytes(testing, state)).toBe(before);
+    Object.defineProperty(state, key, { ...originalDescriptor, writable: true });
+    testing.commitManifestTransition(state, plan);
+    expect(state.generation).toBe(2);
+  });
+
+  it('keeps zero-decision depthless and appends exactly one early-empty completed depth', () => {
+    const state = testing.createManifestState();
+    const binding = manifestBinding(1);
+    const frontier = Object.freeze({ token: 'zero-seed' });
+    const descriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+    const seed = testing.planManifestTransition(state, Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier,
+    }), manifestCandidate(frontier, descriptor), manifestTotals(8));
+    testing.commitManifestTransition(state, seed);
+    expect(() => testing.planManifestTransition(state, Object.freeze({
+      transition: 'complete', previousTip: seed.tip, completedDepth: null, reason: 'final-depth',
+    }), null, manifestTotals(0))).toThrow('fully covered completed depth');
+    const complete = testing.planManifestTransition(state, Object.freeze({
+      transition: 'complete', previousTip: seed.tip, completedDepth: null, reason: 'zero-decision-depth',
+    }), null, manifestTotals(0));
+    expect(complete.projection).toEqual(expect.objectContaining({
+      kind: 'complete', completedDepthCount: 0, reason: 'zero-decision-depth',
+    }));
+    expect(complete.manifest.stateDelta.completedDepth).toBeNull();
+
+    const earlyState = testing.createManifestState();
+    const earlyBinding = manifestBinding(3);
+    const earlyFrontier = Object.freeze({ token: 'early-seed' });
+    const earlySeed = testing.planManifestTransition(earlyState, Object.freeze({
+      transition: 'seed', previousTip: null, binding: earlyBinding, frontier: earlyFrontier,
+    }), manifestCandidate(earlyFrontier, descriptor), manifestTotals(8));
+    testing.commitManifestTransition(earlyState, earlySeed);
+    const unitRun = Object.freeze({ token: 'early-unit' });
+    const unitDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 0, null, null);
+    const unit = testing.planManifestTransition(earlyState, Object.freeze({
+      transition: 'unit', previousTip: earlySeed.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+      transitionsDelta: 3, boundPrunesDelta: 1, nextRun: unitRun,
+    }), manifestCandidate(unitRun, unitDescriptor), manifestTotals(8));
+    testing.commitManifestTransition(earlyState, unit);
+    const completedDepth = Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 3, boundPrunes: 1 });
+    const earlyComplete = testing.planManifestTransition(earlyState, Object.freeze({
+      transition: 'complete', previousTip: unit.tip, completedDepth, reason: 'empty-frontier',
+    }), null, manifestTotals(0));
+    expect(earlyComplete.projection).toEqual(expect.objectContaining({
+      kind: 'complete', completedDepthCount: 1, reason: 'empty-frontier',
+    }));
+    expect(earlyComplete.manifest.runChanges.removeSetSha256)
+      .toBe(testing.runSetHash([descriptor, unitDescriptor]));
+  });
+
+  it('accepts multiple accumulated empty runs for early-empty and rejects any nonempty member', () => {
+    const coveredDepthOne = (sizes) => {
+      const state = testing.createManifestState();
+      const binding = manifestBinding(4);
+      const seedRun = Object.freeze({ token: `multi-seed-${sizes.join('-')}` });
+      const seedDescriptor = manifestDescriptor('r7-f-d00000-g00000', 1, 'ROOT', 'ROOT');
+      const seed = testing.planManifestTransition(state, Object.freeze({
+        transition: 'seed', previousTip: null, binding, frontier: seedRun,
+      }), manifestCandidate(seedRun, seedDescriptor), manifestTotals(8));
+      testing.commitManifestTransition(state, seed);
+
+      const firstRun = Object.freeze({ token: 'depth-0-output' });
+      const firstDescriptor = manifestDescriptor('r7-u-d00000-n00000000-g00001', 1, 'NEXT', 'NEXT');
+      const firstUnit = testing.planManifestTransition(state, Object.freeze({
+        transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'ROOT',
+        transitionsDelta: 1, boundPrunesDelta: 0, nextRun: firstRun,
+      }), manifestCandidate(firstRun, firstDescriptor), manifestTotals(16));
+      testing.commitManifestTransition(state, firstUnit);
+
+      const wideRun = Object.freeze({ token: 'wide-frontier' });
+      const wideDescriptor = manifestDescriptor('r7-f-d00001-g00002', 65_537, 'A', 'Z', 200_000);
+      const layer = testing.planManifestTransition(state, Object.freeze({
+        transition: 'layer', previousTip: firstUnit.tip,
+        completedDepth: Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 1, boundPrunes: 0 }),
+        nextFrontier: wideRun,
+      }), manifestCandidate(wideRun, wideDescriptor), manifestTotals(200_000));
+      testing.commitManifestTransition(state, layer);
+
+      let tip = layer.tip;
+      let latestBytes = wideDescriptor.dataBytes;
+      const descriptors = [];
+      for (const [index, size] of sizes.entries()) {
+        const run = Object.freeze({ token: `wide-unit-${index}` });
+        const descriptor = manifestDescriptor(
+          `r7-u-d00001-n${String(index).padStart(8, '0')}-g${String(3 + index).padStart(5, '0')}`,
+          size,
+          size === 0 ? null : `N${index}`,
+          size === 0 ? null : `N${index}`,
+        );
+        latestBytes += descriptor.dataBytes;
+        const unit = testing.planManifestTransition(state, Object.freeze({
+          transition: 'unit', previousTip: tip,
+          parentOffset: index === 0 ? 65_536 : 65_537,
+          lastProcessedParentKey: index === 0 ? 'Y' : 'Z',
+          transitionsDelta: 1, boundPrunesDelta: 0, nextRun: run,
+        }), manifestCandidate(run, descriptor), manifestTotals(latestBytes));
+        testing.commitManifestTransition(state, unit);
+        tip = unit.tip;
+        descriptors.push(descriptor);
+      }
+      return { state, tip, descriptors, completedDepth: Object.freeze({
+        lockedPieces: 1, frontierStates: 65_537, transitions: 2, boundPrunes: 0,
+      }) };
+    };
+
+    const allEmpty = coveredDepthOne([0, 0]);
+    const accepted = testing.planManifestTransition(allEmpty.state, Object.freeze({
+      transition: 'complete', previousTip: allEmpty.tip,
+      completedDepth: allEmpty.completedDepth, reason: 'empty-frontier',
+    }), null, manifestTotals(0));
+    expect(accepted.removedDescriptors.filter(({ size }) => size === 0)).toHaveLength(2);
+
+    const oneNonempty = coveredDepthOne([0, 1]);
+    expect(() => testing.planManifestTransition(oneNonempty.state, Object.freeze({
+      transition: 'complete', previousTip: oneNonempty.tip,
+      completedDepth: oneNonempty.completedDepth, reason: 'empty-frontier',
+    }), null, manifestTotals(0))).toThrow('every accumulated next run to be empty');
   });
 
   it('computes all formula-reachable index cap vectors without materializing records', () => {
