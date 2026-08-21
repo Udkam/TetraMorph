@@ -10470,5 +10470,37 @@ Every grammar-valid incomplete precommit subset, including a lone part at genera
 returns blocked without proof use. Suspend never throws or masks a primary. Depth IDs are
 five digits and owner identity is same-validation stability, not historical inode trust.
 
-No source or external R7 path is open. Commit and obtain two fresh all-zero reviews of the
-four-document R5 correction before assigning either Core or adapter implementation.
+No source or external R7 path opened under R5. Its former review-next-action is superseded by
+the R6 disposition below.
+
+### F4E-R7A R5 rejected — R6 opaque-collection contract review only
+
+R5 `be35aa9` is rejected after three independent reviews at `P0/P1/P2/P3/GAP =`
+`0/0/0/0/0`, `0/2/1/0/0`, and `0/1/1/0/1`. A single all-zero review does not override the
+other reproducible blockers. No R7 source, external Store, validator, runner, proof, or
+Intro-05 path has opened.
+
+R6 replaces the searching checkpoint's materialized next-run array with
+`EndgameProofRunCollection`, an opaque adapter-owned descriptor collection that consumes zero
+Core slots and opens only one contiguous batch of at most 32 runs at a time. Unit transitions
+never open accumulated prior runs; publication passes only the authenticated previous tip,
+constant-size scalar delta, and at most one new run. Layer transitions release the frontier,
+cover the collection exactly once in bounded batches, and release every opened object before
+the next batch. The 4,096-chunk unit and 4,096-input layer tests must both remain within the
+4,098 Core metadata limit without retaining released descriptor tokens.
+
+On resume, a nonnull `expectedTip` is authenticated before any residue disposition. Empty,
+pre-owner, absent, shorter, or mismatching chains are fatal rollback; only a null expected tip
+may classify an empty stage or lone owner part as blocked with null checkpoint/tip. Invalid or
+mismatched owner finals are always fatal. Index bytes are frozen from run size as
+`24 + 8 * (size === 0 ? 1 : floor((size - 1) / 65536) + 2)` and the exact prospective two-name
+and twice-byte charge must pass before `.idx.part` creation or writing.
+
+Each newly opened resume Store performs exactly one full manifest/run/index authentication
+scan. Later `loadCheckpoint()` calls on that same Store use the cached authenticated inventory
+plus lightweight identity checks, and `values(range)` begins its first data read at the exact
+indexed offset. Only a later reopened Store pays one new full scan. Instrumented I/O tests must
+prove those counts, direct late-range reads, expected-tip precedence, and empty-stage recovery.
+
+**Current next action:** commit and obtain at least two fresh independent all-zero reviews of
+the four-document R6 contract. Core and adapter implementation remain closed until that gate.

@@ -3346,4 +3346,22 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - R5 adds zero-decision completion; 4,095-release/4,096-chunk unit QA; nullable expected tips;
   by-name hard-link accounting; every incomplete owned subset; nonthrowing suspend results;
   five-digit depths; and same-open owner identity only.
-- Next: commit/review only the four R5 docs. Source and external R7 remain closed.
+- The former R5 review next action is superseded by R6 below. Source and external R7 remain
+  closed.
+
+### F4E-R7A R5 rejection and R6 opaque-collection correction
+
+- R5 `be35aa9` reviews are `0/0/0/0/0`, `0/2/1/0/0`, and `0/1/1/0/1`; R5 is rejected.
+- The blockers are expected-tip/residue precedence, 4,095 released objects still retained by
+  the published checkpoint, index quota checks occurring too late, ambiguity between a fresh
+  resume scan and repeated same-Store loads, and the unclassified empty pre-owner stage.
+- R6 exposes a zero-Core-slot `EndgameProofRunCollection` with one live contiguous batch of at
+  most 32. Unit publication uses only prior tip/scalar delta/new run; layers release frontier
+  then cover the collection exactly once in bounded batches. No released token is retained.
+- A nonnull expected tip is checked before residue and makes empty/pre-owner/short state fatal.
+  Null-tip resume recognizes exact empty-stage and owner-part blocked states; mismatched owner
+  finals remain fatal.
+- Index size is computed from run count and its exact two-name/twice-byte charge admitted
+  before part creation. Each new resume Store performs one full scan; same-Store loads use its
+  authenticated cache, while ranged reads start at the index offset.
+- Next: commit/review only the four R6 docs. Source and all external R7 paths remain closed.

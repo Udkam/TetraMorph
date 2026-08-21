@@ -1015,5 +1015,23 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - R5 defines zero-decision completion, exact-max unit release/rehydration, authenticated
   nullable tips, per-name alias accounting, all incomplete owned subsets, nonthrowing suspend,
   five-digit depths, and same-open owner validation. Its maximal QA covers both unit and layer.
-- Next: commit these four R5 docs and obtain two fresh independent all-zero reviews. The four
-  source paths remain closed meanwhile.
+- The former R5 review next action is superseded by the R6 disposition below. The four source
+  paths remain closed meanwhile.
+
+### F4E-R7A R5 rejected and R6 contract candidate
+
+- R5 `be35aa9` is reviewed independently at `0/0/0/0/0`, `0/2/1/0/0`, and `0/1/1/0/1`;
+  reproducible findings reject it despite one all-zero review.
+- R6 replaces the retained next-run object array and released descriptor tokens with an opaque
+  adapter-owned collection that consumes zero Core slots and opens one exact batch of at most
+  32. Unit publication carries only previous tip, scalar delta, and at most one new run; layer
+  merging releases the frontier and every bounded batch before opening the next.
+- Nonnull expected-tip authentication now precedes all residue classification. Exact empty and
+  owner-part stages are blocked only for a null expected tip; invalid owner finals and any
+  missing/short/mismatching nonnull tip are fatal rollback.
+- Index bytes are deterministic from run size and both future names/byte aliases are admitted
+  before `.idx.part` creation. A new resume Store performs one full authentication scan;
+  repeated same-Store loads use cached authenticated inventory, and range data begins at the
+  indexed offset. I/O-count, empty-stage, and pre-part quota tests are mandatory.
+- Next: commit these four R6 docs and obtain at least two fresh independent all-zero reviews.
+  Core, adapter, external R7 paths, proof execution, and Intro-05 remain closed.
