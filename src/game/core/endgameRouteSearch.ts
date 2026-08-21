@@ -1366,6 +1366,307 @@ export const ENDGAME_PROOF_FRONTIER_STORE_TESTING = Object.freeze({
   },
 });
 
+type PreparedResumableEndgameProof = Readonly<{
+  levelId: EndgameId;
+  replay: EndgameRouteReplay;
+  optimalLocks: number;
+  initialStateHash: string;
+  started: GameState;
+  proofContext: EndgameProofFrontierContext;
+  binding: EndgameProofResumeBinding;
+}>;
+
+function resumableProofRunId(kind: 'frontier' | 'unit', depth: number, generation: number, unit?: number): string {
+  if (!Number.isSafeInteger(depth) || depth < 0 || depth > 32_767) {
+    throw proofRunError('resumable depth must be 0..32767');
+  }
+  if (!Number.isSafeInteger(generation) || generation < 0 || generation > 32_767) {
+    throw proofRunError('resumable generation must be 0..32767');
+  }
+  const depthToken = String(depth).padStart(5, '0');
+  const generationToken = String(generation).padStart(5, '0');
+  if (kind === 'frontier') return `r7-f-d${depthToken}-g${generationToken}`;
+  if (!Number.isSafeInteger(unit) || unit! < 0 || unit! > 4095) {
+    throw proofRunError('resumable unit must be 0..4095');
+  }
+  return `r7-u-d${depthToken}-n${String(unit).padStart(8, '0')}-g${generationToken}`;
+}
+
+function prepareResumableEndgameProof(
+  definition: EndgameDefinition,
+  candidateCommandStream: string,
+): PreparedResumableEndgameProof | null {
+  const levelId = definition.id;
+  const replay = replayEndgameRouteForDefinition(definition, candidateCommandStream);
+  if (replay.state.status !== 'finished' || replay.state.endgameCompletion !== 'finished' || replay.locks.length <= 0) {
+    throw new Error(`Optimal Endgame candidate must be a completed public-command replay: ${levelId}.`);
+  }
+  const optimalLocks = replay.locks.length;
+  if (!Number.isSafeInteger(optimalLocks) || optimalLocks <= 0 || optimalLocks > 32_768) {
+    throw proofRunError('optimal lock count must be 1..32768');
+  }
+  const canonicalStart = dispatch(createEndgameInitialState(definition), { type: 'start' }).state;
+  if (!isActive(canonicalStart)) return null;
+  const initialStateHash = stateHash(canonicalStart);
+  const started = withoutUndoHistory(canonicalStart);
+  const proofContext = createProofFrontierContext(started);
+  const initialFrontierKey = proofFrontierStateKey(started, proofContext);
+  const binding: EndgameProofResumeBinding = Object.freeze({
+    schema: 't37-f4e-r7-proof-binding-v1',
+    levelId,
+    candidateCommandStream,
+    optimalLocks,
+    initialStateHash,
+    initialFrontierKey,
+  });
+  return Object.freeze({ levelId, replay, optimalLocks, initialStateHash, started, proofContext, binding });
+}
+
+function assertResumableBinding(
+  actual: EndgameProofResumeBinding,
+  expected: EndgameProofResumeBinding,
+): void {
+  for (const key of [
+    'schema',
+    'levelId',
+    'candidateCommandStream',
+    'optimalLocks',
+    'initialStateHash',
+    'initialFrontierKey',
+  ] as const) {
+    if (actual[key] !== expected[key]) {
+      throw proofRunError(`checkpoint binding ${key} does not match the candidate`);
+    }
+  }
+}
+
+function assertResumableTip(tip: EndgameProofTip | null, generation: number | null): EndgameProofTip {
+  if (tip === null) throw proofRunError('checkpoint is missing its authenticated tip');
+  if (
+    !Number.isSafeInteger(tip.generation)
+    || tip.generation < 0
+    || tip.generation > 32_767
+    || tip.generation !== generation
+  ) {
+    throw proofRunError('checkpoint tip generation is invalid');
+  }
+  if (!/^[0-9A-F]{64}$/.test(tip.manifestSha256)) {
+    throw proofRunError('checkpoint tip hash is invalid');
+  }
+  return tip;
+}
+
+function frozenResumableDepths(
+  records: readonly EndgameOptimalRouteDepthRecord[],
+  maximum: number,
+): readonly EndgameOptimalRouteDepthRecord[] {
+  if (!Array.isArray(records) || records.length > maximum) {
+    throw proofRunError('completed depth prefix length is invalid');
+  }
+  return Object.freeze(records.map((record, index) => {
+    if (
+      record.lockedPieces !== index
+      || !Number.isSafeInteger(record.frontierStates)
+      || record.frontierStates <= 0
+      || !Number.isSafeInteger(record.transitions)
+      || record.transitions < 0
+      || !Number.isSafeInteger(record.boundPrunes)
+      || record.boundPrunes < 0
+    ) {
+      throw proofRunError(`completed depth ${index} is invalid`);
+    }
+    return Object.freeze({
+      lockedPieces: record.lockedPieces,
+      frontierStates: record.frontierStates,
+      transitions: record.transitions,
+      boundPrunes: record.boundPrunes,
+    });
+  }));
+}
+
+function safeDepthTotal(
+  records: readonly EndgameOptimalRouteDepthRecord[],
+  key: 'frontierStates' | 'transitions' | 'boundPrunes',
+): number {
+  let total = 0;
+  for (const record of records) {
+    total += record[key];
+    if (!Number.isSafeInteger(total)) throw proofRunError(`${key} total exceeds the safe integer domain`);
+  }
+  return total;
+}
+
+function certificateFromResumableCheckpoint(
+  prepared: PreparedResumableEndgameProof,
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
+): EndgameOptimalRouteCertificate {
+  const frozenDepths = frozenResumableDepths(exhaustedDepths, prepared.optimalLocks - 1);
+  return Object.freeze({
+    levelId: prepared.levelId,
+    optimalLocks: prepared.optimalLocks,
+    exhaustedDepths: frozenDepths,
+    exhaustedFrontierWidths: Object.freeze(frozenDepths.map(({ frontierStates }) => frontierStates)),
+    exploredStateCount: safeDepthTotal(frozenDepths, 'frontierStates'),
+    transitionCount: safeDepthTotal(frozenDepths, 'transitions'),
+    deficitBoundPrunes: safeDepthTotal(frozenDepths, 'boundPrunes'),
+    initialStateHash: prepared.initialStateHash,
+    replay: prepared.replay,
+  });
+}
+
+function assertCompleteCheckpoint(
+  checkpoint: EndgameProofCompleteCheckpoint,
+  prepared: PreparedResumableEndgameProof,
+): readonly EndgameOptimalRouteDepthRecord[] {
+  assertResumableBinding(checkpoint.binding, prepared.binding);
+  const records = frozenResumableDepths(checkpoint.exhaustedDepths, prepared.optimalLocks - 1);
+  if (checkpoint.reason === 'zero-decision-depth') {
+    if (prepared.optimalLocks !== 1 || records.length !== 0) {
+      throw proofRunError('zero-decision checkpoint shape is invalid');
+    }
+  } else if (checkpoint.reason === 'final-depth') {
+    if (prepared.optimalLocks < 2 || records.length !== prepared.optimalLocks - 1) {
+      throw proofRunError('final-depth checkpoint shape is invalid');
+    }
+  } else if (
+    checkpoint.reason !== 'empty-frontier'
+    || records.length === 0
+    || records.length >= prepared.optimalLocks - 1
+  ) {
+    throw proofRunError('empty-frontier checkpoint shape is invalid');
+  }
+  return records;
+}
+
+function createVerifiedResumableRun(
+  store: EndgameProofRunStore,
+  id: string,
+  records: readonly string[],
+): EndgameProofRun {
+  let writer: EndgameProofRunWriter | null = null;
+  let run: EndgameProofRun | null = null;
+  try {
+    writer = store.createRun(id);
+    for (const record of records) {
+      proofRunRecordBytes(record, PROOF_RUN_RECORD_MAX_BYTES);
+      writer.write(record);
+    }
+    run = writer.finish();
+    assertProofRunDescriptor(run, id);
+    verifyProofRunAgainstRecords(Object.freeze({ expectedId: id, run }), records, ENDGAME_PROOF_RUN_LIMITS);
+    return run;
+  } catch (primary) {
+    const cleanup = createCleanupCollector();
+    if (run) {
+      try {
+        run.dispose();
+      } catch (error) {
+        collectCleanupError(cleanup, error);
+      }
+    } else if (writer) {
+      try {
+        writer.abort();
+      } catch (error) {
+        collectCleanupError(cleanup, error);
+      }
+    }
+    throwProofRunFailure(primary, cleanup);
+  }
+}
+
+function searchingAdvanceResult(
+  generation: number,
+  depth: number,
+  parentOffset: number,
+  publication: ReturnType<EndgameProofCheckpointRunStore['publishCheckpoint']>,
+): EndgameProofAdvanceResult {
+  const tip = assertResumableTip(publication.tip, generation);
+  return Object.freeze({
+    status: 'searching',
+    generation,
+    depth,
+    parentOffset,
+    tip,
+    diagnostics: publication.diagnostics,
+    advanceAllowed: publication.advanceAllowed,
+  });
+}
+
+function blockedAdvanceResult(
+  checkpoint: EndgameProofSearchingCheckpoint | null,
+  tip: EndgameProofTip | null,
+  diagnostics: EndgameProofRunStoreDiagnostics,
+): EndgameProofAdvanceResult {
+  return Object.freeze({
+    status: 'blocked',
+    generation: checkpoint?.generation ?? null,
+    tip,
+    diagnostics,
+    advanceAllowed: false,
+  });
+}
+
+function advanceResumableEndgameProof(
+  definition: EndgameDefinition,
+  candidateCommandStream: string,
+  store: EndgameProofCheckpointRunStore,
+): EndgameProofAdvanceResult | null {
+  const prepared = prepareResumableEndgameProof(definition, candidateCommandStream);
+  if (!prepared) return null;
+  const loaded = store.loadCheckpoint();
+  const { checkpoint, tip } = loaded;
+  if (checkpoint === null) {
+    if (tip !== null) throw proofRunError('null checkpoint has a nonnull tip');
+    if (!loaded.advanceAllowed) return blockedAdvanceResult(null, null, loaded.diagnostics);
+    const frontier = createVerifiedResumableRun(
+      store,
+      resumableProofRunId('frontier', 0, 0),
+      [prepared.binding.initialFrontierKey],
+    );
+    const publication = store.publishCheckpoint(Object.freeze({
+      transition: 'seed',
+      previousTip: null,
+      binding: prepared.binding,
+      frontier,
+    }));
+    return searchingAdvanceResult(0, 0, 0, publication);
+  }
+
+  const authenticatedTip = assertResumableTip(tip, checkpoint.generation);
+  assertResumableBinding(checkpoint.binding, prepared.binding);
+  if (checkpoint.kind === 'complete') {
+    const records = assertCompleteCheckpoint(checkpoint, prepared);
+    return Object.freeze({
+      status: 'complete',
+      generation: checkpoint.generation,
+      certificate: certificateFromResumableCheckpoint(prepared, records),
+      tip: authenticatedTip,
+      diagnostics: loaded.diagnostics,
+      advanceAllowed: loaded.advanceAllowed,
+    });
+  }
+  if (!loaded.advanceAllowed) {
+    return blockedAdvanceResult(checkpoint, authenticatedTip, loaded.diagnostics);
+  }
+  throw proofRunError('searching checkpoint transitions are not yet implemented');
+}
+
+export function advanceOptimalEndgameRouteProof(
+  levelId: EndgameId,
+  candidateCommandStream: string,
+  store: EndgameProofCheckpointRunStore,
+): EndgameProofAdvanceResult | null {
+  return advanceResumableEndgameProof(getEndgameDefinition(levelId), candidateCommandStream, store);
+}
+
+export function advanceOptimalEndgameRouteProofForDefinition(
+  definition: EndgameDefinition,
+  candidateCommandStream: string,
+  store: EndgameProofCheckpointRunStore,
+): EndgameProofAdvanceResult | null {
+  return advanceResumableEndgameProof(definition, candidateCommandStream, store);
+}
+
 function certifyOptimalEndgameRouteWithRunStore(
   definition: EndgameDefinition,
   candidateCommandStream: string,

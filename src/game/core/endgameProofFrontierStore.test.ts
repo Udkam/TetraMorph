@@ -7,11 +7,17 @@ import { ENDGAME_V3_INTRO_DRAFTS } from './endgameV3IntroDefinitions';
 import type { EndgameDefinition } from './endgames';
 import {
   ENDGAME_PROOF_FRONTIER_STORE_TESTING,
+  advanceOptimalEndgameRouteProofForDefinition,
   certifyOptimalEndgameRouteForDefinition,
+  type EndgameProofCheckpoint,
+  type EndgameProofCheckpointPublication,
+  type EndgameProofCheckpointRunStore,
   type EndgameProofRun,
+  type EndgameProofRunRange,
   type EndgameProofRunStore,
   type EndgameProofRunStoreDiagnostics,
   type EndgameProofRunWriter,
+  type EndgameProofTip,
 } from './endgameRouteSearch';
 
 type RunTransform = (id: string, values: readonly string[], read: number) => readonly string[];
@@ -119,17 +125,75 @@ class MemoryRun implements EndgameProofRun {
     private readonly onDispose: () => void,
   ) {}
 
-  values(): Iterable<string> {
+  values(range?: EndgameProofRunRange): Iterable<string> {
     if (this.disposed) throw new Error(`disposed ${this.id}`);
     this.reads += 1;
     const transformed = this.transform(this.id, this.records, this.reads);
-    return Object.isFrozen(transformed) ? transformed : Object.freeze([...transformed]);
+    const selected = range
+      ? transformed.slice(range.startOrdinal, range.endOrdinal)
+      : transformed;
+    return Object.isFrozen(selected) ? selected : Object.freeze([...selected]);
   }
 
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
     this.onDispose();
+  }
+}
+
+class MemoryCheckpointRunStore extends MemoryRunStore implements EndgameProofCheckpointRunStore {
+  readonly publications: EndgameProofCheckpointPublication[] = [];
+  createRunCount = 0;
+  suspendCount = 0;
+
+  constructor(private readonly loaded: Readonly<{
+    checkpoint: EndgameProofCheckpoint | null;
+    tip: EndgameProofTip | null;
+    diagnostics: EndgameProofRunStoreDiagnostics;
+    advanceAllowed: boolean;
+  }>) {
+    super();
+  }
+
+  override createRun(id: string): EndgameProofRunWriter {
+    this.createRunCount += 1;
+    return super.createRun(id);
+  }
+
+  loadCheckpoint(): Readonly<{
+    checkpoint: EndgameProofCheckpoint | null;
+    tip: EndgameProofTip | null;
+    diagnostics: EndgameProofRunStoreDiagnostics;
+    advanceAllowed: boolean;
+  }> {
+    return this.loaded;
+  }
+
+  publishCheckpoint(publication: EndgameProofCheckpointPublication): Readonly<{
+    tip: EndgameProofTip;
+    diagnostics: EndgameProofRunStoreDiagnostics;
+    advanceAllowed: boolean;
+  }> {
+    this.publications.push(publication);
+    if (publication.transition === 'seed') publication.frontier.dispose();
+    if (publication.transition === 'unit') publication.nextRun?.dispose();
+    if (publication.transition === 'layer') publication.nextFrontier.dispose();
+    const generation = publication.previousTip === null ? 0 : publication.previousTip.generation + 1;
+    return Object.freeze({
+      tip: Object.freeze({ generation, manifestSha256: 'A'.repeat(64) }),
+      diagnostics: this.diagnostics(),
+      advanceAllowed: true,
+    });
+  }
+
+  releaseCheckpointRun(run: EndgameProofRun): void {
+    run.dispose();
+  }
+
+  suspend(): Readonly<{ diagnostics: EndgameProofRunStoreDiagnostics; closeFailed: boolean }> {
+    this.suspendCount += 1;
+    return Object.freeze({ diagnostics: this.diagnostics(), closeFailed: false });
   }
 }
 
@@ -150,6 +214,75 @@ function fixedAsciiRecord(index: number, length: number): string {
 const oneRecordChunks = Object.freeze({ chunkMaxBytes: 6, chunkMaxRecords: 1 });
 
 describe('Endgame proof frontier Core-owned runs', () => {
+  it('publishes one deterministic seed transition and recovers complete proof views without writes', () => {
+    const definition = ENDGAME_V3_INTRO_DRAFTS[0]!;
+    const route = intro01.optimalRoute;
+    const emptyDiagnostics = Object.freeze({
+      activeRuns: Object.freeze([]),
+      residue: Object.freeze([]),
+      residueTruncated: false,
+      cleanupErrors: Object.freeze([]),
+      cleanupErrorsTruncated: false,
+    });
+    const seedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null,
+      tip: null,
+      diagnostics: emptyDiagnostics,
+      advanceAllowed: true,
+    }));
+    const seed = advanceOptimalEndgameRouteProofForDefinition(definition, route, seedStore);
+    expect(seed).toMatchObject({ status: 'searching', generation: 0, depth: 0, parentOffset: 0 });
+    expect(seedStore.createRunCount).toBe(1);
+    expect(seedStore.publications).toHaveLength(1);
+    const publication = seedStore.publications[0]!;
+    expect(publication.transition).toBe('seed');
+    if (publication.transition !== 'seed') throw new Error('expected seed publication');
+    expect(publication.frontier.id).toBe('r7-f-d00000-g00000');
+    expect(publication.frontier.size).toBe(1);
+
+    const exhaustedDepths = Object.freeze(Array.from(
+      { length: publication.binding.optimalLocks - 1 },
+      (_, lockedPieces) => Object.freeze({ lockedPieces, frontierStates: 1, transitions: 0, boundPrunes: 0 }),
+    ));
+    const residueDiagnostics = Object.freeze({
+      ...emptyDiagnostics,
+      residue: Object.freeze(['postcommit-superseded-residue']),
+    });
+    const completeStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'complete',
+        generation: 7,
+        binding: publication.binding,
+        reason: 'final-depth',
+        exhaustedDepths,
+      }),
+      tip: Object.freeze({ generation: 7, manifestSha256: 'B'.repeat(64) }),
+      diagnostics: residueDiagnostics,
+      advanceAllowed: false,
+    }));
+    const recovered = advanceOptimalEndgameRouteProofForDefinition(definition, route, completeStore);
+    expect(recovered).toMatchObject({
+      status: 'complete',
+      generation: 7,
+      advanceAllowed: false,
+      diagnostics: residueDiagnostics,
+    });
+    expect(completeStore.createRunCount).toBe(0);
+    expect(completeStore.publications).toEqual([]);
+    expect(completeStore.suspendCount).toBe(0);
+
+    const corruptTipStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null, tip: null, diagnostics: emptyDiagnostics, advanceAllowed: true,
+    }));
+    corruptTipStore.publishCheckpoint = () => Object.freeze({
+      tip: Object.freeze({ generation: 0, manifestSha256: 'not-a-hash' }),
+      diagnostics: emptyDiagnostics,
+      advanceAllowed: true,
+    });
+    expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, corruptTipStore))
+      .toThrow('checkpoint tip hash is invalid');
+  });
+
   it('sorts by unsigned bytes, collapses only full-key duplicates, and preserves prefixes', () => {
     expect(java31Hash('Aa')).toBe(java31Hash('BB'));
     const input = ['aa', 'a', 'BB', 'Aa', 'aa', '~', 'A', 'a'];
