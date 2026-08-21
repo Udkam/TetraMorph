@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <clipPath id="fold-clip"><path d="M19 5 L43 10 L53 23 L42 31 L50 45 L34 59 L17 51 L11 35 L21 26 L13 16 Z" /></clipPath>
+  </defs>
+  <path id="fold-body" d="M19 5 L43 10 L53 23 L42 31 L50 45 L34 59 L17 51 L11 35 L21 26 L13 16 Z" fill="#0A2B49" />
+  <g clip-path="url(#fold-clip)">
+    <path data-role="facet" d="M19 5 L43 10 L37 24 L21 26 L13 16 Z" fill="#123D61" />
+    <path data-role="facet" d="M43 10 L53 23 L42 31 L37 24 Z" fill="#1A5677" />
+    <path data-role="facet" d="M13 16 L21 26 L37 24 L31 38 L17 51 L11 35 Z" fill="#0E3556" />
+    <path data-role="facet" d="M37 24 L42 31 L50 45 L34 59 L31 38 Z" fill="#16496A" />
+    <path data-role="facet" d="M31 38 L34 59 L17 51 Z" fill="#0B2945" />
+  </g>
+  <path id="warm-seam" data-role="seam" d="M22 10 L37 24 L31 38 L39 48" stroke="#E39A58" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -2298,9 +2298,13 @@ describe('T6 frontend mode binding', () => {
     expect(sourceStyles).toContain('stroke: #ffffff');
     expect(endgameLibraryStyles).toMatch(/data-endgame-category="easy"[^}]*repeat\(6,/s);
     expect(endgameLibraryStyles).toMatch(/\[lang="en"\] \.endgame-gallery__page\s*\{[^}]*font-family:\s*var\(--font-ui\)/s);
-    for (const color of ['%233f9f96', '%236687d5', '%23c98243', '%239875be']) {
-      expect(sourceIndex).toContain(color);
+    const iconDocument = new DOMParser().parseFromString(sourceIndex, 'text/html');
+    expect(iconDocument.querySelector('link[rel="icon"][type="image/svg+xml"][sizes="any"][href="/favicon.svg"]')).not.toBeNull();
+    for (const size of [16, 32, 64]) {
+      expect(iconDocument.querySelector(`link[rel="icon"][type="image/png"][sizes="${size}x${size}"][href="/favicon-${size}x${size}.png"]`)).not.toBeNull();
     }
+    expect(iconDocument.querySelector('link[rel="apple-touch-icon"][type="image/png"][sizes="180x180"][href="/apple-touch-icon.png"]')).not.toBeNull();
+    expect(sourceIndex).not.toContain('data:image');
     expect(view.container.textContent).not.toMatch(/GRAVITY FIELD|选择一条重力轨迹/);
 
     for (const banned of ['当前选择', '三种玩法', '随时开始，也可随时退出。', '键盘与触控均可操作']) {
