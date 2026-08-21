@@ -984,7 +984,7 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   Then one writer may implement only the four source/test paths, run all named gates, and
   produce a bounded candidate for two source reviews. External R7B authority remains closed.
 
-### F4E-R7A R1 rejected and R2 contract candidate
+### F4E-R7A R1/R2 rejected and R3 contract candidate
 
 - R1 `b697625` is rejected at `0/3/2/0/0`. No source, Store, external path, or proof ran.
 - R2 closes indexed late-range complexity, early-empty completion, parent-bound ordering,
@@ -993,5 +993,13 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - The persistent store now has a 32,768-manifest hash chain, 49,152-entry inventory, explicit
   96/96/192 GiB active/working/physical run accounting, and 1 GiB auxiliary accounting.
   Superseded cleanup residue is recognized but blocks further advance until later authority.
-- Next: commit these four R2 docs and obtain two fresh independent all-zero reviews. The
-  four source paths remain closed meanwhile.
+- R2 `09da746` is independently rejected twice at `0/1/0/0/0`: unspecified full snapshots
+  could repeat accumulated descriptors quadratically and consume 1 GiB before 4,096 units.
+- R3 uses immutable constant-shape deltas with a previous-byte hash, at most one added run,
+  hash-selected removals, reconstructed checkpoint hash, one-pass replay, and five-digit
+  generation IDs. Manifests are capped at 16 KiB each/512 MiB aggregate; owner plus every
+  index uses a separate 512 MiB aggregate/64 KiB per-file cap.
+- The default-limit test must serialize/replay 32,768 retained deltas including a 4,096-unit
+  layer and prove linear reconstruction plus both auxiliary halves without production proof.
+- Next: commit these four R3 docs and obtain two fresh independent all-zero reviews. The four
+  source paths remain closed meanwhile.

@@ -10411,7 +10411,7 @@ or execute Intro-05. After the candidate, run focused tests, typecheck, full sui
 syntax, one opt-in four-intro equality pass, and two independent all-zero reviews. Only an
 accepted R7A source receipt opens docs-first R7B runner/validator authority.
 
-### F4E-R7A R1 rejected — R2 contract review only
+### F4E-R7A R1/R2 rejected — R3 contract review only
 
 R1 `b697625` is rejected at `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 requires indexed
 range reads with no prefix scan; an early-empty complete checkpoint matching the current
@@ -10425,5 +10425,21 @@ physical run data, and 1 GiB owner/manifest/index bytes. Historical manifests re
 receipts after superseded runs are reclaimed. Post-commit cleanup failure cannot undo the
 new generation, but stops further advance pending audited cleanup.
 
+R2 `09da746` is rejected by two fresh reviews, each
+`P0/P1/P2/P3/GAP = 0/1/0/0/0`, because it did not freeze full-snapshot versus delta
+manifests. R3 requires `t37-f4e-r7-checkpoint-delta-v1`: each retained generation is one
+constant-shape seed/unit/layer/complete delta, contains at most one added run descriptor,
+hashes a rule-selected removal set and the reconstructed full checkpoint, and is replayed
+once in generation order. It never repeats the accumulated next-run list or completed-depth
+prefix.
+
+Each manifest including LF is at most 16,384 bytes and all manifest/manifest-part bytes total
+at most 536,870,912. Owner plus all active/working/residue indexes independently total at most
+536,870,912, with each owner/index at most 65,536 bytes; together they retain the 1 GiB
+auxiliary bound. Resumable IDs use five-digit generation tokens through `32767`. A focused
+default-limit metadata test must serialize/replay all 32,768 deltas including a 4,096-unit
+layer, proving constant-size, both 512 MiB halves, namespace reachability, and linear active
+descriptor reconstruction without running Intro-05 or a production proof.
+
 No source or external R7 path is open. Commit and obtain two fresh all-zero reviews of the
-four-document R2 correction before assigning either Core or adapter implementation.
+four-document R3 correction before assigning either Core or adapter implementation.

@@ -3310,7 +3310,7 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   equality across every boundary; typecheck; full suite; build; syntax; two source reviews.
   R7B external authority remains closed until R7A is accepted.
 
-### F4E-R7A R1 rejection and R2 correction
+### F4E-R7A R1/R2 rejection and R3 correction
 
 - R1 `b697625` review is `0/3/2/0/0`: range reads could remain quadratic; early-empty
   completion was missing; 4,098 physical entries could not hold 4,096 run/index pairs;
@@ -3324,4 +3324,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Every generation manifest is retained with a previous-manifest SHA chain. Only latest
   active runs must remain; exact superseded cleanup residue stops later advance without
   invalidating the committed checkpoint.
-- Next: commit/review only the four corrected docs. Source and external R7 remain closed.
+- R2 `09da746` receives two independent `0/1/0/0/0` rejections: snapshot-versus-delta was
+  unspecified, permitting O(n^2) repeated descriptors and an unreachable auxiliary limit.
+- R3 freezes one constant-shape canonical delta per generation, at most one added descriptor,
+  hashed rule-based removal, full-state hash, and one-pass linear reconstruction. Resumable
+  run IDs use five generation digits.
+- Each manifest is at most 16 KiB; all manifests total at most 512 MiB. Owner plus all indexes
+  independently total at most 512 MiB, each at most 64 KiB. A production-default metadata
+  test replays all 32,768 deltas with a full 4,096-unit layer and proves the exact bounds.
+- Next: commit/review only the four R3 docs. Source and external R7 remain closed.

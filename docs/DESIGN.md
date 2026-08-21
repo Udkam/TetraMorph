@@ -9885,7 +9885,12 @@ metadata/cleanup-error limits remain. The persistent adapter has separate exact 
 (103,079,215,104 bytes) of run data referenced by the latest checkpoint, 96 GiB of
 uncommitted working run data, 192 GiB (206,158,430,208 bytes) of all recognized physical run
 data including superseded cleanup residue, and 1 GiB (1,073,741,824 bytes) total for owner,
-manifest, and index files. Equality to every bound is allowed. Creating the 4,097th unit or
+manifest, and index files. The auxiliary total is split into two independently enforced,
+equality-inclusive halves: all committed/recognized-part manifest bytes are at most
+536,870,912, while the owner plus all active, working, and recognized-residue index bytes are
+at most 536,870,912. Every canonical manifest is at most 16,384 bytes including its single
+terminal LF; every owner or index file is at most 65,536 bytes. Equality to every bound is
+allowed. Creating the 4,097th unit or
 32,769th manifest, adding the 49,153rd entry, or exceeding a byte bound fails before the next
 run write or manifest commit. It is an infrastructure failure with no certificate; it never
 truncates, samples, beams, hashes state identity, or proves that a route is absent. Tests
@@ -9911,6 +9916,50 @@ runs, safe transition/prune counters, and completed depth records. A complete ch
 binds the same proof identity and all completed depth records. Serialized adapter manifests
 contain immutable descriptors, not JavaScript object identity.
 
+Manifest representation is frozen as a constant-shape delta chain, never as a repeated full
+checkpoint snapshot. The filename is `manifest-gNNNNN.json`, where the five decimal digits
+cover generations `00000..32767`. V1 canonical JSON recursively sorts object keys by their
+UTF-8 bytes, preserves array order, permits only JSON strings/booleans/null and safe integers,
+rejects duplicate keys/floats/non-finite values, and emits no insignificant whitespace.
+UTF-8, no BOM, that canonical JSON plus exactly one LF has exact top-level keys
+`schema,generation,previousManifestSha256,transition,bindingSha256,stateDelta,runChanges,`
+`checkpointStateSha256,resourceTotalsBeforeManifest`; schema is
+`t37-f4e-r7-checkpoint-delta-v1`, and transition is exactly `seed`, `unit`, `layer`, or
+`complete`. Generation 0 has `previousManifestSha256:null`; later values are the uppercase
+SHA-256 of the preceding manifest's exact bytes including LF. `bindingSha256` is
+`canonicalHash('T37-F4E-R7-BINDING-V1', binding)`, using the existing
+`SHA-256(UTF8(label + NUL + canonicalJson(value)))` rule.
+
+The seed `stateDelta` exact keys are
+`binding,depth,parentOffset,lastProcessedParentKey,transitions,boundPrunes`; unit keys are
+`depth,parentOffset,lastProcessedParentKey,transitionsDelta,boundPrunesDelta`; layer keys are
+`completedDepth,nextDepth`; and complete keys are `completedDepth,reason`, where reason is
+`empty-frontier` or `final-depth`. Seed values describe the initial searching state; unit
+values are safe scalar increments/new cursor; layer appends exactly one depth record then
+resets the next layer cursor/counters by rule; complete appends exactly one depth record. No
+delta repeats the completed-depth prefix, active run list, accumulated unit-run list, or any
+earlier descriptor.
+
+`runChanges` has exact keys `add,removeRule,removeSetSha256`. `add` contains zero or one
+immutable run descriptor. `removeRule` is `none`, `current-frontier-and-next-runs`, or
+`all-active-proof-runs`; the latter two name the matching set already reconstructed from the
+previous generation, and `removeSetSha256` authenticates that canonical ordered set instead
+of serializing it again. Seed adds its frontier; a non-final unit adds its one possibly-empty
+unit run; a final-depth unit adds none; layer replaces the old frontier/unit set with at most
+one merged frontier; complete removes all active proof runs. `checkpointStateSha256` hashes
+the canonical full Core checkpoint reconstructed after applying the delta. Both hashes use
+the same canonicalHash rule with labels `T37-F4E-R7-RUN-SET-V1` and
+`T37-F4E-R7-CHECKPOINT-STATE-V1`; `removeSetSha256` hashes the empty ordered array when the
+rule is `none`.
+
+The fixed-shape `resourceTotalsBeforeManifest` exact keys are
+`latestCheckpointRunBytes,uncommittedWorkingRunBytes,recognizedPhysicalRunBytes,`
+`retainedManifestBytes,ownerAndIndexBytes,namespaceEntries`. They record the projected
+postcommit active-run total plus observed pre-manifest values for every other category. This
+is a historical precommit receipt, not trusted current inventory; the adapter serializes
+once, adds the candidate's exact byte length and namespace entry, and applies every limit
+before publication.
+
 One `advance...` call performs exactly one durable transition:
 
 1. With no checkpoint it replays the candidate, derives the canonical binding and one-key
@@ -9920,7 +9969,8 @@ One `advance...` call performs exactly one durable transition:
    parent deficit lower bound first, and fully enumerates every public landing only for each
    non-pruned parent. It throws on every shorter win, safe-counts transitions/prunes, writes
    a unit run named
-   `dNNNN-uNNNNNNNN-pNNNN-gNNNN`, and publishes the next generation.
+   `dNNNN-uNNNNNNNN-pNNNN-gNNNNN` outside final decision depth, and publishes the next
+   generation. A final-depth unit writes no next run.
 3. When a layer is covered, it requires `[0, frontier.size)` exactly once with no gap,
    overlap, duplicate, missing tail, wrong depth/cursor, or wrong run shape. Core performs
    the existing deterministic full-key merge and complete omit/add/replace readback. A
@@ -9938,7 +9988,8 @@ The last unit of any layer always publishes a searching checkpoint with
 `advance...` call publishes exactly one layer or complete generation, preserving distinct
 kill boundaries after the final unit and after layer/complete publication. Resumable seed,
 unit, and layer-merge IDs are disjoint: `d0000-s0000`,
-`dNNNN-uNNNNNNNN-pNNNN-gNNNN`, and `dNNNN-mNNNN-gNNNN`. The existing one-shot
+`dNNNN-uNNNNNNNN-pNNNN-gNNNNN`, and `dNNNN-mNNNN-gNNNNN`. The five-digit resumable
+generation token covers the complete 32,768-generation domain. The existing one-shot
 `dNNNN-pNNNN-gNNNN` grammar is unchanged and cannot collide.
 
 Every resume revalidates the candidate replay, initial hash/key, definition binding,
@@ -9963,12 +10014,16 @@ re-read, counted, SHA-256 bound, and file-identity checked before a canonical ma
 written as an exclusive `.part`, flushed, fsynced, closed, re-read, then atomically renamed.
 That manifest rename is the sole checkpoint commit boundary.
 
-Every manifest includes `previousManifestSha256` and is retained immutably through the final
-candidate audit. Resume requires the complete canonical generation `0..highest` sequence and
-hash chain; a gap, fork, rollback, duplicate, or 32,769th manifest is fatal. Only the highest
-manifest's referenced runs must remain active. A committed later manifest may supersede prior
-frontier/unit runs, and only those exact descriptors may be reclaimed after commit; historical
-manifests remain valid audit receipts even after their run files are gone.
+Every manifest includes `previousManifestSha256` over the preceding manifest's exact UTF-8
+bytes including LF and is retained immutably through the final candidate audit. Resume reads
+the complete canonical generation `0..highest` sequence once in order, validates each
+constant-size delta/hash link, applies the run-set rule, appends at most one depth record,
+recomputes `checkpointStateSha256`, and reconstructs the highest active descriptors. It may
+not rescan a manifest prefix for each generation. A gap, fork, rollback, duplicate, malformed
+delta, state-hash mismatch, or 32,769th manifest is fatal. Only the highest manifest's
+reconstructed runs must remain active. A committed later manifest may supersede prior
+frontier/unit runs, and only those exact descriptors may be reclaimed after commit;
+historical manifests remain valid audit receipts even after their run files are gone.
 
 Resume revalidates owner, manifest chain, real paths, non-reparse plain files, dev/ino/file
 ID, bytes, hashes, offsets, first/last boundaries, and every active referenced run. Exact
@@ -9998,8 +10053,14 @@ conflict, manifest-before-run, interruption before/after manifest rename and bef
 foreign/ambiguous residue, and every open/write/fsync/close/read/rename/cleanup seam. Tests
 also cover repeated late-range reads without prefix I/O, final short and exact-multiple
 terminal offsets, 4,096/4,097 units, post-commit reopen with successful/failed cleanup, and
-limit-minus-one/equal/plus-one for every byte, entry, and generation bound. They prove the
-four source paths contain no v6 path or runtime artifact dependency.
+limit-minus-one/equal/plus-one for every byte, entry, and generation bound. A default-limit
+reachability test serializes and replays 32,768 retained canonical deltas, including one full
+4,096-unit layer and its layer transition, proves each delta is constant-size and at most
+16,384 bytes, proves their cumulative bytes are at most 536,870,912, and proves the
+corresponding owner/index inventory remains within its independent 536,870,912-byte half and
+the 1 GiB total. The test operates on metadata/minimal legal runs and does not execute a
+production proof. Tests prove the four source paths contain no v6 path or runtime artifact
+dependency.
 
 After the last source edit, run focused suites, one typecheck, one complete suite, one build,
 Node syntax, and one opt-in Intro-01 through Intro-04 resumable equality pass. Two independent
@@ -10008,11 +10069,15 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1 rejection and R2 correction
+### F4E-R7A R1/R2 rejection and R3 correction
 
 R1 `b697625` is rejected at independent
-`P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 adds mandatory indexed late-range seeking,
-early-empty completion, the existing parent-bound order at final depth, disjoint generation
-transitions and run IDs, inclusive bound semantics with exact byte accounting, and a separate
-bounded persistent namespace with an immutable manifest hash chain. No source or external R7
-path has opened. Commit and independently review this four-document R2 before implementation.
+`P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
+fresh independent reviews at `0/1/0/0/0` and `0/1/0/0/0`: it did not freeze whether retained
+manifests were full snapshots or deltas, so cumulative next-run descriptors could be O(n^2)
+and make the 4,096-unit/1 GiB contract unreachable. R3 freezes the constant-size canonical
+delta/hash-chain representation, linear reconstruction, 16 KiB per-manifest and 512 MiB
+aggregate manifest bounds, a separate 512 MiB owner/index bound, a five-digit generation
+token, and the default-limit 32,768-manifest/4,096-unit reachability test. No source or
+external R7 path has opened. Commit and independently review this four-document R3 before
+implementation.
