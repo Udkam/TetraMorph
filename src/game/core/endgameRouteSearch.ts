@@ -1177,9 +1177,13 @@ function mergeProofRuns(
   owner: EndgameProofRunOwner,
   depth: number,
   initialRuns: readonly TrackedProofRun[],
+  options?: Readonly<{
+    id(pass: number, group: number): string;
+    rewriteSingletons: boolean;
+  }>,
 ): TrackedProofRun {
   if (initialRuns.length === 0) {
-    const empty = persistProofRun(owner, proofRunId(depth, 0, 0), () => 0);
+    const empty = persistProofRun(owner, options?.id(0, 0) ?? proofRunId(depth, 0, 0), () => 0);
     verifyProofRunAgainstRecords(empty, [], owner.limits);
     return empty;
   }
@@ -1189,14 +1193,14 @@ function mergeProofRuns(
     const outputs: TrackedProofRun[] = [];
     for (let start = 0, group = 0; start < runs.length; start += owner.limits.mergeFanIn, group += 1) {
       const inputs = runs.slice(start, start + owner.limits.mergeFanIn);
-      if (inputs.length === 1) {
+      if (inputs.length === 1 && !options?.rewriteSingletons) {
         for (const _value of verifiedProofRunValues(inputs[0]!, owner.limits)) {
           // A one-run tail is revalidated and carried without rewriting it.
         }
         outputs.push(inputs[0]!);
         continue;
       }
-      const id = proofRunId(depth, pass, group);
+      const id = options?.id(pass, group) ?? proofRunId(depth, pass, group);
       const output = persistProofRun(owner, id, (write) => {
         let count = 0;
         for (const value of mergedProofRunValues(inputs, owner.limits)) {
@@ -1218,6 +1222,10 @@ function mergeProofRuns(
 function createProofLayerBuilder(
   owner: EndgameProofRunOwner,
   depth: number,
+  ids?: Readonly<{
+    working(pass: number, group: number): string;
+    committed: string;
+  }>,
 ): Readonly<{ add(key: string): void; finish(): TrackedProofRun }> {
   let chunk: string[] = [];
   let chunkBytes = 0;
@@ -1230,7 +1238,7 @@ function createProofLayerBuilder(
     }
     sortAndDedupeProofChunk(chunk);
     const source = chunk;
-    const run = persistProofRun(owner, proofRunId(depth, 0, runs.length), (write) => {
+    const run = persistProofRun(owner, ids?.working(0, runs.length) ?? proofRunId(depth, 0, runs.length), (write) => {
       for (const value of source) write(value);
       return source.length;
     });
@@ -1258,7 +1266,22 @@ function createProofLayerBuilder(
       if (closed) throw proofRunError('layer is already finished');
       closed = true;
       flush();
-      return mergeProofRuns(owner, depth, runs);
+      const merged = mergeProofRuns(owner, depth, runs, ids ? Object.freeze({
+        id: ids.working,
+        rewriteSingletons: true,
+      }) : undefined);
+      if (!ids) return merged;
+      const committed = persistProofRun(owner, ids.committed, (write) => {
+        let count = 0;
+        for (const value of verifiedProofRunValues(merged, owner.limits)) {
+          write(value);
+          count += 1;
+        }
+        return count;
+      });
+      verifyMergedProofRun([merged], committed, owner.limits);
+      disposeTrackedProofRun(owner, merged);
+      return committed;
     },
   });
 }
@@ -1574,6 +1597,260 @@ function createVerifiedResumableRun(
   }
 }
 
+const RESUMABLE_PARENT_UNIT_SIZE = 65_536;
+const RESUMABLE_PARENT_UNIT_MAX_COUNT = 4096;
+
+function resumableUnitWorkingRunId(
+  generation: number,
+  depth: number,
+  unit: number,
+  pass: number,
+  group: number,
+): string {
+  for (const [label, value, maximum] of [
+    ['generation', generation, 32_767],
+    ['depth', depth, 32_767],
+    ['unit', unit, 4095],
+    ['pass', pass, 4095],
+    ['group', group, 4095],
+  ] as const) {
+    if (!Number.isSafeInteger(value) || value < 0 || value > maximum) {
+      throw proofRunError(`resumable ${label} is outside 0..${maximum}`);
+    }
+  }
+  return `r7w-u-g${String(generation).padStart(5, '0')}`
+    + `-d${String(depth).padStart(5, '0')}`
+    + `-n${String(unit).padStart(8, '0')}`
+    + `-p${String(pass).padStart(4, '0')}`
+    + `-h${String(group).padStart(4, '0')}`;
+}
+
+function createResumableProofRunOwner(store: EndgameProofRunStore): EndgameProofRunOwner {
+  return {
+    store,
+    limits: ENDGAME_PROOF_RUN_LIMITS,
+    active: new Set(),
+    activeIds: new Set(),
+    pendingWriters: 0,
+  };
+}
+
+function cleanupResumableProofRuns(owner: EndgameProofRunOwner): CleanupErrorCollector {
+  const cleanup = createCleanupCollector();
+  for (const tracked of [...owner.active].reverse()) {
+    try {
+      disposeTrackedProofRun(owner, tracked);
+    } catch (error) {
+      collectCleanupError(cleanup, error);
+    }
+  }
+  return cleanup;
+}
+
+function detachResumableProofRun(owner: EndgameProofRunOwner, tracked: TrackedProofRun): EndgameProofRun {
+  owner.active.delete(tracked);
+  owner.activeIds.delete(tracked.expectedId);
+  return tracked.run;
+}
+
+function addSafeProofCounter(base: number, delta: number, label: string): number {
+  if (!Number.isSafeInteger(base) || base < 0 || !Number.isSafeInteger(delta) || delta < 0) {
+    throw proofRunError(`${label} counter is invalid`);
+  }
+  const result = base + delta;
+  if (!Number.isSafeInteger(result)) throw proofRunError(`${label} counter exceeds the safe integer domain`);
+  return result;
+}
+
+function assertSearchingCheckpoint(
+  checkpoint: EndgameProofSearchingCheckpoint,
+  prepared: PreparedResumableEndgameProof,
+): Readonly<{ processedUnits: number; finalDecisionDepth: boolean }> {
+  assertResumableBinding(checkpoint.binding, prepared.binding);
+  assertProofRunDescriptor(checkpoint.frontier, checkpoint.frontier.id);
+  if (
+    !Number.isSafeInteger(checkpoint.depth)
+    || checkpoint.depth < 0
+    || checkpoint.depth > 32_767
+    || (prepared.optimalLocks > 1 && checkpoint.depth > prepared.optimalLocks - 2)
+    || (prepared.optimalLocks === 1 && checkpoint.depth !== 0)
+  ) {
+    throw proofRunError('searching checkpoint depth is invalid');
+  }
+  const exhaustedDepths = frozenResumableDepths(checkpoint.exhaustedDepths, prepared.optimalLocks - 1);
+  if (exhaustedDepths.length !== checkpoint.depth) {
+    throw proofRunError('searching checkpoint completed-depth prefix does not match its depth');
+  }
+  if (checkpoint.frontier.size <= 0
+    || checkpoint.frontier.size > RESUMABLE_PARENT_UNIT_SIZE * RESUMABLE_PARENT_UNIT_MAX_COUNT) {
+    throw proofRunError('searching frontier size exceeds the 4096-unit domain');
+  }
+  if (
+    !Number.isSafeInteger(checkpoint.parentOffset)
+    || checkpoint.parentOffset < 0
+    || checkpoint.parentOffset > checkpoint.frontier.size
+    || (checkpoint.parentOffset !== checkpoint.frontier.size
+      && checkpoint.parentOffset % RESUMABLE_PARENT_UNIT_SIZE !== 0)
+  ) {
+    throw proofRunError('searching parent offset is not a canonical unit boundary');
+  }
+  const processedUnits = checkpoint.parentOffset === 0
+    ? 0
+    : Math.ceil(checkpoint.parentOffset / RESUMABLE_PARENT_UNIT_SIZE);
+  if (processedUnits > RESUMABLE_PARENT_UNIT_MAX_COUNT) {
+    throw proofRunError('searching checkpoint exceeds 4096 parent units');
+  }
+  const frontierMatch = /^r7-f-d(\d{5})-g(\d{5})$/.exec(checkpoint.frontier.id);
+  if (!frontierMatch || Number(frontierMatch[1]) !== checkpoint.depth) {
+    throw proofRunError('searching frontier id does not match its depth');
+  }
+  const frontierGeneration = Number(frontierMatch[2]);
+  if (frontierGeneration + processedUnits !== checkpoint.generation) {
+    throw proofRunError('searching generation does not match its frontier and unit cursor');
+  }
+  const finalDecisionDepth = prepared.optimalLocks > 1
+    && checkpoint.depth === prepared.optimalLocks - 2;
+  const expectedNextRuns = finalDecisionDepth ? 0 : processedUnits;
+  if (!Number.isSafeInteger(checkpoint.nextRuns.count)
+    || checkpoint.nextRuns.count !== expectedNextRuns
+    || checkpoint.nextRuns.count < 0
+    || checkpoint.nextRuns.count > RESUMABLE_PARENT_UNIT_MAX_COUNT) {
+    throw proofRunError('searching next-run collection does not match processed units');
+  }
+  addSafeProofCounter(checkpoint.transitions, 0, 'transition');
+  addSafeProofCounter(checkpoint.boundPrunes, 0, 'bound-prune');
+  if (checkpoint.parentOffset === 0) {
+    if (checkpoint.lastProcessedParentKey !== null
+      || checkpoint.transitions !== 0
+      || checkpoint.boundPrunes !== 0) {
+      throw proofRunError('fresh searching layer has a nonempty cursor or counters');
+    }
+  } else {
+    if (checkpoint.lastProcessedParentKey === null) {
+      throw proofRunError('advanced searching layer is missing its parent cursor');
+    }
+    proofRunRecordBytes(checkpoint.lastProcessedParentKey, PROOF_RUN_RECORD_MAX_BYTES);
+  }
+  return Object.freeze({ processedUnits, finalDecisionDepth });
+}
+
+function visitVerifiedProofRunRange(
+  run: EndgameProofRun,
+  range: EndgameProofRunRange,
+  precedingKey: string | null,
+  visit: (key: string) => void,
+): string {
+  const iterator = run.values(range)[Symbol.iterator]();
+  const cleanup = createCleanupCollector();
+  let previous = precedingKey;
+  let completed = false;
+  let primary: unknown;
+  let hasPrimary = false;
+  try {
+    const expectedCount = range.endOrdinal - range.startOrdinal;
+    for (let index = 0; index < expectedCount; index += 1) {
+      const item = iterator.next();
+      if (item.done) throw proofRunError(`${run.id} omitted ranged record ${range.startOrdinal + index}`);
+      proofRunRecordBytes(item.value, PROOF_RUN_RECORD_MAX_BYTES);
+      if (previous !== null && ordinalByteCompare(previous, item.value) >= 0) {
+        throw proofRunError(`${run.id} ranged records are not strictly increasing`);
+      }
+      previous = item.value;
+      visit(item.value);
+    }
+    if (!iterator.next().done) throw proofRunError(`${run.id} added ranged records`);
+    completed = true;
+  } catch (error) {
+    primary = error;
+    hasPrimary = true;
+  } finally {
+    if (!completed) closeIterator(iterator, cleanup);
+  }
+  if (hasPrimary) throwProofRunFailure(primary, cleanup);
+  if (previous === null) throw proofRunError(`${run.id} returned an empty nonempty range`);
+  return previous;
+}
+
+function advanceSearchingProofUnit(
+  checkpoint: EndgameProofSearchingCheckpoint,
+  tip: EndgameProofTip,
+  prepared: PreparedResumableEndgameProof,
+  store: EndgameProofCheckpointRunStore,
+  processedUnits: number,
+  finalDecisionDepth: boolean,
+): EndgameProofAdvanceResult {
+  const endOrdinal = Math.min(checkpoint.frontier.size, checkpoint.parentOffset + RESUMABLE_PARENT_UNIT_SIZE);
+  const range = Object.freeze({ startOrdinal: checkpoint.parentOffset, endOrdinal });
+  const generation = checkpoint.generation + 1;
+  if (generation > 32_767) throw proofRunError('resumable generation exceeds 32767');
+  const owner = createResumableProofRunOwner(store);
+  const builder = finalDecisionDepth ? null : createProofLayerBuilder(owner, checkpoint.depth + 1, Object.freeze({
+    working: (pass: number, group: number) => resumableUnitWorkingRunId(
+      generation, checkpoint.depth, processedUnits, pass, group,
+    ),
+    committed: resumableProofRunId('unit', checkpoint.depth, generation, processedUnits),
+  }));
+  let frontierReleased = false;
+  try {
+    let transitionsDelta = 0;
+    let boundPrunesDelta = 0;
+    const lastProcessedParentKey = visitVerifiedProofRunRange(
+      checkpoint.frontier,
+      range,
+      checkpoint.lastProcessedParentKey,
+      (parentKey) => {
+        const parent = decodeProofFrontierStateKey(parentKey, prepared.proofContext);
+        if (checkpoint.depth + endgameRouteLockLowerBound(parent) >= prepared.optimalLocks) {
+          boundPrunesDelta += 1;
+          addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
+          return;
+        }
+        for (const landing of exhaustiveEndgameLandings(parent)) {
+          transitionsDelta += 1;
+          addSafeProofCounter(checkpoint.transitions, transitionsDelta, 'transition');
+          if (landing.state.status === 'finished') {
+            throw new Error(
+              `Endgame ${prepared.levelId} has a shorter route than the ${prepared.optimalLocks}-lock candidate.`,
+            );
+          }
+          if (!isActive(landing.state) || finalDecisionDepth) continue;
+          const nextDepth = checkpoint.depth + 1;
+          if (nextDepth + endgameRouteLockLowerBound(landing.state) >= prepared.optimalLocks) {
+            boundPrunesDelta += 1;
+            addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
+            continue;
+          }
+          builder!.add(proofFrontierStateKey(landing.state, prepared.proofContext));
+        }
+      },
+    );
+    store.releaseCheckpointRun(checkpoint.frontier);
+    frontierReleased = true;
+    const trackedNextRun = builder?.finish() ?? null;
+    const nextRun = trackedNextRun ? detachResumableProofRun(owner, trackedNextRun) : null;
+    const publication = store.publishCheckpoint(Object.freeze({
+      transition: 'unit',
+      previousTip: tip,
+      parentOffset: endOrdinal,
+      lastProcessedParentKey,
+      transitionsDelta,
+      boundPrunesDelta,
+      nextRun,
+    }));
+    return searchingAdvanceResult(generation, checkpoint.depth, endOrdinal, publication);
+  } catch (primary) {
+    const cleanup = cleanupResumableProofRuns(owner);
+    if (!frontierReleased) {
+      try {
+        store.releaseCheckpointRun(checkpoint.frontier);
+      } catch (error) {
+        collectCleanupError(cleanup, error);
+      }
+    }
+    throwProofRunFailure(primary, cleanup);
+  }
+}
+
 function searchingAdvanceResult(
   generation: number,
   depth: number,
@@ -1645,10 +1922,24 @@ function advanceResumableEndgameProof(
       advanceAllowed: loaded.advanceAllowed,
     });
   }
+  const searching = assertSearchingCheckpoint(checkpoint, prepared);
   if (!loaded.advanceAllowed) {
     return blockedAdvanceResult(checkpoint, authenticatedTip, loaded.diagnostics);
   }
-  throw proofRunError('searching checkpoint transitions are not yet implemented');
+  if (prepared.optimalLocks === 1) {
+    throw proofRunError('zero-decision transition is not yet implemented');
+  }
+  if (checkpoint.parentOffset < checkpoint.frontier.size) {
+    return advanceSearchingProofUnit(
+      checkpoint,
+      authenticatedTip,
+      prepared,
+      store,
+      searching.processedUnits,
+      searching.finalDecisionDepth,
+    );
+  }
+  throw proofRunError('searching layer transition is not yet implemented');
 }
 
 export function advanceOptimalEndgameRouteProof(
