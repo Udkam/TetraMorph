@@ -437,19 +437,19 @@ describe('Endgame proof frontier Core-owned runs', () => {
     const completeStore = new MemoryCheckpointRunStore(Object.freeze({
       checkpoint: Object.freeze({
         kind: 'complete',
-        generation: 7,
+        generation: 6,
         binding: publication.binding,
         reason: 'final-depth',
         exhaustedDepths,
       }),
-      tip: Object.freeze({ generation: 7, manifestSha256: 'B'.repeat(64) }),
+      tip: Object.freeze({ generation: 6, manifestSha256: 'B'.repeat(64) }),
       diagnostics: residueDiagnostics,
       advanceAllowed: false,
     }));
     const recovered = advanceOptimalEndgameRouteProofForDefinition(definition, route, completeStore);
     expect(recovered).toMatchObject({
       status: 'complete',
-      generation: 7,
+      generation: 6,
       advanceAllowed: false,
       diagnostics: residueDiagnostics,
     });
@@ -523,7 +523,7 @@ describe('Endgame proof frontier Core-owned runs', () => {
 
     const finalDepth = seed.binding.optimalLocks - 2;
     const finalFrontier = new MemoryRun(
-      `r7-f-d${String(finalDepth).padStart(5, '0')}-g00002`,
+      `r7-f-d${String(finalDepth).padStart(5, '0')}-g00004`,
       Object.freeze([seed.binding.initialFrontierKey]),
       1,
       (_id, values) => values,
@@ -531,7 +531,7 @@ describe('Endgame proof frontier Core-owned runs', () => {
     );
     const finalUnitStore = new MemoryCheckpointRunStore(Object.freeze({
       checkpoint: Object.freeze({
-        kind: 'searching', generation: 2, binding: seed.binding, depth: finalDepth,
+        kind: 'searching', generation: 4, binding: seed.binding, depth: finalDepth,
         parentOffset: 0, lastProcessedParentKey: null, frontier: finalFrontier,
         nextRuns: Object.freeze({ count: 0, open: () => Object.freeze([]) }),
         transitions: 0, boundPrunes: 0,
@@ -540,12 +540,12 @@ describe('Endgame proof frontier Core-owned runs', () => {
           (_, lockedPieces) => Object.freeze({ lockedPieces, frontierStates: 1, transitions: 0, boundPrunes: 0 }),
         )),
       }),
-      tip: Object.freeze({ generation: 2, manifestSha256: 'E'.repeat(64) }),
+      tip: Object.freeze({ generation: 4, manifestSha256: 'E'.repeat(64) }),
       diagnostics,
       advanceAllowed: true,
     }));
     const finalResult = advanceOptimalEndgameRouteProofForDefinition(definition, route, finalUnitStore);
-    expect(finalResult).toMatchObject({ status: 'searching', generation: 3, parentOffset: 1 });
+    expect(finalResult).toMatchObject({ status: 'searching', generation: 5, parentOffset: 1 });
     const finalUnit = finalUnitStore.publications[0]!;
     expect(finalUnit.transition).toBe('unit');
     if (finalUnit.transition !== 'unit') throw new Error('expected final-depth unit publication');
@@ -661,18 +661,18 @@ describe('Endgame proof frontier Core-owned runs', () => {
     })));
     const finalStore = new MemoryCheckpointRunStore(Object.freeze({
       checkpoint: Object.freeze({
-        kind: 'searching', generation: 1, binding: seed.binding, depth: finalDepth,
+        kind: 'searching', generation: 5, binding: seed.binding, depth: finalDepth,
         parentOffset: 1, lastProcessedParentKey: key,
-        frontier: memoryRun(`r7-f-d${String(finalDepth).padStart(5, '0')}-g00000`, [key]),
+        frontier: memoryRun(`r7-f-d${String(finalDepth).padStart(5, '0')}-g00004`, [key]),
         nextRuns: Object.freeze({ count: 0, open: () => { throw new Error('final depth opens no collection'); } }),
         transitions: 3, boundPrunes: 2, exhaustedDepths: priorDepths,
       }),
-      tip: Object.freeze({ generation: 1, manifestSha256: '2'.repeat(64) }),
+      tip: Object.freeze({ generation: 5, manifestSha256: '2'.repeat(64) }),
       diagnostics, advanceAllowed: true,
     }));
     const finalResult = advanceOptimalEndgameRouteProofForDefinition(definition, route, finalStore);
     expect(finalResult).toMatchObject({
-      status: 'complete', generation: 2,
+      status: 'complete', generation: 6,
       certificate: { exhaustedDepths: [...priorDepths, {
         lockedPieces: finalDepth, frontierStates: 1, transitions: 3, boundPrunes: 2,
       }] },
@@ -808,6 +808,48 @@ describe('Endgame proof frontier Core-owned runs', () => {
         advanceAllowed: true,
       }));
       expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, store)).toThrow();
+      expect(store.publications).toEqual([]);
+    }
+
+    const historicalRecord = Object.freeze({
+      lockedPieces: 0, frontierStates: 1, transitions: 0, boundPrunes: 0,
+    });
+    for (const impossibleGeneration of [1, 3]) {
+      const checkpoint: EndgameProofSearchingCheckpoint = Object.freeze({
+        kind: 'searching', generation: impossibleGeneration, binding: seed.binding, depth: 1,
+        parentOffset: 0, lastProcessedParentKey: null,
+        frontier: new MemoryRun(
+          `r7-f-d00001-g${String(impossibleGeneration).padStart(5, '0')}`,
+          [seed.binding.initialFrontierKey], 1, (_id, values) => values, () => {},
+        ),
+        nextRuns: Object.freeze({ count: 0, open: () => Object.freeze([]) }),
+        transitions: 0, boundPrunes: 0, exhaustedDepths: Object.freeze([historicalRecord]),
+      });
+      const store = new MemoryCheckpointRunStore(Object.freeze({
+        checkpoint,
+        tip: Object.freeze({ generation: impossibleGeneration, manifestSha256: '6'.repeat(64) }),
+        diagnostics, advanceAllowed: true,
+      }));
+      expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, store))
+        .toThrow('frontier generation does not match its completed-depth history');
+      expect(store.publications).toEqual([]);
+    }
+
+    const completedDepths = Object.freeze(Array.from(
+      { length: seed.binding.optimalLocks - 1 },
+      (_, lockedPieces) => Object.freeze({ lockedPieces, frontierStates: 1, transitions: 0, boundPrunes: 0 }),
+    ));
+    for (const impossibleGeneration of [5, 7]) {
+      const store = new MemoryCheckpointRunStore(Object.freeze({
+        checkpoint: Object.freeze({
+          kind: 'complete', generation: impossibleGeneration, binding: seed.binding,
+          reason: 'final-depth', exhaustedDepths: completedDepths,
+        }),
+        tip: Object.freeze({ generation: impossibleGeneration, manifestSha256: '7'.repeat(64) }),
+        diagnostics, advanceAllowed: true,
+      }));
+      expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, store))
+        .toThrow('complete checkpoint generation does not match its completed-depth history');
       expect(store.publications).toEqual([]);
     }
   });

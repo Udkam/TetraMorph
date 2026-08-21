@@ -1507,6 +1507,21 @@ function frozenResumableDepths(
   }));
 }
 
+function generationAfterCompletedDepths(records: readonly EndgameOptimalRouteDepthRecord[]): number {
+  let generation = 0;
+  for (const record of records) {
+    const unitCount = Math.ceil(record.frontierStates / RESUMABLE_PARENT_UNIT_SIZE);
+    if (!Number.isSafeInteger(unitCount) || unitCount < 1 || unitCount > RESUMABLE_PARENT_UNIT_MAX_COUNT) {
+      throw proofRunError('completed depth frontier exceeds the 4096-unit generation domain');
+    }
+    generation += unitCount + 1;
+    if (!Number.isSafeInteger(generation) || generation > 32_767) {
+      throw proofRunError('completed depth history exceeds generation 32767');
+    }
+  }
+  return generation;
+}
+
 function safeDepthTotal(
   records: readonly EndgameOptimalRouteDepthRecord[],
   key: 'frontierStates' | 'transitions' | 'boundPrunes',
@@ -1557,6 +1572,12 @@ function assertCompleteCheckpoint(
     || records.length >= prepared.optimalLocks - 1
   ) {
     throw proofRunError('empty-frontier checkpoint shape is invalid');
+  }
+  const expectedGeneration = checkpoint.reason === 'zero-decision-depth'
+    ? 1
+    : generationAfterCompletedDepths(records);
+  if (checkpoint.generation !== expectedGeneration) {
+    throw proofRunError('complete checkpoint generation does not match its completed-depth history');
   }
   return records;
 }
@@ -1710,7 +1731,13 @@ function assertSearchingCheckpoint(
     throw proofRunError('searching frontier id does not match its depth');
   }
   const frontierGeneration = Number(frontierMatch[2]);
-  if (frontierGeneration + processedUnits !== checkpoint.generation) {
+  const historicalFrontierGeneration = generationAfterCompletedDepths(exhaustedDepths);
+  if (frontierGeneration !== historicalFrontierGeneration) {
+    throw proofRunError('searching frontier generation does not match its completed-depth history');
+  }
+  const historicalCheckpointGeneration = historicalFrontierGeneration + processedUnits;
+  if (!Number.isSafeInteger(historicalCheckpointGeneration) || historicalCheckpointGeneration > 32_767
+    || historicalCheckpointGeneration !== checkpoint.generation) {
     throw proofRunError('searching generation does not match its frontier and unit cursor');
   }
   const finalDecisionDepth = prepared.optimalLocks > 1
