@@ -3431,3 +3431,26 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - R11 `a8607fd` receives three independent `0/0/0/0/0` reviews and is accepted.
 - Next: two disjoint writers may implement only the named Core/test and adapter/test path pairs.
   External R7 paths, production proof, R7B, and Intro-05 remain closed.
+
+### F4E-R7A implementation checkpoint through manifest planning
+
+- Core implementation is committed through `966c3d1`. It covers seed/unit/layer/complete,
+  lost-result recovery, authenticated generation history, the real 4,096-input merge, an
+  exact 4,098-slot peak, and rejection of a 4,097-unit frontier before Store side effects.
+- Core focused QA is `30 passed / 1 skipped`; opt-in Intro-01..04 equality is `31/31`; the
+  independent source review is `P0/P1/P2/P3/GAP = 0/0/0/0/0`.
+- Adapter primitives and candidate run/index publication are committed through `b69a7f4`.
+  Its independent B review remains rejected at `0/4/0/0/2`: foreign-part ownership,
+  index-final identity, precommit cleanup latching, readback-close retention, real index
+  integration vectors, and later same-Store incremental inventory still require repair.
+- Manifest delta planning and in-memory commit are committed separately at `2c2e17b`.
+  Seed/unit/layer/complete use exact 16 KiB canonical manifests, authenticated detached
+  plans, state-instance binding, single consumption, safe totals, and constant-shape rolling
+  commitments. Unit updates remain O(1) through 4,096 commits; final-decision unit 4,096 is
+  accepted and 4,097 is rejected. Focused QA is `60 passed / 1 skipped`, and the final
+  independent review is `0/0/0/0/0`.
+- Current bounded next action: repair adapter publication ownership, blocked precommit
+  residue, final index identity, and real 65,528/65,536/65,544 index integration vectors.
+  Close-descriptor retention and incremental inventory follow as separate checkpoints.
+  Manifest filesystem publication, resume-chain reconstruction, external R7 execution,
+  R7B, and Intro-05 remain closed.
