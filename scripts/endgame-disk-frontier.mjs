@@ -301,6 +301,7 @@ export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
   rangeByteOffsets: resumableRangeByteOffsets,
   parseCanonicalJson: parseStrictCanonicalJson,
   parseCanonicalLfBytes,
+  admitNamespacePeak,
 });
 
 const RESUMABLE_DEFAULT_FS = Object.freeze({
@@ -886,6 +887,10 @@ function sameProofFileIdentity(left, right) {
     && left.mtimeNs === right.mtimeNs && left.ctimeNs === right.ctimeNs;
 }
 
+function sameProofFileObject(left, right) {
+  return left.dev === right.dev && left.ino === right.ino;
+}
+
 function proofIdentityKey(identity) {
   return `${identity.dev}:${identity.ino}:${identity.size}:${identity.mtimeNs}:${identity.ctimeNs}`;
 }
@@ -980,7 +985,132 @@ function scanResumableInventory(fs, stagePath, limits) {
     retainedManifestBytes,
     ownerAndIndexBytes,
     recognizedPhysicalRunBytes,
+    uncommittedWorkingRunBytes: recognizedPhysicalRunBytes,
   });
+}
+
+const R7_COMMITTED_RUN = /^(?:r7-f-d([0-9]{5})-g([0-9]{5})|r7-u-d([0-9]{5})-n([0-9]{8})-g([0-9]{5}))$/u;
+const R7_WORKING_RUN = /^r7w-(?:u-g([0-9]{5})-d([0-9]{5})-n([0-9]{8})|l-g([0-9]{5})-d([0-9]{5}))-p([0-9]{4})-h([0-9]{4})$/u;
+
+function classifyResumableRunId(id) {
+  validateRunId(id);
+  const committed = R7_COMMITTED_RUN.exec(id);
+  if (committed) {
+    const depth = Number(committed[1] ?? committed[3]);
+    const maybeUnit = committed[4] === undefined ? null : Number(committed[4]);
+    const generation = Number(committed[2] ?? committed[5]);
+    if (depth > 32_767 || generation > 32_767 || (maybeUnit !== null && maybeUnit > 4_095)) {
+      throw frontierError(`committed run id ${id} exceeds its token range`);
+    }
+    return Object.freeze({ committed: true, generation });
+  }
+  const working = R7_WORKING_RUN.exec(id);
+  if (!working) throw frontierError(`run id ${id} is outside the R7 grammar`);
+  const generation = Number(working[1] ?? working[4]);
+  const depth = Number(working[2] ?? working[5]);
+  const unit = working[3] === undefined ? null : Number(working[3]);
+  const pass = Number(working[6]);
+  const group = Number(working[7]);
+  if (generation > 32_767 || depth > 32_767 || (unit !== null && unit > 4_095) || pass > 4_095 || group > 4_095) {
+    throw frontierError(`working run id ${id} exceeds its token range`);
+  }
+  return Object.freeze({ committed: false, generation });
+}
+
+function admitNamespacePeak(current, addition, maximum) {
+  assertSafeNonnegativeInteger(current, 'current namespace entries');
+  assertSafeNonnegativeInteger(addition, 'namespace peak addition');
+  assertSafeNonnegativeInteger(maximum, 'maximum namespace entries');
+  if (current + addition > maximum) throw frontierError(`namespace peak ${current + addition} exceeds ${maximum}`);
+}
+
+function inspectProofRunFile(fs, filePath, expectedSize, expectedIdentity = null) {
+  const stats = fs.lstatSync(filePath, { bigint: true });
+  assertPlainFile(stats, path.basename(filePath));
+  const identity = proofFileIdentity(stats);
+  if (expectedIdentity && !sameProofFileIdentity(identity, expectedIdentity)) throw frontierError('run file identity drift');
+  const dataBytes = Number(stats.size);
+  if (!Number.isSafeInteger(dataBytes)) throw frontierError('run byte length exceeds safe integer range');
+  let descriptor = null;
+  const hash = createHash('sha256');
+  let count = 0;
+  let firstKey = null;
+  let lastKey = null;
+  let record = '';
+  try {
+    descriptor = fs.openSync(filePath, 'r');
+    if (!sameProofFileIdentity(identity, proofFileIdentity(fs.fstatSync(descriptor, { bigint: true })))) throw frontierError('run open identity drift');
+    const buffer = Buffer.allocUnsafe(ENDGAME_DISK_FRONTIER_LIMITS.readBufferBytes);
+    let position = 0;
+    while (position < dataBytes) {
+      const length = Math.min(buffer.length, dataBytes - position);
+      const read = fs.readSync(descriptor, buffer, 0, length, position);
+      if (!Number.isInteger(read) || read <= 0 || read > length) throw frontierError('run returned an invalid read count');
+      hash.update(buffer.subarray(0, read));
+      for (let index = 0; index < read; index += 1) {
+        const byte = buffer[index];
+        if (byte === 0x0a) {
+          if (record.length === 0) throw frontierError('run contains a blank record');
+          if (lastKey !== null && ordinalByteCompare(lastKey, record) >= 0) throw frontierError('run is not strictly increasing');
+          if (firstKey === null) firstKey = record;
+          lastKey = record;
+          record = '';
+          count += 1;
+        } else {
+          if (byte < 0x20 || byte > 0x7e || record.length >= ENDGAME_DISK_FRONTIER_LIMITS.recordMaxBytes) {
+            throw frontierError('run contains invalid framing');
+          }
+          record += String.fromCharCode(byte);
+        }
+      }
+      position += read;
+    }
+    if (record.length !== 0) throw frontierError('run is missing its terminal LF');
+    if (count !== expectedSize) throw frontierError(`run contains ${count} records for size ${expectedSize}`);
+    if (!sameProofFileIdentity(identity, proofFileIdentity(fs.fstatSync(descriptor, { bigint: true })))) throw frontierError('run changed while reading');
+  } finally {
+    if (descriptor !== null) fs.closeSync(descriptor);
+  }
+  return Object.freeze({ dataBytes, dataSha256: hash.digest('hex').toUpperCase(), firstKey, lastKey, identity });
+}
+
+function* readProofRunRange(fs, filePath, identity, size, offsets, range) {
+  const selected = range === undefined ? { startOrdinal: 0, endOrdinal: size } : validateResumableRunRange(size, range);
+  if (selected.startOrdinal === selected.endOrdinal) return;
+  const { startOffset, endOffset } = resumableRangeByteOffsets({ size, offsets }, selected);
+  let descriptor = null;
+  let count = 0;
+  let previous = null;
+  let record = '';
+  try {
+    descriptor = fs.openSync(filePath, 'r');
+    if (!sameProofFileIdentity(identity, proofFileIdentity(fs.fstatSync(descriptor, { bigint: true })))) throw frontierError('range reader identity drift');
+    const buffer = Buffer.allocUnsafe(ENDGAME_DISK_FRONTIER_LIMITS.readBufferBytes);
+    let position = startOffset;
+    while (position < endOffset) {
+      const length = Math.min(buffer.length, endOffset - position);
+      const read = fs.readSync(descriptor, buffer, 0, length, position);
+      if (!Number.isInteger(read) || read <= 0 || read > length) throw frontierError('range reader returned an invalid count');
+      for (let index = 0; index < read; index += 1) {
+        const byte = buffer[index];
+        if (byte === 0x0a) {
+          if (record.length === 0 || (previous !== null && ordinalByteCompare(previous, record) >= 0)) throw frontierError('range record framing/order drift');
+          previous = record;
+          record = '';
+          count += 1;
+          yield previous;
+        } else {
+          if (byte < 0x20 || byte > 0x7e || record.length >= ENDGAME_DISK_FRONTIER_LIMITS.recordMaxBytes) throw frontierError('range record framing drift');
+          record += String.fromCharCode(byte);
+        }
+      }
+      position += read;
+    }
+    if (record.length !== 0 || count !== selected.endOrdinal - selected.startOrdinal) throw frontierError('range yielded the wrong record count');
+    if (!sameProofFileIdentity(identity, proofFileIdentity(fs.fstatSync(descriptor, { bigint: true })))) throw frontierError('run changed during range read');
+  } finally {
+    if (descriptor !== null) fs.closeSync(descriptor);
+  }
 }
 
 function exactResumableStage(fs, stagePath, mode) {
@@ -1092,12 +1222,146 @@ export function createResumableEndgameDiskFrontierStore(options) {
   let invalidated = false;
   let viewOutstanding = false;
   let disposed = false;
+  let suspendCloseFailed = false;
+  const writers = new Map();
+  const runs = new Map();
+  const cleanupErrors = [];
+  let workingRunBytes = inventory.uncommittedWorkingRunBytes;
+  let physicalRunBytes = inventory.recognizedPhysicalRunBytes;
+  const refreshInventory = () => {
+    inventory = scanResumableInventory(fs, stagePath, limits);
+    workingRunBytes = inventory.uncommittedWorkingRunBytes;
+    physicalRunBytes = inventory.recognizedPhysicalRunBytes;
+  };
+  const unlinkOwnedRunPart = (filePath, ownedIdentity, allowOwnedGrowth = false) => {
+    let stats;
+    try {
+      stats = fs.lstatSync(filePath, { bigint: true });
+    } catch (error) {
+      if (isMissing(error)) return;
+      throw error;
+    }
+    const current = proofFileIdentity(stats);
+    if (!(allowOwnedGrowth ? sameProofFileObject(current, ownedIdentity) : sameProofFileIdentity(current, ownedIdentity))) {
+      throw frontierError(`refusing changed run part ${path.basename(filePath)}`);
+    }
+    fs.unlinkSync(filePath);
+  };
+  const makeWorkingRun = (record) => {
+    let runDisposed = false;
+    const run = Object.freeze({
+      id: record.id,
+      size: record.size,
+      values(range) {
+        if (runDisposed || invalidated || disposed) throw frontierError(`run ${record.id} is invalidated`);
+        return readProofRunRange(fs, record.filePath, record.identity, record.size, record.offsets, range);
+      },
+      dispose() {
+        if (runDisposed) return;
+        unlinkOwnedRunPart(record.filePath, record.identity);
+        runDisposed = true;
+        runs.delete(record.id);
+        refreshInventory();
+      },
+    });
+    runs.set(record.id, { run, record });
+    return run;
+  };
+  const createRun = (id) => {
+    requireLive();
+    if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
+    const classification = classifyResumableRunId(id);
+    if (classification.committed) throw frontierError('committed run finalization is reserved for the next checkpoint');
+    if (writers.has(id) || runs.has(id)) throw frontierError(`duplicate run id ${id}`);
+    refreshInventory();
+    admitNamespacePeak(inventory.namespaceEntries, 1, limits.maximumNamespaceEntries);
+    const filePath = path.join(stagePath, `${id}.run.part`);
+    let descriptor = fs.openSync(filePath, 'wx', 0o600);
+    const ownedIdentity = proofFileIdentity(fs.fstatSync(descriptor, { bigint: true }));
+    let state = 'open';
+    let size = 0;
+    let dataBytes = 0;
+    let first = null;
+    let previous = null;
+    const offsets = [0];
+    const closeWriter = () => {
+      if (descriptor === null) return;
+      fs.closeSync(descriptor);
+      descriptor = null;
+    };
+    const abort = () => {
+      if (state === 'aborted' || state === 'finished') return;
+      const errors = [];
+      let closeFailed = false;
+      try { closeWriter(); } catch (error) { closeFailed = true; errors.push(error); }
+      try { unlinkOwnedRunPart(filePath, ownedIdentity, true); } catch (error) { errors.push(error); }
+      if (errors.length > 0) {
+        const failure = aggregate(null, errors, `Run ${id} abort failed.`);
+        Object.defineProperty(failure, 'r7CloseFailed', { value: closeFailed });
+        throw failure;
+      }
+      state = 'aborted';
+      writers.delete(id);
+      refreshInventory();
+    };
+    const writer = Object.freeze({
+      write(key) {
+        if (state !== 'open') throw frontierError(`run writer ${id} is not open`);
+        const encoded = encodeRecord(key, previous);
+        if (workingRunBytes + encoded.length > limits.uncommittedWorkingRunBytes) {
+          throw frontierError('uncommitted working run bytes exceed the limit');
+        }
+        if (physicalRunBytes + encoded.length > limits.recognizedPhysicalRunBytes) {
+          throw frontierError('recognized physical run bytes exceed the limit');
+        }
+        if (size > 0 && size % R7_INDEX_STRIDE === 0) offsets.push(dataBytes);
+        let written = 0;
+        try {
+          while (written < encoded.length) {
+            const count = fs.writeSync(descriptor, encoded, written, encoded.length - written, dataBytes + written);
+            if (!Number.isInteger(count) || count <= 0 || count > encoded.length - written) throw frontierError('run writer returned an invalid count');
+            written += count;
+          }
+        } catch (error) {
+          state = 'failed';
+          refreshInventory();
+          throw error;
+        }
+        size += 1;
+        dataBytes += encoded.length;
+        workingRunBytes += encoded.length;
+        physicalRunBytes += encoded.length;
+        if (first === null) first = key;
+        previous = key;
+      },
+      finish() {
+        if (state !== 'open') throw frontierError(`run writer ${id} cannot finish from ${state}`);
+        fs.fsyncSync(descriptor);
+        closeWriter();
+        const inspected = inspectProofRunFile(fs, filePath, size);
+        if (!sameProofFileObject(inspected.identity, ownedIdentity) || inspected.dataBytes !== dataBytes
+          || inspected.firstKey !== first || inspected.lastKey !== previous) {
+          throw frontierError('working run readback drift');
+        }
+        if (size > 0) offsets.push(dataBytes);
+        bindResumableIndexToDataBytes({ size, offsets }, dataBytes);
+        state = 'finished';
+        writers.delete(id);
+        refreshInventory();
+        return makeWorkingRun(Object.freeze({ id, size, filePath, offsets: Object.freeze(offsets), identity: inspected.identity }));
+      },
+      abort,
+    });
+    writers.set(id, writer);
+    refreshInventory();
+    return writer;
+  };
   const diagnostics = () => Object.freeze({
-    activeRuns: Object.freeze([]),
+    activeRuns: Object.freeze([...new Set([...writers.keys(), ...runs.keys()])].sort(ordinalByteCompare)),
     residue: Object.freeze(blockedReason === null ? [] : ['.', ...inventory.names.filter((name) => name !== 'owner.json')]),
     residueTruncated: false,
-    cleanupErrors: Object.freeze([]),
-    cleanupErrorsTruncated: false,
+    cleanupErrors: Object.freeze([...cleanupErrors]),
+    cleanupErrorsTruncated: cleanupErrors.length >= ENDGAME_DISK_FRONTIER_LIMITS.diagnosticMaxEntries,
   });
   const requireLive = () => {
     if (invalidated || disposed) throw frontierError('resumable Store is suspended or disposed');
@@ -1110,13 +1374,26 @@ export function createResumableEndgameDiskFrontierStore(options) {
   };
   const suspend = () => {
     if (!invalidated) {
+      for (const writer of [...writers.values()]) {
+        try { writer.abort(); } catch (error) {
+          if (error?.r7CloseFailed === true) suspendCloseFailed = true;
+          if (cleanupErrors.length < ENDGAME_DISK_FRONTIER_LIMITS.diagnosticMaxEntries) cleanupErrors.push(normalizeDiagnostic(error));
+        }
+      }
+      for (const { run } of [...runs.values()]) {
+        try { run.dispose(); } catch (error) {
+          if (cleanupErrors.length < ENDGAME_DISK_FRONTIER_LIMITS.diagnosticMaxEntries) cleanupErrors.push(normalizeDiagnostic(error));
+        }
+      }
       invalidated = true;
       viewOutstanding = false;
     }
-    return Object.freeze({ diagnostics: diagnostics(), closeFailed: false });
+    return Object.freeze({ diagnostics: diagnostics(), closeFailed: suspendCloseFailed });
   };
   const dispose = () => {
     if (disposed) return;
+    for (const writer of [...writers.values()]) writer.abort();
+    for (const { run } of [...runs.values()]) run.dispose();
     const current = scanResumableInventory(fs, stagePath, limits);
     if (current.names.length !== inventory.names.length
       || current.names.some((name, index) => name !== inventory.names[index]
@@ -1131,7 +1408,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
     viewOutstanding = false;
   };
   return Object.freeze({
-    createRun() { requireLive(); throw frontierError('resumable run writer is not available in the owner checkpoint'); },
+    createRun,
     diagnostics,
     dispose,
     loadCheckpoint,

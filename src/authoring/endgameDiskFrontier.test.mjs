@@ -258,6 +258,100 @@ describe('R7 resumable disk frontier primitives', () => {
     fs.rmdirSync(stage);
     releaseParent(parent, stage);
   });
+
+  it('writes, verifies, ranges, and identity-disposes one ordered working run', () => {
+    const { parent, stage } = temporaryStage('r7-working');
+    const store = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A' });
+    expect(() => store.createRun('r7w-u-g00000-d00000-n00004096-p0000-h0000')).toThrow('token range');
+    const writer = store.createRun('r7w-u-g00000-d00000-n00000000-p0000-h0000');
+    writer.write('A');
+    writer.write('B');
+    expect(() => writer.write('B')).toThrow('strictly increasing');
+    const run = writer.finish();
+    expect(run.size).toBe(2);
+    expect([...run.values()]).toEqual(['A', 'B']);
+    expect([...run.values({ startOrdinal: 2, endOrdinal: 2 })]).toEqual([]);
+    expect(fs.readFileSync(path.join(stage, `${run.id}.run.part`), 'ascii')).toBe('A\nB\n');
+    run.dispose();
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('admits working/physical bytes before each write and suspend closes an active writer', () => {
+    const { parent, stage } = temporaryStage('r7-working-cap');
+    const events = [];
+    const tracked = trackedFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+      limits: { uncommittedWorkingRunBytes: 2 },
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    expect(tracked.snapshot().openHandles).toBe(1);
+    writer.write('A');
+    const writesAfterEquality = tracked.snapshot().writeLengths.length;
+    expect(() => writer.write('B')).toThrow('working run bytes');
+    expect(tracked.snapshot().writeLengths).toHaveLength(writesAfterEquality);
+    const suspended = store.suspend();
+    expect(suspended.closeFailed).toBe(false);
+    expect(suspended.diagnostics.activeRuns).toEqual([]);
+    expect(tracked.snapshot().openHandles).toBe(0);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('records run cleanup failure without misreporting a successful handle close', () => {
+    const { parent, stage } = temporaryStage('r7-suspend-unlink');
+    let failRunUnlink = false;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+      fs: { unlinkSync(filePath) {
+        if (failRunUnlink && String(filePath).endsWith('.run.part')) {
+          failRunUnlink = false;
+          const error = new Error('injected run unlink cleanup fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.unlinkSync(filePath);
+      } },
+    });
+    store.createRun('r7w-l-g00000-d00000-p0000-h0000').write('A');
+    failRunUnlink = true;
+    const suspended = store.suspend();
+    expect(suspended.closeFailed).toBe(false);
+    expect(suspended.diagnostics.cleanupErrors.join('\n')).toContain('unlink cleanup fault');
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rejects a closed run part replaced between open ownership and finish readback', () => {
+    const { parent, stage } = temporaryStage('r7-working-swap');
+    const opened = new Map();
+    let replaceOnClose = false;
+    const seam = {
+      openSync(...args) { const descriptor = fs.openSync(...args); opened.set(descriptor, String(args[0])); return descriptor; },
+      closeSync(descriptor) {
+        const filePath = opened.get(descriptor);
+        opened.delete(descriptor);
+        const result = fs.closeSync(descriptor);
+        if (replaceOnClose && filePath?.endsWith('.run.part')) {
+          replaceOnClose = false;
+          const bytes = fs.readFileSync(filePath);
+          fs.renameSync(filePath, `${filePath}.swapped`);
+          fs.writeFileSync(filePath, bytes);
+        }
+        return result;
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    replaceOnClose = true;
+    expect(() => writer.finish()).toThrow('readback drift');
+    for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
 });
 
 describe('Node Endgame disk frontier adapter', () => {
