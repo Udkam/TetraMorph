@@ -24,6 +24,8 @@ import {
   LINE_CLEAR_CORE_COMMIT_MS,
   LINE_CLEAR_RELEASE_TICKS,
   STUDIO_LINE_CLEAR_OFFSETS_MS,
+  lineClearRewardTailDurationMs,
+  lineClearVisualDurationMs,
 } from '../../animation/lineClearTimeline';
 import { MUTATION_VFX_TOKENS } from '../../design/mutationTokens';
 import {
@@ -251,7 +253,9 @@ type RendererInternals = {
     }[];
     elapsed: number;
     duration: number;
+    reducedMotion: boolean;
     restrained: boolean;
+    rewardSuppressed: boolean;
     committed: boolean;
     fresh: boolean;
   }>;
@@ -313,6 +317,10 @@ type RendererInternals = {
   advanceSurvivalDebrisPresentation: (state: GameState, deltaMs: number) => void;
   drawEffects: (state: GameState, layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean }) => void;
   drawCommittedOrdinaryMultiLineClearBodies: (
+    graphics: unknown,
+    layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
+  ) => void;
+  drawOrdinaryLineClearRewardTails: (
     graphics: unknown,
     layout: { x: number; y: number; width: number; height: number; cell: number; compact: boolean },
   ) => void;
@@ -1982,6 +1990,63 @@ describe('Endgame undo presentation reset', () => {
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
   });
 
+  it('keeps Mutation and Bomb above the generic reward tail', () => {
+    const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
+    const row = BOARD_HEIGHT - 1;
+    const board = createBoard();
+    board[row]!.fill('I');
+    const state = {
+      ...createInitialState(0x1a16_43c, 'sprint'),
+      board,
+      status: 'playing',
+      phase: 'line-clear',
+      pendingClearRows: [row],
+    } as GameState;
+
+    for (const activation of [
+      mutationEvent('freeze', [{ x: 4, y: row }]),
+      mutationEvent('bomb', [{ x: 4, y: row }]),
+    ]) {
+      const renderer = new TetrisRendererClass();
+      const internals = renderer as unknown as RendererInternals;
+      internals.consumeEvents([{
+        type: 'clear-started',
+        rows: [row],
+        ...(activation.item === 'bomb' ? { mutationBombOutcome: 'blast' as const } : {}),
+      }], state, board);
+      const cue = internals.ordinaryMultiLineClearCues[0]!;
+      expect(cue.rewardSuppressed).toBe(activation.item === 'bomb');
+      internals.consumeEvents([{
+        type: 'lines-cleared', rows: [row], count: 1, score: 40,
+      }, activation], { ...state, phase: 'active', pendingClearRows: [] }, board);
+      expect(cue).toMatchObject({
+        duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+        rewardSuppressed: true,
+        committed: true,
+      });
+      cue.elapsed = 360;
+      const recorder = createGraphicsRecorder();
+      internals.drawOrdinaryLineClearRewardTails(recorder.graphics, layout);
+      expect(recorder.operations).toEqual([]);
+    }
+
+    const ordinaryRenderer = new TetrisRendererClass();
+    const ordinary = ordinaryRenderer as unknown as RendererInternals;
+    ordinary.consumeEvents([{ type: 'clear-started', rows: [row] }], state);
+    ordinary.consumeEvents([{
+      type: 'lines-cleared', rows: [row], count: 1, score: 40,
+    }], { ...state, phase: 'active', pendingClearRows: [] });
+    ordinary.ordinaryMultiLineClearCues[0]!.elapsed = 360;
+    ordinary.consumeEvents([mutationEvent('freeze', [{ x: 4, y: row }])], state, board);
+    const obscured = createGraphicsRecorder();
+    ordinary.drawOrdinaryLineClearRewardTails(obscured.graphics, layout);
+    expect(obscured.operations).toEqual([]);
+    ordinary.mutationFlash = null;
+    const visible = createGraphicsRecorder();
+    ordinary.drawOrdinaryLineClearRewardTails(visible.graphics, layout);
+    expect(visible.operations.length).toBeGreaterThan(0);
+  });
+
   it('keeps the trigger row stable before chain commit and layers the first Bomb last', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
@@ -2361,7 +2426,7 @@ describe('Endgame undo presentation reset', () => {
 
       internals.consumeEvents([{ type: 'clear-started', rows }], state);
       const cue = internals.ordinaryMultiLineClearCues[0]!;
-      expect(cue).toMatchObject({ count, duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS });
+      expect(cue).toMatchObject({ count, duration: lineClearVisualDurationMs(count) });
       for (const elapsedMs of STUDIO_LINE_CLEAR_OFFSETS_MS[count]) {
         cue.elapsed = elapsedMs;
         internals.drawEffects(state, layout);
@@ -2385,6 +2450,112 @@ describe('Endgame undo presentation reset', () => {
     }
 
     expect(new Set(signatures).size).toBe(4);
+  });
+
+  it('renders monotonic count-only reward tails with exact full-motion lifetimes', () => {
+    const layout = { x: 40, y: 24, width: 200, height: 400, cell: 20, compact: false };
+    const intensities: number[] = [];
+    let threeLineOperations: DrawOperation[] | null = null;
+
+    for (const count of [1, 2, 3, 4] as const) {
+      const renderer = new TetrisRendererClass();
+      const internals = renderer as unknown as RendererInternals;
+      const board = createBoard();
+      const rows = Array.from({ length: count }, (_, index) => BOARD_HEIGHT - count + index);
+      for (const row of rows) board[row]!.fill('I');
+      const clearing = {
+        ...createInitialState(0x1a16_3a0 + count, 'marathon'),
+        board,
+        status: 'playing',
+        phase: 'line-clear',
+        pendingClearRows: rows,
+        combo: 0,
+        lines: count,
+      } as GameState;
+      internals.consumeEvents([{ type: 'clear-started', rows }], clearing);
+      internals.consumeEvents([{
+        type: 'lines-cleared',
+        rows,
+        count,
+        score: count * 40,
+      }], { ...clearing, phase: 'active', pendingClearRows: [] });
+      const cue = internals.ordinaryMultiLineClearCues[0]!;
+      cue.elapsed = CLASSIC_LINE_CLEAR_SEQUENCE_MS;
+      internals.updateSnapshot(
+        { ...clearing, phase: 'active', pendingClearRows: [] },
+        layout,
+        { screen: { width: 280, height: 480 }, renderer: { resolution: 1 } },
+      );
+      expect(renderer.getSnapshot().ordinaryMultiLineClearCues[0]).toMatchObject({
+        rewardTailActive: false,
+        rewardTailProgress: 0,
+        rewardTailIntensity: 0,
+        rewardLayerCount: 0,
+      });
+      cue.elapsed = CLASSIC_LINE_CLEAR_SEQUENCE_MS
+        + lineClearRewardTailDurationMs(count, false) / 2;
+      expect(cue).toMatchObject({
+        count,
+        duration: lineClearVisualDurationMs(count),
+        reducedMotion: false,
+        restrained: false,
+        rewardSuppressed: false,
+        committed: true,
+      });
+      expect('score' in cue).toBe(false);
+      expect('combo' in cue).toBe(false);
+      const recorder = createGraphicsRecorder();
+      internals.drawOrdinaryLineClearRewardTails(recorder.graphics, layout);
+      expect(recorder.operations.filter((operation) => operation.kind === 'poly'))
+        .toHaveLength(count * count);
+      expect(recorder.operations.filter((operation) => operation.kind === 'circle'))
+        .toHaveLength(count * count);
+      expect(hasBroadHorizontalGeometry(recorder.operations, layout.width)).toBe(false);
+
+      internals.updateSnapshot(
+        { ...clearing, phase: 'active', pendingClearRows: [] },
+        layout,
+        { screen: { width: 280, height: 480 }, renderer: { resolution: 1 } },
+      );
+      const reward = renderer.getSnapshot().ordinaryMultiLineClearCues[0]!;
+      expect(reward).toMatchObject({
+        rewardSuppressed: false,
+        rewardTailActive: true,
+        rewardTailProgress: 0.5,
+        rewardLayerCount: count,
+      });
+      intensities.push(reward.rewardTailIntensity);
+      if (count === 3) threeLineOperations = recorder.operations;
+    }
+
+    expect(intensities.every((value, index) => index === 0 || value > intensities[index - 1]!)).toBe(true);
+
+    const board = createBoard();
+    const rows = [BOARD_HEIGHT - 3, BOARD_HEIGHT - 2, BOARD_HEIGHT - 1];
+    for (const row of rows) board[row]!.fill('I');
+    const richRenderer = new TetrisRendererClass();
+    const rich = richRenderer as unknown as RendererInternals;
+    const richState = {
+      ...createInitialState(0x1a16_3a3, 'marathon'),
+      board,
+      status: 'playing',
+      phase: 'line-clear',
+      pendingClearRows: rows,
+      combo: 99,
+      lines: 999,
+    } as GameState;
+    rich.consumeEvents([{ type: 'clear-started', rows }], richState);
+    rich.consumeEvents([{
+      type: 'lines-cleared',
+      rows,
+      count: 3,
+      score: 999_999,
+    }], { ...richState, phase: 'active', pendingClearRows: [] });
+    rich.ordinaryMultiLineClearCues[0]!.elapsed = CLASSIC_LINE_CLEAR_SEQUENCE_MS
+      + lineClearRewardTailDurationMs(3, false) / 2;
+    const richRecorder = createGraphicsRecorder();
+    rich.drawOrdinaryLineClearRewardTails(richRecorder.graphics, layout);
+    expect(richRecorder.operations).toEqual(threeLineOperations);
   });
 
   it('flashes then erases multi-line cells centre-out without moving Core or hiding fixed materials', () => {
@@ -2417,7 +2588,7 @@ describe('Endgame undo presentation reset', () => {
     expect(cue).toMatchObject({
       count: 4,
       orderedRows,
-      duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+      duration: lineClearVisualDurationMs(4),
       committed: false,
     });
     expect(cue.cells).toHaveLength(38);
@@ -2437,7 +2608,7 @@ describe('Endgame undo presentation reset', () => {
       },
       ordinaryMultiLineClearCues: [{
         elapsedMs: 30,
-        durationMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+        durationMs: lineClearVisualDurationMs(4),
         visibleCellCount: 38,
       }],
     });
@@ -2491,7 +2662,7 @@ describe('Endgame undo presentation reset', () => {
       ordinaryLineClear: { count: 1, releasedRows: [BOARD_HEIGHT - 1] },
       ordinaryMultiLineClearCues: [{
         count: 1,
-        durationMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+        durationMs: lineClearVisualDurationMs(1),
         visibleCellCount: 8,
       }],
     });
@@ -2701,7 +2872,7 @@ describe('Endgame undo presentation reset', () => {
     expect(cue).toMatchObject({
       count: 1,
       orderedRows: [row],
-      duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+      duration: lineClearVisualDurationMs(1),
       committed: false,
     });
     expect(cue.cells).toHaveLength(10);
@@ -2774,7 +2945,10 @@ describe('Endgame undo presentation reset', () => {
       && (operation.options as { color?: number } | undefined)?.color === COLORS.target
     ))).toBe(true);
 
-    cue.elapsed = 299.9;
+    cue.elapsed = CLASSIC_LINE_CLEAR_SEQUENCE_MS - 0.1;
+    internals.advanceEffects(0.2);
+    expect(internals.ordinaryMultiLineClearCues).toContain(cue);
+    cue.elapsed = lineClearVisualDurationMs(1) - 0.1;
     internals.advanceEffects(0.2);
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
   });
@@ -2826,6 +3000,47 @@ describe('Endgame undo presentation reset', () => {
     endgame.drawEffects(endgameState, layout);
     expect(endgameFrame.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
     expect(endgameFrame.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(10);
+
+    reduced.consumeEvents([{
+      type: 'lines-cleared', rows, count: 4, score: 12_000,
+    }], { ...base, phase: 'active', pendingClearRows: [], combo: 24, lines: 400 });
+    expect(reducedCue.duration).toBe(lineClearVisualDurationMs(4, true));
+    const reducedTailStart = createGraphicsRecorder();
+    reducedCue.elapsed = 330;
+    reduced.drawOrdinaryLineClearRewardTails(reducedTailStart.graphics, layout);
+    const reducedTailLater = createGraphicsRecorder();
+    reducedCue.elapsed = 370;
+    reduced.drawOrdinaryLineClearRewardTails(reducedTailLater.graphics, layout);
+    expect(reducedTailStart.operations.filter((operation) => operation.kind === 'poly')).toHaveLength(16);
+    expect(geometrySignature(reducedTailLater.operations)).toBe(geometrySignature(reducedTailStart.operations));
+
+    endgame.consumeEvents([{
+      type: 'lines-cleared', rows, count: 4, score: 1,
+    }], { ...endgameState, phase: 'active', pendingClearRows: [] });
+    expect(endgameCue.duration).toBe(lineClearVisualDurationMs(4));
+    const endgameTailStart = createGraphicsRecorder();
+    endgameCue.elapsed = 360;
+    endgame.drawOrdinaryLineClearRewardTails(endgameTailStart.graphics, layout);
+    const endgameTailLater = createGraphicsRecorder();
+    endgameCue.elapsed = 480;
+    endgame.drawOrdinaryLineClearRewardTails(endgameTailLater.graphics, layout);
+    expect(endgameTailStart.operations.filter((operation) => operation.kind === 'poly')).toHaveLength(16);
+    expect(geometrySignature(endgameTailLater.operations)).toBe(geometrySignature(endgameTailStart.operations));
+
+    const movingRenderer = new TetrisRendererClass();
+    const moving = movingRenderer as unknown as RendererInternals;
+    moving.consumeEvents([{ type: 'clear-started', rows }], base);
+    moving.consumeEvents([{
+      type: 'lines-cleared', rows, count: 4, score: 1,
+    }], { ...base, phase: 'active', pendingClearRows: [] });
+    const movingCue = moving.ordinaryMultiLineClearCues[0]!;
+    const movingStart = createGraphicsRecorder();
+    movingCue.elapsed = 360;
+    moving.drawOrdinaryLineClearRewardTails(movingStart.graphics, layout);
+    const movingLater = createGraphicsRecorder();
+    movingCue.elapsed = 480;
+    moving.drawOrdinaryLineClearRewardTails(movingLater.graphics, layout);
+    expect(geometrySignature(movingLater.operations)).not.toBe(geometrySignature(movingStart.operations));
   });
 
   it('keeps restrained feedback on one continuous track across the unchanged Core commit', () => {
@@ -2869,11 +3084,11 @@ describe('Endgame undo presentation reset', () => {
         expect(internals.ordinaryMultiLineClearCues[0]).toBe(cueIdentity);
         expect(cue).toMatchObject({
           elapsed: 199.9,
-          duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+          duration: lineClearVisualDurationMs(count, variant.reducedMotion),
           restrained: true,
           committed: true,
         });
-        expect(cue.duration - 200).toBeCloseTo(100, 5);
+        expect(cue.duration).toBe(lineClearVisualDurationMs(count, variant.reducedMotion));
 
         cue.elapsed = 250;
         const postCommit = { ...frame, phase: 'active', pendingClearRows: [], active: null } as GameState;
@@ -2885,8 +3100,11 @@ describe('Endgame undo presentation reset', () => {
         expect(tailFrame.operations.filter((operation) => operation.kind === 'roundRect').length).toBeGreaterThan(0);
         expect(tailFrame.operations.some((operation) => operation.kind === 'rect' || operation.kind === 'segment')).toBe(false);
 
-        cue.elapsed = 299.9;
+        cue.elapsed = CLASSIC_LINE_CLEAR_SEQUENCE_MS - 0.1;
         expect(internals.ordinaryMultiLineClearCues).toContain(cue);
+        internals.advanceEffects(0.2);
+        expect(internals.ordinaryMultiLineClearCues).toContain(cue);
+        cue.elapsed = cue.duration - 0.1;
         internals.advanceEffects(0.2);
         expect(internals.ordinaryMultiLineClearCues).toHaveLength(0);
       }
@@ -2894,7 +3112,7 @@ describe('Endgame undo presentation reset', () => {
 
   });
 
-  it('captures one bounded 300 ms material cue and clears it on lifecycle boundaries', () => {
+  it('keeps a bounded four-cue reward queue and clears it on lifecycle boundaries', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const board = createBoard();
@@ -2920,7 +3138,7 @@ describe('Endgame undo presentation reset', () => {
     expect(internals.ordinaryMultiLineClearCues).toHaveLength(1);
     const cue = internals.ordinaryMultiLineClearCues[0]!;
     expect(cue).toMatchObject({
-      duration: CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+      duration: lineClearVisualDurationMs(4),
       elapsed: 0,
       restrained: false,
       committed: false,

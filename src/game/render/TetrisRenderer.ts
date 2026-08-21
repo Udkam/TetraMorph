@@ -59,6 +59,7 @@ import {
   type TimelineSample,
 } from '../../animation/mutationTimeline';
 import {
+  CLASSIC_LINE_CLEAR_SEQUENCE_MS,
   LINE_CLEAR_FIXED_STEP_MS,
   LINE_CLEAR_CORE_COMMIT_MS,
   lineClearReleaseSnapshot,
@@ -77,6 +78,7 @@ import {
   nextPreviewPieces,
   ORDINARY_LINE_CLEAR_TAIL_LIMIT,
   classicLineClearCellSample,
+  ordinaryLineClearRewardTailSample,
   orthogonalCellComponents,
   projectedLandingCells,
   survivalDebrisCells,
@@ -160,7 +162,9 @@ interface OrdinaryMultiLineClearCue {
   cells: readonly OrdinaryMultiLineClearCueCell[];
   elapsed: number;
   duration: number;
+  reducedMotion: boolean;
   restrained: boolean;
+  rewardSuppressed: boolean;
   committed: boolean;
   fresh: boolean;
 }
@@ -316,6 +320,11 @@ export interface RendererSnapshot {
     durationMs: number;
     committed: boolean;
     restrained: boolean;
+    rewardSuppressed: boolean;
+    rewardTailActive: boolean;
+    rewardTailProgress: number;
+    rewardTailIntensity: number;
+    rewardLayerCount: number;
     visibleCellCount: number;
   }>;
   presentation: { x: number; y: number; offsetX: number; offsetY: number } | null;
@@ -2344,6 +2353,7 @@ export class TetrisRenderer {
     }
     this.drawMutationParticles(mutationGraphics, layout);
     this.drawOrdinaryMultiLineClearCueFaces(graphics, layout);
+    this.drawOrdinaryLineClearRewardTails(graphics, layout);
     this.drawClassicFeedbackCues(graphics, state, layout);
 
     if (this.lockPulse) {
@@ -2827,9 +2837,65 @@ export class TetrisRenderer {
     }
   }
 
+  /**
+   * A non-blocking board-local afterimage begins only after the accepted erase. Its
+   * lifetime, density and intensity are pure functions of the achieved line count.
+   */
+  private drawOrdinaryLineClearRewardTails(graphics: Graphics, layout: BoardLayout): void {
+    // An active item owns the foreground. Same-batch activations additionally mark
+    // their clear cue as suppressed so the generic reward cannot reappear later.
+    if (this.mutationFlash) return;
+    for (const cue of this.ordinaryMultiLineClearCues) {
+      if (!cue.committed || cue.rewardSuppressed) continue;
+      const sample = ordinaryLineClearRewardTailSample(
+        cue.elapsed,
+        cue.count,
+        cue.reducedMotion,
+        cue.restrained,
+      );
+      if (!sample.active || sample.alpha <= 0.001) continue;
+      const visibleRows = cue.orderedRows.filter((row) => (
+        row >= VISIBLE_START_ROW && row < VISIBLE_START_ROW + VISIBLE_HEIGHT
+      ));
+      const layerCount = sample.layerCount;
+      for (let rowOrder = 0; rowOrder < visibleRows.length; rowOrder += 1) {
+        const row = visibleRows[rowOrder]!;
+        const rowCenterY = layout.y + (row - VISIBLE_START_ROW + 0.5) * layout.cell;
+        for (let layer = 0; layer < layerCount; layer += 1) {
+          const lateral = layerCount <= 1 ? 0 : layer / (layerCount - 1) - 0.5;
+          const direction = (rowOrder + layer) % 2 === 0 ? 1 : -1;
+          const fixedX = layout.x + layout.width * 0.5
+            + lateral * layout.cell * (1.3 + cue.count * 0.18);
+          const driftX = cue.restrained
+            ? 0
+            : direction * sample.travel * layout.cell * (0.035 + layer * 0.012);
+          const liftY = sample.travel * layout.cell * (0.12 + layer * 0.025);
+          const x = fixedX + driftX;
+          const y = rowCenterY - liftY;
+          const radius = layout.cell * (0.052 + cue.count * 0.007 + layer * 0.0025);
+          const layerAlpha = sample.alpha * (0.58 + layer / Math.max(1, layerCount - 1) * 0.18);
+          graphics.poly([
+            x, y - radius,
+            x + radius * 0.72, y,
+            x, y + radius,
+            x - radius * 0.72, y,
+          ]).fill({ color: COLORS.action, alpha: Math.min(0.62, layerAlpha) });
+          graphics
+            .circle(x, y, radius * (1.75 + cue.count * 0.08))
+            .stroke({
+              color: COLORS.actionInk,
+              alpha: Math.min(0.44, layerAlpha * 0.66),
+              width: Math.max(0.8, layout.cell * 0.026),
+            });
+        }
+      }
+    }
+  }
+
   private enqueueOrdinaryMultiLineClearCue(
     rows: readonly number[],
     state: GameState | undefined,
+    rewardSuppressed: boolean,
   ): void {
     if (!state || !Array.isArray(state.board)) return;
     const orderedRows = orderedLineClearRows(rows);
@@ -2873,8 +2939,12 @@ export class TetrisRenderer {
       orderedRows,
       cells,
       elapsed: 0,
-      duration: lineClearVisualDurationMs(typedCount),
+      duration: rewardSuppressed
+        ? CLASSIC_LINE_CLEAR_SEQUENCE_MS
+        : lineClearVisualDurationMs(typedCount, this.options.reducedMotion),
+      reducedMotion: this.options.reducedMotion,
       restrained: this.options.reducedMotion || state.mode === 'endgame',
+      rewardSuppressed,
       committed: false,
       fresh: true,
     });
@@ -2886,7 +2956,10 @@ export class TetrisRenderer {
     }
   }
 
-  private commitOrdinaryMultiLineClearCue(rows: readonly number[]): void {
+  private commitOrdinaryMultiLineClearCue(
+    rows: readonly number[],
+    rewardSuppressed: boolean,
+  ): void {
     const orderedRows = orderedLineClearRows(rows);
     for (let index = this.ordinaryMultiLineClearCues.length - 1; index >= 0; index -= 1) {
       const cue = this.ordinaryMultiLineClearCues[index]!;
@@ -2896,6 +2969,10 @@ export class TetrisRenderer {
         && cue.orderedRows.every((row, rowOrder) => row === orderedRows[rowOrder])
       ) {
         cue.committed = true;
+        if (rewardSuppressed) {
+          cue.rewardSuppressed = true;
+          cue.duration = CLASSIC_LINE_CLEAR_SEQUENCE_MS;
+        }
         return;
       }
     }
@@ -4275,6 +4352,9 @@ export class TetrisRenderer {
         return true;
       })
       .sort((left, right) => Number(right.item === 'bomb') - Number(left.item === 'bomb'));
+    const suppressOrdinaryReward = mutationActivations.length > 0 || events.some((event) => (
+      event.type === 'clear-started' && event.mutationBombOutcome != null
+    ));
     for (const event of events) {
       if (event.type === 'piece-moved') {
         if (this.presentation) {
@@ -4339,11 +4419,11 @@ export class TetrisRenderer {
       } else if (event.type === 'clear-started') {
         this.pendingBombClearOutcome = event.mutationBombOutcome ?? null;
         if (event.mutationBombOutcome !== 'chain-clear') {
-          this.enqueueOrdinaryMultiLineClearCue(event.rows, state);
+          this.enqueueOrdinaryMultiLineClearCue(event.rows, state, suppressOrdinaryReward);
         }
       } else if (event.type === 'lines-cleared') {
         this.impact = this.options.reducedMotion ? 0.3 : Math.min(1.4, 0.55 + event.count * 0.2);
-        this.commitOrdinaryMultiLineClearCue(event.rows);
+        this.commitOrdinaryMultiLineClearCue(event.rows, suppressOrdinaryReward);
         if (classic) {
           if ((state?.combo ?? 0) > 1) {
             this.enqueueClassicFeedback('combo', {
@@ -4717,25 +4797,41 @@ export class TetrisRenderer {
             releasedRows: [...ordinaryLineClear.releasedRows],
           }
         : null,
-      ordinaryMultiLineClearCues: this.ordinaryMultiLineClearCues.map((cue) => ({
-        count: cue.count,
-        orderedRows: [...cue.orderedRows],
-        elapsedMs: cue.elapsed,
-        durationMs: cue.duration,
-        committed: cue.committed,
-        restrained: cue.restrained,
-        visibleCellCount: cue.cells.reduce((visibleCount, { cell, rowOrder }) => {
-          const sample = classicLineClearCellSample(
-            cue.elapsed,
-            cell.x,
-            BOARD_WIDTH,
-            rowOrder,
-            cue.count,
-            cue.restrained,
-          );
-          return visibleCount + Number(!sample.complete && sample.alpha > 0.001);
-        }, 0),
-      })),
+      ordinaryMultiLineClearCues: this.ordinaryMultiLineClearCues.map((cue) => {
+        const reward = ordinaryLineClearRewardTailSample(
+          cue.elapsed,
+          cue.count,
+          cue.reducedMotion,
+          cue.restrained,
+        );
+        return {
+          count: cue.count,
+          orderedRows: [...cue.orderedRows],
+          elapsedMs: cue.elapsed,
+          durationMs: cue.duration,
+          committed: cue.committed,
+          restrained: cue.restrained,
+          rewardSuppressed: cue.rewardSuppressed,
+          rewardTailActive: cue.committed
+            && !cue.rewardSuppressed
+            && !this.mutationFlash
+            && reward.active,
+          rewardTailProgress: reward.progress,
+          rewardTailIntensity: reward.intensity,
+          rewardLayerCount: reward.layerCount,
+          visibleCellCount: cue.cells.reduce((visibleCount, { cell, rowOrder }) => {
+            const sample = classicLineClearCellSample(
+              cue.elapsed,
+              cell.x,
+              BOARD_WIDTH,
+              rowOrder,
+              cue.count,
+              cue.restrained,
+            );
+            return visibleCount + Number(!sample.complete && sample.alpha > 0.001);
+          }, 0),
+        };
+      }),
       presentation: drawableActive && this.presentation
         ? {
             x: this.presentation.x,

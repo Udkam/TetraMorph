@@ -11,7 +11,11 @@ import {
   type SurvivalDebris,
 } from '../core';
 import {
-  CLASSIC_LINE_CLEAR_TAIL_MS,
+  CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+  LINE_CLEAR_CORE_COMMIT_MS,
+  LINE_CLEAR_FULL_REWARD_TAIL_MS,
+  LINE_CLEAR_REDUCED_REWARD_TAIL_MS,
+  lineClearRewardTailDurationMs,
   lineClearRowDurationMs,
   lineClearRowElapsedMs,
 } from '../../animation/lineClearTimeline';
@@ -54,6 +58,9 @@ export interface OrdinaryLineClearProfile {
   reducedTicks: number;
   /** Renderer-owned residue after Core's fixed 200 ms line-clear commit. */
   postCommitTailMs: number;
+  reducedPostCommitTailMs: number;
+  rewardTailMs: number;
+  reducedRewardTailMs: number;
   faceAlpha: number;
   fragmentCeiling: number;
   rowStagger: number;
@@ -78,13 +85,26 @@ export interface ClassicLineClearCellSample {
   highlight: number;
 }
 
+export interface OrdinaryLineClearRewardTailSample {
+  active: boolean;
+  complete: boolean;
+  progress: number;
+  alpha: number;
+  intensity: number;
+  layerCount: number;
+  travel: number;
+}
+
 const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
   1: Object.freeze({
     count: 1,
     id: 'precision-cut',
     normalTicks: 9,
     reducedTicks: 6,
-    postCommitTailMs: 0,
+    postCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_FULL_REWARD_TAIL_MS[1] - LINE_CLEAR_CORE_COMMIT_MS,
+    reducedPostCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_REDUCED_REWARD_TAIL_MS[1] - LINE_CLEAR_CORE_COMMIT_MS,
+    rewardTailMs: LINE_CLEAR_FULL_REWARD_TAIL_MS[1],
+    reducedRewardTailMs: LINE_CLEAR_REDUCED_REWARD_TAIL_MS[1],
     faceAlpha: 0.15,
     fragmentCeiling: 8,
     rowStagger: 0,
@@ -94,7 +114,10 @@ const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
     id: 'dual-resonance',
     normalTicks: 11,
     reducedTicks: 7,
-    postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS,
+    postCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_FULL_REWARD_TAIL_MS[2] - LINE_CLEAR_CORE_COMMIT_MS,
+    reducedPostCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_REDUCED_REWARD_TAIL_MS[2] - LINE_CLEAR_CORE_COMMIT_MS,
+    rewardTailMs: LINE_CLEAR_FULL_REWARD_TAIL_MS[2],
+    reducedRewardTailMs: LINE_CLEAR_REDUCED_REWARD_TAIL_MS[2],
     faceAlpha: 0.18,
     fragmentCeiling: 16,
     rowStagger: 0,
@@ -104,7 +127,10 @@ const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
     id: 'cascade-fracture',
     normalTicks: 12,
     reducedTicks: 8,
-    postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS,
+    postCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_FULL_REWARD_TAIL_MS[3] - LINE_CLEAR_CORE_COMMIT_MS,
+    reducedPostCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_REDUCED_REWARD_TAIL_MS[3] - LINE_CLEAR_CORE_COMMIT_MS,
+    rewardTailMs: LINE_CLEAR_FULL_REWARD_TAIL_MS[3],
+    reducedRewardTailMs: LINE_CLEAR_REDUCED_REWARD_TAIL_MS[3],
     faceAlpha: 0.21,
     fragmentCeiling: 32,
     rowStagger: 0.1,
@@ -114,7 +140,10 @@ const ORDINARY_LINE_CLEAR_PROFILES = Object.freeze({
     id: 'tetramorph',
     normalTicks: 12,
     reducedTicks: 8,
-    postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS,
+    postCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_FULL_REWARD_TAIL_MS[4] - LINE_CLEAR_CORE_COMMIT_MS,
+    reducedPostCommitTailMs: CLASSIC_LINE_CLEAR_SEQUENCE_MS + LINE_CLEAR_REDUCED_REWARD_TAIL_MS[4] - LINE_CLEAR_CORE_COMMIT_MS,
+    rewardTailMs: LINE_CLEAR_FULL_REWARD_TAIL_MS[4],
+    reducedRewardTailMs: LINE_CLEAR_REDUCED_REWARD_TAIL_MS[4],
     faceAlpha: 0.24,
     fragmentCeiling: 48,
     rowStagger: 0.07,
@@ -230,6 +259,47 @@ export function classicLineClearCellSample(
     alpha,
     scale,
     highlight: Math.max(rowFlash * 0.8, Math.sin(Math.PI * pairProgress)) * alpha,
+  });
+}
+
+/**
+ * Count-only reward envelope beginning after the accepted 300 ms erase. Geometry is
+ * stationary for reduced motion and Endgame; neither score, combo, mode rank nor Core
+ * state enters this sampler.
+ */
+export function ordinaryLineClearRewardTailSample(
+  elapsedMs: number,
+  count: number,
+  reducedMotion: boolean,
+  stationaryGeometry: boolean,
+): Readonly<OrdinaryLineClearRewardTailSample> {
+  const profile = ordinaryLineClearProfile(count);
+  const durationMs = lineClearRewardTailDurationMs(count, reducedMotion);
+  const tailElapsedMs = elapsedMs - CLASSIC_LINE_CLEAR_SEQUENCE_MS;
+  if (!profile || !Number.isFinite(elapsedMs) || tailElapsedMs <= 0 || durationMs <= 0) {
+    return Object.freeze({
+      active: false,
+      complete: false,
+      progress: 0,
+      alpha: 0,
+      intensity: 0,
+      layerCount: 0,
+      travel: 0,
+    });
+  }
+  const progress = clampUnit(tailElapsedMs / durationMs);
+  const complete = tailElapsedMs >= durationMs;
+  const intensity = 0.38 + profile.count * 0.115;
+  const attack = smoothstepUnit(progress / 0.14);
+  const release = Math.pow(Math.max(0, 1 - progress), 1.35);
+  return Object.freeze({
+    active: !complete,
+    complete,
+    progress,
+    alpha: complete ? 0 : attack * release * intensity,
+    intensity,
+    layerCount: profile.count,
+    travel: reducedMotion || stationaryGeometry ? 0 : smoothstepUnit(progress),
   });
 }
 

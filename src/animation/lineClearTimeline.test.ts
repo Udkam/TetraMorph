@@ -4,11 +4,15 @@ import {
   CLASSIC_LINE_CLEAR_ROW_MIN_MS,
   CLASSIC_LINE_CLEAR_SEQUENCE_MS,
   CLASSIC_LINE_CLEAR_TAIL_MS,
+  LINE_CLEAR_FULL_REWARD_TAIL_MS,
+  LINE_CLEAR_REDUCED_REWARD_TAIL_MS,
   LINE_CLEAR_FIXED_STEP_MS,
   LINE_CLEAR_CORE_COMMIT_MS,
   LINE_CLEAR_RELEASE_TICKS,
   STUDIO_LINE_CLEAR_OFFSETS_MS,
+  lineClearEraseDurationMs,
   lineClearReleaseSnapshot,
+  lineClearRewardTailDurationMs,
   lineClearRowDurationMs,
   lineClearRowElapsedMs,
   lineClearRowElapsedTicks,
@@ -76,7 +80,7 @@ describe('line-clear timeline', () => {
     expect([0, 1].map((rowOrder) => lineClearRowDurationMs(2, rowOrder))).toEqual([210, 120]);
     expect([0, 1, 2].map((rowOrder) => lineClearRowDurationMs(3, rowOrder))).toEqual([120, 120, 120]);
     expect([0, 1, 2, 3].map((rowOrder) => lineClearRowDurationMs(4, rowOrder))).toEqual([120, 120, 120, 120]);
-    expect([1, 2, 3, 4].map(lineClearVisualDurationMs)).toEqual([300, 300, 300, 300]);
+    expect([1, 2, 3, 4].map(lineClearEraseDurationMs)).toEqual([300, 300, 300, 300]);
 
     for (const count of [2, 3, 4] as const) {
       const offsets = STUDIO_LINE_CLEAR_OFFSETS_MS[count];
@@ -84,6 +88,24 @@ describe('line-clear timeline', () => {
         const rowEnd = offsets[rowOrder]! + lineClearRowDurationMs(count, rowOrder);
         expect(rowEnd - offsets[rowOrder + 1]!).toBeGreaterThanOrEqual(CLASSIC_LINE_CLEAR_HANDOFF_MS);
       }
+    }
+  });
+
+  it('adds exact count-only reward tails after the frozen 300 ms erase', () => {
+    expect(LINE_CLEAR_FULL_REWARD_TAIL_MS).toEqual({ 1: 120, 2: 240, 3: 360, 4: 480 });
+    expect(LINE_CLEAR_REDUCED_REWARD_TAIL_MS).toEqual({ 1: 80, 2: 100, 3: 120, 4: 140 });
+    expect([1, 2, 3, 4].map((count) => lineClearRewardTailDurationMs(count, false)))
+      .toEqual([120, 240, 360, 480]);
+    expect([1, 2, 3, 4].map((count) => lineClearRewardTailDurationMs(count, true)))
+      .toEqual([80, 100, 120, 140]);
+    expect([1, 2, 3, 4].map((count) => lineClearVisualDurationMs(count)))
+      .toEqual([420, 540, 660, 780]);
+    expect([1, 2, 3, 4].map((count) => lineClearVisualDurationMs(count, true)))
+      .toEqual([380, 400, 420, 440]);
+    for (const count of [-1, 0, 1.5, 5, Number.NaN]) {
+      expect(lineClearRewardTailDurationMs(count, false)).toBe(0);
+      expect(lineClearRewardTailDurationMs(count, true)).toBe(0);
+      expect(lineClearVisualDurationMs(count)).toBe(0);
     }
   });
 });

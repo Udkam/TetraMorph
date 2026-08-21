@@ -17,12 +17,17 @@ import {
   ordinaryLineClearFragment,
   ordinaryLineClearPresentationProgress,
   ordinaryLineClearProfile,
+  ordinaryLineClearRewardTailSample,
   orthogonalCellComponents,
   projectedLandingCells,
   survivalDebrisCells,
 } from './presentation';
 import { createBoard, createInitialState, dispatch, PIECE_SHAPES, PIECE_TYPES, type Cell, type GameState } from '../core';
-import { CLASSIC_LINE_CLEAR_TAIL_MS } from '../../animation/lineClearTimeline';
+import {
+  CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+  lineClearRewardTailDurationMs,
+  lineClearVisualDurationMs,
+} from '../../animation/lineClearTimeline';
 
 describe('presentation interpolation', () => {
   it('projects the real independent-column Supergravity landing without mutating Core', () => {
@@ -96,10 +101,10 @@ describe('presentation interpolation', () => {
 
   it('maps only the four ordinary clear profiles to their fixed normal and reduced timing', () => {
     expect([1, 2, 3, 4].map((count) => ordinaryLineClearProfile(count))).toMatchObject([
-      { id: 'precision-cut', normalTicks: 9, reducedTicks: 6, postCommitTailMs: 0 },
-      { id: 'dual-resonance', normalTicks: 11, reducedTicks: 7, postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS },
-      { id: 'cascade-fracture', normalTicks: 12, reducedTicks: 8, postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS },
-      { id: 'tetramorph', normalTicks: 12, reducedTicks: 8, postCommitTailMs: CLASSIC_LINE_CLEAR_TAIL_MS },
+      { id: 'precision-cut', normalTicks: 9, reducedTicks: 6, postCommitTailMs: 220, reducedPostCommitTailMs: 180, rewardTailMs: 120, reducedRewardTailMs: 80 },
+      { id: 'dual-resonance', normalTicks: 11, reducedTicks: 7, postCommitTailMs: 340, reducedPostCommitTailMs: 200, rewardTailMs: 240, reducedRewardTailMs: 100 },
+      { id: 'cascade-fracture', normalTicks: 12, reducedTicks: 8, postCommitTailMs: 460, reducedPostCommitTailMs: 220, rewardTailMs: 360, reducedRewardTailMs: 120 },
+      { id: 'tetramorph', normalTicks: 12, reducedTicks: 8, postCommitTailMs: 580, reducedPostCommitTailMs: 240, rewardTailMs: 480, reducedRewardTailMs: 140 },
     ]);
     for (const count of [-1, 0, 1.5, 5, Number.NaN]) {
       expect(ordinaryLineClearProfile(count)).toBeNull();
@@ -127,6 +132,85 @@ describe('presentation interpolation', () => {
     expect(center).toBeGreaterThan(edge);
     expect(lineClearCellProgress(1, 0, 10)).toBe(1);
     expect(lineClearCellProgress(1, 9, 10)).toBe(1);
+  });
+
+  it('samples a count-only reward tail after erase with stationary restrained geometry', () => {
+    const intensities: number[] = [];
+    for (const count of [1, 2, 3, 4] as const) {
+      const fullTailMs = lineClearRewardTailDurationMs(count, false);
+      const reducedTailMs = lineClearRewardTailDurationMs(count, true);
+      const before = ordinaryLineClearRewardTailSample(
+        CLASSIC_LINE_CLEAR_SEQUENCE_MS - 0.1,
+        count,
+        false,
+        false,
+      );
+      const boundary = ordinaryLineClearRewardTailSample(
+        CLASSIC_LINE_CLEAR_SEQUENCE_MS,
+        count,
+        false,
+        false,
+      );
+      const afterBoundary = ordinaryLineClearRewardTailSample(
+        CLASSIC_LINE_CLEAR_SEQUENCE_MS + 0.1,
+        count,
+        false,
+        false,
+      );
+      const full = ordinaryLineClearRewardTailSample(
+        CLASSIC_LINE_CLEAR_SEQUENCE_MS + fullTailMs / 2,
+        count,
+        false,
+        false,
+      );
+      const endgame = ordinaryLineClearRewardTailSample(
+        CLASSIC_LINE_CLEAR_SEQUENCE_MS + fullTailMs / 2,
+        count,
+        false,
+        true,
+      );
+      const reduced = ordinaryLineClearRewardTailSample(
+        CLASSIC_LINE_CLEAR_SEQUENCE_MS + reducedTailMs / 2,
+        count,
+        true,
+        true,
+      );
+
+      expect(before).toMatchObject({ active: false, complete: false, alpha: 0, layerCount: 0 });
+      expect(boundary).toMatchObject({ active: false, complete: false, progress: 0, alpha: 0, layerCount: 0 });
+      expect(afterBoundary.active).toBe(true);
+      expect(afterBoundary.progress).toBeGreaterThan(0);
+      expect(afterBoundary.alpha).toBeGreaterThan(0);
+      expect(afterBoundary.layerCount).toBe(count);
+      expect(full).toMatchObject({ active: true, complete: false, progress: 0.5, layerCount: count });
+      expect(full.alpha).toBeGreaterThan(0);
+      expect(full.travel).toBeGreaterThan(0);
+      expect(endgame).toMatchObject({
+        active: true,
+        progress: full.progress,
+        alpha: full.alpha,
+        intensity: full.intensity,
+        layerCount: count,
+        travel: 0,
+      });
+      expect(reduced).toMatchObject({ active: true, progress: 0.5, layerCount: count, travel: 0 });
+      expect(ordinaryLineClearRewardTailSample(
+        lineClearVisualDurationMs(count),
+        count,
+        false,
+        false,
+      )).toMatchObject({ active: false, complete: true, alpha: 0 });
+      expect(ordinaryLineClearRewardTailSample(
+        lineClearVisualDurationMs(count, true),
+        count,
+        true,
+        true,
+      )).toMatchObject({ active: false, complete: true, alpha: 0 });
+      intensities.push(full.intensity);
+    }
+    expect(intensities.every((value, index) => index === 0 || value > intensities[index - 1]!)).toBe(true);
+    expect(ordinaryLineClearRewardTailSample(360, 0, false, false))
+      .toMatchObject({ active: false, intensity: 0, layerCount: 0 });
   });
 
   it('samples continuous symmetric cell exits while restrained geometry stays stationary', () => {

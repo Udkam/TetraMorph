@@ -22,6 +22,22 @@ export const CLASSIC_LINE_CLEAR_TAIL_MS = Math.max(
   CLASSIC_LINE_CLEAR_SEQUENCE_MS - LINE_CLEAR_CORE_COMMIT_MS,
 );
 
+/** Count-owned reward residue begins only after the accepted 300 ms material erase. */
+export const LINE_CLEAR_FULL_REWARD_TAIL_MS = Object.freeze({
+  1: 120,
+  2: 240,
+  3: 360,
+  4: 480,
+} satisfies Record<LineClearCount, number>);
+
+/** Reduced motion keeps the same erase, followed by a shorter stationary afterimage. */
+export const LINE_CLEAR_REDUCED_REWARD_TAIL_MS = Object.freeze({
+  1: 80,
+  2: 100,
+  3: 120,
+  4: 140,
+} satisfies Record<LineClearCount, number>);
+
 /** Nearest canonical 60 Hz presentation tick for every accepted Studio pulse. */
 export const LINE_CLEAR_RELEASE_TICKS = Object.freeze({
   1: Object.freeze([0]),
@@ -90,11 +106,25 @@ export function lineClearRowDurationMs(count: number, rowOrder: number): number 
     : Math.max(CLASSIC_LINE_CLEAR_ROW_MIN_MS, next - current + CLASSIC_LINE_CLEAR_HANDOFF_MS);
 }
 
-export function lineClearVisualDurationMs(count: number): number {
+/** Duration of the frozen centre-out material erase, excluding its new reward residue. */
+export function lineClearEraseDurationMs(count: number): number {
   if (!isLineClearCount(count)) return 0;
   const offsets = STUDIO_LINE_CLEAR_OFFSETS_MS[count];
   const lastOrder = offsets.length - 1;
   return offsets[lastOrder]! + lineClearRowDurationMs(count, lastOrder);
+}
+
+export function lineClearRewardTailDurationMs(count: number, reducedMotion: boolean): number {
+  if (!isLineClearCount(count)) return 0;
+  return reducedMotion
+    ? LINE_CLEAR_REDUCED_REWARD_TAIL_MS[count]
+    : LINE_CLEAR_FULL_REWARD_TAIL_MS[count];
+}
+
+/** Complete non-blocking renderer lifetime; Core still commits at its unchanged 200 ms. */
+export function lineClearVisualDurationMs(count: number, reducedMotion = false): number {
+  if (!isLineClearCount(count)) return 0;
+  return lineClearEraseDurationMs(count) + lineClearRewardTailDurationMs(count, reducedMotion);
 }
 
 /**
