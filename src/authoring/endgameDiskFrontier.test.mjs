@@ -1165,12 +1165,18 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(() => testing.assertExactPublishedIndexBytes(mutated, admitted)).toThrow('differ from the admitted candidate');
   });
 
-  it('rolls back generation reservation and closes/unlinks after initial fstat failure', () => {
+  it('leaves an unauthenticated run part untouched and latches advancement after initial fstat failure', () => {
     const { parent, stage } = temporaryStage('r7-bootstrap-fstat');
     const descriptors = new Map();
     let failRunFstat = false;
+    let runOpenCalls = 0;
     const seam = {
-      openSync(...args) { const descriptor = fs.openSync(...args); descriptors.set(descriptor, String(args[0])); return descriptor; },
+      openSync(...args) {
+        if (String(args[0]).endsWith('.run.part')) runOpenCalls += 1;
+        const descriptor = fs.openSync(...args);
+        descriptors.set(descriptor, String(args[0]));
+        return descriptor;
+      },
       fstatSync(descriptor, ...args) {
         if (failRunFstat && descriptors.get(descriptor)?.endsWith('.run.part')) {
           failRunFstat = false;
@@ -1184,9 +1190,136 @@ describe('R7 resumable disk frontier primitives', () => {
     failRunFstat = true;
     expect(() => store.createRun('r7-f-d00000-g00000')).toThrow('initial run fstat fault');
     expect(descriptors.size).toBe(0);
+    const residuePath = path.join(stage, 'r7-f-d00000-g00000.run.part');
+    const before = fs.lstatSync(residuePath, { bigint: true });
+    expect(fs.readFileSync(residuePath)).toEqual(Buffer.alloc(0));
+    expect(store.loadCheckpoint()).toEqual(expect.objectContaining({ advanceAllowed: false }));
+    const opensBeforeBlockedRetry = runOpenCalls;
+    expect(() => store.createRun('r7-f-d00000-g00000')).toThrow('precommit-owned-residue');
+    expect(runOpenCalls).toBe(opensBeforeBlockedRetry);
+    expect(store.suspend().diagnostics.cleanupErrors.join('\n')).toContain('initial run fstat fault');
+    const after = fs.lstatSync(residuePath, { bigint: true });
+    expect([String(after.dev), String(after.ino), after.size]).toEqual([String(before.dev), String(before.ino), before.size]);
+    fs.unlinkSync(residuePath);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('never unlinks foreign run/index parts that failed exclusive ownership admission', () => {
+    const runCase = temporaryStage('r7-foreign-run-part');
+    const runUnlinks = [];
+    const runStore = createResumableEndgameDiskFrontierStore({
+      stagePath: runCase.stage, mode: 'create', ownerId: 'owner-A',
+      fs: { unlinkSync(filePath) { runUnlinks.push(String(filePath)); return fs.unlinkSync(filePath); } },
+    });
+    const foreignRun = path.join(runCase.stage, 'r7-f-d00000-g00000.run.part');
+    const foreignRunBytes = Buffer.from('FOREIGN-RUN\n', 'ascii');
+    fs.writeFileSync(foreignRun, foreignRunBytes);
+    const foreignRunIdentity = fs.lstatSync(foreignRun, { bigint: true });
+    expect(() => runStore.createRun('r7-f-d00000-g00000')).toThrow(/EEXIST|exist/u);
+    runStore.suspend();
+    const preservedRunIdentity = fs.lstatSync(foreignRun, { bigint: true });
+    expect(fs.readFileSync(foreignRun)).toEqual(foreignRunBytes);
+    expect([String(preservedRunIdentity.dev), String(preservedRunIdentity.ino)])
+      .toEqual([String(foreignRunIdentity.dev), String(foreignRunIdentity.ino)]);
+    expect(runUnlinks).not.toContain(foreignRun);
+    fs.unlinkSync(foreignRun);
+    runStore.dispose();
+    releaseParent(runCase.parent, runCase.stage);
+
+    const indexCase = temporaryStage('r7-foreign-index-part');
+    const indexUnlinks = [];
+    const indexStore = createResumableEndgameDiskFrontierStore({
+      stagePath: indexCase.stage, mode: 'create', ownerId: 'owner-A',
+      fs: { unlinkSync(filePath) { indexUnlinks.push(String(filePath)); return fs.unlinkSync(filePath); } },
+    });
+    const indexWriter = indexStore.createRun('r7-f-d00000-g00000');
+    indexWriter.write('A');
+    const foreignIndex = path.join(indexCase.stage, 'r7-f-d00000-g00000.idx.part');
+    const foreignIndexBytes = Buffer.from('FOREIGN-INDEX', 'ascii');
+    fs.writeFileSync(foreignIndex, foreignIndexBytes);
+    const foreignIndexIdentity = fs.lstatSync(foreignIndex, { bigint: true });
+    expect(() => indexWriter.finish()).toThrow(/EEXIST|exist/u);
+    expect(indexStore.loadCheckpoint().advanceAllowed).toBe(false);
+    indexStore.suspend();
+    const preservedIndexIdentity = fs.lstatSync(foreignIndex, { bigint: true });
+    expect(fs.readFileSync(foreignIndex)).toEqual(foreignIndexBytes);
+    expect([String(preservedIndexIdentity.dev), String(preservedIndexIdentity.ino)])
+      .toEqual([String(foreignIndexIdentity.dev), String(foreignIndexIdentity.ino)]);
+    expect(indexUnlinks).not.toContain(foreignIndex);
+    fs.unlinkSync(foreignIndex);
+    indexStore.dispose();
+    releaseParent(indexCase.parent, indexCase.stage);
+  });
+
+  it('physically admits exact upper index vectors and rejects 65544 bytes before index open', () => {
+    for (const [logicalSize, expectedBytes, admitted] of [
+      [536_477_697, 65_528, true],
+      [536_543_233, 65_536, true],
+      [536_608_769, 65_544, false],
+    ]) {
+      const { parent, stage } = temporaryStage(`r7-index-probe-${expectedBytes}`);
+      const opened = [];
+      const store = createResumableEndgameDiskFrontierStore({
+        stagePath: stage, mode: 'create', ownerId: 'owner-A',
+        fs: { openSync(filePath, ...args) { opened.push(path.basename(String(filePath))); return fs.openSync(filePath, ...args); } },
+      });
+      const writer = store.createRun('r7-f-d00000-g00000');
+      if (admitted) {
+        expect(testing.probeOwnedCandidateIndex(writer, logicalSize)).toEqual({
+          entryCount: (expectedBytes - 24) / 8,
+          indexBytes: expectedBytes,
+        });
+        expect(fs.lstatSync(path.join(stage, 'r7-f-d00000-g00000.idx.part')).size).toBe(expectedBytes);
+      } else {
+        const indexOpensBefore = opened.filter((name) => name.endsWith('.idx.part')).length;
+        expect(() => testing.probeOwnedCandidateIndex(writer, logicalSize)).toThrow('individual byte limit');
+        expect(opened.filter((name) => name.endsWith('.idx.part'))).toHaveLength(indexOpensBefore);
+      }
+      if (admitted) writer.abort();
+      expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+      store.dispose();
+      releaseParent(parent, stage);
+    }
+  });
+
+  it('aggregates failed admission cleanup, rejects later writes before I/O, and lets suspend retry', () => {
+    const { parent, stage } = temporaryStage('r7-probe-abort-latch');
+    let failRunPartUnlink = false;
+    let openCalls = 0;
+    let writeCalls = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+      fs: {
+        openSync(...args) { openCalls += 1; return fs.openSync(...args); },
+        writeSync(...args) { writeCalls += 1; return fs.writeSync(...args); },
+        unlinkSync(filePath) {
+          if (failRunPartUnlink && String(filePath).endsWith('.run.part')) {
+            failRunPartUnlink = false;
+            const error = new Error('injected owned run cleanup fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.unlinkSync(filePath);
+        },
+      },
+    });
+    const writer = store.createRun('r7-f-d00000-g00000');
+    failRunPartUnlink = true;
+    let failure;
+    try { testing.probeOwnedCandidateIndex(writer, 536_608_769); } catch (error) { failure = error; }
+    expect(failure).toBeInstanceOf(AggregateError);
+    expect(failure.errors.map((error) => error.message).join('\n')).toContain('individual byte limit');
+    expect(failure.errors.map((error) => error.message).join('\n')).toContain('owned run cleanup fault');
+    expect(store.loadCheckpoint()).toEqual(expect.objectContaining({ advanceAllowed: false }));
+    const beforeRejectedWrites = { openCalls, writeCalls };
+    expect(() => writer.write('A')).toThrow('precommit-owned-residue');
+    expect(() => store.createRun('r7-f-d00000-g00001')).toThrow('precommit-owned-residue');
+    expect({ openCalls, writeCalls }).toEqual(beforeRejectedWrites);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json', 'r7-f-d00000-g00000.run.part']);
+    const suspended = store.suspend();
+    expect(suspended.diagnostics.cleanupErrors.join('\n')).toContain('owned run cleanup fault');
     expect(fs.readdirSync(stage)).toEqual(['owner.json']);
-    const retry = store.createRun('r7-f-d00000-g00000');
-    retry.abort();
     store.dispose();
     releaseParent(parent, stage);
   });
@@ -1215,6 +1348,50 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(store.suspend().closeFailed).toBe(false);
     expect(iterator.next().done).toBe(true);
     expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rejects a same-byte replacement index after contraction and never deletes its foreign inode', () => {
+    const { parent, stage } = temporaryStage('r7-index-replacement');
+    let replaceOnIndexContraction = true;
+    let linkedIdentity = null;
+    let replacementIdentity = null;
+    let replacementBytes = null;
+    const indexPartPath = path.join(stage, 'r7-f-d00000-g00000.idx.part');
+    const indexFinalPath = path.join(stage, 'r7-f-d00000-g00000.idx');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+      fs: {
+        unlinkSync(filePath) {
+          if (replaceOnIndexContraction && String(filePath) === indexPartPath) {
+            replaceOnIndexContraction = false;
+            replacementBytes = fs.readFileSync(indexFinalPath);
+            linkedIdentity = fs.lstatSync(indexFinalPath, { bigint: true });
+            const prepared = `${indexFinalPath}.replacement`;
+            fs.writeFileSync(prepared, replacementBytes);
+            fs.unlinkSync(filePath);
+            fs.unlinkSync(indexFinalPath);
+            fs.renameSync(prepared, indexFinalPath);
+            replacementIdentity = fs.lstatSync(indexFinalPath, { bigint: true });
+            return;
+          }
+          return fs.unlinkSync(filePath);
+        },
+      },
+    });
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    expect(() => writer.finish()).toThrow('index final identity drift after alias contraction');
+    expect([String(replacementIdentity.dev), String(replacementIdentity.ino)])
+      .not.toEqual([String(linkedIdentity.dev), String(linkedIdentity.ino)]);
+    expect(store.loadCheckpoint().advanceAllowed).toBe(false);
+    store.suspend();
+    const afterSuspend = fs.lstatSync(indexFinalPath, { bigint: true });
+    expect([String(afterSuspend.dev), String(afterSuspend.ino)])
+      .toEqual([String(replacementIdentity.dev), String(replacementIdentity.ino)]);
+    expect(fs.readFileSync(indexFinalPath)).toEqual(replacementBytes);
+    fs.unlinkSync(indexFinalPath);
     store.dispose();
     releaseParent(parent, stage);
   });
