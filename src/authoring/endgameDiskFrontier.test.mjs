@@ -86,6 +86,53 @@ function trackedFs(events) {
   };
 }
 
+function trackedResumableFs(events) {
+  const descriptors = new Map();
+  const faults = { runPartUnlink: false, indexClose: false };
+  const label = (filePath) => path.basename(String(filePath));
+  return {
+    faults,
+    seam: {
+      openSync(...args) {
+        const descriptor = fs.openSync(...args);
+        descriptors.set(descriptor, label(args[0]));
+        events.push(`open:${label(args[0])}`);
+        return descriptor;
+      },
+      readSync(descriptor, ...args) {
+        events.push(`read:${descriptors.get(descriptor)}:${args[3]}`);
+        return fs.readSync(descriptor, ...args);
+      },
+      closeSync(descriptor) {
+        if (faults.indexClose && descriptors.get(descriptor)?.endsWith('.idx.part')) {
+          faults.indexClose = false;
+          const error = new Error('injected index close fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        const result = fs.closeSync(descriptor);
+        descriptors.delete(descriptor);
+        return result;
+      },
+      linkSync(source, finalPath) {
+        events.push(`link:${label(source)}>${label(finalPath)}`);
+        return fs.linkSync(source, finalPath);
+      },
+      unlinkSync(filePath) {
+        events.push(`unlink:${label(filePath)}`);
+        if (faults.runPartUnlink && String(filePath).endsWith('.run.part')) {
+          faults.runPartUnlink = false;
+          const error = new Error('injected run-part unlink fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.unlinkSync(filePath);
+      },
+    },
+    openHandles() { return descriptors.size; },
+  };
+}
+
 function oneShotFault(operation) {
   let fired = false;
   return {
@@ -350,6 +397,147 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(() => writer.finish()).toThrow('readback drift');
     for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
     fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('freezes reachable index and coupled namespace admissions at exact boundaries', () => {
+    const inventory = { namespaceEntries: 1, ownerAndIndexBytes: 0, retainedManifestBytes: 0 };
+    const limits = RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS;
+    expect(testing.admitCandidateIndex(536_477_697, inventory, limits, 49_148).indexBytes).toBe(65_528);
+    expect(testing.admitCandidateIndex(536_543_233, inventory, limits, 49_148).indexBytes).toBe(65_536);
+    expect(() => testing.admitCandidateIndex(536_608_769, inventory, limits, 49_148)).toThrow('individual byte limit');
+    expect(() => testing.admitNamespacePeak(49_148, 4, 49_152)).not.toThrow();
+    expect(() => testing.admitNamespacePeak(49_149, 4, 49_152)).toThrow('49153');
+
+    const { parent, stage } = temporaryStage('r7-generation-names');
+    const events = [];
+    const tracked = trackedResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+      limits: { maximumNamespaceEntries: 4 },
+    });
+    events.length = 0;
+    expect(() => store.createRun('r7-f-d00000-g00000')).toThrow('namespace peak');
+    expect(events.some((event) => event.includes('.run.part'))).toBe(false);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rejects a structurally valid index whose intermediate offset differs from admitted bytes', () => {
+    const admitted = testing.encodeIndex(65_537, [0, 2, 4]);
+    const mutated = testing.encodeIndex(65_537, [0, 3, 4]);
+    expect(testing.bindIndexToDataBytes(testing.decodeIndex(mutated), 4).size).toBe(65_537);
+    expect(() => testing.assertExactPublishedIndexBytes(mutated, admitted)).toThrow('differ from the admitted candidate');
+  });
+
+  it('rolls back generation reservation and closes/unlinks after initial fstat failure', () => {
+    const { parent, stage } = temporaryStage('r7-bootstrap-fstat');
+    const descriptors = new Map();
+    let failRunFstat = false;
+    const seam = {
+      openSync(...args) { const descriptor = fs.openSync(...args); descriptors.set(descriptor, String(args[0])); return descriptor; },
+      fstatSync(descriptor, ...args) {
+        if (failRunFstat && descriptors.get(descriptor)?.endsWith('.run.part')) {
+          failRunFstat = false;
+          throw new Error('injected initial run fstat fault');
+        }
+        return fs.fstatSync(descriptor, ...args);
+      },
+      closeSync(descriptor) { const result = fs.closeSync(descriptor); descriptors.delete(descriptor); return result; },
+    };
+    const store = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam });
+    failRunFstat = true;
+    expect(() => store.createRun('r7-f-d00000-g00000')).toThrow('initial run fstat fault');
+    expect(descriptors.size).toBe(0);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    const retry = store.createRun('r7-f-d00000-g00000');
+    retry.abort();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('publishes a candidate run/index pair in the sole alias-contraction order and closes a half-read iterator', () => {
+    const { parent, stage } = temporaryStage('r7-candidate');
+    const events = [];
+    const tracked = trackedResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam });
+    events.length = 0;
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    writer.write('B');
+    const run = writer.finish();
+    expect(fs.readdirSync(stage).sort()).toEqual(['owner.json', `${run.id}.idx`, `${run.id}.run`].sort());
+    const runLink = events.indexOf(`link:${run.id}.run.part>${run.id}.run`);
+    const runContract = events.indexOf(`unlink:${run.id}.run.part`);
+    const indexOpen = events.indexOf(`open:${run.id}.idx.part`);
+    const indexLink = events.indexOf(`link:${run.id}.idx.part>${run.id}.idx`);
+    const indexContract = events.indexOf(`unlink:${run.id}.idx.part`);
+    expect([runLink < runContract, runContract < indexOpen, indexOpen < indexLink, indexLink < indexContract]).toEqual([true, true, true, true]);
+    events.length = 0;
+    const iterator = run.values();
+    expect(iterator.next()).toEqual({ value: 'A', done: false });
+    expect(events.find((event) => event.startsWith(`read:${run.id}.run:`))).toBe(`read:${run.id}.run:0`);
+    expect(store.suspend().closeFailed).toBe(false);
+    expect(iterator.next().done).toBe(true);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rejects index admission before run-final or index paths are opened', () => {
+    const { parent, stage } = temporaryStage('r7-index-gate');
+    const events = [];
+    const tracked = trackedResumableFs(events);
+    const ownerBytes = Buffer.byteLength(`${testing.canonicalJson({ schema: 't37-f4e-r7-owner-v1', ownerId: 'owner-A' })}\n`);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+      limits: { ownerAndIndexBytes: ownerBytes * 2 },
+    });
+    events.length = 0;
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    expect(() => writer.finish()).toThrow('two-alias bytes');
+    expect(events.some((event) => event.includes('.idx'))).toBe(false);
+    expect(events.some((event) => event.startsWith('link:') && event.includes('.run'))).toBe(false);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('blocks before every index path when run-part alias contraction fails', () => {
+    const { parent, stage } = temporaryStage('r7-run-unlink');
+    const events = [];
+    const tracked = trackedResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam });
+    events.length = 0;
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    tracked.faults.runPartUnlink = true;
+    expect(() => writer.finish()).toThrow('run-part unlink fault');
+    expect(events.some((event) => event.includes('.idx'))).toBe(false);
+    expect(fs.readdirSync(stage)).toEqual(expect.arrayContaining(['r7-f-d00000-g00000.run', 'r7-f-d00000-g00000.run.part']));
+    expect(store.suspend().closeFailed).toBe(false);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('retains a failed index close descriptor for suspend retry and exact candidate cleanup', () => {
+    const { parent, stage } = temporaryStage('r7-index-close');
+    const events = [];
+    const tracked = trackedResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam });
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    tracked.faults.indexClose = true;
+    let failure;
+    try { writer.finish(); } catch (error) { failure = error; }
+    expect(failure?.r7CloseFailed).toBe(true);
+    expect(tracked.openHandles()).toBe(1);
+    expect(store.suspend().closeFailed).toBe(false);
+    expect(tracked.openHandles()).toBe(0);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    store.dispose();
     releaseParent(parent, stage);
   });
 });
