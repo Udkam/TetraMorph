@@ -9898,9 +9898,10 @@ recognized-residue index bytes, also counted per name, are at most 536,870,912. 
 physical bytes are counted once per file identity while names remain separately bounded.
 Every canonical manifest is at most 16,384 bytes including its single
 terminal LF; every owner or index file is at most 65,536 bytes. Equality to every bound is
-allowed. Creating the 4,097th unit or
-32,769th manifest, adding the 49,153rd entry, or exceeding a byte bound fails before the next
-run write or manifest commit. It is an infrastructure failure with no certificate; it never
+allowed. Creating the 4,097th unit or 32,769th manifest and adding the 49,153rd entry fail
+before their next creation. Run-data physical/working bounds fail before each data write;
+individual/aggregate owner, index, and manifest bounds fail before the corresponding part
+opens. It is an infrastructure failure with no certificate; it never
 truncates, samples, beams, hashes state identity, or proves that a route is absent. Tests
 alone may inject smaller limits.
 
@@ -10106,7 +10107,11 @@ part opens. Index bytes are deterministically known from run size before its par
 `indexBytes = 24 + 8 * entryCount`. Before creating or writing an index part, the adapter first
 requires `indexBytes <= 65,536`, then admits two namespace names and twice that exact length
 against the by-name half; these three checks are one pre-open admission and any failure leaves
-zero new names and zero new bytes. Owner parts likewise require their known individual length
+zero new index names and zero new auxiliary index bytes. The streaming run writer may already
+have an admitted `.run.part` because exact run size is known only after its data closes; that
+part must remain unfinalized until index admission passes. Index-admission failure attempts
+identity-bound cleanup of only that working run part, creates neither `.run` final nor any
+`.idx*` path, and classifies cleanup failure as existing `precommit-owned-residue`. Owner parts likewise require their known individual length
 at most 65,536 plus the two-name/twice-byte aggregate admission before opening. Equality passes
 and plus one fails without creating the part. Before a run-data part it
 likewise admits both future names, and it admits physical/working run bytes incrementally
@@ -10323,9 +10328,15 @@ all data-file reads must remain inside the authenticated
 later reopened Store performs exactly one new admission scan. They cover final short and exact-multiple terminal
 offsets, 4,096/4,097 units, post-commit reopen with successful/failed cleanup, and
 limit-minus-one/equal/plus-one for every byte, entry, and generation bound. Index admission
-tests prove the deterministic byte formula and exercise the individual 65,536-byte cap at
-minus one/equal/plus one; plus one and any rejected prospective two-name/two-byte charge must
-create no `.idx.part`, new name, or new byte. This includes part/final coexistence at 49,151/49,152 names,
+tests prove the deterministic byte formula and exercise the nearest formula-reachable values
+around the individual cap: 65,528 bytes at run size 536,477,697; 65,536 bytes at run size
+536,543,233; and 65,544 bytes at run size 536,608,769. These metadata-only vectors do not
+materialize the declared records. The 65,544-byte vector and any rejected prospective
+two-name/two-byte charge must create/open/write no `.idx.part` and add no index namespace name
+or auxiliary byte. The standalone metadata admission test starts without a run part and leaves
+the full resource inventory byte-identical. A separate integration fault test starts with one
+exact admitted `.run.part`, proves no `.run` final or `.idx*` path appears, and covers both
+successful cleanup and failed cleanup classified as blocked precommit residue. This includes part/final coexistence at 49,151/49,152 names,
 depth 32,767/32,768, expected-tip shorter/equal/extended chains, nonnull expected-tip
 precedence over empty/pre-owner/short-chain residue, the exact empty-stage and owner-part
 `expectedTip:null` blocked cases, clean owner-final-only null/non-null branches, and suspend
@@ -10362,7 +10373,7 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1/R2/R3/R4/R5/R6/R7 rejection and R8 correction
+### F4E-R7A R1/R2/R3/R4/R5/R6/R7/R8 rejection and R9 correction
 
 R1 `b697625` is rejected at independent
 `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
@@ -10404,5 +10415,11 @@ manifest alias.
 R7 `c4db79d` receives two independent all-zero reviews but is rejected by recovery QA at
 `0/1/0/0/1`: the 65,536-byte per-index cap was not explicitly part of pre-open admission. R8
 requires the individual cap, two-name capacity, and twice-byte aggregate capacity to pass as
-one atomic pre-open check, with minus-one/equal/plus-one zero-residue tests. Commit and
-independently review this four-document R8 before implementation.
+one atomic pre-open check.
+
+R8 `d74d832` is rejected by three reviews, each `0/1/0/0/1`: because index length is
+`24 + 8 * entryCount`, literal 65,535/65,537-byte tests are unreachable, and exact size may be
+known only after a working run part exists. R9 freezes the nearest reachable 65,528/65,536/
+65,544-byte values and exact run-size inputs; separates a zero-mutation metadata admission test
+from a real run-part integration seam; and forbids any run-final/index creation before the
+index gate passes. Commit and independently review this four-document R9 before implementation.

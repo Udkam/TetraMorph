@@ -3393,4 +3393,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   exact index bytes one admission gate before `.idx.part` open/write. Any failed check leaves
   zero new names/bytes.
 - QA adds index-length minus-one/equal/plus-one cases; plus one must produce no part/residue.
-- Next: commit/review only the four R8 docs. Source and all external R7 paths remain closed.
+- The former R8 review next action is superseded by R9 below. Source and all external R7 paths
+  remain closed.
+
+### F4E-R7A R8 rejection and R9 reachable index vectors
+
+- R8 `d74d832` is rejected by three `0/1/0/0/1` reviews: index bytes advance by eight, so
+  literal 65,535/65,537 vectors are unreachable, and real size may follow a working run part.
+- R9 freezes reachable byte/run-size pairs 65,528/536,477,697;
+  65,536/536,543,233; and 65,544/536,608,769. The test is metadata-only.
+- Metadata-only rejection preserves the full inventory. In integration, `.run.part` stays
+  unfinalized until the index gate; rejection creates no run final or index path, then cleans
+  the working part or records blocked precommit residue. Index inventory stays unchanged.
+- Next: commit/review only the four R9 docs. Source and all external R7 paths remain closed.

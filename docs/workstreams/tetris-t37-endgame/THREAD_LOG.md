@@ -1060,5 +1060,17 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   capacity to pass as one gate before `.idx.part` opens or writes. Failure leaves zero new
   names/bytes.
 - Focused QA covers index size minus one/equal/plus one; plus one leaves no part or residue.
-- Next: commit these four R8 docs and obtain at least two fresh independent all-zero reviews.
+- The former R8 review next action is superseded by R9 below. Source, external paths, proof
+  execution, and Intro-05 remain closed.
+
+### F4E-R7A R8 rejected and R9 contract candidate
+
+- R8 `d74d832` is rejected by three `0/1/0/0/1` reviews: 65,535/65,537 are unreachable and
+  exact run size may be known only after an admitted working run part exists.
+- R9 uses exact reachable byte/run-size vectors 65,528/536,477,697;
+  65,536/536,543,233; and 65,544/536,608,769 without allocating records.
+- Metadata rejection leaves full inventory byte-identical. Integration keeps `.run.part`
+  unfinalized through the index gate; rejection creates no run final/index path and either
+  cleans the part or reports blocked precommit residue, with index inventory unchanged.
+- Next: commit these four R9 docs and obtain at least two fresh independent all-zero reviews.
   Source, external paths, proof execution, and Intro-05 remain closed.

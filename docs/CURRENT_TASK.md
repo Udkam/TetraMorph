@@ -10546,5 +10546,22 @@ index length to pass together before `.idx.part` is opened or written. Failure c
 names and zero new bytes. The focused matrix must test individual index length at minus one,
 equal, and plus one; plus one must leave no part or other residue.
 
+The former R8 review next action is superseded by the R9 disposition below. Core and adapter
+implementation remain closed.
+
+### F4E-R7A R8 rejected — R9 reachable index vectors
+
+R8 `d74d832` is rejected by three `P0/P1/P2/P3/GAP = 0/1/0/0/1` reviews. Index bytes have
+shape `24 + 8 * entryCount`, so the literal 65,535/65,537 cases cannot exist. A real streaming
+builder also learns exact size only after one admitted `.run.part` may exist.
+
+R9 uses the nearest reachable vectors: 65,528 bytes from run size 536,477,697; 65,536 bytes
+from 536,543,233; and 65,544 bytes from 536,608,769. The focused test exercises only the
+index-size metadata calculation and injected FS; it does not materialize those records and
+leaves the full inventory unchanged. In the real integration seam, the run part remains
+unfinalized until index admission passes. An upper-vector failure creates no `.run` final or
+`.idx*` path and attempts exact cleanup of that working part; cleanup failure becomes blocked
+precommit residue. Index namespace/auxiliary inventory remains unchanged in both cases.
+
 **Current next action:** commit and obtain at least two fresh independent all-zero reviews of
-the four-document R8 contract. Core and adapter implementation remain closed until that gate.
+the four-document R9 contract. Core and adapter implementation remain closed until that gate.
