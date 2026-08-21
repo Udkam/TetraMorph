@@ -1371,6 +1371,13 @@ function testProofRunLimits(overrides: Partial<EndgameProofRunLimits>): EndgameP
   return Object.freeze(limits);
 }
 
+type SyntheticVerifiedUnitForTesting = Readonly<{
+  syntheticVerifiedNextKeys: Iterable<string>;
+  lastProcessedParentKey: string;
+  transitionsDelta: number;
+  boundPrunesDelta: number;
+}>;
+
 /** @internal Bounded low-level matrix seam; it never invokes an Endgame search. */
 export const ENDGAME_PROOF_FRONTIER_STORE_TESTING = Object.freeze({
   limits: ENDGAME_PROOF_RUN_LIMITS,
@@ -1387,6 +1394,18 @@ export const ENDGAME_PROOF_FRONTIER_STORE_TESTING = Object.freeze({
       const run = layer.finish();
       return Object.freeze([...verifiedProofRunValues(run, limits)]);
     });
+  },
+  advanceSyntheticVerifiedUnitForDefinition(
+    definition: EndgameDefinition,
+    candidateCommandStream: string,
+    store: EndgameProofCheckpointRunStore,
+    fixture: SyntheticVerifiedUnitForTesting,
+    overrides: Partial<EndgameProofRunLimits> = {},
+  ): EndgameProofAdvanceResult | null {
+    return advanceResumableEndgameProof(
+      definition, candidateCommandStream, store,
+      Object.freeze({ fixture, limits: testProofRunLimits(overrides) }),
+    );
   },
 });
 
@@ -1665,10 +1684,13 @@ function resumableUnitWorkingRunId(
     + `-h${String(group).padStart(4, '0')}`;
 }
 
-function createResumableProofRunOwner(store: EndgameProofRunStore): EndgameProofRunOwner {
+function createResumableProofRunOwner(
+  store: EndgameProofRunStore,
+  limits: EndgameProofRunLimits = ENDGAME_PROOF_RUN_LIMITS,
+): EndgameProofRunOwner {
   return {
     store,
-    limits: ENDGAME_PROOF_RUN_LIMITS,
+    limits,
     active: new Set(),
     activeIds: new Set(),
     pendingWriters: 0,
@@ -1825,20 +1847,26 @@ function visitVerifiedProofRunRange(
   return previous;
 }
 
-function advanceSearchingProofUnit(
+type VerifiedNextKeyUnitProgress = Readonly<{
+  lastProcessedParentKey: string;
+  transitionsDelta: number;
+  boundPrunesDelta: number;
+}>;
+
+function publishSearchingProofUnitFromVerifiedNextKeys(
   checkpoint: EndgameProofSearchingCheckpoint,
   tip: EndgameProofTip,
-  prepared: PreparedResumableEndgameProof,
   store: EndgameProofCheckpointRunStore,
   processedUnits: number,
   finalDecisionDepth: boolean,
   exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
+  endOrdinal: number,
+  limits: EndgameProofRunLimits,
+  produceVerifiedNextKeys: (add: (key: string) => void) => VerifiedNextKeyUnitProgress,
 ): EndgameProofAdvanceResult {
-  const endOrdinal = Math.min(checkpoint.frontier.size, checkpoint.parentOffset + RESUMABLE_PARENT_UNIT_SIZE);
-  const range = Object.freeze({ startOrdinal: checkpoint.parentOffset, endOrdinal });
   const generation = checkpoint.generation + 1;
   if (generation > 32_767) throw proofRunError('resumable generation exceeds 32767');
-  const owner = createResumableProofRunOwner(store);
+  const owner = createResumableProofRunOwner(store, limits);
   const builder = finalDecisionDepth ? null : createProofLayerBuilder(owner, checkpoint.depth + 1, Object.freeze({
     working: (pass: number, group: number) => resumableUnitWorkingRunId(
       generation, checkpoint.depth, processedUnits, pass, group,
@@ -1847,55 +1875,27 @@ function advanceSearchingProofUnit(
   }));
   let frontierReleased = false;
   try {
-    let transitionsDelta = 0;
-    let boundPrunesDelta = 0;
-    const lastProcessedParentKey = visitVerifiedProofRunRange(
-      checkpoint.frontier,
-      range,
-      checkpoint.lastProcessedParentKey,
-      (parentKey) => {
-        const parent = decodeProofFrontierStateKey(parentKey, prepared.proofContext);
-        if (checkpoint.depth + endgameRouteLockLowerBound(parent) >= prepared.optimalLocks) {
-          boundPrunesDelta += 1;
-          addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
-          return;
-        }
-        for (const landing of exhaustiveEndgameLandings(parent)) {
-          transitionsDelta += 1;
-          addSafeProofCounter(checkpoint.transitions, transitionsDelta, 'transition');
-          if (landing.state.status === 'finished') {
-            throw new Error(
-              `Endgame ${prepared.levelId} has a shorter route than the ${prepared.optimalLocks}-lock candidate.`,
-            );
-          }
-          if (!isActive(landing.state) || finalDecisionDepth) continue;
-          const nextDepth = checkpoint.depth + 1;
-          if (nextDepth + endgameRouteLockLowerBound(landing.state) >= prepared.optimalLocks) {
-            boundPrunesDelta += 1;
-            addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
-            continue;
-          }
-          builder!.add(proofFrontierStateKey(landing.state, prepared.proofContext));
-        }
-      },
-    );
+    const progress = produceVerifiedNextKeys((key) => {
+      if (builder === null) throw proofRunError('final decision unit cannot produce a next key');
+      builder.add(key);
+    });
     assertSafeSearchingTotals(
       exhaustedDepths,
       checkpoint.frontier.size,
-      addSafeProofCounter(checkpoint.transitions, transitionsDelta, 'transition'),
-      addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune'),
+      addSafeProofCounter(checkpoint.transitions, progress.transitionsDelta, 'transition'),
+      addSafeProofCounter(checkpoint.boundPrunes, progress.boundPrunesDelta, 'bound-prune'),
     );
+    const trackedNextRun = builder?.finish() ?? null;
     store.releaseCheckpointRun(checkpoint.frontier);
     frontierReleased = true;
-    const trackedNextRun = builder?.finish() ?? null;
     const nextRun = trackedNextRun ? detachResumableProofRun(owner, trackedNextRun) : null;
     const publication = store.publishCheckpoint(Object.freeze({
       transition: 'unit',
       previousTip: tip,
       parentOffset: endOrdinal,
-      lastProcessedParentKey,
-      transitionsDelta,
-      boundPrunesDelta,
+      lastProcessedParentKey: progress.lastProcessedParentKey,
+      transitionsDelta: progress.transitionsDelta,
+      boundPrunesDelta: progress.boundPrunesDelta,
       nextRun,
     }));
     return searchingAdvanceResult(generation, checkpoint.depth, endOrdinal, publication);
@@ -1910,6 +1910,57 @@ function advanceSearchingProofUnit(
     }
     throwProofRunFailure(primary, cleanup);
   }
+}
+
+function advanceSearchingProofUnit(
+  checkpoint: EndgameProofSearchingCheckpoint,
+  tip: EndgameProofTip,
+  prepared: PreparedResumableEndgameProof,
+  store: EndgameProofCheckpointRunStore,
+  processedUnits: number,
+  finalDecisionDepth: boolean,
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
+): EndgameProofAdvanceResult {
+  const endOrdinal = Math.min(checkpoint.frontier.size, checkpoint.parentOffset + RESUMABLE_PARENT_UNIT_SIZE);
+  const range = Object.freeze({ startOrdinal: checkpoint.parentOffset, endOrdinal });
+  return publishSearchingProofUnitFromVerifiedNextKeys(
+    checkpoint, tip, store, processedUnits, finalDecisionDepth, exhaustedDepths,
+    endOrdinal, ENDGAME_PROOF_RUN_LIMITS, (add) => {
+      let transitionsDelta = 0;
+      let boundPrunesDelta = 0;
+      const lastProcessedParentKey = visitVerifiedProofRunRange(
+        checkpoint.frontier,
+        range,
+        checkpoint.lastProcessedParentKey,
+        (parentKey) => {
+          const parent = decodeProofFrontierStateKey(parentKey, prepared.proofContext);
+          if (checkpoint.depth + endgameRouteLockLowerBound(parent) >= prepared.optimalLocks) {
+            boundPrunesDelta += 1;
+            addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
+            return;
+          }
+          for (const landing of exhaustiveEndgameLandings(parent)) {
+            transitionsDelta += 1;
+            addSafeProofCounter(checkpoint.transitions, transitionsDelta, 'transition');
+            if (landing.state.status === 'finished') {
+              throw new Error(
+                `Endgame ${prepared.levelId} has a shorter route than the ${prepared.optimalLocks}-lock candidate.`,
+              );
+            }
+            if (!isActive(landing.state) || finalDecisionDepth) continue;
+            const nextDepth = checkpoint.depth + 1;
+            if (nextDepth + endgameRouteLockLowerBound(landing.state) >= prepared.optimalLocks) {
+              boundPrunesDelta += 1;
+              addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
+              continue;
+            }
+            add(proofFrontierStateKey(landing.state, prepared.proofContext));
+          }
+        },
+      );
+      return Object.freeze({ lastProcessedParentKey, transitionsDelta, boundPrunesDelta });
+    },
+  );
 }
 
 function resumableLayerWorkingRunId(
@@ -2131,10 +2182,54 @@ function assertStrictAdvanceAllowed(value: unknown, source: string): boolean {
   return value;
 }
 
+type SyntheticVerifiedUnitTestingOptions = Readonly<{
+  fixture: SyntheticVerifiedUnitForTesting;
+  limits: EndgameProofRunLimits;
+}>;
+
+function advanceSyntheticVerifiedSearchingProofUnitForTesting(
+  checkpoint: EndgameProofSearchingCheckpoint,
+  tip: EndgameProofTip,
+  store: EndgameProofCheckpointRunStore,
+  processedUnits: number,
+  finalDecisionDepth: boolean,
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
+  testing: SyntheticVerifiedUnitTestingOptions,
+): EndgameProofAdvanceResult {
+  const endOrdinal = Math.min(checkpoint.frontier.size, checkpoint.parentOffset + RESUMABLE_PARENT_UNIT_SIZE);
+  assertSafeSearchingTotals(
+    exhaustedDepths,
+    checkpoint.frontier.size,
+    addSafeProofCounter(checkpoint.transitions, testing.fixture.transitionsDelta, 'transition'),
+    addSafeProofCounter(checkpoint.boundPrunes, testing.fixture.boundPrunesDelta, 'bound-prune'),
+  );
+  const lastProcessedParentKey = testing.fixture.lastProcessedParentKey;
+  proofRunRecordBytes(lastProcessedParentKey, PROOF_RUN_RECORD_MAX_BYTES);
+  if (checkpoint.lastProcessedParentKey !== null
+    && ordinalByteCompare(checkpoint.lastProcessedParentKey, lastProcessedParentKey) >= 0) {
+    throw proofRunError('synthetic parent cursor is not strictly increasing');
+  }
+  return publishSearchingProofUnitFromVerifiedNextKeys(
+    checkpoint, tip, store, processedUnits, finalDecisionDepth, exhaustedDepths,
+    endOrdinal, testing.limits, (add) => {
+      for (const key of testing.fixture.syntheticVerifiedNextKeys) {
+        proofRunRecordBytes(key, testing.limits.recordMaxBytes);
+        add(key);
+      }
+      return Object.freeze({
+        lastProcessedParentKey,
+        transitionsDelta: testing.fixture.transitionsDelta,
+        boundPrunesDelta: testing.fixture.boundPrunesDelta,
+      });
+    },
+  );
+}
+
 function advanceResumableEndgameProof(
   definition: EndgameDefinition,
   candidateCommandStream: string,
   store: EndgameProofCheckpointRunStore,
+  testing: SyntheticVerifiedUnitTestingOptions | null = null,
 ): EndgameProofAdvanceResult | null {
   const prepared = prepareResumableEndgameProof(definition, candidateCommandStream);
   if (!prepared) return null;
@@ -2142,6 +2237,7 @@ function advanceResumableEndgameProof(
   const loadedAdvanceAllowed = assertStrictAdvanceAllowed(loaded.advanceAllowed, 'loaded checkpoint');
   const { checkpoint, tip } = loaded;
   if (checkpoint === null) {
+    if (testing !== null) throw proofRunError('synthetic unit testing requires a searching checkpoint');
     if (tip !== null) throw proofRunError('null checkpoint has a nonnull tip');
     if (!loadedAdvanceAllowed) return blockedAdvanceResult(null, null, loaded.diagnostics);
     const frontier = createVerifiedResumableRun(
@@ -2166,6 +2262,7 @@ function advanceResumableEndgameProof(
   const authenticatedTip = assertResumableTip(tip, checkpoint.generation);
   assertResumableBinding(checkpoint.binding, prepared.binding);
   if (checkpoint.kind === 'complete') {
+    if (testing !== null) throw proofRunError('synthetic unit testing requires a searching checkpoint');
     const records = assertCompleteCheckpoint(checkpoint, prepared);
     return Object.freeze({
       status: 'complete',
@@ -2177,6 +2274,9 @@ function advanceResumableEndgameProof(
     });
   }
   const searching = assertSearchingCheckpoint(checkpoint, prepared);
+  if (testing !== null && (prepared.optimalLocks === 1 || checkpoint.parentOffset >= checkpoint.frontier.size)) {
+    throw proofRunError('synthetic unit testing requires an uncovered searching unit');
+  }
   if (!loadedAdvanceAllowed) {
     return blockedAdvanceResult(checkpoint, authenticatedTip, loaded.diagnostics);
   }
@@ -2218,6 +2318,17 @@ function advanceResumableEndgameProof(
     }
   }
   if (checkpoint.parentOffset < checkpoint.frontier.size) {
+    if (testing !== null) {
+      return advanceSyntheticVerifiedSearchingProofUnitForTesting(
+        checkpoint,
+        authenticatedTip,
+        store,
+        searching.processedUnits,
+        searching.finalDecisionDepth,
+        searching.exhaustedDepths,
+        testing,
+      );
+    }
     return advanceSearchingProofUnit(
       checkpoint,
       authenticatedTip,

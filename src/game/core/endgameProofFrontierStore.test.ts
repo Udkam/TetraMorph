@@ -7,6 +7,7 @@ import { ENDGAME_V3_INTRO_DRAFTS } from './endgameV3IntroDefinitions';
 import type { EndgameDefinition } from './endgames';
 import {
   ENDGAME_PROOF_FRONTIER_STORE_TESTING,
+  advanceOptimalEndgameRouteProof,
   advanceOptimalEndgameRouteProofForDefinition,
   certifyOptimalEndgameRouteForDefinition,
   type EndgameProofCheckpoint,
@@ -804,6 +805,178 @@ describe('Endgame proof frontier Core-owned runs', () => {
     });
     expect(result?.diagnostics.activeRuns).toEqual([]);
   }, 30_000);
+
+  it('publishes the 4096-chunk final unit without materializing its 4095-run opaque prefix', () => {
+    expect(advanceOptimalEndgameRouteProof).toHaveLength(3);
+    expect(advanceOptimalEndgameRouteProofForDefinition).toHaveLength(3);
+    const definition = ENDGAME_V3_INTRO_DRAFTS[0]!;
+    const route = intro01.optimalRoute;
+    const diagnostics = Object.freeze({
+      activeRuns: Object.freeze([]), residue: Object.freeze([]), residueTruncated: false,
+      cleanupErrors: Object.freeze([]), cleanupErrorsTruncated: false,
+    });
+    const seedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null, tip: null, diagnostics, advanceAllowed: true,
+    }));
+    advanceOptimalEndgameRouteProofForDefinition(definition, route, seedStore);
+    const seed = seedStore.publications[0]!;
+    if (seed.transition !== 'seed') throw new Error('expected seed publication');
+    const unitCount = 4096;
+    const priorUnits = unitCount - 1;
+    const frontierSize = unitCount * 65_536;
+    let collectionOpenCount = 0;
+    let liveFrontier = 1;
+    let currentWorking = 0;
+    let peakCoreSlots = liveFrontier;
+    const observeCoreSlots = (): void => {
+      peakCoreSlots = Math.max(peakCoreSlots, liveFrontier + currentWorking);
+    };
+    const frontier = new MemoryRun(
+      'r7-f-d00000-g00000', [seed.binding.initialFrontierKey], frontierSize,
+      (_id, values) => values,
+      () => {
+        liveFrontier -= 1;
+        observeCoreSlots();
+      },
+    );
+    const store = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: priorUnits, binding: seed.binding, depth: 0,
+        parentOffset: priorUnits * 65_536, lastProcessedParentKey: 'a', frontier,
+        nextRuns: Object.freeze({
+          count: priorUnits,
+          open: () => {
+            collectionOpenCount += 1;
+            throw new Error('opaque prefix must remain unopened during a unit transition');
+          },
+        }),
+        transitions: 0, boundPrunes: 0, exhaustedDepths: Object.freeze([]),
+      }),
+      tip: Object.freeze({ generation: priorUnits, manifestSha256: 'E'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }), {
+      observeDescriptors(current): void {
+        currentWorking = current;
+        observeCoreSlots();
+      },
+    });
+    function* syntheticVerifiedNextKeys(): Generator<string> {
+      for (let index = 0; index < unitCount; index += 1) yield `k${String(index).padStart(4, '0')}`;
+    }
+
+    const result = ENDGAME_PROOF_FRONTIER_STORE_TESTING.advanceSyntheticVerifiedUnitForDefinition(
+      definition,
+      route,
+      store,
+      Object.freeze({
+        syntheticVerifiedNextKeys: syntheticVerifiedNextKeys(),
+        lastProcessedParentKey: 'b',
+        transitionsDelta: unitCount,
+        boundPrunesDelta: 0,
+      }),
+      { chunkMaxRecords: 1, chunkMaxBytes: 8, recordMaxBytes: 8 },
+    );
+    expect(result).toMatchObject({
+      status: 'searching', generation: unitCount, depth: 0, parentOffset: frontierSize,
+    });
+    expect({ collectionOpenCount, liveFrontier, ranges: frontier.ranges }).toEqual({
+      collectionOpenCount: 0, liveFrontier: 0, ranges: [],
+    });
+    expect(store.releasedRunIds).toEqual(['r7-f-d00000-g00000']);
+    const chunks = store.snapshot().completed.filter(({ id }) => (
+      id.startsWith('r7w-u-g04096-d00000-n00004095-p0000-')
+    ));
+    expect(chunks).toHaveLength(unitCount);
+    expect(chunks.every(({ records }) => records === 1)).toBe(true);
+    expect(chunks.at(0)?.id).toBe('r7w-u-g04096-d00000-n00004095-p0000-h0000');
+    expect(chunks.at(-1)?.id).toBe('r7w-u-g04096-d00000-n00004095-p0000-h4095');
+    expect(store.snapshot().peakDescriptors).toBe(4097);
+    expect(peakCoreSlots).toBe(4098);
+    expect(peakCoreSlots).toBeLessThanOrEqual(4098);
+    expect(store.createRunCount).toBe(4230);
+    expect(store.publications).toHaveLength(1);
+    expect(store.publications[0]).toMatchObject({
+      transition: 'unit', parentOffset: frontierSize, lastProcessedParentKey: 'b',
+      transitionsDelta: unitCount, boundPrunesDelta: 0,
+      nextRun: { id: 'r7-u-d00000-n00004095-g04096', size: unitCount },
+    });
+    expect(result?.diagnostics.activeRuns).toEqual([]);
+
+    let malformedKeysIterated = false;
+    function* malformedKeys(): Generator<string> {
+      malformedKeysIterated = true;
+      yield 'unused';
+    }
+    const malformedFrontier = new MemoryRun(
+      'r7-f-d00000-g00000', [seed.binding.initialFrontierKey], 1, (_id, values) => values, () => {},
+    );
+    const malformedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: 0, binding: seed.binding, depth: 0,
+        parentOffset: 0, lastProcessedParentKey: null, frontier: malformedFrontier,
+        nextRuns: Object.freeze({ count: 0, open: () => Object.freeze([]) }),
+        transitions: 0, boundPrunes: 0, exhaustedDepths: Object.freeze([]),
+      }),
+      tip: Object.freeze({ generation: 0, manifestSha256: '1'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }));
+    expect(() => ENDGAME_PROOF_FRONTIER_STORE_TESTING.advanceSyntheticVerifiedUnitForDefinition(
+      definition, route, malformedStore,
+      Object.freeze({
+        syntheticVerifiedNextKeys: malformedKeys(), lastProcessedParentKey: 'a',
+        transitionsDelta: Number.MAX_SAFE_INTEGER + 1, boundPrunesDelta: 0,
+      }),
+      { chunkMaxRecords: 1, chunkMaxBytes: 8, recordMaxBytes: 8 },
+    )).toThrow('transition counter is invalid');
+    expect({ malformedKeysIterated, createRunCount: malformedStore.createRunCount }).toEqual({
+      malformedKeysIterated: false, createRunCount: 0,
+    });
+    expect(malformedStore.releasedRunIds).toEqual([]);
+    expect(malformedStore.publications).toEqual([]);
+  }, 30_000);
+
+  it('rejects a 4097-unit frontier before opening, creating, releasing, or publishing', () => {
+    const definition = ENDGAME_V3_INTRO_DRAFTS[0]!;
+    const route = intro01.optimalRoute;
+    const diagnostics = Object.freeze({
+      activeRuns: Object.freeze([]), residue: Object.freeze([]), residueTruncated: false,
+      cleanupErrors: Object.freeze([]), cleanupErrorsTruncated: false,
+    });
+    const seedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null, tip: null, diagnostics, advanceAllowed: true,
+    }));
+    advanceOptimalEndgameRouteProofForDefinition(definition, route, seedStore);
+    const seed = seedStore.publications[0]!;
+    if (seed.transition !== 'seed') throw new Error('expected seed publication');
+    let collectionOpenCount = 0;
+    const frontier = new MemoryRun(
+      'r7-f-d00000-g00000', [seed.binding.initialFrontierKey], 4097 * 65_536,
+      (_id, values) => values, () => {},
+    );
+    const store = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: 0, binding: seed.binding, depth: 0,
+        parentOffset: 0, lastProcessedParentKey: null, frontier,
+        nextRuns: Object.freeze({
+          count: 0,
+          open: () => {
+            collectionOpenCount += 1;
+            return Object.freeze([]);
+          },
+        }),
+        transitions: 0, boundPrunes: 0, exhaustedDepths: Object.freeze([]),
+      }),
+      tip: Object.freeze({ generation: 0, manifestSha256: 'F'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }));
+    expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, store))
+      .toThrow('searching frontier size exceeds the 4096-unit domain');
+    expect({ collectionOpenCount, ranges: frontier.ranges, createRunCount: store.createRunCount }).toEqual({
+      collectionOpenCount: 0, ranges: [], createRunCount: 0,
+    });
+    expect(store.releasedRunIds).toEqual([]);
+    expect(store.publications).toEqual([]);
+  });
 
   it('publishes a one-lock candidate as zero-decision complete without enumerating a landing', () => {
     const definition: EndgameDefinition = Object.freeze({
