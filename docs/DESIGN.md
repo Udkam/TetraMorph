@@ -9870,7 +9870,9 @@ Core imports no Node API.
 ### Core checkpoint API and exact work units
 
 `EndgameProofRun.values()` remains the full-run default and gains an optional immutable
-`{ startOrdinal, endOrdinal }` half-open range. Core requires safe integers,
+`EndgameProofRunRange = Readonly<{ startOrdinal: number; endOrdinal: number }>` half-open
+range. Its exact signature is `values(range?: EndgameProofRunRange): Iterable<string>`.
+Core requires safe integers,
 `0 <= startOrdinal <= endOrdinal <= size`, fixed-unit alignment except the final short
 range, exact yielded count, printable full keys, and strict order. The adapter must issue its
 first positioned read at the authenticated byte offset for `startOrdinal` and must not read,
@@ -9896,19 +9898,47 @@ run write or manifest commit. It is an infrastructure failure with no certificat
 truncates, samples, beams, hashes state identity, or proves that a route is absent. Tests
 alone may inject smaller limits.
 
-The new authoring-only interfaces are `EndgameProofCheckpointRunStore` plus
-`advanceOptimalEndgameRouteProof` and
-`advanceOptimalEndgameRouteProofForDefinition`. The checkpoint Store is separate from the
-existing one-shot Store and adds:
+The new authoring-only API has the following exact public shape. A binding is
+`Readonly<{ schema:'t37-f4e-r7-proof-binding-v1'; levelId:EndgameId;`
+` candidateCommandStream:string; optimalLocks:number; initialStateHash:string;`
+` initialFrontierKey:string }>`.
 
-- `loadCheckpoint()`, returning null or the highest complete canonical generation with live
-  immutable run objects;
-- `publishCheckpoint()`, atomically publishing exactly current generation plus one; failure
-  before the manifest commit throws, while a successful manifest commit may not later be
-  reported as failure;
-- `suspend()`, closing handles while retaining the latest checkpoint and referenced runs;
-- existing `dispose()` only for explicit final teardown after later candidate/terminal
-  authority, never for ordinary checkpoint, pause, or process interruption.
+A searching checkpoint is
+`Readonly<{ kind:'searching'; generation:number; binding:EndgameProofResumeBinding;`
+` depth:number; parentOffset:number; lastProcessedParentKey:string|null;`
+` frontier:EndgameProofRun; nextRuns:readonly EndgameProofRun[]; transitions:number;`
+` boundPrunes:number; exhaustedDepths:readonly EndgameOptimalRouteDepthRecord[] }>`.
+A complete checkpoint is
+`Readonly<{ kind:'complete'; generation:number; binding:EndgameProofResumeBinding;`
+` reason:'empty-frontier'|'final-depth';`
+` exhaustedDepths:readonly EndgameOptimalRouteDepthRecord[] }>`.
+Their union is `EndgameProofCheckpoint`.
+
+`EndgameProofCheckpointRunStore extends EndgameProofRunStore` with exact additions:
+
+- `loadCheckpoint(): Readonly<{ checkpoint:EndgameProofCheckpoint|null;`
+  ` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>`;
+- `publishCheckpoint(transition:'seed'|'unit'|'layer'|'complete',`
+  ` checkpoint:EndgameProofCheckpoint): Readonly<{ checkpoint:EndgameProofCheckpoint;`
+  ` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>`;
+- `releaseCheckpointRun(run:EndgameProofRun): void`, which invalidates one loaded committed
+  Core object and releases its metadata slot but cannot unlink or alter the latest
+  manifest-referenced run/index bytes;
+- `suspend(): void`, idempotently closing handles while retaining the latest checkpoint and
+  referenced bytes; inherited `dispose()` remains explicit final teardown after later
+  candidate/terminal authority, never ordinary pause/interruption.
+
+`advanceOptimalEndgameRouteProof(levelId,candidateCommandStream,store)` and
+`advanceOptimalEndgameRouteProofForDefinition(definition,candidateCommandStream,store)` each
+return null only where the existing certifier returns null, otherwise exactly
+`Readonly<{ status:'searching'; generation:number; depth:number; parentOffset:number;`
+` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>` or
+`Readonly<{ status:'complete'; generation:number; certificate:EndgameOptimalRouteCertificate;`
+` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:boolean }>`.
+They perform one transition and never call `suspend()` or `dispose()`; the caller owns one
+`suspend()` in its pause/exit `finally`. Every advance closes transient readers/writers before
+returning. `advanceAllowed:false` returns only after a committed checkpoint with recognized
+cleanup residue and forbids another advance; malformed/ambiguous state throws.
 
 A searching checkpoint binds schema, generation, level/route/optimal-lock/start identity,
 depth, parent offset, last processed parent key, current frontier, accumulated next-unit
@@ -9940,17 +9970,46 @@ resets the next layer cursor/counters by rule; complete appends exactly one dept
 delta repeats the completed-depth prefix, active run list, accumulated unit-run list, or any
 earlier descriptor.
 
+An immutable run descriptor has exact keys
+`id,size,dataFile,dataBytes,dataSha256,indexFile,indexBytes,indexSha256,firstKey,lastKey,`
+`dataIdentity,indexIdentity`. `id/dataFile/indexFile/firstKey/lastKey` are strings except
+empty runs use null first/last keys; sizes/bytes are safe nonnegative integers; hashes are
+64 uppercase hex. Each identity has exact decimal-string keys
+`dev,ino,size,mtimeNs,ctimeNs`, obtained from non-reparse `lstat` and open-handle BigInt
+stats. Data/index basenames are respectively `${id}.run` and `${id}.idx`; no directory or
+alternate separator is permitted; exclusive parts add the literal `.part` suffix. Manifest
+final/part names are `manifest-gNNNNN.json` and `manifest-gNNNNN.json.part`.
+`descriptorSha256` is
+`canonicalHash('T37-F4E-R7-RUN-DESCRIPTOR-V1', descriptor)`.
+
 `runChanges` has exact keys `add,removeRule,removeSetSha256`. `add` contains zero or one
 immutable run descriptor. `removeRule` is `none`, `current-frontier-and-next-runs`, or
 `all-active-proof-runs`; the latter two name the matching set already reconstructed from the
 previous generation, and `removeSetSha256` authenticates that canonical ordered set instead
-of serializing it again. Seed adds its frontier; a non-final unit adds its one possibly-empty
-unit run; a final-depth unit adds none; layer replaces the old frontier/unit set with at most
-one merged frontier; complete removes all active proof runs. `checkpointStateSha256` hashes
-the canonical full Core checkpoint reconstructed after applying the delta. Both hashes use
-the same canonicalHash rule with labels `T37-F4E-R7-RUN-SET-V1` and
-`T37-F4E-R7-CHECKPOINT-STATE-V1`; `removeSetSha256` hashes the empty ordered array when the
-rule is `none`.
+of serializing it again. Its hash input is the array of full descriptor hashes sorted by
+unsigned UTF-8 `id`; duplicate IDs are fatal. Seed adds its frontier; a non-final unit adds
+its one possibly-empty unit run; a final-depth unit adds none; layer replaces the old
+frontier/unit set with at most one merged frontier; complete removes all active proof runs.
+`removeSetSha256` uses label
+`T37-F4E-R7-RUN-SET-V1` and hashes the empty ordered array when the rule is `none`.
+
+No generation hashes a growing descriptor or completed-depth prefix. `nextRunsSha256` starts
+as `canonicalHash('T37-F4E-R7-NEXT-RUNS-EMPTY-V1', [])` and appending one descriptor computes
+`canonicalHash('T37-F4E-R7-NEXT-RUNS-STEP-V1',`
+` { previousSha256,descriptorSha256 })`. A layer reset restores the empty hash.
+`completedDepthsSha256` uses the analogous `T37-F4E-R7-DEPTHS-EMPTY-V1` and
+`T37-F4E-R7-DEPTHS-STEP-V1` labels with `{ previousSha256,record }`.
+
+`checkpointStateSha256` hashes only the exact constant-size authenticated projection. A
+searching projection has exact keys
+`kind,generation,bindingSha256,depth,parentOffset,lastProcessedParentKey,transitions,`
+`boundPrunes,frontierDescriptorSha256,nextRunsSha256,nextRunCount,completedDepthsSha256,`
+`completedDepthCount`; a complete projection has exact keys
+`kind,generation,bindingSha256,reason,completedDepthsSha256,completedDepthCount`.
+The label is `T37-F4E-R7-CHECKPOINT-STATE-V1`. Loader and publisher still reconstruct the
+actual ordered descriptor/depth arrays once and compare every element, but update their
+commitments once per delta; uninterrupted publication and one resume scan are O(generations),
+not the sum of growing prefixes.
 
 The fixed-shape `resourceTotalsBeforeManifest` exact keys are
 `latestCheckpointRunBytes,uncommittedWorkingRunBytes,recognizedPhysicalRunBytes,`
@@ -9969,7 +10028,7 @@ One `advance...` call performs exactly one durable transition:
    parent deficit lower bound first, and fully enumerates every public landing only for each
    non-pruned parent. It throws on every shorter win, safe-counts transitions/prunes, writes
    a unit run named
-   `dNNNN-uNNNNNNNN-pNNNN-gNNNNN` outside final decision depth, and publishes the next
+   `r7-u-dNNNN-nNNNNNNNN-gNNNNN` outside final decision depth, and publishes the next
    generation. A final-depth unit writes no next run.
 3. When a layer is covered, it requires `[0, frontier.size)` exactly once with no gap,
    overlap, duplicate, missing tail, wrong depth/cursor, or wrong run shape. Core performs
@@ -9986,11 +10045,16 @@ One `advance...` call performs exactly one durable transition:
 The last unit of any layer always publishes a searching checkpoint with
 `parentOffset === frontier.size`. It never also merges or completes. A subsequent
 `advance...` call publishes exactly one layer or complete generation, preserving distinct
-kill boundaries after the final unit and after layer/complete publication. Resumable seed,
-unit, and layer-merge IDs are disjoint: `d0000-s0000`,
-`dNNNN-uNNNNNNNN-pNNNN-gNNNNN`, and `dNNNN-mNNNN-gNNNNN`. The five-digit resumable
-generation token covers the complete 32,768-generation domain. The existing one-shot
-`dNNNN-pNNNN-gNNNN` grammar is unchanged and cannot collide.
+kill boundaries after the final unit and after layer/complete publication. Committed
+resumable IDs are `r7-f-dNNNN-gNNNNN` for seed/layer frontiers and
+`r7-u-dNNNN-nNNNNNNNN-gNNNNN` for unit runs. Internal unit chunk/merge IDs are
+`r7w-u-gNNNNN-dNNNN-nNNNNNNNN-pNNNN-hNNNN`; internal layer merge IDs are
+`r7w-l-gNNNNN-dNNNN-pNNNN-hNNNN`. `d` is depth, `n` is the zero-based unit ordinal,
+`g` is manifest generation, `p` is merge pass (`0000` for raw chunks), and `h` is chunk/group
+ordinal; depth/pass/group are `0000..4095`, unit is `00000000..00004095`, and generation is
+`00000..32767`. Every singleton tail is read/re-keyed into the next deterministic ID rather
+than carried under an old working ID. Prefixes make committed, working, and unchanged
+one-shot `dNNNN-pNNNN-gNNNN` grammars disjoint; overflow or collision fails before creation.
 
 Every resume revalidates the candidate replay, initial hash/key, definition binding,
 generation/depth/cursor, completed-depth prefix, all safe counters, current frontier and
@@ -10002,17 +10066,36 @@ certifier.
 ### Persistent Node adapter
 
 `createEndgameDiskFrontierStore` and its initially-absent/cleanup semantics stay unchanged.
-The adapter adds `createResumableEndgameDiskFrontierStore` with `mode: 'create' | 'resume'`,
-an exact absolute stage, and an immutable owner ID.
+The adapter adds
+`createResumableEndgameDiskFrontierStore(options): EndgameProofCheckpointRunStore`, where
+options has exact production keys `stagePath,mode,ownerId`, mode is `create` or `resume`,
+stagePath is exact/absolute/normalized, and ownerId is 1..128 printable ASCII bytes. Tests
+alone may additionally provide `fs` and smaller `limits`. Create requires the stage absent;
+resume requires it present. Immutable `owner.json` has exact canonical keys `schema,ownerId`
+with schema `t37-f4e-r7-owner-v1`, is created exclusive and fsynced, and is at most 65,536
+bytes; resume requires exact bytes and identity.
 
 The resumable store uses owner, generation manifests, run files, and run indexes only beneath
 that stage. The 4,098 limit still bounds Core-active runs and cleanup errors; the separate
 32,768-manifest/49,152-entry limits above bound the persistent namespace. Each run is
 printable ASCII/LF and strictly increasing. Its index records byte
-offset 0, every 65,536th ordinal, and the terminal byte offset. Run and index are fully
-re-read, counted, SHA-256 bound, and file-identity checked before a canonical manifest is
-written as an exclusive `.part`, flushed, fsynced, closed, re-read, then atomically renamed.
-That manifest rename is the sole checkpoint commit boundary.
+offset 0, every 65,536th ordinal, and the terminal byte offset. The binary index is exactly
+8-byte ASCII magic `T37R7I1\n`, uint64-le run size, uint32-le stride `65536`, uint32-le entry
+count, then distinct uint64-le offsets for ordinals `0,65536,...<size,size`; empty runs have
+the sole ordinal/offset `0`. Integers above JavaScript's safe range, extra/trailing bytes,
+wrong counts, non-monotone offsets, or an index over 65,536 bytes are fatal. Because every
+nonterminal range start is 65,536-aligned, its first read uses that exact indexed byte offset.
+
+Run and index are each written to exclusive parts, fsynced, closed, re-read, then finalized
+by a no-replace same-directory hard link; an existing final is fatal and never overwritten.
+Their same-identity parts are unlinked only after final verification. Both finals are fully
+re-read, counted, SHA-256 bound, and file-identity checked after that unlink; this post-unlink
+final stat is the descriptor identity. Only then is a canonical manifest
+written as an exclusive `.part`, flushed, fsynced, closed, and re-read. Publication uses one
+atomic `linkSync(part,final)`-equivalent no-replace hard-link creation; an existing final path
+must fail and may never be overwritten. The successful no-replace link is the sole checkpoint
+commit boundary. Final bytes/identity are re-read before the exact same-identity part link is
+unlinked.
 
 Every manifest includes `previousManifestSha256` over the preceding manifest's exact UTF-8
 bytes including LF and is retained immutably through the final candidate audit. Resume reads
@@ -10032,7 +10115,30 @@ input; the committed generation remains valid but further advance must stop for 
 cleanup. Unknown entries, truncation, ambiguous orphans, or unauthorized partials fail closed.
 A later R7B recovery authority may list exact owned residue for cleanup; R7A authorizes no
 automatic broad deletion. `publishCheckpoint()` returns the committed generation plus
-diagnostics after rename and never throws because post-commit cleanup failed.
+diagnostics after the no-replace link. Once that link succeeds, final-path verification,
+part unlink, or superseded-file cleanup failure is captured in diagnostics with
+`advanceAllowed:false`; it cannot be thrown or reported as an uncommitted generation.
+
+Loaded latest-checkpoint runs use logical release, not physical disposal. At a 4,096-unit
+layer start, the frontier plus 4,096 units occupy 4,097 Core metadata slots. Core first calls
+`releaseCheckpointRun(frontier)`, then after each committed input is fully revalidated and
+consumed releases that object; the adapter retains every old run/index byte until the new
+manifest link commits. Working outputs use ordinary `dispose()` and are physically reclaimed
+when superseded before commit. Thus a new output reaches at most slot 4,098, while physical
+old/working bytes remain governed by the separate 192 GiB and namespace limits. Only after
+commit does the adapter reclaim the exact old descriptors selected by the manifest delta.
+
+Same-call failure before the manifest link attempts identity-bound cleanup only for working
+files created by that call. On resume, an unreferenced grammar-valid paired working run/index
+final and/or its same-identity part, or a final-absent manifest part, is
+`precommit-owned-residue`; a final-present same-identity manifest part is
+`postcommit-manifest-alias-residue`; and exact run/index descriptors referenced by an older
+but superseded manifest are
+`postcommit-superseded-residue`. The first leaves the prior generation authoritative; the
+latter two leave the new generation authoritative. All three set `advanceAllowed:false` and
+remain untouched pending later exact cleanup authority. A mismatched hard link, final/part
+byte or identity disagreement, unpaired run/index, unknown name, ambiguous descriptor, or
+foreign entry is fatal, not recognized residue.
 
 This mechanism claims recovery from process/conversation interruption, not power-loss
 durability beyond the explicit file fsync and atomic/no-replace boundaries. A mutable
@@ -10049,8 +10155,8 @@ early empty frontier and a final-depth parent pruned by the existing lower bound
 Fault matrices cover unaligned/range/count/order drift, gap/overlap/duplicate/tail loss,
 unsafe counter addition, same-size omit/add/replace/reorder, corrupt/truncated run/index/
 manifest, offset swap, binding/cursor/generation drift, reparse/path/file-ID drift, owner
-conflict, manifest-before-run, interruption before/after manifest rename and before cleanup,
-foreign/ambiguous residue, and every open/write/fsync/close/read/rename/cleanup seam. Tests
+conflict, manifest-before-run, interruption before/after manifest link and before cleanup,
+foreign/ambiguous residue, and every open/write/fsync/close/read/link/unlink/cleanup seam. Tests
 also cover repeated late-range reads without prefix I/O, final short and exact-multiple
 terminal offsets, 4,096/4,097 units, post-commit reopen with successful/failed cleanup, and
 limit-minus-one/equal/plus-one for every byte, entry, and generation bound. A default-limit
@@ -10062,6 +10168,13 @@ the 1 GiB total. The test operates on metadata/minimal legal runs and does not e
 production proof. Tests prove the four source paths contain no v6 path or runtime artifact
 dependency.
 
+The default-limit matrix additionally performs a real synthetic 4,096-input, 32-way
+multi-pass layer merge. It asserts Core metadata peaks at no more than 4,098, every working
+ID is unique and in grammar, every committed old byte survives until the manifest link,
+interrupted working residue is classified exactly, and only postcommit selected descriptors
+become reclaimable. Separate fault cases cover no-replace collision and every part/final
+identity combination.
+
 After the last source edit, run focused suites, one typecheck, one complete suite, one build,
 Node syntax, and one opt-in Intro-01 through Intro-04 resumable equality pass. Two independent
 source/behavior reviews must be all-zero. Only then may a separate four-document R7B contract
@@ -10069,7 +10182,7 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1/R2 rejection and R3 correction
+### F4E-R7A R1/R2/R3 rejection and R4 correction
 
 R1 `b697625` is rejected at independent
 `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
@@ -10079,5 +10192,11 @@ and make the 4,096-unit/1 GiB contract unreachable. R3 freezes the constant-size
 delta/hash-chain representation, linear reconstruction, 16 KiB per-manifest and 512 MiB
 aggregate manifest bounds, a separate 512 MiB owner/index bound, a five-digit generation
 token, and the default-limit 32,768-manifest/4,096-unit reachability test. No source or
-external R7 path has opened. Commit and independently review this four-document R3 before
-implementation.
+external R7 path has opened.
+
+R3 `c0c03f2` is rejected by three independent reviews at `0/4/1/0/0`, `0/2/0/0/0`, and
+`0/2/2/0/1`. R4 adds logical release/deferred physical reclamation with the 4,098-slot merge
+proof, incremental descriptor/depth commitments, exact nested binding/checkpoint/descriptor
+hash shapes, exact public API/results and caller lifecycle, collision-free committed/working
+IDs, no-replace hard-link manifest publication, and exhaustive owned-part recovery classes.
+Commit and independently review this four-document R4 before implementation.

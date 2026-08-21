@@ -10411,7 +10411,7 @@ or execute Intro-05. After the candidate, run focused tests, typecheck, full sui
 syntax, one opt-in four-intro equality pass, and two independent all-zero reviews. Only an
 accepted R7A source receipt opens docs-first R7B runner/validator authority.
 
-### F4E-R7A R1/R2 rejected — R3 contract review only
+### F4E-R7A R1/R2/R3 rejected — R4 contract review only
 
 R1 `b697625` is rejected at `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 requires indexed
 range reads with no prefix scan; an early-empty complete checkpoint matching the current
@@ -10441,5 +10441,22 @@ default-limit metadata test must serialize/replay all 32,768 deltas including a 
 layer, proving constant-size, both 512 MiB halves, namespace reachability, and linear active
 descriptor reconstruction without running Intro-05 or a production proof.
 
+R3 `c0c03f2` is rejected by three fresh reviews at `0/4/1/0/0`, `0/2/0/0/0`, and
+`0/2/2/0/1`. R4 freezes the exact public binding/searching/complete checkpoint types,
+checkpoint Store load/publish/release/suspend signatures, advance results, and caller-owned
+lifecycle. It also freezes the complete run/index descriptor and file-identity schemas plus
+every canonical hash projection/order.
+
+Growing run/depth prefixes are replaced by one-step domain-separated accumulators and a
+constant-size checkpoint projection. A loaded committed run is logically released from Core
+metadata without deletion; working runs alone use precommit dispose. A real 4,096-input
+32-way merge must stay at or below 4,098 Core slots while old bytes survive through commit.
+Committed and working IDs now have disjoint depth/unit/generation/pass/group grammars.
+
+Manifest publication uses an atomic no-replace hard link, not rename. Precommit-owned parts,
+postcommit same-identity manifest aliases, and postcommit superseded files have exact distinct
+classifications; they preserve the authoritative old/new generation, set
+`advanceAllowed:false`, and await later exact cleanup. Mismatch/ambiguity remains fatal.
+
 No source or external R7 path is open. Commit and obtain two fresh all-zero reviews of the
-four-document R3 correction before assigning either Core or adapter implementation.
+four-document R4 correction before assigning either Core or adapter implementation.

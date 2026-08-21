@@ -3310,7 +3310,7 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   equality across every boundary; typecheck; full suite; build; syntax; two source reviews.
   R7B external authority remains closed until R7A is accepted.
 
-### F4E-R7A R1/R2 rejection and R3 correction
+### F4E-R7A R1/R2/R3 rejection and R4 correction
 
 - R1 `b697625` review is `0/3/2/0/0`: range reads could remain quadratic; early-empty
   completion was missing; 4,098 physical entries could not hold 4,096 run/index pairs;
@@ -3332,4 +3332,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Each manifest is at most 16 KiB; all manifests total at most 512 MiB. Owner plus all indexes
   independently total at most 512 MiB, each at most 64 KiB. A production-default metadata
   test replays all 32,768 deltas with a full 4,096-unit layer and proves the exact bounds.
-- Next: commit/review only the four R3 docs. Source and external R7 remain closed.
+- R3 `c0c03f2` is rejected independently at `0/4/1/0/0`, `0/2/0/0/0`, and `0/2/2/0/1`:
+  metadata release, growing-prefix hashes, working IDs, exact nested/API shapes, no-replace
+  commit, partial recovery, and a real maximal merge test were not closed.
+- R4 defines exact checkpoint/API/descriptor/hash schemas, incremental list/depth commitments,
+  logical committed-run release versus working-run disposal, disjoint final/working ID fields,
+  hard-link no-replace commit, and three exact owned-residue classes.
+- Default QA now includes a real 4,096-input 32-way merge at no more than 4,098 Core slots
+  with all old bytes retained until commit and working-ID/residue checks.
+- Next: commit/review only the four R4 docs. Source and external R7 remain closed.

@@ -984,7 +984,7 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   Then one writer may implement only the four source/test paths, run all named gates, and
   produce a bounded candidate for two source reviews. External R7B authority remains closed.
 
-### F4E-R7A R1/R2 rejected and R3 contract candidate
+### F4E-R7A R1/R2/R3 rejected and R4 contract candidate
 
 - R1 `b697625` is rejected at `0/3/2/0/0`. No source, Store, external path, or proof ran.
 - R2 closes indexed late-range complexity, early-empty completion, parent-bound ordering,
@@ -1001,5 +1001,14 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   index uses a separate 512 MiB aggregate/64 KiB per-file cap.
 - The default-limit test must serialize/replay 32,768 retained deltas including a 4,096-unit
   layer and prove linear reconstruction plus both auxiliary halves without production proof.
-- Next: commit these four R3 docs and obtain two fresh independent all-zero reviews. The four
+- R3 `c0c03f2` is rejected at `0/4/1/0/0`, `0/2/0/0/0`, and `0/2/2/0/1`. It lacked a
+  deletion-free release path under 4,098 slots, incremental hashes, exact nested/API schemas,
+  unique working IDs, no-replace commit, complete part recovery, and real maximal merge QA.
+- R4 freezes all of those: logical committed-run release/deferred reclamation, constant-size
+  accumulator state, exact binding/checkpoint/descriptor/hash shapes, exact Store/advance
+  signatures, disjoint final/working ID coordinates, hard-link commit, and three residue
+  classes with `advanceAllowed:false`.
+- The maximal matrix now executes a synthetic 4,096-input 32-way merge and proves metadata,
+  byte-retention, working-ID, no-replace, and residue invariants without production proof.
+- Next: commit these four R4 docs and obtain two fresh independent all-zero reviews. The four
   source paths remain closed meanwhile.
