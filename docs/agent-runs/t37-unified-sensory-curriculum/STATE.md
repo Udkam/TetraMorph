@@ -3309,3 +3309,19 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Required QA: focused range/coverage/fault tests; Intro-01..04 memory/one-shot/resumable
   equality across every boundary; typecheck; full suite; build; syntax; two source reviews.
   R7B external authority remains closed until R7A is accepted.
+
+### F4E-R7A R1 rejection and R2 correction
+
+- R1 `b697625` review is `0/3/2/0/0`: range reads could remain quadratic; early-empty
+  completion was missing; 4,098 physical entries could not hold 4,096 run/index pairs;
+  final-depth wording drifted from parent-bound order; and exact limit equality/accounting
+  conflicted.
+- R2 mandates direct indexed range start, early-empty completion, final-unit and layer/
+  complete as separate generations, existing bound order, and disjoint resumable run IDs.
+- Persistent namespace limits are manifests 32,768, entries 49,152, active and working run
+  bytes 96 GiB each, recognized physical run bytes 192 GiB, auxiliary bytes 1 GiB. Equality
+  passes; the next increment fails before commit.
+- Every generation manifest is retained with a previous-manifest SHA chain. Only latest
+  active runs must remain; exact superseded cleanup residue stops later advance without
+  invalidating the committed checkpoint.
+- Next: commit/review only the four corrected docs. Source and external R7 remain closed.

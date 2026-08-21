@@ -983,3 +983,15 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Next: commit these four authority docs and obtain two independent all-zero contract reviews.
   Then one writer may implement only the four source/test paths, run all named gates, and
   produce a bounded candidate for two source reviews. External R7B authority remains closed.
+
+### F4E-R7A R1 rejected and R2 contract candidate
+
+- R1 `b697625` is rejected at `0/3/2/0/0`. No source, Store, external path, or proof ran.
+- R2 closes indexed late-range complexity, early-empty completion, parent-bound ordering,
+  separate last-unit/layer commits, seed/unit/merge ID collision, exact inclusive byte/unit
+  limits, and the mismatch between Core's 4,098 active metadata and persistent files.
+- The persistent store now has a 32,768-manifest hash chain, 49,152-entry inventory, explicit
+  96/96/192 GiB active/working/physical run accounting, and 1 GiB auxiliary accounting.
+  Superseded cleanup residue is recognized but blocks further advance until later authority.
+- Next: commit these four R2 docs and obtain two fresh independent all-zero reviews. The
+  four source paths remain closed meanwhile.

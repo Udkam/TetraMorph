@@ -9872,15 +9872,24 @@ Core imports no Node API.
 `EndgameProofRun.values()` remains the full-run default and gains an optional immutable
 `{ startOrdinal, endOrdinal }` half-open range. Core requires safe integers,
 `0 <= startOrdinal <= endOrdinal <= size`, fixed-unit alignment except the final short
-range, exact yielded count, printable full keys, and strict order. The adapter may seek with
-an authenticated byte-offset index, but it cannot choose the range or substitute a
-self-consistent size.
+range, exact yielded count, printable full keys, and strict order. The adapter must issue its
+first positioned read at the authenticated byte offset for `startOrdinal` and must not read,
+scan, or decode any byte or record in `0..startOrdinal-1`. Late-range work is therefore
+linear in the requested range bytes, not the prefix or prior units. The adapter cannot choose
+the range or substitute a self-consistent size.
 
-The production parent unit is exactly 65,536 keys, with at most 4,096 units and 96 GiB of
-committed run bytes per layer. Existing 2,048-byte record, 64 MiB/131,072-record chunk,
-32-way merge, and 4,098-entry metadata/diagnostic limits remain. A limit breach is an
-infrastructure failure with no certificate; it never truncates, samples, beams, hashes state
-identity, or proves that a route is absent. Tests alone may inject smaller limits.
+The production parent unit is exactly 65,536 keys, with 0..4,096 units inclusive. Existing
+2,048-byte record, 64 MiB/131,072-record chunk, 32-way merge, and 4,098 active Core-run
+metadata/cleanup-error limits remain. The persistent adapter has separate exact limits:
+32,768 immutable generation manifests, 49,152 total namespace entries, 96 GiB
+(103,079,215,104 bytes) of run data referenced by the latest checkpoint, 96 GiB of
+uncommitted working run data, 192 GiB (206,158,430,208 bytes) of all recognized physical run
+data including superseded cleanup residue, and 1 GiB (1,073,741,824 bytes) total for owner,
+manifest, and index files. Equality to every bound is allowed. Creating the 4,097th unit or
+32,769th manifest, adding the 49,153rd entry, or exceeding a byte bound fails before the next
+run write or manifest commit. It is an infrastructure failure with no certificate; it never
+truncates, samples, beams, hashes state identity, or proves that a route is absent. Tests
+alone may inject smaller limits.
 
 The new authoring-only interfaces are `EndgameProofCheckpointRunStore` plus
 `advanceOptimalEndgameRouteProof` and
@@ -9907,19 +9916,30 @@ One `advance...` call performs exactly one durable transition:
 1. With no checkpoint it replays the candidate, derives the canonical binding and one-key
    depth-0 frontier, publishes generation 0, and returns.
 2. With an incomplete layer it processes the next Core-derived range, never splitting a
-   parent's complete landing domain. It decodes and re-keys every parent, applies only the
-   existing deficit lower bound, enumerates every public landing, throws on every shorter
-   win, safe-counts transitions/prunes, writes a unit run named
+   parent's complete landing domain. It decodes and re-keys every parent, applies the existing
+   parent deficit lower bound first, and fully enumerates every public landing only for each
+   non-pruned parent. It throws on every shorter win, safe-counts transitions/prunes, writes
+   a unit run named
    `dNNNN-uNNNNNNNN-pNNNN-gNNNN`, and publishes the next generation.
 3. When a layer is covered, it requires `[0, frontier.size)` exactly once with no gap,
    overlap, duplicate, missing tail, wrong depth/cursor, or wrong run shape. Core performs
-   the existing deterministic full-key merge and complete omit/add/replace readback, then
-   publishes the next layer before old frontier/unit reclamation.
-4. At depth `optimalLocks - 2` every unit still decodes and exhausts its full landing domain
+   the existing deterministic full-key merge and complete omit/add/replace readback. A
+   nonempty output publishes the next searching layer; an empty output publishes a complete
+   checkpoint immediately, including the just-exhausted layer record, to match the current
+   certifier's early-empty termination. Either commit precedes old frontier/unit reclamation.
+4. At depth `optimalLocks - 2` each non-pruned parent still exhausts its full landing domain
    to exclude a shorter win, but produces no next run. Complete coverage publishes a complete
    checkpoint before the certificate is returned.
 5. Loading a complete checkpoint recomputes definition/candidate binding and reconstructs,
    rather than trusting a serialized replay or GameState, the ordinary immutable certificate.
+
+The last unit of any layer always publishes a searching checkpoint with
+`parentOffset === frontier.size`. It never also merges or completes. A subsequent
+`advance...` call publishes exactly one layer or complete generation, preserving distinct
+kill boundaries after the final unit and after layer/complete publication. Resumable seed,
+unit, and layer-merge IDs are disjoint: `d0000-s0000`,
+`dNNNN-uNNNNNNNN-pNNNN-gNNNN`, and `dNNNN-mNNNN-gNNNN`. The existing one-shot
+`dNNNN-pNNNN-gNNNN` grammar is unchanged and cannot collide.
 
 Every resume revalidates the candidate replay, initial hash/key, definition binding,
 generation/depth/cursor, completed-depth prefix, all safe counters, current frontier and
@@ -9935,19 +9955,29 @@ The adapter adds `createResumableEndgameDiskFrontierStore` with `mode: 'create' 
 an exact absolute stage, and an immutable owner ID.
 
 The resumable store uses owner, generation manifests, run files, and run indexes only beneath
-that stage. Each run is printable ASCII/LF and strictly increasing. Its index records byte
+that stage. The 4,098 limit still bounds Core-active runs and cleanup errors; the separate
+32,768-manifest/49,152-entry limits above bound the persistent namespace. Each run is
+printable ASCII/LF and strictly increasing. Its index records byte
 offset 0, every 65,536th ordinal, and the terminal byte offset. Run and index are fully
 re-read, counted, SHA-256 bound, and file-identity checked before a canonical manifest is
 written as an exclusive `.part`, flushed, fsynced, closed, re-read, then atomically renamed.
 That manifest rename is the sole checkpoint commit boundary.
 
-Resume selects only the highest complete contiguous generation, revalidates owner, real
-paths, non-reparse plain files, dev/ino/file ID, bytes, hashes, offsets, first/last boundaries,
-and every referenced run. Unknown entries, generation gaps/conflicts, truncation, ambiguous
-orphans, or unauthorized partials fail closed. A later R7B recovery authority may list exact
-owned residue for cleanup; R7A does not authorize automatic broad deletion. After a new
-manifest commits, cleanup failure is diagnostic residue and cannot revoke the committed
-generation or silently delete committed files.
+Every manifest includes `previousManifestSha256` and is retained immutably through the final
+candidate audit. Resume requires the complete canonical generation `0..highest` sequence and
+hash chain; a gap, fork, rollback, duplicate, or 32,769th manifest is fatal. Only the highest
+manifest's referenced runs must remain active. A committed later manifest may supersede prior
+frontier/unit runs, and only those exact descriptors may be reclaimed after commit; historical
+manifests remain valid audit receipts even after their run files are gone.
+
+Resume revalidates owner, manifest chain, real paths, non-reparse plain files, dev/ino/file
+ID, bytes, hashes, offsets, first/last boundaries, and every active referenced run. Exact
+superseded descriptors left by failed post-commit cleanup are recognized residue, never proof
+input; the committed generation remains valid but further advance must stop for later audited
+cleanup. Unknown entries, truncation, ambiguous orphans, or unauthorized partials fail closed.
+A later R7B recovery authority may list exact owned residue for cleanup; R7A authorizes no
+automatic broad deletion. `publishCheckpoint()` returns the committed generation plus
+diagnostics after rename and never throws because post-commit cleanup failed.
 
 This mechanism claims recovery from process/conversation interruption, not power-loss
 durability beyond the explicit file fsync and atomic/no-replace boundaries. A mutable
@@ -9958,14 +9988,18 @@ heartbeat or process lease is never proof authority.
 Core tests use synthetic domains and, only in the existing opt-in exact gate, Intro-01 through
 Intro-04. They compare uninterrupted memory, existing one-shot disk, and resumable execution
 reopened after seed, every unit, every layer merge, and complete-checkpoint publication.
-Canonical certificate and complete telemetry bytes must match.
+Canonical certificate and complete telemetry bytes must match. Synthetic cases include an
+early empty frontier and a final-depth parent pruned by the existing lower bound.
 
 Fault matrices cover unaligned/range/count/order drift, gap/overlap/duplicate/tail loss,
 unsafe counter addition, same-size omit/add/replace/reorder, corrupt/truncated run/index/
 manifest, offset swap, binding/cursor/generation drift, reparse/path/file-ID drift, owner
 conflict, manifest-before-run, interruption before/after manifest rename and before cleanup,
 foreign/ambiguous residue, and every open/write/fsync/close/read/rename/cleanup seam. Tests
-also prove the four source paths contain no v6 path or runtime artifact dependency.
+also cover repeated late-range reads without prefix I/O, final short and exact-multiple
+terminal offsets, 4,096/4,097 units, post-commit reopen with successful/failed cleanup, and
+limit-minus-one/equal/plus-one for every byte, entry, and generation bound. They prove the
+four source paths contain no v6 path or runtime artifact dependency.
 
 After the last source edit, run focused suites, one typecheck, one complete suite, one build,
 Node syntax, and one opt-in Intro-01 through Intro-04 resumable equality pass. Two independent
@@ -9973,3 +10007,12 @@ source/behavior reviews must be all-zero. Only then may a separate four-document
 bind source blobs and define the external schemas, detached Task Scheduler runner,
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
+
+### F4E-R7A R1 rejection and R2 correction
+
+R1 `b697625` is rejected at independent
+`P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 adds mandatory indexed late-range seeking,
+early-empty completion, the existing parent-bound order at final depth, disjoint generation
+transitions and run IDs, inclusive bound semantics with exact byte accounting, and a separate
+bounded persistent namespace with an immutable manifest hash chain. No source or external R7
+path has opened. Commit and independently review this four-document R2 before implementation.

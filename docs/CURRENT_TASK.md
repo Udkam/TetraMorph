@@ -10397,11 +10397,12 @@ decode, landing, lower-bound decision, full-key output, range-coverage rule, mer
 counter, and certificate reconstruction. The final decision depth still exhausts every
 landing while producing no next run.
 
-The Node adapter adds an independent resumable factory with owner binding, full run/index
-hashes, fixed ordinal offsets, manifest-last atomic publication, strict reopen/identity
-checks, suspend-without-delete, and bounded fail-closed diagnostics. Production limits are
-4,096 units and 96 GiB committed run bytes per layer; reaching them is infrastructure
-failure only, never a partial proof.
+The Node adapter adds an independent resumable factory with owner binding, direct indexed
+late-range reads, full run/index hashes, fixed ordinal offsets, manifest-last atomic
+publication, strict reopen/identity checks, suspend-without-delete, and bounded fail-closed
+diagnostics. Production permits up to and including 4,096 units and equality to each exact
+byte/entry/generation limit; exceeding a limit before commit is infrastructure failure only,
+never a partial proof.
 
 Focused tests compare uninterrupted memory, current one-shot disk, and interruption/resume
 at seed/unit/layer/complete boundaries for Intro-01 through Intro-04, plus corruption,
@@ -10409,3 +10410,20 @@ coverage, range, index, identity, owner, residue, and filesystem-fault matrices.
 or execute Intro-05. After the candidate, run focused tests, typecheck, full suite, build,
 syntax, one opt-in four-intro equality pass, and two independent all-zero reviews. Only an
 accepted R7A source receipt opens docs-first R7B runner/validator authority.
+
+### F4E-R7A R1 rejected — R2 contract review only
+
+R1 `b697625` is rejected at `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 requires indexed
+range reads with no prefix scan; an early-empty complete checkpoint matching the current
+certifier; existing parent-bound-before-landing order at final depth; separate final-unit and
+layer/complete generations; disjoint seed/unit/merge run IDs; and inclusive exact resource
+bounds.
+
+Persistent limits are now 32,768 immutable hash-chained manifests, 49,152 namespace entries,
+96 GiB latest-checkpoint run data, 96 GiB uncommitted working run data, 192 GiB recognized
+physical run data, and 1 GiB owner/manifest/index bytes. Historical manifests remain audit
+receipts after superseded runs are reclaimed. Post-commit cleanup failure cannot undo the
+new generation, but stops further advance pending audited cleanup.
+
+No source or external R7 path is open. Commit and obtain two fresh all-zero reviews of the
+four-document R2 correction before assigning either Core or adapter implementation.
