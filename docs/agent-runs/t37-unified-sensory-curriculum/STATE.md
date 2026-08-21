@@ -3454,3 +3454,28 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   Close-descriptor retention and incremental inventory follow as separate checkpoints.
   Manifest filesystem publication, resume-chain reconstruction, external R7 execution,
   R7B, and Intro-05 remain closed.
+
+### F4E-R7A adapter publication and incremental-inventory closure
+
+- Adapter publication ownership and close-descriptor retention are committed through
+  `ba56b18`. Candidate run/index publication now keeps foreign parts immutable, verifies
+  final identities, latches blocked precommit cleanup, and propagates close markers until
+  cleanup can safely converge.
+- Incremental inventory checkpoint `a7c5ca0` replaces repeated same-Store directory scans
+  with an authenticated name/byte/identity ledger and physical run alias reference counts.
+  It admits one full scan only when opening a Store, then updates the inventory at owned
+  publication and cleanup boundaries. A 128-run instrumented case remains linear.
+- Public mutation boundaries revalidate the root/stage sentinel and bounded owner bytes.
+  External drift fails closed without deleting stage or owner artifacts; descriptor-close
+  failures remain observable and retryable. The sentinel claim is deliberately limited to
+  one honest coordinator at public-call boundaries: same-call hostile mutation or restored
+  timestamps are not claimed detectable.
+- Final independent read-only QA for the frozen two-path B3 diff reports
+  `P0/P1/P2/P3 = 0/0/0/0`; focused adapter tests are `108 passed / 1 skipped`, the historical
+  18-class fault matrix and three new targeted reproductions pass, and typecheck, Node syntax,
+  and diff checks are green.
+- Current bounded next action is C1b manifest publication. First split the existing
+  in-memory manifest transition into a fully fallible prepare token and a near-infallible
+  post-link apply step; then add standalone manifest part/final publication, Store
+  integration, committed-versus-working byte classification, recovery, and fault seams.
+  External R7 paths, R7B, Intro-05, and production proof execution remain closed.
