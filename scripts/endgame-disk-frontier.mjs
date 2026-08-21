@@ -170,6 +170,124 @@ function resumableRangeByteOffsets(index, range) {
   });
 }
 
+function bindResumableIndexToDataBytes(index, dataBytes) {
+  assertSafeNonnegativeInteger(dataBytes, 'run dataBytes');
+  const parsed = index && Array.isArray(index.offsets)
+    ? index
+    : decodeResumableRunIndex(index);
+  if (parsed.offsets.at(-1) !== dataBytes) {
+    throw frontierError('run index terminal offset does not equal dataBytes');
+  }
+  return parsed;
+}
+
+function parseStrictCanonicalJson(text) {
+  if (typeof text !== 'string') throw frontierError('canonical JSON input must be text');
+  let cursor = 0;
+  const fail = (message) => { throw frontierError(`canonical JSON ${message} at byte ${cursor}`); };
+  const parseString = () => {
+    if (text[cursor] !== '"') fail('expected a string');
+    const start = cursor;
+    cursor += 1;
+    let escaped = false;
+    while (cursor < text.length) {
+      const character = text[cursor];
+      cursor += 1;
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (character === '\\') {
+        escaped = true;
+        continue;
+      }
+      if (character === '"') {
+        try {
+          return JSON.parse(text.slice(start, cursor));
+        } catch {
+          fail('contains an invalid string');
+        }
+      }
+      if (character.charCodeAt(0) < 0x20) fail('contains a control character');
+    }
+    fail('contains an unterminated string');
+  };
+  const parseValue = () => {
+    const character = text[cursor];
+    if (character === '"') return parseString();
+    if (character === '[') {
+      cursor += 1;
+      const result = [];
+      if (text[cursor] === ']') {
+        cursor += 1;
+        return result;
+      }
+      for (;;) {
+        result.push(parseValue());
+        if (text[cursor] === ']') {
+          cursor += 1;
+          return result;
+        }
+        if (text[cursor] !== ',') fail('expected an array comma');
+        cursor += 1;
+      }
+    }
+    if (character === '{') {
+      cursor += 1;
+      const result = Object.create(null);
+      const seen = new Set();
+      if (text[cursor] === '}') {
+        cursor += 1;
+        return result;
+      }
+      for (;;) {
+        const key = parseString();
+        if (seen.has(key)) fail(`contains duplicate key ${JSON.stringify(key)}`);
+        seen.add(key);
+        if (text[cursor] !== ':') fail('expected an object colon');
+        cursor += 1;
+        result[key] = parseValue();
+        if (text[cursor] === '}') {
+          cursor += 1;
+          return result;
+        }
+        if (text[cursor] !== ',') fail('expected an object comma');
+        cursor += 1;
+      }
+    }
+    for (const [literal, value] of [['true', true], ['false', false], ['null', null]]) {
+      if (text.startsWith(literal, cursor)) {
+        cursor += literal.length;
+        return value;
+      }
+    }
+    const number = text.slice(cursor).match(/^-?(?:0|[1-9][0-9]*)/u)?.[0];
+    if (number) {
+      cursor += number.length;
+      const value = Number(number);
+      if (!Number.isSafeInteger(value)) fail('number is not a safe integer');
+      return value;
+    }
+    fail('contains an unsupported token');
+  };
+  const value = parseValue();
+  if (cursor !== text.length) fail('has trailing bytes');
+  if (canonicalizeJson(value) !== text) throw frontierError('canonical JSON bytes are not canonical');
+  return value;
+}
+
+function parseCanonicalLfBytes(bytes) {
+  const buffer = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
+  if (buffer.length === 0 || buffer.at(-1) !== 0x0a || (buffer.length > 1 && buffer.at(-2) === 0x0a)) {
+    throw frontierError('canonical JSON file must end in exactly one LF');
+  }
+  const text = buffer.subarray(0, -1).toString('utf8');
+  if (!Buffer.from(text, 'utf8').equals(buffer.subarray(0, -1))) {
+    throw frontierError('canonical JSON file is not valid UTF-8');
+  }
+  return parseStrictCanonicalJson(text);
+}
+
 export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
   canonicalJson: canonicalizeJson,
   canonicalHash,
@@ -178,8 +296,27 @@ export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
   indexLayout: resumableIndexLayout,
   encodeIndex: encodeResumableRunIndex,
   decodeIndex: decodeResumableRunIndex,
+  bindIndexToDataBytes: bindResumableIndexToDataBytes,
   validateRange: validateResumableRunRange,
   rangeByteOffsets: resumableRangeByteOffsets,
+  parseCanonicalJson: parseStrictCanonicalJson,
+  parseCanonicalLfBytes,
+});
+
+const RESUMABLE_DEFAULT_FS = Object.freeze({
+  closeSync: nativeFs.closeSync,
+  fstatSync: nativeFs.fstatSync,
+  fsyncSync: nativeFs.fsyncSync,
+  linkSync: nativeFs.linkSync,
+  lstatSync: nativeFs.lstatSync,
+  mkdirSync: nativeFs.mkdirSync,
+  openSync: nativeFs.openSync,
+  readSync: nativeFs.readSync,
+  readdirSync: nativeFs.readdirSync,
+  realpathSync: nativeFs.realpathSync,
+  rmdirSync: nativeFs.rmdirSync,
+  unlinkSync: nativeFs.unlinkSync,
+  writeSync: nativeFs.writeSync,
 });
 
 const DEFAULT_FS = Object.freeze({
@@ -707,4 +844,299 @@ export function createEndgameDiskFrontierStore(options) {
   };
 
   return Object.freeze({ createRun, diagnostics, dispose });
+}
+
+function validateResumableOwnerId(ownerId) {
+  if (typeof ownerId !== 'string' || ownerId.length === 0
+    || Buffer.byteLength(ownerId, 'ascii') > RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.ownerIdBytes
+    || !/^[\x20-\x7E]+$/u.test(ownerId)) {
+    throw frontierError('resumable ownerId must be 1..128 printable ASCII bytes');
+  }
+}
+
+function normalizeResumableLimits(overrides) {
+  if (overrides === undefined) return RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS;
+  if (!overrides || typeof overrides !== 'object' || Array.isArray(overrides)) {
+    throw frontierError('resumable test limits must be an object');
+  }
+  const result = { ...RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS };
+  for (const [name, value] of Object.entries(overrides)) {
+    if (!Object.hasOwn(result, name)) throw frontierError(`unknown resumable limit ${name}`);
+    assertSafeNonnegativeInteger(value, `resumable limit ${name}`);
+    if (value > RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS[name]) {
+      throw frontierError(`resumable test limit ${name} cannot exceed production`);
+    }
+    result[name] = value;
+  }
+  return Object.freeze(result);
+}
+
+function proofFileIdentity(stats) {
+  return Object.freeze({
+    dev: String(stats.dev),
+    ino: String(stats.ino),
+    size: String(stats.size),
+    mtimeNs: String(stats.mtimeNs),
+    ctimeNs: String(stats.ctimeNs),
+  });
+}
+
+function sameProofFileIdentity(left, right) {
+  return left.dev === right.dev && left.ino === right.ino && left.size === right.size
+    && left.mtimeNs === right.mtimeNs && left.ctimeNs === right.ctimeNs;
+}
+
+function proofIdentityKey(identity) {
+  return `${identity.dev}:${identity.ino}:${identity.size}:${identity.mtimeNs}:${identity.ctimeNs}`;
+}
+
+function readBoundedProofFile(fs, filePath, maximumBytes) {
+  const beforeStats = fs.lstatSync(filePath, { bigint: true });
+  assertPlainFile(beforeStats, path.basename(filePath));
+  assertExactRealpath(fs, filePath);
+  const beforeIdentity = proofFileIdentity(beforeStats);
+  const byteLength = Number(beforeStats.size);
+  if (!Number.isSafeInteger(byteLength) || byteLength < 0 || byteLength > maximumBytes) {
+    throw frontierError(`${path.basename(filePath)} exceeds ${maximumBytes} bytes`);
+  }
+  let descriptor = null;
+  let primary = null;
+  const cleanup = [];
+  try {
+    descriptor = fs.openSync(filePath, 'r');
+    const opened = proofFileIdentity(fs.fstatSync(descriptor, { bigint: true }));
+    if (!sameProofFileIdentity(beforeIdentity, opened)) throw frontierError(`${path.basename(filePath)} open identity drift`);
+    const bytes = Buffer.alloc(byteLength);
+    let offset = 0;
+    while (offset < bytes.length) {
+      const count = fs.readSync(descriptor, bytes, offset, bytes.length - offset, offset);
+      if (!Number.isInteger(count) || count <= 0 || count > bytes.length - offset) {
+        throw frontierError(`${path.basename(filePath)} returned an invalid read count`);
+      }
+      offset += count;
+    }
+    const after = proofFileIdentity(fs.fstatSync(descriptor, { bigint: true }));
+    if (!sameProofFileIdentity(beforeIdentity, after)) throw frontierError(`${path.basename(filePath)} changed while reading`);
+    return Object.freeze({ bytes, identity: beforeIdentity });
+  } catch (error) {
+    primary = error;
+    throw error;
+  } finally {
+    if (descriptor !== null) {
+      try {
+        fs.closeSync(descriptor);
+      } catch (error) {
+        cleanup.push(error);
+      }
+    }
+    if (cleanup.length > 0) throw aggregate(primary, cleanup, `${path.basename(filePath)} read cleanup failed.`);
+  }
+}
+
+function writeAllProofBytes(fs, descriptor, bytes) {
+  let offset = 0;
+  while (offset < bytes.length) {
+    const count = fs.writeSync(descriptor, bytes, offset, bytes.length - offset, offset);
+    if (!Number.isInteger(count) || count <= 0 || count > bytes.length - offset) {
+      throw frontierError('proof file returned an invalid write count');
+    }
+    offset += count;
+  }
+}
+
+function scanResumableInventory(fs, stagePath, limits) {
+  const names = fs.readdirSync(stagePath, { encoding: 'utf8' }).map(String).sort(ordinalByteCompare);
+  if (names.length > limits.maximumNamespaceEntries) {
+    throw frontierError(`resumable namespace exceeds ${limits.maximumNamespaceEntries} entries`);
+  }
+  const entries = new Map();
+  const physicalRuns = new Map();
+  let retainedManifestBytes = 0;
+  let ownerAndIndexBytes = 0;
+  for (const name of names) {
+    if (name === '.' || name === '..' || path.basename(name) !== name) throw frontierError('invalid stage entry name');
+    const filePath = path.join(stagePath, name);
+    const stats = fs.lstatSync(filePath, { bigint: true });
+    assertPlainFile(stats, name);
+    assertExactRealpath(fs, filePath);
+    const identity = proofFileIdentity(stats);
+    const bytes = Number(stats.size);
+    if (!Number.isSafeInteger(bytes) || bytes < 0) throw frontierError(`${name} has an unsafe byte length`);
+    entries.set(name, Object.freeze({ name, filePath, bytes, identity }));
+    if (/^manifest-g[0-9]{5}\.json(?:\.part)?$/u.test(name)) retainedManifestBytes += bytes;
+    if (name === 'owner.json' || name === 'owner.json.part' || /\.idx(?:\.part)?$/u.test(name)) {
+      ownerAndIndexBytes += bytes;
+    }
+    if (/\.run(?:\.part)?$/u.test(name)) physicalRuns.set(proofIdentityKey(identity), bytes);
+  }
+  const recognizedPhysicalRunBytes = [...physicalRuns.values()].reduce((sum, value) => sum + value, 0);
+  if (retainedManifestBytes > limits.retainedManifestBytes) throw frontierError('retained manifest bytes exceed the limit');
+  if (ownerAndIndexBytes > limits.ownerAndIndexBytes) throw frontierError('owner/index bytes exceed the limit');
+  if (recognizedPhysicalRunBytes > limits.recognizedPhysicalRunBytes) throw frontierError('physical run bytes exceed the limit');
+  return Object.freeze({
+    names: Object.freeze(names),
+    entries,
+    namespaceEntries: names.length,
+    retainedManifestBytes,
+    ownerAndIndexBytes,
+    recognizedPhysicalRunBytes,
+  });
+}
+
+function exactResumableStage(fs, stagePath, mode) {
+  if (typeof stagePath !== 'string' || !path.isAbsolute(stagePath)) throw frontierError('stagePath must be absolute');
+  const exact = path.resolve(stagePath);
+  if ((process.platform === 'win32' ? exact.toLowerCase() : exact)
+    !== (process.platform === 'win32' ? stagePath.toLowerCase() : stagePath)) throw frontierError('stagePath must already be normalized');
+  if (exact.length === 0 || exact.length > ENDGAME_DISK_FRONTIER_LIMITS.stagePathMaxCodeUnits) {
+    throw frontierError('stagePath length is invalid');
+  }
+  if (mode === 'create') return createStage(fs, exact);
+  const stats = fs.lstatSync(exact, { bigint: true });
+  assertPlainDirectory(stats, 'resumable stage');
+  assertExactRealpath(fs, exact);
+  return exact;
+}
+
+function publishResumableOwner(fs, stagePath, ownerBytes, limits) {
+  if (ownerBytes.length > limits.ownerOrIndexBytes) throw frontierError('owner.json exceeds its individual byte limit');
+  const initial = scanResumableInventory(fs, stagePath, limits);
+  if (initial.namespaceEntries + 2 > limits.maximumNamespaceEntries
+    || initial.ownerAndIndexBytes + 2 * ownerBytes.length > limits.ownerAndIndexBytes) {
+    throw frontierError('owner two-alias admission exceeds resumable limits');
+  }
+  const partPath = path.join(stagePath, 'owner.json.part');
+  const finalPath = path.join(stagePath, 'owner.json');
+  let descriptor = null;
+  try {
+    descriptor = fs.openSync(partPath, 'wx', 0o600);
+    writeAllProofBytes(fs, descriptor, ownerBytes);
+    fs.fsyncSync(descriptor);
+    fs.closeSync(descriptor);
+    descriptor = null;
+    const part = readBoundedProofFile(fs, partPath, limits.ownerOrIndexBytes);
+    if (!part.bytes.equals(ownerBytes)) throw frontierError('owner part bytes changed before publication');
+    fs.linkSync(partPath, finalPath);
+    const linkedPart = readBoundedProofFile(fs, partPath, limits.ownerOrIndexBytes);
+    const linked = readBoundedProofFile(fs, finalPath, limits.ownerOrIndexBytes);
+    if (!linked.bytes.equals(ownerBytes) || !sameProofFileIdentity(linkedPart.identity, linked.identity)) {
+      throw frontierError('owner final does not match its hard-link part');
+    }
+    fs.unlinkSync(partPath);
+    const final = readBoundedProofFile(fs, finalPath, limits.ownerOrIndexBytes);
+    if (!final.bytes.equals(ownerBytes)) throw frontierError('owner final changed after alias contraction');
+  } finally {
+    if (descriptor !== null) fs.closeSync(descriptor);
+  }
+}
+
+function validateResumableTip(tip) {
+  if (!tip || typeof tip !== 'object' || !Number.isSafeInteger(tip.generation)
+    || tip.generation < 0 || tip.generation >= RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumManifests
+    || typeof tip.manifestSha256 !== 'string' || !R7_HASH_PATTERN.test(tip.manifestSha256)) {
+    throw frontierError('expectedTip is invalid');
+  }
+}
+
+/**
+ * Creates or resumes the R7 persistent proof namespace. Manifest publication and active-run
+ * replay are layered onto this owner/admission cache by the following bounded checkpoint.
+ */
+export function createResumableEndgameDiskFrontierStore(options) {
+  if (!options || typeof options !== 'object') throw frontierError('resumable options are required');
+  const { mode, ownerId } = options;
+  if (mode !== 'create' && mode !== 'resume') throw frontierError('resumable mode must be create or resume');
+  validateResumableOwnerId(ownerId);
+  if (mode === 'resume' && !Object.hasOwn(options, 'expectedTip')) {
+    throw frontierError('resume requires expectedTip, including explicit null');
+  }
+  if (mode === 'resume' && options.expectedTip !== null) validateResumableTip(options.expectedTip);
+  const fs = Object.freeze({ ...RESUMABLE_DEFAULT_FS, ...(options.fs ?? {}) });
+  for (const name of Object.keys(RESUMABLE_DEFAULT_FS)) {
+    if (typeof fs[name] !== 'function') throw frontierError(`filesystem operation ${name} is missing`);
+  }
+  const limits = normalizeResumableLimits(options.limits);
+  const stagePath = exactResumableStage(fs, options.stagePath, mode);
+  const ownerValue = Object.freeze({ schema: 't37-f4e-r7-owner-v1', ownerId });
+  const ownerBytes = Buffer.from(`${canonicalizeJson(ownerValue)}\n`, 'utf8');
+  if (mode === 'create') publishResumableOwner(fs, stagePath, ownerBytes, limits);
+  let inventory = scanResumableInventory(fs, stagePath, limits);
+  const manifests = inventory.names.filter((name) => /^manifest-g[0-9]{5}\.json$/u.test(name));
+  if (mode === 'resume' && options.expectedTip !== null && manifests.length === 0) {
+    throw frontierError('authenticated rollback: expectedTip is absent from the manifest chain');
+  }
+  const owner = inventory.entries.get('owner.json');
+  const ownerPart = inventory.entries.get('owner.json.part');
+  let blockedReason = null;
+  if (!owner) {
+    if (mode === 'create') throw frontierError('created owner final is absent');
+    if (options.expectedTip !== null) throw frontierError('authenticated rollback: owner final is absent');
+    if (inventory.names.length === 0) blockedReason = 'pre-owner-empty-residue';
+    else if (inventory.names.length === 1 && ownerPart) blockedReason = 'pre-owner-part-residue';
+    else throw frontierError('owner final is absent with ambiguous stage entries');
+  } else {
+    const verifiedOwner = readBoundedProofFile(fs, owner.filePath, limits.ownerOrIndexBytes);
+    const parsedOwner = parseCanonicalLfBytes(verifiedOwner.bytes);
+    if (canonicalizeJson(parsedOwner) !== canonicalizeJson(ownerValue)) throw frontierError('owner.json does not match ownerId');
+    if (ownerPart) {
+      const verifiedPart = readBoundedProofFile(fs, ownerPart.filePath, limits.ownerOrIndexBytes);
+      if (!sameProofFileIdentity(verifiedOwner.identity, verifiedPart.identity)
+        || !verifiedOwner.bytes.equals(verifiedPart.bytes)) throw frontierError('owner alias identity mismatch');
+      if (inventory.names.length === 2 && manifests.length === 0 && options.expectedTip === null) {
+        blockedReason = 'owner-alias-residue';
+      }
+    }
+    const unrelated = inventory.names.filter((name) => name !== 'owner.json' && name !== 'owner.json.part');
+    if (unrelated.length > 0) throw frontierError('manifest admission scan is not yet available in this checkpoint');
+  }
+  let invalidated = false;
+  let viewOutstanding = false;
+  let disposed = false;
+  const diagnostics = () => Object.freeze({
+    activeRuns: Object.freeze([]),
+    residue: Object.freeze(blockedReason === null ? [] : ['.', ...inventory.names.filter((name) => name !== 'owner.json')]),
+    residueTruncated: false,
+    cleanupErrors: Object.freeze([]),
+    cleanupErrorsTruncated: false,
+  });
+  const requireLive = () => {
+    if (invalidated || disposed) throw frontierError('resumable Store is suspended or disposed');
+  };
+  const loadCheckpoint = () => {
+    requireLive();
+    if (viewOutstanding) throw frontierError('a checkpoint view is already outstanding');
+    viewOutstanding = true;
+    return Object.freeze({ checkpoint: null, tip: null, diagnostics: diagnostics(), advanceAllowed: blockedReason === null });
+  };
+  const suspend = () => {
+    if (!invalidated) {
+      invalidated = true;
+      viewOutstanding = false;
+    }
+    return Object.freeze({ diagnostics: diagnostics(), closeFailed: false });
+  };
+  const dispose = () => {
+    if (disposed) return;
+    const current = scanResumableInventory(fs, stagePath, limits);
+    if (current.names.length !== inventory.names.length
+      || current.names.some((name, index) => name !== inventory.names[index]
+        || !sameProofFileIdentity(current.entries.get(name).identity, inventory.entries.get(name).identity))) {
+      throw frontierError('refusing final teardown after stage inventory drift');
+    }
+    for (const name of [...current.names].reverse()) fs.unlinkSync(path.join(stagePath, name));
+    fs.rmdirSync(stagePath);
+    inventory = Object.freeze({ ...inventory, names: Object.freeze([]), entries: new Map() });
+    disposed = true;
+    invalidated = true;
+    viewOutstanding = false;
+  };
+  return Object.freeze({
+    createRun() { requireLive(); throw frontierError('resumable run writer is not available in the owner checkpoint'); },
+    diagnostics,
+    dispose,
+    loadCheckpoint,
+    publishCheckpoint() { requireLive(); throw frontierError('resumable manifest publication is not available in the owner checkpoint'); },
+    releaseCheckpointRun() { requireLive(); throw frontierError('no committed run is loaded'); },
+    suspend,
+  });
 }

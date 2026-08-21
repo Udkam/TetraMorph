@@ -11,6 +11,7 @@ import {
   RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS,
   RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING,
   createEndgameDiskFrontierStore,
+  createResumableEndgameDiskFrontierStore,
 } from '../../scripts/endgame-disk-frontier.mjs';
 import { ENDGAME_V3_INTRO_DRAFTS } from '../game/core/endgameV3IntroDefinitions.ts';
 import {
@@ -191,6 +192,71 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(() => testing.validateRange(size, { startOrdinal: 1, endOrdinal: 65_536 }))
       .toThrow('align');
     expect(() => testing.decodeIndex(Buffer.concat([encoded, Buffer.from([0])]))).toThrow('inconsistent');
+  });
+
+  it('rejects duplicate/noncanonical raw JSON and binds the terminal offset to dataBytes', () => {
+    expect(() => testing.parseCanonicalLfBytes(Buffer.from('{"a":1,"a":2}\n'))).toThrow('duplicate key');
+    expect(() => testing.parseCanonicalLfBytes(Buffer.from('{"b":2,"a":1}\n'))).toThrow('not canonical');
+    expect(testing.parseCanonicalLfBytes(Buffer.from('{"a":1,"b":2}\n'))).toEqual({ a: 1, b: 2 });
+    const index = testing.decodeIndex(testing.encodeIndex(1, [0, 4]));
+    expect(testing.bindIndexToDataBytes(index, 4)).toBe(index);
+    expect(() => testing.bindIndexToDataBytes(index, 3)).toThrow('terminal offset');
+  });
+
+  it('publishes owner by no-replace link and resumes it without any write authority', () => {
+    const { parent, stage } = temporaryStage('r7-owner');
+    const events = [];
+    const seam = {
+      writeSync(...args) { events.push('write'); return fs.writeSync(...args); },
+      fsyncSync(...args) { events.push('fsync'); return fs.fsyncSync(...args); },
+      linkSync(...args) { events.push('link'); return fs.linkSync(...args); },
+      unlinkSync(...args) { events.push('unlink'); return fs.unlinkSync(...args); },
+    };
+    const created = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam });
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    expect(created.loadCheckpoint()).toEqual(expect.objectContaining({ checkpoint: null, tip: null, advanceAllowed: true }));
+    created.suspend();
+    expect(events).toEqual(expect.arrayContaining(['write', 'fsync', 'link', 'unlink']));
+    events.length = 0;
+    const resumed = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: null, fs: seam });
+    expect(resumed.loadCheckpoint().advanceAllowed).toBe(true);
+    resumed.suspend();
+    expect(events).toEqual([]);
+    resumed.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('classifies exact pre-owner residue and gives nonnull expectedTip rollback precedence', () => {
+    const first = temporaryStage('r7-empty');
+    fs.mkdirSync(first.stage);
+    const blocked = createResumableEndgameDiskFrontierStore({ stagePath: first.stage, mode: 'resume', ownerId: 'owner-A', expectedTip: null });
+    expect(blocked.loadCheckpoint()).toEqual(expect.objectContaining({ checkpoint: null, tip: null, advanceAllowed: false }));
+    blocked.dispose();
+    releaseParent(first.parent, first.stage);
+
+    const second = temporaryStage('r7-rollback');
+    fs.mkdirSync(second.stage);
+    expect(() => createResumableEndgameDiskFrontierStore({
+      stagePath: second.stage, mode: 'resume', ownerId: 'owner-A',
+      expectedTip: { generation: 0, manifestSha256: 'A'.repeat(64) },
+    })).toThrow('authenticated rollback');
+    fs.rmdirSync(second.stage);
+    releaseParent(second.parent, second.stage);
+  });
+
+  it('rejects owner alias capacity before opening the part', () => {
+    const { parent, stage } = temporaryStage('r7-owner-cap');
+    const unnormalized = `${parent}${path.sep}.${path.sep}frontier-stage`;
+    expect(() => createResumableEndgameDiskFrontierStore({ stagePath: unnormalized, mode: 'create', ownerId: 'owner-A' })).toThrow('already be normalized');
+    expect(fs.existsSync(stage)).toBe(false);
+    let opened = 0;
+    expect(() => createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', limits: { maximumNamespaceEntries: 1 },
+      fs: { openSync(...args) { opened += 1; return fs.openSync(...args); } },
+    })).toThrow('two-alias admission');
+    expect(opened).toBe(0);
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
   });
 });
 
