@@ -47,6 +47,7 @@ const R7_MANIFEST_PLAN_HASH_LABEL = 'T37-F4E-R7-MANIFEST-PLAN-V1';
 const R7_MANIFEST_PLAN_SNAPSHOTS = new WeakMap();
 const R7_MANIFEST_STATES = new WeakSet();
 const R7_OWNED_CANDIDATE_INDEX_PROBES = new WeakMap();
+const R7_AUTHORIZATION_BUCKET_VISIT_PROBES = new WeakMap();
 const R7_NATIVE_ARRAY_PUSH = Array.prototype.push;
 const R7_NATIVE_IS_PROXY = nativeTypes.isProxy;
 const R7_NATIVE_SET_ADD = Set.prototype.add;
@@ -350,6 +351,13 @@ export const RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING = Object.freeze({
     if (probe === undefined) throw frontierError('candidate index probe requires a live owned writer');
     return probe(logicalSize);
   },
+  authorizationBucketVisits(store) {
+    const probe = store && typeof store === 'object'
+      ? R7_AUTHORIZATION_BUCKET_VISIT_PROBES.get(store)
+      : undefined;
+    if (probe === undefined) throw frontierError('authorization bucket probe requires a resumable Store');
+    return probe();
+  },
 });
 
 const RESUMABLE_DEFAULT_FS = Object.freeze({
@@ -365,8 +373,19 @@ const RESUMABLE_DEFAULT_FS = Object.freeze({
   realpathSync: nativeFs.realpathSync,
   rmdirSync: nativeFs.rmdirSync,
   unlinkSync: nativeFs.unlinkSync,
+  utimesSync: nativeFs.utimesSync,
   writeSync: nativeFs.writeSync,
 });
+
+let resumableStageSentinelSerial = 0;
+
+function nextResumableStageSentinelTime() {
+  resumableStageSentinelSerial = (resumableStageSentinelSerial + 1) % 1_000_000;
+  const processComponent = Number.isSafeInteger(process.pid) ? process.pid % 100_000 : 0;
+  // A Store-specific historical mtime makes same-tick namespace writes observable on Windows.
+  // Exact path/owner identities remain the authority; this is not a hostile timestamp-restoration boundary.
+  return new Date(Date.UTC(2000, 0, 1) + processComponent * 1_000_000 + resumableStageSentinelSerial);
+}
 
 const DEFAULT_FS = Object.freeze({
   closeSync: nativeFs.closeSync,
@@ -534,9 +553,18 @@ function createR7DescriptorTracker(fs, pendingCloseDescriptors, recordDiagnostic
     }
     return errors;
   };
+  const drainPhase = (phase) => {
+    const errors = [];
+    for (const [descriptor, record] of [...pendingCloseDescriptors]) {
+      if (record.phase !== phase) continue;
+      try { close(descriptor); } catch (error) { errors.push(error); }
+    }
+    return errors;
+  };
   return Object.freeze({
     close,
     drain,
+    drainPhase,
     hasDescriptor(descriptor) {
       return trackedDescriptors.has(descriptor) || pendingCloseDescriptors.has(descriptor);
     },
@@ -1044,8 +1072,134 @@ function sameProofFileObject(left, right) {
   return left.dev === right.dev && left.ino === right.ino;
 }
 
-function proofIdentityKey(identity) {
-  return `${identity.dev}:${identity.ino}:${identity.size}:${identity.mtimeNs}:${identity.ctimeNs}`;
+function proofObjectKey(identity) {
+  return `${identity.dev}:${identity.ino}`;
+}
+
+function resumableInventoryEntry(name, filePath, bytes, identity) {
+  if (!Number.isSafeInteger(bytes) || bytes < 0 || identity.size !== String(bytes)) {
+    throw frontierError(`${name} has an inconsistent ledger byte length`);
+  }
+  return Object.freeze({ name, filePath, bytes, identity });
+}
+
+function createResumableInventoryLedger(initial, limits) {
+  const entries = new Map();
+  const physicalRuns = new Map();
+  let sortedNames = null;
+  let retainedManifestBytes = 0;
+  let ownerAndIndexBytes = 0;
+  let recognizedPhysicalRunBytes = 0;
+
+  const isManifest = (name) => /^manifest-g[0-9]{5}\.json(?:\.part)?$/u.test(name);
+  const isOwnerOrIndex = (name) => name === 'owner.json' || name === 'owner.json.part' || /\.idx(?:\.part)?$/u.test(name);
+  const isRun = (name) => /\.run(?:\.part)?$/u.test(name);
+  const assertWithinLimits = () => {
+    if (entries.size > limits.maximumNamespaceEntries) {
+      throw frontierError(`resumable namespace exceeds ${limits.maximumNamespaceEntries} entries`);
+    }
+    if (retainedManifestBytes > limits.retainedManifestBytes) throw frontierError('retained manifest bytes exceed the limit');
+    if (ownerAndIndexBytes > limits.ownerAndIndexBytes) throw frontierError('owner/index bytes exceed the limit');
+    if (retainedManifestBytes + ownerAndIndexBytes > limits.auxiliaryBytes) {
+      throw frontierError('auxiliary bytes exceed the limit');
+    }
+    if (recognizedPhysicalRunBytes > limits.recognizedPhysicalRunBytes) throw frontierError('physical run bytes exceed the limit');
+  };
+  const addPhysicalRun = (entry) => {
+    if (!isRun(entry.name)) return;
+    const key = proofObjectKey(entry.identity);
+    const physical = physicalRuns.get(key);
+    if (physical === undefined) {
+      physicalRuns.set(key, { bytes: entry.bytes, references: 1 });
+      recognizedPhysicalRunBytes += entry.bytes;
+      return;
+    }
+    if (physical.bytes !== entry.bytes) throw frontierError(`${entry.name} aliases a run with inconsistent bytes`);
+    physical.references += 1;
+  };
+  const removePhysicalRun = (entry) => {
+    if (!isRun(entry.name)) return;
+    const key = proofObjectKey(entry.identity);
+    const physical = physicalRuns.get(key);
+    if (physical === undefined || physical.references < 1 || physical.bytes !== entry.bytes) {
+      throw frontierError(`${entry.name} is inconsistent with the physical run ledger`);
+    }
+    physical.references -= 1;
+    if (physical.references === 0) {
+      physicalRuns.delete(key);
+      recognizedPhysicalRunBytes -= physical.bytes;
+    }
+  };
+  const add = (entry) => {
+    if (entries.has(entry.name)) throw frontierError(`duplicate inventory entry ${entry.name}`);
+    entries.set(entry.name, entry);
+    sortedNames = null;
+    if (isManifest(entry.name)) retainedManifestBytes += entry.bytes;
+    if (isOwnerOrIndex(entry.name)) ownerAndIndexBytes += entry.bytes;
+    addPhysicalRun(entry);
+    assertWithinLimits();
+  };
+  const remove = (name) => {
+    const entry = entries.get(name);
+    if (entry === undefined) throw frontierError(`missing inventory entry ${name}`);
+    removePhysicalRun(entry);
+    if (isManifest(name)) retainedManifestBytes -= entry.bytes;
+    if (isOwnerOrIndex(name)) ownerAndIndexBytes -= entry.bytes;
+    entries.delete(name);
+    sortedNames = null;
+    return entry;
+  };
+  const update = (entry) => {
+    if (!entries.has(entry.name)) throw frontierError(`missing inventory entry ${entry.name}`);
+    remove(entry.name);
+    add(entry);
+  };
+  const grow = (name, additionalBytes) => {
+    assertSafeNonnegativeInteger(additionalBytes, `${name} ledger growth`);
+    const previous = entries.get(name);
+    if (previous === undefined) throw frontierError(`missing inventory entry ${name}`);
+    if (additionalBytes === 0) return;
+    const bytes = previous.bytes + additionalBytes;
+    if (!Number.isSafeInteger(bytes)) throw frontierError(`${name} ledger byte length exceeds safe integer range`);
+    const identity = Object.freeze({ ...previous.identity, size: String(bytes) });
+    update(resumableInventoryEntry(name, previous.filePath, bytes, identity));
+  };
+  const replace = (scanned) => {
+    entries.clear();
+    physicalRuns.clear();
+    sortedNames = null;
+    retainedManifestBytes = 0;
+    ownerAndIndexBytes = 0;
+    recognizedPhysicalRunBytes = 0;
+    for (const name of scanned.names) add(scanned.entries.get(name));
+    assertWithinLimits();
+  };
+  const matches = (scanned) => {
+    if (entries.size !== scanned.namespaceEntries
+      || retainedManifestBytes !== scanned.retainedManifestBytes
+      || ownerAndIndexBytes !== scanned.ownerAndIndexBytes
+      || recognizedPhysicalRunBytes !== scanned.recognizedPhysicalRunBytes) return false;
+    for (const [name, entry] of entries) {
+      const candidate = scanned.entries.get(name);
+      if (candidate === undefined || candidate.filePath !== entry.filePath || candidate.bytes !== entry.bytes
+        || !sameProofFileIdentity(candidate.identity, entry.identity)) return false;
+    }
+    return true;
+  };
+  const view = Object.freeze({
+    entries,
+    get names() {
+      if (sortedNames === null) sortedNames = Object.freeze([...entries.keys()].sort(ordinalByteCompare));
+      return sortedNames;
+    },
+    get namespaceEntries() { return entries.size; },
+    get retainedManifestBytes() { return retainedManifestBytes; },
+    get ownerAndIndexBytes() { return ownerAndIndexBytes; },
+    get recognizedPhysicalRunBytes() { return recognizedPhysicalRunBytes; },
+    get uncommittedWorkingRunBytes() { return recognizedPhysicalRunBytes; },
+  });
+  replace(initial);
+  return Object.freeze({ add, grow, matches, remove, replace, update, view });
 }
 
 function readBoundedProofFile(fs, filePath, maximumBytes, descriptorTracker, phase = 'bounded-readback') {
@@ -1128,11 +1282,14 @@ function scanResumableInventory(fs, stagePath, limits) {
     if (name === 'owner.json' || name === 'owner.json.part' || /\.idx(?:\.part)?$/u.test(name)) {
       ownerAndIndexBytes += bytes;
     }
-    if (/\.run(?:\.part)?$/u.test(name)) physicalRuns.set(proofIdentityKey(identity), bytes);
+    if (/\.run(?:\.part)?$/u.test(name)) physicalRuns.set(proofObjectKey(identity), bytes);
   }
   const recognizedPhysicalRunBytes = [...physicalRuns.values()].reduce((sum, value) => sum + value, 0);
   if (retainedManifestBytes > limits.retainedManifestBytes) throw frontierError('retained manifest bytes exceed the limit');
   if (ownerAndIndexBytes > limits.ownerAndIndexBytes) throw frontierError('owner/index bytes exceed the limit');
+  if (retainedManifestBytes + ownerAndIndexBytes > limits.auxiliaryBytes) {
+    throw frontierError('auxiliary bytes exceed the limit');
+  }
   if (recognizedPhysicalRunBytes > limits.recognizedPhysicalRunBytes) throw frontierError('physical run bytes exceed the limit');
   return Object.freeze({
     names: Object.freeze(names),
@@ -2181,11 +2338,51 @@ function exactResumableStage(fs, stagePath, mode) {
   return exact;
 }
 
+function resumableStageIdentity(fs, stagePath) {
+  const stats = fs.lstatSync(stagePath, { bigint: true });
+  assertPlainDirectory(stats, 'resumable stage');
+  return proofFileIdentity(stats);
+}
+
+function assertResumableStageRootIdentity(identity, expectedRootIdentity) {
+  if (expectedRootIdentity !== null && !sameProofFileObject(identity, expectedRootIdentity)) {
+    throw frontierError('resumable stage root identity drift');
+  }
+}
+
+function stampResumableStageIdentity(fs, stagePath, sentinelTime, expectedRootIdentity = null) {
+  assertResumableStageRootIdentity(resumableStageIdentity(fs, stagePath), expectedRootIdentity);
+  fs.utimesSync(stagePath, sentinelTime, sentinelTime);
+  const identity = resumableStageIdentity(fs, stagePath);
+  assertResumableStageRootIdentity(identity, expectedRootIdentity);
+  return identity;
+}
+
+function scanObservedResumableInventory(fs, stagePath, limits, expectedRootIdentity = null) {
+  const before = resumableStageIdentity(fs, stagePath);
+  assertResumableStageRootIdentity(before, expectedRootIdentity);
+  const inventory = scanResumableInventory(fs, stagePath, limits);
+  const after = resumableStageIdentity(fs, stagePath);
+  assertResumableStageRootIdentity(after, expectedRootIdentity);
+  if (!sameProofFileIdentity(before, after)) throw frontierError('resumable stage changed during inventory scan');
+  return Object.freeze({ inventory, stageIdentity: after });
+}
+
+function scanStampedResumableInventory(fs, stagePath, limits, sentinelTime, expectedRootIdentity = null) {
+  const before = stampResumableStageIdentity(fs, stagePath, sentinelTime, expectedRootIdentity);
+  const inventory = scanResumableInventory(fs, stagePath, limits);
+  const after = resumableStageIdentity(fs, stagePath);
+  assertResumableStageRootIdentity(after, expectedRootIdentity);
+  if (!sameProofFileIdentity(before, after)) throw frontierError('resumable stage changed during inventory scan');
+  return Object.freeze({ inventory, stageIdentity: after });
+}
+
 function publishResumableOwner(fs, stagePath, ownerBytes, limits, descriptorTracker) {
   if (ownerBytes.length > limits.ownerOrIndexBytes) throw frontierError('owner.json exceeds its individual byte limit');
-  const initial = scanResumableInventory(fs, stagePath, limits);
-  if (initial.namespaceEntries + 2 > limits.maximumNamespaceEntries
-    || initial.ownerAndIndexBytes + 2 * ownerBytes.length > limits.ownerAndIndexBytes) {
+  // createStage just won an exclusive non-recursive mkdir; the post-publication admission
+  // scan authenticates the resulting namespace, so owner admission does not enumerate twice.
+  if (2 > limits.maximumNamespaceEntries || 2 * ownerBytes.length > limits.ownerAndIndexBytes
+    || 2 * ownerBytes.length > limits.auxiliaryBytes) {
     throw frontierError('owner two-alias admission exceeds resumable limits');
   }
   const partPath = path.join(stagePath, 'owner.json.part');
@@ -2264,15 +2461,24 @@ export function createResumableEndgameDiskFrontierStore(options) {
   const pendingCloseDescriptors = new Map();
   const descriptorTracker = createR7DescriptorTracker(fs, pendingCloseDescriptors, recordCleanupError);
   const limits = normalizeResumableLimits(options.limits);
+  const stageSentinelTime = nextResumableStageSentinelTime();
+  let stageSentinelArmed = false;
   const ownerValue = Object.freeze({ schema: 't37-f4e-r7-owner-v1', ownerId });
   const ownerBytes = Buffer.from(`${canonicalizeJson(ownerValue)}\n`, 'utf8');
   let stagePath;
+  let stageRootIdentity;
   let inventory;
+  let stageIdentity;
   let blockedReason = null;
   try {
     stagePath = exactResumableStage(fs, options.stagePath, mode);
+    stageRootIdentity = resumableStageIdentity(fs, stagePath);
     if (mode === 'create') publishResumableOwner(fs, stagePath, ownerBytes, limits, descriptorTracker);
-    inventory = scanResumableInventory(fs, stagePath, limits);
+    const initialScan = mode === 'create'
+      ? scanStampedResumableInventory(fs, stagePath, limits, stageSentinelTime, stageRootIdentity)
+      : scanObservedResumableInventory(fs, stagePath, limits, stageRootIdentity);
+    ({ inventory, stageIdentity } = initialScan);
+    if (mode === 'create') stageSentinelArmed = true;
     const manifests = inventory.names.filter((name) => /^manifest-g[0-9]{5}\.json$/u.test(name));
     if (mode === 'resume' && options.expectedTip !== null && manifests.length === 0) {
       throw frontierError('authenticated rollback: expectedTip is absent from the manifest chain');
@@ -2304,6 +2510,11 @@ export function createResumableEndgameDiskFrontierStore(options) {
       const unrelated = inventory.names.filter((name) => name !== 'owner.json' && name !== 'owner.json.part');
       if (unrelated.length > 0) throw frontierError('manifest admission scan is not yet available in this checkpoint');
     }
+    const admittedStageIdentity = resumableStageIdentity(fs, stagePath);
+    assertResumableStageRootIdentity(admittedStageIdentity, stageRootIdentity);
+    if (!sameProofFileIdentity(stageIdentity, admittedStageIdentity)) {
+      throw frontierError('resumable stage changed during Store admission');
+    }
   } catch (primary) {
     const closeFailures = descriptorTracker.drain();
     const failure = aggregate(primary, closeFailures, 'resumable Store construction failed.');
@@ -2318,24 +2529,89 @@ export function createResumableEndgameDiskFrontierStore(options) {
   const runs = new Map();
   const activeReaders = new Set();
   const ownedFiles = new Map();
+  const orphanOwnedPaths = new Map();
+  const pendingAuthorizedHardLinkRefreshes = new Map();
+  let authorizationBucketVisits = 0;
+  const inventoryLedger = createResumableInventoryLedger(inventory, limits);
+  inventory = inventoryLedger.view;
   const teardownAuthorized = new Map(
     [...inventory.entries.values()].map((entry) => [entry.filePath, entry.identity]),
   );
+  const teardownAuthorizedObjects = new Map();
+  for (const [filePath, identity] of teardownAuthorized) {
+    const key = proofObjectKey(identity);
+    const paths = teardownAuthorizedObjects.get(key) ?? new Set();
+    paths.add(filePath);
+    teardownAuthorizedObjects.set(key, paths);
+  }
   let candidateReservation = null;
-  let workingRunBytes = inventory.uncommittedWorkingRunBytes;
-  let physicalRunBytes = inventory.recognizedPhysicalRunBytes;
-  const refreshInventory = () => {
-    inventory = scanResumableInventory(fs, stagePath, limits);
-    workingRunBytes = inventory.uncommittedWorkingRunBytes;
-    physicalRunBytes = inventory.recognizedPhysicalRunBytes;
+  let inventoryInvalid = false;
+  let inventoryRecoveryAttempts = 0;
+  let inventoryRecoveryTerminal = false;
+  const recoveryTerminalError = () => frontierError('inventory recovery attempts are exhausted');
+  const markInventoryInvalid = () => {
+    if (!inventoryInvalid && !inventoryRecoveryTerminal) inventoryRecoveryAttempts = 0;
+    inventoryInvalid = true;
   };
-  const refreshInventoryForDiagnostics = () => {
-    try { refreshInventory(); } catch (error) { recordCleanupError(error); }
+  const markInventoryRecoveryTerminal = () => {
+    if (!inventoryRecoveryTerminal) recordCleanupError(recoveryTerminalError());
+    inventoryRecoveryTerminal = true;
+    inventoryInvalid = true;
+    stageSentinelArmed = false;
+  };
+  const captureStageMutation = () => {
+    if (inventoryRecoveryTerminal) {
+      stageSentinelArmed = false;
+      const observed = resumableStageIdentity(fs, stagePath);
+      assertResumableStageRootIdentity(observed, stageRootIdentity);
+      stageIdentity = observed;
+      return;
+    }
+    try {
+      const stamped = stampResumableStageIdentity(fs, stagePath, stageSentinelTime, stageRootIdentity);
+      stageIdentity = stamped;
+      stageSentinelArmed = true;
+    } catch (error) {
+      stageSentinelArmed = false;
+      markInventoryInvalid();
+      throw error;
+    }
+  };
+  const applyInventoryScan = (scannedResult) => {
+    const scanned = scannedResult.inventory;
+    const matched = inventoryLedger.matches(scanned);
+    inventoryLedger.replace(scanned);
+    stageIdentity = scannedResult.stageIdentity;
+    inventoryInvalid = false;
+    inventoryRecoveryAttempts = 0;
+    return matched;
+  };
+  const attemptInventoryRecovery = () => {
+    if (inventoryRecoveryTerminal) throw recoveryTerminalError();
+    if (inventoryRecoveryAttempts >= 2) {
+      markInventoryRecoveryTerminal();
+      throw recoveryTerminalError();
+    }
+    inventoryRecoveryAttempts += 1;
+    try {
+      return applyInventoryScan(scanObservedResumableInventory(
+        fs, stagePath, limits, stageRootIdentity,
+      ));
+    } catch (error) {
+      recordCleanupError(error);
+      if (inventoryRecoveryAttempts >= 2) markInventoryRecoveryTerminal();
+      throw error;
+    }
+  };
+  const attemptInitialInventoryRecovery = () => {
+    if (inventoryRecoveryTerminal || inventoryRecoveryAttempts !== 0) return;
+    try { attemptInventoryRecovery(); } catch { /* A single public recovery attempt remains. */ }
   };
   const latchBlocked = (error = null) => {
     if (blockedReason === null) blockedReason = 'precommit-owned-residue';
     if (error !== null) recordCleanupError(error);
-    refreshInventoryForDiagnostics();
+    markInventoryInvalid();
+    attemptInitialInventoryRecovery();
   };
   const assertOwnedStagePath = (filePath) => {
     if (typeof filePath !== 'string' || path.resolve(filePath) !== filePath
@@ -2343,6 +2619,86 @@ export function createResumableEndgameDiskFrontierStore(options) {
       || path.basename(filePath) === filePath) {
       throw frontierError('owned proof path escaped its exact stage');
     }
+  };
+  const failExternalInventoryDrift = (phase, cause = null) => {
+    const failure = frontierError(`external inventory drift before ${phase}`);
+    if (blockedReason === null) blockedReason = 'external-inventory-drift';
+    recordCleanupError(failure);
+    if (cause !== null) recordCleanupError(cause);
+    markInventoryInvalid();
+    attemptInitialInventoryRecovery();
+    throw cause === null ? failure : aggregatePropagatingR7Close(failure, [cause], failure.message);
+  };
+  const armInventorySentinel = (phase) => {
+    if (stageSentinelArmed) return;
+    if (inventoryRecoveryTerminal) throw recoveryTerminalError();
+    // Resume admission itself remains read-only. The first mutation revalidates once, then arms O(1) checks.
+    let scannedResult;
+    try {
+      scannedResult = scanStampedResumableInventory(
+        fs, stagePath, limits, stageSentinelTime, stageRootIdentity,
+      );
+    } catch (cause) {
+      stageSentinelArmed = false;
+      const failure = frontierError(`external inventory drift before ${phase}`);
+      if (blockedReason === null) blockedReason = 'external-inventory-drift';
+      recordCleanupError(failure);
+      recordCleanupError(cause);
+      markInventoryInvalid();
+      attemptInitialInventoryRecovery();
+      throw aggregate(failure, [cause], failure.message);
+    }
+    const matched = inventoryLedger.matches(scannedResult.inventory);
+    try {
+      inventoryLedger.replace(scannedResult.inventory);
+      stageIdentity = scannedResult.stageIdentity;
+      inventoryInvalid = false;
+      inventoryRecoveryAttempts = 0;
+    } catch (cause) {
+      stageSentinelArmed = false;
+      if (blockedReason === null) blockedReason = 'external-inventory-drift';
+      recordCleanupError(cause);
+      markInventoryInvalid();
+      attemptInitialInventoryRecovery();
+      throw cause;
+    }
+    if (!matched) {
+      const failure = frontierError(`external inventory drift before ${phase}`);
+      if (blockedReason === null) blockedReason = 'external-inventory-drift';
+      recordCleanupError(failure);
+      stageSentinelArmed = false;
+      throw failure;
+    }
+    stageSentinelArmed = true;
+  };
+  const ensureInventoryCurrent = (phase, mutation = false) => {
+    if (mutation) armInventorySentinel(phase);
+    if (inventoryInvalid) attemptInventoryRecovery();
+    let currentStageIdentity;
+    try {
+      currentStageIdentity = resumableStageIdentity(fs, stagePath);
+      assertResumableStageRootIdentity(currentStageIdentity, stageRootIdentity);
+    } catch (error) {
+      failExternalInventoryDrift(phase, error);
+    }
+    if (!sameProofFileIdentity(stageIdentity, currentStageIdentity)) {
+      failExternalInventoryDrift(phase);
+    }
+    const owner = inventory.entries.get('owner.json');
+    if (owner === undefined) return;
+    let ownerDrift = null;
+    try {
+      const verifiedOwner = readBoundedProofFile(
+        fs, owner.filePath, limits.ownerOrIndexBytes, descriptorTracker, 'owner-lightweight-readback',
+      );
+      if (!sameProofFileIdentity(owner.identity, verifiedOwner.identity)) {
+        throw frontierError('owner inventory identity drift');
+      }
+      if (!verifiedOwner.bytes.equals(ownerBytes)) throw frontierError('owner bytes drift');
+    } catch (error) {
+      ownerDrift = error;
+    }
+    if (ownerDrift !== null) failExternalInventoryDrift(phase, ownerDrift);
   };
   const authenticateOpenedOwnedFile = (descriptor, filePath) => {
     assertOwnedStagePath(filePath);
@@ -2358,23 +2714,71 @@ export function createResumableEndgameDiskFrontierStore(options) {
     }
     return descriptorIdentity;
   };
-  const registerOwnedFile = (filePath, identity, allowOwnedGrowth = false) => {
+  const deleteTeardownAuthorization = (filePath) => {
+    const identity = teardownAuthorized.get(filePath);
+    if (identity === undefined) return;
+    teardownAuthorized.delete(filePath);
+    const key = proofObjectKey(identity);
+    const paths = teardownAuthorizedObjects.get(key);
+    paths?.delete(filePath);
+    if (paths?.size === 0) teardownAuthorizedObjects.delete(key);
+  };
+  const setTeardownAuthorization = (filePath, identity) => {
+    const previous = teardownAuthorized.get(filePath);
+    if (previous !== undefined && proofObjectKey(previous) !== proofObjectKey(identity)) {
+      deleteTeardownAuthorization(filePath);
+    }
+    teardownAuthorized.set(filePath, identity);
+    const key = proofObjectKey(identity);
+    const paths = teardownAuthorizedObjects.get(key) ?? new Set();
+    paths.add(filePath);
+    teardownAuthorizedObjects.set(key, paths);
+  };
+  const registerOwnedFile = (filePath, identity, allowOwnedGrowth = false, onRegistered = null) => {
     assertOwnedStagePath(filePath);
     if (ownedFiles.has(filePath)) throw frontierError(`duplicate proof ownership for ${path.basename(filePath)}`);
+    const name = path.basename(filePath);
+    const bytes = Number(identity.size);
+    inventoryLedger.add(resumableInventoryEntry(name, filePath, bytes, identity));
     ownedFiles.set(filePath, Object.freeze({ identity, allowOwnedGrowth }));
-    teardownAuthorized.set(filePath, identity);
+    setTeardownAuthorization(filePath, identity);
+    onRegistered?.();
+    captureStageMutation();
   };
   const updateOwnedFile = (filePath, identity, allowOwnedGrowth = false) => {
     if (!ownedFiles.has(filePath)) throw frontierError(`missing proof ownership for ${path.basename(filePath)}`);
+    const name = path.basename(filePath);
+    const bytes = Number(identity.size);
+    inventoryLedger.update(resumableInventoryEntry(name, filePath, bytes, identity));
     ownedFiles.set(filePath, Object.freeze({ identity, allowOwnedGrowth }));
-    teardownAuthorized.set(filePath, identity);
+    setTeardownAuthorization(filePath, identity);
   };
-  const unlinkOwnedFile = (filePath, expectedIdentity = null) => {
+  const growOwnedFile = (filePath, additionalBytes) => {
+    if (!ownedFiles.has(filePath)) throw frontierError(`missing proof ownership for ${path.basename(filePath)}`);
+    inventoryLedger.grow(path.basename(filePath), additionalBytes);
+  };
+  const notePendingAuthorizedHardLinkRefresh = (identity, removedFilePath) => {
+    const key = proofObjectKey(identity);
+    const existing = pendingAuthorizedHardLinkRefreshes.get(key);
+    if (existing !== undefined
+      && (existing.identity.size !== identity.size || existing.identity.mtimeNs !== identity.mtimeNs)) {
+      throw frontierError('hard-link teardown invariant drift');
+    }
+    const sourcePaths = existing?.remainingPaths ?? teardownAuthorizedObjects.get(key) ?? [];
+    authorizationBucketVisits += sourcePaths.size ?? sourcePaths.length;
+    const remainingPaths = new Set(sourcePaths);
+    remainingPaths.delete(removedFilePath);
+    pendingAuthorizedHardLinkRefreshes.set(key, Object.freeze({
+      identity: existing?.identity ?? identity,
+      remainingPaths,
+    }));
+  };
+  const unlinkOwnedFile = (filePath, expectedIdentity = null, onReleased = null) => {
     assertOwnedStagePath(filePath);
     if (descriptorTracker.hasPath(filePath)) {
       throw markR7CloseFailed(frontierError(`refusing unlink while ${path.basename(filePath)} has a pending descriptor close`));
     }
-    const ownership = ownedFiles.get(filePath);
+    let ownership = ownedFiles.get(filePath);
     if (!ownership) throw frontierError(`refusing unowned proof path ${path.basename(filePath)}`);
     if (expectedIdentity !== null && !sameProofFileObject(ownership.identity, expectedIdentity)) {
       throw frontierError(`proof ownership drift for ${path.basename(filePath)}`);
@@ -2384,11 +2788,23 @@ export function createResumableEndgameDiskFrontierStore(options) {
       stats = fs.lstatSync(filePath, { bigint: true });
     } catch (error) {
       if (isMissing(error)) {
+        const disappearedWhileLive = blockedReason === null;
+        notePendingAuthorizedHardLinkRefresh(ownership.identity, filePath);
+        if (inventory.entries.has(path.basename(filePath))) inventoryLedger.remove(path.basename(filePath));
         ownedFiles.delete(filePath);
-        teardownAuthorized.delete(filePath);
+        deleteTeardownAuthorization(filePath);
+        onReleased?.();
+        refreshAuthorizedHardLinkAliases(ownership.identity);
+        captureStageMutation();
+        if (disappearedWhileLive) throw frontierError(`owned proof disappeared before unlink: ${path.basename(filePath)}`);
         return;
       }
       throw error;
+    }
+    if (pendingAuthorizedHardLinkRefreshes.has(proofObjectKey(ownership.identity))) {
+      refreshAuthorizedHardLinkAliases(ownership.identity);
+      ownership = ownedFiles.get(filePath);
+      if (!ownership) throw frontierError(`missing refreshed proof ownership for ${path.basename(filePath)}`);
     }
     assertPlainFile(stats, path.basename(filePath));
     assertExactRealpath(fs, filePath);
@@ -2399,8 +2815,58 @@ export function createResumableEndgameDiskFrontierStore(options) {
       throw frontierError(`refusing changed owned proof ${path.basename(filePath)}`);
     }
     fs.unlinkSync(filePath);
+    notePendingAuthorizedHardLinkRefresh(current, filePath);
+    inventoryLedger.remove(path.basename(filePath));
     ownedFiles.delete(filePath);
-    teardownAuthorized.delete(filePath);
+    deleteTeardownAuthorization(filePath);
+    onReleased?.();
+    refreshAuthorizedHardLinkAliases(current);
+    captureStageMutation();
+  };
+  const refreshAuthorizedHardLinkAliases = (removedIdentity) => {
+    const key = proofObjectKey(removedIdentity);
+    const pending = pendingAuthorizedHardLinkRefreshes.get(key);
+    const invariantIdentity = pending?.identity ?? removedIdentity;
+    const remainingPaths = pending?.remainingPaths
+      ?? new Set(teardownAuthorizedObjects.get(key) ?? []);
+    authorizationBucketVisits += remainingPaths.size;
+    for (const filePath of remainingPaths) {
+      const authorizedIdentity = teardownAuthorized.get(filePath);
+      if (authorizedIdentity === undefined || !sameProofFileObject(authorizedIdentity, invariantIdentity)) {
+        throw frontierError(`hard-link teardown authorization drift for ${path.basename(filePath)}`);
+      }
+      const stats = fs.lstatSync(filePath, { bigint: true });
+      assertPlainFile(stats, path.basename(filePath));
+      assertExactRealpath(fs, filePath);
+      const refreshedIdentity = proofFileIdentity(stats);
+      if (!sameProofFileObject(refreshedIdentity, invariantIdentity)
+        || refreshedIdentity.size !== invariantIdentity.size
+        || refreshedIdentity.mtimeNs !== invariantIdentity.mtimeNs) {
+        throw frontierError(`hard-link teardown identity drift for ${path.basename(filePath)}`);
+      }
+      setTeardownAuthorization(filePath, refreshedIdentity);
+      const name = path.basename(filePath);
+      const ledgerEntry = inventory.entries.get(name);
+      if (ledgerEntry === undefined || ledgerEntry.filePath !== filePath) {
+        throw frontierError(`hard-link teardown ledger drift for ${name}`);
+      }
+      inventoryLedger.update(resumableInventoryEntry(
+        name, filePath, ledgerEntry.bytes, refreshedIdentity,
+      ));
+      const ownership = ownedFiles.get(filePath);
+      if (ownership !== undefined) {
+        ownedFiles.set(filePath, Object.freeze({
+          identity: refreshedIdentity,
+          allowOwnedGrowth: ownership.allowOwnedGrowth,
+        }));
+      }
+    }
+    pendingAuthorizedHardLinkRefreshes.delete(key);
+  };
+  const refreshPendingAuthorizedHardLinkAliases = () => {
+    for (const pending of [...pendingAuthorizedHardLinkRefreshes.values()]) {
+      refreshAuthorizedHardLinkAliases(pending.identity);
+    }
   };
   const unlinkAuthorizedTeardownFile = (filePath, currentIdentity) => {
     assertOwnedStagePath(filePath);
@@ -2418,12 +2884,28 @@ export function createResumableEndgameDiskFrontierStore(options) {
       throw frontierError(`final teardown identity drift for ${path.basename(filePath)}`);
     }
     fs.unlinkSync(filePath);
+    notePendingAuthorizedHardLinkRefresh(currentIdentity, filePath);
+    inventoryLedger.remove(path.basename(filePath));
     ownedFiles.delete(filePath);
-    teardownAuthorized.delete(filePath);
+    deleteTeardownAuthorization(filePath);
+    refreshAuthorizedHardLinkAliases(currentIdentity);
+    captureStageMutation();
+  };
+  const cleanupOrphanOwnedPaths = () => {
+    const cleanup = [];
+    for (const [filePath, identity] of [...orphanOwnedPaths]) {
+      try {
+        unlinkOwnedFile(filePath, identity, () => orphanOwnedPaths.delete(filePath));
+      } catch (error) { cleanup.push(error); }
+    }
+    return cleanup;
   };
   const makeWorkingRun = (record) => {
     let runDisposed = false;
     const runReaders = new Set();
+    const remainingOwnedPaths = new Map();
+    if (record.indexFilePath) remainingOwnedPaths.set(record.indexFilePath, record.indexIdentity);
+    remainingOwnedPaths.set(record.filePath, record.identity);
     const trackedValues = (range) => {
       const source = readProofRunRange(
         fs, record.filePath, record.identity, record.size, record.offsets, range, descriptorTracker,
@@ -2454,6 +2936,28 @@ export function createResumableEndgameDiskFrontierStore(options) {
       runReaders.add(iterator);
       return iterator;
     };
+    const disposeOwned = () => {
+      if (runDisposed) return;
+      const cleanup = [];
+      for (const reader of [...runReaders]) {
+        try { reader.return(); } catch (error) { cleanup.push(error); }
+      }
+      for (const [filePath, identity] of [...remainingOwnedPaths]) {
+        try {
+          unlinkOwnedFile(filePath, identity, () => remainingOwnedPaths.delete(filePath));
+        } catch (error) { cleanup.push(error); }
+      }
+      if (remainingOwnedPaths.size === 0) {
+        runDisposed = true;
+        runs.delete(record.id);
+        if (candidateReservation?.id === record.id) candidateReservation = null;
+      }
+      if (cleanup.length > 0) {
+        const failure = aggregatePropagatingR7Close(null, cleanup, `Run ${record.id} cleanup failed.`);
+        latchBlocked(failure);
+        throw failure;
+      }
+    };
     const run = Object.freeze({
       id: record.id,
       size: record.size,
@@ -2463,41 +2967,29 @@ export function createResumableEndgameDiskFrontierStore(options) {
       },
       dispose() {
         if (runDisposed) return;
-        const errors = [];
-        for (const reader of [...runReaders]) {
-          try { reader.return(); } catch (error) { errors.push(error); }
-        }
-        if (errors.length > 0) {
-          throw aggregatePropagatingR7Close(null, errors, `Run ${record.id} reader cleanup failed.`);
-        }
+        let primary = null;
+        try { ensureInventoryCurrent(`run ${record.id} disposal`, true); } catch (error) { primary = error; }
         const cleanup = [];
-        if (record.indexFilePath) {
-          try { unlinkOwnedFile(record.indexFilePath, record.indexIdentity); } catch (error) { cleanup.push(error); }
+        try { disposeOwned(); } catch (error) { cleanup.push(error); }
+        if (primary !== null || cleanup.length > 0) {
+          throw aggregatePropagatingR7Close(primary, cleanup, `Run ${record.id} disposal failed.`);
         }
-        try { unlinkOwnedFile(record.filePath, record.identity); } catch (error) { cleanup.push(error); }
-        if (cleanup.length > 0) {
-          const failure = aggregatePropagatingR7Close(null, cleanup, `Run ${record.id} cleanup failed.`);
-          latchBlocked(failure);
-          throw failure;
-        }
-        runDisposed = true;
-        runs.delete(record.id);
-        if (candidateReservation?.id === record.id) candidateReservation = null;
-        refreshInventory();
       },
     });
-    runs.set(record.id, { run, record });
+    runs.set(record.id, Object.freeze({ run, record, disposeOwned }));
     return run;
   };
   const createRun = (id) => {
     requireLive();
+    ensureInventoryCurrent(`run ${id} creation`, true);
     if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
     const classification = classifyResumableRunId(id);
     if (writers.has(id) || runs.has(id)) throw frontierError(`duplicate run id ${id}`);
     if (candidateReservation !== null) throw frontierError(`candidate ${candidateReservation.id} still owns the generation reservation`);
-    refreshInventory();
-    admitNamespacePeak(inventory.namespaceEntries, classification.committed ? 4 : 1, limits.maximumNamespaceEntries);
+    const generationNamespaceBaseline = inventory.namespaceEntries;
+    admitNamespacePeak(generationNamespaceBaseline, classification.committed ? 4 : 1, limits.maximumNamespaceEntries);
     const filePath = path.join(stagePath, `${id}.run.part`);
+    const ownedPaths = new Set();
     let descriptor = null;
     let ownedIdentity;
     let openedPath = false;
@@ -2505,7 +2997,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
       descriptor = descriptorTracker.open(filePath, 'wx', 0o600, 'run-writer');
       openedPath = true;
       ownedIdentity = authenticateOpenedOwnedFile(descriptor, filePath);
-      registerOwnedFile(filePath, ownedIdentity, true);
+      registerOwnedFile(filePath, ownedIdentity, true, () => ownedPaths.add(filePath));
     } catch (primary) {
       const cleanup = [];
       if (descriptor !== null) {
@@ -2513,12 +3005,20 @@ export function createResumableEndgameDiskFrontierStore(options) {
           cleanup.push(error);
         }
       }
+      if (ownedPaths.has(filePath)) {
+        try {
+          unlinkOwnedFile(filePath, null, () => ownedPaths.delete(filePath));
+        } catch (error) { cleanup.push(error); }
+      }
+      for (const ownedPath of ownedPaths) {
+        const ownership = ownedFiles.get(ownedPath);
+        if (ownership !== undefined) orphanOwnedPaths.set(ownedPath, ownership.identity);
+      }
       const failure = aggregatePropagatingR7Close(primary, cleanup, `Run ${id} bootstrap failed.`);
-      if (openedPath) latchBlocked(failure);
+      if (openedPath || primary?.code === 'EEXIST') latchBlocked(failure);
       throw failure;
     }
-    if (classification.committed) candidateReservation = { id, baseline: inventory.namespaceEntries };
-    const ownedPaths = new Set([filePath]);
+    if (classification.committed) candidateReservation = { id, baseline: generationNamespaceBaseline };
     let pendingIndexDescriptor = null;
     let state = 'open';
     let size = 0;
@@ -2546,19 +3046,24 @@ export function createResumableEndgameDiskFrontierStore(options) {
       try { descriptorTracker.close(pendingIndexDescriptor); pendingIndexDescriptor = null; }
       catch (error) { throw error; }
     };
-    const abort = () => {
+    const abortOwned = () => {
       if (state === 'aborted' || state === 'finished') return;
       const errors = [];
       let closeFailed = false;
       try { closeWriter(); } catch (error) { closeFailed = true; errors.push(error); }
       try { closePendingIndex(); } catch (error) { closeFailed = true; errors.push(error); }
-      for (const ownedPath of ownedPaths) {
+      for (const ownedPath of [...ownedPaths]) {
         try {
-          unlinkOwnedFile(ownedPath);
-          ownedPaths.delete(ownedPath);
+          unlinkOwnedFile(ownedPath, null, () => ownedPaths.delete(ownedPath));
         } catch (error) { errors.push(error); }
       }
       if (errors.length > 0) {
+        if (descriptor === null && pendingIndexDescriptor === null && ownedPaths.size === 0) {
+          state = 'aborted';
+          R7_OWNED_CANDIDATE_INDEX_PROBES.delete(writer);
+          writers.delete(id);
+          if (candidateReservation?.id === id) candidateReservation = null;
+        }
         const failure = aggregate(null, errors, `Run ${id} abort failed.`);
         if (closeFailed || errors.some((error) => error?.r7CloseFailed === true)) markR7CloseFailed(failure);
         latchBlocked(failure);
@@ -2568,16 +3073,27 @@ export function createResumableEndgameDiskFrontierStore(options) {
       R7_OWNED_CANDIDATE_INDEX_PROBES.delete(writer);
       writers.delete(id);
       if (candidateReservation?.id === id) candidateReservation = null;
-      refreshInventory();
+    };
+    const abort = () => {
+      if (state === 'aborted' || state === 'finished') return;
+      let primary = null;
+      if (!invalidated && !disposed) {
+        try { ensureInventoryCurrent(`run ${id} abort`, true); } catch (error) { primary = error; }
+      }
+      const cleanup = [];
+      try { abortOwned(); } catch (error) { cleanup.push(error); }
+      if (primary !== null || cleanup.length > 0) {
+        throw aggregatePropagatingR7Close(primary, cleanup, `Run ${id} abort failed.`);
+      }
     };
     const admitCandidateIndexOrCleanup = (logicalSize) => {
       try {
-        refreshInventory();
+        ensureInventoryCurrent(`run ${id} index admission`, true);
         return admitCandidateIndex(logicalSize, inventory, limits, candidateReservation.baseline);
       } catch (primary) {
         state = 'failed';
         const cleanup = [];
-        try { abort(); } catch (error) { cleanup.push(error); }
+        try { abortOwned(); } catch (error) { cleanup.push(error); }
         const failure = aggregatePropagatingR7Close(primary, cleanup, `Run ${id} index admission failed.`);
         throw failure;
       }
@@ -2588,14 +3104,14 @@ export function createResumableEndgameDiskFrontierStore(options) {
         pendingIndexDescriptor = descriptorTracker.open(indexPartPath, 'wx', 0o600, 'index-writer');
         openedIndexPath = true;
         const indexOwned = authenticateOpenedOwnedFile(pendingIndexDescriptor, indexPartPath);
-        registerOwnedFile(indexPartPath, indexOwned, true);
-        ownedPaths.add(indexPartPath);
+        registerOwnedFile(indexPartPath, indexOwned, true, () => ownedPaths.add(indexPartPath));
         writeAllProofBytes(fs, pendingIndexDescriptor, indexBytes);
+        growOwnedFile(indexPartPath, indexBytes.length);
         fs.fsyncSync(pendingIndexDescriptor);
         closePendingIndex();
         return indexOwned;
       } catch (primary) {
-        if (openedIndexPath) latchBlocked(primary);
+        if (openedIndexPath || primary?.code === 'EEXIST') latchBlocked(primary);
         throw primary;
       }
     };
@@ -2610,7 +3126,6 @@ export function createResumableEndgameDiskFrontierStore(options) {
       const layout = admitCandidateIndexOrCleanup(logicalSize);
       const indexPartPath = path.join(stagePath, `${id}.idx.part`);
       openOwnedIndexPart(indexPartPath, Buffer.alloc(layout.indexBytes));
-      refreshInventory();
       return layout;
     };
     const writer = Object.freeze({
@@ -2618,10 +3133,10 @@ export function createResumableEndgameDiskFrontierStore(options) {
         if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
         if (state !== 'open') throw frontierError(`run writer ${id} is not open`);
         const encoded = encodeRecord(key, previous);
-        if (workingRunBytes + encoded.length > limits.uncommittedWorkingRunBytes) {
+        if (inventory.uncommittedWorkingRunBytes + encoded.length > limits.uncommittedWorkingRunBytes) {
           throw frontierError('uncommitted working run bytes exceed the limit');
         }
-        if (physicalRunBytes + encoded.length > limits.recognizedPhysicalRunBytes) {
+        if (inventory.recognizedPhysicalRunBytes + encoded.length > limits.recognizedPhysicalRunBytes) {
           throw frontierError('recognized physical run bytes exceed the limit');
         }
         if (size > 0 && size % R7_INDEX_STRIDE === 0) offsets.push(dataBytes);
@@ -2632,6 +3147,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
             if (!Number.isInteger(count) || count <= 0 || count > encoded.length - written) throw frontierError('run writer returned an invalid count');
             written += count;
           }
+          growOwnedFile(filePath, encoded.length);
         } catch (error) {
           state = 'failed';
           latchBlocked(error);
@@ -2639,14 +3155,13 @@ export function createResumableEndgameDiskFrontierStore(options) {
         }
         size += 1;
         dataBytes += encoded.length;
-        workingRunBytes += encoded.length;
-        physicalRunBytes += encoded.length;
         if (first === null) first = key;
         previous = key;
       },
       finish() {
         if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
         if (state !== 'open') throw frontierError(`run writer ${id} cannot finish from ${state}`);
+        ensureInventoryCurrent(`run ${id} finish`, true);
         let inspected;
         try {
           fs.fsyncSync(descriptor);
@@ -2683,10 +3198,8 @@ export function createResumableEndgameDiskFrontierStore(options) {
             const linkedFinal = proofFileIdentity(linkedFinalStats);
             if (!sameProofFileIdentity(linkedPart, linkedFinal)) throw frontierError('run hard-link aliases disagree');
             updateOwnedFile(filePath, linkedPart, true);
-            registerOwnedFile(runFinalPath, linkedFinal, true);
-            ownedPaths.add(runFinalPath);
-            unlinkOwnedFile(filePath, linkedPart);
-            ownedPaths.delete(filePath);
+            registerOwnedFile(runFinalPath, linkedFinal, true, () => ownedPaths.add(runFinalPath));
+            unlinkOwnedFile(filePath, linkedPart, () => ownedPaths.delete(filePath));
             try { fs.lstatSync(filePath); throw frontierError('run part survived alias contraction'); }
             catch (error) { if (!isMissing(error)) throw error; }
             const finalRun = inspectProofRunFile(
@@ -2712,10 +3225,8 @@ export function createResumableEndgameDiskFrontierStore(options) {
             if (!linkedIndexPart.bytes.equals(indexBytes) || !linkedIndexFinal.bytes.equals(indexBytes)
               || !sameProofFileIdentity(linkedIndexPart.identity, linkedIndexFinal.identity)) throw frontierError('index hard-link aliases disagree');
             updateOwnedFile(indexPartPath, linkedIndexPart.identity, true);
-            registerOwnedFile(indexFinalPath, linkedIndexFinal.identity, true);
-            ownedPaths.add(indexFinalPath);
-            unlinkOwnedFile(indexPartPath, linkedIndexPart.identity);
-            ownedPaths.delete(indexPartPath);
+            registerOwnedFile(indexFinalPath, linkedIndexFinal.identity, true, () => ownedPaths.add(indexFinalPath));
+            unlinkOwnedFile(indexPartPath, linkedIndexPart.identity, () => ownedPaths.delete(indexPartPath));
             try { fs.lstatSync(indexPartPath); throw frontierError('index part survived alias contraction'); }
             catch (error) { if (!isMissing(error)) throw error; }
             const finalIndex = readBoundedProofFile(
@@ -2731,7 +3242,6 @@ export function createResumableEndgameDiskFrontierStore(options) {
             state = 'finished';
             R7_OWNED_CANDIDATE_INDEX_PROBES.delete(writer);
             writers.delete(id);
-            refreshInventory();
             const descriptorRecord = Object.freeze({
               id, size, dataFile: `${id}.run`, dataBytes, dataSha256: finalRun.dataSha256,
               indexFile: `${id}.idx`, indexBytes: finalIndex.bytes.length,
@@ -2752,17 +3262,18 @@ export function createResumableEndgameDiskFrontierStore(options) {
         state = 'finished';
         R7_OWNED_CANDIDATE_INDEX_PROBES.delete(writer);
         writers.delete(id);
-        refreshInventory();
         return makeWorkingRun(Object.freeze({ id, size, filePath, offsets: Object.freeze(offsets), identity: inspected.identity }));
       },
       abort,
     });
     R7_OWNED_CANDIDATE_INDEX_PROBES.set(writer, probeOwnedCandidateIndex);
-    writers.set(id, writer);
-    refreshInventory();
+    writers.set(id, Object.freeze({ writer, abortOwned }));
     return writer;
   };
   const diagnostics = () => {
+    if (!invalidated && !disposed && !inventoryInvalid) {
+      try { ensureInventoryCurrent('diagnostics'); } catch { /* Diagnostics reports the fail-closed latch below. */ }
+    }
     const completeResidue = blockedReason === null
       ? []
       : ['.', ...inventory.names.filter((name) => name !== 'owner.json')];
@@ -2780,6 +3291,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
   };
   const loadCheckpoint = () => {
     requireLive();
+    ensureInventoryCurrent('checkpoint load');
     if (viewOutstanding) throw frontierError('a checkpoint view is already outstanding');
     viewOutstanding = true;
     return Object.freeze({ checkpoint: null, tip: null, diagnostics: diagnostics(), advanceAllowed: blockedReason === null });
@@ -2787,22 +3299,27 @@ export function createResumableEndgameDiskFrontierStore(options) {
   const suspend = () => {
     if (!invalidated) {
       suspendCloseFailed = false;
+      try { ensureInventoryCurrent('suspend'); } catch { /* Suspend still owns bounded cleanup. */ }
       const pendingCloseFailures = descriptorTracker.drain();
       if (pendingCloseFailures.length > 0) suspendCloseFailed = true;
+      for (const error of cleanupOrphanOwnedPaths()) {
+        if (error?.r7CloseFailed === true) suspendCloseFailed = true;
+        recordCleanupError(error);
+      }
       for (const reader of [...activeReaders]) {
         try { reader.return(); } catch (error) {
           if (error?.r7CloseFailed === true) suspendCloseFailed = true;
           recordCleanupError(error);
         }
       }
-      for (const writer of [...writers.values()]) {
-        try { writer.abort(); } catch (error) {
+      for (const { abortOwned } of [...writers.values()]) {
+        try { abortOwned(); } catch (error) {
           if (error?.r7CloseFailed === true) suspendCloseFailed = true;
           recordCleanupError(error);
         }
       }
-      for (const { run } of [...runs.values()]) {
-        try { run.dispose(); } catch (error) {
+      for (const { disposeOwned } of [...runs.values()]) {
+        try { disposeOwned(); } catch (error) {
           if (error?.r7CloseFailed === true) suspendCloseFailed = true;
           recordCleanupError(error);
         }
@@ -2815,27 +3332,82 @@ export function createResumableEndgameDiskFrontierStore(options) {
   };
   const dispose = () => {
     if (disposed) return;
-    for (const writer of [...writers.values()]) writer.abort();
-    for (const { run } of [...runs.values()]) run.dispose();
-    const current = scanResumableInventory(fs, stagePath, limits);
-    if (current.names.some((name) => {
-      const entry = current.entries.get(name);
-      const authorized = teardownAuthorized.get(entry.filePath);
-      return authorized === undefined || !sameProofFileIdentity(entry.identity, authorized);
-    })) {
-      throw frontierError('refusing final teardown after stage inventory drift');
+    let primary = null;
+    if (!invalidated) {
+      try { ensureInventoryCurrent('Store disposal', true); } catch (error) { primary = error; }
     }
-    for (const name of [...current.names].reverse()) {
-      const entry = current.entries.get(name);
-      unlinkAuthorizedTeardownFile(entry.filePath, entry.identity);
+    const cleanup = [];
+    let rootIsOwned = false;
+    try {
+      assertResumableStageRootIdentity(resumableStageIdentity(fs, stagePath), stageRootIdentity);
+      rootIsOwned = true;
+    } catch (error) {
+      cleanup.push(error);
     }
-    fs.rmdirSync(stagePath);
-    inventory = Object.freeze({ ...inventory, names: Object.freeze([]), entries: new Map() });
-    disposed = true;
-    invalidated = true;
-    viewOutstanding = false;
+    if (rootIsOwned) {
+      if (!invalidated) cleanup.push(...descriptorTracker.drain());
+      else cleanup.push(...descriptorTracker.drainPhase('owner-final-teardown-readback'));
+      cleanup.push(...cleanupOrphanOwnedPaths());
+      for (const { abortOwned } of [...writers.values()]) {
+        try { abortOwned(); } catch (error) { cleanup.push(error); }
+      }
+      for (const { disposeOwned } of [...runs.values()]) {
+        try { disposeOwned(); } catch (error) { cleanup.push(error); }
+      }
+      try { refreshPendingAuthorizedHardLinkAliases(); } catch (error) { cleanup.push(error); }
+    }
+    if (rootIsOwned && cleanup.length === 0) {
+      try {
+        const currentResult = scanObservedResumableInventory(fs, stagePath, limits, stageRootIdentity);
+        const current = currentResult.inventory;
+        const exactAuthorizedInventory = current.namespaceEntries === teardownAuthorized.size
+          && current.names.every((name) => {
+            const entry = current.entries.get(name);
+            const authorized = teardownAuthorized.get(entry.filePath);
+            return authorized !== undefined && sameProofFileIdentity(entry.identity, authorized);
+          })
+          && [...teardownAuthorized].every(([filePath, authorized]) => {
+            const entry = current.entries.get(path.basename(filePath));
+            return entry !== undefined && entry.filePath === filePath
+              && sameProofFileIdentity(entry.identity, authorized);
+          });
+        if (!exactAuthorizedInventory) {
+          throw frontierError('refusing final teardown after stage inventory drift');
+        }
+        const currentOwner = current.entries.get('owner.json');
+        if (currentOwner !== undefined) {
+          const verifiedOwner = readBoundedProofFile(
+            fs, currentOwner.filePath, limits.ownerOrIndexBytes, descriptorTracker, 'owner-final-teardown-readback',
+          );
+          if (!sameProofFileIdentity(currentOwner.identity, verifiedOwner.identity)
+            || !verifiedOwner.bytes.equals(ownerBytes)) {
+            throw frontierError('refusing final teardown after owner byte drift');
+          }
+        }
+        inventoryLedger.replace(current);
+        stageIdentity = currentResult.stageIdentity;
+        inventoryInvalid = false;
+        for (const name of [...current.names].reverse()) {
+          const entry = current.entries.get(name);
+          const authorizedIdentity = teardownAuthorized.get(entry.filePath);
+          if (authorizedIdentity === undefined) {
+            throw frontierError(`missing final teardown authorization for ${name}`);
+          }
+          unlinkAuthorizedTeardownFile(entry.filePath, authorizedIdentity);
+        }
+        fs.rmdirSync(stagePath);
+        disposed = true;
+        invalidated = true;
+        viewOutstanding = false;
+      } catch (error) {
+        cleanup.push(error);
+      }
+    }
+    if (primary !== null || cleanup.length > 0) {
+      throw aggregatePropagatingR7Close(primary, cleanup, 'Resumable Store disposal failed.');
+    }
   };
-  return Object.freeze({
+  const store = Object.freeze({
     createRun,
     diagnostics,
     dispose,
@@ -2844,4 +3416,6 @@ export function createResumableEndgameDiskFrontierStore(options) {
     releaseCheckpointRun() { requireLive(); throw frontierError('no committed run is loaded'); },
     suspend,
   });
+  R7_AUTHORIZATION_BUCKET_VISIT_PROBES.set(store, () => authorizationBucketVisits);
+  return store;
 }

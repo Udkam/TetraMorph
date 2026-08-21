@@ -134,6 +134,24 @@ function trackedResumableFs(events) {
   };
 }
 
+function countedResumableInventoryFs() {
+  const counts = { fstatSync: 0, lstatSync: 0, readdirSync: 0, realpathSync: 0 };
+  const seam = {};
+  for (const operation of Object.keys(counts)) {
+    seam[operation] = (...args) => {
+      counts[operation] += 1;
+      return fs[operation](...args);
+    };
+  }
+  return {
+    seam,
+    reset() {
+      for (const operation of Object.keys(counts)) counts[operation] = 0;
+    },
+    snapshot() { return { ...counts }; },
+  };
+}
+
 function closeFailureResumableFs(events) {
   const descriptors = new Map();
   let fault = null;
@@ -1033,11 +1051,24 @@ describe('R7 resumable disk frontier primitives', () => {
   it('publishes owner by no-replace link and resumes it without any write authority', () => {
     const { parent, stage } = temporaryStage('r7-owner');
     const events = [];
+    let denyWrites = false;
+    let readdirCalls = 0;
+    const denyWrite = (operation) => {
+      if (denyWrites) throw new Error(`resume attempted ${operation}`);
+    };
     const seam = {
-      writeSync(...args) { events.push('write'); return fs.writeSync(...args); },
-      fsyncSync(...args) { events.push('fsync'); return fs.fsyncSync(...args); },
-      linkSync(...args) { events.push('link'); return fs.linkSync(...args); },
-      unlinkSync(...args) { events.push('unlink'); return fs.unlinkSync(...args); },
+      openSync(filePath, flags, ...args) {
+        if (denyWrites && flags !== 'r') throw new Error(`resume attempted write-capable open ${String(flags)}`);
+        return fs.openSync(filePath, flags, ...args);
+      },
+      mkdirSync(...args) { denyWrite('mkdir'); return fs.mkdirSync(...args); },
+      rmdirSync(...args) { denyWrite('rmdir'); return fs.rmdirSync(...args); },
+      writeSync(...args) { denyWrite('write'); events.push('write'); return fs.writeSync(...args); },
+      fsyncSync(...args) { denyWrite('fsync'); events.push('fsync'); return fs.fsyncSync(...args); },
+      linkSync(...args) { denyWrite('link'); events.push('link'); return fs.linkSync(...args); },
+      unlinkSync(...args) { denyWrite('unlink'); events.push('unlink'); return fs.unlinkSync(...args); },
+      utimesSync(...args) { denyWrite('utimes'); events.push('utimes'); return fs.utimesSync(...args); },
+      readdirSync(...args) { readdirCalls += 1; return fs.readdirSync(...args); },
     };
     const created = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam });
     expect(fs.readdirSync(stage)).toEqual(['owner.json']);
@@ -1045,11 +1076,16 @@ describe('R7 resumable disk frontier primitives', () => {
     created.suspend();
     expect(events).toEqual(expect.arrayContaining(['write', 'fsync', 'link', 'unlink']));
     events.length = 0;
+    readdirCalls = 0;
+    denyWrites = true;
     const resumed = createResumableEndgameDiskFrontierStore({ stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: null, fs: seam });
+    expect(readdirCalls).toBe(1);
     expect(resumed.loadCheckpoint().advanceAllowed).toBe(true);
     resumed.suspend();
+    expect(readdirCalls).toBe(1);
     expect(events).toEqual([]);
-    resumed.dispose();
+    denyWrites = false;
+    created.dispose();
     releaseParent(parent, stage);
   });
 
@@ -1083,6 +1119,147 @@ describe('R7 resumable disk frontier primitives', () => {
     })).toThrow('two-alias admission');
     expect(opened).toBe(0);
     fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('enforces the shared auxiliary budget at owner publication and resumable scan boundaries', () => {
+    const ownerBytes = Buffer.byteLength(`${testing.canonicalJson({
+      schema: 't37-f4e-r7-owner-v1', ownerId: 'owner-A',
+    })}\n`);
+
+    const equality = temporaryStage('r7-owner-aux-equality');
+    const equalityStore = createResumableEndgameDiskFrontierStore({
+      stagePath: equality.stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      limits: { auxiliaryBytes: ownerBytes * 2 },
+    });
+    equalityStore.dispose();
+    releaseParent(equality.parent, equality.stage);
+
+    const rejected = temporaryStage('r7-owner-aux-rejected');
+    let rejectedOpens = 0;
+    expect(() => createResumableEndgameDiskFrontierStore({
+      stagePath: rejected.stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      limits: { auxiliaryBytes: ownerBytes * 2 - 1 },
+      fs: { openSync(...args) { rejectedOpens += 1; return fs.openSync(...args); } },
+    })).toThrow('owner two-alias admission');
+    expect(rejectedOpens).toBe(0);
+    expect(fs.readdirSync(rejected.stage)).toEqual([]);
+    fs.rmdirSync(rejected.stage);
+    releaseParent(rejected.parent, rejected.stage);
+
+    const scanned = temporaryStage('r7-owner-aux-scan');
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: scanned.stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.suspend();
+    const ownerPath = path.join(scanned.stage, 'owner.json');
+    const ownerPartPath = path.join(scanned.stage, 'owner.json.part');
+    fs.linkSync(ownerPath, ownerPartPath);
+    const exactResume = createResumableEndgameDiskFrontierStore({
+      stagePath: scanned.stage,
+      mode: 'resume',
+      ownerId: 'owner-A',
+      expectedTip: null,
+      limits: { auxiliaryBytes: ownerBytes * 2 },
+    });
+    expect(exactResume.loadCheckpoint().advanceAllowed).toBe(false);
+    exactResume.suspend();
+    expect(() => createResumableEndgameDiskFrontierStore({
+      stagePath: scanned.stage,
+      mode: 'resume',
+      ownerId: 'owner-A',
+      expectedTip: null,
+      limits: { auxiliaryBytes: ownerBytes * 2 - 1 },
+    })).toThrow('auxiliary bytes exceed the limit');
+    expect(() => exactResume.dispose()).not.toThrow();
+    expect(fs.existsSync(ownerPartPath)).toBe(false);
+    expect(fs.existsSync(ownerPath)).toBe(false);
+    expect(fs.existsSync(scanned.stage)).toBe(false);
+    releaseParent(scanned.parent, scanned.stage);
+  });
+
+  it('refreshes a surviving owner hard-link before a failed mutation stamp and safely retries teardown', () => {
+    const { parent, stage } = temporaryStage('r7-owner-alias-teardown-retry');
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.suspend();
+    const ownerPath = path.join(stage, 'owner.json');
+    const ownerPartPath = path.join(stage, 'owner.json.part');
+    fs.linkSync(ownerPath, ownerPartPath);
+    let failNextUtimes = false;
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'resume',
+      ownerId: 'owner-A',
+      expectedTip: null,
+      fs: {
+        utimesSync(...args) {
+          if (failNextUtimes) {
+            failNextUtimes = false;
+            const error = new Error('injected owner-alias teardown utimes fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.utimesSync(...args);
+        },
+      },
+    });
+    expect(resumed.loadCheckpoint().advanceAllowed).toBe(false);
+    resumed.suspend();
+    failNextUtimes = true;
+
+    expect(() => resumed.dispose()).toThrow('owner-alias teardown utimes fault');
+    expect(fs.existsSync(ownerPartPath)).toBe(false);
+    expect(fs.existsSync(ownerPath)).toBe(true);
+    expect(() => resumed.dispose()).not.toThrow();
+    expect(fs.existsSync(stage)).toBe(false);
+    releaseParent(parent, stage);
+  });
+
+  it('retries a pending owner hard-link refresh after a one-shot lstat fault', () => {
+    const { parent, stage } = temporaryStage('r7-owner-alias-refresh-retry');
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.suspend();
+    const ownerPath = path.join(stage, 'owner.json');
+    const ownerPartPath = path.join(stage, 'owner.json.part');
+    fs.linkSync(ownerPath, ownerPartPath);
+    let failOwnerRefreshLstat = false;
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'resume',
+      ownerId: 'owner-A',
+      expectedTip: null,
+      fs: {
+        unlinkSync(filePath) {
+          const result = fs.unlinkSync(filePath);
+          if (String(filePath) === ownerPartPath) failOwnerRefreshLstat = true;
+          return result;
+        },
+        lstatSync(filePath, ...args) {
+          if (failOwnerRefreshLstat && String(filePath) === ownerPath) {
+            failOwnerRefreshLstat = false;
+            const error = new Error('injected owner-alias refresh lstat fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.lstatSync(filePath, ...args);
+        },
+      },
+    });
+    resumed.suspend();
+
+    expect(() => resumed.dispose()).toThrow('owner-alias refresh lstat fault');
+    expect(fs.existsSync(ownerPartPath)).toBe(false);
+    expect(fs.existsSync(ownerPath)).toBe(true);
+    expect(() => resumed.dispose()).not.toThrow();
+    expect(fs.existsSync(stage)).toBe(false);
     releaseParent(parent, stage);
   });
 
@@ -1201,6 +1378,23 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(events.some((event) => event.includes('.run.part'))).toBe(false);
     store.dispose();
     releaseParent(parent, stage);
+
+    const equality = temporaryStage('r7-generation-names-equality');
+    const equalityStore = createResumableEndgameDiskFrontierStore({
+      stagePath: equality.stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      limits: { maximumNamespaceEntries: 5 },
+    });
+    const equalityWriter = equalityStore.createRun('r7-f-d00000-g00000');
+    equalityWriter.write('A');
+    const equalityRun = equalityWriter.finish();
+    expect(fs.readdirSync(equality.stage).sort()).toEqual([
+      'owner.json', 'r7-f-d00000-g00000.idx', 'r7-f-d00000-g00000.run',
+    ].sort());
+    equalityRun.dispose();
+    equalityStore.dispose();
+    releaseParent(equality.parent, equality.stage);
   });
 
   it('rejects a structurally valid index whose intermediate offset differs from admitted bytes', () => {
@@ -1311,7 +1505,7 @@ describe('R7 resumable disk frontier primitives', () => {
     const foreignRunBytes = Buffer.from('FOREIGN-RUN\n', 'ascii');
     fs.writeFileSync(foreignRun, foreignRunBytes);
     const foreignRunIdentity = fs.lstatSync(foreignRun, { bigint: true });
-    expect(() => runStore.createRun('r7-f-d00000-g00000')).toThrow(/EEXIST|exist/u);
+    expect(() => runStore.createRun('r7-f-d00000-g00000')).toThrow('external inventory drift');
     runStore.suspend();
     const preservedRunIdentity = fs.lstatSync(foreignRun, { bigint: true });
     expect(fs.readFileSync(foreignRun)).toEqual(foreignRunBytes);
@@ -1334,7 +1528,7 @@ describe('R7 resumable disk frontier primitives', () => {
     const foreignIndexBytes = Buffer.from('FOREIGN-INDEX', 'ascii');
     fs.writeFileSync(foreignIndex, foreignIndexBytes);
     const foreignIndexIdentity = fs.lstatSync(foreignIndex, { bigint: true });
-    expect(() => indexWriter.finish()).toThrow(/EEXIST|exist/u);
+    expect(() => indexWriter.finish()).toThrow('external inventory drift');
     expect(indexStore.loadCheckpoint().advanceAllowed).toBe(false);
     indexStore.suspend();
     const preservedIndexIdentity = fs.lstatSync(foreignIndex, { bigint: true });
@@ -1454,7 +1648,8 @@ describe('R7 resumable disk frontier primitives', () => {
     const beforeRejectedWrites = { openCalls, writeCalls };
     expect(() => writer.write('A')).toThrow('precommit-owned-residue');
     expect(() => store.createRun('r7-f-d00000-g00001')).toThrow('precommit-owned-residue');
-    expect({ openCalls, writeCalls }).toEqual(beforeRejectedWrites);
+    expect(writeCalls).toBe(beforeRejectedWrites.writeCalls);
+    expect(openCalls).toBe(beforeRejectedWrites.openCalls + 1);
     expect(fs.readdirSync(stage)).toEqual(['owner.json', 'r7-f-d00000-g00000.run.part']);
     const suspended = store.suspend();
     expect(suspended.diagnostics.cleanupErrors.join('\n')).toContain('owned run cleanup fault');
@@ -1543,7 +1738,7 @@ describe('R7 resumable disk frontier primitives', () => {
     });
     const writer = store.createRun('r7-f-d00000-g00000');
     writer.write('A');
-    expect(() => writer.finish()).toThrow('index final identity drift after alias contraction');
+    expect(() => writer.finish()).toThrow('hard-link teardown identity drift');
     expect([String(replacementIdentity.dev), String(replacementIdentity.ino)])
       .not.toEqual([String(linkedIdentity.dev), String(linkedIdentity.ino)]);
     expect(store.loadCheckpoint().advanceAllowed).toBe(false);
@@ -1575,6 +1770,48 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(fs.readdirSync(stage)).toEqual(['owner.json']);
     store.dispose();
     releaseParent(parent, stage);
+  });
+
+  it('admits the incremental owner/index ledger at auxiliary equality and rejects one byte over pre-open', () => {
+    const ownerBytes = Buffer.byteLength(`${testing.canonicalJson({
+      schema: 't37-f4e-r7-owner-v1', ownerId: 'owner-A',
+    })}\n`);
+    const indexBytes = testing.indexLayout(1).indexBytes;
+    const exactAuxiliaryBytes = ownerBytes + 2 * indexBytes;
+
+    const equality = temporaryStage('r7-index-aux-equality');
+    const equalityStore = createResumableEndgameDiskFrontierStore({
+      stagePath: equality.stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      limits: { auxiliaryBytes: exactAuxiliaryBytes },
+    });
+    const equalityWriter = equalityStore.createRun('r7-f-d00000-g00000');
+    equalityWriter.write('A');
+    const equalityRun = equalityWriter.finish();
+    equalityRun.dispose();
+    equalityStore.dispose();
+    releaseParent(equality.parent, equality.stage);
+
+    const rejected = temporaryStage('r7-index-aux-rejected');
+    const events = [];
+    const tracked = trackedResumableFs(events);
+    const rejectedStore = createResumableEndgameDiskFrontierStore({
+      stagePath: rejected.stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: tracked.seam,
+      limits: { auxiliaryBytes: exactAuxiliaryBytes - 1 },
+    });
+    events.length = 0;
+    const rejectedWriter = rejectedStore.createRun('r7-f-d00000-g00000');
+    rejectedWriter.write('A');
+    expect(() => rejectedWriter.finish()).toThrow('run index two-alias bytes exceed the auxiliary limit');
+    expect(events.some((event) => event.includes('.idx'))).toBe(false);
+    expect(events.some((event) => event.startsWith('link:') && event.includes('.run'))).toBe(false);
+    expect(fs.readdirSync(rejected.stage)).toEqual(['owner.json']);
+    rejectedStore.dispose();
+    releaseParent(rejected.parent, rejected.stage);
   });
 
   it('blocks before every index path when run-part alias contraction fails', () => {
@@ -1739,6 +1976,1032 @@ describe('R7 resumable disk frontier primitives', () => {
     expect(tracked.openHandles()).toBe(0);
     expect(events.filter((event) => event === 'close:owner.json:r:ok')).toHaveLength(1);
     ownerStore.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('keeps large same-Store chunk and run batches on a constant-scan incremental inventory ledger', () => {
+    const { parent, stage } = temporaryStage('r7-incremental-ledger');
+    const counted = countedResumableInventoryFs();
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: counted.seam,
+    });
+    expect(counted.snapshot().readdirSync).toBe(1);
+    const authorizationBucketBaseline = testing.authorizationBucketVisits(store);
+    counted.reset();
+
+    const totalRuns = 128;
+    const runs = [];
+    const largeWriter = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    const beforeChunks = counted.snapshot();
+    for (let index = 0; index < 4_096; index += 1) {
+      largeWriter.write(`K${String(index).padStart(5, '0')}`);
+    }
+    expect(counted.snapshot()).toEqual(beforeChunks);
+    runs.push(largeWriter.finish());
+
+    for (let index = 1; index < totalRuns; index += 1) {
+      const writer = store.createRun(`r7w-l-g00000-d00000-p${String(index).padStart(4, '0')}-h0000`);
+      writer.write(`R${String(index).padStart(4, '0')}`);
+      runs.push(writer.finish());
+    }
+    expect(store.diagnostics().activeRuns).toHaveLength(totalRuns);
+    const live = counted.snapshot();
+    expect(live.readdirSync).toBe(0);
+    expect(live.lstatSync).toBeLessThanOrEqual(totalRuns * 8 + 16);
+    expect(live.fstatSync).toBeLessThanOrEqual(totalRuns * 7 + 16);
+    expect(live.realpathSync).toBeLessThanOrEqual(totalRuns * 5 + 16);
+
+    expect(store.suspend().closeFailed).toBe(false);
+    const suspended = counted.snapshot();
+    expect(suspended.readdirSync).toBe(0);
+    expect(suspended.lstatSync).toBeLessThanOrEqual(totalRuns * 14 + 32);
+    expect(suspended.fstatSync).toBeLessThanOrEqual(totalRuns * 7 + 32);
+    expect(suspended.realpathSync).toBeLessThanOrEqual(totalRuns * 7 + 24);
+    expect(testing.authorizationBucketVisits(store) - authorizationBucketBaseline).toBe(totalRuns);
+    store.dispose();
+    expect(counted.snapshot().readdirSync).toBe(1);
+    expect(testing.authorizationBucketVisits(store) - authorizationBucketBaseline).toBe(totalRuns + 1);
+    releaseParent(parent, stage);
+  }, 30_000);
+
+  it('deduplicates a committed run hard-link alias while enforcing exact physical byte limits', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-hardlink');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      limits: { recognizedPhysicalRunBytes: 2, uncommittedWorkingRunBytes: 2 },
+    });
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const run = writer.finish();
+    expect(run.size).toBe(1);
+    expect(fs.readdirSync(stage).sort()).toEqual([
+      'owner.json', 'r7-f-d00000-g00000.idx', 'r7-f-d00000-g00000.run',
+    ].sort());
+    run.dispose();
+    const reusedWriter = store.createRun('r7-f-d00000-g00000');
+    reusedWriter.write('B');
+    const reusedRun = reusedWriter.finish();
+    expect([...reusedRun.values()]).toEqual(['B']);
+    reusedRun.dispose();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rescans one external namespace drift and does not rescan again before final teardown', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-external');
+    const counted = countedResumableInventoryFs();
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: counted.seam,
+    });
+    counted.reset();
+    const foreignPath = path.join(stage, 'foreign.tmp');
+    const foreignBytes = Buffer.from('FOREIGN\n', 'ascii');
+    fs.writeFileSync(foreignPath, foreignBytes);
+
+    expect(() => store.createRun('r7w-l-g00000-d00000-p0000-h0000')).toThrow('external inventory drift');
+    expect(counted.snapshot().readdirSync).toBe(1);
+    expect(store.loadCheckpoint().advanceAllowed).toBe(false);
+    expect(store.diagnostics().residue).toContain('foreign.tmp');
+    expect(store.suspend().diagnostics.residue).toContain('foreign.tmp');
+    expect(counted.snapshot().readdirSync).toBe(1);
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+
+    fs.unlinkSync(foreignPath);
+    store.dispose();
+    expect(counted.snapshot().readdirSync).toBe(2);
+    releaseParent(parent, stage);
+  });
+
+  it('preflights public abort, closes exact-owned state, and preserves the foreign drift evidence', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-abort-drift');
+    const events = [];
+    const tracked = trackedResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    expect(tracked.openHandles()).toBe(1);
+    const foreignPath = path.join(stage, 'foreign.tmp');
+    const foreignBytes = Buffer.from('FOREIGN-ABORT\n', 'ascii');
+    fs.writeFileSync(foreignPath, foreignBytes);
+
+    expect(() => writer.abort()).toThrow('external inventory drift');
+    expect(tracked.openHandles()).toBe(0);
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    expect(store.loadCheckpoint().advanceAllowed).toBe(false);
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+    expect(store.suspend().closeFailed).toBe(false);
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+
+    fs.unlinkSync(foreignPath);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('propagates a public-abort close marker while suspend retries exact-owned cleanup', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-abort-close-drift');
+    const events = [];
+    const tracked = closeFailureResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    const foreignPath = path.join(stage, 'foreign.tmp');
+    const foreignBytes = Buffer.from('FOREIGN-ABORT-CLOSE\n', 'ascii');
+    fs.writeFileSync(foreignPath, foreignBytes);
+    tracked.arm({ suffix: '.run.part', flags: 'wx', failures: 1, label: 'public abort writer' });
+
+    let failure;
+    try { writer.abort(); } catch (error) { failure = error; }
+    expect(failure?.r7CloseFailed).toBe(true);
+    expect(tracked.openHandles()).toBe(1);
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+    const suspended = store.suspend();
+    expect(suspended.closeFailed).toBe(false);
+    expect(suspended.diagnostics.activeRuns).toEqual([]);
+    expect(tracked.openHandles()).toBe(0);
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+
+    fs.unlinkSync(foreignPath);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rescans foreign drift before abort even when the writer was already blocked', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-blocked-abort-drift');
+    let failWrite = false;
+    let readdirCalls = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        readdirSync(...args) { readdirCalls += 1; return fs.readdirSync(...args); },
+        writeSync(descriptor, bytes, offset, length, position) {
+          if (failWrite) {
+            failWrite = false;
+            fs.writeSync(descriptor, bytes, offset, Math.min(1, length), position);
+            const error = new Error('injected blocked-abort partial write fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.writeSync(descriptor, bytes, offset, length, position);
+        },
+      },
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    readdirCalls = 0;
+    failWrite = true;
+    expect(() => writer.write('A')).toThrow('blocked-abort partial write fault');
+    expect(readdirCalls).toBe(1);
+    const foreignPath = path.join(stage, 'foreign.tmp');
+    const foreignBytes = Buffer.from('FOREIGN-BLOCKED-ABORT\n', 'ascii');
+    fs.writeFileSync(foreignPath, foreignBytes);
+
+    expect(() => writer.abort()).toThrow('external inventory drift');
+    expect(readdirCalls).toBe(2);
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    expect(store.diagnostics().residue).toContain('foreign.tmp');
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+    expect(store.suspend().diagnostics.residue).toContain('foreign.tmp');
+    expect(readdirCalls).toBe(2);
+
+    fs.unlinkSync(foreignPath);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('refuses final teardown when the authorized owner is missing', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-owner-missing');
+    const mutations = [];
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        unlinkSync(...args) { mutations.push('unlink'); return fs.unlinkSync(...args); },
+        utimesSync(...args) { mutations.push('utimes'); return fs.utimesSync(...args); },
+      },
+    });
+    mutations.length = 0;
+    fs.unlinkSync(path.join(stage, 'owner.json'));
+
+    expect(() => store.dispose()).toThrow('external inventory drift');
+    expect(mutations).toEqual([]);
+    expect(fs.existsSync(stage)).toBe(true);
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('pins final teardown to the immutable stage root and preserves both renamed namespaces', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-stage-replacement');
+    const mutations = [];
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        unlinkSync(...args) { mutations.push('unlink'); return fs.unlinkSync(...args); },
+        utimesSync(...args) { mutations.push('utimes'); return fs.utimesSync(...args); },
+      },
+    });
+    mutations.length = 0;
+    const originalStage = `${stage}-original`;
+    fs.renameSync(stage, originalStage);
+    fs.mkdirSync(stage);
+    const replacementPath = path.join(stage, 'replacement.tmp');
+    fs.writeFileSync(replacementPath, 'REPLACEMENT\n', 'ascii');
+
+    expect(() => store.dispose()).toThrow('external inventory drift');
+    expect(store.diagnostics().cleanupErrors.join('\n')).toContain('stage root identity drift');
+    expect(mutations).toEqual([]);
+    expect(fs.readFileSync(replacementPath, 'ascii')).toBe('REPLACEMENT\n');
+    expect(fs.existsSync(path.join(originalStage, 'owner.json'))).toBe(true);
+
+    fs.unlinkSync(replacementPath);
+    fs.rmdirSync(stage);
+    fs.unlinkSync(path.join(originalStage, 'owner.json'));
+    fs.rmdirSync(originalStage);
+    releaseParent(parent, stage);
+  });
+
+  it('latches an exclusive-open race without ever adopting or unlinking the foreign path', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-open-race');
+    const foreignPath = path.join(stage, 'r7w-l-g00000-d00000-p0000-h0000.run.part');
+    const foreignBytes = Buffer.from('FOREIGN-RACE\n', 'ascii');
+    let raceOpen = false;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        openSync(filePath, flags, ...args) {
+          if (raceOpen && String(filePath) === foreignPath && flags === 'wx') {
+            raceOpen = false;
+            fs.writeFileSync(foreignPath, foreignBytes);
+          }
+          return fs.openSync(filePath, flags, ...args);
+        },
+      },
+    });
+    raceOpen = true;
+    expect(() => store.createRun('r7w-l-g00000-d00000-p0000-h0000')).toThrow(/EEXIST|exist/u);
+    expect(store.loadCheckpoint().advanceAllowed).toBe(false);
+    expect(store.suspend().diagnostics.residue).toContain(path.basename(foreignPath));
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+    fs.unlinkSync(foreignPath);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('detects an in-place same-length owner identity drift even when the namespace is unchanged', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-owner-drift');
+    const counted = countedResumableInventoryFs();
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: counted.seam,
+    });
+    counted.reset();
+    const ownerPath = path.join(stage, 'owner.json');
+    const original = fs.readFileSync(ownerPath);
+    const changed = Buffer.from(original.toString('ascii').replace('owner-A', 'owner-B'), 'ascii');
+    expect(changed.length).toBe(original.length);
+    fs.writeFileSync(ownerPath, changed);
+
+    expect(() => store.loadCheckpoint()).toThrow('external inventory drift');
+    expect(counted.snapshot().readdirSync).toBe(1);
+    expect(() => store.dispose()).toThrow('external inventory drift');
+    expect(fs.readFileSync(ownerPath)).toEqual(changed);
+    fs.unlinkSync(ownerPath);
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('rejects changed owner bytes even when the filesystem seam reports the original full identity', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-owner-stale-stat');
+    const ownerPath = path.join(stage, 'owner.json');
+    const descriptors = new Map();
+    let originalOwnerStats = null;
+    let reportStaleOwnerStats = false;
+    let unlinkCalls = 0;
+    const seam = {
+      openSync(filePath, flags, ...args) {
+        const descriptor = fs.openSync(filePath, flags, ...args);
+        descriptors.set(descriptor, String(filePath));
+        return descriptor;
+      },
+      closeSync(descriptor) {
+        const result = fs.closeSync(descriptor);
+        descriptors.delete(descriptor);
+        return result;
+      },
+      lstatSync(filePath, ...args) {
+        if (reportStaleOwnerStats && String(filePath) === ownerPath) return originalOwnerStats;
+        return fs.lstatSync(filePath, ...args);
+      },
+      fstatSync(descriptor, ...args) {
+        if (reportStaleOwnerStats && descriptors.get(descriptor) === ownerPath) return originalOwnerStats;
+        return fs.fstatSync(descriptor, ...args);
+      },
+      unlinkSync(...args) { unlinkCalls += 1; return fs.unlinkSync(...args); },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    unlinkCalls = 0;
+    originalOwnerStats = fs.lstatSync(ownerPath, { bigint: true });
+    const original = fs.readFileSync(ownerPath);
+    const changed = Buffer.from(original.toString('ascii').replace('owner-A', 'owner-B'), 'ascii');
+    expect(changed.length).toBe(original.length);
+    fs.writeFileSync(ownerPath, changed);
+    reportStaleOwnerStats = true;
+
+    expect(() => store.loadCheckpoint()).toThrow('external inventory drift');
+    expect(store.diagnostics().cleanupErrors.join('\n')).toContain('owner bytes drift');
+    expect(descriptors.size).toBe(0);
+    expect(() => store.dispose()).toThrow('external inventory drift');
+    expect(fs.existsSync(stage)).toBe(true);
+    expect(fs.readFileSync(ownerPath)).toEqual(changed);
+    expect(descriptors.size).toBe(0);
+    expect(unlinkCalls).toBe(0);
+    reportStaleOwnerStats = false;
+    fs.unlinkSync(ownerPath);
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('propagates and retains an owner boundary read close marker until suspend retries it', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-owner-boundary-close');
+    const events = [];
+    const tracked = closeFailureResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    tracked.arm({ suffix: 'owner.json', flags: 'r', failures: 1, label: 'owner boundary read' });
+    let failure;
+    try { store.loadCheckpoint(); } catch (error) { failure = error; }
+    expect(failure?.r7CloseFailed).toBe(true);
+    expect(tracked.openHandles()).toBe(1);
+    expect(store.diagnostics().cleanupErrors.join('\n')).toContain('owner boundary read close fault');
+
+    expect(store.suspend().closeFailed).toBe(false);
+    expect(tracked.openHandles()).toBe(0);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('preserves the owner when its final teardown readback close fails', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-owner-final-close');
+    const ownerPath = path.join(stage, 'owner.json');
+    const descriptors = new Map();
+    let armed = false;
+    let ownerReadCloses = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        openSync(filePath, flags, ...args) {
+          const descriptor = fs.openSync(filePath, flags, ...args);
+          descriptors.set(descriptor, { filePath: String(filePath), flags: String(flags) });
+          return descriptor;
+        },
+        closeSync(descriptor) {
+          const record = descriptors.get(descriptor);
+          if (armed && record?.filePath === ownerPath && record.flags === 'r') {
+            ownerReadCloses += 1;
+            if (ownerReadCloses === 1) {
+              const error = new Error('injected owner final teardown close fault');
+              error.code = 'EIO';
+              throw error;
+            }
+          }
+          const result = fs.closeSync(descriptor);
+          descriptors.delete(descriptor);
+          return result;
+        },
+      },
+    });
+    expect(store.suspend().closeFailed).toBe(false);
+    armed = true;
+    let failure;
+    try { store.dispose(); } catch (error) { failure = error; }
+    expect(failure?.r7CloseFailed).toBe(true);
+    expect(fs.existsSync(ownerPath)).toBe(true);
+    expect(fs.existsSync(stage)).toBe(true);
+    expect(descriptors.size).toBe(1);
+
+    expect(() => store.dispose()).not.toThrow();
+    expect(descriptors.size).toBe(0);
+    releaseParent(parent, stage);
+  });
+
+  it('never unlinks through a persistent invalidated Store final-read close failure', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-owner-final-close-persistent');
+    const ownerPath = path.join(stage, 'owner.json');
+    const descriptors = new Map();
+    let failOwnerClose = false;
+    let unlinkCalls = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        openSync(filePath, flags, ...args) {
+          const descriptor = fs.openSync(filePath, flags, ...args);
+          descriptors.set(descriptor, String(filePath));
+          return descriptor;
+        },
+        closeSync(descriptor) {
+          if (failOwnerClose && descriptors.get(descriptor) === ownerPath) {
+            const error = new Error('injected persistent owner final close fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          const result = fs.closeSync(descriptor);
+          descriptors.delete(descriptor);
+          return result;
+        },
+        unlinkSync(...args) { unlinkCalls += 1; return fs.unlinkSync(...args); },
+      },
+    });
+    expect(store.suspend().closeFailed).toBe(false);
+    unlinkCalls = 0;
+    failOwnerClose = true;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      let failure;
+      try { store.dispose(); } catch (error) { failure = error; }
+      expect(failure?.r7CloseFailed).toBe(true);
+      expect(fs.existsSync(ownerPath)).toBe(true);
+      expect(unlinkCalls).toBe(0);
+      expect(descriptors.size).toBe(1);
+    }
+
+    failOwnerClose = false;
+    expect(() => store.dispose()).not.toThrow();
+    expect(descriptors.size).toBe(0);
+    expect(fs.existsSync(stage)).toBe(false);
+    releaseParent(parent, stage);
+  });
+
+  it('invalidates after an ambiguous partial write and rescans exactly once on same-Store recovery', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-fault-reentry');
+    let failWrite = false;
+    let failRescan = false;
+    let readdirCalls = 0;
+    const seam = {
+      readdirSync(...args) {
+        readdirCalls += 1;
+        if (failRescan) {
+          failRescan = false;
+          const error = new Error('injected inventory rescan fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.readdirSync(...args);
+      },
+      writeSync(descriptor, bytes, offset, length, position) {
+        if (failWrite) {
+          failWrite = false;
+          fs.writeSync(descriptor, bytes, offset, Math.min(1, length), position);
+          const error = new Error('injected partial run write fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.writeSync(descriptor, bytes, offset, length, position);
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    readdirCalls = 0;
+    failWrite = true;
+    failRescan = true;
+    expect(() => writer.write('A')).toThrow('partial run write fault');
+    expect(readdirCalls).toBe(1);
+
+    expect(store.loadCheckpoint().advanceAllowed).toBe(false);
+    expect(readdirCalls).toBe(2);
+    expect(store.diagnostics().cleanupErrors.join('\n')).toContain('inventory rescan fault');
+    expect(store.diagnostics().cleanupErrors.join('\n')).toContain('partial run write fault');
+    expect(readdirCalls).toBe(2);
+    expect(store.suspend().closeFailed).toBe(false);
+    expect(readdirCalls).toBe(2);
+    store.dispose();
+    expect(readdirCalls).toBe(3);
+    releaseParent(parent, stage);
+  });
+
+  it('keeps a resumed Store unarmed after its first mutation stamp fails', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-resume-utimes-fault');
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.suspend();
+    let failNextUtimes = true;
+    let utimesCalls = 0;
+    let readdirCalls = 0;
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'resume',
+      ownerId: 'owner-A',
+      expectedTip: null,
+      fs: {
+        readdirSync(...args) { readdirCalls += 1; return fs.readdirSync(...args); },
+        utimesSync(...args) {
+          utimesCalls += 1;
+          if (failNextUtimes) {
+            failNextUtimes = false;
+            const error = new Error('injected first mutation utimes fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.utimesSync(...args);
+        },
+      },
+    });
+    readdirCalls = 0;
+    utimesCalls = 0;
+
+    expect(() => resumed.createRun('r7w-l-g00000-d00000-p0000-h0000'))
+      .toThrow('external inventory drift');
+    expect({ readdirCalls, utimesCalls }).toEqual({ readdirCalls: 1, utimesCalls: 1 });
+    expect(resumed.loadCheckpoint().advanceAllowed).toBe(false);
+    resumed.diagnostics();
+    expect(resumed.suspend().closeFailed).toBe(false);
+    expect({ readdirCalls, utimesCalls }).toEqual({ readdirCalls: 1, utimesCalls: 1 });
+
+    creator.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('bounds persistent inventory rescan failure to one latch attempt and one public recovery', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-terminal-recovery');
+    let failWrite = false;
+    let failReaddir = false;
+    let readdirCalls = 0;
+    let utimesCalls = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        readdirSync(...args) {
+          readdirCalls += 1;
+          if (failReaddir) {
+            const error = new Error('injected persistent inventory rescan fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.readdirSync(...args);
+        },
+        utimesSync(...args) { utimesCalls += 1; return fs.utimesSync(...args); },
+        writeSync(descriptor, bytes, offset, length, position) {
+          if (failWrite) {
+            failWrite = false;
+            fs.writeSync(descriptor, bytes, offset, Math.min(1, length), position);
+            const error = new Error('injected terminal partial write fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.writeSync(descriptor, bytes, offset, length, position);
+        },
+      },
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    readdirCalls = 0;
+    utimesCalls = 0;
+    failWrite = true;
+    failReaddir = true;
+
+    expect(() => writer.write('A')).toThrow('terminal partial write fault');
+    expect(readdirCalls).toBe(1);
+    expect(() => store.loadCheckpoint()).toThrow('persistent inventory rescan fault');
+    expect(readdirCalls).toBe(2);
+    expect(() => store.loadCheckpoint()).toThrow('inventory recovery attempts are exhausted');
+    store.diagnostics();
+    expect(store.suspend().closeFailed).toBe(false);
+    expect({ readdirCalls, utimesCalls }).toEqual({ readdirCalls: 2, utimesCalls: 0 });
+
+    failReaddir = false;
+    store.dispose();
+    expect(readdirCalls).toBe(3);
+    releaseParent(parent, stage);
+  });
+
+  it('suspend exact-cleans a finished run after terminal recovery without touching foreign residue', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-terminal-finished-run');
+    let failReaddir = false;
+    let readdirCalls = 0;
+    let utimesCalls = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        readdirSync(...args) {
+          readdirCalls += 1;
+          if (failReaddir) {
+            const error = new Error('injected finished-run inventory rescan fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.readdirSync(...args);
+        },
+        utimesSync(...args) { utimesCalls += 1; return fs.utimesSync(...args); },
+      },
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    const run = writer.finish();
+    const runPath = path.join(stage, `${run.id}.run.part`);
+    const foreignPath = path.join(stage, 'foreign.tmp');
+    const foreignBytes = Buffer.from('FOREIGN-TERMINAL-RUN\n', 'ascii');
+    fs.writeFileSync(foreignPath, foreignBytes);
+    readdirCalls = 0;
+    utimesCalls = 0;
+    failReaddir = true;
+
+    expect(() => store.loadCheckpoint()).toThrow('external inventory drift');
+    expect(readdirCalls).toBe(1);
+    expect(() => store.loadCheckpoint()).toThrow('finished-run inventory rescan fault');
+    expect(readdirCalls).toBe(2);
+    const suspended = store.suspend();
+    expect(suspended.closeFailed).toBe(false);
+    expect(suspended.diagnostics.activeRuns).toEqual([]);
+    expect({ readdirCalls, utimesCalls }).toEqual({ readdirCalls: 2, utimesCalls: 0 });
+    expect(fs.existsSync(runPath)).toBe(false);
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+
+    failReaddir = false;
+    fs.unlinkSync(foreignPath);
+    store.dispose();
+    expect(readdirCalls).toBe(3);
+    releaseParent(parent, stage);
+  });
+
+  it('direct Store disposal exact-cleans and tears down after terminal recovery while preserving the primary', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-terminal-direct-dispose');
+    let failReaddir = false;
+    let readdirCalls = 0;
+    let utimesCalls = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        readdirSync(...args) {
+          readdirCalls += 1;
+          if (failReaddir) {
+            const error = new Error('injected direct-dispose inventory rescan fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.readdirSync(...args);
+        },
+        utimesSync(...args) { utimesCalls += 1; return fs.utimesSync(...args); },
+      },
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    const run = writer.finish();
+    const runPath = path.join(stage, `${run.id}.run.part`);
+    const foreignPath = path.join(stage, 'foreign.tmp');
+    fs.writeFileSync(foreignPath, 'FOREIGN-DIRECT-DISPOSE\n', 'ascii');
+    readdirCalls = 0;
+    utimesCalls = 0;
+    failReaddir = true;
+
+    expect(() => store.loadCheckpoint()).toThrow('external inventory drift');
+    expect(() => store.loadCheckpoint()).toThrow('direct-dispose inventory rescan fault');
+    expect(readdirCalls).toBe(2);
+    failReaddir = false;
+    fs.unlinkSync(foreignPath);
+    let failure;
+    try { store.dispose(); } catch (error) { failure = error; }
+    expect(failure?.message).toContain('inventory recovery attempts are exhausted');
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    expect(fs.existsSync(runPath)).toBe(false);
+    expect(fs.existsSync(stage)).toBe(false);
+    expect({ readdirCalls, utimesCalls }).toEqual({ readdirCalls: 3, utimesCalls: 0 });
+    expect(() => store.dispose()).not.toThrow();
+    releaseParent(parent, stage);
+  });
+
+  it('direct Store disposal cleans exact-owned runs but retains an unresolved foreign namespace', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-foreign-direct-dispose');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    const run = writer.finish();
+    const runPath = path.join(stage, `${run.id}.run.part`);
+    const ownerPath = path.join(stage, 'owner.json');
+    const foreignPath = path.join(stage, 'foreign.tmp');
+    const foreignBytes = Buffer.from('FOREIGN-DIRECT\n', 'ascii');
+    fs.writeFileSync(foreignPath, foreignBytes);
+
+    expect(() => store.dispose()).toThrow('external inventory drift');
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    expect(fs.existsSync(runPath)).toBe(false);
+    expect(fs.existsSync(ownerPath)).toBe(true);
+    expect(fs.readFileSync(foreignPath)).toEqual(foreignBytes);
+
+    fs.unlinkSync(foreignPath);
+    expect(() => store.dispose()).toThrow('external inventory drift');
+    expect(fs.existsSync(stage)).toBe(false);
+    expect(() => store.dispose()).not.toThrow();
+    releaseParent(parent, stage);
+  });
+
+  for (const failedSuffix of ['.idx', '.run']) {
+    it(`retries only the remaining committed artifact after a one-shot ${failedSuffix} unlink fault`, () => {
+      const { parent, stage } = temporaryStage(`r7-ledger-partial-dispose-${failedSuffix.slice(1)}`);
+      let failNextUnlink = false;
+      const store = createResumableEndgameDiskFrontierStore({
+        stagePath: stage,
+        mode: 'create',
+        ownerId: 'owner-A',
+        fs: {
+          unlinkSync(filePath) {
+            if (failNextUnlink && String(filePath).endsWith(failedSuffix)) {
+              failNextUnlink = false;
+              const error = new Error(`injected ${failedSuffix} partial disposal fault`);
+              error.code = 'EIO';
+              throw error;
+            }
+            return fs.unlinkSync(filePath);
+          },
+        },
+      });
+      const writer = store.createRun('r7-f-d00000-g00000');
+      writer.write('A');
+      const run = writer.finish();
+      const failedPath = path.join(stage, `${run.id}${failedSuffix}`);
+      const releasedSuffix = failedSuffix === '.idx' ? '.run' : '.idx';
+      const releasedPath = path.join(stage, `${run.id}${releasedSuffix}`);
+      failNextUnlink = true;
+
+      expect(() => run.dispose()).toThrow(`injected ${failedSuffix} partial disposal fault`);
+      expect(fs.existsSync(failedPath)).toBe(true);
+      expect(fs.existsSync(releasedPath)).toBe(false);
+      expect(store.diagnostics().activeRuns).toEqual([run.id]);
+      expect(() => run.dispose()).not.toThrow();
+      expect(store.diagnostics().activeRuns).toEqual([]);
+      expect(fs.existsSync(failedPath)).toBe(false);
+      expect(store.suspend().closeFailed).toBe(false);
+      store.dispose();
+      releaseParent(parent, stage);
+    });
+  }
+
+  it('does not strand an open writer after a post-unlink mutation-stamp fault', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-writer-post-unlink-stamp');
+    let failNextUtimes = false;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        utimesSync(...args) {
+          if (failNextUtimes) {
+            failNextUtimes = false;
+            const error = new Error('injected writer post-unlink utimes fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.utimesSync(...args);
+        },
+      },
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    const runPath = path.join(stage, 'r7w-l-g00000-d00000-p0000-h0000.run.part');
+    failNextUtimes = true;
+
+    expect(() => writer.abort()).toThrow('writer post-unlink utimes fault');
+    expect(fs.existsSync(runPath)).toBe(false);
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    expect(store.suspend().diagnostics.activeRuns).toEqual([]);
+    expect(() => writer.abort()).not.toThrow();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('does not strand a finished run after a post-unlink mutation-stamp fault', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-run-post-unlink-stamp');
+    let failNextUtimes = false;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        utimesSync(...args) {
+          if (failNextUtimes) {
+            failNextUtimes = false;
+            const error = new Error('injected run post-unlink utimes fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.utimesSync(...args);
+        },
+      },
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    const run = writer.finish();
+    const runPath = path.join(stage, `${run.id}.run.part`);
+    failNextUtimes = true;
+
+    expect(() => run.dispose()).toThrow('run post-unlink utimes fault');
+    expect(fs.existsSync(runPath)).toBe(false);
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    expect(() => run.dispose()).not.toThrow();
+    expect(store.suspend().diagnostics.activeRuns).toEqual([]);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  for (const { phase, target } of [
+    { phase: 'run-final registration', target: 1 },
+    { phase: 'index-part registration', target: 3 },
+    { phase: 'index-final registration', target: 4 },
+  ]) {
+    it(`keeps ${phase} in exact cleanup membership before its mutation stamp`, () => {
+      const { parent, stage } = temporaryStage(`r7-ledger-${phase.replaceAll(' ', '-')}-stamp`);
+      let armed = false;
+      let finishUtimesCalls = 0;
+      const store = createResumableEndgameDiskFrontierStore({
+        stagePath: stage,
+        mode: 'create',
+        ownerId: 'owner-A',
+        fs: {
+          utimesSync(...args) {
+            if (armed) {
+              finishUtimesCalls += 1;
+              if (finishUtimesCalls === target) {
+                const error = new Error(`injected ${phase} utimes fault`);
+                error.code = 'EIO';
+                throw error;
+              }
+            }
+            return fs.utimesSync(...args);
+          },
+        },
+      });
+      const writer = store.createRun('r7-f-d00000-g00000');
+      writer.write('A');
+      armed = true;
+
+      expect(() => writer.finish()).toThrow(`injected ${phase} utimes fault`);
+      expect(finishUtimesCalls).toBe(target);
+      const suspended = store.suspend();
+      expect(suspended.closeFailed).toBe(false);
+      expect(suspended.diagnostics.activeRuns).toEqual([]);
+      expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+      store.dispose();
+      releaseParent(parent, stage);
+    });
+  }
+
+  for (const injectedFailures of [1, 2]) {
+    it(`cleans an authenticated bootstrap run part after ${injectedFailures} registration stamp fault(s)`, () => {
+    const { parent, stage } = temporaryStage(`r7-ledger-bootstrap-registration-stamp-${injectedFailures}`);
+    let remainingUtimesFailures = 0;
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        utimesSync(...args) {
+          if (remainingUtimesFailures > 0) {
+            remainingUtimesFailures -= 1;
+            const error = new Error('injected bootstrap registration utimes fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.utimesSync(...args);
+        },
+      },
+    });
+    remainingUtimesFailures = injectedFailures;
+
+    expect(() => store.createRun('r7w-l-g00000-d00000-p0000-h0000'))
+      .toThrow('bootstrap registration utimes fault');
+    expect(store.diagnostics().activeRuns).toEqual([]);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    expect(store.suspend().diagnostics.activeRuns).toEqual([]);
+    store.dispose();
+    releaseParent(parent, stage);
+    });
+  }
+
+  it('suspend retries a bootstrap orphan after registration stamp and descriptor close both fail', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-bootstrap-orphan-close');
+    let failNextUtimes = false;
+    let failNextClose = false;
+    const descriptors = new Map();
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      fs: {
+        openSync(filePath, flags, ...args) {
+          const descriptor = fs.openSync(filePath, flags, ...args);
+          descriptors.set(descriptor, String(filePath));
+          return descriptor;
+        },
+        closeSync(descriptor) {
+          if (failNextClose && descriptors.get(descriptor)?.endsWith('.run.part')) {
+            failNextClose = false;
+            const error = new Error('injected bootstrap descriptor close fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          const result = fs.closeSync(descriptor);
+          descriptors.delete(descriptor);
+          return result;
+        },
+        utimesSync(...args) {
+          if (failNextUtimes) {
+            failNextUtimes = false;
+            const error = new Error('injected bootstrap orphan utimes fault');
+            error.code = 'EIO';
+            throw error;
+          }
+          return fs.utimesSync(...args);
+        },
+      },
+    });
+    failNextUtimes = true;
+    failNextClose = true;
+    let failure;
+    try { store.createRun('r7w-l-g00000-d00000-p0000-h0000'); } catch (error) { failure = error; }
+    expect(failure?.r7CloseFailed).toBe(true);
+    expect(fs.readdirSync(stage).sort()).toEqual([
+      'owner.json', 'r7w-l-g00000-d00000-p0000-h0000.run.part',
+    ].sort());
+
+    const suspended = store.suspend();
+    expect(suspended.closeFailed).toBe(false);
+    expect(suspended.diagnostics.activeRuns).toEqual([]);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('direct live Store disposal drains a one-shot pending writer close and converges', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-direct-dispose-close-retry');
+    const events = [];
+    const tracked = closeFailureResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    const writer = store.createRun('r7w-l-g00000-d00000-p0000-h0000');
+    writer.write('A');
+    tracked.arm({ suffix: '.run.part', flags: 'wx', failures: 1, label: 'direct dispose writer' });
+    let abortFailure;
+    try { writer.abort(); } catch (error) { abortFailure = error; }
+    expect(abortFailure?.r7CloseFailed).toBe(true);
+    expect(tracked.openHandles()).toBe(1);
+
+    expect(() => store.dispose()).not.toThrow();
+    expect(tracked.openHandles()).toBe(0);
+    expect(fs.existsSync(stage)).toBe(false);
+    releaseParent(parent, stage);
+  });
+
+  it('direct live Store disposal preserves a path when its pending close still fails', () => {
+    const { parent, stage } = temporaryStage('r7-ledger-direct-dispose-close-persistent');
+    const events = [];
+    const tracked = closeFailureResumableFs(events);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: tracked.seam,
+    });
+    const id = 'r7w-l-g00000-d00000-p0000-h0000';
+    const runPath = path.join(stage, `${id}.run.part`);
+    const writer = store.createRun(id);
+    writer.write('A');
+    tracked.arm({ suffix: '.run.part', flags: 'wx', failures: 3, label: 'persistent direct dispose writer' });
+    let abortFailure;
+    try { writer.abort(); } catch (error) { abortFailure = error; }
+    expect(abortFailure?.r7CloseFailed).toBe(true);
+    events.length = 0;
+    let disposeFailure;
+    try { store.dispose(); } catch (error) { disposeFailure = error; }
+    expect(disposeFailure?.r7CloseFailed).toBe(true);
+    expect(fs.existsSync(runPath)).toBe(true);
+    expect(events.some((event) => event === `unlink:${id}.run.part`)).toBe(false);
+
+    tracked.forceCloseAll();
+    fs.unlinkSync(runPath);
+    fs.unlinkSync(path.join(stage, 'owner.json'));
+    fs.rmdirSync(stage);
     releaseParent(parent, stage);
   });
 });
