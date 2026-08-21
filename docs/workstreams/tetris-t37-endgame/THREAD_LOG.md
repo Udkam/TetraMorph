@@ -928,3 +928,39 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   contract reviews and two independent output audits. Only then may one THREAD_LOG-only
   canonical receipt be committed and reviewed twice. V6 residue remains immutable; retry,
   resume, cleanup, Intro-05 source integration, and successor proof execution stay closed.
+
+### F4E-R6B consumed v6 interruption receipt
+
+- Contract commit `7e4dfae790817918637bd6b3998c5581b3036e79` received two independent
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0` reviews. They accept only the narrow JSON `null`
+  exit-observation branch and confirm one command marker plus zero consumed/preclaim markers.
+- Two later independent read-only output audits each report
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`. Both bind production HEAD `8776bb8`, the exact source and
+  predecessor pins, canonical attempt and run-ID reconstruction, absent candidate/terminal,
+  empty publication residue, the retained frontier identity, and the frozen recovery gate.
+- The retained frontier has exactly `d0005-p0002-g0000.run`, 9,151,727,935 bytes, created
+  `2026-08-17T00:12:33.2840720Z`, last written `2026-08-17T00:16:32.5609195Z`, SHA-256
+  `1C9993ABAC88255AAEC924C7696F444C640AF9A701F9B20653E229793C896DCC`, and stable Windows
+  File ID `0x0000000000000000008600000000d63c`. Both audits fully recomputed the SHA;
+  audit A's read ran from `2026-08-21T00:50:37.1827294Z` to `00:50:46.6175207Z`, with
+  unchanged path, length, timestamps, attributes, link target, and File ID.
+- The lost immediate post-exit scan is not reconstructed. The first retained recovery scan
+  occurred during 2026-08-21 coordinator recovery before this receipt sequence; its original
+  capture did not retain a wall-clock field but did retain the exact 32-byte canonical output
+  `{"entries":[],"truncated":false}`. Fresh audit-bound scans at
+  `2026-08-21T00:57:30.3033238Z` and `2026-08-21T01:01:48.2160173Z` each exited zero with
+  the same stdout SHA-256
+  `EF295A612DED67CBBE2F7B9E1B0F42C9C80F74AD3EFA5FFF2E5CBA6021CEFDB6` and zero-byte
+  stderr. These are recovery observations only and prove no orderly close/reap or empty gap.
+- For planning only, the most specific supported failure class is
+  `external-lifecycle-interruption-after-depth-5-merge`. It is an inference from the live
+  observation and stable stage chronology, not a validator terminal result and not evidence
+  of OOM, a Node crash, a signal, or a specific terminating actor.
+
+F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":"6115144d171aa6305de1fdaca8abd7b145e2ca13","coreTree":"9628592aed3c66de1386bc45efdd4766fc5c29db","validator":{"path":"t37-f4e-endgame-canonical-validate-v6.mjs","bytes":89769,"sha256":"7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311"},"attempt":{"path":"t37-f4e-endgame-canonical-attempt-v6.json","present":true,"bytes":7227,"sha256":"5B1F18B8601CA57FD9BA8C977008C1F7B55B5CACEE606A6D20239522BEF2F132","runId":"b091b231d8ba8f7c68e5a92b"},"candidate":{"path":"t37-f4e-endgame-canonical-candidate-v6.json","present":false,"bytes":null,"sha256":null,"passed":null},"terminal":{"path":"t37-f4e-endgame-canonical-terminal-v6.json","present":false,"bytes":null,"sha256":null,"status":null,"passed":null},"outerExitCode":null,"frontierStage":{"path":"t37-f4e-endgame-canonical-frontier-stage-v6","present":true,"entries":["d0005-p0002-g0000.run"],"entriesTruncated":false},"publicationStages":[],"publicationStagesTruncated":false,"matchingProcesses":[],"matchingProcessesTruncated":false,"audit":"P0/P1/P2/P3/GAP=0/0/0/0/0+0/0/0/0/0"}
+
+- Receipt disposition: v6 is permanently consumed and failed closed. Candidate and terminal
+  are absent; `outerExitCode:null` records only the permanently unavailable observation. Do
+  not retry, resume, rename, repair, clean, or use the retained run as successor proof input.
+  This marker opens no Intro-05 source. Two exact-marker/commit reviews must accept this sole
+  receipt before a fresh docs-first successor can open.
