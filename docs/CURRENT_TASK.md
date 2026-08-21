@@ -10563,5 +10563,27 @@ unfinalized until index admission passes. An upper-vector failure creates no `.r
 `.idx*` path and attempts exact cleanup of that working part; cleanup failure becomes blocked
 precommit residue. Index namespace/auxiliary inventory remains unchanged in both cases.
 
+The former R9 review next action is superseded by the R10 disposition below. Core and adapter
+implementation remain closed.
+
+### F4E-R7A R9 rejected — R10 coupled aliases and complete recovery
+
+R9 `f176a5b` is rejected by two `P0/P1/P2/P3/GAP = 0/1/0/0/1` reviews. Independent run/index
+two-name admissions can overlap at 49,153 names, and a complete manifest whose first result is
+lost had no legal zero-write recovery call.
+
+R10 admits an added-run generation at `preOperationNames + 4 <= 49,152` before `.run.part`;
+the run/index subphase itself peaks at plus three, and a no-added-run manifest transition uses
+plus two. After the later index-size/byte gate passes, the only order is run final link and
+verify, run-part unlink and inventory contraction, then index part/final link and alias unlink.
+An added-run generation starts at 49,148 and peaks at 49,152 on manifest link; 49,149 rejects
+before a run path. A no-run transition accepts 49,150 and rejects 49,151 before manifest part.
+Run-part unlink failure blocks before any index path.
+
+Loading an already complete checkpoint is the sole successful exception to one-transition-per-
+advance: it recomputes and returns the identical certificate/generation/tip with no publish,
+manifest, or write. The caller's final `suspend()` consumes that complete view. Tests interrupt
+after complete commit but before result observation and assert zero new I/O authority.
+
 **Current next action:** commit and obtain at least two fresh independent all-zero reviews of
-the four-document R9 contract. Core and adapter implementation remain closed until that gate.
+the four-document R10 contract. Core and adapter implementation remain closed until that gate.

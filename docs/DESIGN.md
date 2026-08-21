@@ -10012,8 +10012,13 @@ return null only where the existing certifier returns null, otherwise exactly
 ` advanceAllowed:boolean }>` or
 `Readonly<{ status:'blocked'; generation:number|null; tip:EndgameProofTip|null;`
 ` diagnostics:EndgameProofRunStoreDiagnostics; advanceAllowed:false }>`.
-Every nonblocked searching/complete call performs one transition; blocked returns perform
-none. They never call `suspend()` or `dispose()`; the caller owns one
+Every nonblocked searching call performs one transition; blocked returns perform none. A
+loaded complete checkpoint is the sole zero-transition success: `advance...` recomputes the
+binding and immutable certificate, returns that existing generation/tip without calling
+`publishCheckpoint`, and creates no manifest, run, index, or other write. This closes
+interruption after the complete manifest commits but before its first result is observed. The
+complete view remains outstanding until the caller's required `suspend()`. Advance functions
+never call `suspend()` or `dispose()` themselves; the caller owns one
 `suspend()` in its pause/exit `finally`. Every advance closes transient readers/writers before
 returning. A load with recognized residue returns `status:'blocked'` without writing; this may
 be `checkpoint:null,tip:null` after an interrupted generation-0 precommit. A committed
@@ -10100,21 +10105,33 @@ postcommit active-run total plus observed pre-manifest values for every other ca
 is a historical precommit receipt, not trusted current inventory; the adapter serializes
 once from totals that exclude both candidate manifest names/bytes. Before creating the part it
 prospectively adds exactly two namespace names and, for by-name manifest accounting, twice the
-candidate byte length; equality is tested after that addition. Every owner/run/index
-hard-link performs the analogous pre-part two-name check. Owner bytes are known before its
-part opens. Index bytes are deterministically known from run size before its part opens:
+candidate byte length; equality is tested after that addition. Owner publication requires its
+known length at most 65,536 and performs the same two-name/twice-byte check before opening.
+
+An added-run checkpoint publication is one coupled run/index/manifest operation. Before
+creating its run part, the resumable writer prospectively admits a maximum peak of four
+additional namespace names above the pre-operation inventory: the run/index pair's two finals
+plus simultaneous manifest part/final aliases. The internal run/index subphase peaks at three
+additional names. Equality at 49,152 passes and plus one fails before any run path opens. A
+checkpoint transition that adds no run instead admits its two-name manifest peak before the
+manifest part. Index bytes are deterministically known from final run size before its part
+opens:
 `entryCount = size === 0 ? 1 : floor((size - 1) / 65536) + 2` and
-`indexBytes = 24 + 8 * entryCount`. Before creating or writing an index part, the adapter first
+`indexBytes = 24 + 8 * entryCount`. Before creating or writing an index part, the adapter
 requires `indexBytes <= 65,536`, then admits two namespace names and twice that exact length
-against the by-name half; these three checks are one pre-open admission and any failure leaves
-zero new index names and zero new auxiliary index bytes. The streaming run writer may already
-have an admitted `.run.part` because exact run size is known only after its data closes; that
-part must remain unfinalized until index admission passes. Index-admission failure attempts
+against the by-name half while revalidating both the reserved four-name generation peak and
+the current three-name pair subpeak. These checks are one
+pre-open admission and any failure leaves zero new index names and zero new auxiliary index
+bytes. The streaming writer may already have the admitted `.run.part` because exact size is
+known only after its data closes; that part remains unfinalized until index admission passes.
+Index-admission failure attempts
 identity-bound cleanup of only that working run part, creates neither `.run` final nor any
-`.idx*` path, and classifies cleanup failure as existing `precommit-owned-residue`. Owner parts likewise require their known individual length
-at most 65,536 plus the two-name/twice-byte aggregate admission before opening. Equality passes
-and plus one fails without creating the part. Before a run-data part it
-likewise admits both future names, and it admits physical/working run bytes incrementally
+`.idx*` path, and classifies cleanup failure as existing `precommit-owned-residue`. After
+admission succeeds, the sole legal order is link/verify `.run` final, unlink/verify the
+same-identity `.run.part`, re-inventory that single contracted run name, then create/write/
+link/verify `.idx.part` and `.idx` before unlinking the index alias. Run-part unlink failure
+blocks before any index path opens. Thus the pair peak is exactly three names and the later
+manifest-link peak is exactly four, never a sum of independently admitted aliases. Physical/working run bytes are admitted incrementally
 before every data write so no transient byte total can exceed its bound. This avoids
 self-reference and ensures a failed
 part unlink remains within, never one beyond, the namespace and auxiliary bounds.
@@ -10144,6 +10161,7 @@ One `advance...` call performs exactly one durable transition:
    checkpoint before the certificate is returned.
 5. Loading a complete checkpoint recomputes definition/candidate binding and reconstructs,
    rather than trusting a serialized replay or GameState, the ordinary immutable certificate.
+   It returns the already committed generation/tip with no publication or write.
 
 The last unit of any layer always publishes a searching checkpoint with
 `parentOffset === frontier.size`. It never also merges or completes. A subsequent
@@ -10313,6 +10331,9 @@ reopened after seed, every unit, every layer merge, and complete-checkpoint publ
 Canonical certificate and complete telemetry bytes must match. Synthetic cases include an
 early empty frontier, a final-depth parent pruned by the existing lower bound, and an
 `optimalLocks === 1` zero-decision certificate with no exhausted depth record.
+They also interrupt after the complete manifest link but before the result is observed, reopen,
+and prove the identical certificate/generation/tip returns with zero publication call, zero new
+manifest or other write, and caller `suspend()` consuming the complete view.
 
 Fault matrices cover unaligned/range/count/order drift, gap/overlap/duplicate/tail loss,
 unsafe counter addition, same-size omit/add/replace/reorder, corrupt/truncated run/index/
@@ -10336,8 +10357,16 @@ two-name/two-byte charge must create/open/write no `.idx.part` and add no index 
 or auxiliary byte. The standalone metadata admission test starts without a run part and leaves
 the full resource inventory byte-identical. A separate integration fault test starts with one
 exact admitted `.run.part`, proves no `.run` final or `.idx*` path appears, and covers both
-successful cleanup and failed cleanup classified as blocked precommit residue. This includes part/final coexistence at 49,151/49,152 names,
-depth 32,767/32,768, expected-tip shorter/equal/extended chains, nonnull expected-tip
+successful cleanup and failed cleanup classified as blocked precommit residue.
+
+The coupled namespace matrix starts an added-run generation at 49,148 names, creates the
+run/index pair in the sole legal contraction order, then links the manifest and proves the
+pair subpeak is 49,151 while the exact generation peak is 49,152. Starting at 49,149 rejects
+before `.run.part`. A no-added-run transition starts at 49,150 and reaches 49,152 only during
+manifest link; 49,151 rejects before its manifest part. Run-part unlink failure stops before
+`.idx.part`. Every intermediate inventory and FS call is asserted, so independent two-name
+admissions cannot pass.
+Additional cases include depth 32,767/32,768, expected-tip shorter/equal/extended chains, nonnull expected-tip
 precedence over empty/pre-owner/short-chain residue, the exact empty-stage and owner-part
 `expectedTip:null` blocked cases, clean owner-final-only null/non-null branches, and suspend
 faults both behind a precommit primary and after a committed success. Live committed
@@ -10373,7 +10402,7 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1/R2/R3/R4/R5/R6/R7/R8 rejection and R9 correction
+### F4E-R7A R1/R2/R3/R4/R5/R6/R7/R8/R9 rejection and R10 correction
 
 R1 `b697625` is rejected at independent
 `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
@@ -10422,4 +10451,11 @@ R8 `d74d832` is rejected by three reviews, each `0/1/0/0/1`: because index lengt
 known only after a working run part exists. R9 freezes the nearest reachable 65,528/65,536/
 65,544-byte values and exact run-size inputs; separates a zero-mutation metadata admission test
 from a real run-part integration seam; and forbids any run-final/index creation before the
-index gate passes. Commit and independently review this four-document R9 before implementation.
+index gate passes.
+
+R9 `f176a5b` is rejected by two reviews at `0/1/0/0/1`: separately admitted two-name peaks
+could exceed the namespace cap when aliases overlap, and a reopened complete checkpoint lacked
+a zero-transition result-recovery path. R10 admits an added-run generation at its four-name
+peak (three inside the run/index subphase) and mandates alias contraction order; it also makes loaded-complete recovery
+the sole zero-transition success with no publication/write and caller-owned suspend. Commit and
+independently review this four-document R10 before implementation.

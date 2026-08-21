@@ -3405,4 +3405,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Metadata-only rejection preserves the full inventory. In integration, `.run.part` stays
   unfinalized until the index gate; rejection creates no run final or index path, then cleans
   the working part or records blocked precommit residue. Index inventory stays unchanged.
-- Next: commit/review only the four R9 docs. Source and all external R7 paths remain closed.
+- The former R9 review next action is superseded by R10 below. Source and all external R7
+  paths remain closed.
+
+### F4E-R7A R9 rejection and R10 alias/complete correction
+
+- R9 `f176a5b` receives two `0/1/0/0/1` rejections: independent pair admissions can peak at
+  49,153 names, and complete-result loss had no zero-transition reopen path.
+- R10 reserves an added-run generation's four-name peak before run part creation (three inside
+  the pair subphase) and forces run link/verify/part-unlink contraction before index part.
+  49,148 peaks at 49,152; 49,149 rejects before a run path. No-run publication reserves two.
+- A loaded complete checkpoint returns the same certificate/tip without publication or write;
+  caller suspend consumes the view. A lost-result reopen test proves zero new generation.
+- Next: commit/review only the four R10 docs. Source and all external R7 paths remain closed.

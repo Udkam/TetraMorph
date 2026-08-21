@@ -1072,5 +1072,18 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Metadata rejection leaves full inventory byte-identical. Integration keeps `.run.part`
   unfinalized through the index gate; rejection creates no run final/index path and either
   cleans the part or reports blocked precommit residue, with index inventory unchanged.
-- Next: commit these four R9 docs and obtain at least two fresh independent all-zero reviews.
+- The former R9 review next action is superseded by R10 below. Source, external paths, proof
+  execution, and Intro-05 remain closed.
+
+### F4E-R7A R9 rejected and R10 contract candidate
+
+- R9 `f176a5b` receives two `0/1/0/0/1` rejections: overlapping run/index aliases can reach
+  49,153 names, and complete-checkpoint result loss had no zero-transition recovery.
+- R10 reserves an added-run generation's four-name peak before run part creation, with a
+  three-name run/index subpeak, and forces run-final alias contraction before index part.
+  49,148 reaches 49,152; 49,149 rejects before any run path; no-run transitions reserve two.
+- Loaded-complete recovery returns the existing certificate/generation/tip with no publication
+  or write; caller suspend consumes the view. A postcommit lost-result test proves no new
+  manifest.
+- Next: commit these four R10 docs and obtain at least two fresh independent all-zero reviews.
   Source, external paths, proof execution, and Intro-05 remain closed.
