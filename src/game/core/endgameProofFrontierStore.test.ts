@@ -146,6 +146,7 @@ class MemoryRun implements EndgameProofRun {
 
 class MemoryCheckpointRunStore extends MemoryRunStore implements EndgameProofCheckpointRunStore {
   readonly publications: EndgameProofCheckpointPublication[] = [];
+  readonly releasedRunIds: string[] = [];
   createRunCount = 0;
   suspendCount = 0;
 
@@ -190,6 +191,7 @@ class MemoryCheckpointRunStore extends MemoryRunStore implements EndgameProofChe
   }
 
   releaseCheckpointRun(run: EndgameProofRun): void {
+    this.releasedRunIds.push(run.id);
     run.dispose();
   }
 
@@ -397,6 +399,176 @@ describe('Endgame proof frontier Core-owned runs', () => {
     expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, malformed))
       .toThrow('fresh searching layer has a nonempty cursor or counters');
     expect(malformed.publications).toEqual([]);
+  });
+
+  it('publishes strict nonempty, early-empty, and final-depth covered-layer transitions', () => {
+    const definition = ENDGAME_V3_INTRO_DRAFTS[0]!;
+    const route = intro01.optimalRoute;
+    const diagnostics = Object.freeze({
+      activeRuns: Object.freeze([]), residue: Object.freeze([]), residueTruncated: false,
+      cleanupErrors: Object.freeze([]), cleanupErrorsTruncated: false,
+    });
+    const seedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null, tip: null, diagnostics, advanceAllowed: true,
+    }));
+    advanceOptimalEndgameRouteProofForDefinition(definition, route, seedStore);
+    const seed = seedStore.publications[0]!;
+    if (seed.transition !== 'seed') throw new Error('expected seed publication');
+    const key = seed.binding.initialFrontierKey;
+    const memoryRun = (id: string, values: readonly string[], size = values.length) => new MemoryRun(
+      id, Object.freeze(values), size, (_id, records) => records, () => {},
+    );
+
+    const opened: { startIndex: number; endIndex: number }[] = [];
+    const unitRuns = Object.freeze(Array.from({ length: 33 }, (_, unit) => memoryRun(
+      `r7-u-d00000-n${String(unit).padStart(8, '0')}-g${String(unit + 1).padStart(5, '0')}`,
+      [key],
+    )));
+    const largeFrontierSize = 33 * 65_536;
+    const layerStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: 33, binding: seed.binding, depth: 0,
+        parentOffset: largeFrontierSize, lastProcessedParentKey: key,
+        frontier: memoryRun('r7-f-d00000-g00000', [key], largeFrontierSize),
+        nextRuns: Object.freeze({
+          count: unitRuns.length,
+          open(range: { startIndex: number; endIndex: number }): readonly EndgameProofRun[] {
+            opened.push(Object.freeze({ ...range }));
+            return Object.freeze(unitRuns.slice(range.startIndex, range.endIndex));
+          },
+        }),
+        transitions: 44, boundPrunes: 5, exhaustedDepths: Object.freeze([]),
+      }),
+      tip: Object.freeze({ generation: 33, manifestSha256: 'F'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }));
+    const layerResult = advanceOptimalEndgameRouteProofForDefinition(definition, route, layerStore);
+    expect(layerResult).toMatchObject({ status: 'searching', generation: 34, depth: 1, parentOffset: 0 });
+    expect(opened).toEqual([{ startIndex: 0, endIndex: 32 }, { startIndex: 32, endIndex: 33 }]);
+    expect(layerStore.releasedRunIds).toEqual([
+      'r7-f-d00000-g00000',
+      ...unitRuns.map(({ id }) => id),
+    ]);
+    const layer = layerStore.publications[0]!;
+    expect(layer.transition).toBe('layer');
+    if (layer.transition !== 'layer') throw new Error('expected layer publication');
+    expect(layer.completedDepth).toEqual({ lockedPieces: 0, frontierStates: largeFrontierSize, transitions: 44, boundPrunes: 5 });
+    expect(layer.nextFrontier).toMatchObject({ id: 'r7-f-d00001-g00034', size: 1 });
+
+    const emptyUnit = memoryRun('r7-u-d00000-n00000000-g00001', []);
+    const emptyStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: 1, binding: seed.binding, depth: 0,
+        parentOffset: 1, lastProcessedParentKey: key,
+        frontier: memoryRun('r7-f-d00000-g00000', [key]),
+        nextRuns: Object.freeze({ count: 1, open: () => Object.freeze([emptyUnit]) }),
+        transitions: 2, boundPrunes: 1, exhaustedDepths: Object.freeze([]),
+      }),
+      tip: Object.freeze({ generation: 1, manifestSha256: '1'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }));
+    const emptyResult = advanceOptimalEndgameRouteProofForDefinition(definition, route, emptyStore);
+    expect(emptyResult).toMatchObject({ status: 'complete', generation: 2, certificate: { exhaustedDepths: [
+      { lockedPieces: 0, frontierStates: 1, transitions: 2, boundPrunes: 1 },
+    ] } });
+    expect(emptyStore.publications[0]).toMatchObject({ transition: 'complete', reason: 'empty-frontier' });
+
+    const finalDepth = seed.binding.optimalLocks - 2;
+    const priorDepths = Object.freeze(Array.from({ length: finalDepth }, (_, lockedPieces) => Object.freeze({
+      lockedPieces, frontierStates: 1, transitions: 0, boundPrunes: 0,
+    })));
+    const finalStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: 1, binding: seed.binding, depth: finalDepth,
+        parentOffset: 1, lastProcessedParentKey: key,
+        frontier: memoryRun(`r7-f-d${String(finalDepth).padStart(5, '0')}-g00000`, [key]),
+        nextRuns: Object.freeze({ count: 0, open: () => { throw new Error('final depth opens no collection'); } }),
+        transitions: 3, boundPrunes: 2, exhaustedDepths: priorDepths,
+      }),
+      tip: Object.freeze({ generation: 1, manifestSha256: '2'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }));
+    const finalResult = advanceOptimalEndgameRouteProofForDefinition(definition, route, finalStore);
+    expect(finalResult).toMatchObject({
+      status: 'complete', generation: 2,
+      certificate: { exhaustedDepths: [...priorDepths, {
+        lockedPieces: finalDepth, frontierStates: 1, transitions: 3, boundPrunes: 2,
+      }] },
+    });
+    expect(finalStore.publications[0]).toMatchObject({ transition: 'complete', reason: 'final-depth' });
+    expect(finalStore.createRunCount).toBe(0);
+
+    const wrongBatchRuns = Object.freeze([
+      memoryRun('r7-u-d00000-n00000000-g00001', [key]),
+      memoryRun('r7-u-d00000-n00000001-g00002', [key]),
+    ]);
+    const wrongBatchStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: 1, binding: seed.binding, depth: 0,
+        parentOffset: 1, lastProcessedParentKey: key,
+        frontier: memoryRun('r7-f-d00000-g00000', [key]),
+        nextRuns: Object.freeze({ count: 1, open: () => wrongBatchRuns }),
+        transitions: 0, boundPrunes: 0, exhaustedDepths: Object.freeze([]),
+      }),
+      tip: Object.freeze({ generation: 1, manifestSha256: '4'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }));
+    expect(() => advanceOptimalEndgameRouteProofForDefinition(definition, route, wrongBatchStore))
+      .toThrow('wrong contiguous batch length');
+    expect(wrongBatchStore.releasedRunIds).toEqual([
+      'r7-f-d00000-g00000',
+      ...wrongBatchRuns.map(({ id }) => id),
+    ]);
+    expect(wrongBatchStore.publications).toEqual([]);
+    expect(wrongBatchStore.createRunCount).toBe(0);
+  });
+
+  it('publishes a one-lock candidate as zero-decision complete without enumerating a landing', () => {
+    const definition: EndgameDefinition = Object.freeze({
+      ...ENDGAME_V3_INTRO_DRAFTS[1]!,
+      name: 'One-lock resumable fixture',
+      seed: 2,
+      anchorCells: Object.freeze([
+        Object.freeze({ x: 0, y: 17 }),
+        Object.freeze({ x: 2, y: 17 }),
+      ]),
+    });
+    const route = 'SCRRHTTTTTTTTTTTT';
+    const diagnostics = Object.freeze({
+      activeRuns: Object.freeze([]), residue: Object.freeze([]), residueTruncated: false,
+      cleanupErrors: Object.freeze([]), cleanupErrorsTruncated: false,
+    });
+    const seedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null, tip: null, diagnostics, advanceAllowed: true,
+    }));
+    advanceOptimalEndgameRouteProofForDefinition(definition, route, seedStore);
+    const seed = seedStore.publications[0]!;
+    if (seed.transition !== 'seed') throw new Error('expected seed publication');
+    expect(seed.binding.optimalLocks).toBe(1);
+    const frontier = new MemoryRun(
+      'r7-f-d00000-g00000', [seed.binding.initialFrontierKey], 1, (_id, values) => values, () => {},
+    );
+    const completeStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching', generation: 0, binding: seed.binding, depth: 0,
+        parentOffset: 0, lastProcessedParentKey: null, frontier,
+        nextRuns: Object.freeze({ count: 0, open: () => { throw new Error('zero decision opens no collection'); } }),
+        transitions: 0, boundPrunes: 0, exhaustedDepths: Object.freeze([]),
+      }),
+      tip: Object.freeze({ generation: 0, manifestSha256: '3'.repeat(64) }),
+      diagnostics, advanceAllowed: true,
+    }));
+    const result = advanceOptimalEndgameRouteProofForDefinition(definition, route, completeStore);
+    expect(result).toMatchObject({
+      status: 'complete', generation: 1, certificate: { exhaustedDepths: [] },
+    });
+    if (result?.status !== 'complete') throw new Error('expected zero-decision certificate');
+    expect(result.certificate).toEqual(certifyOptimalEndgameRouteForDefinition(definition, route));
+    expect(completeStore.publications[0]).toMatchObject({
+      transition: 'complete', completedDepth: null, reason: 'zero-decision-depth',
+    });
+    expect(frontier.ranges).toEqual([{ startOrdinal: 0, endOrdinal: 1 }]);
+    expect(completeStore.createRunCount).toBe(0);
   });
 
   it('sorts by unsigned bytes, collapses only full-key duplicates, and preserves prefixes', () => {

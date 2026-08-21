@@ -1665,7 +1665,12 @@ function addSafeProofCounter(base: number, delta: number, label: string): number
 function assertSearchingCheckpoint(
   checkpoint: EndgameProofSearchingCheckpoint,
   prepared: PreparedResumableEndgameProof,
-): Readonly<{ processedUnits: number; finalDecisionDepth: boolean }> {
+): Readonly<{
+  processedUnits: number;
+  finalDecisionDepth: boolean;
+  frontierGeneration: number;
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[];
+}> {
   assertResumableBinding(checkpoint.binding, prepared.binding);
   assertProofRunDescriptor(checkpoint.frontier, checkpoint.frontier.id);
   if (
@@ -1731,7 +1736,7 @@ function assertSearchingCheckpoint(
     }
     proofRunRecordBytes(checkpoint.lastProcessedParentKey, PROOF_RUN_RECORD_MAX_BYTES);
   }
-  return Object.freeze({ processedUnits, finalDecisionDepth });
+  return Object.freeze({ processedUnits, finalDecisionDepth, frontierGeneration, exhaustedDepths });
 }
 
 function visitVerifiedProofRunRange(
@@ -1851,6 +1856,185 @@ function advanceSearchingProofUnit(
   }
 }
 
+function resumableLayerWorkingRunId(
+  generation: number,
+  depth: number,
+  pass: number,
+  group: number,
+): string {
+  for (const [label, value, maximum] of [
+    ['generation', generation, 32_767],
+    ['depth', depth, 32_767],
+    ['pass', pass, 4095],
+    ['group', group, 4095],
+  ] as const) {
+    if (!Number.isSafeInteger(value) || value < 0 || value > maximum) {
+      throw proofRunError(`resumable layer ${label} is outside 0..${maximum}`);
+    }
+  }
+  return `r7w-l-g${String(generation).padStart(5, '0')}`
+    + `-d${String(depth).padStart(5, '0')}`
+    + `-p${String(pass).padStart(4, '0')}`
+    + `-h${String(group).padStart(4, '0')}`;
+}
+
+function validateMergedCheckpointInput(
+  tracked: TrackedProofRun,
+  prepared: PreparedResumableEndgameProof,
+): void {
+  for (const key of verifiedProofRunValues(tracked, ENDGAME_PROOF_RUN_LIMITS)) {
+    decodeProofFrontierStateKey(key, prepared.proofContext);
+  }
+}
+
+function mergeCheckpointRunCollection(
+  checkpoint: EndgameProofSearchingCheckpoint,
+  prepared: PreparedResumableEndgameProof,
+  store: EndgameProofCheckpointRunStore,
+  owner: EndgameProofRunOwner,
+  generation: number,
+  frontierGeneration: number,
+): TrackedProofRun {
+  const firstPass: TrackedProofRun[] = [];
+  for (let startIndex = 0, group = 0; startIndex < checkpoint.nextRuns.count; startIndex += 32, group += 1) {
+    const endIndex = Math.min(checkpoint.nextRuns.count, startIndex + 32);
+    const opened = checkpoint.nextRuns.open(Object.freeze({ startIndex, endIndex }));
+    const inputs = Array.isArray(opened) ? opened.map((run, offset) => {
+      const unit = startIndex + offset;
+      const expectedId = resumableProofRunId('unit', checkpoint.depth, frontierGeneration + unit + 1, unit);
+      return Object.freeze({ expectedId, run });
+    }) : [];
+    let output: TrackedProofRun | null = null;
+    let primary: unknown;
+    let hasPrimary = false;
+    try {
+      if (!Array.isArray(opened) || opened.length !== endIndex - startIndex) {
+        throw proofRunError('checkpoint collection returned the wrong contiguous batch length');
+      }
+      for (const input of inputs) {
+        assertProofRunDescriptor(input.run, input.expectedId);
+        validateMergedCheckpointInput(input, prepared);
+      }
+      output = persistProofRun(owner, resumableLayerWorkingRunId(
+        generation, checkpoint.depth + 1, 0, group,
+      ), (write) => {
+        let count = 0;
+        for (const value of mergedProofRunValues(inputs, ENDGAME_PROOF_RUN_LIMITS)) {
+          write(value);
+          count += 1;
+        }
+        return count;
+      });
+      verifyMergedProofRun(inputs, output, ENDGAME_PROOF_RUN_LIMITS);
+    } catch (error) {
+      primary = error;
+      hasPrimary = true;
+    }
+    const cleanup = createCleanupCollector();
+    for (const input of inputs) {
+      try {
+        store.releaseCheckpointRun(input.run);
+      } catch (error) {
+        collectCleanupError(cleanup, error);
+      }
+    }
+    if (hasPrimary) throwProofRunFailure(primary, cleanup);
+    if (cleanup.errors.length > 0 || cleanup.omitted > 0) {
+      throwProofRunFailure(proofRunError('checkpoint collection release failed'), cleanup);
+    }
+    firstPass.push(output!);
+  }
+  return mergeProofRuns(owner, checkpoint.depth + 1, firstPass, Object.freeze({
+    id: (pass: number, group: number) => resumableLayerWorkingRunId(
+      generation, checkpoint.depth + 1, pass, group,
+    ),
+    rewriteSingletons: true,
+  }));
+}
+
+function completeAdvanceResult(
+  prepared: PreparedResumableEndgameProof,
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
+  generation: number,
+  publication: ReturnType<EndgameProofCheckpointRunStore['publishCheckpoint']>,
+): EndgameProofAdvanceResult {
+  const tip = assertResumableTip(publication.tip, generation);
+  return Object.freeze({
+    status: 'complete',
+    generation,
+    certificate: certificateFromResumableCheckpoint(prepared, exhaustedDepths),
+    tip,
+    diagnostics: publication.diagnostics,
+    advanceAllowed: publication.advanceAllowed,
+  });
+}
+
+function advanceCoveredSearchingLayer(
+  checkpoint: EndgameProofSearchingCheckpoint,
+  tip: EndgameProofTip,
+  prepared: PreparedResumableEndgameProof,
+  store: EndgameProofCheckpointRunStore,
+  validated: ReturnType<typeof assertSearchingCheckpoint>,
+): EndgameProofAdvanceResult {
+  const generation = checkpoint.generation + 1;
+  if (generation > 32_767) throw proofRunError('resumable generation exceeds 32767');
+  const completedDepth = Object.freeze({
+    lockedPieces: checkpoint.depth,
+    frontierStates: checkpoint.frontier.size,
+    transitions: checkpoint.transitions,
+    boundPrunes: checkpoint.boundPrunes,
+  });
+  const exhaustedDepths = Object.freeze([...validated.exhaustedDepths, completedDepth]);
+  const owner = createResumableProofRunOwner(store);
+  let frontierReleased = false;
+  try {
+    store.releaseCheckpointRun(checkpoint.frontier);
+    frontierReleased = true;
+    if (validated.finalDecisionDepth) {
+      const publication = store.publishCheckpoint(Object.freeze({
+        transition: 'complete', previousTip: tip, completedDepth, reason: 'final-depth',
+      }));
+      return completeAdvanceResult(prepared, exhaustedDepths, generation, publication);
+    }
+    const merged = mergeCheckpointRunCollection(
+      checkpoint, prepared, store, owner, generation, validated.frontierGeneration,
+    );
+    if (merged.run.size === 0) {
+      disposeTrackedProofRun(owner, merged);
+      const publication = store.publishCheckpoint(Object.freeze({
+        transition: 'complete', previousTip: tip, completedDepth, reason: 'empty-frontier',
+      }));
+      return completeAdvanceResult(prepared, exhaustedDepths, generation, publication);
+    }
+    const committedId = resumableProofRunId('frontier', checkpoint.depth + 1, generation);
+    const committed = persistProofRun(owner, committedId, (write) => {
+      let count = 0;
+      for (const value of verifiedProofRunValues(merged, ENDGAME_PROOF_RUN_LIMITS)) {
+        write(value);
+        count += 1;
+      }
+      return count;
+    });
+    verifyMergedProofRun([merged], committed, ENDGAME_PROOF_RUN_LIMITS);
+    disposeTrackedProofRun(owner, merged);
+    const nextFrontier = detachResumableProofRun(owner, committed);
+    const publication = store.publishCheckpoint(Object.freeze({
+      transition: 'layer', previousTip: tip, completedDepth, nextFrontier,
+    }));
+    return searchingAdvanceResult(generation, checkpoint.depth + 1, 0, publication);
+  } catch (primary) {
+    const cleanup = cleanupResumableProofRuns(owner);
+    if (!frontierReleased) {
+      try {
+        store.releaseCheckpointRun(checkpoint.frontier);
+      } catch (error) {
+        collectCleanupError(cleanup, error);
+      }
+    }
+    throwProofRunFailure(primary, cleanup);
+  }
+}
+
 function searchingAdvanceResult(
   generation: number,
   depth: number,
@@ -1927,7 +2111,41 @@ function advanceResumableEndgameProof(
     return blockedAdvanceResult(checkpoint, authenticatedTip, loaded.diagnostics);
   }
   if (prepared.optimalLocks === 1) {
-    throw proofRunError('zero-decision transition is not yet implemented');
+    let frontierReleased = false;
+    try {
+      if (checkpoint.generation !== 0 || checkpoint.frontier.id !== 'r7-f-d00000-g00000'
+        || checkpoint.frontier.size !== 1) {
+        throw proofRunError('zero-decision checkpoint is not the canonical seed');
+      }
+      const initialKey = visitVerifiedProofRunRange(
+        checkpoint.frontier,
+        Object.freeze({ startOrdinal: 0, endOrdinal: 1 }),
+        null,
+        () => {},
+      );
+      if (initialKey !== prepared.binding.initialFrontierKey) {
+        throw proofRunError('zero-decision frontier does not match the binding');
+      }
+      store.releaseCheckpointRun(checkpoint.frontier);
+      frontierReleased = true;
+      const publication = store.publishCheckpoint(Object.freeze({
+        transition: 'complete',
+        previousTip: authenticatedTip,
+        completedDepth: null,
+        reason: 'zero-decision-depth',
+      }));
+      return completeAdvanceResult(prepared, Object.freeze([]), checkpoint.generation + 1, publication);
+    } catch (primary) {
+      const cleanup = createCleanupCollector();
+      if (!frontierReleased) {
+        try {
+          store.releaseCheckpointRun(checkpoint.frontier);
+        } catch (error) {
+          collectCleanupError(cleanup, error);
+        }
+      }
+      throwProofRunFailure(primary, cleanup);
+    }
   }
   if (checkpoint.parentOffset < checkpoint.frontier.size) {
     return advanceSearchingProofUnit(
@@ -1939,7 +2157,9 @@ function advanceResumableEndgameProof(
       searching.finalDecisionDepth,
     );
   }
-  throw proofRunError('searching layer transition is not yet implemented');
+  return advanceCoveredSearchingLayer(
+    checkpoint, authenticatedTip, prepared, store, searching,
+  );
 }
 
 export function advanceOptimalEndgameRouteProof(
