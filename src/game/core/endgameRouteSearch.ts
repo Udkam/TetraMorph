@@ -841,6 +841,7 @@ function ordinalByteCompare(left: string, right: string): number {
 }
 
 function proofRunRecordBytes(key: string, limit: number): number {
+  if (typeof key !== 'string') throw proofRunError('records must be strings');
   if (key.length === 0) throw proofRunError('records cannot be blank');
   if (key.length > limit) throw proofRunError(`record exceeds ${limit} bytes`);
   for (let index = 0; index < key.length; index += 1) {
@@ -1534,6 +1535,23 @@ function safeDepthTotal(
   return total;
 }
 
+function assertSafeCompletedDepthTotals(records: readonly EndgameOptimalRouteDepthRecord[]): void {
+  safeDepthTotal(records, 'frontierStates');
+  safeDepthTotal(records, 'transitions');
+  safeDepthTotal(records, 'boundPrunes');
+}
+
+function assertSafeSearchingTotals(
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
+  frontierStates: number,
+  transitions: number,
+  boundPrunes: number,
+): void {
+  addSafeProofCounter(safeDepthTotal(exhaustedDepths, 'frontierStates'), frontierStates, 'frontier-state total');
+  addSafeProofCounter(safeDepthTotal(exhaustedDepths, 'transitions'), transitions, 'transition total');
+  addSafeProofCounter(safeDepthTotal(exhaustedDepths, 'boundPrunes'), boundPrunes, 'bound-prune total');
+}
+
 function certificateFromResumableCheckpoint(
   prepared: PreparedResumableEndgameProof,
   exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
@@ -1579,6 +1597,7 @@ function assertCompleteCheckpoint(
   if (checkpoint.generation !== expectedGeneration) {
     throw proofRunError('complete checkpoint generation does not match its completed-depth history');
   }
+  assertSafeCompletedDepthTotals(records);
   return records;
 }
 
@@ -1763,6 +1782,9 @@ function assertSearchingCheckpoint(
     }
     proofRunRecordBytes(checkpoint.lastProcessedParentKey, PROOF_RUN_RECORD_MAX_BYTES);
   }
+  assertSafeSearchingTotals(
+    exhaustedDepths, checkpoint.frontier.size, checkpoint.transitions, checkpoint.boundPrunes,
+  );
   return Object.freeze({ processedUnits, finalDecisionDepth, frontierGeneration, exhaustedDepths });
 }
 
@@ -1810,6 +1832,7 @@ function advanceSearchingProofUnit(
   store: EndgameProofCheckpointRunStore,
   processedUnits: number,
   finalDecisionDepth: boolean,
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[],
 ): EndgameProofAdvanceResult {
   const endOrdinal = Math.min(checkpoint.frontier.size, checkpoint.parentOffset + RESUMABLE_PARENT_UNIT_SIZE);
   const range = Object.freeze({ startOrdinal: checkpoint.parentOffset, endOrdinal });
@@ -1855,6 +1878,12 @@ function advanceSearchingProofUnit(
           builder!.add(proofFrontierStateKey(landing.state, prepared.proofContext));
         }
       },
+    );
+    assertSafeSearchingTotals(
+      exhaustedDepths,
+      checkpoint.frontier.size,
+      addSafeProofCounter(checkpoint.transitions, transitionsDelta, 'transition'),
+      addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune'),
     );
     store.releaseCheckpointRun(checkpoint.frontier);
     frontierReleased = true;
@@ -1985,6 +2014,7 @@ function completeAdvanceResult(
   generation: number,
   publication: ReturnType<EndgameProofCheckpointRunStore['publishCheckpoint']>,
 ): EndgameProofAdvanceResult {
+  const advanceAllowed = assertStrictAdvanceAllowed(publication.advanceAllowed, 'checkpoint publication');
   const tip = assertResumableTip(publication.tip, generation);
   return Object.freeze({
     status: 'complete',
@@ -1992,7 +2022,7 @@ function completeAdvanceResult(
     certificate: certificateFromResumableCheckpoint(prepared, exhaustedDepths),
     tip,
     diagnostics: publication.diagnostics,
-    advanceAllowed: publication.advanceAllowed,
+    advanceAllowed,
   });
 }
 
@@ -2012,6 +2042,7 @@ function advanceCoveredSearchingLayer(
     boundPrunes: checkpoint.boundPrunes,
   });
   const exhaustedDepths = Object.freeze([...validated.exhaustedDepths, completedDepth]);
+  assertSafeCompletedDepthTotals(exhaustedDepths);
   const owner = createResumableProofRunOwner(store);
   let frontierReleased = false;
   try {
@@ -2068,6 +2099,7 @@ function searchingAdvanceResult(
   parentOffset: number,
   publication: ReturnType<EndgameProofCheckpointRunStore['publishCheckpoint']>,
 ): EndgameProofAdvanceResult {
+  const advanceAllowed = assertStrictAdvanceAllowed(publication.advanceAllowed, 'checkpoint publication');
   const tip = assertResumableTip(publication.tip, generation);
   return Object.freeze({
     status: 'searching',
@@ -2076,7 +2108,7 @@ function searchingAdvanceResult(
     parentOffset,
     tip,
     diagnostics: publication.diagnostics,
-    advanceAllowed: publication.advanceAllowed,
+    advanceAllowed,
   });
 }
 
@@ -2094,6 +2126,11 @@ function blockedAdvanceResult(
   });
 }
 
+function assertStrictAdvanceAllowed(value: unknown, source: string): boolean {
+  if (typeof value !== 'boolean') throw proofRunError(`${source} advanceAllowed must be boolean`);
+  return value;
+}
+
 function advanceResumableEndgameProof(
   definition: EndgameDefinition,
   candidateCommandStream: string,
@@ -2102,10 +2139,11 @@ function advanceResumableEndgameProof(
   const prepared = prepareResumableEndgameProof(definition, candidateCommandStream);
   if (!prepared) return null;
   const loaded = store.loadCheckpoint();
+  const loadedAdvanceAllowed = assertStrictAdvanceAllowed(loaded.advanceAllowed, 'loaded checkpoint');
   const { checkpoint, tip } = loaded;
   if (checkpoint === null) {
     if (tip !== null) throw proofRunError('null checkpoint has a nonnull tip');
-    if (!loaded.advanceAllowed) return blockedAdvanceResult(null, null, loaded.diagnostics);
+    if (!loadedAdvanceAllowed) return blockedAdvanceResult(null, null, loaded.diagnostics);
     const frontier = createVerifiedResumableRun(
       store,
       resumableProofRunId('frontier', 0, 0),
@@ -2120,6 +2158,11 @@ function advanceResumableEndgameProof(
     return searchingAdvanceResult(0, 0, 0, publication);
   }
 
+  const checkpointKind: unknown = checkpoint.kind;
+  if (checkpointKind !== 'searching' && checkpointKind !== 'complete') {
+    throw proofRunError('checkpoint kind must be searching or complete');
+  }
+
   const authenticatedTip = assertResumableTip(tip, checkpoint.generation);
   assertResumableBinding(checkpoint.binding, prepared.binding);
   if (checkpoint.kind === 'complete') {
@@ -2130,11 +2173,11 @@ function advanceResumableEndgameProof(
       certificate: certificateFromResumableCheckpoint(prepared, records),
       tip: authenticatedTip,
       diagnostics: loaded.diagnostics,
-      advanceAllowed: loaded.advanceAllowed,
+      advanceAllowed: loadedAdvanceAllowed,
     });
   }
   const searching = assertSearchingCheckpoint(checkpoint, prepared);
-  if (!loaded.advanceAllowed) {
+  if (!loadedAdvanceAllowed) {
     return blockedAdvanceResult(checkpoint, authenticatedTip, loaded.diagnostics);
   }
   if (prepared.optimalLocks === 1) {
@@ -2182,6 +2225,7 @@ function advanceResumableEndgameProof(
       store,
       searching.processedUnits,
       searching.finalDecisionDepth,
+      searching.exhaustedDepths,
     );
   }
   return advanceCoveredSearchingLayer(
