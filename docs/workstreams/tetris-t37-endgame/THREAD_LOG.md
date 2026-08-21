@@ -1049,5 +1049,16 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - I/O assertions are per identity/phase: new publication files still receive prescribed full
   verification, but old identities are not rescanned in the same Store. Range reads are wholly
   bounded by both authenticated offsets and empty ranges read no data.
-- Next: commit these four R7 docs and obtain at least two fresh independent all-zero reviews.
+- The former R7 review next action is superseded by R8 below. Source, external paths, proof
+  execution, and Intro-05 remain closed.
+
+### F4E-R7A R7 rejected and R8 contract candidate
+
+- R7 `c4db79d` receives two `0/0/0/0/0` reviews but is rejected at `0/1/0/0/1` because its
+  pre-open index admission did not explicitly include the 65,536-byte individual-file cap.
+- R8 requires the individual cap, two future namespace names, and twice-index-byte aggregate
+  capacity to pass as one gate before `.idx.part` opens or writes. Failure leaves zero new
+  names/bytes.
+- Focused QA covers index size minus one/equal/plus one; plus one leaves no part or residue.
+- Next: commit these four R8 docs and obtain at least two fresh independent all-zero reviews.
   Source, external paths, proof execution, and Intro-05 remain closed.

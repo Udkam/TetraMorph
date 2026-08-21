@@ -3382,4 +3382,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Same-Store I/O counts distinguish required verification of new identities from forbidden
   rescans of old identities. Every range read is bounded by both authenticated offsets; empty
   ranges read no data.
-- Next: commit/review only the four R7 docs. Source and all external R7 paths remain closed.
+- The former R7 review next action is superseded by R8 below. Source and all external R7 paths
+  remain closed.
+
+### F4E-R7A R7 rejection and R8 index pre-open correction
+
+- R7 `c4db79d` reviews include two `0/0/0/0/0` results but recovery QA is `0/1/0/0/1`; R7 is
+  rejected.
+- R8 makes the 65,536-byte individual index limit, both future namespace names, and twice the
+  exact index bytes one admission gate before `.idx.part` open/write. Any failed check leaves
+  zero new names/bytes.
+- QA adds index-length minus-one/equal/plus-one cases; plus one must produce no part/residue.
+- Next: commit/review only the four R8 docs. Source and all external R7 paths remain closed.

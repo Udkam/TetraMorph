@@ -10531,5 +10531,20 @@ inside the two authenticated index offsets; an empty range performs no data read
 dispose/suspend/old-handle invalidation, clean-owner null/non-null branches, mixed cleanup
 halves, alias coexistence, per-phase I/O, and both range boundaries.
 
+The former R7 review next action is superseded by the R8 disposition below. Core and adapter
+implementation remain closed.
+
+### F4E-R7A R7 rejected — R8 pre-open index cap
+
+R7 `c4db79d` receives two independent `0/0/0/0/0` reviews but recovery QA rejects it at
+`0/1/0/0/1`: the deterministic index length was checked against namespace and aggregate bytes
+before `.idx.part`, but the individual 65,536-byte index cap was not explicitly in that same
+pre-open gate.
+
+R8 requires `indexBytes <= 65,536`, capacity for both future names, and capacity for twice the
+index length to pass together before `.idx.part` is opened or written. Failure creates zero new
+names and zero new bytes. The focused matrix must test individual index length at minus one,
+equal, and plus one; plus one must leave no part or other residue.
+
 **Current next action:** commit and obtain at least two fresh independent all-zero reviews of
-the four-document R7 contract. Core and adapter implementation remain closed until that gate.
+the four-document R8 contract. Core and adapter implementation remain closed until that gate.

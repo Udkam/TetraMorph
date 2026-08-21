@@ -10103,9 +10103,12 @@ candidate byte length; equality is tested after that addition. Every owner/run/i
 hard-link performs the analogous pre-part two-name check. Owner bytes are known before its
 part opens. Index bytes are deterministically known from run size before its part opens:
 `entryCount = size === 0 ? 1 : floor((size - 1) / 65536) + 2` and
-`indexBytes = 24 + 8 * entryCount`. Before creating or writing an owner or index part, the
-adapter must admit two namespace names and twice its exact byte length against the by-name
-half; equality passes and plus one fails without creating the part. Before a run-data part it
+`indexBytes = 24 + 8 * entryCount`. Before creating or writing an index part, the adapter first
+requires `indexBytes <= 65,536`, then admits two namespace names and twice that exact length
+against the by-name half; these three checks are one pre-open admission and any failure leaves
+zero new names and zero new bytes. Owner parts likewise require their known individual length
+at most 65,536 plus the two-name/twice-byte aggregate admission before opening. Equality passes
+and plus one fails without creating the part. Before a run-data part it
 likewise admits both future names, and it admits physical/working run bytes incrementally
 before every data write so no transient byte total can exceed its bound. This avoids
 self-reference and ensures a failed
@@ -10320,8 +10323,9 @@ all data-file reads must remain inside the authenticated
 later reopened Store performs exactly one new admission scan. They cover final short and exact-multiple terminal
 offsets, 4,096/4,097 units, post-commit reopen with successful/failed cleanup, and
 limit-minus-one/equal/plus-one for every byte, entry, and generation bound. Index admission
-tests prove the deterministic byte formula and that a rejected prospective two-name/two-byte
-charge creates no `.idx.part`. This includes part/final coexistence at 49,151/49,152 names,
+tests prove the deterministic byte formula and exercise the individual 65,536-byte cap at
+minus one/equal/plus one; plus one and any rejected prospective two-name/two-byte charge must
+create no `.idx.part`, new name, or new byte. This includes part/final coexistence at 49,151/49,152 names,
 depth 32,767/32,768, expected-tip shorter/equal/extended chains, nonnull expected-tip
 precedence over empty/pre-owner/short-chain residue, the exact empty-stage and owner-part
 `expectedTip:null` blocked cases, clean owner-final-only null/non-null branches, and suspend
@@ -10358,7 +10362,7 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1/R2/R3/R4/R5/R6 rejection and R7 correction
+### F4E-R7A R1/R2/R3/R4/R5/R6/R7 rejection and R8 correction
 
 R1 `b697625` is rejected at independent
 `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
@@ -10395,4 +10399,10 @@ release; makes suspend terminal while invalidating every live view/slot; defines
 owner-only seed state; separates old-file rescan counts from required new-file publication
 verification; bounds every range read at both authenticated offsets; and recognizes every
 bounded half-pair combination of superseded cleanup residue, including coexistence with a
-manifest alias. Commit and independently review this four-document R7 before implementation.
+manifest alias.
+
+R7 `c4db79d` receives two independent all-zero reviews but is rejected by recovery QA at
+`0/1/0/0/1`: the 65,536-byte per-index cap was not explicitly part of pre-open admission. R8
+requires the individual cap, two-name capacity, and twice-byte aggregate capacity to pass as
+one atomic pre-open check, with minus-one/equal/plus-one zero-residue tests. Commit and
+independently review this four-document R8 before implementation.
