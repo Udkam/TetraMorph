@@ -107,11 +107,16 @@ export interface EndgameOptimalRouteCertificate {
   replay: EndgameRouteReplay;
 }
 
+export type EndgameProofRunRange = Readonly<{
+  startOrdinal: number;
+  endOrdinal: number;
+}>;
+
 /** One immutable, repeatably readable run used by the exact proof frontier. */
 export interface EndgameProofRun {
   readonly id: string;
   readonly size: number;
-  values(): Iterable<string>;
+  values(range?: EndgameProofRunRange): Iterable<string>;
   dispose(): void;
 }
 
@@ -139,6 +144,130 @@ export interface EndgameProofRunStore {
   diagnostics(): EndgameProofRunStoreDiagnostics;
   dispose(): void;
 }
+
+export type EndgameProofResumeBinding = Readonly<{
+  schema: 't37-f4e-r7-proof-binding-v1';
+  levelId: EndgameId;
+  candidateCommandStream: string;
+  optimalLocks: number;
+  initialStateHash: string;
+  initialFrontierKey: string;
+}>;
+
+export type EndgameProofRunCollectionRange = Readonly<{
+  startIndex: number;
+  endIndex: number;
+}>;
+
+export type EndgameProofRunCollection = Readonly<{
+  count: number;
+  open(range: EndgameProofRunCollectionRange): readonly EndgameProofRun[];
+}>;
+
+export type EndgameProofSearchingCheckpoint = Readonly<{
+  kind: 'searching';
+  generation: number;
+  binding: EndgameProofResumeBinding;
+  depth: number;
+  parentOffset: number;
+  lastProcessedParentKey: string | null;
+  frontier: EndgameProofRun;
+  nextRuns: EndgameProofRunCollection;
+  transitions: number;
+  boundPrunes: number;
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[];
+}>;
+
+export type EndgameProofCompleteCheckpoint = Readonly<{
+  kind: 'complete';
+  generation: number;
+  binding: EndgameProofResumeBinding;
+  reason: 'empty-frontier' | 'final-depth' | 'zero-decision-depth';
+  exhaustedDepths: readonly EndgameOptimalRouteDepthRecord[];
+}>;
+
+export type EndgameProofCheckpoint =
+  | EndgameProofSearchingCheckpoint
+  | EndgameProofCompleteCheckpoint;
+
+export type EndgameProofTip = Readonly<{
+  generation: number;
+  manifestSha256: string;
+}>;
+
+export type EndgameProofCheckpointPublication =
+  | Readonly<{
+      transition: 'seed';
+      previousTip: null;
+      binding: EndgameProofResumeBinding;
+      frontier: EndgameProofRun;
+    }>
+  | Readonly<{
+      transition: 'unit';
+      previousTip: EndgameProofTip;
+      parentOffset: number;
+      lastProcessedParentKey: string;
+      transitionsDelta: number;
+      boundPrunesDelta: number;
+      nextRun: EndgameProofRun | null;
+    }>
+  | Readonly<{
+      transition: 'layer';
+      previousTip: EndgameProofTip;
+      completedDepth: EndgameOptimalRouteDepthRecord;
+      nextFrontier: EndgameProofRun;
+    }>
+  | Readonly<{
+      transition: 'complete';
+      previousTip: EndgameProofTip;
+      completedDepth: EndgameOptimalRouteDepthRecord | null;
+      reason: 'empty-frontier' | 'final-depth' | 'zero-decision-depth';
+    }>;
+
+export interface EndgameProofCheckpointRunStore extends EndgameProofRunStore {
+  loadCheckpoint(): Readonly<{
+    checkpoint: EndgameProofCheckpoint | null;
+    tip: EndgameProofTip | null;
+    diagnostics: EndgameProofRunStoreDiagnostics;
+    advanceAllowed: boolean;
+  }>;
+  publishCheckpoint(publication: EndgameProofCheckpointPublication): Readonly<{
+    tip: EndgameProofTip;
+    diagnostics: EndgameProofRunStoreDiagnostics;
+    advanceAllowed: boolean;
+  }>;
+  releaseCheckpointRun(run: EndgameProofRun): void;
+  suspend(): Readonly<{
+    diagnostics: EndgameProofRunStoreDiagnostics;
+    closeFailed: boolean;
+  }>;
+}
+
+export type EndgameProofAdvanceResult =
+  | Readonly<{
+      status: 'searching';
+      generation: number;
+      depth: number;
+      parentOffset: number;
+      tip: EndgameProofTip;
+      diagnostics: EndgameProofRunStoreDiagnostics;
+      advanceAllowed: boolean;
+    }>
+  | Readonly<{
+      status: 'complete';
+      generation: number;
+      certificate: EndgameOptimalRouteCertificate;
+      tip: EndgameProofTip;
+      diagnostics: EndgameProofRunStoreDiagnostics;
+      advanceAllowed: boolean;
+    }>
+  | Readonly<{
+      status: 'blocked';
+      generation: number | null;
+      tip: EndgameProofTip | null;
+      diagnostics: EndgameProofRunStoreDiagnostics;
+      advanceAllowed: false;
+    }>;
 
 export interface EndgameOptimalRouteCertificateOptions {
   runStore?: EndgameProofRunStore;
