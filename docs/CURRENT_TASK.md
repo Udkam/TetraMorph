@@ -10344,3 +10344,33 @@ boundary. Commit and re-review R5 before authoring.
   only in the DESIGN command-pin section. The v6 mutable namespace remains fully absent.
 - Commit and independently review this exact four-document pin. Then create and twice review
   one THREAD_LOG-only final-HEAD binding. Preflight and production remain closed meanwhile.
+
+## Current checkpoint — F4E-R6B consumed-attempt interruption clarification
+
+The command pin and final binding were accepted at `b5c1ecf` and `8776bb8`. The sole v6
+preflight passed without writes, and the sole production invocation durably claimed canonical
+attempt run `b091b231d8ba8f7c68e5a92b`. The coordinating turn was later interrupted while the
+outer and worker were still live. The original execution cell no longer retains a result.
+
+Recovery finds the exact 7,227-byte attempt at SHA-256
+`5B1F18B8601CA57FD9BA8C977008C1F7B55B5CACEE606A6D20239522BEF2F132`,
+no candidate, no terminal, no publication residue, and exactly one frontier entry,
+`d0005-p0002-g0000.run`. That entry is 9,151,727,935 bytes at stable SHA-256
+`1C9993ABAC88255AAEC924C7696F444C640AF9A701F9B20653E229793C896DCC`.
+The first retained recovery process scan is the exact 32-byte
+`{"entries":[],"truncated":false}` result. It is not the lost immediate post-exit scan and
+does not prove worker close/reap during the unobserved interval.
+
+V6 is therefore consumed fail-closed and cannot be retried, resumed, renamed, repaired, or
+cleaned. No candidate or terminal means no Intro-05 certificate and no integration authority.
+The exact outer exit code, worker exit/signal, and terminating actor are unobservable; the
+canonical receipt must use JSON `null`, never a guessed integer or `"unknown"`. This is only
+an unavailable exit observation after durable authority consumption, not a successful exit or
+a validator-declared failure.
+
+The current slice is documentation only. Commit this four-authority reporting clarification,
+obtain two independent all-zero contract reviews, then obtain two independent read-only output
+audits. Only those audits may authorize one THREAD_LOG-only `F4E-R6-CONSUMED-V1` receipt,
+followed by two exact-marker reviews. Preserve every v6 artifact and stage byte unchanged.
+Intro-05 proof/source, all later curriculum work, and any successor execution remain closed
+until the consumed receipt is accepted.

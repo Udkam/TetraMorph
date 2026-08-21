@@ -3257,3 +3257,34 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next action: exact four-doc command-pin commit and two fresh reviews, then a
   THREAD_LOG-only final-HEAD binding plus two reviews. No process gate or validator mode is
   authorized before that sequence completes.
+
+### F4E-R6B consumed v6 interruption recovery checkpoint
+
+- Command pin `b5c1ecf` and final binding `8776bb8` opened exactly one no-write preflight and
+  one production invocation. Preflight passed. Production durably wrote canonical attempt
+  run `b091b231d8ba8f7c68e5a92b` at `2026-08-16T22:15:00.774Z`; its bound outer PID was 7784.
+- The coordinating turn was interrupted at `2026-08-16T22:40:45Z`. The original execution
+  cell is no longer readable and retained no production result. Windows application/system
+  evidence provides no relevant Node crash, OOM, shutdown, restart, or reliable process-exit
+  record. Exact outer exit, worker exit/signal, and terminating actor are unobservable.
+- Frozen recovery inventory: validator 89,769 bytes /
+  `7F843B3BB22BF40881C25310B8D0881B172E828F46E468FBCD956CBE1677A311`;
+  attempt 7,227 bytes /
+  `5B1F18B8601CA57FD9BA8C977008C1F7B55B5CACEE606A6D20239522BEF2F132`;
+  candidate absent; terminal absent; publication residue empty; stage contains only
+  `d0005-p0002-g0000.run`, 9,151,727,935 bytes /
+  `1C9993ABAC88255AAEC924C7696F444C640AF9A701F9B20653E229793C896DCC`.
+  Stage identity remained stable across the full hash read.
+- The first retained exact recovery gate is 32-byte
+  `{"entries":[],"truncated":false}`. It proves no matching v6 process at recovery only; it
+  is not the unavailable immediate post-exit gate and proves no orderly close/reap in the
+  observation gap.
+- Disposition: attempt existence permanently consumes v6. With no candidate or terminal,
+  this is fail-closed and grants no Intro-05 integration. Do not retry, resume, repair, rename,
+  delete, or use the retained run as successor proof input.
+- Reporting correction: `outerExitCode` is JSON `null` only because external orchestration
+  interruption permanently lost the observation after durable claim. It is not zero, normal
+  exit, OOM, or a guessed signal. The canonical receipt schema otherwise stays unchanged.
+- Next exact sequence: four-doc clarification commit; two all-zero contract reviews; two
+  read-only output audits; THREAD_LOG-only consumed receipt; two exact-marker reviews. No
+  successor contract, Intro-05 source, or proof execution opens before that closure.

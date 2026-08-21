@@ -9792,3 +9792,46 @@ This checkpoint opens no execution. Commit these exact four authority documents 
 two fresh all-zero exact-byte/command reviews. Then add one THREAD_LOG-only static-QA
 disposition/final-binding commit and review its exact resulting HEAD twice. Only that accepted
 binding opens the first process gate and the sole preflight.
+
+### F4E-R6B post-attempt orchestration-interruption reporting clarification
+
+This clarification is narrower than the accepted v6 proof contract. It changes no proof
+definition, validator byte, source pin, process-gate command, namespace, or one-use rule. It
+only defines canonical failure reporting when a durable attempt exists but the external
+orchestrator loses the outer process's exit observation before it can retain the production
+metadata. It does not authorize a validator invocation, a retry, residue cleanup, Intro-05
+source integration, or use of a retained frontier as successor proof input.
+
+Normally `outerExitCode` is the reliably observed integer exit code captured by the
+coordinator after the outer process exits. There is exactly one exceptional representation:
+when a canonical durable attempt already exists, external orchestration interruption makes
+the original process result permanently unavailable, and candidate plus terminal are both
+absent, `outerExitCode` is JSON `null`. `null` means only **exit observation unavailable after
+authority consumption**. It never means exit zero, orderly worker close/reap, a validator-
+declared failure, OOM, signal 137, or any other inferred lifecycle. String sentinels such as
+`"unknown"` are forbidden, and no integer may be guessed.
+
+The existing canonical consumption-receipt key order and nested shapes remain unchanged.
+This exceptional `null` branch is always a consumed failure: the durable attempt remains the
+authority boundary, success is impossible without independently audited candidate and terminal
+artifacts, and v6 cannot be rerun, renamed, repaired, resumed, or cleaned. The original stage
+is immutable failure residue. `frontierStage.entries` continues to contain only sorted entry
+names; a retained entry's stable byte count, SHA-256, timestamps, and inspection limits belong
+in adjacent receipt prose and do not expand the canonical marker schema.
+
+R4's immediate post-exit process gate remains the normal source of receipt
+`matchingProcesses`. If the same external interruption also makes that scan permanently
+unavailable, the exceptional branch uses the coordinator's first later exact recovery scan.
+That scan and the publication/stage inventories are recovery-time observations only. They
+must be identified as such with their time, exact output, and reason for delay; they prove no
+matching process at recovery, but do not retroactively prove orderly close/reap or an empty
+interval after the lost exit. Attempt consumption does not depend on that immediacy.
+
+The interruption leaves no second marker. After this four-authority clarification receives
+two independent all-zero contract reviews, two fresh independent read-only output audits must
+bind the attempt, absent candidate/terminal, exact recovery inventories, retained stage
+descriptor, and recovery process gate. Only then may one THREAD_LOG-only
+`F4E-R6-CONSUMED-V1` marker be committed with the already frozen canonical key order. Its
+`audit` field reports those two real audit totals. Two later exact-marker/commit reviews close
+the receipt before any docs-first successor is opened. Until that sequence finishes, the
+consumed marker remains absent and all Intro-05 source and proof work remains closed.

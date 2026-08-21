@@ -903,3 +903,28 @@ F4E-R5-CONSUMED-V1 {"head":"d5a95ff765f2a018da8c7409e2a923fb69ad1110","validator
   HEAD replaces FINAL_QA_BINDING_HEAD in the frozen public arguments only after two fresh
   exact-HEAD/history/blob/command reviews each return all-zero. Until then, process gate,
   preflight, worker, production, Store, and Intro-05 remain closed.
+
+### F4E-R6B post-attempt interruption reporting candidate
+
+- Final binding `8776bb8` opened the accepted one-use v6 command. Its no-write preflight
+  passed, and the sole production invocation durably claimed canonical attempt run
+  `b091b231d8ba8f7c68e5a92b` before the coordinating turn was interrupted.
+- Recovery binds the exact validator and source pin, the 7,227-byte attempt at SHA-256
+  `5B1F18B8601CA57FD9BA8C977008C1F7B55B5CACEE606A6D20239522BEF2F132`,
+  absent candidate and terminal, empty publication residue, and one retained frontier entry.
+  `d0005-p0002-g0000.run` is 9,151,727,935 bytes at stable SHA-256
+  `1C9993ABAC88255AAEC924C7696F444C640AF9A701F9B20653E229793C896DCC`.
+- The original execution cell and outer-exit observation are permanently unavailable.
+  Contemporary Windows logs do not establish a Node crash, OOM, shutdown, restart, signal,
+  or terminating actor. No lifecycle result will be invented.
+- The exact 32-byte empty process result is the first retained recovery scan, not the lost
+  immediate post-exit gate. It establishes no matching process at recovery only and does not
+  retroactively prove orderly worker close/reap.
+- This four-document candidate clarifies that a consumed-attempt receipt may use JSON `null`
+  for `outerExitCode` only in this externally interrupted, permanently unobservable branch.
+  It always denotes failure after authority consumption; strings and guessed integers are
+  forbidden. The frozen canonical key order remains unchanged.
+- No consumed marker is written in this candidate. First obtain two independent all-zero
+  contract reviews and two independent output audits. Only then may one THREAD_LOG-only
+  canonical receipt be committed and reviewed twice. V6 residue remains immutable; retry,
+  resume, cleanup, Intro-05 source integration, and successor proof execution stay closed.
