@@ -1033,5 +1033,21 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   before `.idx.part` creation. A new resume Store performs one full authentication scan;
   repeated same-Store loads use cached authenticated inventory, and range data begins at the
   indexed offset. I/O-count, empty-stage, and pre-part quota tests are mandatory.
-- Next: commit these four R6 docs and obtain at least two fresh independent all-zero reviews.
-  Core, adapter, external R7 paths, proof execution, and Intro-05 remain closed.
+- The former R6 review next action is superseded by R7 below. Core, adapter, external R7
+  paths, proof execution, and Intro-05 remain closed.
+
+### F4E-R7A R6 rejected and R7 contract candidate
+
+- R6 `67091e4` is rejected independently at `0/1/4/0/1` and `0/1/1/0/1`.
+- R7 exports the binding alias, requires safe collection coordinates, and fails invalid opens
+  before any reader/slot. Committed view disposal is an idempotent logical release with no
+  unlink; publication or terminal suspend consumes the only view and invalidates every object.
+- Owner-final-only/null-tip is the clean advanceable pre-seed state; the nonnull-tip branch is
+  rollback. Precommit residue is nonempty. Postcommit cleanup may leave any exact bounded
+  historical data/index half subset, alone or with a manifest alias, while retaining the
+  highest tip and blocking advance.
+- I/O assertions are per identity/phase: new publication files still receive prescribed full
+  verification, but old identities are not rescanned in the same Store. Range reads are wholly
+  bounded by both authenticated offsets and empty ranges read no data.
+- Next: commit these four R7 docs and obtain at least two fresh independent all-zero reviews.
+  Source, external paths, proof execution, and Intro-05 remain closed.

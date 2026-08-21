@@ -9877,8 +9877,11 @@ Core requires safe integers,
 range, exact yielded count, printable full keys, and strict order. The adapter must issue its
 first positioned read at the authenticated byte offset for `startOrdinal` and must not read,
 scan, or decode any byte or record in `0..startOrdinal-1`. Late-range work is therefore
-linear in the requested range bytes, not the prefix or prior units. The adapter cannot choose
-the range or substitute a self-consistent size.
+linear in the requested range bytes, not the prefix or prior units. Every data-file read for a
+nonempty range is wholly contained in the authenticated half-open byte interval
+`[indexOffset(startOrdinal), indexOffset(endOrdinal))`; it may not buffer or read past the end
+offset. An empty range yields nothing and performs zero data-file reads. The adapter cannot
+choose the range, read to EOF, or substitute a self-consistent size.
 
 The production parent unit is exactly 65,536 keys, with 0..4,096 units inclusive. Existing
 2,048-byte record, 64 MiB/131,072-record chunk, 32-way merge, and 4,098 active Core-run
@@ -9901,7 +9904,8 @@ run write or manifest commit. It is an infrastructure failure with no certificat
 truncates, samples, beams, hashes state identity, or proves that a route is absent. Tests
 alone may inject smaller limits.
 
-The new authoring-only API has the following exact public shape. A binding is
+The new authoring-only API has the following exact public shape. The exported
+`EndgameProofResumeBinding` type is exactly
 `Readonly<{ schema:'t37-f4e-r7-proof-binding-v1'; levelId:EndgameId;`
 ` candidateCommandStream:string; optimalLocks:number; initialStateHash:string;`
 ` initialFrontierKey:string }>`.
@@ -9909,14 +9913,19 @@ The new authoring-only API has the following exact public shape. A binding is
 `EndgameProofRunCollection` is an opaque adapter-owned descriptor collection with exact
 public shape `Readonly<{ count:number; open(range:Readonly<{ startIndex:number;`
 ` endIndex:number }>):readonly EndgameProofRun[] }>`; it never materializes Core run objects
-until `open`. An open range requires `0 <= startIndex < endIndex <= count` and
+until `open`. `count`, `startIndex`, and `endIndex` are safe integers; count is `0..4096`.
+An open range requires `0 <= startIndex < endIndex <= count` and
 `endIndex - startIndex <= 32`, returns that exact contiguous descriptor slice in committed
-order, and is invalid while any object from the preceding range remains live. Core must call
-`releaseCheckpointRun` for every returned object before another range can open. The opaque
+order, and is invalid while any object from the preceding range remains live. An empty,
+fractional, unsafe, reversed, oversized, or out-of-bounds range throws before opening a reader
+or consuming a slot. Core must logically release every returned object through
+`releaseCheckpointRun` (or its exact committed-view `dispose()` alias) before another range
+can open. The opaque
 collection itself consumes no Core run-metadata slot, cannot be enumerated or serialized by
 Core, and becomes invalid after successful publication or `suspend()`. A Store permits one
-loaded checkpoint view at a time; calling `loadCheckpoint()` again while its frontier or an
-opened collection member remains live is fatal.
+loaded checkpoint view at a time. That view remains outstanding even after all of its run
+objects are released; only successful publication or terminal `suspend()` consumes it.
+Calling `loadCheckpoint()` again while a view remains outstanding is fatal.
 
 A searching checkpoint is
 `Readonly<{ kind:'searching'; generation:number; binding:EndgameProofResumeBinding;`
@@ -9963,16 +9972,23 @@ cursor, counter, binding, reason, run, or tip mismatch is fatal before publicati
 - `publishCheckpoint(publication:EndgameProofCheckpointPublication):`
   ` Readonly<{ tip:EndgameProofTip; diagnostics:EndgameProofRunStoreDiagnostics;`
   ` advanceAllowed:boolean }>`;
-- `releaseCheckpointRun(run:EndgameProofRun): void`, which invalidates one loaded committed
-  Core object and releases its metadata slot but cannot unlink or alter the latest
-  manifest-referenced run/index bytes. The released object is never accepted by publication;
-  `values()`/`dispose()` then fail. A later collection `open` or `loadCheckpoint()` creates a
-  fresh live object from the Store's authenticated descriptor inventory;
+- `releaseCheckpointRun(run:EndgameProofRun): void`, which idempotently invalidates one loaded
+  committed Core object and releases its metadata slot but cannot unlink or alter any
+  manifest-referenced run/index bytes. On a live committed checkpoint view, inherited
+  `run.dispose()` is exactly an idempotent alias for this logical release and likewise never
+  touches a file; after release `values()` fails while repeated `dispose()` or
+  `releaseCheckpointRun()` is a no-op. Physical unlinking `dispose()` remains exclusive to
+  uncommitted working runs. A later collection `open` or a post-publication
+  `loadCheckpoint()` creates a fresh live object from authenticated descriptors. Passing a
+  foreign, working, other-Store, or non-current-view run fails before any mutation;
 - `suspend(): Readonly<{ diagnostics:EndgameProofRunStoreDiagnostics;`
   ` closeFailed:boolean }>`, idempotently attempting every close and retaining the latest
   checkpoint/referenced bytes. It never throws, never masks an existing primary, and never
-  reclassifies a committed generation as uncommitted. `closeFailed:true` forbids reuse of that
-  Store object and requires process exit/reopen. Inherited `dispose()` remains explicit final
+  reclassifies a committed generation as uncommitted. Its first call permanently invalidates
+  the Store, its outstanding checkpoint/collection handles, frontier, and every opened member;
+  logically releases every corresponding Core slot without unlinking committed bytes, and
+  requires a fresh Store open before any load/open/publish. `closeFailed:true` additionally
+  requires process exit before reopen. Inherited Store `dispose()` remains explicit final
   teardown after later candidate/terminal authority, never ordinary pause/interruption;
   fixture tests alone may dispose their isolated temporary stores.
 
@@ -10219,7 +10235,13 @@ lightweight current file-identity checks; it performs no repeated full manifest,
 or hash scan. `values(range)` is a separate reader operation whose first data-file read is the
 exact indexed byte offset and whose I/O is linear only in returned range bytes. Reopening a
 later process/Store pays exactly one new full admission scan. Same-Store publication updates
-the authenticated cache from its one constant-size delta and newly verified file bytes.
+the authenticated cache from its one constant-size delta and newly verified file bytes. This
+no-rescan rule is per file identity: every newly published run/index/manifest still undergoes
+all prescribed part/final rereads, hashes, framing, and identity verification during its
+publication, but no later same-Store load or advance fully rereads an identity already admitted
+or published. A later Store admission scans each then-existing authoritative identity once
+again. Instrumentation distinguishes admission, publication verification, range, and
+lightweight-stat I/O rather than treating required reads of new files as an old-file rescan.
 
 Loaded latest-checkpoint runs use logical release, not physical disposal. At the last unit
 start, the frontier occupies one Core slot and the opaque collection representing 4,095
@@ -10244,24 +10266,32 @@ Same-call failure before the manifest link attempts identity-bound cleanup only 
 files created by that call. With `expectedTip:null`, an exactly empty stage left after
 directory creation but before the owner part is `pre-owner-empty-residue`; an absent owner
 final plus only `owner.json.part` is `pre-owner-part-residue`; and an exact owner final plus a
-same-identity owner part is `owner-alias-residue`. All return
+same-identity owner part, with no manifest or other entry, is `owner-alias-residue`. All return
 `checkpoint:null,tip:null,advanceAllowed:false` and are never proof authority. With nonnull
 `expectedTip`, each is fatal authenticated rollback before residue classification. An invalid
 or mismatched owner final is always fatal whether or not a part also exists.
-After a clean owner, any bounded subset of exact grammar-valid unreferenced
+With `expectedTip:null`, an exact owner final alone—no part, manifest, run, index, or other
+entry—is the clean pre-seed state and returns
+`checkpoint:null,tip:null,advanceAllowed:true`; with nonnull `expectedTip` it is fatal rollback.
+After a clean owner, any nonempty bounded subset of exact grammar-valid unreferenced
 working/committed-ID run or index parts/finals—including a lone newly opened part before its
 pair exists—or a final-absent manifest part is `precommit-owned-residue`. Parts need not be
 complete or parseable and are never proof input; conflicting duplicate names/identities remain
 ambiguous. A final-present same-identity manifest part is
 `postcommit-manifest-alias-residue`; and exact run/index descriptors referenced by an older
-but superseded manifest are
-`postcommit-superseded-residue`. The first leaves the prior generation authoritative; the
-latter two leave the new generation authoritative. With no prior manifest, the first returns
+but superseded manifest are `postcommit-superseded-residue`. The latter includes any nonempty,
+resource-bounded subset of exact superseded data/index finals: one `.run` without its `.idx`,
+one `.idx` without its `.run`, both, or different halves across multiple descriptors. Every
+present final must match its historical descriptor bytes/hash/identity; an absent complement
+is accepted because its cleanup succeeded. Manifest-alias and superseded subsets may coexist
+and are reported together. Precommit residue leaves the prior generation authoritative; both
+postcommit classes leave the new generation authoritative. With no prior manifest, the first returns
 `checkpoint:null,tip:null,advanceAllowed:false`; otherwise all three retain the authoritative
 tip and set `advanceAllowed:false`. They
 remain untouched pending later exact cleanup authority. A mismatched hard link, final/part
 byte or identity disagreement, unknown name, ambiguous descriptor, or foreign entry is fatal,
-not recognized residue.
+not recognized residue. Both data and index finals for every descriptor active in the highest
+checkpoint are mandatory; a missing active half is fatal, never superseded residue.
 
 This mechanism claims recovery from process/conversation interruption, not power-loss
 durability beyond the explicit file fsync and atomic/no-replace boundaries. A mutable
@@ -10281,18 +10311,25 @@ unsafe counter addition, same-size omit/add/replace/reorder, corrupt/truncated r
 manifest, offset swap, binding/cursor/generation drift, reparse/path/file-ID drift, owner
 conflict, manifest-before-run, interruption before/after manifest link and before cleanup,
 foreign/ambiguous residue, and every open/write/fsync/close/read/link/unlink/cleanup seam. Tests
-also use instrumented I/O counts to prove exactly one full admission scan per Store open, no
-second full manifest/run/index/hash scan across repeated same-Store loads and unit advances,
-and an exact indexed first data read for every repeated late range; a later reopened Store
-must perform exactly one new full scan. They cover final short and exact-multiple terminal
+also use per-identity and per-phase instrumented I/O counts to prove exactly one full admission
+scan per newly opened resume Store, no second full scan of a previously authenticated identity across
+same-Store loads and unit advances, every required publication reread of each newly written
+identity, and no later same-Store rescan of that new identity. For every repeated late range,
+all data-file reads must remain inside the authenticated
+`[indexOffset(startOrdinal),indexOffset(endOrdinal))` interval; empty ranges perform none, and a
+later reopened Store performs exactly one new admission scan. They cover final short and exact-multiple terminal
 offsets, 4,096/4,097 units, post-commit reopen with successful/failed cleanup, and
 limit-minus-one/equal/plus-one for every byte, entry, and generation bound. Index admission
 tests prove the deterministic byte formula and that a rejected prospective two-name/two-byte
 charge creates no `.idx.part`. This includes part/final coexistence at 49,151/49,152 names,
 depth 32,767/32,768, expected-tip shorter/equal/extended chains, nonnull expected-tip
 precedence over empty/pre-owner/short-chain residue, the exact empty-stage and owner-part
-`expectedTip:null` blocked cases, and suspend faults both behind a precommit primary and after
-a committed success. A default-limit
+`expectedTip:null` blocked cases, clean owner-final-only null/non-null branches, and suspend
+faults both behind a precommit primary and after a committed success. Live committed
+`dispose()` must never delete bytes; suspend must invalidate the view and reclaim all logical
+slots; a post-publication reload must reject the old collection handle. Postcommit cleanup
+tests leave only data, only index, mixed halves across descriptors, and those subsets combined
+with a manifest alias while preserving the latest tip and blocking advance. A default-limit
 reachability test serializes and replays 32,768 retained canonical deltas, including one full
 4,096-unit layer and its layer transition, proves each delta is constant-size and at most
 16,384 bytes, proves their cumulative bytes are at most 536,870,912, and proves the
@@ -10321,7 +10358,7 @@ bind source blobs and define the external schemas, detached Task Scheduler runne
 same-attempt resume authority, process/task/resource gates, and the sole fresh Intro-05
 production attempt. R7A runs no Intro-05 work.
 
-### F4E-R7A R1/R2/R3/R4/R5 rejection and R6 correction
+### F4E-R7A R1/R2/R3/R4/R5/R6 rejection and R7 correction
 
 R1 `b697625` is rejected at independent
 `P0/P1/P2/P3/GAP = 0/3/2/0/0`. R2 `09da746` closes those findings but is rejected by two
@@ -10350,4 +10387,12 @@ is rejected. R6 removes materialized/released prior-run tokens in favor of a zer
 collection and constant-size publication deltas; makes nonnull expected-tip rollback checks
 precede residue handling; freezes pre-part index-size admission; separates one fresh-Store
 admission scan from same-Store loads and indexed range reads; and classifies the empty
-pre-owner stage. Commit and independently review this four-document R6 before implementation.
+pre-owner stage.
+
+R6 `67091e4` is independently rejected at `0/1/4/0/1` and `0/1/1/0/1`. R7 names the binding
+type; requires safe collection indices; makes committed `dispose()` a deletion-free logical
+release; makes suspend terminal while invalidating every live view/slot; defines the clean
+owner-only seed state; separates old-file rescan counts from required new-file publication
+verification; bounds every range read at both authenticated offsets; and recognizes every
+bounded half-pair combination of superseded cleanup residue, including coexistence with a
+manifest alias. Commit and independently review this four-document R7 before implementation.

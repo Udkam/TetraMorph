@@ -10502,5 +10502,34 @@ plus lightweight identity checks, and `values(range)` begins its first data read
 indexed offset. Only a later reopened Store pays one new full scan. Instrumented I/O tests must
 prove those counts, direct late-range reads, expected-tip precedence, and empty-stage recovery.
 
+The former R6 review next action is superseded by the R7 disposition below. Core and adapter
+implementation remain closed.
+
+### F4E-R7A R6 rejected — R7 lifecycle and recovery closure
+
+R6 `67091e4` is independently rejected at `P0/P1/P2/P3/GAP = 0/1/4/0/1` and
+`0/1/1/0/1`. R7 explicitly exports `EndgameProofResumeBinding`; makes collection count/range
+coordinates safe integers; and rejects invalid ranges before reader or slot creation.
+
+Committed checkpoint views now have deletion-free disposal: their inherited `dispose()` is an
+idempotent alias for `releaseCheckpointRun`, while only uncommitted working runs may physically
+unlink. Publication or terminal `suspend()` consumes the sole outstanding checkpoint view;
+suspend invalidates every frontier/collection/member and releases all logical Core slots, and
+the Store object cannot be reused. Successful publication returns no materialized checkpoint.
+
+For `expectedTip:null`, exact owner-final-only state is the clean pre-seed state and returns
+null checkpoint/tip with `advanceAllowed:true`; its nonnull-tip counterpart is fatal rollback.
+Precommit residue is explicitly nonempty, and owner alias is confined to the exact no-manifest
+pre-seed state. Postcommit superseded residue accepts any bounded exact historical final-file
+subset—data only, index only, full pairs, or mixed halves—and may coexist with a manifest
+alias; the newest tip remains authoritative and advance stays blocked.
+
+I/O accounting is per file identity and phase. Previously authenticated identities are never
+fully rescanned in the same Store, while every newly published identity still receives all
+required part/final verification reads. Every nonempty `values(range)` data read stays wholly
+inside the two authenticated index offsets; an empty range performs no data read. Tests cover
+dispose/suspend/old-handle invalidation, clean-owner null/non-null branches, mixed cleanup
+halves, alias coexistence, per-phase I/O, and both range boundaries.
+
 **Current next action:** commit and obtain at least two fresh independent all-zero reviews of
-the four-document R6 contract. Core and adapter implementation remain closed until that gate.
+the four-document R7 contract. Core and adapter implementation remain closed until that gate.

@@ -3364,4 +3364,22 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Index size is computed from run count and its exact two-name/twice-byte charge admitted
   before part creation. Each new resume Store performs one full scan; same-Store loads use its
   authenticated cache, while ranged reads start at the index offset.
-- Next: commit/review only the four R6 docs. Source and all external R7 paths remain closed.
+- The former R6 review next action is superseded by R7 below. Source and all external R7 paths
+  remain closed.
+
+### F4E-R7A R6 rejection and R7 lifecycle/recovery correction
+
+- R6 `67091e4` reviews are `0/1/4/0/1` and `0/1/1/0/1`; R6 is rejected.
+- R7 names the exported resume binding and makes collection counts/indices safe integers with
+  failure before any reader or slot opens.
+- Committed-run `dispose()` is an idempotent deletion-free logical release. Publication or
+  terminal suspend consumes the single view; suspend invalidates all handles/objects and
+  releases their Core slots. Only working runs may unlink before commit.
+- Exact owner-final-only with null expected tip is clean pre-seed/advance allowed; nonnull tip
+  is rollback. Precommit residue is nonempty. Historical superseded data/index finals may
+  remain as any exact half-pair subset and combine with a manifest alias while retaining the
+  highest blocked tip.
+- Same-Store I/O counts distinguish required verification of new identities from forbidden
+  rescans of old identities. Every range read is bounded by both authenticated offsets; empty
+  ranges read no data.
+- Next: commit/review only the four R7 docs. Source and all external R7 paths remain closed.
