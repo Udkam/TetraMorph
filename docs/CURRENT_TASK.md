@@ -10608,3 +10608,17 @@ R11 `a8607fd` receives three fresh independent `0/0/0/0/0` reviews and is accept
 `src/authoring/endgameDiskFrontier.test.mjs`. Keep Core and adapter ownership disjoint, preserve
 memory/one-shot compatibility, and run the exact focused/max/fault gates before the final suite.
 No external R7 path, production Store/proof, R7B, or Intro-05 is authorized.
+
+### F4E-R7A C1b atomic publication source-checkpoint exception
+
+The C1b prepared-manifest publication boundary may exceed the normal 500 handwritten-line
+checkpoint budget only across `scripts/endgame-disk-frontier.mjs` and
+`src/authoring/endgameDiskFrontier.test.mjs`. The authenticated inventory ledger,
+candidate ownership lifecycle, no-replace manifest part/final transaction, reentrant
+publication lease, nonthrowing suspension, and fault matrix describe one filesystem commit
+boundary; splitting them would leave a green-looking checkpoint that can either publish a
+manifest without its retained run accounting or expose an unsafe reentrant state. No Core,
+adapter, external runner, product proof, browser evidence, curriculum, or inherited dirty
+path is included in this exception. The source candidate requires Node syntax, focused tests,
+typecheck, the complete current-source suite, production build, diff check, and independent
+read-only exact-range QA before any recovery or R7B work opens.
