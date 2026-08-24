@@ -17,6 +17,7 @@ import {
 import { ENDGAME_V3_INTRO_DRAFTS } from '../game/core/endgameV3IntroDefinitions.ts';
 import {
   ENDGAME_PROOF_FRONTIER_STORE_TESTING,
+  advanceOptimalEndgameRouteProofForDefinition,
   certifyOptimalEndgameRouteForDefinition,
 } from '../game/core/endgameRouteSearch.ts';
 
@@ -4305,6 +4306,657 @@ describe('Node Endgame disk frontier adapter', () => {
     expect(fs.readFileSync(foreign, 'utf8')).toBe('foreign');
     expect(store.diagnostics().residue).toEqual(['.', 'foreign.txt']);
     fs.unlinkSync(foreign);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+});
+
+describe('R7 same-Store seed and unit checkpoint publication', () => {
+  const directBinding = (optimalLocks = 4, initialFrontierKey = 'A') => Object.freeze({
+    schema: 't37-f4e-r7-proof-binding-v1',
+    levelId: 't3r-shaft-01',
+    candidateCommandStream: 'S',
+    optimalLocks,
+    initialStateHash: '00000000',
+    initialFrontierKey,
+  });
+
+  it('advances real Core through seed and one unit without charging the old active run as working bytes', () => {
+    const { parent, stage } = temporaryStage('r7-product-seed-unit');
+    const counted = countedResumableInventoryFs();
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: counted.seam,
+    });
+    expect(counted.snapshot().readdirSync).toBe(1);
+    const definition = ENDGAME_V3_INTRO_DRAFTS[0];
+    const route = intro01.optimalRoute;
+
+    const seeded = advanceOptimalEndgameRouteProofForDefinition(definition, route, store);
+    expect(seeded).toMatchObject({ status: 'searching', generation: 0, depth: 0, parentOffset: 0, advanceAllowed: true });
+    const seedManifest = JSON.parse(fs.readFileSync(path.join(stage, 'manifest-g00000.json'), 'utf8'));
+    expect(seedManifest.transition).toBe('seed');
+    expect(seedManifest.resourceTotalsBeforeManifest.latestCheckpointRunBytes).toBeGreaterThan(0);
+    expect(seedManifest.resourceTotalsBeforeManifest.uncommittedWorkingRunBytes)
+      .toBe(seedManifest.resourceTotalsBeforeManifest.latestCheckpointRunBytes);
+    expect(seedManifest.resourceTotalsBeforeManifest.recognizedPhysicalRunBytes)
+      .toBe(seedManifest.resourceTotalsBeforeManifest.latestCheckpointRunBytes);
+
+    const unit = advanceOptimalEndgameRouteProofForDefinition(definition, route, store);
+    expect(unit).toMatchObject({ status: 'searching', generation: 1, depth: 0, parentOffset: 1, advanceAllowed: true });
+    const unitManifest = JSON.parse(fs.readFileSync(path.join(stage, 'manifest-g00001.json'), 'utf8'));
+    expect(unitManifest.transition).toBe('unit');
+    expect(unitManifest.resourceTotalsBeforeManifest.uncommittedWorkingRunBytes).toBeGreaterThan(0);
+    expect(unitManifest.resourceTotalsBeforeManifest.uncommittedWorkingRunBytes)
+      .toBeLessThan(unitManifest.resourceTotalsBeforeManifest.recognizedPhysicalRunBytes);
+    expect(unitManifest.resourceTotalsBeforeManifest.latestCheckpointRunBytes)
+      .toBe(unitManifest.resourceTotalsBeforeManifest.recognizedPhysicalRunBytes);
+
+    const loaded = store.loadCheckpoint();
+    expect(loaded.tip).toEqual(unit.tip);
+    expect(loaded.checkpoint).toMatchObject({
+      kind: 'searching', generation: 1, depth: 0, parentOffset: 1,
+    });
+    expect(loaded.checkpoint.nextRuns.count).toBe(1);
+    expect(counted.snapshot().readdirSync).toBe(1);
+    const members = loaded.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 1 });
+    expect(members).toHaveLength(1);
+    expect(() => loaded.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 1 })).toThrow('open batch');
+    expect([...members[0].values()]).toHaveLength(34);
+    store.releaseCheckpointRun(members[0]);
+    expect(() => loaded.checkpoint.nextRuns.open({ startIndex: 1, endIndex: 1 })).toThrow('nonempty');
+    store.releaseCheckpointRun(loaded.checkpoint.frontier);
+    const suspended = store.suspend();
+    expect(suspended.closeFailed).toBe(false);
+    expect(() => loaded.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 0 })).toThrow('invalidated');
+    store.dispose();
+    releaseParent(parent, stage);
+  }, 30_000);
+
+  it('cleans an owned candidate exactly when manifest planning fails before commit', () => {
+    const { parent, stage } = temporaryStage('r7-product-precommit-clean');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    expect(store.loadCheckpoint().checkpoint).toBeNull();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(4, 'B'), frontier,
+    }))).toThrow('does not match');
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    expect(() => store.loadCheckpoint()).toThrow('already outstanding');
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('closes a candidate reader and cleans its files when ownership preparation fails', () => {
+    const { parent, stage } = temporaryStage('r7-product-candidate-reader-clean');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    const reader = frontier.values();
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }))).toThrow('active reader');
+    expect(reader.next().done).toBe(true);
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    expect(() => store.loadCheckpoint()).toThrow('already outstanding');
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rolls back a prelink ownership claim and lets suspend retry an exact candidate cleanup fault', () => {
+    const { parent, stage } = temporaryStage('r7-product-prelink-clean-retry');
+    let failManifestLink = false;
+    let failCandidateUnlink = false;
+    const seam = {
+      linkSync(source, finalPath) {
+        if (failManifestLink && path.basename(String(finalPath)) === 'manifest-g00000.json') {
+          const error = new Error('injected prelink manifest failure');
+          error.code = 'ENOSPC';
+          throw error;
+        }
+        return fs.linkSync(source, finalPath);
+      },
+      unlinkSync(filePath) {
+        if (failCandidateUnlink && path.basename(String(filePath)) === 'r7-f-d00000-g00000.run') {
+          failCandidateUnlink = false;
+          const error = new Error('injected candidate cleanup fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.unlinkSync(filePath);
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    failManifestLink = true;
+    failCandidateUnlink = true;
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }))).toThrow('injected prelink manifest failure');
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(false);
+    expect(() => store.loadCheckpoint()).toThrow('already outstanding');
+    store.suspend();
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(false);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('publishes a final-decision unit without a candidate and records zero working run bytes', () => {
+    const { parent, stage } = temporaryStage('r7-product-null-unit');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    expect(store.loadCheckpoint().checkpoint).toBeNull();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    const seed = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(2), frontier,
+    }));
+    const loaded = store.loadCheckpoint();
+    store.releaseCheckpointRun(loaded.checkpoint.frontier);
+    const unit = store.publishCheckpoint(Object.freeze({
+      transition: 'unit',
+      previousTip: seed.tip,
+      parentOffset: 1,
+      lastProcessedParentKey: 'A',
+      transitionsDelta: 1,
+      boundPrunesDelta: 0,
+      nextRun: null,
+    }));
+    expect(unit).toMatchObject({ advanceAllowed: true, tip: { generation: 1 } });
+    const manifest = JSON.parse(fs.readFileSync(path.join(stage, 'manifest-g00001.json'), 'utf8'));
+    expect(manifest.resourceTotalsBeforeManifest.uncommittedWorkingRunBytes).toBe(0);
+    expect(manifest.resourceTotalsBeforeManifest.latestCheckpointRunBytes)
+      .toBe(manifest.resourceTotalsBeforeManifest.recognizedPhysicalRunBytes);
+    const after = store.loadCheckpoint();
+    expect(after.checkpoint.nextRuns.count).toBe(0);
+    store.releaseCheckpointRun(after.checkpoint.frontier);
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rejects same-Store load when a cached active index identity changes in place', () => {
+    const { parent, stage } = temporaryStage('r7-product-active-identity');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }));
+    const indexPath = path.join(stage, 'r7-f-d00000-g00000.idx');
+    const corrupt = fs.readFileSync(indexPath);
+    corrupt[0] ^= 0x01;
+    fs.writeFileSync(indexPath, corrupt);
+    expect(() => store.loadCheckpoint()).toThrow('external inventory drift before checkpoint active identity');
+    expect(store.diagnostics().cleanupErrors.join('\n')).toContain('cached committed index identity drift');
+    store.suspend();
+    for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('promotes the candidate before suspend when manifest alias contraction fails after commit', () => {
+    const { parent, stage } = temporaryStage('r7-product-postcommit-preserve');
+    let failManifestPartUnlink = false;
+    const seam = {
+      unlinkSync(filePath) {
+        if (failManifestPartUnlink && path.basename(String(filePath)) === 'manifest-g00000.json.part') {
+          failManifestPartUnlink = false;
+          const error = new Error('injected manifest alias contraction fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.unlinkSync(filePath);
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    failManifestPartUnlink = true;
+    const result = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }));
+    expect(result).toMatchObject({ advanceAllowed: false, tip: { generation: 0 } });
+    expect(result.diagnostics.residue).toContain('manifest-g00000.json.part');
+    expect(result.diagnostics.residue).not.toContain('manifest-g00000.json');
+    expect(result.diagnostics.residue).not.toContain('r7-f-d00000-g00000.run');
+    expect(result.diagnostics.residue).not.toContain('r7-f-d00000-g00000.idx');
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(true);
+    frontier.dispose();
+    const suspended = store.suspend();
+    expect(suspended.diagnostics.residue).not.toContain('r7-f-d00000-g00000.run');
+    expect(suspended.diagnostics.residue).not.toContain('r7-f-d00000-g00000.idx');
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(true);
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('makes candidate disposal deletion-free before any post-link filesystem callback can reenter', () => {
+    const { parent, stage } = temporaryStage('r7-product-reentrant-postlink');
+    let reentrantFrontier = null;
+    let reentrantDiagnostics = null;
+    let reenterInsideManifestLink = false;
+    const seam = {
+      linkSync(source, finalPath) {
+        const result = fs.linkSync(source, finalPath);
+        if (reenterInsideManifestLink
+          && path.basename(String(finalPath)) === 'manifest-g00000.json') {
+          reenterInsideManifestLink = false;
+          reentrantDiagnostics = store.diagnostics();
+          reentrantFrontier.dispose();
+        }
+        return result;
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    reentrantFrontier = writer.finish();
+    reenterInsideManifestLink = true;
+    const result = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier: reentrantFrontier,
+    }));
+    expect(result).toMatchObject({ advanceAllowed: true, tip: { generation: 0 } });
+    expect(reentrantDiagnostics.cleanupErrors).toEqual([]);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(true);
+    const loaded = store.loadCheckpoint();
+    store.releaseCheckpointRun(loaded.checkpoint.frontier);
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rejects a projected active-byte overflow before opening the next manifest', () => {
+    const { parent, stage } = temporaryStage('r7-product-active-byte-limit');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'create',
+      ownerId: 'owner-A',
+      limits: { latestCheckpointRunBytes: 3 },
+    });
+    store.loadCheckpoint();
+    const seedWriter = store.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const frontier = seedWriter.finish();
+    const seed = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }));
+    const loaded = store.loadCheckpoint();
+    store.releaseCheckpointRun(loaded.checkpoint.frontier);
+    const unitWriter = store.createRun('r7-u-d00000-n00000000-g00001');
+    unitWriter.write('B');
+    const nextRun = unitWriter.finish();
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'unit',
+      previousTip: seed.tip,
+      parentOffset: 1,
+      lastProcessedParentKey: 'A',
+      transitionsDelta: 1,
+      boundPrunesDelta: 0,
+      nextRun,
+    }))).toThrow('latest checkpoint run bytes exceed the limit');
+    expect(fs.existsSync(path.join(stage, 'manifest-g00001.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-u-d00000-n00000000-g00001.run'))).toBe(false);
+    expect(() => store.loadCheckpoint()).toThrow('already outstanding');
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('treats a same-object lost manifest link result as committed and preserves the candidate', () => {
+    const { parent, stage } = temporaryStage('r7-product-lost-link');
+    let loseManifestLinkResult = false;
+    const seam = {
+      linkSync(source, finalPath) {
+        const result = fs.linkSync(source, finalPath);
+        if (loseManifestLinkResult && path.basename(String(finalPath)) === 'manifest-g00000.json') {
+          loseManifestLinkResult = false;
+          const error = new Error('injected lost manifest link result');
+          error.code = 'EIO';
+          throw error;
+        }
+        return result;
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    loseManifestLinkResult = true;
+    const result = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }));
+    expect(result).toMatchObject({ advanceAllowed: false, tip: { generation: 0 } });
+    frontier.dispose();
+    store.suspend();
+    for (const suffix of ['run', 'idx']) {
+      expect(fs.existsSync(path.join(stage, `r7-f-d00000-g00000.${suffix}`))).toBe(true);
+    }
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('quarantines the candidate when the manifest link outcome cannot be observed', () => {
+    const { parent, stage } = temporaryStage('r7-product-unknown-link');
+    let unknownManifestLink = false;
+    const seam = {
+      linkSync(source, finalPath) {
+        if (unknownManifestLink && path.basename(String(finalPath)) === 'manifest-g00000.json') {
+          fs.linkSync(source, finalPath);
+          const error = new Error('injected unknown manifest link result');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.linkSync(source, finalPath);
+      },
+      lstatSync(filePath, ...args) {
+        if (unknownManifestLink && path.basename(String(filePath)) === 'manifest-g00000.json') {
+          const error = new Error('injected manifest final observation fault');
+          error.code = 'EACCES';
+          throw error;
+        }
+        return fs.lstatSync(filePath, ...args);
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    unknownManifestLink = true;
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }))).toThrow('outcome is unknown');
+    unknownManifestLink = false;
+    frontier.dispose();
+    store.suspend();
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(true);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(true);
+    for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it.each(['run', 'idx'])('rejects a same-length candidate %s identity drift before manifest commit', (suffix) => {
+    const { parent, stage } = temporaryStage(`r7-product-candidate-${suffix}-drift`);
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    const candidatePath = path.join(stage, `r7-f-d00000-g00000.${suffix}`);
+    const changed = fs.readFileSync(candidatePath);
+    changed[0] ^= 0x01;
+    fs.writeFileSync(candidatePath, changed);
+
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }))).toThrow(`manifest candidate ${suffix === 'run' ? 'data' : 'index'} identity drift`);
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    store.suspend();
+    for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('rejects new candidate readers while the manifest publication claim is live', () => {
+    const { parent, stage } = temporaryStage('r7-product-claimed-reader');
+    let store = null;
+    let frontier = null;
+    let readerError = null;
+    let probeClaim = false;
+    const seam = {
+      linkSync(source, finalPath) {
+        const result = fs.linkSync(source, finalPath);
+        if (probeClaim && path.basename(String(finalPath)) === 'manifest-g00000.json') {
+          probeClaim = false;
+          try { frontier.values(); } catch (error) { readerError = error; }
+        }
+        return result;
+      },
+    };
+    store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    frontier = writer.finish();
+    probeClaim = true;
+    const result = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }));
+    expect(readerError?.message).toContain('claimed for manifest publication');
+    expect(result).toMatchObject({ advanceAllowed: true, tip: { generation: 0 } });
+    const loaded = store.loadCheckpoint();
+    store.releaseCheckpointRun(loaded.checkpoint.frontier);
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('keeps the public publication lease through candidate identity rechecks', () => {
+    const { parent, stage } = temporaryStage('r7-product-candidate-identity-lease');
+    let store = null;
+    let frontier = null;
+    let publication = null;
+    let candidateDataChecks = 0;
+    let nestedPublicationError = null;
+    let candidateReaderError = null;
+    let probe = false;
+    const seam = {
+      lstatSync(filePath, ...args) {
+        if (probe && path.basename(String(filePath)) === 'r7-f-d00000-g00000.run') {
+          candidateDataChecks += 1;
+          if (candidateDataChecks === 2) {
+            probe = false;
+            try { store.publishCheckpoint(publication); } catch (error) { nestedPublicationError = error; }
+            try { frontier.values(); } catch (error) { candidateReaderError = error; }
+          }
+        }
+        return fs.lstatSync(filePath, ...args);
+      },
+    };
+    store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    frontier = writer.finish();
+    publication = Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    });
+    probe = true;
+    const result = store.publishCheckpoint(publication);
+    expect(candidateDataChecks).toBe(2);
+    expect(nestedPublicationError?.message).toContain('checkpoint publication in flight');
+    expect(candidateReaderError?.message).toContain('claimed for manifest publication');
+    expect(result).toMatchObject({ advanceAllowed: true, tip: { generation: 0 } });
+    const loaded = store.loadCheckpoint();
+    store.releaseCheckpointRun(loaded.checkpoint.frontier);
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('suspends before manifest commit without leaving working candidate bytes', () => {
+    const { parent, stage } = temporaryStage('r7-product-precommit-suspend');
+    let store = null;
+    let suspendResult = null;
+    let probe = false;
+    const seam = {
+      lstatSync(filePath, ...args) {
+        if (probe && path.basename(String(filePath)) === 'r7-f-d00000-g00000.run') {
+          probe = false;
+          suspendResult = store.suspend();
+        }
+        return fs.lstatSync(filePath, ...args);
+      },
+    };
+    store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    probe = true;
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }))).toThrow('suspended before checkpoint publication');
+    expect(suspendResult).toMatchObject({ closeFailed: true });
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(false);
+    expect(() => frontier.values()).toThrow('invalidated');
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('cleans an open writer on a known precommit publication failure', () => {
+    const { parent, stage } = temporaryStage('r7-product-open-writer-clean');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier: null,
+    }))).toThrow();
+    expect(() => writer.write('B')).toThrow('not open');
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('makes a reentrant suspend nonthrowing, terminal, and postcommit-blocked', () => {
+    const { parent, stage } = temporaryStage('r7-product-inflight-suspend');
+    let store = null;
+    let suspended = null;
+    let probeSuspend = false;
+    const seam = {
+      linkSync(source, finalPath) {
+        const result = fs.linkSync(source, finalPath);
+        if (probeSuspend && path.basename(String(finalPath)) === 'manifest-g00000.json') {
+          probeSuspend = false;
+          suspended = store.suspend();
+        }
+        return result;
+      },
+    };
+    store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    probeSuspend = true;
+    const result = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier,
+    }));
+    expect(suspended).toMatchObject({ closeFailed: true });
+    expect(result).toMatchObject({ advanceAllowed: false, tip: { generation: 0 } });
+    expect(fs.existsSync(path.join(stage, 'manifest-g00000.json'))).toBe(true);
+    expect(() => store.loadCheckpoint()).toThrow('suspended');
+    expect(store.suspend()).toMatchObject({ closeFailed: true });
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('cleans the supplied candidate when publication shape validation fails', () => {
+    const { parent, stage } = temporaryStage('r7-product-shape-clean');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    store.loadCheckpoint();
+    const writer = store.createRun('r7-f-d00000-g00000');
+    writer.write('A');
+    const frontier = writer.finish();
+    expect(() => store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(), frontier, extra: true,
+    }))).toThrow('exact keys');
+    expect(fs.readdirSync(stage)).toEqual(['owner.json']);
+    expect(() => frontier.values()).toThrow('invalidated');
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('rejects and cleans a reserved candidate before a no-run unit publication', () => {
+    const { parent, stage } = temporaryStage('r7-product-null-unit-reservation');
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    store.loadCheckpoint();
+    const seedWriter = store.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const frontier = seedWriter.finish();
+    const seed = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: directBinding(2), frontier,
+    }));
+    const loaded = store.loadCheckpoint();
+    store.releaseCheckpointRun(loaded.checkpoint.frontier);
+    const strayWriter = store.createRun('r7-u-d00000-n00000000-g00001');
+    strayWriter.write('B');
+    const stray = strayWriter.finish();
+    const publication = Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'A',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: null,
+    });
+    expect(() => store.publishCheckpoint(publication)).toThrow('cannot leave a manifest candidate reserved');
+    expect(() => stray.values()).toThrow('invalidated');
+    expect(fs.existsSync(path.join(stage, 'manifest-g00001.json'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-u-d00000-n00000000-g00001.run'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-u-d00000-n00000000-g00001.idx'))).toBe(false);
+    expect(store.publishCheckpoint(publication)).toMatchObject({ advanceAllowed: true, tip: { generation: 1 } });
+    const after = store.loadCheckpoint();
+    store.releaseCheckpointRun(after.checkpoint.frontier);
+    store.suspend();
     store.dispose();
     releaseParent(parent, stage);
   });

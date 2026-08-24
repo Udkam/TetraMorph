@@ -1094,10 +1094,12 @@ function resumableInventoryEntry(name, filePath, bytes, identity) {
 function createResumableInventoryLedger(initial, limits) {
   const entries = new Map();
   const physicalRuns = new Map();
+  const committedRunKeys = new Set();
   let sortedNames = null;
   let retainedManifestBytes = 0;
   let ownerAndIndexBytes = 0;
   let recognizedPhysicalRunBytes = 0;
+  let uncommittedWorkingRunBytes = 0;
 
   const isManifest = (name) => /^manifest-g[0-9]{5}\.json(?:\.part)?$/u.test(name);
   const isOwnerOrIndex = (name) => name === 'owner.json' || name === 'owner.json.part' || /\.idx(?:\.part)?$/u.test(name);
@@ -1111,6 +1113,9 @@ function createResumableInventoryLedger(initial, limits) {
     if (retainedManifestBytes + ownerAndIndexBytes > limits.auxiliaryBytes) {
       throw frontierError('auxiliary bytes exceed the limit');
     }
+    if (uncommittedWorkingRunBytes > limits.uncommittedWorkingRunBytes) {
+      throw frontierError('uncommitted working run bytes exceed the limit');
+    }
     if (recognizedPhysicalRunBytes > limits.recognizedPhysicalRunBytes) throw frontierError('physical run bytes exceed the limit');
   };
   const addPhysicalRun = (entry) => {
@@ -1118,11 +1123,16 @@ function createResumableInventoryLedger(initial, limits) {
     const key = proofObjectKey(entry.identity);
     const physical = physicalRuns.get(key);
     if (physical === undefined) {
-      physicalRuns.set(key, { bytes: entry.bytes, references: 1 });
+      const committed = committedRunKeys.has(key);
+      physicalRuns.set(key, { bytes: entry.bytes, references: 1, committed });
       recognizedPhysicalRunBytes += entry.bytes;
+      if (!committed) uncommittedWorkingRunBytes += entry.bytes;
       return;
     }
     if (physical.bytes !== entry.bytes) throw frontierError(`${entry.name} aliases a run with inconsistent bytes`);
+    if (physical.committed !== committedRunKeys.has(key)) {
+      throw frontierError(`${entry.name} aliases a run with inconsistent commit accounting`);
+    }
     physical.references += 1;
   };
   const removePhysicalRun = (entry) => {
@@ -1136,6 +1146,7 @@ function createResumableInventoryLedger(initial, limits) {
     if (physical.references === 0) {
       physicalRuns.delete(key);
       recognizedPhysicalRunBytes -= physical.bytes;
+      if (!physical.committed) uncommittedWorkingRunBytes -= physical.bytes;
     }
   };
   const add = (entry) => {
@@ -1179,7 +1190,24 @@ function createResumableInventoryLedger(initial, limits) {
     retainedManifestBytes = 0;
     ownerAndIndexBytes = 0;
     recognizedPhysicalRunBytes = 0;
+    uncommittedWorkingRunBytes = 0;
     for (const name of scanned.names) add(scanned.entries.get(name));
+    assertWithinLimits();
+  };
+  const assertRunMayCommit = (identity) => {
+    const key = proofObjectKey(identity);
+    const physical = physicalRuns.get(key);
+    if (physical === undefined || physical.bytes !== Number(identity.size)) {
+      throw frontierError('committed run is absent from the physical ledger');
+    }
+    if (physical.committed) throw frontierError('physical run was already committed');
+    return Object.freeze({ key, physical });
+  };
+  const markRunCommitted = (identity) => {
+    const { key, physical } = assertRunMayCommit(identity);
+    committedRunKeys.add(key);
+    physical.committed = true;
+    uncommittedWorkingRunBytes -= physical.bytes;
     assertWithinLimits();
   };
   const matches = (scanned) => {
@@ -1204,10 +1232,10 @@ function createResumableInventoryLedger(initial, limits) {
     get retainedManifestBytes() { return retainedManifestBytes; },
     get ownerAndIndexBytes() { return ownerAndIndexBytes; },
     get recognizedPhysicalRunBytes() { return recognizedPhysicalRunBytes; },
-    get uncommittedWorkingRunBytes() { return recognizedPhysicalRunBytes; },
+    get uncommittedWorkingRunBytes() { return uncommittedWorkingRunBytes; },
   });
   replace(initial);
-  return Object.freeze({ add, grow, matches, remove, replace, update, view });
+  return Object.freeze({ add, assertRunMayCommit, grow, markRunCommitted, matches, remove, replace, update, view });
 }
 
 function readBoundedProofFile(fs, filePath, maximumBytes, descriptorTracker, phase = 'bounded-readback') {
@@ -2667,8 +2695,12 @@ export function createResumableEndgameDiskFrontierStore(options) {
     throw failure;
   }
   let invalidated = false;
+  let checkpointPublicationInFlight = false;
+  let checkpointPublicationLease = null;
   let manifestPublicationTerminal = false;
   let manifestPublicationTerminalReason = null;
+  let manifestPublicationInFlight = false;
+  let suspendRequestedDuringPublication = false;
   let viewOutstanding = false;
   let disposed = false;
   let suspendCloseFailed = false;
@@ -2681,6 +2713,11 @@ export function createResumableEndgameDiskFrontierStore(options) {
   let authorizationBucketVisits = 0;
   const inventoryLedger = createResumableInventoryLedger(inventory, limits);
   inventory = inventoryLedger.view;
+  const manifestState = createResumableManifestState();
+  const committedRunRecords = new Map();
+  const committedRunViewStates = new WeakMap();
+  const productAuthoritativeNames = new Set();
+  let checkpointView = null;
   const teardownAuthorized = new Map(
     [...inventory.entries.values()].map((entry) => [entry.filePath, entry.identity]),
   );
@@ -2892,6 +2929,25 @@ export function createResumableEndgameDiskFrontierStore(options) {
     onRegistered?.();
     captureStageMutation();
   };
+  const registerOrAdoptOwnedFile = (filePath, identity, allowOwnedGrowth = false) => {
+    assertOwnedStagePath(filePath);
+    const name = path.basename(filePath);
+    const observed = inventory.entries.get(name);
+    if (observed === undefined) {
+      registerOwnedFile(filePath, identity, allowOwnedGrowth);
+      return;
+    }
+    if (observed.filePath !== filePath || observed.bytes !== Number(identity.size)
+      || !sameProofFileIdentity(observed.identity, identity)) {
+      throw frontierError(`observed proof ownership drift for ${name}`);
+    }
+    const existing = ownedFiles.get(filePath);
+    if (existing !== undefined && !sameProofFileIdentity(existing.identity, identity)) {
+      throw frontierError(`existing proof ownership drift for ${name}`);
+    }
+    ownedFiles.set(filePath, Object.freeze({ identity, allowOwnedGrowth }));
+    setTeardownAuthorization(filePath, identity);
+  };
   const updateOwnedFile = (filePath, identity, allowOwnedGrowth = false) => {
     if (!ownedFiles.has(filePath)) throw frontierError(`missing proof ownership for ${path.basename(filePath)}`);
     const name = path.basename(filePath);
@@ -3047,8 +3103,36 @@ export function createResumableEndgameDiskFrontierStore(options) {
     }
     return cleanup;
   };
+  const cleanupWorkingState = () => {
+    const cleanup = [];
+    for (const reader of [...activeReaders]) {
+      try { reader.return(); } catch (error) { cleanup.push(error); }
+    }
+    for (const { abortOwned } of [...writers.values()]) {
+      try { abortOwned(); } catch (error) { cleanup.push(error); }
+    }
+    for (const { disposeOwned } of [...runs.values()]) {
+      try { disposeOwned(); } catch (error) { cleanup.push(error); }
+    }
+    return cleanup;
+  };
+  const authenticateCurrentRunRecordIdentity = (record, label) => {
+    for (const [suffix, filePath, expectedIdentity] of [
+      ['data', record.filePath, record.identity],
+      ['index', record.indexFilePath, record.indexIdentity],
+    ]) {
+      const stats = fs.lstatSync(filePath, { bigint: true });
+      assertPlainFile(stats, path.basename(filePath));
+      assertExactRealpath(fs, filePath);
+      if (!sameProofFileIdentity(proofFileIdentity(stats), expectedIdentity)) {
+        throw frontierError(`${label} ${suffix} identity drift for ${record.id}`);
+      }
+    }
+  };
   const makeWorkingRun = (record) => {
     let runDisposed = false;
+    let ownershipTransferred = false;
+    let publicationClaimed = false;
     const runReaders = new Set();
     const remainingOwnedPaths = new Map();
     if (record.indexFilePath) remainingOwnedPaths.set(record.indexFilePath, record.indexIdentity);
@@ -3085,16 +3169,19 @@ export function createResumableEndgameDiskFrontierStore(options) {
     };
     const disposeOwned = () => {
       if (runDisposed) return;
+      if (publicationClaimed) return;
       const cleanup = [];
       for (const reader of [...runReaders]) {
         try { reader.return(); } catch (error) { cleanup.push(error); }
       }
-      for (const [filePath, identity] of [...remainingOwnedPaths]) {
-        try {
-          unlinkOwnedFile(filePath, identity, () => remainingOwnedPaths.delete(filePath));
-        } catch (error) { cleanup.push(error); }
+      if (!ownershipTransferred) {
+        for (const [filePath, identity] of [...remainingOwnedPaths]) {
+          try {
+            unlinkOwnedFile(filePath, identity, () => remainingOwnedPaths.delete(filePath));
+          } catch (error) { cleanup.push(error); }
+        }
       }
-      if (remainingOwnedPaths.size === 0) {
+      if (ownershipTransferred || remainingOwnedPaths.size === 0) {
         runDisposed = true;
         runs.delete(record.id);
         if (candidateReservation?.id === record.id) candidateReservation = null;
@@ -3105,15 +3192,67 @@ export function createResumableEndgameDiskFrontierStore(options) {
         throw failure;
       }
     };
+    const assertOwnedCommitReady = () => {
+      if (runDisposed || ownershipTransferred || publicationClaimed || record.descriptor === undefined) {
+        throw frontierError(`run ${record.id} is not an uncommitted manifest candidate`);
+      }
+      const registered = runs.get(record.id);
+      if (registered?.run !== run || registered.record !== record
+        || candidateReservation?.id !== record.id) {
+        throw frontierError(`run ${record.id} lost its manifest candidate ownership`);
+      }
+      if (runReaders.size !== 0) throw frontierError(`run ${record.id} still has an active reader`);
+      if (committedRunRecords.has(record.id)) throw frontierError(`run ${record.id} is already cached as committed`);
+    };
+    const verifyOwnedCommitIdentity = () => {
+      authenticateCurrentRunRecordIdentity(record, 'manifest candidate');
+      inventoryLedger.assertRunMayCommit(record.identity);
+    };
+    const prepareOwnedCommit = () => {
+      assertOwnedCommitReady();
+      verifyOwnedCommitIdentity();
+    };
+    const claimOwnedCommit = () => {
+      assertOwnedCommitReady();
+      publicationClaimed = true;
+      try { verifyOwnedCommitIdentity(); }
+      catch (error) {
+        publicationClaimed = false;
+        throw error;
+      }
+    };
+    const rollbackOwnedCommit = () => {
+      if (ownershipTransferred) return;
+      publicationClaimed = false;
+    };
+    const transferOwned = (committed) => {
+      if (!publicationClaimed) prepareOwnedCommit();
+      if (committed) {
+        inventoryLedger.markRunCommitted(record.identity);
+        committedRunRecords.set(record.id, record);
+      }
+      publicationClaimed = false;
+      ownershipTransferred = true;
+      runDisposed = true;
+      runs.delete(record.id);
+      if (candidateReservation?.id === record.id) candidateReservation = null;
+    };
     const run = Object.freeze({
       id: record.id,
       size: record.size,
       values(range) {
+        if (publicationClaimed) {
+          throw frontierError(`run ${record.id} is claimed for manifest publication`);
+        }
+        if (checkpointPublicationInFlight || manifestPublicationInFlight) {
+          throw frontierError(`run ${record.id} is reserved by checkpoint publication`);
+        }
         if (runDisposed || invalidated || disposed) throw frontierError(`run ${record.id} is invalidated`);
         return trackedValues(range);
       },
       dispose() {
         if (runDisposed) return;
+        if (checkpointPublicationInFlight || manifestPublicationInFlight || publicationClaimed) return;
         let primary = null;
         try { ensureInventoryCurrent(`run ${record.id} disposal`, true); } catch (error) { primary = error; }
         const cleanup = [];
@@ -3123,7 +3262,17 @@ export function createResumableEndgameDiskFrontierStore(options) {
         }
       },
     });
-    runs.set(record.id, Object.freeze({ run, record, disposeOwned }));
+    runs.set(record.id, Object.freeze({
+      run,
+      record,
+      disposeOwned,
+      prepareOwnedCommit,
+      claimOwnedCommit,
+      rollbackOwnedCommit,
+      isPublicationClaimed() { return publicationClaimed; },
+      promoteOwned() { transferOwned(true); },
+      quarantineOwned() { transferOwned(false); },
+    }));
     return run;
   };
   const createRun = (id) => {
@@ -3223,6 +3372,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
     };
     const abort = () => {
       if (state === 'aborted' || state === 'finished') return;
+      if (checkpointPublicationInFlight || manifestPublicationInFlight) {
+        throw frontierError(`run writer ${id} is reserved by manifest publication`);
+      }
       let primary = null;
       if (!invalidated && !disposed) {
         try { ensureInventoryCurrent(`run ${id} abort`, true); } catch (error) { primary = error; }
@@ -3263,6 +3415,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
       }
     };
     const probeOwnedCandidateIndex = (logicalSize) => {
+      if (checkpointPublicationInFlight || manifestPublicationInFlight) {
+        throw frontierError(`run writer ${id} is reserved by manifest publication`);
+      }
       if (state !== 'open' || descriptor === null || !ownedFiles.has(filePath)) {
         throw frontierError('candidate index probe requires a live owned writer');
       }
@@ -3277,6 +3432,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
     };
     const writer = Object.freeze({
       write(key) {
+        if (checkpointPublicationInFlight || manifestPublicationInFlight) {
+          throw frontierError(`run writer ${id} is reserved by manifest publication`);
+        }
         if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
         if (state !== 'open') throw frontierError(`run writer ${id} is not open`);
         const encoded = encodeRecord(key, previous);
@@ -3306,6 +3464,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
         previous = key;
       },
       finish() {
+        if (checkpointPublicationInFlight || manifestPublicationInFlight) {
+          throw frontierError(`run writer ${id} is reserved by manifest publication`);
+        }
         if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
         if (state !== 'open') throw frontierError(`run writer ${id} cannot finish from ${state}`);
         ensureInventoryCurrent(`run ${id} finish`, true);
@@ -3417,27 +3578,271 @@ export function createResumableEndgameDiskFrontierStore(options) {
     writers.set(id, Object.freeze({ writer, abortOwned }));
     return writer;
   };
+  const releaseCommittedRunView = (run) => {
+    const state = committedRunViewStates.get(run);
+    if (state === undefined) throw frontierError('checkpoint run is not owned by this Store view');
+    if (state.released) return;
+    const cleanup = [];
+    for (const reader of [...state.readers]) {
+      try { reader.return(); } catch (error) { cleanup.push(error); }
+    }
+    state.released = true;
+    state.owner.openRuns.delete(run);
+    state.collection?.openBatch.delete(run);
+    if (cleanup.length > 0) {
+      const failure = aggregatePropagatingR7Close(null, cleanup, `Checkpoint run ${state.record.id} release failed.`);
+      latchBlocked(failure);
+      throw failure;
+    }
+  };
+  const makeCommittedRunView = (record, owner, collection = null) => {
+    if (committedRunRecords.get(record.id) !== record || record.descriptor === undefined) {
+      throw frontierError(`committed run ${record.id} is absent from the authenticated cache`);
+    }
+    const state = { owner, collection, record, readers: new Set(), released: false };
+    const run = Object.freeze({
+      id: record.id,
+      size: record.size,
+      values(range) {
+        if (!owner.active || state.released || invalidated || disposed) {
+          throw frontierError(`checkpoint run ${record.id} is invalidated`);
+        }
+        const source = readProofRunRange(
+          fs, record.filePath, record.identity, record.size, record.offsets, range, descriptorTracker,
+        );
+        let released = false;
+        const releaseReader = () => {
+          if (released) return;
+          released = true;
+          activeReaders.delete(iterator);
+          state.readers.delete(iterator);
+        };
+        const iterator = {
+          [Symbol.iterator]() { return this; },
+          next() {
+            try { const result = source.next(); if (result.done) releaseReader(); return result; }
+            catch (error) { releaseReader(); throw error; }
+          },
+          return() {
+            try { return source.return?.() ?? { done: true, value: undefined }; }
+            finally { releaseReader(); }
+          },
+          throw(error) {
+            try { return source.throw?.(error) ?? (() => { throw error; })(); }
+            finally { releaseReader(); }
+          },
+        };
+        activeReaders.add(iterator);
+        state.readers.add(iterator);
+        return iterator;
+      },
+      dispose() { releaseCommittedRunView(run); },
+    });
+    committedRunViewStates.set(run, state);
+    owner.openRuns.add(run);
+    collection?.openBatch.add(run);
+    return run;
+  };
+  const authenticateCachedCommittedRecordIdentity = (record) => {
+    authenticateCurrentRunRecordIdentity(record, 'cached committed');
+  };
+  const committedRecordForDescriptor = (descriptor) => {
+    const record = committedRunRecords.get(descriptor.id);
+    if (record === undefined
+      || canonicalizeJson(record.descriptor) !== canonicalizeJson(descriptor)) {
+      throw frontierError(`checkpoint run ${descriptor.id} cache does not match its descriptor`);
+    }
+    authenticateCachedCommittedRecordIdentity(record);
+    return record;
+  };
+  const validateCollectionRange = (range, count) => {
+    assertExactRecord(range, ['startIndex', 'endIndex'], 'checkpoint run collection range');
+    assertSafeManifestInteger(range.startIndex, 'checkpoint collection startIndex', count);
+    assertSafeManifestInteger(range.endIndex, 'checkpoint collection endIndex', count);
+    if (range.startIndex >= range.endIndex) throw frontierError('checkpoint collection range must be nonempty');
+    if (range.endIndex - range.startIndex > limits.collectionOpenRuns) {
+      throw frontierError(`checkpoint collection range exceeds ${limits.collectionOpenRuns} runs`);
+    }
+    return range;
+  };
+  const makeCommittedRunCollection = (descriptors, owner) => {
+    const state = { active: true, owner, descriptors, openBatch: new Set() };
+    const collection = Object.freeze({
+      count: descriptors.length,
+      open(range) {
+        if (!owner.active || !state.active || invalidated || disposed) {
+          throw frontierError('checkpoint run collection is invalidated');
+        }
+        validateCollectionRange(range, descriptors.length);
+        if (state.openBatch.size !== 0) {
+          throw frontierError('checkpoint run collection still has an open batch');
+        }
+        const opened = [];
+        try {
+          for (let index = range.startIndex; index < range.endIndex; index += 1) {
+            const descriptor = descriptors[index];
+            const record = committedRecordForDescriptor(descriptor);
+            opened.push(makeCommittedRunView(record, owner, state));
+          }
+          return Object.freeze(opened);
+        } catch (primary) {
+          const cleanup = [];
+          for (const run of opened) {
+            try { releaseCommittedRunView(run); } catch (error) { cleanup.push(error); }
+          }
+          throw aggregatePropagatingR7Close(primary, cleanup, 'Checkpoint collection open failed.');
+        }
+      },
+    });
+    owner.collections.add(state);
+    return collection;
+  };
+  const consumeCheckpointView = () => {
+    const owner = checkpointView;
+    if (owner === null) return;
+    owner.active = false;
+    for (const collection of owner.collections) collection.active = false;
+    const cleanup = [];
+    for (const run of [...owner.openRuns]) {
+      try { releaseCommittedRunView(run); } catch (error) { cleanup.push(error); }
+    }
+    checkpointView = null;
+    viewOutstanding = false;
+    if (cleanup.length > 0) {
+      throw aggregatePropagatingR7Close(null, cleanup, 'Checkpoint view invalidation failed.');
+    }
+  };
+  const beginCheckpointView = () => {
+    if (checkpointView !== null || viewOutstanding) throw frontierError('a checkpoint view is already outstanding');
+    checkpointView = { active: true, openRuns: new Set(), collections: new Set() };
+    viewOutstanding = true;
+    return checkpointView;
+  };
+  const candidateForPublication = (publication) => {
+    if (!publication || typeof publication !== 'object' || Array.isArray(publication)) return null;
+    const run = publication.transition === 'seed'
+      ? publication.frontier
+      : publication.transition === 'unit'
+        ? publication.nextRun
+        : publication.transition === 'layer'
+          ? publication.nextFrontier
+          : null;
+    if (run === null) return null;
+    if (!run || typeof run !== 'object' || typeof run.id !== 'string') {
+      throw frontierError('checkpoint publication run candidate is invalid');
+    }
+    const candidate = runs.get(run.id);
+    if (candidate === undefined || candidate.run !== run || candidate.record.descriptor === undefined) {
+      throw frontierError('checkpoint publication run candidate is not owned by this Store');
+    }
+    return candidate;
+  };
+  const assertPublicationWorkingSet = (candidate) => {
+    if (writers.size !== 0) throw frontierError('checkpoint publication cannot leave an open run writer');
+    if (activeReaders.size !== 0) throw frontierError('checkpoint publication cannot leave an active reader');
+    const expectedRunId = candidate?.record.id ?? null;
+    const unexpectedRuns = [...runs.keys()].filter((id) => id !== expectedRunId);
+    if (unexpectedRuns.length !== 0 || runs.size !== (candidate === null ? 0 : 1)) {
+      throw frontierError('checkpoint publication cannot leave unrelated working runs');
+    }
+    if ((candidateReservation === null) !== (candidate === null)
+      || (candidate !== null && candidateReservation.id !== candidate.record.id)) {
+      throw frontierError('checkpoint publication candidate reservation is inconsistent');
+    }
+  };
+  const resourceTotalsForPublication = (publication, candidate) => {
+    const latestCheckpointRunBytes = publication.transition === 'seed'
+      ? candidate.record.descriptor.dataBytes
+      : addSafeManifestInteger(
+        manifestState.activeRunBytes,
+        candidate?.record.descriptor.dataBytes ?? 0,
+        'projected latest checkpoint run bytes',
+      );
+    if (latestCheckpointRunBytes > limits.latestCheckpointRunBytes) {
+      throw frontierError('latest checkpoint run bytes exceed the limit');
+    }
+    return Object.freeze({
+      latestCheckpointRunBytes,
+      uncommittedWorkingRunBytes: inventory.uncommittedWorkingRunBytes,
+      recognizedPhysicalRunBytes: inventory.recognizedPhysicalRunBytes,
+      retainedManifestBytes: inventory.retainedManifestBytes,
+      ownerAndIndexBytes: inventory.ownerAndIndexBytes,
+      namespaceEntries: inventory.namespaceEntries,
+    });
+  };
+  const productCheckpointDiagnostics = (base, candidateRecord = null) => {
+    const authoritativeNames = new Set(
+      inventory.names.filter((name) => /^manifest-g[0-9]{5}\.json$/u.test(name)),
+    );
+    for (const id of manifestState.activeIds) {
+      const record = committedRunRecords.get(id);
+      if (record !== undefined) {
+        authoritativeNames.add(record.descriptor.dataFile);
+        authoritativeNames.add(record.descriptor.indexFile);
+      }
+    }
+    if (candidateRecord?.descriptor !== undefined) {
+      authoritativeNames.add(candidateRecord.descriptor.dataFile);
+      authoritativeNames.add(candidateRecord.descriptor.indexFile);
+    }
+    const names = base.residue.filter((name) => name !== '.' && !authoritativeNames.has(name));
+    return Object.freeze({
+      ...base,
+      activeRuns: diagnostics().activeRuns,
+      residue: Object.freeze(names.length === 0 ? [] : ['.', ...names]),
+      residueTruncated: base.residueTruncated,
+    });
+  };
+  const recordProductCheckpointAuthority = (candidateRecord = null) => {
+    for (const name of inventory.names) {
+      if (/^manifest-g[0-9]{5}\.json$/u.test(name)) productAuthoritativeNames.add(name);
+    }
+    for (const id of manifestState.activeIds) {
+      const record = committedRunRecords.get(id);
+      if (record !== undefined) {
+        productAuthoritativeNames.add(record.descriptor.dataFile);
+        productAuthoritativeNames.add(record.descriptor.indexFile);
+      }
+    }
+    if (candidateRecord?.descriptor !== undefined) {
+      productAuthoritativeNames.add(candidateRecord.descriptor.dataFile);
+      productAuthoritativeNames.add(candidateRecord.descriptor.indexFile);
+    }
+  };
   const diagnostics = () => {
-    if (!invalidated && !disposed && !inventoryInvalid) {
+    if (!invalidated && !disposed && !inventoryInvalid
+      && !checkpointPublicationInFlight && !manifestPublicationInFlight) {
       try { ensureInventoryCurrent('diagnostics'); } catch { /* Diagnostics reports the fail-closed latch below. */ }
     }
     const completeResidue = blockedReason === null
       ? []
-      : ['.', ...inventory.names.filter((name) => name !== 'owner.json')];
+      : ['.', ...inventory.names.filter(
+        (name) => name !== 'owner.json' && !productAuthoritativeNames.has(name),
+      )];
     const residue = completeResidue.slice(0, ENDGAME_DISK_FRONTIER_LIMITS.diagnosticMaxEntries);
     return Object.freeze({
-      activeRuns: Object.freeze([...new Set([...writers.keys(), ...runs.keys()])].sort(ordinalByteCompare)),
+      activeRuns: Object.freeze([...new Set([
+        ...writers.keys(),
+        ...runs.keys(),
+        ...(checkpointView === null ? [] : [...checkpointView.openRuns].map((run) => run.id)),
+      ])].sort(ordinalByteCompare)),
       residue: Object.freeze(residue),
       residueTruncated: completeResidue.length > residue.length,
       cleanupErrors: Object.freeze([...cleanupErrors]),
       cleanupErrorsTruncated: cleanupErrorsOmitted > 0,
     });
   };
-  const requireLive = () => {
+  const assertStoreStateLive = () => {
     if (manifestPublicationTerminal) {
       throw frontierError(`resumable Store is suspended after ${manifestPublicationTerminalReason}`);
     }
     if (invalidated || disposed) throw frontierError('resumable Store is suspended or disposed');
+  };
+  const requireLive = () => {
+    if (checkpointPublicationInFlight || manifestPublicationInFlight) {
+      throw frontierError('resumable Store has a checkpoint publication in flight');
+    }
+    assertStoreStateLive();
   };
   const manifestPublicationDiagnostics = (extraResidue = [], authoritativeNames = []) => {
     const current = diagnostics();
@@ -3474,8 +3879,11 @@ export function createResumableEndgameDiskFrontierStore(options) {
       throw frontierError(`${label} bytes are not the prepared canonical manifest`);
     }
   };
-  const publishPreparedManifest = (state, token) => {
-    requireLive();
+  const publishPreparedManifest = (state, token, candidateLifecycle = null, publicationLease = null) => {
+    if (checkpointPublicationInFlight && publicationLease !== checkpointPublicationLease) {
+      throw frontierError('prepared manifest publication does not own the checkpoint publication lease');
+    }
+    assertStoreStateLive();
     const prepared = token && typeof token === 'object'
       ? R7_PREPARED_MANIFEST_TRANSITIONS.get(token)
       : undefined;
@@ -3486,6 +3894,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
     if (prepared.phase !== 'prepared' || R7_PENDING_MANIFEST_TRANSITIONS.get(state) !== token) {
       throw frontierError('prepared manifest transition is not available for publication');
     }
+    if (manifestPublicationInFlight) throw frontierError('a manifest publication is already in flight');
+    manifestPublicationInFlight = true;
+    try {
     const manifestBytes = Buffer.from(prepared.manifestBytes);
     const targetTip = prepared.sealed.tip;
     const generationToken = paddedManifestToken(prepared.targetGeneration, 5);
@@ -3498,11 +3909,16 @@ export function createResumableEndgameDiskFrontierStore(options) {
     let openedPart = false;
     let committed = false;
     let committedLinkError = null;
+    let committedLinkRegistrationError = null;
     let partReleased = false;
     let partContracted = false;
     let ownedPartIdentity = null;
+    let candidateClaimed = false;
 
     const burnToken = () => discardPreparedResumableManifestTransition(token);
+    const assertNotSuspendedBeforeCommit = () => {
+      if (suspendRequestedDuringPublication) throw frontierError('Store was suspended before manifest commit');
+    };
     const cleanOwnedPart = (primary) => {
       const cleanup = [];
       if (descriptor !== null && descriptorTracker.hasDescriptor(descriptor)
@@ -3527,6 +3943,14 @@ export function createResumableEndgameDiskFrontierStore(options) {
       return cleanup;
     };
     const failPrecommit = (primary, terminal = false) => {
+      if (candidateClaimed) {
+        try {
+          candidateLifecycle.rollback();
+          candidateClaimed = false;
+        } catch (error) {
+          primary = aggregatePropagatingR7Close(primary, [error], 'Manifest candidate claim rollback failed.');
+        }
+      }
       burnToken();
       const cleanup = cleanOwnedPart(primary);
       const failure = aggregatePropagatingR7Close(primary, cleanup, 'Manifest publication failed before commit.');
@@ -3563,6 +3987,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
     try {
       assertPreparedManifestBytes(prepared, manifestBytes, 'private');
       ensureInventoryCurrent('manifest publication', true);
+      assertNotSuspendedBeforeCommit();
       if (blockedReason !== null) throw frontierError(`advance is blocked by ${blockedReason}`);
       if (prepared.targetGeneration >= limits.maximumManifests) {
         throw frontierError(`manifest generation exceeds the ${limits.maximumManifests}-manifest limit`);
@@ -3584,11 +4009,15 @@ export function createResumableEndgameDiskFrontierStore(options) {
       openedPart = true;
       ownedPartIdentity = authenticateOpenedOwnedFile(descriptor, partPath);
       registerOwnedFile(partPath, ownedPartIdentity, true);
+      assertNotSuspendedBeforeCommit();
       writeAllProofBytes(fs, descriptor, manifestBytes);
       growOwnedFile(partPath, manifestBytes.length);
+      assertNotSuspendedBeforeCommit();
       fs.fsyncSync(descriptor);
+      assertNotSuspendedBeforeCommit();
       descriptorTracker.close(descriptor);
       descriptor = null;
+      assertNotSuspendedBeforeCommit();
       const verifiedPart = readBoundedProofFile(
         fs, partPath, limits.manifestBytes, descriptorTracker, 'manifest-part-readback',
       );
@@ -3598,12 +4027,18 @@ export function createResumableEndgameDiskFrontierStore(options) {
       }
       updateOwnedFile(partPath, verifiedPart.identity, false);
       ownedPartIdentity = verifiedPart.identity;
+      assertNotSuspendedBeforeCommit();
     } catch (error) {
       failPrecommit(error, error?.code === 'EEXIST' || (partOpenAttempted && !openedPart));
     }
 
     try {
       claimPreparedResumableManifestTransitionCommit(state, token);
+      if (candidateLifecycle !== null) {
+        candidateLifecycle.claim();
+        candidateClaimed = true;
+      }
+      assertNotSuspendedBeforeCommit();
     } catch (error) {
       failPrecommit(error);
     }
@@ -3641,11 +4076,26 @@ export function createResumableEndgameDiskFrontierStore(options) {
       if (!sameProofFileObject(linkedPart.identity, linkedFinal.identity)) {
         failPrecommit(linkError, true);
       }
+      try {
+        updateOwnedFile(partPath, linkedPart.identity, false);
+        ownedPartIdentity = linkedPart.identity;
+        registerOrAdoptOwnedFile(finalPath, linkedFinal.identity, false);
+      } catch (error) {
+        committedLinkRegistrationError = error;
+      }
       committed = true;
       committedLinkError = linkError;
     }
 
     if (!committed) throw frontierError('manifest publication did not reach a commit decision');
+    if (candidateClaimed) {
+      try {
+        candidateLifecycle.commit();
+        candidateClaimed = false;
+      } catch (error) {
+        return postcommitResult(error);
+      }
+    }
     try {
       applyPreparedResumableManifestTransition(token);
     } catch (error) {
@@ -3655,8 +4105,14 @@ export function createResumableEndgameDiskFrontierStore(options) {
           error, [committedLinkError], 'Manifest transition apply failed after a lost link result.',
         ));
     }
-    if (committedLinkError !== null) return postcommitResult(committedLinkError);
-
+    if (committedLinkError !== null) {
+      return postcommitResult(committedLinkRegistrationError === null
+        ? committedLinkError
+        : aggregatePropagatingR7Close(
+          committedLinkError, [committedLinkRegistrationError],
+          'Manifest final registration failed after a lost link result.',
+        ));
+    }
     try {
       const linkedPart = readBoundedProofFile(
         fs, partPath, limits.manifestBytes, descriptorTracker, 'manifest-linked-part-readback',
@@ -3673,7 +4129,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
         throw frontierError('manifest part/final hard-link aliases disagree');
       }
       updateOwnedFile(partPath, linkedPart.identity, false);
-      registerOwnedFile(finalPath, linkedFinal.identity, false);
+      registerOrAdoptOwnedFile(finalPath, linkedFinal.identity, false);
       if (descriptorTracker.hasPath(partPath)) {
         throw markR7CloseFailed(frontierError('refusing manifest alias contraction with a pending part close'));
       }
@@ -3693,6 +4149,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
         throw frontierError('manifest final identity drift after alias contraction');
       }
       updateOwnedFile(finalPath, contractedFinal.identity, false);
+      if (suspendRequestedDuringPublication) {
+        return postcommitResult(frontierError('Store was suspended during manifest commit'));
+      }
       return Object.freeze({
         tip: targetTip,
         diagnostics: manifestPublicationDiagnostics(),
@@ -3702,23 +4161,206 @@ export function createResumableEndgameDiskFrontierStore(options) {
     } catch (error) {
       return postcommitResult(error);
     }
+    } finally {
+      manifestPublicationInFlight = false;
+    }
   };
   const loadCheckpoint = () => {
     requireLive();
     ensureInventoryCurrent('checkpoint load');
-    if (viewOutstanding) throw frontierError('a checkpoint view is already outstanding');
-    viewOutstanding = true;
-    return Object.freeze({ checkpoint: null, tip: null, diagnostics: diagnostics(), advanceAllowed: blockedReason === null });
+    const owner = beginCheckpointView();
+    try {
+      if (manifestState.tip === null) {
+        if (manifestState.kind !== null || manifestState.generation !== -1) {
+          throw frontierError('empty manifest cache has a nonempty checkpoint state');
+        }
+        return Object.freeze({
+          checkpoint: null,
+          tip: null,
+          diagnostics: diagnostics(),
+          advanceAllowed: blockedReason === null,
+        });
+      }
+      if (manifestState.kind !== 'searching' || manifestState.frontierDescriptor === null) {
+        throw frontierError('same-Store checkpoint cache is not a searching seed/unit state');
+      }
+      let activeRecords;
+      try {
+        activeRecords = [manifestState.frontierDescriptor, ...manifestState.nextRuns]
+          .map(committedRecordForDescriptor);
+      } catch (error) {
+        failExternalInventoryDrift('checkpoint active identity', error);
+      }
+      const [frontierRecord] = activeRecords;
+      const frontier = makeCommittedRunView(frontierRecord, owner);
+      const nextDescriptors = Object.freeze([...manifestState.nextRuns]);
+      const nextRuns = makeCommittedRunCollection(nextDescriptors, owner);
+      const checkpoint = Object.freeze({
+        kind: 'searching',
+        generation: manifestState.generation,
+        binding: manifestState.binding,
+        depth: manifestState.depth,
+        parentOffset: manifestState.parentOffset,
+        lastProcessedParentKey: manifestState.lastProcessedParentKey,
+        frontier,
+        nextRuns,
+        transitions: manifestState.transitions,
+        boundPrunes: manifestState.boundPrunes,
+        exhaustedDepths: Object.freeze([...manifestState.completedDepths]),
+      });
+      return Object.freeze({
+        checkpoint,
+        tip: manifestState.tip,
+        diagnostics: diagnostics(),
+        advanceAllowed: blockedReason === null,
+      });
+    } catch (primary) {
+      const cleanup = [];
+      try { consumeCheckpointView(); } catch (error) { cleanup.push(error); }
+      throw aggregatePropagatingR7Close(primary, cleanup, 'Checkpoint load failed.');
+    }
+  };
+  const releaseCheckpointRun = (run) => {
+    const state = run && typeof run === 'object' ? committedRunViewStates.get(run) : undefined;
+    if (state !== undefined) {
+      releaseCommittedRunView(run);
+      return;
+    }
+    requireLive();
+    throw frontierError('checkpoint run is not owned by this Store view');
+  };
+  const publishCheckpoint = (publication) => {
+    requireLive();
+    const publicationLease = Object.freeze({});
+    checkpointPublicationInFlight = true;
+    checkpointPublicationLease = publicationLease;
+    suspendRequestedDuringPublication = false;
+    let candidate = null;
+    let token = null;
+    let committedResult = null;
+    try {
+      ensureInventoryCurrent('checkpoint publication', true);
+      if (suspendRequestedDuringPublication) {
+        throw frontierError('Store was suspended before checkpoint publication');
+      }
+      candidate = candidateForPublication(publication);
+      if (candidate === null && candidateReservation !== null) {
+        candidate = runs.get(candidateReservation.id) ?? null;
+        throw frontierError('checkpoint publication without a run cannot leave a manifest candidate reserved');
+      }
+      if (checkpointView === null || !viewOutstanding || !checkpointView.active) {
+        throw frontierError('checkpoint publication requires the sole outstanding loaded view');
+      }
+      if (checkpointView.openRuns.size !== 0) {
+        throw frontierError('checkpoint publication requires every loaded run to be released');
+      }
+      assertPublicationRecord(publication);
+      if (publication.transition !== 'seed' && publication.transition !== 'unit') {
+        throw frontierError('same-Store checkpoint publication currently supports only seed and unit transitions');
+      }
+      if (publication.transition === 'seed' && candidate === null) {
+        throw frontierError('seed publication requires an owned frontier candidate');
+      }
+      assertPublicationWorkingSet(candidate);
+      candidate?.prepareOwnedCommit();
+      if (suspendRequestedDuringPublication) {
+        throw frontierError('Store was suspended before checkpoint publication');
+      }
+      const plan = planResumableManifestTransition(
+        manifestState,
+        publication,
+        candidate === null ? null : Object.freeze({ run: candidate.run, descriptor: candidate.record.descriptor }),
+        resourceTotalsForPublication(publication, candidate),
+      );
+      token = prepareResumableManifestTransitionCommit(manifestState, plan);
+      const result = publishPreparedManifest(
+        manifestState,
+        token,
+        Object.freeze({
+          claim() { candidate?.claimOwnedCommit(); },
+          rollback() { candidate?.rollbackOwnedCommit(); },
+          commit() {
+            if (candidate !== null) candidate.promoteOwned();
+            consumeCheckpointView();
+          },
+        }),
+        publicationLease,
+      );
+      token = null;
+      committedResult = result;
+      recordProductCheckpointAuthority(candidate?.record ?? null);
+      if (candidate !== null && committedRunRecords.get(candidate.record.id) !== candidate.record) {
+        candidate.promoteOwned();
+      }
+      if (checkpointView !== null) consumeCheckpointView();
+      const returnedDiagnostics = productCheckpointDiagnostics(result.diagnostics, candidate?.record ?? null);
+      return Object.freeze({
+        tip: result.tip,
+        diagnostics: returnedDiagnostics,
+        advanceAllowed: result.advanceAllowed,
+      });
+    } catch (primary) {
+      if (token !== null) discardPreparedResumableManifestTransition(token);
+      const cleanup = [];
+      if (committedResult !== null || manifestPublicationTerminalReason === 'manifest-link-outcome-unknown') {
+        if (candidate !== null) {
+          try {
+            if (committedRunRecords.get(candidate.record.id) !== candidate.record) candidate.quarantineOwned();
+          } catch (error) { cleanup.push(error); }
+        }
+      } else {
+        cleanup.push(...cleanupWorkingState());
+      }
+      if (checkpointView !== null
+        && (committedResult !== null || manifestPublicationTerminalReason === 'manifest-link-outcome-unknown')) {
+        try { consumeCheckpointView(); } catch (error) { cleanup.push(error); }
+      }
+      if (committedResult !== null) {
+        const failure = aggregatePropagatingR7Close(
+          primary, cleanup, 'Checkpoint publication integration failed after commit.',
+        );
+        terminateManifestPublication('postcommit-checkpoint-integration-failed', failure);
+        const current = diagnostics();
+        return Object.freeze({
+          tip: committedResult.tip,
+          diagnostics: Object.freeze({
+            ...productCheckpointDiagnostics(committedResult.diagnostics, candidate?.record ?? null),
+            cleanupErrors: current.cleanupErrors,
+            cleanupErrorsTruncated: current.cleanupErrorsTruncated,
+          }),
+          advanceAllowed: false,
+        });
+      }
+      throw aggregatePropagatingR7Close(primary, cleanup, 'Checkpoint publication failed.');
+    } finally {
+      checkpointPublicationInFlight = false;
+      checkpointPublicationLease = null;
+    }
   };
   const suspend = () => {
     if (!invalidated) {
       suspendCloseFailed = false;
+      if (checkpointPublicationInFlight || manifestPublicationInFlight) {
+        suspendRequestedDuringPublication = true;
+        suspendCloseFailed = true;
+        try { consumeCheckpointView(); } catch (error) {
+          if (error?.r7CloseFailed === true) suspendCloseFailed = true;
+          recordCleanupError(error);
+        }
+        invalidated = true;
+        viewOutstanding = false;
+        return Object.freeze({ diagnostics: diagnostics(), closeFailed: suspendCloseFailed });
+      }
       if (!manifestPublicationTerminal) {
         try { ensureInventoryCurrent('suspend'); } catch { /* Suspend still owns bounded cleanup. */ }
       }
       const pendingCloseFailures = descriptorTracker.drain();
       if (pendingCloseFailures.length > 0) suspendCloseFailed = true;
       for (const error of cleanupOrphanOwnedPaths()) {
+        if (error?.r7CloseFailed === true) suspendCloseFailed = true;
+        recordCleanupError(error);
+      }
+      try { consumeCheckpointView(); } catch (error) {
         if (error?.r7CloseFailed === true) suspendCloseFailed = true;
         recordCleanupError(error);
       }
@@ -3748,6 +4390,9 @@ export function createResumableEndgameDiskFrontierStore(options) {
   };
   const dispose = () => {
     if (disposed) return;
+    if (manifestPublicationInFlight || [...runs.values()].some((entry) => entry.isPublicationClaimed())) {
+      throw frontierError('refusing Store disposal during manifest publication');
+    }
     let primary = null;
     if (!invalidated && !manifestPublicationTerminal) {
       try { ensureInventoryCurrent('Store disposal', true); } catch (error) { primary = error; }
@@ -3761,6 +4406,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
       cleanup.push(error);
     }
     if (rootIsOwned) {
+      try { consumeCheckpointView(); } catch (error) { cleanup.push(error); }
       if (!invalidated) cleanup.push(...descriptorTracker.drain());
       else cleanup.push(...descriptorTracker.drainPhase('owner-final-teardown-readback'));
       cleanup.push(...cleanupOrphanOwnedPaths());
@@ -3828,8 +4474,8 @@ export function createResumableEndgameDiskFrontierStore(options) {
     diagnostics,
     dispose,
     loadCheckpoint,
-    publishCheckpoint() { requireLive(); throw frontierError('resumable manifest publication is not available in the owner checkpoint'); },
-    releaseCheckpointRun() { requireLive(); throw frontierError('no committed run is loaded'); },
+    publishCheckpoint,
+    releaseCheckpointRun,
     suspend,
   });
   R7_RESUMABLE_STORE_INTERNALS.set(store, Object.freeze({ publishPreparedManifest }));
