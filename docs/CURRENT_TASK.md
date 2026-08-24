@@ -10636,3 +10636,19 @@ instrumented fault matrix cannot leave a safe intermediate Store. R7B, Intro-05,
 execution, product proof, browser evidence, curriculum edits, and inherited dirty paths remain
 closed. Required gates are Node syntax, direct fault/I-O tests, typecheck, one full suite,
 production build, diff check, and two independent exact-range read-only reviews.
+
+## Current checkpoint — F4E-R7B fresh Intro-05 proof authority contract
+
+R7A resumed admission is accepted through `9258acb`. This docs-only checkpoint changes exactly
+`docs/DESIGN.md`, this file, the T37 curriculum `STATE.md`, and the Endgame `THREAD_LOG.md`.
+It binds Core blob `c0f66a5e` / SHA-256 `A594FDFF...66D75526` and adapter blob `aa9b7bf3` /
+SHA-256 `800677A2...2476DCE1`, a new v7 Temp namespace, canonical
+attempt/candidate/terminal schemas, and the later detached Task Scheduler same-attempt-resume
+boundary.
+
+No v7 validator, task, attempt, candidate, terminal, stage, preflight, or proof execution is
+authorized by this unreviewed contract. V6 remains immutable excluded evidence. Commit only
+these four documents and obtain two independent all-zero contract reviews; only then may one
+writer author the external validator/worker runner for static review. Intro-05 source/fixture,
+the 46-level curriculum, UI/progression, sensory work, browser evidence, and inherited dirty
+paths remain closed in this checkpoint.

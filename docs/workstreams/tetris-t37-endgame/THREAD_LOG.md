@@ -1099,3 +1099,16 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - R11 `a8607fd` receives three independent `0/0/0/0/0` reviews and is accepted.
 - Next: authorize disjoint Core/test and adapter/test writers for only the four named R7A
   source paths. External paths, production Store/proof, R7B, and Intro-05 remain closed.
+
+### F4E-R7B fresh v7 authority contract candidate
+
+- R7A source receipt `9258acb` opens only a four-document contract. It freezes the current
+  Core and adapter blobs, excludes consumed v6 artifacts, reserves a fresh v7 namespace, and
+  specifies canonical attempt/candidate/terminal schemas plus one detached Task Scheduler
+  worker per durable run ID.
+- A restart may resume only the same recorded attempt, task action, source pin, owner, and
+  checkpoint tip; it cannot start a second attempt or adopt residue. Preflight is no-write and
+  no-task; a successful audited production terminal is the sole future source-integration
+  authority.
+- Next: commit and independently review this contract twice. Validator/runner authoring is not
+  yet open, and no task, validator, Store, candidate search, or Intro-05 source work ran.

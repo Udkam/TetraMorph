@@ -3523,3 +3523,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   path was read, edited, staged, or executed.
 - Next: R7B only, then the sole Intro-05 contract/implementation path; external execution
   and all deferred player acceptance remain closed.
+
+### F4E-R7B fresh v7 authority contract candidate
+
+- Base receipt is `9258acb`; Core `c0f66a5e` / `A594FDFF...66D75526` and adapter `aa9b7bf3` /
+  `800677A2...2476DCE1` are the only future captured proof blobs. V6 and its retained stage
+  are excluded from every R7 source, input, and resume path.
+- The fresh v7 namespace, canonical schemas, detached Task Scheduler worker identity,
+  same-attempt-only resume rule, no-write preflight, and one durable-attempt disposition are
+  docs-only. No external artifact exists or is authorized.
+- Next: commit this exact four-document contract and obtain two independent all-zero reviews.
+  Only that opens validator/runner authoring for static review; not a validator mode, task,
+  Store, candidate search, Intro-05 source, or production attempt.

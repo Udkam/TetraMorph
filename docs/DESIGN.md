@@ -10506,3 +10506,42 @@ loads and mutations may stat current identities and owner bytes, but never rerea
 manifest/run/index contents or enumerate the directory again. The first resumed mutation
 uses a lightweight root identity check followed by the sentinel stamp; a later reopened Store
 alone pays one new full admission scan.
+
+## 2026-08-24 F4E-R7B — fresh Intro-05 proof authority contract
+
+R7A is accepted through `9258acb28843768a7a187c6d83c488e17b4a10c2`. This is a
+four-document, docs-only authority contract for a fresh v7 proof chain; it does not create a
+validator, scheduled task, attempt, stage, candidate, or terminal. Consumed v6 remains failure
+evidence and is excluded from every R7 input or resume path.
+
+The future validator captures the exact R7A blobs from the bound Git commit, never a dirty
+worktree: Core route search blob `c0f66a5e144f70e6be7504f5c19f7c681206d0fe` /
+`A594FDFF8C1D76E0626046798DDB93A71D52818C9DE5F17F0E83079366D75526`, and disk adapter blob
+`aa9b7bf390b414fa2ce21066522ac60fcb773022` /
+`800677A27C10EA92B25101C5AC8E6E63904B6119BC7C76BFC4C21EAC2476DCE1`. It must use only
+`createResumableEndgameDiskFrontierStore` via the public checkpoint API; memory/one-shot
+fallback, a private checkpoint, unbound imports, or v6 material are fatal.
+
+The sole v7 namespace is the existing plain, non-reparse Temp directory with validator
+`t37-f4e-endgame-canonical-validate-r7.mjs`, attempt
+`t37-f4e-endgame-canonical-attempt-r7.json`, candidate
+`t37-f4e-endgame-canonical-candidate-r7.json`, terminal
+`t37-f4e-endgame-canonical-terminal-r7.json`, and stage
+`t37-f4e-endgame-canonical-frontier-stage-r7`. Candidate/terminal use owned exclusive
+same-volume staging names. Schemas are `t37-f4e-r7-validator-v1`, `t37-f4e-r7-attempt-v1`,
+`t37-f4e-r7-candidate-v1`, `t37-f4e-r7-worker-result-v1`, and `t37-f4e-r7-terminal-v1`.
+
+The detached worker has exactly one disabled-by-default Task Scheduler identity,
+`\\TetraMorph\\F4E-R7-Intro05-<runId>`. The outer validator owns attempt/terminal and task
+registration; the task owns only bound worker mode. Same-attempt resume is legal only when
+the durable attempt, task action, source pin, owner, stage, and expected tip all match. It
+cannot create a second attempt, switch input geometry, adopt residue, or delete files. A
+mismatch, ambiguous task outcome, resource breach, source drift, or blocked diagnostics yields
+only an immutable failure terminal. The future no-write preflight creates no task or Store and
+executes no exact/partial/sampled Intro-05 frontier. One audited preflight may later authorize
+one durable v7 attempt; a successful audited terminal is the sole source-integration authority.
+
+Admission sequence: commit and independently review these four documents; author only the
+external validator/worker runner and obtain two static all-zero reviews without executing it;
+then pin one command and final HEAD before a no-write preflight. No Intro-05 source, fixture,
+product, curriculum, or browser work is opened by this contract.
