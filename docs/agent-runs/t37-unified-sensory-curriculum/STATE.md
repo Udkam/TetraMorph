@@ -3638,3 +3638,11 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   reconstruction equality.
 - Next: commit only the four authority docs and obtain two independent all-zero R13 reviews.
   Static source and all execution/product/player-acceptance action remain closed.
+
+### F4E-R7B R14 replay-encoding correction
+
+- Self-audit finds certificate `replay` is an object. R14 freezes its only valid input binding as
+  `encodeEndgameRoute(certificate.replay.commands)`, for both complete proof equality and input
+  reconstruction hash.
+- Next: commit only four authority docs and obtain two independent all-zero R14 reviews.
+  Static source and all execution/product/player-acceptance action remain closed.

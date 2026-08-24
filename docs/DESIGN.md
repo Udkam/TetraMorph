@@ -10678,8 +10678,8 @@ canonical bytes/hash before Store creation, then calls only the captured Core
 `advanceOptimalEndgameRouteProofForDefinition` and the public
 `createResumableEndgameDiskFrontierStore` checkpoint methods with this literal
 `candidate.commandStream` until it returns the one complete certificate or a blocked/failure
-state. A complete certificate's `replay` must equal that command stream byte-for-byte and its
-`optimalLocks` must equal the previously replayed candidate lock count. It never calls a memory/one-shot certifier and never
+state. `encodeEndgameRoute(completeCertificate.replay.commands)` must equal that command stream
+byte-for-byte and its `optimalLocks` must equal the previously replayed candidate lock count. It never calls a memory/one-shot certifier and never
 searches or authors a second definition. The resulting exact definition, route, and certificate
 are the sole candidate publication payload; any mismatch, incomplete search, second candidate,
 or nonempty diagnostic is failure-only.
@@ -10715,8 +10715,9 @@ Candidate's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,inputS
 definitionJsonBase64,definitionSha256,certificateJsonBase64,certificateSha256,
 frontierAuditJsonBase64,frontierAuditSha256}`. Each base64 field decodes to canonical JSON and
 each adjacent hash hashes decoded bytes. `inputSha256` must equal the immutable attempt parameter;
-reconstructing the canonical input from candidate definition and certificate replay must hash to
-that same value. Definition must have exactly the captured
+reconstructing the canonical input from candidate definition and
+`encodeEndgameRoute(certificate.replay.commands)` must hash to that same value. Definition must
+have exactly the captured
 `EndgameDefinition` key set `{id,name,difficulty,targetRows,seed,setup,boardRows,hiddenCells,
 anchorCells}` and is revalidated by the captured Core. Certificate must have exactly the
 captured `EndgameOptimalRouteCertificate` key set `{levelId,optimalLocks,exhaustedDepths,
@@ -10854,3 +10855,10 @@ command-pinned `inputSha256` to immutable parameters/candidate reconstruction, r
 reread equality before Store creation, and makes the literal input stream the only public proof
 argument whose replay/lock count can publish. Commit only the four authority documents and
 obtain two all-zero R13 reviews before static source authoring; execution remains closed.
+
+### F4E-R7B R13 self-audit correction — R14 replay encoding
+
+R13 initially described the certificate replay as a command string; captured Core defines it as
+an `EndgameRouteReplay` object. R14 fixes the only valid comparison/reconstruction to
+`encodeEndgameRoute(certificate.replay.commands)`. Commit only the four authority documents and
+obtain two fresh all-zero R14 reviews before static source authoring; execution remains closed.

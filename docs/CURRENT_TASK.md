@@ -10740,3 +10740,7 @@ R12 review finds the complete input bytes and route stream still unbound. R13 ad
 literal input-stream equality through public proof, certificate replay/lock count, and candidate
 reconstruction. Commit and obtain two independent all-zero R13 reviews before external source
 authoring; execution remains closed.
+
+R13 self-audit corrects certificate replay typing: Core stores a replay object, so R14 binds the
+input stream through `encodeEndgameRoute(certificate.replay.commands)`, not a false direct string
+comparison. Commit and obtain two independent all-zero R14 reviews before source authoring.

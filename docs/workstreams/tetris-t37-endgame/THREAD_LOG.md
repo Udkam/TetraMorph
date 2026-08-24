@@ -1216,3 +1216,11 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   proof only with the literal input stream, whose replay/lock count must match certificate.
 - Changed paths are exactly four authority docs; no source/artifact/mode/task/proof occurred.
 - Sole next action: commit and independently review R13 twice, then reopen static source only.
+
+### F4E-R7B R14 replay-encoding correction
+
+- Self-audit catches R13 type mismatch: certificate replay is an object. R14 requires the
+  captured Core encoder over `certificate.replay.commands` for complete-stream equality and
+  canonical input reconstruction.
+- Changed paths are exactly four authority docs; no source/artifact/mode/task/proof occurred.
+- Sole next action: commit and independently review R14 twice, then reopen static source only.
