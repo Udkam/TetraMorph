@@ -1112,3 +1112,13 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   authority.
 - Next: commit and independently review this contract twice. Validator/runner authoring is not
   yet open, and no task, validator, Store, candidate search, or Intro-05 source work ran.
+
+### F4E-R7B R1 rejection and R2 executable correction
+
+- Contract QA rejects `6c9dfec`: a task-name template and named schemas cannot authenticate
+  resume or immutable outcome. R2 fixes canonical field order/cross-hash rules, Temp/part
+  grammar, no-replace publication, and literal Task Scheduler action/query identity.
+- Same-attempt is now monitor-only reconnect to the exact already-running task; it cannot
+  relaunch an interrupted worker, create another attempt, or adopt an ambiguous stage.
+- Next: commit and re-review this four-document correction. External authoring/execution and
+  all Intro-05 source remain closed.

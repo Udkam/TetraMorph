@@ -3535,3 +3535,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next: commit this exact four-document contract and obtain two independent all-zero reviews.
   Only that opens validator/runner authoring for static review; not a validator mode, task,
   Store, candidate search, Intro-05 source, or production attempt.
+
+### F4E-R7B R1 rejection and R2 executable correction
+
+- R1 `6c9dfec` receives `P0/P1/P2/P3/GAP = 0/2/0/0/0` and `0/1/0/0/1` rejections. Schema
+  names, task identity, and same-attempt prose could not authenticate an implementation.
+- R2 freezes canonical bytes, every strict record field/cross-hash, run/path/part grammar,
+  Task Scheduler action/query round trip, realpath and no-replace publication, worker result,
+  terminal, and same-attempt monitor-only resume. It creates no external v7 object.
+- Next: commit and independently re-review only the same four docs. Nothing external or
+  Intro-05-specific is authorized.

@@ -10652,3 +10652,15 @@ these four documents and obtain two independent all-zero contract reviews; only 
 writer author the external validator/worker runner for static review. Intro-05 source/fixture,
 the 46-level curriculum, UI/progression, sensory work, browser evidence, and inherited dirty
 paths remain closed in this checkpoint.
+
+### F4E-R7B R1 rejected — R2 executable contract review only
+
+R1 `6c9dfec` is rejected at `0/2/0/0/1`: schema names and a task-name template could not
+mechanically bind a same-attempt resume. R2 in `docs/DESIGN.md` freezes canonical record
+encoding, exact field order and cross-record hashes, run-ID/path/part grammar, literal Task
+Scheduler action/query requirements, realpath/reparse/absence rules, owned no-replace
+publication, and the task/result/terminal recovery matrix. No v7 artifact exists.
+
+Commit only the same four authority documents and obtain two new all-zero contract reviews.
+Validator/runner authoring, task registration, preflight, candidate discovery, Store creation,
+Intro-05 source, later curriculum, and inherited dirty paths remain closed.

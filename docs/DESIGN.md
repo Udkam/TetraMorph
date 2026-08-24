@@ -10545,3 +10545,68 @@ Admission sequence: commit and independently review these four documents; author
 external validator/worker runner and obtain two static all-zero reviews without executing it;
 then pin one command and final HEAD before a no-write preflight. No Intro-05 source, fixture,
 product, curriculum, or browser work is opened by this contract.
+
+### F4E-R7B R1 executable authority correction
+
+R1 `6c9dfec` is not implementation authority: its schema and task prose left the future author
+to choose permanent bytes. R1 is rejected at `P0/P1/P2/P3/GAP = 0/2/0/0/1`. R2 freezes the
+following exact contracts before validator/runner authoring.
+
+All R2 JSON values are canonical UTF-8 without BOM, no CR/LF except one final LF, recursively
+ordinal-key-sorted, with safe-integer numbers only. A record's uppercase `sha256` is SHA-256 of
+those exact final bytes and is never a field of the record it names; no record accepts unknown
+keys. `runId` is exactly
+`r7-[0-9a-f]{24}`. The absolute plain parent is
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp`; after exact realpath comparison every final
+path is the parent joined to its listed basename, is not a reparse point, and is absent before
+the first claim. The sixth external control path is
+`t37-f4e-endgame-canonical-worker-result-r7.json`; it is a worker-owned result only, not an
+input. Every final `attempt`, `candidate`, `worker-result`, and `terminal` uses an owned
+exclusive sibling `<basename>.part-<runId>` followed by flush, close, byte/hash reread,
+same-volume `link(part, final)` with no replacement, final reread, then best-effort owned-part
+unlink. Existing final, foreign part, reparse, mismatch, or unknown same-prefix entry is fatal;
+only an owned failed part is reportable immutable failure residue.
+
+`sourcePin` has exactly `head`, `coreBlob`, `coreSha256`, `adapterBlob`, `adapterSha256`; its
+canonical hash is `sourcePinSha256`. `expectedTip` is either null or exactly
+`{generation,manifestSha256}` with generation `0..32767` and a 64-uppercase-hex hash. The
+canonical attempt keys, in this order, are `schema`, `runId`, `claimedAt`, `outerPid`,
+`sourcePin`, `sourcePinSha256`, `task`, `stage`, `expectedTip`, `parameters`,
+`workerCapabilitySha256`, `candidatePath`, and `terminalPath`. `stage` is exactly
+`{path,ownerId,expectedTip}` where `path` is the fixed v7 stage and `ownerId` is `runId`.
+`parameters` is exactly `{nodePath,nodeVersion,nodeFlags,heapLimitBytes,inputDomainSha256}`;
+the later command pin fixes all values before claim. An attempt is the durable consumption
+boundary and is never rewritten.
+
+`task` is exactly `{path,program,arguments,workingDirectory,runAs,logonType,runLevel,triggers,
+enabled,actionSha256}`. The path is the literal Windows Task Scheduler path
+`\TetraMorph\F4E-R7-Intro05-<runId>` (single leading separators, not a Markdown escape);
+program is `E:\\Nodejs\\node.exe`; arguments are the ordered literal array
+`["--disable-warning=ExperimentalWarning","--max-old-space-size=6144",validatorPath,"--worker",
+"--attempt",attemptPath,"--stage",stagePath,"--run-id",runId]`; working directory is the
+bound repository root; runAs is the current interactive user; logonType is `InteractiveToken`;
+runLevel is `LeastPrivilege`; triggers is `[]`; and enabled is initially `false`. `actionSha256`
+is SHA-256 of canonical JSON containing every task field except itself. Registration is accepted
+only after a task-XML/query round trip proves every field and digest; the outer may enable it
+only immediately before `Start-ScheduledTask`, disables it after recording completion, and
+never edits the action. A task cannot be registered or started in preflight.
+
+Worker-result keys are exactly `schema`, `runId`, `attemptSha256`, `sourcePinSha256`,
+`taskActionSha256`, `status`, `checkpointTip`, `candidateSha256`, `diagnosticsSha256`, and
+`stageAudit`; status is one of `passed`, `failed`, `interrupted`. Candidate keys are exactly
+`schema`, `runId`, `attemptSha256`, `sourcePinSha256`, `workerResultSha256`, `definition`,
+`certificate`, and `frontierAudit`. Terminal keys are exactly `schema`, `runId`,
+`attemptSha256`, `sourcePinSha256`, `taskActionSha256`, `workerResultSha256`,
+`candidateSha256`, `status`, `passed`, `observedTaskState`, `stageAudit`, and `residue`. The
+validator recomputes every referenced record hash and requires the attempt/source/task hashes
+to agree byte-for-byte across every present record. `passed:true` requires a `passed` result,
+a candidate, empty stage/residue audit, and task completion; every other terminal is
+`passed:false` and preserves all observed bytes.
+
+Same-attempt resume means only a fresh outer monitor of the immutable attempt and the exact
+registered task may reconnect to an already-running task. It may not relaunch a failed or
+interrupted task. The stage's authenticated highest manifest tip is compared with the immutable
+attempt `expectedTip` before worker start; a null first tip may advance only under the recorded
+owner ID, while a nonnull tip must match or extend it under the R7A authenticated chain rule.
+An absent/mismatched task, result, source pin, owner, stage, or terminal is fail-closed. These
+rules deliberately do not claim detection of an honest coordinator's never-recorded tail.
