@@ -10679,7 +10679,7 @@ Commit and obtain two independent all-zero R3 document reviews before any valida
 authoring. All external execution, Intro-05 source, later curriculum, and inherited dirty paths
 remain closed.
 
-### F4E-R7B R3/R4/R5/R6/R7 rejected — R8 residual-node-audit review only
+### F4E-R7B R3/R4/R5/R6/R7/R8 rejected — R9 claim-collision review only
 
 R3 `1ef80f5` is rejected because its passed worker-result and candidate hashes formed a cycle.
 R4 `d9e85f6` repairs that graph to `candidate -> worker-result -> terminal`, retains the
@@ -10700,8 +10700,13 @@ R7 review then finds its descriptor cannot represent zero-byte parts or nonregul
 nodes. R8 adds a no-follow `lstat` identity matrix: regular entries admit zero bytes and hash
 their bytes; directory/reparse/other entries record lexical path, kind, type, and the exact
 lstat identity with `bytes`/`sha256:null`, without `stat`, `realpath`, traversal, or deletion.
+R8 review finds a malformed file already occupying the fixed attempt or terminal final cannot
+be described by a newly published no-replace terminal. R9 makes that an irrecoverable
+claim-collision disposition: return only no-follow lstat descriptors to the coordinator/audit
+log, create no new v7 artifact or task, delete/rename/replace/integrate nothing, and permanently
+block that run namespace rather than fabricate a terminal or retry.
 
-Commit and obtain two independent all-zero R8 document reviews before any validator/runner
+Commit and obtain two independent all-zero R9 document reviews before any validator/runner
 authoring. No v7 validator, task, attempt, candidate, result, terminal, stage, preflight, or
 proof execution is authorized; Intro-05 source, later curriculum, sensory work, browser
 evidence, player acceptance, and inherited dirty paths remain closed.

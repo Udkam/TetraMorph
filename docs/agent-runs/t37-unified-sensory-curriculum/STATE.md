@@ -3564,7 +3564,7 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   file/task/Store/proof action occurred.
 - Next: commit and independently review R4 before static external authoring.
 
-### F4E-R7B R4/R5/R6/R7 lifecycle rejection and R8 correction
+### F4E-R7B R4/R5/R6/R7/R8 lifecycle rejection and R9 correction
 
 - R4 `d9e85f6` has no hash cycle, but lifecycle review correctly finds an unrecordable durable
   state when candidate publication succeeds and the worker stops before worker-result
@@ -3586,6 +3586,10 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   reparse/nonregular nodes. R8 splits it by no-follow lstat type: regular files use zero-safe
   byte/hash fields; directory/reparse/other nodes keep lexical path and exact lstat identity
   with null byte/hash and are never opened, resolved, traversed, or deleted.
-- Next: commit only the four R7B authority docs and obtain two independent all-zero R8 reviews.
+- R8 review finds a malformed occupied fixed attempt/terminal final prevents a no-replace
+  canonical record from describing itself. R9 makes this a no-write irreversible
+  claim-collision: only returned no-follow evidence, no new artifacts/task/attempt/terminal,
+  no integration or retry, and permanent namespace block.
+- Next: commit only the four R7B authority docs and obtain two independent all-zero R9 reviews.
   Static validator/runner authoring, every external action, Intro-05 source, the curriculum,
   sensory/browser work, and player acceptance remain closed.

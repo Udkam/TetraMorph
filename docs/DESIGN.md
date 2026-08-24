@@ -10715,6 +10715,21 @@ descriptor records the stage root even when that child-name array is empty. Thus
 unbound named finals, zero-byte parts, nonregular/reparse nodes, and pre-owner creation residue
 are no-replace audit data, not candidates, results, or implicit authorities.
 
+The descriptor array above applies only when an authentic immutable attempt exists and the
+fixed terminal final path is absent, so a terminal can be published without replacement. A
+malformed/foreign occupied attempt final prevents creating an authentic attempt; a
+malformed/foreign occupied terminal final prevents publishing any second terminal. Either is a
+separate irreversible **claim collision**, not a terminal state: the outer performs only the
+same no-follow lexical-path/lstat collection and returns the canonical in-memory
+`{collisionFiles,runId,schema}` report with `schema:"t37-f4e-r7-claim-collision-v1"`, where
+`collisionFiles` uses the exact `unexpectedFiles` descriptor shape and is nonempty. It creates,
+replaces, deletes, renames, registers, starts, resumes, or integrates nothing; it writes no new
+attempt, candidate, worker-result, terminal, stage, collision receipt, or alternate namespace.
+The coordinator/audit log may surface that returned no-follow evidence, but it is not an R7
+terminal, cannot authorize source integration, and permanently blocks this run ID/namespace
+from retry. A valid existing attempt may still be monitor-only audited under the ordinary
+same-attempt rules; this collision branch never claims to repair a malformed one.
+
 The terminal matrix is closed. `passed:true/status:"passed"` requires completed task, nonnull
 result and candidate hashes, a passed worker-result that binds that identical candidate hash,
 `orphanCandidate:null`, the exact false-stage tuple, and empty untruncated residue. Whenever a
@@ -10748,4 +10763,6 @@ treats an invalid named final as residue. R6 review finds a legal null-tip owner
 stage and names-only residue insufficient for terminal byte evidence. R7 adds that exact
 pre-seed tuple and full `unexpectedFiles` descriptors. R7 review finds the descriptor cannot
 represent zero-byte or nonregular/reparse residue, so R8 adds a no-follow lstat identity
-matrix. Static validator/runner authoring remains closed pending two fresh all-zero R8 reviews.
+matrix. R8 review finds malformed occupied attempt/terminal finals cannot be described by a
+new no-replace terminal, so R9 adds the separate no-write claim-collision disposition. Static
+validator/runner authoring remains closed pending two fresh all-zero R9 reviews.
