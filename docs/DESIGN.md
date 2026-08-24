@@ -10807,3 +10807,9 @@ directly and only starts an XML/query-round-tripped Task action; worker validate
 attempt/action/run/capability binding without asserting process origin. Commit only the four
 authority documents and obtain two fresh all-zero R11 reviews before external source authoring.
 All modes and every external/product/player-acceptance action remain closed.
+
+R11 `95d23d5` receives independent integrity and lifecycle reviews at
+`P0/P1/P2/P3/GAP = 0/0/0/0/0` and `0/0/0/0/0`; it is accepted. One writer may now create only
+the external validator/worker source for static review. No validator mode, Task Scheduler
+operation, Temp artifact other than that source file, Store/proof, Intro-05 source, curriculum,
+sensory/browser action, or player acceptance is authorized.

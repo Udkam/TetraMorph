@@ -10721,3 +10721,9 @@ can verify—immutable attempt, taskActionSha256, runId, and capability—while 
 operationally to XML/query-verified Task registration/start and forbidding direct worker launch.
 Commit and obtain two independent all-zero R11 document reviews before external source authoring;
 all mode execution and deferred work remain closed.
+
+R11 `95d23d5` now has two independent `P0/P1/P2/P3/GAP = 0/0/0/0/0` reviews and is accepted.
+One writer may create only the external v7 validator/worker source for static review. It may not
+invoke any validator mode or create any other v7 Temp artifact, task, attempt, candidate,
+result, terminal, stage, Store/proof, Intro-05 source, curriculum/UI/sensory work, browser
+evidence, or player acceptance action.
