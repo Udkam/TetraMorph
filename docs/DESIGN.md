@@ -10654,8 +10654,10 @@ the sorted observed entry prefix (empty only when the complete observed director
 requires `tip` to be the nonnull authenticated highest checkpoint tip recovered for that stage.
 When `entriesTruncated:false`, `entries` is the complete inventory; when true it is only the
 deterministic bounded prefix. `residue` is exactly `{entries,entriesTruncated}` with the same
-basename rules, but contains only unexpected/foreign/incomplete same-prefix entries: immutable
-canonical finals named by this contract are never residue. Worker-result's exact key set is
+basename rules, but contains only unexpected/foreign/incomplete same-prefix entries: a valid
+canonical final that the terminal separately authenticates is never residue, while any named
+file that fails its required type, hash, or cross-record binding is unexpected residue.
+Worker-result's exact key set is
 `{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,status,checkpointTip,
 candidateSha256,diagnosticsJsonBase64,diagnosticsSha256,stageAudit}`. It has
 `schema:"t37-f4e-r7-worker-result-v1"`; `checkpointTip` has the `expectedTip` shape and is
@@ -10691,13 +10693,16 @@ integration authority and is never deleted, replaced, resumed, or retried by thi
 
 The terminal matrix is closed. `passed:true/status:"passed"` requires completed task, nonnull
 result and candidate hashes, a passed worker-result that binds that identical candidate hash,
-`orphanCandidate:null`, the exact false-stage tuple, and empty untruncated residue. If the
-candidate final exists but the worker-result final does not, the terminal must be
-`passed:false/status:"candidate-unacknowledged"`, `workerResultSha256:null`,
-`candidateSha256:null`, and carry the exact nonnull `orphanCandidate` descriptor. Every other
-failed/interrupted terminal has `passed:false`; it carries a nonnull worker-result hash only if
-that final exists, then its `stageAudit` must exactly equal the worker result's audit, and it
-uses `candidateSha256:null` and `orphanCandidate:null`. Without a result it uses the closed
+`orphanCandidate:null`, the exact false-stage tuple, and empty untruncated residue. Whenever a
+candidate final exists but no passed worker-result binds that exact candidate SHA-256, terminal
+must carry its exact nonnull `orphanCandidate` descriptor; the candidate remains
+non-authoritative and terminal `candidateSha256` remains null. With no worker-result final,
+that terminal is `passed:false/status:"candidate-unacknowledged"` and
+`workerResultSha256:null`. With a failed/interrupted worker-result final, it is respectively
+`status:"failed"` or `status:"interrupted"`, retains that nonnull result hash, reproduces its
+stage audit exactly, and carries the orphan descriptor whenever the unauthoritative candidate
+exists. Every failure terminal without that candidate uses `orphanCandidate:null`; any present
+candidate hash outside the one passed binding is invalid. Without a result it uses the closed
 stage-audit relation above and records only actually observed stage/residue bytes. Attempt and
 terminal finals are one immutable attempt followed by at most one immutable terminal in the
 same v7 namespace; a terminal retains rather than replaces the attempt. The successful
@@ -10711,5 +10716,7 @@ R4 `d9e85f6` correctly removes the candidate/result hash cycle, but independent 
 finds an unrepresented durable state: candidate publication can complete before the worker
 publishes a result. R5 adds the non-authoritative, exact-byte `orphanCandidate` terminal
 descriptor, excludes described canonical finals from residue, and freezes the stage-audit
-absence/presence relation. The authoritative R7B checkpoint below records this correction;
-static validator/runner authoring remains closed pending two fresh all-zero R5 reviews.
+absence/presence relation. R5 review finds the same durable candidate can coexist with a later
+failed/interrupted result, so R6 requires orphan audit whenever no passed result binds it and
+treats an invalid named final as residue. Static validator/runner authoring remains closed
+pending two fresh all-zero R6 reviews.

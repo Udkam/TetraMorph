@@ -10679,7 +10679,7 @@ Commit and obtain two independent all-zero R3 document reviews before any valida
 authoring. All external execution, Intro-05 source, later curriculum, and inherited dirty paths
 remain closed.
 
-### F4E-R7B R3/R4 rejected — R5 orphan-candidate review only
+### F4E-R7B R3/R4/R5 rejected — R6 orphan-candidate review only
 
 R3 `1ef80f5` is rejected because its passed worker-result and candidate hashes formed a cycle.
 R4 `d9e85f6` repairs that graph to `candidate -> worker-result -> terminal`, retains the
@@ -10687,10 +10687,14 @@ immutable attempt, and fixes Base64/checkpoint-tip semantics; independent review
 it because a worker can stop after durable candidate publication but before worker-result
 publication. R5 keeps that candidate non-authoritative: the failure terminal must carry its
 exact final path/size/SHA-256 as `orphanCandidate`, never delete or integrate it, while its
-ordinary `candidateSha256` remains null. It also makes the false-stage audit tuple and the
-canonical-final-versus-residue split mechanically exact.
+ordinary `candidateSha256` remains null. R5 review correctly finds the adjacent branch where
+that candidate exists alongside a later failed/interrupted worker-result. R6 requires orphan
+audit whenever no passed result binds that exact candidate SHA-256, including that result-bearing
+failure branch; only valid separately authenticated canonical finals are excluded from residue.
+It retains the false-stage audit tuple and canonical-final-versus-residue split mechanically
+exact.
 
-Commit and obtain two independent all-zero R5 document reviews before any validator/runner
+Commit and obtain two independent all-zero R6 document reviews before any validator/runner
 authoring. No v7 validator, task, attempt, candidate, result, terminal, stage, preflight, or
 proof execution is authorized; Intro-05 source, later curriculum, sensory work, browser
 evidence, player acceptance, and inherited dirty paths remain closed.
