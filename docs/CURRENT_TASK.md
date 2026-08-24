@@ -10679,7 +10679,7 @@ Commit and obtain two independent all-zero R3 document reviews before any valida
 authoring. All external execution, Intro-05 source, later curriculum, and inherited dirty paths
 remain closed.
 
-### F4E-R7B R3/R4/R5/R6 rejected — R7 terminal-byte-audit review only
+### F4E-R7B R3/R4/R5/R6/R7 rejected — R8 residual-node-audit review only
 
 R3 `1ef80f5` is rejected because its passed worker-result and candidate hashes formed a cycle.
 R4 `d9e85f6` repairs that graph to `candidate -> worker-result -> terminal`, retains the
@@ -10696,8 +10696,12 @@ names-only residue cannot bind malformed/unbound final bytes. R7 permits `tip:nu
 the exact authenticated `owner.json`-only pre-seed state, classifies pre-owner creation state as
 residue, and adds complete `unexpectedFiles` `{path,bytes,sha256,kind}` audit descriptors for
 every residual file. Malformed candidates cannot enter passed/candidate-unacknowledged paths.
+R7 review then finds its descriptor cannot represent zero-byte parts or nonregular/reparse
+nodes. R8 adds a no-follow `lstat` identity matrix: regular entries admit zero bytes and hash
+their bytes; directory/reparse/other entries record lexical path, kind, type, and the exact
+lstat identity with `bytes`/`sha256:null`, without `stat`, `realpath`, traversal, or deletion.
 
-Commit and obtain two independent all-zero R7 document reviews before any validator/runner
+Commit and obtain two independent all-zero R8 document reviews before any validator/runner
 authoring. No v7 validator, task, attempt, candidate, result, terminal, stage, preflight, or
 proof execution is authorized; Intro-05 source, later curriculum, sensory work, browser
 evidence, player acceptance, and inherited dirty paths remain closed.

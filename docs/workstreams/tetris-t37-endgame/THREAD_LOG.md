@@ -1139,7 +1139,7 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   immutable attempt, fixes strict Base64, and treats checkpointTip as observed highest tip.
 - No v7 external object or Intro-05 work ran. Next: commit and re-review this correction.
 
-### F4E-R7B R4/R5/R6 lifecycle rejection and R7 correction
+### F4E-R7B R4/R5/R6/R7 lifecycle rejection and R8 correction
 
 - R4 `d9e85f6` removes the hash cycle but does not give a non-destructive terminal shape for a
   candidate final left durable before worker-result publication. R5 requires a
@@ -1156,7 +1156,11 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   residuals insufficient for byte evidence. R7 allows null tip only for authenticated
   `entries:["owner.json"]`, classifies pre-owner creation as residue, and freezes full
   untruncated `unexpectedFiles` `{path,bytes,sha256,kind}` for every residual file.
+- R7 review finds zero-byte/nonregular/reparse residue cannot fit that regular-file-only shape.
+  R8 freezes a no-follow lstat matrix: regular files permit zero bytes plus hash; directories,
+  reparse points, and other nodes use lexical path/type/lstat identity with null byte/hash and
+  are always failure-only, with no open, resolve, traversal, or deletion.
 - Base is `d9e85f6`; changed paths are exactly the four R7B authority documents. No validator,
   task, Temp artifact, Store/proof, Intro-05 source, or player-acceptance action occurred.
-- Sole next action: commit this docs-only R7 correction and request two independent all-zero
+- Sole next action: commit this docs-only R8 correction and request two independent all-zero
   R7B contract reviews. Static authoring remains closed until both pass.

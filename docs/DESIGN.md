@@ -10618,8 +10618,9 @@ also have a separately imposed prose field order, and the nested values/null mat
 open. R3 replaces every conflicting R2 schema/publication sentence. R3's only serialization
 order is recursive ordinal UTF-8 byte order. Every field list
 below is an exact *set*, all strings are ASCII unless explicitly `...JsonBase64`, every hash is
-exactly `[A-F0-9]{64}`, every path is the exact resolved absolute string, and absent optional
-values are literal JSON `null`, never omitted. Every `...JsonBase64` is standard RFC 4648 base64
+exactly `[A-F0-9]{64}`, every path is the exact resolved absolute string except the explicitly
+non-dereferenced `unexpectedFiles` lexical paths below, and absent optional values are literal
+JSON `null`, never omitted. Every `...JsonBase64` is standard RFC 4648 base64
 using `[A-Za-z0-9+/]`, required `=` padding, no whitespace, and strict round-trip equality to
 `Buffer.from(value, 'base64').toString('base64')`; its decoded bytes must be the one-LF
 canonical JSON bytes named by the adjacent SHA-256 field.
@@ -10695,14 +10696,24 @@ is its positive safe regular-file byte size, and `sha256` is recomputed from tho
 bytes. It records a candidate that was never acknowledged by a worker result; it is not an
 integration authority and is never deleted, replaced, resumed, or retried by this contract.
 `unexpectedFiles` is the full untruncated ordinal-path-sorted array of exact
-`{bytes,kind,path,sha256}` descriptors for every residue entry. `kind` is exactly one of
-`malformed-attempt-final`, `malformed-candidate-final`, `malformed-worker-result-final`,
-`owned-part`, `foreign`, or `pre-owner-stage`; `path` is the exact resolved absolute path,
-`bytes` is its positive safe regular-file size, and `sha256` is recomputed from its exact
-regular-file bytes. Terminal publication requires `residue.entriesTruncated:false`, and the
-residue entry basenames must equal this array's path basenames in ordinal order. Thus malformed
-or unbound named finals and pre-owner creation residue are byte-bound, no-replace audit data,
-not candidates, results, or implicit authorities.
+`{bytes,entryType,kind,lstat,path,sha256}` descriptors for every residue entry. `kind` is
+exactly one of `malformed-attempt-final`, `malformed-candidate-final`,
+`malformed-worker-result-final`, `malformed-terminal-final`, `owned-part`, `foreign`, or
+`pre-owner-stage`; `entryType` is exactly `regular`, `directory`, `reparse`, or `other`.
+`path` is never resolved or dereferenced: it is the lexically normalized absolute direct child
+of the fixed namespace, except `pre-owner-stage`, whose path is the fixed lexical stage root.
+`lstat` is exactly `{ctimeNs,dev,ino,mode,mtimeNs,nlink,size}`, with each nonnegative decimal
+integer rendered as an ASCII string from the single no-follow `lstat(...,{bigint:true})` sample.
+For `regular`, `bytes` is a nonnegative safe integer equal to lstat `size` and `sha256` is the
+recomputed exact regular-file hash; zero-byte files are valid audit entries. For `directory`,
+`reparse`, and `other`, `bytes` and `sha256` are literal `null`, the lstat sample is retained,
+and the validator must not call `stat`, `realpath`, open, traverse, or hash the node/target.
+`reparse` includes every symlink, junction, or platform reparse point recognized without
+following it. Terminal publication requires `residue.entriesTruncated:false`; its entries equal
+the ordinal basenames of all non-`pre-owner-stage` descriptors, while the sole pre-owner-stage
+descriptor records the stage root even when that child-name array is empty. Thus malformed or
+unbound named finals, zero-byte parts, nonregular/reparse nodes, and pre-owner creation residue
+are no-replace audit data, not candidates, results, or implicit authorities.
 
 The terminal matrix is closed. `passed:true/status:"passed"` requires completed task, nonnull
 result and candidate hashes, a passed worker-result that binds that identical candidate hash,
@@ -10735,5 +10746,6 @@ absence/presence relation. R5 review finds the same durable candidate can coexis
 failed/interrupted result, so R6 requires orphan audit whenever no passed result binds it and
 treats an invalid named final as residue. R6 review finds a legal null-tip owner-only pre-seed
 stage and names-only residue insufficient for terminal byte evidence. R7 adds that exact
-pre-seed tuple and full `unexpectedFiles` descriptors. Static validator/runner authoring
-remains closed pending two fresh all-zero R7 reviews.
+pre-seed tuple and full `unexpectedFiles` descriptors. R7 review finds the descriptor cannot
+represent zero-byte or nonregular/reparse residue, so R8 adds a no-follow lstat identity
+matrix. Static validator/runner authoring remains closed pending two fresh all-zero R8 reviews.
