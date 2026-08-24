@@ -1122,3 +1122,12 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   relaunch an interrupted worker, create another attempt, or adopt an ambiguous stage.
 - Next: commit and re-review this four-document correction. External authoring/execution and
   all Intro-05 source remain closed.
+
+### F4E-R7B R2 rejection and R3 schema correction
+
+- R2 remains non-authoritative: its canonical byte order and nested payload/null rules were
+  ambiguous. R3 freezes ordinal JSON only, strict validator/input/diagnostic/stage/residue
+  schemas, source-validated base64 candidate payloads, and all terminal outcomes.
+- Capability is a visible action-bound correlation nonce, not an unimplementable Scheduler
+  stdin secret. No external file, task, Store, or proof action occurred.
+- Next: commit and obtain two fresh all-zero reviews before static runner authoring opens.

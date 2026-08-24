@@ -3545,3 +3545,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   terminal, and same-attempt monitor-only resume. It creates no external v7 object.
 - Next: commit and independently re-review only the same four docs. Nothing external or
   Intro-05-specific is authorized.
+
+### F4E-R7B R2 rejection and R3 schema correction
+
+- R2 `d70f6b6` is rejected twice at `P0/P1/P2/P3/GAP = 0/2/0/0/0`: its byte order and nested
+  payload/nullability rules remained ambiguous.
+- R3 admits only recursive ordinal canonical JSON, exact validator/input/diagnostic/audit and
+  base64 captured-Core payload schemas, action-bound visible capability correlation, and the
+  full failure-terminal matrix. It creates no v7 artifact.
+- Next: commit and independently review this correction before static external authoring.

@@ -10664,3 +10664,16 @@ publication, and the task/result/terminal recovery matrix. No v7 artifact exists
 Commit only the same four authority documents and obtain two new all-zero contract reviews.
 Validator/runner authoring, task registration, preflight, candidate discovery, Store creation,
 Intro-05 source, later curriculum, and inherited dirty paths remain closed.
+
+### F4E-R7B R2 rejected — R3 schema review only
+
+R2 `d70f6b6` is rejected at `0/2/0/0/0`: recursive ordinal serialization conflicted with prose
+field order, and several nested values plus the failure null matrix were still author-chosen.
+R3 keeps ordinal serialization as the only byte order and freezes validator/input-domain,
+diagnostics/stage/residue, base64 captured-source candidate payloads, and every terminal state.
+The task capability is explicitly a visible action-bound correlation nonce, not an impossible
+Task Scheduler stdin secret. No external v7 object exists.
+
+Commit and obtain two independent all-zero R3 document reviews before any validator/runner
+authoring. All external execution, Intro-05 source, later curriculum, and inherited dirty paths
+remain closed.

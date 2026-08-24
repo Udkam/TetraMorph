@@ -10570,8 +10570,8 @@ only an owned failed part is reportable immutable failure residue.
 `sourcePin` has exactly `head`, `coreBlob`, `coreSha256`, `adapterBlob`, `adapterSha256`; its
 canonical hash is `sourcePinSha256`. `expectedTip` is either null or exactly
 `{generation,manifestSha256}` with generation `0..32767` and a 64-uppercase-hex hash. The
-canonical attempt keys, in this order, are `schema`, `runId`, `claimedAt`, `outerPid`,
-`sourcePin`, `sourcePinSha256`, `task`, `stage`, `expectedTip`, `parameters`,
+canonical attempt key set is `schema`, `runId`, `claimedAt`, `outerPid`,
+`sourcePin`, `sourcePinSha256`, `validator`, `task`, `stage`, `expectedTip`, `parameters`,
 `workerCapabilitySha256`, `candidatePath`, and `terminalPath`. `stage` is exactly
 `{path,ownerId,expectedTip}` where `path` is the fixed v7 stage and `ownerId` is `runId`.
 `parameters` is exactly `{nodePath,nodeVersion,nodeFlags,heapLimitBytes,inputDomainSha256}`;
@@ -10583,7 +10583,7 @@ enabled,actionSha256}`. The path is the literal Windows Task Scheduler path
 `\TetraMorph\F4E-R7-Intro05-<runId>` (single leading separators, not a Markdown escape);
 program is `E:\\Nodejs\\node.exe`; arguments are the ordered literal array
 `["--disable-warning=ExperimentalWarning","--max-old-space-size=6144",validatorPath,"--worker",
-"--attempt",attemptPath,"--stage",stagePath,"--run-id",runId]`; working directory is the
+"--attempt",attemptPath,"--stage",stagePath,"--run-id",runId,"--capability",capabilityHex]`; working directory is the
 bound repository root; runAs is the current interactive user; logonType is `InteractiveToken`;
 runLevel is `LeastPrivilege`; triggers is `[]`; and enabled is initially `false`. `actionSha256`
 is SHA-256 of canonical JSON containing every task field except itself. Registration is accepted
@@ -10610,3 +10610,68 @@ attempt `expectedTip` before worker start; a null first tip may advance only und
 owner ID, while a nonnull tip must match or extend it under the R7A authenticated chain rule.
 An absent/mismatched task, result, source pin, owner, stage, or terminal is fail-closed. These
 rules deliberately do not claim detection of an honest coordinator's never-recorded tail.
+
+### F4E-R7B R2 schema correction
+
+R2 `d70f6b6` is rejected at `P0/P1/P2/P3/GAP = 0/2/0/0/0`: an ordinal-key encoding cannot
+also have a separately imposed prose field order, and the nested values/null matrix remained
+open. R3's only serialization order is recursive ordinal UTF-8 byte order. Every field list
+below is an exact *set*, all strings are ASCII unless explicitly `...JsonBase64`, every hash is
+exactly `[A-F0-9]{64}`, every path is the exact resolved absolute string, and absent optional
+values are literal JSON `null`, never omitted.
+
+The validator descriptor is exactly `{schema,path,bytes,sha256,nodePath,nodeVersion,cli}` with
+`schema:"t37-f4e-r7-validator-v1"`, positive safe `bytes`, `path` equal to the fixed validator
+path, `nodePath:"E:\\Nodejs\\node.exe"`, `nodeVersion:"v24.12.0"`, and `cli` equal to
+`["--describe","--preflight","--worker"]`; its `sha256` is the validator's raw UTF-8 bytes.
+`workerCapabilitySha256` is SHA-256 of exactly 32 random bytes encoded as the 64-lowercase-hex
+`capabilityHex` final task argument. It is a correlation handle, not a secret: the exact value
+is therefore intentionally visible in the immutable task action, must hash to the attempt
+field, and must not be copied to stdout, candidate, terminal, or error text.
+
+`parameters` is exactly `{nodePath,nodeVersion,nodeFlags,heapLimitBytes,inputDomainJsonBase64,
+inputDomainSha256}`. `nodeFlags` is the ordered two-string array already fixed for the task;
+`heapLimitBytes` is positive and must equal the result of the frozen no-proof heap probe under
+those flags; `inputDomainJsonBase64` decodes to a canonical JSON object with exact key set
+`{schema,baseLevelId,candidateCountLimit,setupDropCount,targetRows,minimumLocks,maximumLocks,
+commandAlphabet}` and types string, string, positive safe integer, positive safe integer,
+positive safe integer, nonnegative safe integer, nonnegative safe integer, string respectively.
+Its `schema` is `t37-f4e-r7-intro05-domain-v1`, `commandAlphabet` is nonempty distinct ASCII,
+and `inputDomainSha256` hashes the decoded canonical JSON bytes. The future command pin chooses
+the values but may not change this shape.
+
+`diagnosticsJsonBase64` decodes to exactly `{activeRuns,cleanupErrors,cleanupErrorsTruncated,
+residue,residueTruncated}` where both arrays are sorted unique strings, both flags are booleans,
+and the hash of its canonical decoded bytes is `diagnosticsSha256`. `stageAudit` is exactly
+`{entries,entriesTruncated,present,tip}` where entries is a sorted unique basename array,
+`entriesTruncated`/`present` are booleans, and tip is `expectedTip`; `residue` is exactly
+`{entries,entriesTruncated}` with the same basename rules. Worker-result's exact key set is
+`{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,status,checkpointTip,
+candidateSha256,diagnosticsJsonBase64,diagnosticsSha256,stageAudit}`. It has
+`schema:"t37-f4e-r7-worker-result-v1"`; `checkpointTip` is `expectedTip`; and status-specific
+values are: `passed` requires nonnull `candidateSha256`, empty diagnostics and a false/present-
+false stage audit; `failed` or `interrupted` requires `candidateSha256:null` and preserves the
+nonempty or truncated diagnostic/stage audit.
+
+Candidate's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,workerResultSha256,
+definitionJsonBase64,definitionSha256,certificateJsonBase64,certificateSha256,
+frontierAuditJsonBase64,frontierAuditSha256}`. Each base64 field decodes to canonical JSON and
+each adjacent hash hashes decoded bytes. Definition must have exactly the captured
+`EndgameDefinition` key set `{id,name,difficulty,targetRows,seed,setup,boardRows,hiddenCells,
+anchorCells}` and is revalidated by the captured Core. Certificate must have exactly the
+captured `EndgameOptimalRouteCertificate` key set `{levelId,optimalLocks,exhaustedDepths,
+exhaustedFrontierWidths,exploredStateCount,transitionCount,deficitBoundPrunes,initialStateHash,
+replay}` and is recomputed by Core. Frontier audit has exact key set
+`{adapterSha256,diagnosticsSha256,expectedTip,stageAudit}` and must show a null expected tip,
+empty diagnostics, and absent stage on success. These captured-source validations, rather than
+author-selected nested shapes, are mandatory before candidate publication.
+
+Terminal's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,
+workerResultSha256,candidateSha256,status,passed,observedTaskState,stageAudit,residue}` with
+`schema:"t37-f4e-r7-terminal-v1"`. `observedTaskState` is one of `completed`, `failed`,
+`interrupted`, `unavailable`. Matrix: `passed:true/status:"passed"` requires completed task,
+nonnull result and candidate hashes, worker-result passed, stage `present:false`, and empty
+untruncated residue. Every other state uses `passed:false`, requires nonnull worker-result hash
+when a result final exists otherwise null, requires candidate hash null, and preserves its real
+task/stage/residue observation. Attempt and terminal finals are mutually exclusive one-per-v7
+namespace; once a terminal exists every later action is audit-only.
