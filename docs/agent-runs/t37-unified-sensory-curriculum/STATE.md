@@ -3595,3 +3595,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   authoring against the accepted blobs/contract, followed by independent static review.
   Validator execution, task/Temp artifacts, proof, Intro-05 source, curriculum/UI/sensory work,
   browser evidence, and player acceptance remain closed.
+
+### F4E-R7B R10 outer-mode grammar correction
+
+- Static implementation finds R9's descriptor omits the outer CLI mode although the contract
+  assigns attempt/task ownership there. R10 adds `--outer` and freezes the shared ordered
+  `--root/--input/--domain-json-base64/--expect-head` arguments plus task-only `--worker`
+  grammar; only a later command pin supplies values or grants execution authority.
+- Next: commit only the four authority docs and obtain two independent all-zero R10 reviews.
+  Static external source, all modes, task/Temp artifacts, proof, Intro-05 source, curriculum,
+  sensory/browser work, and player acceptance are closed meanwhile.

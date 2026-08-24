@@ -1171,3 +1171,14 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   validator/worker source only; no validator mode, task, Temp artifact, Store/proof, Intro-05
   source, or player-acceptance action is authorized.
 - Sole next action: static source authoring followed by independent review; do not execute it.
+
+### F4E-R7B R10 outer-mode grammar correction
+
+- Static authoring stops before source creation: R9's CLI descriptor lacks the outer mode that
+  owns attempt/task registration. R10 adds the explicit mutually-exclusive `--outer` mode,
+  shared ordered input arguments, and task-only worker grammar; static authoring cannot invoke
+  any mode.
+- Changed paths remain exactly the four R7B authority docs. No external source/artifact, task,
+  Store/proof, Intro-05 source, or player-acceptance action occurred.
+- Sole next action: commit and independently review R10 twice; only then reopen static runner
+  source authoring.

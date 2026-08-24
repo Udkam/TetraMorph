@@ -10591,6 +10591,20 @@ only after a task-XML/query round trip proves every field and digest; the outer 
 only immediately before `Start-ScheduledTask`, disables it after recording completion, and
 never edits the action. A task cannot be registered or started in preflight.
 
+The validator has exactly four mutually exclusive modes. Bare `--describe` has no further
+argument and reports only its deterministic descriptor. `--preflight` and `--outer` each take
+the same ordered triples `--root <absolute-root>`, `--input <absolute-input>`,
+`--domain-json-base64 <strict-base64>`, and `--expect-head <40-lowercase-hex>`; only the future
+command-pin checkpoint supplies their literal values. Preflight performs the frozen read-only
+source/path/input/domain checks and creates no file, Task Scheduler object, Store, candidate,
+or proof. `--outer` is the sole later writable production entry: after those checks it generates
+the durable run ID/capability, claims attempt/task/terminal under this contract, and never runs
+the frontier itself. `--worker` accepts exactly the existing ordered task-action pairs
+`--attempt <attemptPath> --stage <stagePath> --run-id <runId> --capability <capabilityHex>`;
+only the registered task may invoke it. Unknown, repeated, missing, or cross-mode flags are
+fatal. `--outer` is not executable authority until the later command pin, preflight, and
+independent production gates; static authoring must not invoke any mode.
+
 Worker-result keys are exactly `schema`, `runId`, `attemptSha256`, `sourcePinSha256`,
 `taskActionSha256`, `status`, `checkpointTip`, `candidateSha256`, `diagnosticsSha256`, and
 `stageAudit`; status is one of `passed`, `failed`, `interrupted`. Candidate keys are exactly
@@ -10628,7 +10642,7 @@ canonical JSON bytes named by the adjacent SHA-256 field.
 The validator descriptor is exactly `{schema,path,bytes,sha256,nodePath,nodeVersion,cli}` with
 `schema:"t37-f4e-r7-validator-v1"`, positive safe `bytes`, `path` equal to the fixed validator
 path, `nodePath:"E:\\Nodejs\\node.exe"`, `nodeVersion:"v24.12.0"`, and `cli` equal to
-`["--describe","--preflight","--worker"]`; its `sha256` is the validator's raw UTF-8 bytes.
+`["--describe","--preflight","--outer","--worker"]`; its `sha256` is the validator's raw UTF-8 bytes.
 `workerCapabilitySha256` is SHA-256 of exactly 32 random bytes encoded as the 64-lowercase-hex
 `capabilityHex` final task argument. It is a correlation handle, not a secret: the exact value
 is therefore intentionally visible in the immutable task action, must hash to the attempt
@@ -10771,3 +10785,12 @@ receives independent integrity and lifecycle reviews at `P0/P1/P2/P3/GAP = 0/0/0
 external validator/worker runner for static review. All validator modes, task registration,
 attempt/candidate/result/terminal/stage creation, Store/proof execution, Intro-05 source,
 curriculum/UI/sensory work, browser evidence, and player acceptance remain closed.
+
+### F4E-R7B R9 acceptance correction — R10 outer-mode grammar
+
+Static authoring finds that R9's accepted descriptor omitted the outer mode even though the
+contract assigns attempt/task ownership to the outer. R10 adds the only legal `--outer` entry
+and freezes its shared preflight arguments, task-only worker argument grammar, and no-mode
+static-authoring boundary. Commit only the four authority documents and obtain two fresh
+all-zero R10 contract reviews before creating the external runner source. No validator mode,
+task, Temp artifact, Store/proof, Intro-05 source, or player acceptance action is authorized.

@@ -10679,7 +10679,7 @@ Commit and obtain two independent all-zero R3 document reviews before any valida
 authoring. All external execution, Intro-05 source, later curriculum, and inherited dirty paths
 remain closed.
 
-### F4E-R7B R9 accepted — static validator/runner authoring only
+### F4E-R7B R9 accepted — R10 outer-mode grammar review only
 
 R3 `1ef80f5` is rejected because its passed worker-result and candidate hashes formed a cycle.
 R4 `d9e85f6` repairs that graph to `candidate -> worker-result -> terminal`, retains the
@@ -10707,8 +10707,10 @@ log, create no new v7 artifact or task, delete/rename/replace/integrate nothing,
 block that run namespace rather than fabricate a terminal or retry.
 
 R9 `7f34272` receives two independent `P0/P1/P2/P3/GAP = 0/0/0/0/0` reviews and is accepted.
-One writer may now create only the external v7 validator/worker runner for static source review,
-using this accepted contract and the captured Core/adapter blobs. It must not invoke any
-validator mode or create a task, attempt, candidate, result, terminal, stage, preflight, or
-proof. Intro-05 source, later curriculum, sensory work, browser evidence, player acceptance,
-and inherited dirty paths remain closed.
+Static implementation then identifies that its CLI descriptor omitted the outer mode responsible
+for attempt/task ownership. R10 adds explicit `--outer`, shared `--root/--input/
+--domain-json-base64/--expect-head` grammar, and task-only worker arguments. Commit and obtain
+two independent all-zero R10 document reviews before external source authoring. No validator
+mode or task, attempt, candidate, result, terminal, stage, preflight, or proof execution is
+authorized; Intro-05 source, later curriculum, sensory work, browser evidence, player
+acceptance, and inherited dirty paths remain closed.
