@@ -10480,3 +10480,29 @@ R11 `a8607fd` receives three fresh independent
 only in the four source/test paths named above. External R7 paths, a production Store or proof,
 R7B, and Intro-05 remain closed until the source candidate passes every focused/full gate and
 two independent source reviews.
+
+### F4E-R7A C1b-D resumed manifest admission
+
+A resumed Store authenticates its full canonical final-manifest chain exactly once before it
+classifies any residue: filenames are contiguous generation numbers, every LF-canonical byte
+hash and previous tip link matches, the supplied nonnull expected tip equals the authenticated
+highest final, and each delta independently replays the binding, cursor, counters, active
+descriptor set, depth history, projection hash, removal commitment, and pre-manifest resource
+receipt. Replay is adapter-local and must not call planner/commit helpers or fabricate their
+private snapshots.
+
+Every present active data/index pair is fully authenticated against its descriptor, including
+run framing/order/hash, exact index bytes/hash, terminal offset, and identity. A final file
+for a historical superseded descriptor may remain only when it independently matches that
+descriptor; either data or index half may be absent. A same-identity manifest `.part` may
+remain only beside the highest final. A final-absent manifest part and any grammar-valid
+uncommitted/unknown working file are precommit residue. A missing active half, mismatched
+byte/hash/identity, nonhighest alias, unknown name, malformed chain, or expected-tip mismatch
+is fatal. Recognized precommit or searching postcommit residue leaves advance blocked; an
+otherwise complete highest checkpoint remains loadable but blocked as already specified.
+
+This one admission scan populates cached manifest state and committed records. Same-Store
+loads and mutations may stat current identities and owner bytes, but never reread historical
+manifest/run/index contents or enumerate the directory again. The first resumed mutation
+uses a lightweight root identity check followed by the sentinel stamp; a later reopened Store
+alone pays one new full admission scan.

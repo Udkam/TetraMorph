@@ -10622,3 +10622,17 @@ adapter, external runner, product proof, browser evidence, curriculum, or inheri
 path is included in this exception. The source candidate requires Node syntax, focused tests,
 typecheck, the complete current-source suite, production build, diff check, and independent
 read-only exact-range QA before any recovery or R7B work opens.
+
+### F4E-R7A C1b-D bounded recovery admission
+
+The next source checkpoint may change only `scripts/endgame-disk-frontier.mjs` and
+`src/authoring/endgameDiskFrontier.test.mjs` to materialize the frozen C1b-D resume admission
+contract in `DESIGN.md`: one complete authenticated final-manifest chain scan, expected-tip
+precedence, descriptor recovery, exact residue classification, and cached same-Store access
+without a second directory scan or historic body reread. It may not call the manifest planner
+or use its private snapshot registry to replay a chain. The two-path atomic source exception
+continues to apply because admission, ownership ledger restoration, view construction, and the
+instrumented fault matrix cannot leave a safe intermediate Store. R7B, Intro-05, external R7
+execution, product proof, browser evidence, curriculum edits, and inherited dirty paths remain
+closed. Required gates are Node syntax, direct fault/I-O tests, typecheck, one full suite,
+production build, diff check, and two independent exact-range read-only reviews.
