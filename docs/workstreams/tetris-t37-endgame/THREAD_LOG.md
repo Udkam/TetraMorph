@@ -1166,5 +1166,8 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   and permanently block the run namespace rather than claim a terminal.
 - Base is `d9e85f6`; changed paths are exactly the four R7B authority documents. No validator,
   task, Temp artifact, Store/proof, Intro-05 source, or player-acceptance action occurred.
-- Sole next action: commit this docs-only R9 correction and request two independent all-zero
-  R7B contract reviews. Static authoring remains closed until both pass.
+- Integrity and lifecycle R9 reviews both report `P0/P1/P2/P3/GAP = 0/0/0/0/0`; contract
+  `7f34272` is accepted. Static authoring is now open to one writer for the external
+  validator/worker source only; no validator mode, task, Temp artifact, Store/proof, Intro-05
+  source, or player-acceptance action is authorized.
+- Sole next action: static source authoring followed by independent review; do not execute it.

@@ -3590,6 +3590,8 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   canonical record from describing itself. R9 makes this a no-write irreversible
   claim-collision: only returned no-follow evidence, no new artifacts/task/attempt/terminal,
   no integration or retry, and permanent namespace block.
-- Next: commit only the four R7B authority docs and obtain two independent all-zero R9 reviews.
-  Static validator/runner authoring, every external action, Intro-05 source, the curriculum,
-  sensory/browser work, and player acceptance remain closed.
+- R9 `7f34272` receives two independent `P0/P1/P2/P3/GAP = 0/0/0/0/0` reviews and is
+  accepted. The sole next action is one-writer static external validator/worker source
+  authoring against the accepted blobs/contract, followed by independent static review.
+  Validator execution, task/Temp artifacts, proof, Intro-05 source, curriculum/UI/sensory work,
+  browser evidence, and player acceptance remain closed.

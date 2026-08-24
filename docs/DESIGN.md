@@ -10765,4 +10765,9 @@ pre-seed tuple and full `unexpectedFiles` descriptors. R7 review finds the descr
 represent zero-byte or nonregular/reparse residue, so R8 adds a no-follow lstat identity
 matrix. R8 review finds malformed occupied attempt/terminal finals cannot be described by a
 new no-replace terminal, so R9 adds the separate no-write claim-collision disposition. Static
-validator/runner authoring remains closed pending two fresh all-zero R9 reviews.
+validator/runner authoring remains closed pending two fresh all-zero R9 reviews. R9 `7f34272`
+receives independent integrity and lifecycle reviews at `P0/P1/P2/P3/GAP = 0/0/0/0/0` and
+`0/0/0/0/0`; the four-document contract is accepted. Only one writer may now author the
+external validator/worker runner for static review. All validator modes, task registration,
+attempt/candidate/result/terminal/stage creation, Store/proof execution, Intro-05 source,
+curriculum/UI/sensory work, browser evidence, and player acceptance remain closed.
