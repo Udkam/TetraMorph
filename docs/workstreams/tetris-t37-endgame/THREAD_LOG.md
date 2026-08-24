@@ -1138,3 +1138,18 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   contradicted. R4 makes the only success order candidate, result, terminal; it keeps the
   immutable attempt, fixes strict Base64, and treats checkpointTip as observed highest tip.
 - No v7 external object or Intro-05 work ran. Next: commit and re-review this correction.
+
+### F4E-R7B R4 lifecycle rejection and R5 correction
+
+- R4 `d9e85f6` removes the hash cycle but does not give a non-destructive terminal shape for a
+  candidate final left durable before worker-result publication. R5 requires a
+  `candidate-unacknowledged` terminal with `candidateSha256:null` and exact non-authoritative
+  `orphanCandidate` `{path,bytes,sha256}`; no later action may integrate, delete, resume, or
+  retry that candidate.
+- `stageAudit` now has an exact absent tuple (`[]`, `false`, `null`) and an authenticated
+  present-tip relation; result-bearing terminals must reproduce the result audit. `residue`
+  inventories only unexpected/part/foreign names, excluding named canonical finals.
+- Base is `d9e85f6`; changed paths are exactly the four R7B authority documents. No validator,
+  task, Temp artifact, Store/proof, Intro-05 source, or player-acceptance action occurred.
+- Sole next action: commit this docs-only R5 correction and request two independent all-zero
+  R7B contract reviews. Static authoring remains closed until both pass.

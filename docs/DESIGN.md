@@ -10647,16 +10647,23 @@ the values but may not change this shape.
 `diagnosticsJsonBase64` decodes to exactly `{activeRuns,cleanupErrors,cleanupErrorsTruncated,
 residue,residueTruncated}` where both arrays are sorted unique strings, both flags are booleans,
 and the hash of its canonical decoded bytes is `diagnosticsSha256`. `stageAudit` is exactly
-`{entries,entriesTruncated,present,tip}` where entries is a sorted unique basename array,
-`entriesTruncated`/`present` are booleans, and tip is `expectedTip`; `residue` is exactly
-`{entries,entriesTruncated}` with the same basename rules. Worker-result's exact key set is
+`{entries,entriesTruncated,present,tip}` where entries is a sorted unique basename array and
+`entriesTruncated`/`present` are booleans. Its relation matrix is closed: `present:false`
+requires exactly `entries:[]`, `entriesTruncated:false`, and `tip:null`; `present:true` permits
+the sorted observed entry prefix (empty only when the complete observed directory is empty), and
+requires `tip` to be the nonnull authenticated highest checkpoint tip recovered for that stage.
+When `entriesTruncated:false`, `entries` is the complete inventory; when true it is only the
+deterministic bounded prefix. `residue` is exactly `{entries,entriesTruncated}` with the same
+basename rules, but contains only unexpected/foreign/incomplete same-prefix entries: immutable
+canonical finals named by this contract are never residue. Worker-result's exact key set is
 `{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,status,checkpointTip,
 candidateSha256,diagnosticsJsonBase64,diagnosticsSha256,stageAudit}`. It has
 `schema:"t37-f4e-r7-worker-result-v1"`; `checkpointTip` has the `expectedTip` shape and is
-the authenticated highest tip observed after the worker's last checkpoint; and status-specific
-values are: `passed` requires nonnull `candidateSha256`, empty diagnostics and a false/present-
-false stage audit; `failed` or `interrupted` requires `candidateSha256:null` and preserves the
-nonempty or truncated diagnostic/stage audit.
+the authenticated highest tip observed after the worker's last checkpoint. A present worker
+stage must have `stageAudit.tip === checkpointTip`; an absent one uses the false-stage tuple
+above. Status-specific values are: `passed` requires nonnull `candidateSha256`, empty
+diagnostics and a false/present-false stage audit; `failed` or `interrupted` requires
+`candidateSha256:null` and preserves the nonempty or truncated diagnostic/stage audit.
 
 Candidate's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,
 definitionJsonBase64,definitionSha256,certificateJsonBase64,certificateSha256,
@@ -10668,18 +10675,41 @@ captured `EndgameOptimalRouteCertificate` key set `{levelId,optimalLocks,exhaust
 exhaustedFrontierWidths,exploredStateCount,transitionCount,deficitBoundPrunes,initialStateHash,
 replay}` and is recomputed by Core. Frontier audit has exact key set
 `{adapterSha256,diagnosticsSha256,expectedTip,stageAudit}` and must show a null expected tip,
-empty diagnostics, and absent stage on success. These captured-source validations, rather than
-author-selected nested shapes, are mandatory before candidate publication.
+empty diagnostics, and the exact false-stage tuple on success. These captured-source
+validations, rather than author-selected nested shapes, are mandatory before candidate
+publication.
 
 Terminal's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,
-workerResultSha256,candidateSha256,status,passed,observedTaskState,stageAudit,residue}` with
-`schema:"t37-f4e-r7-terminal-v1"`. `observedTaskState` is one of `completed`, `failed`,
-`interrupted`, `unavailable`. Matrix: `passed:true/status:"passed"` requires completed task,
-nonnull result and candidate hashes, worker-result passed, stage `present:false`, and empty
-untruncated residue. Every other state uses `passed:false`, requires nonnull worker-result hash
-when a result final exists otherwise null, requires candidate hash null, and preserves its real
-task/stage/residue observation. Attempt and terminal finals are one immutable attempt followed
-by at most one immutable terminal in the same v7 namespace; a terminal retains rather than
-replaces the attempt. The successful publication order is candidate first (binding
-attempt/source), worker-result second (binding that candidate), then terminal (binding both);
-once a terminal exists every later action is audit-only.
+workerResultSha256,candidateSha256,status,passed,observedTaskState,stageAudit,residue,
+orphanCandidate}` with `schema:"t37-f4e-r7-terminal-v1"`. `status` is exactly `passed`,
+`failed`, `interrupted`, or `candidate-unacknowledged`; `observedTaskState` is one of
+`completed`, `failed`, `interrupted`, `unavailable`. `orphanCandidate` is either `null` or
+exactly `{path,bytes,sha256}`. When nonnull, `path` is the fixed candidate final path, `bytes`
+is its positive safe regular-file byte size, and `sha256` is recomputed from those exact final
+bytes. It records a candidate that was never acknowledged by a worker result; it is not an
+integration authority and is never deleted, replaced, resumed, or retried by this contract.
+
+The terminal matrix is closed. `passed:true/status:"passed"` requires completed task, nonnull
+result and candidate hashes, a passed worker-result that binds that identical candidate hash,
+`orphanCandidate:null`, the exact false-stage tuple, and empty untruncated residue. If the
+candidate final exists but the worker-result final does not, the terminal must be
+`passed:false/status:"candidate-unacknowledged"`, `workerResultSha256:null`,
+`candidateSha256:null`, and carry the exact nonnull `orphanCandidate` descriptor. Every other
+failed/interrupted terminal has `passed:false`; it carries a nonnull worker-result hash only if
+that final exists, then its `stageAudit` must exactly equal the worker result's audit, and it
+uses `candidateSha256:null` and `orphanCandidate:null`. Without a result it uses the closed
+stage-audit relation above and records only actually observed stage/residue bytes. Attempt and
+terminal finals are one immutable attempt followed by at most one immutable terminal in the
+same v7 namespace; a terminal retains rather than replaces the attempt. The successful
+publication order is candidate first (binding attempt/source), worker-result second (binding
+that candidate), then terminal (binding both); once a terminal exists every later action is
+audit-only.
+
+### F4E-R7B R4 rejection and R5 orphan-candidate correction
+
+R4 `d9e85f6` correctly removes the candidate/result hash cycle, but independent lifecycle QA
+finds an unrepresented durable state: candidate publication can complete before the worker
+publishes a result. R5 adds the non-authoritative, exact-byte `orphanCandidate` terminal
+descriptor, excludes described canonical finals from residue, and freezes the stage-audit
+absence/presence relation. The authoritative R7B checkpoint below records this correction;
+static validator/runner authoring remains closed pending two fresh all-zero R5 reviews.

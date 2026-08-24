@@ -3563,3 +3563,18 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   one terminal, strict padded RFC 4648, and an observed authenticated checkpoint tip. No v7
   file/task/Store/proof action occurred.
 - Next: commit and independently review R4 before static external authoring.
+
+### F4E-R7B R4 lifecycle rejection and R5 correction
+
+- R4 `d9e85f6` has no hash cycle, but lifecycle review correctly finds an unrecordable durable
+  state when candidate publication succeeds and the worker stops before worker-result
+  publication. R5 adds terminal-only non-authoritative `orphanCandidate` `{path,bytes,sha256}`
+  for that exact final file; `candidateSha256` remains null, and the file cannot be integrated,
+  deleted, resumed, or retried.
+- R5 also closes `stageAudit`: absence is exactly `entries:[]`,
+  `entriesTruncated:false`, `tip:null`; a present audit carries an authenticated nonnull stage
+  tip, and a terminal with worker-result must reproduce that result's audit exactly. Residue
+  contains only unexpected/incomplete names, never the canonical finals described by terminal.
+- Next: commit only the four R7B authority docs and obtain two independent all-zero R5 reviews.
+  Static validator/runner authoring, every external action, Intro-05 source, the curriculum,
+  sensory/browser work, and player acceptance remain closed.
