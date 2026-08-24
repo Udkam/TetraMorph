@@ -1131,3 +1131,10 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Capability is a visible action-bound correlation nonce, not an unimplementable Scheduler
   stdin secret. No external file, task, Store, or proof action occurred.
 - Next: commit and obtain two fresh all-zero reviews before static runner authoring opens.
+
+### F4E-R7B R3 rejection and R4 publication-graph correction
+
+- R3's passed result/candidate cross-hashes were cyclic and attempt/terminal coexistence was
+  contradicted. R4 makes the only success order candidate, result, terminal; it keeps the
+  immutable attempt, fixes strict Base64, and treats checkpointTip as observed highest tip.
+- No v7 external object or Intro-05 work ran. Next: commit and re-review this correction.

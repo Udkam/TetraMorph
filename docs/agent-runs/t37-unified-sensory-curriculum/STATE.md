@@ -3554,3 +3554,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   base64 captured-Core payload schemas, action-bound visible capability correlation, and the
   full failure-terminal matrix. It creates no v7 artifact.
 - Next: commit and independently review this correction before static external authoring.
+
+### F4E-R7B R3 rejection and R4 publication-graph correction
+
+- R3 `1ef80f5` is rejected at `1/1/0/0/0` and `0/1/1/0/0`: successful result/candidate hashes
+  formed a cycle, attempt/terminal coexistence was misstated, and Base64/tip rules were open.
+- R4 freezes `candidate -> worker-result -> terminal`, retained immutable attempt plus at most
+  one terminal, strict padded RFC 4648, and an observed authenticated checkpoint tip. No v7
+  file/task/Store/proof action occurred.
+- Next: commit and independently review R4 before static external authoring.

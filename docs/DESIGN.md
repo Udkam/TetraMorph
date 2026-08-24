@@ -10615,10 +10615,14 @@ rules deliberately do not claim detection of an honest coordinator's never-recor
 
 R2 `d70f6b6` is rejected at `P0/P1/P2/P3/GAP = 0/2/0/0/0`: an ordinal-key encoding cannot
 also have a separately imposed prose field order, and the nested values/null matrix remained
-open. R3's only serialization order is recursive ordinal UTF-8 byte order. Every field list
+open. R3 replaces every conflicting R2 schema/publication sentence. R3's only serialization
+order is recursive ordinal UTF-8 byte order. Every field list
 below is an exact *set*, all strings are ASCII unless explicitly `...JsonBase64`, every hash is
 exactly `[A-F0-9]{64}`, every path is the exact resolved absolute string, and absent optional
-values are literal JSON `null`, never omitted.
+values are literal JSON `null`, never omitted. Every `...JsonBase64` is standard RFC 4648 base64
+using `[A-Za-z0-9+/]`, required `=` padding, no whitespace, and strict round-trip equality to
+`Buffer.from(value, 'base64').toString('base64')`; its decoded bytes must be the one-LF
+canonical JSON bytes named by the adjacent SHA-256 field.
 
 The validator descriptor is exactly `{schema,path,bytes,sha256,nodePath,nodeVersion,cli}` with
 `schema:"t37-f4e-r7-validator-v1"`, positive safe `bytes`, `path` equal to the fixed validator
@@ -10648,12 +10652,13 @@ and the hash of its canonical decoded bytes is `diagnosticsSha256`. `stageAudit`
 `{entries,entriesTruncated}` with the same basename rules. Worker-result's exact key set is
 `{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,status,checkpointTip,
 candidateSha256,diagnosticsJsonBase64,diagnosticsSha256,stageAudit}`. It has
-`schema:"t37-f4e-r7-worker-result-v1"`; `checkpointTip` is `expectedTip`; and status-specific
+`schema:"t37-f4e-r7-worker-result-v1"`; `checkpointTip` has the `expectedTip` shape and is
+the authenticated highest tip observed after the worker's last checkpoint; and status-specific
 values are: `passed` requires nonnull `candidateSha256`, empty diagnostics and a false/present-
 false stage audit; `failed` or `interrupted` requires `candidateSha256:null` and preserves the
 nonempty or truncated diagnostic/stage audit.
 
-Candidate's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,workerResultSha256,
+Candidate's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,
 definitionJsonBase64,definitionSha256,certificateJsonBase64,certificateSha256,
 frontierAuditJsonBase64,frontierAuditSha256}`. Each base64 field decodes to canonical JSON and
 each adjacent hash hashes decoded bytes. Definition must have exactly the captured
@@ -10673,5 +10678,8 @@ workerResultSha256,candidateSha256,status,passed,observedTaskState,stageAudit,re
 nonnull result and candidate hashes, worker-result passed, stage `present:false`, and empty
 untruncated residue. Every other state uses `passed:false`, requires nonnull worker-result hash
 when a result final exists otherwise null, requires candidate hash null, and preserves its real
-task/stage/residue observation. Attempt and terminal finals are mutually exclusive one-per-v7
-namespace; once a terminal exists every later action is audit-only.
+task/stage/residue observation. Attempt and terminal finals are one immutable attempt followed
+by at most one immutable terminal in the same v7 namespace; a terminal retains rather than
+replaces the attempt. The successful publication order is candidate first (binding
+attempt/source), worker-result second (binding that candidate), then terminal (binding both);
+once a terminal exists every later action is audit-only.

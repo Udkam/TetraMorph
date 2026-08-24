@@ -1075,6 +1075,18 @@ Only `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
 `src/game/core/puzzleV3PrototypeExact.test.ts` are open for one final non-product proof
 checkpoint. Published Puzzle definitions, runtime Core, UI, T27/`progress.md`, icon, and Ice
 remain closed.
+
+### F4E-R7B R3 rejected — R4 publication-graph review only
+
+R3 `1ef80f5` is rejected at `1/1/0/0/0` and `0/1/1/0/0`: passed worker-result and candidate
+formed a SHA-256 cycle; terminal wording incorrectly excluded its immutable attempt; Base64 and
+checkpoint-tip semantics were incomplete. R4 makes the success graph one-way:
+candidate binds attempt/source, then worker-result binds candidate, then terminal binds both.
+Attempt and terminal coexist; all base64 uses strict padded RFC 4648 round trips; checkpointTip
+is the observed authenticated highest tip. No v7 artifact exists.
+
+Commit and independently review R4 before static validator/runner authoring. External execution,
+Intro-05 source, later curriculum, and inherited dirty paths remain closed.
 The first writer correctly stopped before creating either path because nested exact keys and
 three scalar literals were underspecified. `docs/DESIGN.md` now freezes every top/nested key,
 artifact/schema version, and claim string; no implementer-selected field name is permitted.
