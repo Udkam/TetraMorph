@@ -10727,3 +10727,10 @@ One writer may create only the external v7 validator/worker source for static re
 invoke any validator mode or create any other v7 Temp artifact, task, attempt, candidate,
 result, terminal, stage, Store/proof, Intro-05 source, curriculum/UI/sensory work, browser
 evidence, or player acceptance action.
+
+Static implementation identifies an author-selected gap in R11: `--input` has no frozen
+candidate payload or selection. R12 makes input one canonical definition/route proposal and
+sets `candidateCountLimit:1`; worker may only domain-validate it, invoke captured Core through
+the public resumable checkpoint store to complete/blocked, and publish that exact payload. Commit
+and obtain two independent all-zero R12 reviews before external source authoring; all modes and
+deferred work remain closed.

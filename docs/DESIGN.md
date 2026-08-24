@@ -10662,6 +10662,23 @@ Its `schema` is `t37-f4e-r7-intro05-domain-v1`, `commandAlphabet` is nonempty di
 and `inputDomainSha256` hashes the decoded canonical JSON bytes. The future command pin chooses
 the values but may not change this shape.
 
+The `--input` bytes are independently canonical LF JSON with exact key set `{candidate,schema}`
+and `schema:"t37-f4e-r7-intro05-input-v1"`. `candidate` has exact key set
+`{commandStream,definitionJsonBase64,definitionSha256}`. Its definition base64/hash has the
+same strict decoding and captured `EndgameDefinition` validation as the future candidate record;
+`commandStream` is nonempty ASCII and every character is in `commandAlphabet`. The decoded
+definition must have `id === baseLevelId`, exactly `setupDropCount` placements, exactly
+`targetRows`, and the replay lock count must be in the inclusive
+`minimumLocks..maximumLocks` domain. `candidateCountLimit` is fixed to literal `1`: an input
+does not hide a generator, chooser, tie-breaker, or alternate level. The worker first verifies
+all of those input/domain facts, then calls only the captured Core
+`advanceOptimalEndgameRouteProofForDefinition` and the public
+`createResumableEndgameDiskFrontierStore` checkpoint methods until it returns the one complete
+certificate or a blocked/failure state. It never calls a memory/one-shot certifier and never
+searches or authors a second definition. The resulting exact definition, route, and certificate
+are the sole candidate publication payload; any mismatch, incomplete search, second candidate,
+or nonempty diagnostic is failure-only.
+
 `diagnosticsJsonBase64` decodes to exactly `{activeRuns,cleanupErrors,cleanupErrorsTruncated,
 residue,residueTruncated}` where both arrays are sorted unique strings, both flags are booleans,
 and the hash of its canonical decoded bytes is `diagnosticsSha256`. `stageAudit` is exactly
@@ -10813,3 +10830,12 @@ R11 `95d23d5` receives independent integrity and lifecycle reviews at
 the external validator/worker source for static review. No validator mode, Task Scheduler
 operation, Temp artifact other than that source file, Store/proof, Intro-05 source, curriculum,
 sensory/browser action, or player acceptance is authorized.
+
+### F4E-R7B R11 acceptance correction — R12 explicit proof input
+
+Before runner source creation, static implementation finds that R11 leaves `--input` semantic
+content and candidate selection author-chosen. R12 freezes it as one canonical proposed
+definition plus public command stream, with no hidden search/chooser and one public checkpoint
+proof flow to a complete certificate. Commit only the four authority documents and obtain two
+fresh all-zero R12 reviews before external source authoring. No mode execution or other deferred
+work is authorized.

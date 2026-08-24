@@ -3620,3 +3620,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   reviews and is accepted. The sole next action is one-writer external validator/worker static
   source authoring, then independent static review; no mode, task, other v7 artifact, proof,
   Intro-05 source, curriculum/UI/sensory/browser action, or player acceptance may occur.
+
+### F4E-R7B R12 explicit proof-input correction
+
+- Static implementation finds R11 leaves `--input` candidate meaning and selection open. R12
+  freezes one canonical definition/route proposal (`candidateCountLimit:1`), exact domain/replay
+  checks, and only captured-Core public-checkpoint proof to complete/blocked; no generator,
+  alternate chooser, or one-shot/memory proof is allowed.
+- Next: commit only the four authority docs and obtain two independent all-zero R12 reviews.
+  Static source and every execution/product/player-acceptance action are closed meanwhile.

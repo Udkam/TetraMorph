@@ -1198,3 +1198,13 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   source; no mode execution, Task Scheduler action, other v7 artifact, Store/proof, Intro-05
   source, or player acceptance is authorized.
 - Sole next action: create that source and request independent static review without execution.
+
+### F4E-R7B R12 explicit proof-input correction
+
+- Static implementation stops before source creation: R11 leaves input payload and candidate
+  selection author-chosen. R12 admits exactly one canonical definition/route proposal and only
+  public-checkpoint captured-Core certification; it excludes implicit generation, alternatives,
+  and memory/one-shot proof.
+- Changed paths are exactly the four R7B authority docs. No source/artifact/mode/task/proof,
+  Intro-05 source, curriculum, or player-acceptance action occurred.
+- Sole next action: commit and independently review R12 twice, then reopen static source only.
