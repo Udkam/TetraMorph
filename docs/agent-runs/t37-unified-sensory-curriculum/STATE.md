@@ -3503,3 +3503,23 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   classify recognized residue after the expected-tip check, cache the committed descriptor
   state, and preserve the one-full-scan/no-same-Store-rescan I/O contract. R7B, Intro-05,
   external execution, and final player acceptance remain closed.
+
+### F4E-R7A C1b-D resumed manifest admission accepted locally
+
+- Contract `a418f84`; source checkpoints `414f35a` and corrective `47534ed`, based on
+  `1635c44`, change only `scripts/endgame-disk-frontier.mjs` and
+  `src/authoring/endgameDiskFrontier.test.mjs`. Resume now authenticates and independently
+  replays the full final chain, exact active/historical run halves, resource receipts,
+  cached records, expected-tip precedence, and the one-admission-scan sentinel boundary.
+- The direct adapter suite is `193 passed / 1 skipped`; Node syntax, typecheck, the full
+  suite (`778 passed / 17 skipped` in `59 passed / 2 skipped` files), production build, and
+  diff check passed. Build emits only the pre-existing Vite large-chunk advisory.
+- First review of `414f35a` found a P1 cumulative-counter replay gap and a P2 same-Store
+  cleanup-residue diagnostic gap. `47534ed` aligns unit replay with the planner's completed
+  totals limits and demotes superseded descriptor authority immediately after manifest apply.
+  Exact forged-highest-unit and same-Store failed-cleanup regressions are green.
+- Two corrective independent read-only re-reviews of `1635c44..47534ed` report
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`. No protected T27, `progress.md`, HANDOFF, or external R7
+  path was read, edited, staged, or executed.
+- Next: R7B only, then the sole Intro-05 contract/implementation path; external execution
+  and all deferred player acceptance remain closed.
