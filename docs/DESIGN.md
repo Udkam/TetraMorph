@@ -10593,9 +10593,10 @@ never edits the action. A task cannot be registered or started in preflight.
 
 The validator has exactly four mutually exclusive modes. Bare `--describe` has no further
 argument and reports only its deterministic descriptor. `--preflight` and `--outer` each take
-the same ordered triples `--root <absolute-root>`, `--input <absolute-input>`,
-`--domain-json-base64 <strict-base64>`, and `--expect-head <40-lowercase-hex>`; only the future
-command-pin checkpoint supplies their literal values. Preflight performs the frozen read-only
+the same ordered flag-value pairs `--root <absolute-root>`, `--input <absolute-input>`,
+`--domain-json-base64 <strict-base64>`, `--expect-head <40-lowercase-hex>`, and
+`--expect-input-sha <64-uppercase-hex>`; only the future command-pin checkpoint supplies their
+literal values. Preflight performs the frozen read-only
 source/path/input/domain checks and creates no file, Task Scheduler object, Store, candidate,
 or proof. `--outer` is the sole later writable production entry: after those checks it generates
 the durable run ID/capability, claims attempt/task/terminal under this contract, and never runs
@@ -10652,15 +10653,16 @@ is therefore intentionally visible in the immutable task action, must hash to th
 field, and must not be copied to stdout, candidate, terminal, or error text.
 
 `parameters` is exactly `{nodePath,nodeVersion,nodeFlags,heapLimitBytes,inputDomainJsonBase64,
-inputDomainSha256}`. `nodeFlags` is the ordered two-string array already fixed for the task;
+inputDomainSha256,inputSha256}`. `nodeFlags` is the ordered two-string array already fixed for the task;
 `heapLimitBytes` is positive and must equal the result of the frozen no-proof heap probe under
 those flags; `inputDomainJsonBase64` decodes to a canonical JSON object with exact key set
 `{schema,baseLevelId,candidateCountLimit,setupDropCount,targetRows,minimumLocks,maximumLocks,
 commandAlphabet}` and types string, string, positive safe integer, positive safe integer,
 positive safe integer, nonnegative safe integer, nonnegative safe integer, string respectively.
 Its `schema` is `t37-f4e-r7-intro05-domain-v1`, `commandAlphabet` is nonempty distinct ASCII,
-and `inputDomainSha256` hashes the decoded canonical JSON bytes. The future command pin chooses
-the values but may not change this shape.
+and `inputDomainSha256` hashes the decoded canonical JSON bytes. `inputSha256` is the uppercase
+SHA-256 of the complete canonical `--input` bytes and must equal `--expect-input-sha`; the future
+command pin chooses the values but may not change this shape.
 
 The `--input` bytes are independently canonical LF JSON with exact key set `{candidate,schema}`
 and `schema:"t37-f4e-r7-intro05-input-v1"`. `candidate` has exact key set
@@ -10671,10 +10673,13 @@ definition must have `id === baseLevelId`, exactly `setupDropCount` placements, 
 `targetRows`, and the replay lock count must be in the inclusive
 `minimumLocks..maximumLocks` domain. `candidateCountLimit` is fixed to literal `1`: an input
 does not hide a generator, chooser, tie-breaker, or alternate level. The worker first verifies
-all of those input/domain facts, then calls only the captured Core
+all of those input/domain facts, rereads the input regular-file bytes and proves the same
+canonical bytes/hash before Store creation, then calls only the captured Core
 `advanceOptimalEndgameRouteProofForDefinition` and the public
-`createResumableEndgameDiskFrontierStore` checkpoint methods until it returns the one complete
-certificate or a blocked/failure state. It never calls a memory/one-shot certifier and never
+`createResumableEndgameDiskFrontierStore` checkpoint methods with this literal
+`candidate.commandStream` until it returns the one complete certificate or a blocked/failure
+state. A complete certificate's `replay` must equal that command stream byte-for-byte and its
+`optimalLocks` must equal the previously replayed candidate lock count. It never calls a memory/one-shot certifier and never
 searches or authors a second definition. The resulting exact definition, route, and certificate
 are the sole candidate publication payload; any mismatch, incomplete search, second candidate,
 or nonempty diagnostic is failure-only.
@@ -10706,10 +10711,12 @@ null-tip tuple; an absent one uses the false-stage tuple above. Status-specific 
 diagnostics and a false/present-false stage audit; `failed` or `interrupted` requires
 `candidateSha256:null` and preserves the nonempty or truncated diagnostic/stage audit.
 
-Candidate's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,
+Candidate's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,inputSha256,
 definitionJsonBase64,definitionSha256,certificateJsonBase64,certificateSha256,
 frontierAuditJsonBase64,frontierAuditSha256}`. Each base64 field decodes to canonical JSON and
-each adjacent hash hashes decoded bytes. Definition must have exactly the captured
+each adjacent hash hashes decoded bytes. `inputSha256` must equal the immutable attempt parameter;
+reconstructing the canonical input from candidate definition and certificate replay must hash to
+that same value. Definition must have exactly the captured
 `EndgameDefinition` key set `{id,name,difficulty,targetRows,seed,setup,boardRows,hiddenCells,
 anchorCells}` and is revalidated by the captured Core. Certificate must have exactly the
 captured `EndgameOptimalRouteCertificate` key set `{levelId,optimalLocks,exhaustedDepths,
@@ -10839,3 +10846,11 @@ definition plus public command stream, with no hidden search/chooser and one pub
 proof flow to a complete certificate. Commit only the four authority documents and obtain two
 fresh all-zero R12 reviews before external source authoring. No mode execution or other deferred
 work is authorized.
+
+### F4E-R7B R12 input-binding rejection — R13 byte-and-route correction
+
+R12 validates one proposal but leaves complete input bytes and route flow unbound. R13 adds the
+command-pinned `inputSha256` to immutable parameters/candidate reconstruction, requires worker
+reread equality before Store creation, and makes the literal input stream the only public proof
+argument whose replay/lock count can publish. Commit only the four authority documents and
+obtain two all-zero R13 reviews before static source authoring; execution remains closed.

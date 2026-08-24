@@ -3629,3 +3629,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   alternate chooser, or one-shot/memory proof is allowed.
 - Next: commit only the four authority docs and obtain two independent all-zero R12 reviews.
   Static source and every execution/product/player-acceptance action are closed meanwhile.
+
+### F4E-R7B R13 input-byte-and-route correction
+
+- R12 review finds input SHA and command stream not bound from command/attempt through public
+  proof/publication. R13 pins full input SHA, rereads it before Store creation, uses its literal
+  stream as the only proof argument, and requires certificate replay/lock and candidate
+  reconstruction equality.
+- Next: commit only the four authority docs and obtain two independent all-zero R13 reviews.
+  Static source and all execution/product/player-acceptance action remain closed.

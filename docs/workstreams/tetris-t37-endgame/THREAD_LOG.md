@@ -1208,3 +1208,11 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Changed paths are exactly the four R7B authority docs. No source/artifact/mode/task/proof,
   Intro-05 source, curriculum, or player-acceptance action occurred.
 - Sole next action: commit and independently review R12 twice, then reopen static source only.
+
+### F4E-R7B R13 input-byte-and-route correction
+
+- R12 review finds the immutable route/input not fully chained. R13 pins complete input SHA in
+  command/attempt/candidate reconstruction; worker rereads it before Store work and calls public
+  proof only with the literal input stream, whose replay/lock count must match certificate.
+- Changed paths are exactly four authority docs; no source/artifact/mode/task/proof occurred.
+- Sole next action: commit and independently review R13 twice, then reopen static source only.

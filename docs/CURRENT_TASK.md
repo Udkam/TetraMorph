@@ -10734,3 +10734,9 @@ sets `candidateCountLimit:1`; worker may only domain-validate it, invoke capture
 the public resumable checkpoint store to complete/blocked, and publish that exact payload. Commit
 and obtain two independent all-zero R12 reviews before external source authoring; all modes and
 deferred work remain closed.
+
+R12 review finds the complete input bytes and route stream still unbound. R13 adds a pinned
+`--expect-input-sha`/attempt `inputSha256`, worker reread equality before Store creation, and
+literal input-stream equality through public proof, certificate replay/lock count, and candidate
+reconstruction. Commit and obtain two independent all-zero R13 reviews before external source
+authoring; execution remains closed.
