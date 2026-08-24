@@ -2127,6 +2127,408 @@ describe('R7 resumable disk frontier primitives', () => {
     releaseParent(parent, stage);
   });
 
+  it('replays a searching seed once and does not rescan historic files in the same Store', () => {
+    const { parent, stage } = temporaryStage('r7-resume-seed-cache');
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seedFrontier = seedWriter.finish();
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding: Object.freeze({
+        schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+        candidateCommandStream: 'S', optimalLocks: 4, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+      }), frontier: seedFrontier,
+    }));
+    creator.suspend();
+
+    let readdirCalls = 0;
+    let historicRunOpens = 0;
+    let historicManifestOpens = 0;
+    const seam = {
+      readdirSync(...args) { readdirCalls += 1; return fs.readdirSync(...args); },
+      openSync(filePath, flags, ...args) {
+        if (flags === 'r' && /r7-f-d00000-g00000\.(?:run|idx)$/u.test(path.basename(String(filePath)))) {
+          historicRunOpens += 1;
+        }
+        if (flags === 'r' && /^manifest-g[0-9]{5}\.json$/u.test(path.basename(String(filePath)))) {
+          historicManifestOpens += 1;
+        }
+        return fs.openSync(filePath, flags, ...args);
+      },
+    };
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: seed.tip, fs: seam,
+    });
+    expect(readdirCalls).toBe(1);
+    historicRunOpens = 0;
+    historicManifestOpens = 0;
+    const loaded = resumed.loadCheckpoint();
+    expect(loaded).toMatchObject({ tip: seed.tip, advanceAllowed: true });
+    expect(historicRunOpens).toBe(0);
+    expect(historicManifestOpens).toBe(0);
+    expect([...loaded.checkpoint.frontier.values()]).toEqual(['A']);
+    resumed.releaseCheckpointRun(loaded.checkpoint.frontier);
+    expect(historicRunOpens).toBe(1);
+    const working = resumed.createRun('r7-u-d00000-n00000000-g00001');
+    working.abort();
+    expect(readdirCalls).toBe(1);
+    expect(historicRunOpens).toBe(1);
+    expect(historicManifestOpens).toBe(0);
+    resumed.suspend();
+    resumed.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('replays a seed-plus-unit chain with its cached opaque next-run collection', () => {
+    const { parent, stage } = temporaryStage('r7-resume-unit-chain');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 4, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    const seedView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(seedView.checkpoint.frontier);
+    const unitWriter = creator.createRun('r7-u-d00000-n00000000-g00001');
+    unitWriter.write('B');
+    const unit = creator.publishCheckpoint(Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'A',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: unitWriter.finish(),
+    }));
+    creator.suspend();
+
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: unit.tip,
+    });
+    const loaded = resumed.loadCheckpoint();
+    expect(loaded).toMatchObject({ tip: unit.tip, advanceAllowed: true });
+    expect([...loaded.checkpoint.frontier.values()]).toEqual(['A']);
+    resumed.releaseCheckpointRun(loaded.checkpoint.frontier);
+    expect(loaded.checkpoint.nextRuns.count).toBe(1);
+    const [next] = loaded.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 1 });
+    expect([...next.values()]).toEqual(['B']);
+    next.dispose();
+    resumed.suspend();
+    resumed.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('classifies only a same-identity highest manifest alias as blocked postcommit residue', () => {
+    const { parent, stage } = temporaryStage('r7-resume-manifest-alias');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 4, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    creator.suspend();
+    fs.linkSync(path.join(stage, 'manifest-g00000.json'), path.join(stage, 'manifest-g00000.json.part'));
+
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: seed.tip,
+    });
+    const loaded = resumed.loadCheckpoint();
+    expect(loaded).toMatchObject({ tip: seed.tip, advanceAllowed: false });
+    expect(loaded.diagnostics.residue).toContain('manifest-g00000.json.part');
+    resumed.releaseCheckpointRun(loaded.checkpoint.frontier);
+    resumed.suspend();
+    resumed.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('fails admission when either mandatory active checkpoint half is absent', () => {
+    const { parent, stage } = temporaryStage('r7-resume-active-half');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 4, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    creator.suspend();
+    fs.unlinkSync(path.join(stage, 'r7-f-d00000-g00000.idx'));
+    expect(() => createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: seed.tip,
+    })).toThrow('missing a mandatory file');
+    for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('checks a nonnull expected tip before classifying residual working names', () => {
+    const { parent, stage } = temporaryStage('r7-resume-tip-precedence');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 4, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    creator.suspend();
+    fs.writeFileSync(path.join(stage, 'r7w-l-g00000-d00000-p0000-h0000.run.part'), Buffer.from('residue'));
+    expect(() => createResumableEndgameDiskFrontierStore({
+      stagePath: stage,
+      mode: 'resume',
+      ownerId: 'owner-A',
+      expectedTip: Object.freeze({ generation: 1, manifestSha256: 'A'.repeat(64) }),
+    })).toThrow('expectedTip does not match the manifest chain tip');
+    for (const name of fs.readdirSync(stage)) fs.unlinkSync(path.join(stage, name));
+    fs.rmdirSync(stage);
+    releaseParent(parent, stage);
+  });
+
+  it('replays multiple reclaimed layers after exact postcommit data/index reclamation', () => {
+    const { parent, stage } = temporaryStage('r7-resume-layer-chain');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 4, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    const seedView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(seedView.checkpoint.frontier);
+    const unitWriter = creator.createRun('r7-u-d00000-n00000000-g00001');
+    unitWriter.write('B');
+    const unit = creator.publishCheckpoint(Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'A',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: unitWriter.finish(),
+    }));
+    const unitView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(unitView.checkpoint.frontier);
+    const [unitRun] = unitView.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 1 });
+    unitRun.dispose();
+    const layerWriter = creator.createRun('r7-f-d00001-g00002');
+    layerWriter.write('C');
+    const layer = creator.publishCheckpoint(Object.freeze({
+      transition: 'layer', previousTip: unit.tip,
+      completedDepth: Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 1, boundPrunes: 0 }),
+      nextFrontier: layerWriter.finish(),
+    }));
+    for (const name of [
+      'r7-f-d00000-g00000.run', 'r7-f-d00000-g00000.idx',
+      'r7-u-d00000-n00000000-g00001.run', 'r7-u-d00000-n00000000-g00001.idx',
+    ]) expect(fs.existsSync(path.join(stage, name))).toBe(false);
+    creator.suspend();
+
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: layer.tip,
+    });
+    const loaded = resumed.loadCheckpoint();
+    expect(loaded).toMatchObject({ tip: layer.tip, advanceAllowed: true });
+    expect(loaded.checkpoint).toMatchObject({ generation: 2, depth: 1 });
+    expect([...loaded.checkpoint.frontier.values()]).toEqual(['C']);
+    resumed.releaseCheckpointRun(loaded.checkpoint.frontier);
+    const secondUnitWriter = resumed.createRun('r7-u-d00001-n00000000-g00003');
+    secondUnitWriter.write('D');
+    const secondUnit = resumed.publishCheckpoint(Object.freeze({
+      transition: 'unit', previousTip: layer.tip, parentOffset: 1, lastProcessedParentKey: 'C',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: secondUnitWriter.finish(),
+    }));
+    const secondUnitView = resumed.loadCheckpoint();
+    resumed.releaseCheckpointRun(secondUnitView.checkpoint.frontier);
+    const [secondUnitRun] = secondUnitView.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 1 });
+    secondUnitRun.dispose();
+    const secondLayerWriter = resumed.createRun('r7-f-d00002-g00004');
+    secondLayerWriter.write('E');
+    const secondLayer = resumed.publishCheckpoint(Object.freeze({
+      transition: 'layer', previousTip: secondUnit.tip,
+      completedDepth: Object.freeze({ lockedPieces: 1, frontierStates: 1, transitions: 1, boundPrunes: 0 }),
+      nextFrontier: secondLayerWriter.finish(),
+    }));
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00001-g00002.run'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-u-d00001-n00000000-g00003.idx'))).toBe(false);
+    resumed.suspend();
+
+    const reopened = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: secondLayer.tip,
+    });
+    const reopenedView = reopened.loadCheckpoint();
+    expect(reopenedView).toMatchObject({ tip: secondLayer.tip, advanceAllowed: true });
+    expect(reopenedView.checkpoint).toMatchObject({ generation: 4, depth: 2 });
+    expect([...reopenedView.checkpoint.frontier.values()]).toEqual(['E']);
+    reopened.releaseCheckpointRun(reopenedView.checkpoint.frontier);
+    reopened.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('replays a complete zero-decision checkpoint without a new publication', () => {
+    const { parent, stage } = temporaryStage('r7-resume-complete-chain');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 1, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    const seedView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(seedView.checkpoint.frontier);
+    const complete = creator.publishCheckpoint(Object.freeze({
+      transition: 'complete', previousTip: seed.tip, completedDepth: null, reason: 'zero-decision-depth',
+    }));
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(false);
+    creator.suspend();
+
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: complete.tip,
+    });
+    expect(resumed.loadCheckpoint()).toMatchObject({
+      tip: complete.tip, advanceAllowed: true,
+      checkpoint: { kind: 'complete', generation: 1, reason: 'zero-decision-depth', exhaustedDepths: [] },
+    });
+    resumed.suspend();
+    resumed.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('reconciles a lost old-index unlink result after the complete manifest commits', () => {
+    const { parent, stage } = temporaryStage('r7-complete-lost-index-unlink');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 1, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    let loseOldIndexUnlink = false;
+    const seam = {
+      unlinkSync(filePath) {
+        if (loseOldIndexUnlink && path.basename(String(filePath)) === 'r7-f-d00000-g00000.idx') {
+          loseOldIndexUnlink = false;
+          fs.unlinkSync(filePath);
+          const error = new Error('injected lost old index unlink result');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.unlinkSync(filePath);
+      },
+    };
+    const store = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    store.loadCheckpoint();
+    const seedWriter = store.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = store.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    const seedView = store.loadCheckpoint();
+    store.releaseCheckpointRun(seedView.checkpoint.frontier);
+    loseOldIndexUnlink = true;
+    expect(store.publishCheckpoint(Object.freeze({
+      transition: 'complete', previousTip: seed.tip, completedDepth: null, reason: 'zero-decision-depth',
+    }))).toMatchObject({ advanceAllowed: true, tip: { generation: 1 } });
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(false);
+    expect(store.loadCheckpoint().checkpoint).toMatchObject({ kind: 'complete' });
+    store.suspend();
+    store.dispose();
+    releaseParent(parent, stage);
+  });
+
+  it('keeps a verified superseded index half as blocked postcommit residue after lost cleanup', () => {
+    const { parent, stage } = temporaryStage('r7-resume-superseded-index');
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 4, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    let failOldIndexUnlink = false;
+    const seam = {
+      unlinkSync(filePath) {
+        if (failOldIndexUnlink && path.basename(String(filePath)) === 'r7-f-d00000-g00000.idx') {
+          failOldIndexUnlink = false;
+          const error = new Error('injected old index cleanup fault');
+          error.code = 'EIO';
+          throw error;
+        }
+        return fs.unlinkSync(filePath);
+      },
+    };
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A', fs: seam,
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    const seedView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(seedView.checkpoint.frontier);
+    const unitWriter = creator.createRun('r7-u-d00000-n00000000-g00001');
+    unitWriter.write('B');
+    const unit = creator.publishCheckpoint(Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'A',
+      transitionsDelta: 1, boundPrunesDelta: 0, nextRun: unitWriter.finish(),
+    }));
+    const unitView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(unitView.checkpoint.frontier);
+    const [unitRun] = unitView.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 1 });
+    unitRun.dispose();
+    const layerWriter = creator.createRun('r7-f-d00001-g00002');
+    layerWriter.write('C');
+    failOldIndexUnlink = true;
+    const layer = creator.publishCheckpoint(Object.freeze({
+      transition: 'layer', previousTip: unit.tip,
+      completedDepth: Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: 1, boundPrunes: 0 }),
+      nextFrontier: layerWriter.finish(),
+    }));
+    expect(layer).toMatchObject({ advanceAllowed: false, tip: { generation: 2 } });
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(false);
+    expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(true);
+    creator.suspend();
+
+    const resumed = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: layer.tip,
+    });
+    const loaded = resumed.loadCheckpoint();
+    expect(loaded).toMatchObject({ tip: layer.tip, advanceAllowed: false });
+    expect([...loaded.checkpoint.frontier.values()]).toEqual(['C']);
+    resumed.releaseCheckpointRun(loaded.checkpoint.frontier);
+    resumed.suspend();
+    resumed.dispose();
+    releaseParent(parent, stage);
+  });
+
   it('classifies exact pre-owner residue and gives nonnull expectedTip rollback precedence', () => {
     const first = temporaryStage('r7-empty');
     fs.mkdirSync(first.stage);

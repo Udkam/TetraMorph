@@ -2603,6 +2603,464 @@ function publishResumableOwner(fs, stagePath, ownerBytes, limits, descriptorTrac
   }
 }
 
+function replayResumableManifestDelta(state, manifest, tip, receipt) {
+  assertWritableManifestState(state);
+  assertExactRecord(manifest, [
+    'schema', 'generation', 'previousManifestSha256', 'transition', 'bindingSha256', 'stateDelta',
+    'runChanges', 'checkpointStateSha256', 'resourceTotalsBeforeManifest',
+  ], 'resumed checkpoint manifest');
+  if (manifest.schema !== R7_MANIFEST_SCHEMA) throw frontierError('resumed manifest schema is invalid');
+  assertSafeManifestInteger(manifest.generation, 'resumed manifest generation', 32_767);
+  if (manifest.generation !== state.generation + 1) throw frontierError('resumed manifest generation is not contiguous');
+  if (manifest.previousManifestSha256 !== (state.tip?.manifestSha256 ?? null)) {
+    throw frontierError('resumed manifest previous tip does not match the chain');
+  }
+  if (typeof manifest.bindingSha256 !== 'string' || !R7_HASH_PATTERN.test(manifest.bindingSha256)) {
+    throw frontierError('resumed manifest binding hash is invalid');
+  }
+  if (typeof manifest.checkpointStateSha256 !== 'string' || !R7_HASH_PATTERN.test(manifest.checkpointStateSha256)) {
+    throw frontierError('resumed manifest checkpoint hash is invalid');
+  }
+  validateResumableRunChanges(manifest.runChanges);
+  const descriptorFromManifest = () => {
+    if (manifest.runChanges.add.length === 0) return null;
+    const descriptor = freezeCanonicalTree(detachedCanonicalValue(manifest.runChanges.add[0]));
+    validateResumableRunDescriptor(descriptor);
+    if (receipt.descriptors.has(descriptor.id)) {
+      throw frontierError(`resumed manifest duplicates run descriptor ${descriptor.id}`);
+    }
+    const dataKey = proofObjectKey(descriptor.dataIdentity);
+    const indexKey = proofObjectKey(descriptor.indexIdentity);
+    if (receipt.dataObjects.has(dataKey) || receipt.indexObjects.has(indexKey)) {
+      throw frontierError('resumed manifest aliases a historical descriptor identity');
+    }
+    receipt.descriptors.set(descriptor.id, descriptor);
+    receipt.dataObjects.add(dataKey);
+    receipt.indexObjects.add(indexKey);
+    return descriptor;
+  };
+  const expectRunChanges = (added, removeRule, removed) => {
+    if ((added === null) !== (manifest.runChanges.add.length === 0)) {
+      throw frontierError('resumed manifest added descriptor shape is invalid');
+    }
+    if (manifest.runChanges.removeRule !== removeRule
+      || manifest.runChanges.removeSetSha256 !== resumableRunSetHash(removed)) {
+      throw frontierError('resumed manifest run removal commitment is invalid');
+    }
+  };
+  const ensureReceipt = (added, presentDescriptors) => {
+    const totals = validateResumableResourceTotals(
+      manifest.resourceTotalsBeforeManifest, state.activeRunBytes,
+    );
+    let allDataBytes = 0;
+    let allIndexBytes = receipt.ownerBytes;
+    for (const descriptor of presentDescriptors) {
+      allDataBytes = addSafeManifestInteger(allDataBytes, descriptor.dataBytes, 'resumed physical data bytes');
+      allIndexBytes = addSafeManifestInteger(allIndexBytes, descriptor.indexBytes, 'resumed owner/index bytes');
+    }
+    const expected = Object.freeze({
+      latestCheckpointRunBytes: state.activeRunBytes,
+      uncommittedWorkingRunBytes: added?.dataBytes ?? 0,
+      recognizedPhysicalRunBytes: allDataBytes,
+      retainedManifestBytes: receipt.previousManifestBytes,
+      ownerAndIndexBytes: allIndexBytes,
+      namespaceEntries: addSafeManifestInteger(
+        addSafeManifestInteger(1, receipt.previousManifestCount, 'resumed manifest namespace'),
+        presentDescriptors.length * 2,
+        'resumed descriptor namespace',
+      ),
+    });
+    for (const key of Object.keys(expected)) {
+      if (totals[key] !== expected[key]) {
+        throw frontierError(`resumed manifest resource receipt ${key} is inconsistent`);
+      }
+    }
+  };
+  const assertProjection = (projection) => {
+    if (manifest.checkpointStateSha256 !== canonicalHash(R7_CHECKPOINT_STATE_HASH_LABEL, projection)) {
+      throw frontierError('resumed manifest checkpoint projection commitment is invalid');
+    }
+  };
+  const setTip = () => { state.tip = tip; state.generation = manifest.generation; };
+  const emptyRunSetSha256 = resumableRunSetHash([]);
+
+  if (manifest.transition === 'seed') {
+    if (state.tip !== null || state.kind !== null || manifest.previousManifestSha256 !== null) {
+      throw frontierError('resumed seed does not begin an empty manifest chain');
+    }
+    assertExactRecord(manifest.stateDelta, [
+      'binding', 'depth', 'parentOffset', 'lastProcessedParentKey', 'transitions', 'boundPrunes',
+    ], 'resumed seed stateDelta');
+    const binding = freezeCanonicalTree(detachedCanonicalValue(manifest.stateDelta.binding));
+    validateResumableBinding(binding);
+    if (manifest.bindingSha256 !== canonicalHash(R7_BINDING_HASH_LABEL, binding)) {
+      throw frontierError('resumed seed binding commitment is invalid');
+    }
+    const added = descriptorFromManifest();
+    if (added === null || added.id !== expectedFrontierRunId(0, 0) || added.size !== 1
+      || added.firstKey !== binding.initialFrontierKey || added.lastKey !== binding.initialFrontierKey) {
+      throw frontierError('resumed seed frontier descriptor is invalid');
+    }
+    expectRunChanges(added, 'none', []);
+    if (manifest.stateDelta.depth !== 0 || manifest.stateDelta.parentOffset !== 0
+      || manifest.stateDelta.lastProcessedParentKey !== null || manifest.stateDelta.transitions !== 0
+      || manifest.stateDelta.boundPrunes !== 0) throw frontierError('resumed seed stateDelta is invalid');
+    state.binding = binding;
+    state.bindingSha256 = manifest.bindingSha256;
+    state.kind = 'searching';
+    state.depth = 0;
+    state.parentOffset = 0;
+    state.lastProcessedParentKey = null;
+    state.transitions = 0;
+    state.boundPrunes = 0;
+    state.frontierDescriptor = added;
+    state.nextRuns = [];
+    state.activeIds = new Set([added.id]);
+    state.activeRunBytes = added.dataBytes;
+    state.nextRunsSha256 = R7_NEXT_RUNS_EMPTY_HASH;
+    state.completedDepths = [];
+    state.completedDepthsSha256 = R7_DEPTHS_EMPTY_HASH;
+    state.completedTotals = { frontierStates: 0, transitions: 0, boundPrunes: 0 };
+    state.reason = null;
+    setTip();
+    assertProjection(Object.freeze({
+      kind: 'searching', generation: state.generation, bindingSha256: state.bindingSha256,
+      depth: state.depth, parentOffset: state.parentOffset, lastProcessedParentKey: null,
+      transitions: 0, boundPrunes: 0, frontierDescriptorSha256: resumableDescriptorHash(added),
+      nextRunsSha256: state.nextRunsSha256, nextRunCount: 0,
+      completedDepthsSha256: state.completedDepthsSha256, completedDepthCount: 0,
+    }));
+    ensureReceipt(added, [added]);
+    return;
+  }
+
+  if (state.kind !== 'searching' || state.tip === null || manifest.bindingSha256 !== state.bindingSha256) {
+    throw frontierError('resumed nonseed manifest does not continue a searching checkpoint');
+  }
+  const finalDecisionDepth = state.binding.optimalLocks > 1 && state.depth === state.binding.optimalLocks - 2;
+  const activeDescriptors = [state.frontierDescriptor, ...state.nextRuns];
+  const assertCompletedDepth = (record) => {
+    const depth = freezeCanonicalTree(detachedCanonicalValue(record));
+    validateResumableDepthRecord(depth, state.depth);
+    if (depth.frontierStates !== state.frontierDescriptor.size || depth.transitions !== state.transitions
+      || depth.boundPrunes !== state.boundPrunes) {
+      throw frontierError('resumed completed depth does not match the checkpoint totals');
+    }
+    for (const key of ['frontierStates', 'transitions', 'boundPrunes']) {
+      addSafeManifestInteger(state.completedTotals[key], depth[key], `resumed completed ${key}`);
+    }
+    return depth;
+  };
+
+  if (manifest.transition === 'unit') {
+    assertExactRecord(manifest.stateDelta, [
+      'depth', 'parentOffset', 'lastProcessedParentKey', 'transitionsDelta', 'boundPrunesDelta',
+    ], 'resumed unit stateDelta');
+    if (state.binding.optimalLocks === 1 || state.parentOffset >= state.frontierDescriptor.size
+      || manifest.stateDelta.depth !== state.depth) throw frontierError('resumed unit cursor is invalid');
+    const expectedOffset = Math.min(
+      state.frontierDescriptor.size,
+      addSafeManifestInteger(state.parentOffset, RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.parentUnitKeys, 'resumed unit parentOffset'),
+    );
+    if (manifest.stateDelta.parentOffset !== expectedOffset) throw frontierError('resumed unit parentOffset is invalid');
+    encodeRecord(manifest.stateDelta.lastProcessedParentKey, null);
+    if (state.lastProcessedParentKey !== null
+      && ordinalByteCompare(state.lastProcessedParentKey, manifest.stateDelta.lastProcessedParentKey) >= 0) {
+      throw frontierError('resumed unit cursor did not advance');
+    }
+    if (expectedOffset === state.frontierDescriptor.size
+      && manifest.stateDelta.lastProcessedParentKey !== state.frontierDescriptor.lastKey) {
+      throw frontierError('resumed terminal unit cursor is invalid');
+    }
+    assertSafeManifestInteger(manifest.stateDelta.transitionsDelta, 'resumed unit transitionsDelta');
+    assertSafeManifestInteger(manifest.stateDelta.boundPrunesDelta, 'resumed unit boundPrunesDelta');
+    const transitions = addSafeManifestInteger(state.transitions, manifest.stateDelta.transitionsDelta, 'resumed transition counter');
+    const boundPrunes = addSafeManifestInteger(state.boundPrunes, manifest.stateDelta.boundPrunesDelta, 'resumed bound-prune counter');
+    let added = null;
+    if (finalDecisionDepth) {
+      if (manifest.runChanges.add.length !== 0) throw frontierError('resumed final-decision unit adds a run');
+    } else {
+      added = descriptorFromManifest();
+      const unit = Math.floor(state.parentOffset / RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.parentUnitKeys);
+      if (added === null || added.id !== expectedUnitRunId(state.depth, unit, manifest.generation)
+        || state.activeIds.has(added.id) || state.nextRuns.length >= RESUMABLE_ENDGAME_DISK_FRONTIER_LIMITS.maximumUnits) {
+        throw frontierError('resumed unit descriptor is invalid');
+      }
+    }
+    expectRunChanges(added, 'none', []);
+    state.parentOffset = expectedOffset;
+    state.lastProcessedParentKey = manifest.stateDelta.lastProcessedParentKey;
+    state.transitions = transitions;
+    state.boundPrunes = boundPrunes;
+    if (added !== null) {
+      state.nextRuns.push(added);
+      state.activeIds.add(added.id);
+      state.activeRunBytes = addSafeManifestInteger(state.activeRunBytes, added.dataBytes, 'resumed active run bytes');
+      state.nextRunsSha256 = canonicalHash('T37-F4E-R7-NEXT-RUNS-STEP-V1', {
+        previousSha256: state.nextRunsSha256, descriptorSha256: resumableDescriptorHash(added),
+      });
+    }
+    setTip();
+    assertProjection(Object.freeze({
+      kind: 'searching', generation: state.generation, bindingSha256: state.bindingSha256,
+      depth: state.depth, parentOffset: state.parentOffset,
+      lastProcessedParentKey: state.lastProcessedParentKey, transitions: state.transitions,
+      boundPrunes: state.boundPrunes, frontierDescriptorSha256: resumableDescriptorHash(state.frontierDescriptor),
+      nextRunsSha256: state.nextRunsSha256, nextRunCount: state.nextRuns.length,
+      completedDepthsSha256: state.completedDepthsSha256, completedDepthCount: state.completedDepths.length,
+    }));
+    ensureReceipt(added, [...activeDescriptors, ...(added === null ? [] : [added])]);
+    return;
+  }
+
+  if (manifest.transition === 'layer') {
+    assertExactRecord(manifest.stateDelta, ['completedDepth', 'nextDepth'], 'resumed layer stateDelta');
+    if (state.parentOffset !== state.frontierDescriptor.size || finalDecisionDepth
+      || manifest.stateDelta.nextDepth !== state.depth + 1) throw frontierError('resumed layer cursor is invalid');
+    const completedDepth = assertCompletedDepth(manifest.stateDelta.completedDepth);
+    const added = descriptorFromManifest();
+    if (added === null || added.id !== expectedFrontierRunId(state.depth + 1, manifest.generation)
+      || added.size === 0) throw frontierError('resumed layer frontier descriptor is invalid');
+    expectRunChanges(added, 'current-frontier-and-next-runs', activeDescriptors);
+    const nextDepthsSha256 = canonicalHash('T37-F4E-R7-DEPTHS-STEP-V1', {
+      previousSha256: state.completedDepthsSha256, record: completedDepth,
+    });
+    state.depth += 1;
+    state.parentOffset = 0;
+    state.lastProcessedParentKey = null;
+    state.transitions = 0;
+    state.boundPrunes = 0;
+    state.frontierDescriptor = added;
+    state.nextRuns = [];
+    state.activeIds = new Set([added.id]);
+    state.activeRunBytes = added.dataBytes;
+    state.nextRunsSha256 = R7_NEXT_RUNS_EMPTY_HASH;
+    state.completedDepths = [...state.completedDepths, completedDepth];
+    state.completedDepthsSha256 = nextDepthsSha256;
+    state.completedTotals = {
+      frontierStates: state.completedTotals.frontierStates + completedDepth.frontierStates,
+      transitions: state.completedTotals.transitions + completedDepth.transitions,
+      boundPrunes: state.completedTotals.boundPrunes + completedDepth.boundPrunes,
+    };
+    state.reason = null;
+    setTip();
+    assertProjection(Object.freeze({
+      kind: 'searching', generation: state.generation, bindingSha256: state.bindingSha256,
+      depth: state.depth, parentOffset: 0, lastProcessedParentKey: null, transitions: 0, boundPrunes: 0,
+      frontierDescriptorSha256: resumableDescriptorHash(added), nextRunsSha256: state.nextRunsSha256,
+      nextRunCount: 0, completedDepthsSha256: state.completedDepthsSha256,
+      completedDepthCount: state.completedDepths.length,
+    }));
+    ensureReceipt(added, [...activeDescriptors, added]);
+    return;
+  }
+
+  if (manifest.transition !== 'complete') throw frontierError('resumed manifest transition is invalid');
+  assertExactRecord(manifest.stateDelta, ['completedDepth', 'reason'], 'resumed complete stateDelta');
+  if (!['empty-frontier', 'final-depth', 'zero-decision-depth'].includes(manifest.stateDelta.reason)) {
+    throw frontierError('resumed complete reason is invalid');
+  }
+  const { reason } = manifest.stateDelta;
+  let completedDepth = null;
+  let nextDepthsSha256 = state.completedDepthsSha256;
+  if (reason === 'zero-decision-depth') {
+    if (state.binding.optimalLocks !== 1 || state.generation !== 0 || state.depth !== 0
+      || state.parentOffset !== 0 || state.frontierDescriptor.size !== 1 || state.nextRuns.length !== 0
+      || state.transitions !== 0 || state.boundPrunes !== 0 || manifest.stateDelta.completedDepth !== null) {
+      throw frontierError('resumed zero-decision completion is invalid');
+    }
+  } else {
+    if (state.parentOffset !== state.frontierDescriptor.size || (reason === 'final-depth') !== finalDecisionDepth
+      || manifest.stateDelta.completedDepth === null) throw frontierError('resumed completion cursor is invalid');
+    completedDepth = assertCompletedDepth(manifest.stateDelta.completedDepth);
+    if (reason === 'empty-frontier' && state.nextRuns.some((descriptor) => descriptor.size !== 0)) {
+      throw frontierError('resumed empty-frontier completion has nonempty units');
+    }
+    nextDepthsSha256 = canonicalHash('T37-F4E-R7-DEPTHS-STEP-V1', {
+      previousSha256: state.completedDepthsSha256, record: completedDepth,
+    });
+  }
+  expectRunChanges(null, 'all-active-proof-runs', activeDescriptors);
+  state.kind = 'complete';
+  state.depth = null;
+  state.parentOffset = null;
+  state.lastProcessedParentKey = null;
+  state.transitions = null;
+  state.boundPrunes = null;
+  state.frontierDescriptor = null;
+  state.nextRuns = [];
+  state.activeIds = new Set();
+  state.activeRunBytes = 0;
+  state.nextRunsSha256 = R7_NEXT_RUNS_EMPTY_HASH;
+  if (completedDepth !== null) {
+    state.completedDepths = [...state.completedDepths, completedDepth];
+    state.completedTotals = {
+      frontierStates: state.completedTotals.frontierStates + completedDepth.frontierStates,
+      transitions: state.completedTotals.transitions + completedDepth.transitions,
+      boundPrunes: state.completedTotals.boundPrunes + completedDepth.boundPrunes,
+    };
+  }
+  state.completedDepthsSha256 = nextDepthsSha256;
+  state.reason = reason;
+  setTip();
+  assertProjection(Object.freeze({
+    kind: 'complete', generation: state.generation, bindingSha256: state.bindingSha256, reason,
+    completedDepthsSha256: state.completedDepthsSha256, completedDepthCount: state.completedDepths.length,
+  }));
+  ensureReceipt(null, activeDescriptors);
+}
+
+function admitResumableManifestChain(fs, inventory, ownerEntry, limits, descriptorTracker, expectedTip) {
+  const finalPattern = /^manifest-g([0-9]{5})\.json$/u;
+  const manifestEntries = inventory.names
+    .map((name) => [name, finalPattern.exec(name)])
+    .filter(([, match]) => match !== null)
+    .map(([name, match]) => Object.freeze({ name, generation: Number(match[1]), entry: inventory.entries.get(name) }))
+    .sort((left, right) => left.generation - right.generation);
+  if (manifestEntries.length === 0) {
+    if (expectedTip !== null) throw frontierError('authenticated rollback: expectedTip is absent from the manifest chain');
+    return null;
+  }
+  const state = createResumableManifestState();
+  const receipt = {
+    ownerBytes: ownerEntry.bytes,
+    previousManifestBytes: 0,
+    previousManifestCount: 0,
+    descriptors: new Map(),
+    dataObjects: new Set(),
+    indexObjects: new Set(),
+  };
+  const parsedManifests = [];
+  for (const manifestEntry of manifestEntries) {
+    const verified = readBoundedProofFile(
+      fs, manifestEntry.entry.filePath, limits.manifestBytes, descriptorTracker, 'manifest-admission-readback',
+    );
+    const manifest = freezeCanonicalTree(parseCanonicalLfBytes(verified.bytes));
+    const tip = Object.freeze({ generation: manifestEntry.generation, manifestSha256: sha256Upper(verified.bytes) });
+    if (manifest.generation !== manifestEntry.generation) {
+      throw frontierError('manifest filename generation does not match its canonical body');
+    }
+    replayResumableManifestDelta(state, manifest, tip, receipt);
+    parsedManifests.push(Object.freeze({ ...manifestEntry, bytes: verified.bytes, identity: verified.identity, manifest, tip }));
+    receipt.previousManifestBytes = addSafeManifestInteger(
+      receipt.previousManifestBytes, verified.bytes.length, 'resumed retained manifest bytes',
+    );
+    receipt.previousManifestCount += 1;
+  }
+  if (expectedTip !== null && !manifestTipsMatch(expectedTip, state.tip)) {
+    throw frontierError('authenticated rollback: expectedTip does not match the manifest chain tip');
+  }
+  const knownNames = new Set(['owner.json', ...parsedManifests.map((entry) => entry.name)]);
+  const activeRecords = new Map();
+  const committedDataIdentities = [];
+  let precommitResidue = false;
+  let manifestAliasResidue = false;
+  let supersededResidue = false;
+  for (const descriptor of receipt.descriptors.values()) {
+    knownNames.add(descriptor.dataFile);
+    knownNames.add(descriptor.indexFile);
+    const dataEntry = inventory.entries.get(descriptor.dataFile);
+    const indexEntry = inventory.entries.get(descriptor.indexFile);
+    const active = state.activeIds.has(descriptor.id);
+    if (active && (dataEntry === undefined || indexEntry === undefined)) {
+      throw frontierError(`resumed active descriptor ${descriptor.id} is missing a mandatory file`);
+    }
+    let inspected = null;
+    let index = null;
+    if (dataEntry !== undefined) {
+      inspected = inspectProofRunFile(
+        fs, dataEntry.filePath, descriptor.size, descriptor.dataIdentity, descriptorTracker,
+        'resumed-run-admission-readback',
+      );
+      if (inspected.dataBytes !== descriptor.dataBytes || inspected.dataSha256 !== descriptor.dataSha256
+        || inspected.firstKey !== descriptor.firstKey || inspected.lastKey !== descriptor.lastKey) {
+        throw frontierError(`resumed run descriptor ${descriptor.id} does not match its data file`);
+      }
+      committedDataIdentities.push(inspected.identity);
+    }
+    if (indexEntry !== undefined) {
+      const verifiedIndex = readBoundedProofFile(
+        fs, indexEntry.filePath, limits.ownerOrIndexBytes, descriptorTracker, 'resumed-index-admission-readback',
+      );
+      if (!sameProofFileIdentity(verifiedIndex.identity, descriptor.indexIdentity)
+        || verifiedIndex.bytes.length !== descriptor.indexBytes
+        || sha256Upper(verifiedIndex.bytes) !== descriptor.indexSha256) {
+        throw frontierError(`resumed run descriptor ${descriptor.id} does not match its index file`);
+      }
+      index = bindResumableIndexToDataBytes(
+        decodeResumableRunIndex(verifiedIndex.bytes), descriptor.dataBytes,
+      );
+      if (index.size !== descriptor.size) throw frontierError(`resumed index size is invalid for ${descriptor.id}`);
+    }
+    if (!active && (dataEntry !== undefined || indexEntry !== undefined)) supersededResidue = true;
+    if (active) {
+      activeRecords.set(descriptor.id, Object.freeze({
+        id: descriptor.id,
+        size: descriptor.size,
+        filePath: dataEntry.filePath,
+        offsets: index.offsets,
+        identity: inspected.identity,
+        indexFilePath: indexEntry.filePath,
+        indexIdentity: indexEntry.identity,
+        descriptor,
+      }));
+    }
+  }
+  const highest = parsedManifests.at(-1);
+  for (const name of inventory.names) {
+    const partMatch = /^manifest-g([0-9]{5})\.json\.part$/u.exec(name);
+    if (!partMatch) continue;
+    const generation = Number(partMatch[1]);
+    const final = parsedManifests.find((entry) => entry.generation === generation);
+    if (final === undefined) {
+      precommitResidue = true;
+      continue;
+    }
+    if (generation !== highest.generation) throw frontierError('resumed manifest alias is not the highest generation');
+    const partEntry = inventory.entries.get(name);
+    const verifiedPart = readBoundedProofFile(
+      fs, partEntry.filePath, limits.manifestBytes, descriptorTracker, 'resumed-manifest-alias-readback',
+    );
+    if (!sameProofFileIdentity(verifiedPart.identity, final.identity) || !verifiedPart.bytes.equals(final.bytes)) {
+      throw frontierError('resumed manifest alias does not match its final');
+    }
+    knownNames.add(name);
+    manifestAliasResidue = true;
+  }
+  if (inventory.entries.has('owner.json.part')) {
+    if (parsedManifests.length !== 0) throw frontierError('owner alias is invalid after manifest publication');
+    knownNames.add('owner.json.part');
+  }
+  for (const name of inventory.names) {
+    if (knownNames.has(name) || /^manifest-g[0-9]{5}\.json\.part$/u.test(name)) continue;
+    const runMatch = /^(.*)\.(run|idx)(\.part)?$/u.exec(name);
+    if (runMatch === null) throw frontierError(`resumed stage contains an unknown entry ${name}`);
+    classifyResumableRunId(runMatch[1]);
+    precommitResidue = true;
+  }
+  const authoritativeNames = new Set(parsedManifests.map((entry) => entry.name));
+  for (const record of activeRecords.values()) {
+    authoritativeNames.add(record.descriptor.dataFile);
+    authoritativeNames.add(record.descriptor.indexFile);
+  }
+  const blockedReason = precommitResidue
+    ? 'precommit-owned-residue'
+    : manifestAliasResidue
+      ? 'postcommit-manifest-alias-residue'
+      : supersededResidue
+        ? 'postcommit-superseded-residue'
+        : null;
+  return Object.freeze({
+    state,
+    parsedManifests: Object.freeze(parsedManifests),
+    descriptors: receipt.descriptors,
+    activeRecords,
+    committedDataIdentities: Object.freeze(committedDataIdentities),
+    authoritativeNames,
+    blockedReason,
+  });
+}
+
 function validateResumableTip(tip) {
   validateResumableManifestTip(tip, 'expectedTip');
 }
@@ -2643,6 +3101,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
   let inventory;
   let stageIdentity;
   let blockedReason = null;
+  let resumedManifestAdmission = null;
   try {
     stagePath = exactResumableStage(fs, options.stagePath, mode);
     stageRootIdentity = resumableStageIdentity(fs, stagePath);
@@ -2681,7 +3140,13 @@ export function createResumableEndgameDiskFrontierStore(options) {
         }
       }
       const unrelated = inventory.names.filter((name) => name !== 'owner.json' && name !== 'owner.json.part');
-      if (unrelated.length > 0) throw frontierError('manifest admission scan is not yet available in this checkpoint');
+      if (mode === 'resume' && manifests.length > 0) {
+        resumedManifestAdmission = admitResumableManifestChain(
+          fs, inventory, owner, limits, descriptorTracker, options.expectedTip,
+        );
+      } else if (unrelated.length > 0) {
+        throw frontierError('manifest admission scan is not yet available in this checkpoint');
+      }
     }
     const admittedStageIdentity = resumableStageIdentity(fs, stagePath);
     assertResumableStageRootIdentity(admittedStageIdentity, stageRootIdentity);
@@ -2695,6 +3160,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
     throw failure;
   }
   let invalidated = false;
+  let resumeAdmissionSentinelPending = mode === 'resume';
   let checkpointPublicationInFlight = false;
   let checkpointPublicationLease = null;
   let manifestPublicationTerminal = false;
@@ -2713,10 +3179,19 @@ export function createResumableEndgameDiskFrontierStore(options) {
   let authorizationBucketVisits = 0;
   const inventoryLedger = createResumableInventoryLedger(inventory, limits);
   inventory = inventoryLedger.view;
-  const manifestState = createResumableManifestState();
+  const manifestState = resumedManifestAdmission?.state ?? createResumableManifestState();
   const committedRunRecords = new Map();
   const committedRunViewStates = new WeakMap();
-  const productAuthoritativeNames = new Set();
+  const productAuthoritativeNames = new Set(resumedManifestAdmission?.authoritativeNames ?? []);
+  if (resumedManifestAdmission !== null) {
+    for (const identity of resumedManifestAdmission.committedDataIdentities) {
+      inventoryLedger.markRunCommitted(identity);
+    }
+    for (const [id, record] of resumedManifestAdmission.activeRecords) {
+      committedRunRecords.set(id, record);
+    }
+    if (blockedReason === null) blockedReason = resumedManifestAdmission.blockedReason;
+  }
   let checkpointView = null;
   const teardownAuthorized = new Map(
     [...inventory.entries.values()].map((entry) => [entry.filePath, entry.identity]),
@@ -2727,6 +3202,18 @@ export function createResumableEndgameDiskFrontierStore(options) {
     const paths = teardownAuthorizedObjects.get(key) ?? new Set();
     paths.add(filePath);
     teardownAuthorizedObjects.set(key, paths);
+  }
+  if (resumedManifestAdmission !== null) {
+    for (const descriptor of resumedManifestAdmission.descriptors.values()) {
+      for (const [filePath, identity] of [
+        [path.join(stagePath, descriptor.dataFile), descriptor.dataIdentity],
+        [path.join(stagePath, descriptor.indexFile), descriptor.indexIdentity],
+      ]) {
+        if (inventory.entries.has(path.basename(filePath))) {
+          ownedFiles.set(filePath, Object.freeze({ identity, allowOwnedGrowth: false }));
+        }
+      }
+    }
   }
   let candidateReservation = null;
   let inventoryInvalid = false;
@@ -2816,6 +3303,28 @@ export function createResumableEndgameDiskFrontierStore(options) {
   const armInventorySentinel = (phase) => {
     if (stageSentinelArmed) return;
     if (inventoryRecoveryTerminal) throw recoveryTerminalError();
+    if (resumeAdmissionSentinelPending) {
+      try {
+        const current = resumableStageIdentity(fs, stagePath);
+        assertResumableStageRootIdentity(current, stageRootIdentity);
+        if (!sameProofFileIdentity(stageIdentity, current)) {
+          throw frontierError('resumable stage changed after resume admission');
+        }
+        stageIdentity = stampResumableStageIdentity(fs, stagePath, stageSentinelTime, stageRootIdentity);
+        stageSentinelArmed = true;
+        resumeAdmissionSentinelPending = false;
+        return;
+      } catch (cause) {
+        stageSentinelArmed = false;
+        const failure = frontierError(`external inventory drift before ${phase}`);
+        if (blockedReason === null) blockedReason = 'external-inventory-drift';
+        recordCleanupError(failure);
+        recordCleanupError(cause);
+        markInventoryInvalid();
+        attemptInitialInventoryRecovery();
+        throw aggregate(failure, [cause], failure.message);
+      }
+    }
     // Resume admission itself remains read-only. The first mutation revalidates once, then arms O(1) checks.
     let scannedResult;
     try {
@@ -3024,6 +3533,19 @@ export function createResumableEndgameDiskFrontierStore(options) {
     deleteTeardownAuthorization(filePath);
     onReleased?.();
     refreshAuthorizedHardLinkAliases(current);
+    captureStageMutation();
+  };
+  const reconcileLostOwnedUnlink = (filePath, expectedIdentity) => {
+    const ownership = ownedFiles.get(filePath);
+    if (ownership === undefined) return;
+    if (!sameProofFileIdentity(ownership.identity, expectedIdentity)) {
+      throw frontierError(`lost unlink ownership drift for ${path.basename(filePath)}`);
+    }
+    notePendingAuthorizedHardLinkRefresh(ownership.identity, filePath);
+    if (inventory.entries.has(path.basename(filePath))) inventoryLedger.remove(path.basename(filePath));
+    ownedFiles.delete(filePath);
+    deleteTeardownAuthorization(filePath);
+    refreshAuthorizedHardLinkAliases(ownership.identity);
     captureStageMutation();
   };
   const refreshAuthorizedHardLinkAliases = (removedIdentity) => {
@@ -3751,13 +4273,15 @@ export function createResumableEndgameDiskFrontierStore(options) {
     }
   };
   const resourceTotalsForPublication = (publication, candidate) => {
-    const latestCheckpointRunBytes = publication.transition === 'seed'
-      ? candidate.record.descriptor.dataBytes
-      : addSafeManifestInteger(
-        manifestState.activeRunBytes,
-        candidate?.record.descriptor.dataBytes ?? 0,
-        'projected latest checkpoint run bytes',
-      );
+    const latestCheckpointRunBytes = publication.transition === 'complete'
+      ? 0
+      : ['seed', 'layer'].includes(publication.transition)
+        ? candidate.record.descriptor.dataBytes
+        : addSafeManifestInteger(
+          manifestState.activeRunBytes,
+          candidate?.record.descriptor.dataBytes ?? 0,
+          'projected latest checkpoint run bytes',
+        );
     if (latestCheckpointRunBytes > limits.latestCheckpointRunBytes) {
       throw frontierError('latest checkpoint run bytes exceed the limit');
     }
@@ -3983,6 +4507,35 @@ export function createResumableEndgameDiskFrontierStore(options) {
         clean: false,
       });
     };
+    const unlinkPublishedDescriptorFile = (filePath, identity) => {
+      if (!inventory.entries.has(path.basename(filePath))) return;
+      try {
+        unlinkOwnedFile(filePath, identity);
+      } catch (error) {
+        try {
+          fs.lstatSync(filePath, { bigint: true });
+        } catch (observation) {
+          if (isMissing(observation)) {
+            reconcileLostOwnedUnlink(filePath, identity);
+            return;
+          }
+          throw aggregatePropagatingR7Close(
+            error, [observation], `Postcommit cleanup observation failed for ${path.basename(filePath)}.`,
+          );
+        }
+        throw error;
+      }
+    };
+    const cleanupPublishedSupersededDescriptors = () => {
+      const removed = prepared.sealed.removedDescriptors;
+      for (const descriptor of removed) {
+        unlinkPublishedDescriptorFile(path.join(stagePath, descriptor.dataFile), descriptor.dataIdentity);
+      }
+      for (const descriptor of removed) {
+        unlinkPublishedDescriptorFile(path.join(stagePath, descriptor.indexFile), descriptor.indexIdentity);
+        committedRunRecords.delete(descriptor.id);
+      }
+    };
 
     try {
       assertPreparedManifestBytes(prepared, manifestBytes, 'private');
@@ -4105,6 +4658,11 @@ export function createResumableEndgameDiskFrontierStore(options) {
           error, [committedLinkError], 'Manifest transition apply failed after a lost link result.',
         ));
     }
+    try {
+      cleanupPublishedSupersededDescriptors();
+    } catch (error) {
+      return postcommitResult(error);
+    }
     if (committedLinkError !== null) {
       return postcommitResult(committedLinkRegistrationError === null
         ? committedLinkError
@@ -4177,6 +4735,20 @@ export function createResumableEndgameDiskFrontierStore(options) {
         return Object.freeze({
           checkpoint: null,
           tip: null,
+          diagnostics: diagnostics(),
+          advanceAllowed: blockedReason === null,
+        });
+      }
+      if (manifestState.kind === 'complete') {
+        return Object.freeze({
+          checkpoint: Object.freeze({
+            kind: 'complete',
+            generation: manifestState.generation,
+            binding: manifestState.binding,
+            reason: manifestState.reason,
+            exhaustedDepths: Object.freeze([...manifestState.completedDepths]),
+          }),
+          tip: manifestState.tip,
           diagnostics: diagnostics(),
           advanceAllowed: blockedReason === null,
         });
@@ -4255,11 +4827,11 @@ export function createResumableEndgameDiskFrontierStore(options) {
         throw frontierError('checkpoint publication requires every loaded run to be released');
       }
       assertPublicationRecord(publication);
-      if (publication.transition !== 'seed' && publication.transition !== 'unit') {
-        throw frontierError('same-Store checkpoint publication currently supports only seed and unit transitions');
+      if (!['seed', 'unit', 'layer', 'complete'].includes(publication.transition)) {
+        throw frontierError('same-Store checkpoint publication transition is unsupported');
       }
-      if (publication.transition === 'seed' && candidate === null) {
-        throw frontierError('seed publication requires an owned frontier candidate');
+      if (['seed', 'layer'].includes(publication.transition) && candidate === null) {
+        throw frontierError(`${publication.transition} publication requires an owned frontier candidate`);
       }
       assertPublicationWorkingSet(candidate);
       candidate?.prepareOwnedCommit();
