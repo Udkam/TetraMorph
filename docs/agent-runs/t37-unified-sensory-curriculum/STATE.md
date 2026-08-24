@@ -3479,3 +3479,27 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   post-link apply step; then add standalone manifest part/final publication, Store
   integration, committed-versus-working byte classification, recovery, and fault seams.
   External R7 paths, R7B, Intro-05, and production proof execution remain closed.
+
+### F4E-R7A C1b prepared-manifest publication accepted locally
+
+- Contract exception `baea390` and source checkpoint `660c6f8` are based on `8ca5599` and
+  change only `scripts/endgame-disk-frontier.mjs` and
+  `src/authoring/endgameDiskFrontier.test.mjs`. The source owns the fallible prepare token,
+  manifest part/final no-replace link, candidate claim/rollback/promotion, committed versus
+  working ledger accounting, known/unknown link result split, public reentrancy lease,
+  nonthrowing terminal suspend, and exact precommit working-set cleanup.
+- Frozen candidate SHA-256: adapter `C94CCF63F8CC89B12F1DBC533646B356AAA59E82EED0687FBCE9A22C8A763C5B`;
+  direct test `14A2C66A406C5D165A9F45C3364423F320E89224AF5746046EAD69DF495E02BA`.
+  Node syntax, focused adapter tests (`183 passed / 1 skipped`), typecheck, full suite
+  (`768 passed / 17 skipped` in `59 passed / 2 skipped` files), production build, and diff
+  check passed. Build emits only the pre-existing Vite large-chunk advisory.
+- Two independent read-only reviews of `8ca5599..660c6f8` report
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`. They independently verify atomic link ownership,
+  identity/ledger transitions, known/unknown link isolation, precommit writer/run cleanup,
+  nested-publication rejection, reentrant diagnostics/dispose safety, and nonthrowing
+  prelink/postlink suspension. No protected T27, `progress.md`, HANDOFF, or external R7
+  path was read, edited, staged, or executed.
+- Next: C1b-D only, reconstruct and authenticate the full manifest chain at Store admission,
+  classify recognized residue after the expected-tip check, cache the committed descriptor
+  state, and preserve the one-full-scan/no-same-Store-rescan I/O contract. R7B, Intro-05,
+  external execution, and final player acceptance remain closed.
