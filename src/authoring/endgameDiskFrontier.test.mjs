@@ -2223,6 +2223,86 @@ describe('R7 resumable disk frontier primitives', () => {
     releaseParent(parent, stage);
   });
 
+  it('rejects a highest unit whose cumulative counters normal planning cannot produce', () => {
+    const { parent, stage } = temporaryStage('r7-resume-unit-total-overflow');
+    const testing = RESUMABLE_ENDGAME_DISK_FRONTIER_TESTING;
+    const maximum = Number.MAX_SAFE_INTEGER;
+    const binding = Object.freeze({
+      schema: 't37-f4e-r7-proof-binding-v1', levelId: 't3r-shaft-01',
+      candidateCommandStream: 'S', optimalLocks: 3, initialStateHash: 'A'.repeat(64), initialFrontierKey: 'A',
+    });
+    const creator = createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'create', ownerId: 'owner-A',
+    });
+    creator.loadCheckpoint();
+    const seedWriter = creator.createRun('r7-f-d00000-g00000');
+    seedWriter.write('A');
+    const seed = creator.publishCheckpoint(Object.freeze({
+      transition: 'seed', previousTip: null, binding, frontier: seedWriter.finish(),
+    }));
+    const seedView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(seedView.checkpoint.frontier);
+    const unitWriter = creator.createRun('r7-u-d00000-n00000000-g00001');
+    unitWriter.write('B');
+    const unit = creator.publishCheckpoint(Object.freeze({
+      transition: 'unit', previousTip: seed.tip, parentOffset: 1, lastProcessedParentKey: 'A',
+      transitionsDelta: maximum, boundPrunesDelta: 0, nextRun: unitWriter.finish(),
+    }));
+    const unitView = creator.loadCheckpoint();
+    creator.releaseCheckpointRun(unitView.checkpoint.frontier);
+    const [unitRun] = unitView.checkpoint.nextRuns.open({ startIndex: 0, endIndex: 1 });
+    unitRun.dispose();
+    const layerWriter = creator.createRun('r7-f-d00001-g00002');
+    layerWriter.write('C');
+    const layer = creator.publishCheckpoint(Object.freeze({
+      transition: 'layer', previousTip: unit.tip,
+      completedDepth: Object.freeze({ lockedPieces: 0, frontierStates: 1, transitions: maximum, boundPrunes: 0 }),
+      nextFrontier: layerWriter.finish(),
+    }));
+    creator.suspend();
+
+    const previousFiles = ['manifest-g00000.json', 'manifest-g00001.json', 'manifest-g00002.json'];
+    const previousBytes = previousFiles.map((name) => fs.readFileSync(path.join(stage, name)));
+    const layerManifest = JSON.parse(previousBytes[2].toString('utf8'));
+    const frontier = layerManifest.runChanges.add[0];
+    const completedDepthsSha256 = testing.canonicalHash('T37-F4E-R7-DEPTHS-STEP-V1', {
+      previousSha256: testing.canonicalHash('T37-F4E-R7-DEPTHS-EMPTY-V1', []),
+      record: layerManifest.stateDelta.completedDepth,
+    });
+    const projection = Object.freeze({
+      kind: 'searching', generation: 3, bindingSha256: layerManifest.bindingSha256, depth: 1,
+      parentOffset: 1, lastProcessedParentKey: frontier.lastKey, transitions: 1, boundPrunes: 0,
+      frontierDescriptorSha256: testing.descriptorHash(frontier),
+      nextRunsSha256: testing.canonicalHash('T37-F4E-R7-NEXT-RUNS-EMPTY-V1', []), nextRunCount: 0,
+      completedDepthsSha256, completedDepthCount: 1,
+    });
+    const forged = Object.freeze({
+      schema: 't37-f4e-r7-checkpoint-delta-v1', generation: 3, previousManifestSha256: layer.tip.manifestSha256,
+      transition: 'unit', bindingSha256: layerManifest.bindingSha256,
+      stateDelta: Object.freeze({
+        depth: 1, parentOffset: 1, lastProcessedParentKey: frontier.lastKey,
+        transitionsDelta: 1, boundPrunesDelta: 0,
+      }),
+      runChanges: Object.freeze({ add: Object.freeze([]), removeRule: 'none', removeSetSha256: testing.runSetHash([]) }),
+      checkpointStateSha256: testing.canonicalHash('T37-F4E-R7-CHECKPOINT-STATE-V1', projection),
+      resourceTotalsBeforeManifest: Object.freeze({
+        latestCheckpointRunBytes: frontier.dataBytes,
+        uncommittedWorkingRunBytes: 0,
+        recognizedPhysicalRunBytes: frontier.dataBytes,
+        retainedManifestBytes: previousBytes.reduce((total, bytes) => total + bytes.length, 0),
+        ownerAndIndexBytes: fs.statSync(path.join(stage, 'owner.json')).size + frontier.indexBytes,
+        namespaceEntries: 6,
+      }),
+    });
+    const forgedBytes = Buffer.from(`${testing.canonicalJson(forged)}\n`, 'utf8');
+    const forgedTip = Object.freeze({ generation: 3, manifestSha256: testing.sha256Upper(forgedBytes) });
+    fs.writeFileSync(path.join(stage, 'manifest-g00003.json'), forgedBytes);
+    expect(() => createResumableEndgameDiskFrontierStore({
+      stagePath: stage, mode: 'resume', ownerId: 'owner-A', expectedTip: forgedTip,
+    })).toThrow('resumed search transition total');
+    forceReleaseManifestStage(parent, stage);
+  });
+
   it('classifies only a same-identity highest manifest alias as blocked postcommit residue', () => {
     const { parent, stage } = temporaryStage('r7-resume-manifest-alias');
     const binding = Object.freeze({
@@ -2513,6 +2593,7 @@ describe('R7 resumable disk frontier primitives', () => {
       nextFrontier: layerWriter.finish(),
     }));
     expect(layer).toMatchObject({ advanceAllowed: false, tip: { generation: 2 } });
+    expect(layer.diagnostics.residue).toContain('r7-f-d00000-g00000.idx');
     expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.run'))).toBe(false);
     expect(fs.existsSync(path.join(stage, 'r7-f-d00000-g00000.idx'))).toBe(true);
     creator.suspend();

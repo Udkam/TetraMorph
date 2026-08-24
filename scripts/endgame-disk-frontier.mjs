@@ -2776,6 +2776,11 @@ function replayResumableManifestDelta(state, manifest, tip, receipt) {
     assertSafeManifestInteger(manifest.stateDelta.boundPrunesDelta, 'resumed unit boundPrunesDelta');
     const transitions = addSafeManifestInteger(state.transitions, manifest.stateDelta.transitionsDelta, 'resumed transition counter');
     const boundPrunes = addSafeManifestInteger(state.boundPrunes, manifest.stateDelta.boundPrunesDelta, 'resumed bound-prune counter');
+    addSafeManifestInteger(state.completedTotals.transitions, transitions, 'resumed search transition total');
+    addSafeManifestInteger(state.completedTotals.boundPrunes, boundPrunes, 'resumed search bound-prune total');
+    addSafeManifestInteger(
+      state.completedTotals.frontierStates, state.frontierDescriptor.size, 'resumed search frontier-state total',
+    );
     let added = null;
     if (finalDecisionDepth) {
       if (manifest.runChanges.add.length !== 0) throw frontierError('resumed final-decision unit adds a run');
@@ -4511,12 +4516,14 @@ export function createResumableEndgameDiskFrontierStore(options) {
       if (!inventory.entries.has(path.basename(filePath))) return;
       try {
         unlinkOwnedFile(filePath, identity);
+        productAuthoritativeNames.delete(path.basename(filePath));
       } catch (error) {
         try {
           fs.lstatSync(filePath, { bigint: true });
         } catch (observation) {
           if (isMissing(observation)) {
             reconcileLostOwnedUnlink(filePath, identity);
+            productAuthoritativeNames.delete(path.basename(filePath));
             return;
           }
           throw aggregatePropagatingR7Close(
@@ -4534,6 +4541,12 @@ export function createResumableEndgameDiskFrontierStore(options) {
       for (const descriptor of removed) {
         unlinkPublishedDescriptorFile(path.join(stagePath, descriptor.indexFile), descriptor.indexIdentity);
         committedRunRecords.delete(descriptor.id);
+      }
+    };
+    const demotePublishedSupersededDescriptorAuthority = () => {
+      for (const descriptor of prepared.sealed.removedDescriptors) {
+        productAuthoritativeNames.delete(descriptor.dataFile);
+        productAuthoritativeNames.delete(descriptor.indexFile);
       }
     };
 
@@ -4658,6 +4671,7 @@ export function createResumableEndgameDiskFrontierStore(options) {
           error, [committedLinkError], 'Manifest transition apply failed after a lost link result.',
         ));
     }
+    demotePublishedSupersededDescriptorAuthority();
     try {
       cleanupPublishedSupersededDescriptors();
     } catch (error) {
