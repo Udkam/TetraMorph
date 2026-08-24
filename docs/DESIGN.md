@@ -10601,9 +10601,12 @@ or proof. `--outer` is the sole later writable production entry: after those che
 the durable run ID/capability, claims attempt/task/terminal under this contract, and never runs
 the frontier itself. `--worker` accepts exactly the existing ordered task-action pairs
 `--attempt <attemptPath> --stage <stagePath> --run-id <runId> --capability <capabilityHex>`;
-only the registered task may invoke it. Unknown, repeated, missing, or cross-mode flags are
-fatal. `--outer` is not executable authority until the later command pin, preflight, and
-independent production gates; static authoring must not invoke any mode.
+the outer never invokes worker mode directly and may only register/start its XML/query-verified
+fixed Task action. Worker mode verifies immutable attempt, taskActionSha256, runId, and
+capability binding, but does not claim to authenticate its invoking process as Task Scheduler.
+Unknown, repeated, missing, or cross-mode flags are fatal. `--outer` is not executable authority
+until the later command pin, preflight, and independent production gates; static authoring must
+not invoke any mode.
 
 Worker-result keys are exactly `schema`, `runId`, `attemptSha256`, `sourcePinSha256`,
 `taskActionSha256`, `status`, `checkpointTip`, `candidateSha256`, `diagnosticsSha256`, and
@@ -10794,3 +10797,13 @@ and freezes its shared preflight arguments, task-only worker argument grammar, a
 static-authoring boundary. Commit only the four authority documents and obtain two fresh
 all-zero R10 contract reviews before creating the external runner source. No validator mode,
 task, Temp artifact, Store/proof, Intro-05 source, or player acceptance action is authorized.
+
+### F4E-R7B R10 lifecycle rejection — R11 worker-origin correction
+
+R10 correctly defines the outer mode, but the visible action-bound capability cannot prove that
+worker mode was invoked by Task Scheduler rather than an identical direct child process. R11
+removes that unimplementable authentication claim: outer operationally never runs worker mode
+directly and only starts an XML/query-round-tripped Task action; worker validates immutable
+attempt/action/run/capability binding without asserting process origin. Commit only the four
+authority documents and obtain two fresh all-zero R11 reviews before external source authoring.
+All modes and every external/product/player-acceptance action remain closed.

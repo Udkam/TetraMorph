@@ -1182,3 +1182,13 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   Store/proof, Intro-05 source, or player-acceptance action occurred.
 - Sole next action: commit and independently review R10 twice; only then reopen static runner
   source authoring.
+
+### F4E-R7B R11 worker-origin correction
+
+- R10 lifecycle review correctly rejects an impossible claim: visible Task action capability
+  cannot distinguish Scheduler worker launch from a direct matching process. R11 freezes the
+  real boundary: outer never calls worker directly and starts only XML/query-verified Task
+  action; worker validates immutable attempt/action/run/capability fields without origin claim.
+- Changed paths are exactly the four R7B authority docs. No source/artifact, mode, task,
+  Store/proof, Intro-05 source, or player-acceptance action occurred.
+- Sole next action: commit and independently review R11 twice, then reopen static source only.

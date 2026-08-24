@@ -10679,7 +10679,7 @@ Commit and obtain two independent all-zero R3 document reviews before any valida
 authoring. All external execution, Intro-05 source, later curriculum, and inherited dirty paths
 remain closed.
 
-### F4E-R7B R9 accepted — R10 outer-mode grammar review only
+### F4E-R7B R9 accepted — R11 worker-origin correction review only
 
 R3 `1ef80f5` is rejected because its passed worker-result and candidate hashes formed a cycle.
 R4 `d9e85f6` repairs that graph to `candidate -> worker-result -> terminal`, retains the
@@ -10714,3 +10714,10 @@ two independent all-zero R10 document reviews before external source authoring. 
 mode or task, attempt, candidate, result, terminal, stage, preflight, or proof execution is
 authorized; Intro-05 source, later curriculum, sensory work, browser evidence, player
 acceptance, and inherited dirty paths remain closed.
+
+R10 lifecycle review correctly rejects one unimplementable statement: a visible action-bound
+capability cannot authenticate worker invocation as Task Scheduler. R11 instead binds what code
+can verify—immutable attempt, taskActionSha256, runId, and capability—while restricting outer
+operationally to XML/query-verified Task registration/start and forbidding direct worker launch.
+Commit and obtain two independent all-zero R11 document reviews before external source authoring;
+all mode execution and deferred work remain closed.

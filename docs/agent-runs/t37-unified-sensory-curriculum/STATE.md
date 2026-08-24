@@ -3605,3 +3605,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next: commit only the four authority docs and obtain two independent all-zero R10 reviews.
   Static external source, all modes, task/Temp artifacts, proof, Intro-05 source, curriculum,
   sensory/browser work, and player acceptance are closed meanwhile.
+
+### F4E-R7B R11 worker-origin correction
+
+- Lifecycle review rejects R10's claim that worker can prove Task Scheduler process origin:
+  capability is intentionally action-visible. R11 makes only the outer's operational rule
+  enforceable (never direct-worker, only XML/query-verified Task registration/start), while
+  worker validates immutable attempt/action/run/capability fields without an origin claim.
+- Next: commit only the four authority docs and obtain two independent all-zero R11 reviews.
+  Static runner source, all modes, task/Temp artifacts, proof, Intro-05 source, curriculum,
+  sensory/browser work, and player acceptance remain closed.
