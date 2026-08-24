@@ -10679,7 +10679,7 @@ Commit and obtain two independent all-zero R3 document reviews before any valida
 authoring. All external execution, Intro-05 source, later curriculum, and inherited dirty paths
 remain closed.
 
-### F4E-R7B R3/R4/R5 rejected — R6 orphan-candidate review only
+### F4E-R7B R3/R4/R5/R6 rejected — R7 terminal-byte-audit review only
 
 R3 `1ef80f5` is rejected because its passed worker-result and candidate hashes formed a cycle.
 R4 `d9e85f6` repairs that graph to `candidate -> worker-result -> terminal`, retains the
@@ -10691,10 +10691,13 @@ ordinary `candidateSha256` remains null. R5 review correctly finds the adjacent 
 that candidate exists alongside a later failed/interrupted worker-result. R6 requires orphan
 audit whenever no passed result binds that exact candidate SHA-256, including that result-bearing
 failure branch; only valid separately authenticated canonical finals are excluded from residue.
-It retains the false-stage audit tuple and canonical-final-versus-residue split mechanically
-exact.
+R6 review then finds that a valid owner-only pre-seed stage has no checkpoint tip and that
+names-only residue cannot bind malformed/unbound final bytes. R7 permits `tip:null` only for
+the exact authenticated `owner.json`-only pre-seed state, classifies pre-owner creation state as
+residue, and adds complete `unexpectedFiles` `{path,bytes,sha256,kind}` audit descriptors for
+every residual file. Malformed candidates cannot enter passed/candidate-unacknowledged paths.
 
-Commit and obtain two independent all-zero R6 document reviews before any validator/runner
+Commit and obtain two independent all-zero R7 document reviews before any validator/runner
 authoring. No v7 validator, task, attempt, candidate, result, terminal, stage, preflight, or
 proof execution is authorized; Intro-05 source, later curriculum, sensory work, browser
 evidence, player acceptance, and inherited dirty paths remain closed.

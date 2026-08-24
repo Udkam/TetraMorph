@@ -10649,11 +10649,14 @@ residue,residueTruncated}` where both arrays are sorted unique strings, both fla
 and the hash of its canonical decoded bytes is `diagnosticsSha256`. `stageAudit` is exactly
 `{entries,entriesTruncated,present,tip}` where entries is a sorted unique basename array and
 `entriesTruncated`/`present` are booleans. Its relation matrix is closed: `present:false`
-requires exactly `entries:[]`, `entriesTruncated:false`, and `tip:null`; `present:true` permits
-the sorted observed entry prefix (empty only when the complete observed directory is empty), and
-requires `tip` to be the nonnull authenticated highest checkpoint tip recovered for that stage.
-When `entriesTruncated:false`, `entries` is the complete inventory; when true it is only the
-deterministic bounded prefix. `residue` is exactly `{entries,entriesTruncated}` with the same
+requires exactly `entries:[]`, `entriesTruncated:false`, and `tip:null`. `present:true` has only
+two legal shapes: the authenticated owner-only pre-seed stage is exactly
+`entries:["owner.json"]`, `entriesTruncated:false`, `tip:null`, with that owner bound to the
+attempt/run/source and no final/part manifest; every other present stage requires its nonnull
+authenticated highest checkpoint tip. An empty/pre-owner creation-fault directory is never a
+stage audit and is unexpected residue. When `entriesTruncated:false`, `entries` is the complete
+inventory; when true it is only the deterministic bounded prefix. `residue` is exactly
+`{entries,entriesTruncated}` with the same
 basename rules, but contains only unexpected/foreign/incomplete same-prefix entries: a valid
 canonical final that the terminal separately authenticates is never residue, while any named
 file that fails its required type, hash, or cross-record binding is unexpected residue.
@@ -10661,9 +10664,10 @@ Worker-result's exact key set is
 `{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,status,checkpointTip,
 candidateSha256,diagnosticsJsonBase64,diagnosticsSha256,stageAudit}`. It has
 `schema:"t37-f4e-r7-worker-result-v1"`; `checkpointTip` has the `expectedTip` shape and is
-the authenticated highest tip observed after the worker's last checkpoint. A present worker
-stage must have `stageAudit.tip === checkpointTip`; an absent one uses the false-stage tuple
-above. Status-specific values are: `passed` requires nonnull `candidateSha256`, empty
+the authenticated highest tip observed after the worker's last checkpoint. Any present worker
+stage must have `stageAudit.tip === checkpointTip`, including the exact owner-only pre-seed
+null-tip tuple; an absent one uses the false-stage tuple above. Status-specific values are:
+`passed` requires nonnull `candidateSha256`, empty
 diagnostics and a false/present-false stage audit; `failed` or `interrupted` requires
 `candidateSha256:null` and preserves the nonempty or truncated diagnostic/stage audit.
 
@@ -10683,13 +10687,22 @@ publication.
 
 Terminal's exact key set is `{schema,runId,attemptSha256,sourcePinSha256,taskActionSha256,
 workerResultSha256,candidateSha256,status,passed,observedTaskState,stageAudit,residue,
-orphanCandidate}` with `schema:"t37-f4e-r7-terminal-v1"`. `status` is exactly `passed`,
+orphanCandidate,unexpectedFiles}` with `schema:"t37-f4e-r7-terminal-v1"`. `status` is exactly `passed`,
 `failed`, `interrupted`, or `candidate-unacknowledged`; `observedTaskState` is one of
 `completed`, `failed`, `interrupted`, `unavailable`. `orphanCandidate` is either `null` or
 exactly `{path,bytes,sha256}`. When nonnull, `path` is the fixed candidate final path, `bytes`
 is its positive safe regular-file byte size, and `sha256` is recomputed from those exact final
 bytes. It records a candidate that was never acknowledged by a worker result; it is not an
 integration authority and is never deleted, replaced, resumed, or retried by this contract.
+`unexpectedFiles` is the full untruncated ordinal-path-sorted array of exact
+`{bytes,kind,path,sha256}` descriptors for every residue entry. `kind` is exactly one of
+`malformed-attempt-final`, `malformed-candidate-final`, `malformed-worker-result-final`,
+`owned-part`, `foreign`, or `pre-owner-stage`; `path` is the exact resolved absolute path,
+`bytes` is its positive safe regular-file size, and `sha256` is recomputed from its exact
+regular-file bytes. Terminal publication requires `residue.entriesTruncated:false`, and the
+residue entry basenames must equal this array's path basenames in ordinal order. Thus malformed
+or unbound named finals and pre-owner creation residue are byte-bound, no-replace audit data,
+not candidates, results, or implicit authorities.
 
 The terminal matrix is closed. `passed:true/status:"passed"` requires completed task, nonnull
 result and candidate hashes, a passed worker-result that binds that identical candidate hash,
@@ -10702,8 +10715,10 @@ that terminal is `passed:false/status:"candidate-unacknowledged"` and
 `status:"failed"` or `status:"interrupted"`, retains that nonnull result hash, reproduces its
 stage audit exactly, and carries the orphan descriptor whenever the unauthoritative candidate
 exists. Every failure terminal without that candidate uses `orphanCandidate:null`; any present
-candidate hash outside the one passed binding is invalid. Without a result it uses the closed
-stage-audit relation above and records only actually observed stage/residue bytes. Attempt and
+candidate hash outside the one passed binding is invalid. Its `unexpectedFiles` byte-binds every
+untrusted residual file; malformed candidates cannot enter passed or candidate-unacknowledged
+semantics. Without a result it uses the closed stage-audit relation above and records only
+actually observed stage/residue bytes. Attempt and
 terminal finals are one immutable attempt followed by at most one immutable terminal in the
 same v7 namespace; a terminal retains rather than replaces the attempt. The successful
 publication order is candidate first (binding attempt/source), worker-result second (binding
@@ -10718,5 +10733,7 @@ publishes a result. R5 adds the non-authoritative, exact-byte `orphanCandidate` 
 descriptor, excludes described canonical finals from residue, and freezes the stage-audit
 absence/presence relation. R5 review finds the same durable candidate can coexist with a later
 failed/interrupted result, so R6 requires orphan audit whenever no passed result binds it and
-treats an invalid named final as residue. Static validator/runner authoring remains closed
-pending two fresh all-zero R6 reviews.
+treats an invalid named final as residue. R6 review finds a legal null-tip owner-only pre-seed
+stage and names-only residue insufficient for terminal byte evidence. R7 adds that exact
+pre-seed tuple and full `unexpectedFiles` descriptors. Static validator/runner authoring
+remains closed pending two fresh all-zero R7 reviews.

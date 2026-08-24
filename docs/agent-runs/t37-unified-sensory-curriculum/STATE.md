@@ -3564,7 +3564,7 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   file/task/Store/proof action occurred.
 - Next: commit and independently review R4 before static external authoring.
 
-### F4E-R7B R4/R5 lifecycle rejection and R6 correction
+### F4E-R7B R4/R5/R6 lifecycle rejection and R7 correction
 
 - R4 `d9e85f6` has no hash cycle, but lifecycle review correctly finds an unrecordable durable
   state when candidate publication succeeds and the worker stops before worker-result
@@ -3578,6 +3578,10 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   tip, and a terminal with worker-result must reproduce that result's audit exactly. Residue
   contains only unexpected/incomplete names, never a valid separately authenticated canonical
   final; a malformed/unbound named final is unexpected residue.
-- Next: commit only the four R7B authority docs and obtain two independent all-zero R6 reviews.
+- R6 review finds that legal owner-only pre-seed stage has no tip and malformed/unbound residual
+  files need byte evidence. R7 allows `tip:null` only for exact authenticated
+  `entries:["owner.json"]` pre-seed state, treats pre-owner creation as residue, and gives every
+  residual final/part a full `unexpectedFiles` `{path,bytes,sha256,kind}` terminal descriptor.
+- Next: commit only the four R7B authority docs and obtain two independent all-zero R7 reviews.
   Static validator/runner authoring, every external action, Intro-05 source, the curriculum,
   sensory/browser work, and player acceptance remain closed.
