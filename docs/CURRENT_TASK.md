@@ -10749,3 +10749,8 @@ R14 lifecycle review finds detached worker cannot locate input for required rere
 the outer-verified canonical `inputPath` in immutable attempt parameters; worker reads only that
 no-follow regular file and verifies `inputSha256` before Store creation. Commit and obtain two
 independent all-zero R15 reviews before source authoring; execution remains closed.
+
+R15 `86a3cec` now has two independent `P0/P1/P2/P3/GAP = 0/0/0/0/0` reviews and is accepted.
+One writer may create only the external validator/worker source for static review; every mode,
+Task Scheduler action, other artifact, proof, product/UI/audio change, browser evidence, and
+player acceptance remains closed.

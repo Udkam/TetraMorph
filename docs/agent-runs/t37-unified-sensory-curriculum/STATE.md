@@ -3639,6 +3639,11 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next: commit only the four authority docs and obtain two independent all-zero R13 reviews.
   Static source and all execution/product/player-acceptance action remain closed.
 
+- R15 `86a3cec` receives independent integrity and lifecycle `P0/P1/P2/P3/GAP = 0/0/0/0/0`
+  reviews and is accepted. Next: one-writer static external validator/worker source, then
+  independent static review. All modes/Task/other artifacts/proof/product/player acceptance
+  remain closed.
+
 ### F4E-R7B R15 input-path correction
 
 - R14 lifecycle review finds worker has input hash but no immutable input locator. R15 writes

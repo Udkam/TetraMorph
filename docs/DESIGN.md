@@ -10873,3 +10873,9 @@ R15 adds the exact validated `inputPath` to attempt parameters while retaining t
 Task worker action; worker may read only that no-follow regular path and must hash-equal it
 before Store construction. Commit only the four authority documents and obtain two all-zero R15
 reviews before static source authoring; execution remains closed.
+
+R15 `86a3cec` receives independent integrity and lifecycle reviews at
+`P0/P1/P2/P3/GAP = 0/0/0/0/0` and `0/0/0/0/0`; it is accepted. One writer may now create only
+the external validator/worker source for static review. No mode, Task Scheduler operation,
+other Temp artifact, Store/proof, Intro-05 source, curriculum/UI/sensory/browser action, or
+player acceptance is authorized.

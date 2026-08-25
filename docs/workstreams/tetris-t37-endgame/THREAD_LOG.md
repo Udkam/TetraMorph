@@ -1232,3 +1232,8 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   worker reads only this no-follow regular path and verifies hash before Store work.
 - Changed paths are exactly four authority docs; no source/artifact/mode/task/proof occurred.
 - Sole next action: commit and independently review R15 twice, then reopen static source only.
+
+- R15 `86a3cec` receives two independent `P0/P1/P2/P3/GAP = 0/0/0/0/0` reviews and is
+  accepted. Static source authoring opens only for the external validator/worker; no mode,
+  Task/other artifact, proof, product, or player-acceptance action is authorized.
+- Sole next action: create static source and request independent review without execution.
