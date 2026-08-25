@@ -10993,3 +10993,18 @@ from `assertPinnedBlob` and `assertPinnedModuleClosure`. It must retain no-follo
 Git blob/hash/closure checks, the later Git-clean/untracked checks, strict CLI/input validation,
 and every task/store/publication boundary. No R8 mode, input artifact, task, Store/proof, or
 product action is authorized until new parser/static reviews and a later R8 command contract.
+
+### F4E-R7B R20 R19 execution-model correction
+
+R19 is not R8 source authority: independent integrity review rejects it at
+`P0/P1/P2/P3/GAP = 0/1/0/0/0`. Git blobs pin and validate the Core/adapter closure, but
+`loadPinnedApi` actually uses Vite's `ssrLoadModule` and working-tree adapter import after the
+existing Git-clean/untracked gates; it does not execute module bytes from `git cat-file`. The
+EOL diagnosis remains valid (`core.autocrlf=true` makes a clean working copy byte-different from
+the LF blob), but R8 must not claim otherwise.
+
+R20 corrects only that model statement. The permitted R8 source correction remains removal of
+the two raw worktree-versus-blob equality checks, while retaining blob/hash/closure verification
+and requiring the existing tracked/untracked `src`/`scripts` clean checks before any Vite or
+adapter load. Commit these four documents and obtain two fresh all-zero reviews before creating
+the R8 static source; every R8 mode, input, task, Store/proof, and product action remains closed.

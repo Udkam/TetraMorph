@@ -3727,3 +3727,11 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   namespace. Mechanical correction: remove only raw working-copy byte equality from blob/closure
   checks; retain no-follow, Git blob/hash/closure, Git-clean/untracked, CLI, and lifecycle guards.
   All R8 modes and artifacts remain closed.
+
+### F4E-R7B R20 R19 execution-model correction
+
+- Integrity review rejects R19 at `P0/P1/P2/P3/GAP = 0/1/0/0/0`: Git blobs pin/validate the
+  closure, while Vite/adapter execute the Git-clean working tree. Do not claim blob execution.
+- EOL diagnosis and R7 closure stand. R20 preserves blob/hash/closure plus tracked/untracked
+  `src`/`scripts` clean gates before any load, and removes only two raw byte comparisons.
+- Commit/review this wording before R8 static source creation. All R8 modes/artifacts remain closed.

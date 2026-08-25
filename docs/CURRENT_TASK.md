@@ -10821,3 +10821,11 @@ so this is an EOL-sensitive static-source defect, not source drift. R7 is closed
 input may be reused. After review, open only fresh R8 runner authoring at a new `...validate-r8.mjs`
 path/namespace, carrying the Git/blob and lifecycle guards while removing only raw worktree byte
 equality checks. No R8 mode/input/task/Store/proof/product action is open.
+
+### 2026-08-25 F4E-R7B R20 execution-model correction
+
+R19 is rejected at `0/1/0/0/0`: Git blobs pin/verify imports, but Vite and the adapter load from
+the Git-clean working tree rather than executing `git cat-file` bytes. The EOL failure diagnosis
+stands. Before any R8 source creation, R20 requires that removing the two raw byte comparisons
+still preserves blob/hash/closure verification and the existing tracked/untracked `src`/`scripts`
+clean gate before module loading. Re-review four docs; all R8 execution remains closed.

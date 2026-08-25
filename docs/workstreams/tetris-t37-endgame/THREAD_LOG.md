@@ -1302,3 +1302,11 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   R7-to-R8 names and remove the two raw worktree byte comparisons, preserving no-follow,
   Git blob/hash/closure, Git-clean/untracked, CLI, and lifecycle guards. R8 modes/input/task/
   Store/proof/product remain closed until later static and command contracts.
+
+### F4E-R7B R20 execution-model correction
+
+- Integrity review rejects R19 at `0/1/0/0/0`: `git cat-file` bytes pin/verify closure, but
+  Vite/adapter execute Git-clean working-tree modules. EOL diagnosis/R7 closure remain valid.
+- R20 keeps blob/hash/closure and tracked/untracked `src`/`scripts` clean gates before module
+  loading; only the two raw byte equality checks may be removed. Re-review docs before any R8
+  source. All R8 modes/artifacts remain closed.
