@@ -11024,3 +11024,25 @@ matcher with an R8-suffix matcher that includes every canonical basename/owned p
 `-r8` but excludes every retained `-r7` and R1–R6 record; an unknown `-r8` entry remains foreign
 and fatal. It must not change schemas, task/proof/publication flow, or any runtime mode. New
 syntax and two independent all-zero static reviews are mandatory before R8 command/input authority.
+
+The corrected R8 static source is accepted: 69,812 UTF-8/no-BOM/LF bytes /
+`144612A92173096413E7DC6D6C35F935E4BA06FC7B35F259284000F8DB22F300`; parser-only syntax and
+independent integrity/lifecycle reviews are each all-zero. It is immutable. The R8 command
+checkpoint may now open exactly one fresh input, not either retained R7 input.
+
+### F4E-R8 R22 canonical input and no-write preflight contract
+
+After this four-document checkpoint receives two all-zero reviews, create only the absent plain
+regular `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r8-intro05-input.json`. Its
+canonical UTF-8/no-BOM/LF bytes are 1,182 / SHA-256
+`8154EAC8B47DE46193A40C033A0DC7EC9B6DDF0F1CA1B0323A3077D71313209D`, schema
+`t37-f4e-r8-intro05-input-v1`, and exactly the prior frozen primary route/definition payload
+except for that fresh outer schema. The decoded definition remains 682 bytes /
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`.
+
+Domain is 191 bytes / `CC9046EF8954FF932D0170F00BB12D919DE6425F2C18582AD4B07A0C4AF60AB4`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yOC1pbnRybzA1LWRvbWFpbi12MSIsInNldHVwRHJvcENvdW50Ijo4LCJ0YXJnZXRSb3dzIjo0fQo=`.
+It freezes the same base level, count one, alphabet `SQLHTCR`, setup 8, target 4, and locks 5..7.
+The one allowed R8 `--preflight` takes those literal input/domain/SHA values and the literal
+current lowercase HEAD of this committed checkpoint. It is no-write/no-task/no-Store/no-proof;
+nonzero is fail-closed with no retry. R8 `--outer`/`--worker` and all product paths remain closed.

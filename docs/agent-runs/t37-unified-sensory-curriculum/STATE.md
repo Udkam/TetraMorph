@@ -3744,3 +3744,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Only same R8 source reopens: restore no-follow reads but not equality decisions; match canonical
   R8/owned-part `-r8` entries only, excluding R7/R1-R6 while retaining unknown-r8 collision.
 - No mode/input/task/Store/proof/product change. Require syntax and two new all-zero static reviews.
+
+### F4E-R8 R21 corrected static acceptance / R22 input contract
+
+- R8 source accepted: 69,812 UTF-8/no-BOM/LF bytes /
+  `144612A92173096413E7DC6D6C35F935E4BA06FC7B35F259284000F8DB22F300`; syntax and both static
+  reviews all-zero. Source is immutable.
+- Post-R22-review only, create absent `...t37-f4e-endgame-r8-intro05-input.json`: 1,182 bytes /
+  `8154EAC8B47DE46193A40C033A0DC7EC9B6DDF0F1CA1B0323A3077D71313209D`; definition 682 /
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`; domain 191 /
+  `CC9046EF8954FF932D0170F00BB12D919DE6425F2C18582AD4B07A0C4AF60AB4`.
+- Then only one literal-HEAD R8 no-write preflight; outer/worker/task/Store/proof/product closed.

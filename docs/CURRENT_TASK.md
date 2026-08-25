@@ -10838,3 +10838,13 @@ evidence as R8 residue. Reopen only that R8 static source to restore both no-fol
 equality decisions and match only `-r8` canonical/part entries; R7 and R1–R6 remain excluded.
 No schema/flow/mode or product change is allowed. Syntax plus two static all-zero reviews precede
 any R8 command or input authority.
+
+R8 corrected static source is accepted at 69,812 UTF-8/no-BOM/LF bytes /
+`144612A92173096413E7DC6D6C35F935E4BA06FC7B35F259284000F8DB22F300`; parser and two independent
+static reviews are all-zero. R22 next opens only fresh
+`...t37-f4e-endgame-r8-intro05-input.json`: 1,182 bytes /
+`8154EAC8B47DE46193A40C033A0DC7EC9B6DDF0F1CA1B0323A3077D71313209D`, decoded definition 682 /
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`, and domain 191 /
+`CC9046EF8954FF932D0170F00BB12D919DE6425F2C18582AD4B07A0C4AF60AB4` (Base64 in DESIGN).
+After review, only one literal-current-HEAD R8 no-write preflight is allowed; outer/worker and
+product actions remain closed.

@@ -1319,3 +1319,12 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Reopen only same R8 source: restore no-follow reads (unused result is allowed), remove only
   equality decisions, and limit matcher to `-r8` canonical/part names while R7/R1-R6 stay out;
   unknown r8 remains fatal. No flow/schema/mode change. Syntax plus two all-zero reviews required.
+
+- Corrected R8 source accepted: 69,812 UTF-8/no-BOM/LF bytes /
+  `144612A92173096413E7DC6D6C35F935E4BA06FC7B35F259284000F8DB22F300`; syntax and independent
+  static reviews all-zero. Source immutable.
+- R22 post-review authority: create only absent `...t37-f4e-endgame-r8-intro05-input.json`,
+  1,182 bytes / `8154EAC8B47DE46193A40C033A0DC7EC9B6DDF0F1CA1B0323A3077D71313209D`; definition 682 /
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`; domain 191 /
+  `CC9046EF8954FF932D0170F00BB12D919DE6425F2C18582AD4B07A0C4AF60AB4`.
+- Then one literal-HEAD R8 no-write preflight only. No outer/worker/task/Store/proof/product action.
