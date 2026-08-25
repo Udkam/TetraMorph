@@ -10811,3 +10811,13 @@ created from locally recomputed canonical R17 content and must match the origina
 `572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4` and 682-byte definition /
 `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16` pins. Then, and only then,
 one new literal-HEAD no-write preflight is eligible.
+
+### 2026-08-25 F4E-R7B R19 preflight stop and R8 successor
+
+The sole R18 `--preflight` ran once at `6564ab7c0763e0d0b6be55ff540917948b349bd7` and stopped
+before any mutable action because it compared CRLF worktree `src/game/core/types.ts` bytes against
+the LF pinned Git blob. `git diff --quiet` is clean; the runner already loads Core from Git blobs,
+so this is an EOL-sensitive static-source defect, not source drift. R7 is closed and neither R7
+input may be reused. After review, open only fresh R8 runner authoring at a new `...validate-r8.mjs`
+path/namespace, carrying the Git/blob and lifecycle guards while removing only raw worktree byte
+equality checks. No R8 mode/input/task/Store/proof/product action is open.

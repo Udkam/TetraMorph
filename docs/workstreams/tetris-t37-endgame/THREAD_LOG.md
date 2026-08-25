@@ -1291,3 +1291,14 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   from locally recomputed canonical R17 bytes, with exact input pin `572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4`
   and definition pin `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16` before an R18
   literal-HEAD no-write preflight. The mismatch remains excluded; it is not a retry.
+
+### F4E-R7B R19 consumed preflight and fresh R8 source contract
+
+- R18 preflight ran once at `6564ab7c0763e0d0b6be55ff540917948b349bd7` and failed before
+  mutation on CRLF worktree versus LF Git-blob equality for `src/game/core/types.ts`; Git diff is
+  clean and the runner imports the pinned Git blob closure. No attempt/candidate/result/terminal/
+  stage/task/Store/proof/product action was created. R7 is closed; do not rerun or reuse R7 input.
+- Post-review only open new R8 external static runner and fresh r8 namespace. It may change only
+  R7-to-R8 names and remove the two raw worktree byte comparisons, preserving no-follow,
+  Git blob/hash/closure, Git-clean/untracked, CLI, and lifecycle guards. R8 modes/input/task/
+  Store/proof/product remain closed until later static and command contracts.

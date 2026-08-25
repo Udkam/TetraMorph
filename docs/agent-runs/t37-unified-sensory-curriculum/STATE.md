@@ -3715,3 +3715,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Post-review only, create fresh `...t37-f4e-endgame-r7-intro05-input-r2.json` from locally
   recomputed R17 canonical payload and require the original `572AD3...C8CF4` / `DB814F...80A16`
   input/definition pins before one R18 literal-HEAD no-write preflight. Old path stays excluded.
+
+### F4E-R7B R19 preflight stop / R8 successor boundary
+
+- The sole R18 preflight at `6564ab7c0763e0d0b6be55ff540917948b349bd7` failed before mutation:
+  CRLF `src/game/core/types.ts` bytes differ from its LF Git blob although Git diff is clean.
+  Runner loads blobs from Git and already checks source drift, so its live-byte duplicate gate is
+  EOL-sensitive. No attempt/candidate/result/terminal/stage/task/Store/proof/product action ran.
+- R7 is closed and must not be rerun; both retained R7 inputs are excluded from successors.
+- Post-review only, author fresh R8 static source at a new `...validate-r8.mjs` and fresh r8
+  namespace. Mechanical correction: remove only raw working-copy byte equality from blob/closure
+  checks; retain no-follow, Git blob/hash/closure, Git-clean/untracked, CLI, and lifecycle guards.
+  All R8 modes and artifacts remain closed.

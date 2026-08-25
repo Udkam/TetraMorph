@@ -10969,3 +10969,27 @@ must be 682 bytes / `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC
 Generate the patch content directly from a locally recomputed canonical payload, then verify
 byte-for-byte before the sole R18 literal-HEAD `--preflight`. The old mismatch is neither an
 input nor mutable R7 namespace residue; it remains excluded from every validator argument.
+
+### F4E-R7B R19 consumed preflight and fresh R8 static-source contract
+
+The one R18 preflight was invoked exactly once at HEAD
+`6564ab7c0763e0d0b6be55ff540917948b349bd7` and failed closed before any mutable action with
+`T37 R7 fail-closed: src/game/core/types.ts differs from its pinned Git blob`. The current
+worktree is Git-clean for that path (`git diff --quiet HEAD -- src/game/core/types.ts` exits 0),
+but its CRLF working copy differs byte-for-byte from the LF Git blob. The R7 runner already loads
+the Core closure from pinned `git cat-file` blobs and separately rejects tracked/untracked
+`src`/`scripts` drift; raw working-copy equality is therefore an incorrect EOL-sensitive duplicate
+gate. No attempt, candidate, result, terminal, stage, task, Store, proof, or product action was
+created. R7 is closed: its preflight must not be rerun, and both retained R7 input files are
+excluded from any successor argument.
+
+R8 is a fresh source-authoring-only successor. It reserves
+`t37-f4e-endgame-canonical-validate-r8.mjs`, `...attempt-r8.json`, `...candidate-r8.json`,
+`...worker-result-r8.json`, `...terminal-r8.json`, and `...frontier-stage-r8`, all initially
+absent. After this checkpoint receives two all-zero contract reviews, create only the new R8
+runner source. It may mechanically carry the accepted R7 source into the fresh R8 filename and
+namespace/schema strings, and may remove only the two raw working-tree byte-equality comparisons
+from `assertPinnedBlob` and `assertPinnedModuleClosure`. It must retain no-follow path checks,
+Git blob/hash/closure checks, the later Git-clean/untracked checks, strict CLI/input validation,
+and every task/store/publication boundary. No R8 mode, input artifact, task, Store/proof, or
+product action is authorized until new parser/static reviews and a later R8 command contract.
