@@ -3652,6 +3652,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next: commit only four authority docs and obtain two independent all-zero R15 reviews.
   Static source and all execution/product/player-acceptance action remain closed.
 
+### F4E-R7B static validator acceptance
+
+- Source `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-r7.mjs`
+  is frozen at 69,752 UTF-8 no-BOM/LF-only bytes / SHA-256
+  `A76341A00FDA8ADDE7EF6EA7CBF83F2E6A1530E751A86F9BDB2CFD05F9191FB8`.
+- Parser-only syntax check plus independent integrity and lifecycle reviews are all-zero.
+  No validator mode, Task, Store/proof, candidate, terminal, product, browser, or player action ran.
+- Next: four-document command/final-HEAD pin for a single no-write preflight; source is immutable.
+
 ### F4E-R7B R14 replay-encoding correction
 
 - Self-audit finds certificate `replay` is an object. R14 freezes its only valid input binding as

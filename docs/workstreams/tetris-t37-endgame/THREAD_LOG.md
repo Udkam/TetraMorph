@@ -1237,3 +1237,13 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   accepted. Static source authoring opens only for the external validator/worker; no mode,
   Task/other artifact, proof, product, or player-acceptance action is authorized.
 - Sole next action: create static source and request independent review without execution.
+
+### F4E-R7B static validator acceptance
+
+- External source only: `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-
+  validate-r7.mjs`, 69,752 UTF-8 no-BOM/LF-only bytes, SHA-256
+  `A76341A00FDA8ADDE7EF6EA7CBF83F2E6A1530E751A86F9BDB2CFD05F9191FB8`.
+- Parser-only syntax check and independent integrity/lifecycle static reviews are each
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`. No mode, Task, mutable artifact, proof, or product work ran.
+- Sole next action: commit these four authority docs, then freeze one command/final HEAD for a
+  no-write preflight. Source authoring is closed.
