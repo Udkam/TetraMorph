@@ -10653,14 +10653,16 @@ is therefore intentionally visible in the immutable task action, must hash to th
 field, and must not be copied to stdout, candidate, terminal, or error text.
 
 `parameters` is exactly `{nodePath,nodeVersion,nodeFlags,heapLimitBytes,inputDomainJsonBase64,
-inputDomainSha256,inputSha256}`. `nodeFlags` is the ordered two-string array already fixed for the task;
+inputDomainSha256,inputPath,inputSha256}`. `nodeFlags` is the ordered two-string array already fixed for the task;
 `heapLimitBytes` is positive and must equal the result of the frozen no-proof heap probe under
 those flags; `inputDomainJsonBase64` decodes to a canonical JSON object with exact key set
 `{schema,baseLevelId,candidateCountLimit,setupDropCount,targetRows,minimumLocks,maximumLocks,
 commandAlphabet}` and types string, string, positive safe integer, positive safe integer,
 positive safe integer, nonnegative safe integer, nonnegative safe integer, string respectively.
 Its `schema` is `t37-f4e-r7-intro05-domain-v1`, `commandAlphabet` is nonempty distinct ASCII,
-and `inputDomainSha256` hashes the decoded canonical JSON bytes. `inputSha256` is the uppercase
+and `inputDomainSha256` hashes the decoded canonical JSON bytes. `inputPath` is the exact
+resolved absolute plain regular-file `--input` path verified by outer before attempt claim.
+`inputSha256` is the uppercase
 SHA-256 of the complete canonical `--input` bytes and must equal `--expect-input-sha`; the future
 command pin chooses the values but may not change this shape.
 
@@ -10673,7 +10675,8 @@ definition must have `id === baseLevelId`, exactly `setupDropCount` placements, 
 `targetRows`, and the replay lock count must be in the inclusive
 `minimumLocks..maximumLocks` domain. `candidateCountLimit` is fixed to literal `1`: an input
 does not hide a generator, chooser, tie-breaker, or alternate level. The worker first verifies
-all of those input/domain facts, rereads the input regular-file bytes and proves the same
+all of those input/domain facts, rereads only `attempt.parameters.inputPath` as a no-follow
+regular file and proves the same
 canonical bytes/hash before Store creation, then calls only the captured Core
 `advanceOptimalEndgameRouteProofForDefinition` and the public
 `createResumableEndgameDiskFrontierStore` checkpoint methods with this literal
@@ -10862,3 +10865,11 @@ R13 initially described the certificate replay as a command string; captured Cor
 an `EndgameRouteReplay` object. R14 fixes the only valid comparison/reconstruction to
 `encodeEndgameRoute(certificate.replay.commands)`. Commit only the four authority documents and
 obtain two fresh all-zero R14 reviews before static source authoring; execution remains closed.
+
+### F4E-R7B R14 detached-worker rejection — R15 input-path correction
+
+R14 binds input bytes but does not give the detached worker an immutable path to reread them.
+R15 adds the exact validated `inputPath` to attempt parameters while retaining the small fixed
+Task worker action; worker may read only that no-follow regular path and must hash-equal it
+before Store construction. Commit only the four authority documents and obtain two all-zero R15
+reviews before static source authoring; execution remains closed.

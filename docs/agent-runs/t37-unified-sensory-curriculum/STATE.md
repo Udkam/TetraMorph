@@ -3639,6 +3639,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next: commit only the four authority docs and obtain two independent all-zero R13 reviews.
   Static source and all execution/product/player-acceptance action remain closed.
 
+### F4E-R7B R15 input-path correction
+
+- R14 lifecycle review finds worker has input hash but no immutable input locator. R15 writes
+  validated absolute regular `inputPath` into attempt parameters; worker reads only it
+  no-follow and hash-equals before Store creation, without widening the Task action.
+- Next: commit only four authority docs and obtain two independent all-zero R15 reviews.
+  Static source and all execution/product/player-acceptance action remain closed.
+
 ### F4E-R7B R14 replay-encoding correction
 
 - Self-audit finds certificate `replay` is an object. R14 freezes its only valid input binding as

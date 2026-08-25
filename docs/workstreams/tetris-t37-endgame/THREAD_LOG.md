@@ -1224,3 +1224,11 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   canonical input reconstruction.
 - Changed paths are exactly four authority docs; no source/artifact/mode/task/proof occurred.
 - Sole next action: commit and independently review R14 twice, then reopen static source only.
+
+### F4E-R7B R15 input-path correction
+
+- R14 lifecycle review finds detached worker cannot perform its required reread from hash alone.
+  R15 freezes the outer-verified canonical `inputPath` inside immutable attempt parameters;
+  worker reads only this no-follow regular path and verifies hash before Store work.
+- Changed paths are exactly four authority docs; no source/artifact/mode/task/proof occurred.
+- Sole next action: commit and independently review R15 twice, then reopen static source only.
