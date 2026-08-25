@@ -10799,3 +10799,15 @@ The only next execution is one corrected-runner `--preflight` at the committed c
 literal current lowercase HEAD, with those exact input/domain values. It is no-write and opens no
 outer/worker/Task/Store/proof/product path. First rehash source/input and prove exclusive input
 creation; a failure stops the chain rather than authorizing a retry.
+
+### 2026-08-25 F4E-R7B R18 input-materialization correction
+
+The R17 input path is retained, never replaced or deleted: it is 1,182 valid-format bytes but
+its SHA-256 `A76A137B263E1CC7C6E681C806CCA09A17D71C2D9B35F8B45D09853D648548A7` and decoded definition
+SHA-256 `A3BF286299B8E3FA2F485A8D84243A59595E2FE4B4F8139751D9E92048A1E365` miss both frozen pins.
+No runner mode or proof-adjacent operation ran. After independent review, only a new absent path
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r7-intro05-input-r2.json` may be
+created from locally recomputed canonical R17 content and must match the original 1,182-byte /
+`572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4` and 682-byte definition /
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16` pins. Then, and only then,
+one new literal-HEAD no-write preflight is eligible.

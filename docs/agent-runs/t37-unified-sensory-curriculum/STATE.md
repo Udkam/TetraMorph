@@ -3704,3 +3704,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next only after two all-zero R17 contract reviews: one literal-HEAD corrected-runner
   `--preflight`, with pre/post hash and absence checks. It is no-write; outer/worker/task/Store/
   proof/product actions remain closed, and failure consumes no retry authority.
+
+### F4E-R7B R18 input-materialization mismatch
+
+- R17's created input is retained at its original path with no overwrite/delete. It is 1,182
+  UTF-8/no-BOM/LF bytes but hashes `A76A137B263E1CC7C6E681C806CCA09A17D71C2D9B35F8B45D09853D648548A7`;
+  decoded definition hashes `A3BF286299B8E3FA2F485A8D84243A59595E2FE4B4F8139751D9E92048A1E365`.
+- No runner mode, task, Store, proof, v7 mutable record, or product action ran. It is not a proof
+  retry or consumption.
+- Post-review only, create fresh `...t37-f4e-endgame-r7-intro05-input-r2.json` from locally
+  recomputed R17 canonical payload and require the original `572AD3...C8CF4` / `DB814F...80A16`
+  input/definition pins before one R18 literal-HEAD no-write preflight. Old path stays excluded.

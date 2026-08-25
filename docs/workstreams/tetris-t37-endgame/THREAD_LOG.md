@@ -1280,3 +1280,14 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Then run exactly one corrected-runner `--preflight` with literal current checkpoint HEAD,
   root/input/domain/input-SHA pins and pre/post hash/absence audit. It creates no task, Store,
   proof, candidate, terminal, stage, or product artifact. Any failure stops rather than retries.
+
+### F4E-R7B R18 input-materialization mismatch and path correction
+
+- The R17 input is retained (no overwrite/delete) as non-proof evidence: 1,182 UTF-8/no-BOM/LF
+  bytes / `A76A137B263E1CC7C6E681C806CCA09A17D71C2D9B35F8B45D09853D648548A7`; its decoded definition
+  is `A3BF286299B8E3FA2F485A8D84243A59595E2FE4B4F8139751D9E92048A1E365`, so it fails both R17 pins.
+  No mode/task/Store/proof/mutable v7 or product action occurred.
+- After this contract is reviewed, only a fresh absent `...-input-r2.json` path may be created
+  from locally recomputed canonical R17 bytes, with exact input pin `572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4`
+  and definition pin `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16` before an R18
+  literal-HEAD no-write preflight. The mismatch remains excluded; it is not a retry.

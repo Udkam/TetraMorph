@@ -10949,3 +10949,23 @@ the command, independently rehash the input and runner and prove the input path 
 exclusive creation; after it, retain only the no-write exit/output observation. No `--outer`,
 `--worker`, Task Scheduler operation, Store/proof, candidate/terminal/stage, or product action is
 authorized. A nonzero preflight is a fail-closed stop, not a retry authorization.
+
+### F4E-R7B R18 input-materialization mismatch and fresh-path correction
+
+R17's first external input materialization is retained as immutable non-proof evidence, not
+overwritten or deleted. The path
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r7-intro05-input.json` is 1,182
+UTF-8/no-BOM/LF bytes but hashes to
+`A76A137B263E1CC7C6E681C806CCA09A17D71C2D9B35F8B45D09853D648548A7`, with decoded definition
+hash `A3BF286299B8E3FA2F485A8D84243A59595E2FE4B4F8139751D9E92048A1E365`; neither equals the R17
+pin. No runner mode, task, Store, proof, candidate, terminal, stage, or product action ran.
+
+This is an input-transport correction before any preflight, not a proof retry or v7 consumption.
+After this four-document checkpoint is independently accepted, create only the previously absent
+plain regular path `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r7-intro05-input-r2.json`
+from the canonical 1,182-byte payload already frozen in R17; it must hash exactly
+`572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4` and its decoded definition
+must be 682 bytes / `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`.
+Generate the patch content directly from a locally recomputed canonical payload, then verify
+byte-for-byte before the sole R18 literal-HEAD `--preflight`. The old mismatch is neither an
+input nor mutable R7 namespace residue; it remains excluded from every validator argument.
