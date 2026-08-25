@@ -10848,3 +10848,11 @@ static reviews are all-zero. R22 next opens only fresh
 `CC9046EF8954FF932D0170F00BB12D919DE6425F2C18582AD4B07A0C4AF60AB4` (Base64 in DESIGN).
 After review, only one literal-current-HEAD R8 no-write preflight is allowed; outer/worker and
 product actions remain closed.
+
+### 2026-08-25 F4E-R8 R23 malformed preflight / R9 successor
+
+R8's one `--preflight` received a malformed, too-short input SHA and failed in argument syntax
+before `preflight()`; no mutable action ran. R8 and its correct retained input are closed and may
+not be reused. After review, only new R9 static source at `...validate-r9.mjs`/fresh r9 namespace
+may be mechanically copied from accepted R8 identity/schema names. No R9 mode/input/task/Store/
+proof/product action opens.

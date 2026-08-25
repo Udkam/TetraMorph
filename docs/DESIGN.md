@@ -11046,3 +11046,20 @@ It freezes the same base level, count one, alphabet `SQLHTCR`, setup 8, target 4
 The one allowed R8 `--preflight` takes those literal input/domain/SHA values and the literal
 current lowercase HEAD of this committed checkpoint. It is no-write/no-task/no-Store/no-proof;
 nonzero is fail-closed with no retry. R8 `--outer`/`--worker` and all product paths remain closed.
+
+### F4E-R8 R23 consumed malformed preflight and fresh R9 static contract
+
+R8 `--preflight` was invoked once at HEAD `346f47cd2e787a05764ec12eeff7a15b92198cfc` with a
+malformed (too-short) `--expect-input-sha`. The runner rejected argument syntax before
+`parseSharedArguments` could enter `preflight()`: `T37 R8 fail-closed: preflight arguments have
+invalid absolute path or hash syntax`. The retained R8 input is correct at 1,182 bytes /
+`8154EAC8B47DE46193A40C033A0DC7EC9B6DDF0F1CA1B0323A3077D71313209D`; no R8 attempt, candidate,
+result, terminal, stage, task, Store, proof, or product action exists. R8 is nonetheless closed:
+neither a corrected command nor its input may be reused.
+
+R9 opens fresh static source only after this checkpoint's two all-zero reviews. New absent names
+are `t37-f4e-endgame-canonical-validate-r9.mjs`, `...attempt-r9.json`, `...candidate-r9.json`,
+`...worker-result-r9.json`, `...terminal-r9.json`, and `...frontier-stage-r9`. The only allowed
+source operation is a mechanical R8-to-R9 identity/schema/namespace copy of the accepted R8
+runner. It must not alter no-follow, blob/hash/closure, clean-source, CLI, task, Store, proof, or
+publication behavior; no R9 mode, input, task, Store/proof, or product action is open.

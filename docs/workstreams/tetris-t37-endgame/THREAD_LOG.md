@@ -1328,3 +1328,11 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`; domain 191 /
   `CC9046EF8954FF932D0170F00BB12D919DE6425F2C18582AD4B07A0C4AF60AB4`.
 - Then one literal-HEAD R8 no-write preflight only. No outer/worker/task/Store/proof/product action.
+
+### F4E-R8 R23 malformed preflight and R9 static contract
+
+- R8 preflight was invoked once with a too-short input SHA and rejected during argument parsing,
+  before `preflight()`/any mutable action. Correct retained R8 input and R8 are closed; no retry.
+- Post-review only create fresh `...validate-r9.mjs` plus r9 namespace through mechanical R8-to-R9
+  identity/schema replacement. Preserve all behavior/boundaries; no R9 mode/input/task/Store/
+  proof/product action opens.

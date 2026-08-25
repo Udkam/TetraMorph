@@ -3755,3 +3755,11 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`; domain 191 /
   `CC9046EF8954FF932D0170F00BB12D919DE6425F2C18582AD4B07A0C4AF60AB4`.
 - Then only one literal-HEAD R8 no-write preflight; outer/worker/task/Store/proof/product closed.
+
+### F4E-R8 R23 malformed preflight and R9 successor
+
+- R8 `--preflight` at `346f47cd2e787a05764ec12eeff7a15b92198cfc` had a too-short input SHA and
+  failed argument parsing before `preflight()`; R8 input remains correct but both are closed.
+  No mutable R8 object/task/Store/proof/product action ran.
+- Post-review only, create new R9 static runner/fresh r9 namespace by mechanical R8-to-R9 identity
+  replacement. No other code/flow change and no R9 mode/input/task/Store/proof/product action.
