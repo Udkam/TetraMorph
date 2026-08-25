@@ -3682,3 +3682,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   `placements` count equals `setupDropCount`; preserve every other static and no-production
   boundary. Then parser-only syntax plus two independent all-zero source reviews. Command pin,
   input artifact, and preflight remain closed.
+
+### F4E-R7B R16 corrected static acceptance
+
+- Same-path corrected source: 69,932 UTF-8 no-BOM/LF-only bytes / SHA-256
+  `50BA9B1BD5B621F90D0DF9AB95D39803941330C0661A2023367240B44B809AD8`.
+- Parser-only syntax and independent integrity/lifecycle reviews are each
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`; no mode, artifact, task, Store/proof, or product action ran.
+- Source is closed and immutable. Next: four-document input/command/final-HEAD pin, then its
+  independent review before any one input artifact or no-write preflight.

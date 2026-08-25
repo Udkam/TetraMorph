@@ -10775,3 +10775,10 @@ and its `placements.length === setupDropCount`. It must retain the existing oute
 set and all no-production restrictions. A parser-only check and two independent all-zero static
 reviews are mandatory before a new command/final-HEAD pin; no input artifact or preflight is
 authorized in this correction checkpoint.
+
+R16 corrected static source is accepted at 69,932 UTF-8 no-BOM/LF-only bytes / SHA-256
+`50BA9B1BD5B621F90D0DF9AB95D39803941330C0661A2023367240B44B809AD8` after parser-only syntax
+and independent integrity/lifecycle reviews, each `P0/P1/P2/P3/GAP = 0/0/0/0/0`. It now admits
+only the true `{ seed, placements }` setup history with a nonzero uint32 seed and the exact
+placement count; no mode or mutable artifact was created. Source is closed again. The next
+checkpoint must separately pin input bytes, command, and final HEAD before any preflight.

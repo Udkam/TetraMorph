@@ -10909,3 +10909,12 @@ fields, generate a candidate, load a retired clue/v6 artifact, invoke any valida
 register a task, create a Store, or run a proof. It requires a new parser-only syntax check and
 two independent all-zero source/behavior reviews. Only then may a fresh four-document
 command/final-HEAD pin reopen one no-write preflight.
+
+The R16 correction is static-accepted at the same path: 69,932 UTF-8 no-BOM/LF-only bytes,
+SHA-256 `50BA9B1BD5B621F90D0DF9AB95D39803941330C0661A2023367240B44B809AD8`.
+`node --check` passes. Independent integrity and lifecycle reviews are each
+`P0/P1/P2/P3/GAP = 0/0/0/0/0`; they confirm the fixed outer key set, strict
+`{ seed, placements }` setup history, nonzero uint32 setup seed, and exact placement count, with
+no top-level mode or publication side effect. Static source is again closed and immutable. The
+next action is a separate four-document command/input/final-HEAD pin; no input artifact or mode
+is authorized by this acceptance alone.

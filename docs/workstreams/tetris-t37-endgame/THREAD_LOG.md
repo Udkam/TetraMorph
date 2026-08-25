@@ -1259,3 +1259,11 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   strict `{ seed, placements }` validation and `placements.length === setupDropCount`, without
   widening fields or invoking a mode. Require syntax and two independent all-zero static reviews
   before any new four-document command/final-HEAD pin. All other paths stay closed.
+
+- R16 corrected static source is accepted at 69,932 UTF-8 no-BOM/LF-only bytes /
+  `50BA9B1BD5B621F90D0DF9AB95D39803941330C0661A2023367240B44B809AD8`.
+  Parser-only syntax plus independent integrity and lifecycle reviews are all-zero. The narrowed
+  setup object/count correction is the only source change; no mode, artifact, task, Store/proof,
+  or product action ran.
+- Static source is closed. Sole next action: author and independently review a four-document
+  canonical input/command/final-HEAD pin before making one input artifact or preflight.
