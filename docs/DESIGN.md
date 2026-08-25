@@ -11008,3 +11008,19 @@ the two raw worktree-versus-blob equality checks, while retaining blob/hash/clos
 and requiring the existing tracked/untracked `src`/`scripts` clean checks before any Vite or
 adapter load. Commit these four documents and obtain two fresh all-zero reviews before creating
 the R8 static source; every R8 mode, input, task, Store/proof, and product action remains closed.
+
+### F4E-R8 R21 static-review rejection and isolation correction
+
+The first R8 static candidate `AC47F93D976DE6D8F4DC3E648DF0F86A4A6BE7F56F48EA142C6F60A604C257A8`
+is rejected before execution at independent `0/1/0/0/0` and `0/1/0/0/0`. It removed the adjacent
+`livePath`/`readRegularNoFollow` calls rather than only the two byte-equality `if`s, losing the
+required no-follow checks; and its broad canonical prefix treats retained R7 runner evidence as
+foreign R8 residue, making a future R8 preflight fail closed. No R8 mode, input, task, Store,
+proof, candidate, terminal, stage, or product action ran.
+
+Only the existing R8 static-source path reopens. Restore both original no-follow reads (their
+values may remain unused) while removing only equality decisions. Replace the broad namespace
+matcher with an R8-suffix matcher that includes every canonical basename/owned part containing
+`-r8` but excludes every retained `-r7` and R1–R6 record; an unknown `-r8` entry remains foreign
+and fatal. It must not change schemas, task/proof/publication flow, or any runtime mode. New
+syntax and two independent all-zero static reviews are mandatory before R8 command/input authority.

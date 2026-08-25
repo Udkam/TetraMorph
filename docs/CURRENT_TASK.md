@@ -10829,3 +10829,12 @@ the Git-clean working tree rather than executing `git cat-file` bytes. The EOL f
 stands. Before any R8 source creation, R20 requires that removing the two raw byte comparisons
 still preserves blob/hash/closure verification and the existing tracked/untracked `src`/`scripts`
 clean gate before module loading. Re-review four docs; all R8 execution remains closed.
+
+### 2026-08-25 F4E-R8 R21 static correction
+
+R8 static candidate is rejected twice at `0/1/0/0/0` before execution: it dropped no-follow reads
+along with the two EOL equality decisions, and its broad namespace catches retained R7 runner
+evidence as R8 residue. Reopen only that R8 static source to restore both no-follow reads without
+equality decisions and match only `-r8` canonical/part entries; R7 and R1–R6 remain excluded.
+No schema/flow/mode or product change is allowed. Syntax plus two static all-zero reviews precede
+any R8 command or input authority.

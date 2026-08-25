@@ -1310,3 +1310,12 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - R20 keeps blob/hash/closure and tracked/untracked `src`/`scripts` clean gates before module
   loading; only the two raw byte equality checks may be removed. Re-review docs before any R8
   source. All R8 modes/artifacts remain closed.
+
+### F4E-R8 R21 static-review rejection and repair boundary
+
+- R8 static `AC47F93D...C257A8` receives independent `0/1/0/0/0` twice before execution: it
+  removes no-follow reads as well as comparisons, and broad prefix namespace checks classify the
+  retained R7 runner as foreign R8 residue.
+- Reopen only same R8 source: restore no-follow reads (unused result is allowed), remove only
+  equality decisions, and limit matcher to `-r8` canonical/part names while R7/R1-R6 stay out;
+  unknown r8 remains fatal. No flow/schema/mode change. Syntax plus two all-zero reviews required.

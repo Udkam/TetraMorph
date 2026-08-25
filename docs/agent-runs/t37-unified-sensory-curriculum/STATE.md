@@ -3735,3 +3735,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - EOL diagnosis and R7 closure stand. R20 preserves blob/hash/closure plus tracked/untracked
   `src`/`scripts` clean gates before any load, and removes only two raw byte comparisons.
 - Commit/review this wording before R8 static source creation. All R8 modes/artifacts remain closed.
+
+### F4E-R8 R21 static-review rejection
+
+- R8 candidate `AC47F93D...C257A8` is rejected before execution at two `0/1/0/0/0` reviews:
+  it removed no-follow reads with raw equality checks and broad prefix isolation absorbs retained
+  R7 runner evidence as foreign R8 residue.
+- Only same R8 source reopens: restore no-follow reads but not equality decisions; match canonical
+  R8/owned-part `-r8` entries only, excluding R7/R1-R6 while retaining unknown-r8 collision.
+- No mode/input/task/Store/proof/product change. Require syntax and two new all-zero static reviews.
