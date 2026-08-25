@@ -10761,3 +10761,17 @@ validate-r7.mjs` is 69,752 UTF-8 no-BOM/LF-only bytes, SHA-256
 independent integrity/lifecycle reviews are all-zero. Do not modify or execute it. Next, freeze
 only the command and final HEAD in the four authority documents for one no-write preflight.
 Task/Store/proof/product/audio/browser/player acceptance remain closed.
+
+### 2026-08-25 F4E-R7B R16 static-schema correction
+
+The preceding static acceptance is superseded before execution. Direct reconciliation against
+the current Core shows that its input checker incorrectly demands `definition.setup` be an array;
+the actual `EndgameDefinition` passed to Core is `{ seed, placements }`. The former source could
+therefore preflight a value that fails on Worker replay. No mode, Task Scheduler operation, Store,
+proof, candidate, stage, terminal, product, or player action occurred.
+
+Only the existing static source path reopens, solely to validate the exact setup-history object
+and its `placements.length === setupDropCount`. It must retain the existing outer definition key
+set and all no-production restrictions. A parser-only check and two independent all-zero static
+reviews are mandatory before a new command/final-HEAD pin; no input artifact or preflight is
+authorized in this correction checkpoint.

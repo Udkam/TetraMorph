@@ -1247,3 +1247,15 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   `P0/P1/P2/P3/GAP = 0/0/0/0/0`. No mode, Task, mutable artifact, proof, or product work ran.
 - Sole next action: commit these four authority docs, then freeze one command/final HEAD for a
   no-write preflight. Source authoring is closed.
+
+### F4E-R7B R16 static-schema rejection and correction contract
+
+- Static source/Core reconciliation rejects `A76341A00FDA8ADDE7EF6EA7CBF83F2E6A1530E751A86F9BDB2CFD05F9191FB8`
+  before execution: its input parser treats `definition.setup` as an array, while the captured
+  Core replays an `EndgameDefinition.setup` object `{ seed, placements }`.
+- No mode, task, Store, proof, candidate/result/terminal/stage, input artifact, or product/player
+  action occurred. This is not a consumed proof attempt and v6 remains excluded.
+- Exact opened path: the existing external static source only. Replace that type mismatch with
+  strict `{ seed, placements }` validation and `placements.length === setupDropCount`, without
+  widening fields or invoking a mode. Require syntax and two independent all-zero static reviews
+  before any new four-document command/final-HEAD pin. All other paths stay closed.

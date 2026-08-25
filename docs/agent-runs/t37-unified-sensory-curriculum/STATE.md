@@ -3668,3 +3668,17 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   reconstruction hash.
 - Next: commit only four authority docs and obtain two independent all-zero R14 reviews.
   Static source and all execution/product/player-acceptance action remain closed.
+
+### F4E-R7B R16 static-schema rejection
+
+- Coordinator source/Core reconciliation found the static source's `minimalEndgameDefinition`
+  expects `definition.setup` as an array, whereas current Core requires the setup-history object
+  `{ seed, placements }`. A preflight could otherwise accept an input which fails immediately on
+  Worker replay.
+- No validator mode, task, Store, proof, mutable v7 record, or product action ran. The static
+  acceptance at `A76341...191FB8` is rejected before consumption, and no retry/cleanup question
+  arises.
+- Open only same-path static source correction: validate the exact setup object and require its
+  `placements` count equals `setupDropCount`; preserve every other static and no-production
+  boundary. Then parser-only syntax plus two independent all-zero source reviews. Command pin,
+  input artifact, and preflight remain closed.

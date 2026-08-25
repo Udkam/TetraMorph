@@ -10888,3 +10888,24 @@ Its parser-only syntax check and independent integrity/lifecycle reviews are eac
 Static authoring is closed and the source is immutable. The sole next action is a four-document
 command/final-HEAD pin for one no-write preflight; every validator mode, Task operation, other
 artifact, Store/proof, product/UI/sensory/browser action, and player acceptance remains closed.
+
+### F4E-R7B R16 static-schema rejection and correction boundary
+
+Before any command pin or validator mode, coordinator source/Core reconciliation found a fatal
+static defect in `A76341A00FDA8ADDE7EF6EA7CBF83F2E6A1530E751A86F9BDB2CFD05F9191FB8`:
+`minimalEndgameDefinition` requires `definition.setup` to be an array, while current Core's
+`EndgameDefinition` and `replayEndgameRouteForDefinition` require the immutable setup-history
+object `{ seed, placements }`. This would admit a non-Core-shaped input during preflight and then
+fail before the worker can replay or certify it. No validator mode, Task Scheduler action, Store,
+proof, candidate, terminal, stage, or product path ran, so no v7 consumption boundary exists.
+
+The prior static acceptance is therefore rejected, not grandfathered. The sole allowed follow-up
+is a same-path source correction in
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r7.mjs`:
+replace only that minimal schema check with exact object validation for `setup.seed` and
+`setup.placements`, preserving the existing exact outer definition key set, and require the
+placement count to equal `setupDropCount`. The correction must not broaden accepted definition
+fields, generate a candidate, load a retired clue/v6 artifact, invoke any validator mode,
+register a task, create a Store, or run a proof. It requires a new parser-only syntax check and
+two independent all-zero source/behavior reviews. Only then may a fresh four-document
+command/final-HEAD pin reopen one no-write preflight.
