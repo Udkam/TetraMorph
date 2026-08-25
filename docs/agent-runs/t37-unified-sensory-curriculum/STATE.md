@@ -3691,3 +3691,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   `P0/P1/P2/P3/GAP = 0/0/0/0/0`; no mode, artifact, task, Store/proof, or product action ran.
 - Source is closed and immutable. Next: four-document input/command/final-HEAD pin, then its
   independent review before any one input artifact or no-write preflight.
+
+### F4E-R7B R17 canonical input/preflight contract
+
+- Post-review only, create one absent external input at
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r7-intro05-input.json`: 1,182 canonical
+  UTF-8/no-BOM/LF bytes / `572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4`.
+  It is one `t3r-shaft-04` primary seven-lock proposal; definition payload is 682 bytes /
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`.
+- Domain is 191 bytes / `537C4995054430B238F6252CE7675304E2CD32571FAE759A38698E9B553681F8`, Base64
+  `eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yNy1pbnRybzA1LWRvbWFpbi12MSIsInNldHVwRHJvcENvdW50Ijo4LCJ0YXJnZXRSb3dzIjo0fQo=`.
+- Next only after two all-zero R17 contract reviews: one literal-HEAD corrected-runner
+  `--preflight`, with pre/post hash and absence checks. It is no-write; outer/worker/task/Store/
+  proof/product actions remain closed, and failure consumes no retry authority.

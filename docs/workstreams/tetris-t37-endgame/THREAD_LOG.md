@@ -1267,3 +1267,16 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   or product action ran.
 - Static source is closed. Sole next action: author and independently review a four-document
   canonical input/command/final-HEAD pin before making one input artifact or preflight.
+
+### F4E-R7B R17 canonical input and no-write preflight contract
+
+- After commit plus two all-zero reviews only, create exactly one absent external input:
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r7-intro05-input.json`, 1,182 canonical
+  UTF-8/no-BOM/LF bytes / `572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4`.
+  It binds the sole `t3r-shaft-04` primary route and 682-byte definition payload
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`.
+- Frozen domain: 191 bytes / `537C4995054430B238F6252CE7675304E2CD32571FAE759A38698E9B553681F8`, Base64
+  `eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yNy1pbnRybzA1LWRvbWFpbi12MSIsInNldHVwRHJvcENvdW50Ijo4LCJ0YXJnZXRSb3dzIjo0fQo=`.
+- Then run exactly one corrected-runner `--preflight` with literal current checkpoint HEAD,
+  root/input/domain/input-SHA pins and pre/post hash/absence audit. It creates no task, Store,
+  proof, candidate, terminal, stage, or product artifact. Any failure stops rather than retries.

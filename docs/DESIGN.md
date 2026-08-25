@@ -10918,3 +10918,34 @@ SHA-256 `50BA9B1BD5B621F90D0DF9AB95D39803941330C0661A2023367240B44B809AD8`.
 no top-level mode or publication side effect. Static source is again closed and immutable. The
 next action is a separate four-document command/input/final-HEAD pin; no input artifact or mode
 is authorized by this acceptance alone.
+
+### F4E-R7B R17 canonical input and preflight command contract
+
+After this four-document checkpoint is committed and independently accepted, the coordinator may
+create exactly one previously absent, plain, no-follow regular input file at
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r7-intro05-input.json`. Its bytes are
+the 1,182-byte canonical UTF-8/no-BOM/LF JSON with SHA-256
+`572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4`. It has recursively ordinal
+JSON keys `{candidate,schema}`, schema `t37-f4e-r7-intro05-input-v1`, the frozen primary route
+`SQLHTTTQLHTTTCLLHTTTRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRHTTTTTTTTTTTTLLLLHTTTTTTTTTTTT`, and
+the 682-byte definition payload SHA-256
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`. That payload is the sole
+`t3r-shaft-04` / `后手` / difficulty 5 definition: seed 3887; setup seed 37220 with exactly
+`I0@5,T0@2,S0@4,L0@0,J2@7,Z0@2,O0@0,L2@7`; target rows 4; empty hidden/anchor arrays; and the
+twenty rows ending `OOZZ...LLL`, `OOLZZSSL..`, `LLLTSS.JJJ`, `..TTTIIIIJ`.
+
+The sole domain argument is 191 canonical bytes / SHA-256
+`537C4995054430B238F6252CE7675304E2CD32571FAE759A38698E9B553681F8`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yNy1pbnRybzA1LWRvbWFpbi12MSIsInNldHVwRHJvcENvdW50Ijo4LCJ0YXJnZXRSb3dzIjo0fQo=`.
+It freezes base level `t3r-shaft-04`, one candidate, alphabet `SQLHTCR`, setup count 8, target
+rows 4, and inclusive lock bounds 5..7.
+
+The one allowed no-write command is the corrected 69,932-byte runner with `--preflight`, root
+`E:\\Proj\\reproduction-tetris`, that exact input path, the literal domain Base64, the exact
+uppercase input SHA above, and the literal lowercase current `git rev-parse --verify HEAD` of
+this committed checkpoint. It must be assembled only after this commit without any subsequent
+repository change, use no shell substitution in the runner argv, and be executed once. Before
+the command, independently rehash the input and runner and prove the input path was absent before
+exclusive creation; after it, retain only the no-write exit/output observation. No `--outer`,
+`--worker`, Task Scheduler operation, Store/proof, candidate/terminal/stage, or product action is
+authorized. A nonzero preflight is a fail-closed stop, not a retry authorization.

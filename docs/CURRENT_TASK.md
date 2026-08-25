@@ -10782,3 +10782,20 @@ and independent integrity/lifecycle reviews, each `P0/P1/P2/P3/GAP = 0/0/0/0/0`.
 only the true `{ seed, placements }` setup history with a nonzero uint32 seed and the exact
 placement count; no mode or mutable artifact was created. Source is closed again. The next
 checkpoint must separately pin input bytes, command, and final HEAD before any preflight.
+
+### 2026-08-25 F4E-R7B R17 canonical input/preflight pin
+
+After this checkpoint's independent review only, create one absent external input:
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r7-intro05-input.json`, canonical
+1,182 UTF-8/no-BOM/LF bytes / SHA-256
+`572AD3D04E14C47765A9544119911FF214B04CAA9C1BD9F9F5B510EC855C8CF4`. It freezes the sole
+five-to-seven-lock primary Intro-05 route, `t3r-shaft-04` 682-byte definition hash
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`, the eight canonical setup
+drops, four bottom target rows, and empty hidden/anchor arrays. Domain bytes are 191 /
+`537C4995054430B238F6252CE7675304E2CD32571FAE759A38698E9B553681F8`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yNy1pbnRybzA1LWRvbWFpbi12MSIsInNldHVwRHJvcENvdW50Ijo4LCJ0YXJnZXRSb3dzIjo0fQo=`.
+
+The only next execution is one corrected-runner `--preflight` at the committed checkpoint's
+literal current lowercase HEAD, with those exact input/domain values. It is no-write and opens no
+outer/worker/Task/Store/proof/product path. First rehash source/input and prove exclusive input
+creation; a failure stops the chain rather than authorizing a retry.
