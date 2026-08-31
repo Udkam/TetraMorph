@@ -11015,3 +11015,13 @@ no output. Input remains 1,183 bytes / `3A1F4E49…52874`; only R13 source/input
 task/process/Store/proof/product action ran. It is consumed. The sole next action is one audited
 outer with this immutable input/domain and a fresh literal current HEAD; all other paths remain
 closed pending its terminal disposition.
+
+### 2026-09-01 F4E-R13 R40 consumed outer / R14 Arguments successor
+
+R13 outer at `eda95d2a9bd8bd8023ee289f25d78f70c3994907` created immutable 3,025-byte
+`EA0CD747…EFF0D` attempt / `r13-2cc8ad615fdf5e1b93288a6d` and a disabled task, then stopped
+before start/worker/Store/proof on XML field round-trip. Candidate/result/terminal/stage/process
+are absent; retain it unchanged. The only mismatch is encoded action quotes registered as `&quot;`
+but exported as literal quotes. After fresh review only, R14 may mechanically isolate R13→R14 and
+change only that exact Arguments comparison; all other guards and all R14 input/execution paths
+remain closed.

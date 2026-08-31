@@ -1546,3 +1546,17 @@ product path is open.
   action. Preflight is consumed and cannot rerun.
 - Next action: one separately audited R13 outer with immutable input/domain and a fresh literal
   current HEAD; all other modes and product paths remain closed pending terminal disposition.
+
+### F4E-R13 R40 consumed outer / R14 Arguments successor
+
+- R13 outer at literal HEAD `eda95d2a9bd8bd8023ee289f25d78f70c3994907` published immutable
+  3,025-byte / `EA0CD747D30C600E1D265B61822404BAEAF11C8D24CF6683BB036E47435EFF0D` attempt,
+  run `r13-2cc8ad615fdf5e1b93288a6d`, and a Disabled task. It stopped before start/worker/Store/
+  proof at `Task Scheduler XML field round trip differs`; candidate/result/terminal/stage/process
+  absent. Do not alter/retry/resume/delete R13.
+- Read-only export audit: UserId/token/default/unique empty trigger/Enabled/Exec/command/working
+  directory/action hash all match. Only `<Arguments>` differs in representation: task XML uses
+  `&quot;`, export emits the same quote characters literally.
+- R14 opens post-review only for fresh mechanical R13→R14 static source/namespace plus that one
+  literal-Arguments comparator correction. All other safeguards and all R14 input/execution/product
+  paths remain closed.

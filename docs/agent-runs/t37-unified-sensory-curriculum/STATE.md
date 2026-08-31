@@ -3949,3 +3949,18 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   exist, and R13 task/process/Store/proof/product actions are absent. It was no-write.
 - Preflight is permanently consumed. Next action is one audited R13 outer only, with immutable
   input/domain and a fresh literal current HEAD; every other path remains closed.
+
+### F4E-R13 R40 consumed outer / R14 Arguments static boundary
+
+- R13 outer ran once at `eda95d2a9bd8bd8023ee289f25d78f70c3994907`, published 3,025-byte
+  `EA0CD747D30C600E1D265B61822404BAEAF11C8D24CF6683BB036E47435EFF0D` attempt /
+  `r13-2cc8ad615fdf5e1b93288a6d`, and registered disabled task
+  `\\TetraMorph\\F4E-R13-Intro05-r13-2cc8ad615fdf5e1b93288a6d`.
+- It fail-closed before enable/start/worker/Store/proof at XML field round trip; candidate/result/
+  terminal/stage and node process are absent. Retain all R13 evidence/task immutable; no retry,
+  resume, delete or repair.
+- Export verifies all task fields except serialized Arguments representation: `&quot;` in registration
+  is emitted as literal quotes. Post-review only R14 may mechanically replace R13 identity/schema/
+  namespace and change only the Arguments exact-fragment comparison to literal `actionArguments`.
+  All remaining XML/source/lifecycle guards and all R14 input/mode/task/Store/proof/product closure
+  remain unchanged.

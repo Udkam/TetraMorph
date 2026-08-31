@@ -11203,6 +11203,25 @@ or product action ran. Preflight is consumed and cannot rerun. The only eligible
 R13 `--outer` with the immutable input/domain and a fresh literal current-HEAD pin; all other modes
 and product paths remain closed pending its audited terminal disposition.
 
+### F4E-R13 R40 consumed outer arguments-serialization interruption / R14 static contract
+
+R13's sole `--outer` used literal HEAD `eda95d2a9bd8bd8023ee289f25d78f70c3994907`, published
+immutable attempt `t37-f4e-endgame-canonical-attempt-r13.json`, 3,025 UTF-8/no-BOM/LF bytes /
+`EA0CD747D30C600E1D265B61822404BAEAF11C8D24CF6683BB036E47435EFF0D`, run
+`r13-2cc8ad615fdf5e1b93288a6d`, and registered disabled task
+`\\TetraMorph\\F4E-R13-Intro05-r13-2cc8ad615fdf5e1b93288a6d`. It stopped before enable/start/
+worker/Store/proof at `Task Scheduler XML field round trip differs`; candidate/result/terminal/
+stage and node process are absent. Retain R13 attempt, input and disabled task unchanged: no retry,
+resume, delete or repair.
+
+The verified export has every task field correct but normalizes the XML entity-encoded action quotes
+to literal quotes inside `<Arguments>`. R14 opens only fresh static source/namespace after two
+all-zero reviews. It may mechanically replace R13 identity/schema/namespace and change only the
+Arguments round-trip comparison from entity-encoded `xmlEscape(actionArguments)` text to the exact
+literal `actionArguments` text emitted by this verified export. Principal/UserId/token/default/
+trigger/Enabled/Exec/command/working-directory/action-hash, source pin and all lifecycle guards
+remain exact. No R14 input, mode, Task Scheduler, Store/proof or product action opens.
+
 ### F4E-R11 R35 malformed input materialization / R12 static successor
 
 R11's authorized materialization created its previously absent input but the patch transport added
