@@ -11236,3 +11236,25 @@ SID fallback. All R10 no-follow, source-pin, strict CLI, XML default/unique empt
 task/store/publication and fail-closed lifecycle guards remain byte-equivalent. The source is
 immutable. A later four-document checkpoint may open only fresh R11 input and one no-write
 preflight; no R11 mode, Task Scheduler, Store/proof or product action is yet authorized.
+
+### F4E-R11 R34 canonical input and no-write preflight contract
+
+After this four-document checkpoint's two all-zero contract reviews, create only previously absent
+plain no-follow regular `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r11-intro05-input.json`.
+Its canonical UTF-8/no-BOM/LF bytes are 1,183 / SHA-256
+`607C0FF51CA5522D66664D693C8607CCE885D9D491BD3D294B8443FF5272A5B2`, recursive keys
+`{candidate,schema}`, schema `t37-f4e-r11-intro05-input-v1`, and exactly the already frozen
+primary route and 682-byte `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`
+definition. It is fresh R11 bytes, not a retained R7–R10 input.
+
+Domain is 192 canonical bytes / SHA-256
+`06E363774089C0369924E523AED4C10D183A06BD8C2B68F7C649DD726E0728B8`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTEtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K`.
+It freezes one `t3r-shaft-04`, alphabet `SQLHTCR`, setup 8, target 4 and locks 5..7.
+
+After input/no-follow/hash and empty R11 mutable-namespace inspection, record the current
+checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R11
+`--preflight --root <absolute-root> --input <absolute-input> --domain-json-base64 <above>
+--expect-head <literal-head> --expect-input-sha <above-SHA>`. It is no-write/no-task/no-Store/
+no-proof; nonzero consumes R11. Outer/worker, Task Scheduler, source integration and every product
+path remain closed.

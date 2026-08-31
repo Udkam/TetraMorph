@@ -10957,3 +10957,16 @@ task/action/XML UserId to a strict current interactive-token SID; all XML, lifec
 one-attempt guards remain fail-closed. The immutable source has not executed. Next action is a
 four-document fresh R11 input/preflight contract only; creation of input and every R11 execution
 or product action remains closed until that contract is independently reviewed.
+
+### 2026-09-01 F4E-R11 R34 input/preflight pin
+
+After two all-zero reviews of this four-document contract only, create absent fresh R11 input at
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r11-intro05-input.json`: 1,183
+UTF-8/no-BOM/LF canonical bytes / SHA-256
+`607C0FF51CA5522D66664D693C8607CCE885D9D491BD3D294B8443FF5272A5B2`, schema
+`t37-f4e-r11-intro05-input-v1`, fixed route and 682-byte definition `DB814FF9…0A16`.
+The R11-only domain is 192 bytes / `06E363774089C0369924E523AED4C10D183A06BD8C2B68F7C649DD726E0728B8`
+(Base64 in DESIGN), preserving one `SQLHTCR` candidate, eight drops, four rows and five through
+seven locks. Rehash/no-follow check this new file and prove the R11 mutable namespace empty, then
+run precisely one literal-current-HEAD no-write preflight. A nonzero consumes R11; outer/worker/
+Task Scheduler/Store/proof/product paths remain closed.

@@ -1472,3 +1472,18 @@ product path is open.
 - Status: immutable static source; R11 input, attempt, candidate, result, terminal, stage, task,
   Store/proof and product action are absent. Next action is a separate reviewed input/preflight
   contract only.
+
+### F4E-R11 R34 canonical input and preflight command contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R11-INPUT-001`.
+- After two independent all-zero contract reviews only, create one absent plain no-follow input at
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r11-intro05-input.json`: 1,183
+  UTF-8/no-BOM/LF bytes / SHA-256 `607C0FF51CA5522D66664D693C8607CCE885D9D491BD3D294B8443FF5272A5B2`,
+  schema `t37-f4e-r11-intro05-input-v1`, fixed route, and 682-byte definition
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`.
+- Frozen R11 domain: 192 bytes / `06E363774089C0369924E523AED4C10D183A06BD8C2B68F7C649DD726E0728B8`,
+  Base64 in DESIGN, with count one / `SQLHTCR` / eight drops / four rows / five-to-seven locks.
+- Only after review: verify no-follow/hash and no R11 mutable residue, use this committed
+  checkpoint's exact lowercase HEAD in one ordered no-write preflight. No shell substitution,
+  outer/worker, Task Scheduler, Store, proof, source integration or product path is allowed;
+  nonzero consumes R11.

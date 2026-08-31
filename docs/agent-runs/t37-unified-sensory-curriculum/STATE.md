@@ -3870,3 +3870,21 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   processes are absent.
 - Next action: author and independently review a four-document R11 input/no-write-preflight
   contract. No input creation, validator mode, Task Scheduler, Store/proof or product path opens.
+
+### F4E-R11 R34 input/preflight contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R11-INPUT-001`.
+- Post-review only create absent plain no-follow input at
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r11-intro05-input.json`: 1,183
+  UTF-8/no-BOM/LF bytes / SHA-256
+  `607C0FF51CA5522D66664D693C8607CCE885D9D491BD3D294B8443FF5272A5B2`, schema
+  `t37-f4e-r11-intro05-input-v1`, fixed primary route, and definition 682 bytes /
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`.
+- Frozen domain: 192 canonical bytes / SHA-256
+  `06E363774089C0369924E523AED4C10D183A06BD8C2B68F7C649DD726E0728B8`; its Base64 is recorded
+  in DESIGN and permits only one `t3r-shaft-04` candidate, `SQLHTCR`, eight drops, four rows and
+  five through seven locks.
+- After two independent all-zero contract reviews only, verify absent-to-created no-follow
+  identity/hash and empty R11 mutable names, literalize the committed checkpoint's lowercase HEAD,
+  then invoke one ordered R11 `--preflight`. It must perform no Task Scheduler/Store/proof/product
+  action. Nonzero consumes R11; outer/worker and all product paths stay closed.
