@@ -10988,3 +10988,11 @@ the exact 70,756-byte mechanical transform `F5D8E283…EC715`. Parser check pass
 review/mode/task/Store/proof/product action ran; retain it unchanged. Following fresh review only,
 R13 may author the same bounded mechanical static successor with a final-LF-safe transport; no R13
 input or execution path is open.
+
+### 2026-09-01 F4E-R13 R37 static-source acceptance
+
+R13 static validator is accepted: 70,756 UTF-8/no-BOM/LF bytes / SHA-256
+`111D5FAC04ECE4D969BA672111BAD92922B307E84ACC64C7009022180210F630`; parser plus independent
+integrity/lifecycle reviews are all `0/0/0/0/0`. It is byte-exact R11→R13 isolation with all SID,
+XML, source-pin and fail-closed lifecycle controls retained. Source is immutable; next is only a
+four-document fresh R13 input/preflight contract, not input creation or any execution/product path.

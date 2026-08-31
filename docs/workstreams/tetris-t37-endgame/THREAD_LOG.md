@@ -1511,3 +1511,15 @@ product path is open.
   delete, reuse or review it.
 - R13 opens after review only for fresh mechanical identity/schema/namespace static source with
   final-LF-safe transport. All R13 input/execution/product paths remain closed.
+
+### F4E-R13 R37 static-source acceptance
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R13-STATIC-001`.
+- Source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r13.mjs`,
+  70,756 UTF-8/no-BOM/LF bytes / SHA-256
+  `111D5FAC04ECE4D969BA672111BAD92922B307E84ACC64C7009022180210F630`.
+- Parser-only syntax plus independent integrity/lifecycle QA each return `P0/P1/P2/P3/GAP =
+  0/0/0/0/0`; no validator mode, write, Scheduler/Store/proof or product action occurred.
+- Accepted source is byte-exact mechanical R11→R13 identity/schema/namespace isolation with strict
+  SID/no-follow/source-pin/XML/default/empty-trigger/lifecycle safeguards preserved. R13 source is
+  immutable. Next is an independently reviewed input/preflight contract only.

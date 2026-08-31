@@ -3913,3 +3913,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Post-review only R13 may author a fresh mechanical source/namespace successor, preserving all
   R11 controls and adding no semantic change. Its transport must avoid a blank terminal add-line;
   R13 input/mode/task/Store/proof/product paths are closed.
+
+### F4E-R13 R37 static-source acceptance
+
+- Source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r13.mjs`,
+  70,756 UTF-8/no-BOM/LF bytes / SHA-256
+  `111D5FAC04ECE4D969BA672111BAD92922B307E84ACC64C7009022180210F630`; parser-only syntax green.
+- Independent integrity and lifecycle QA each report `P0/P1/P2/P3/GAP = 0/0/0/0/0` without modes,
+  writes or Scheduler/Store/proof/product actions. R13 is byte-exact mechanical R11-to-R13
+  identity/schema/namespace isolation; strict SID, XML/default/empty-trigger, no-follow, source-
+  pin and lifecycle guards remain intact.
+- Status: immutable static source; R13 input/attempt/candidate/result/terminal/stage/task and
+  process are absent. Next action is an independently reviewed input/no-write-preflight contract.

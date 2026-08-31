@@ -11224,6 +11224,18 @@ strict-CLI/XML/task/store/publication/lifecycle guard. The transport must constr
 without adding a blank added line. No R13 input, mode, Task Scheduler, Store/proof or product
 action opens until static parser and independent acceptance complete.
 
+### F4E-R13 R37 static-source acceptance
+
+The sole R13 source at `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r13.mjs`
+is accepted: 70,756 UTF-8/no-BOM/LF bytes / SHA-256
+`111D5FAC04ECE4D969BA672111BAD92922B307E84ACC64C7009022180210F630`. Parser-only syntax and
+independent integrity/lifecycle reviews each return `P0/P1/P2/P3/GAP = 0/0/0/0/0`. It is a
+byte-exact mechanical R11-to-R13 identity/schema/namespace transformation and retains strict
+current-token SID task/action/XML binding, no-follow, source pin, strict CLI, default/unique-empty-
+trigger XML checks, task/store/publication and all fail-closed lifecycle guards. Source is
+immutable. A later four-document contract may open only fresh R13 input and one no-write
+preflight; no R13 mode, Task Scheduler, Store/proof or product action is yet authorized.
+
 ### F4E-R10 R31 successful no-write preflight receipt
 
 R10's sole preflight ran once at `7364a9fd41b8e271920244a955e4d417df3425df` with literal root,
