@@ -3809,3 +3809,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - R10 static source/new r10 namespace opens only after review: mechanical R9-to-R10 replacement
   plus only omission-or-exact-safe-default acceptance for those two XML fields; all other guards
   and R10 execution/product paths remain closed.
+
+### F4E-R10 R28 empty trigger container correction
+
+- Integrity QA rejects R27 at `0/1/0/0/0`: actual Scheduler export has one empty `<Triggers />`,
+  and the former shape guard rejects all Triggers forms before checking safe defaults. No R10 source
+  or other R10 artifact/task exists.
+- After fresh review only, R10 source may accept zero containers or one exact `<Triggers />`; it
+  must reject multiple/nonempty/attributed/alternate containers and every child Trigger. The two
+  omission-or-safe-default XML rules and every other guard remain unchanged; execution stays closed.

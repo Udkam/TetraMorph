@@ -10903,3 +10903,12 @@ is frozen; do not retry, resume or alter it.
 Post-review only, R10 creates fresh static source/new r10 namespace. It may apply mechanical
 R9-to-R10 identity/schema replacement and let only those two XML fields be omitted or equal their
 safe default; every other guard is unchanged. No R10 execution or product path opens.
+
+### 2026-09-01 F4E-R10 R28 empty-trigger correction
+
+R10 R27 is rejected at `0/1/0/0/0`: Scheduler export also has one empty `<Triggers />`, while the
+old verifier rejects every Triggers token before default-field checks. No R10 source/artifact/task
+exists. Following fresh review only, the source may accept zero containers or exactly one literal
+`<Triggers />`; it must reject multiple, nonempty, attributed or alternate trigger forms and every
+Trigger child. The two omitted-safe-default rules and all remaining guards are unchanged; execution
+and product paths stay closed.

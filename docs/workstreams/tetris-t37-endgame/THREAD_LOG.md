@@ -1396,5 +1396,17 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Scheduler's export omits explicit safe-default RunLevel and AllowStartOnDemand fields. R10 may
   only accept each as absent or exactly the safe value; any present mismatch stays fatal.
 - Next: two contract reviews, then fresh R10 static source/new r10 namespace through mechanical
-  identity/schema replacement plus that verifier correction. No R10 mode/input/task/Store/proof/
-  product path is open.
+identity/schema replacement plus that verifier correction. No R10 mode/input/task/Store/proof/
+product path is open.
+
+### F4E-R10 R28 empty-trigger contract correction
+
+- Independent integrity QA rejects R27 at `P0/P1/P2/P3/GAP = 0/1/0/0/0`: Scheduler export also
+  includes a single empty `<Triggers />`, while the source's pre-field shape test rejects every
+  trigger token. No R10 source/artifact/task/mode ran.
+- Fresh R10 source authority adds only this exact compatibility: zero trigger containers or one
+  byte-exact `<Triggers />` is acceptable; multiple, attributed, nonempty, opening/closing or
+  child-trigger forms are fatal. Keep both omitted-or-exact-safe-default field rules and every
+  other XML/source/lifecycle guard exact.
+- Next: commit and obtain two fresh all-zero R28 reviews before creating R10 source; no execution
+  or product path is open.

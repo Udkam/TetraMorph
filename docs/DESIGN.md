@@ -11140,3 +11140,20 @@ change only `assertTaskXml` so each field is either absent (Windows default) or 
 value; any present mismatch remains fatal. All other principal, token, disabled, Exec, action,
 working-directory, no-follow, source pin, CLI, task/store/publication and collision guards remain
 unchanged. No R10 mode, input, task, Store/proof or product action is open.
+
+### F4E-R10 R28 contract correction — empty trigger container
+
+R10 R27 is rejected before source authoring at independent `P0/P1/P2/P3/GAP = 0/1/0/0/0`: the
+actual Scheduler export also contains exactly one empty `<Triggers />` container. R9's verifier
+rejects every `<Triggers...>` token before it reaches the two omitted defaults, so the former R10
+contract would deterministically fail again. No R10 source, input, task, mutable record, Store,
+proof or product action exists.
+
+R10 may, after this correction checkpoint's two fresh all-zero reviews, author only its fresh
+static source. Alongside R9-to-R10 identity/schema/namespace and the two default-field rules, its
+xml shape check may accept either no trigger container or exactly one byte-for-byte `<Triggers />`.
+It must reject two or more containers, any opening/closing `<Triggers>...</Triggers>` form, every
+attribute/alternate serialization, and any Trigger child. Every other task identity/principal/
+token/disabled/Exec/action/working-directory/`IgnoreNew` check stays exact. No R10 mode, input,
+Task operation, Store/proof, source integration, curriculum/UI, sensory/browser or player action
+opens until the resulting static source passes parser and two independent reviews.
