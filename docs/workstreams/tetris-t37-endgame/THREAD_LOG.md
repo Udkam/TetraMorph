@@ -1423,3 +1423,14 @@ product path is open.
 - Accepted delta is only R28: absent-or-exact-safe defaults plus zero or unique exact `<Triggers />`;
   all other trigger forms and every other guard remain fatal. Status immutable.
 - Next: author/review a four-document fresh R10 input and one no-write preflight contract.
+
+### F4E-R10 R30 canonical input/preflight contract
+
+- Post-review only create absent `...t37-f4e-endgame-r10-intro05-input.json`: 1,183 UTF-8/no-BOM/
+  LF bytes / `AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`, schema
+  `t37-f4e-r10-intro05-input-v1`, fixed primary route and 682-byte definition `DB814FF9…0A16`.
+- Domain: 192 bytes / `2F7F954D792C5DF5E3B69DE203BB5323F58304895B8DBAFF6EFBC714CD301FE0`, Base64 in DESIGN;
+  count one, `SQLHTCR`, 8 drops, 4 rows, 5..7 locks.
+- After two all-zero reviews, inspect fresh input/no-follow identity/hash and empty R10 mutable
+  names, then run one literal-current-HEAD R10 preflight only. Nonzero consumes R10; all outer/
+  worker/task/Store/proof/product paths remain closed.

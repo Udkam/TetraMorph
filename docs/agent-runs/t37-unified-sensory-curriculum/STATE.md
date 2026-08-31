@@ -3827,3 +3827,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - It is mechanical R9-to-R10 identity/schema isolation plus only R28's absent-or-exact-safe-default
   fields and zero-or-exact-single-empty-trigger handling. All other source/lifecycle guards remain
   fail-closed. Source immutable; input/preflight requires a later four-document contract.
+
+### F4E-R10 R30 input/preflight contract
+
+- Post-review only create absent R10 input: 1,183 UTF-8/no-BOM/LF bytes /
+  `AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`, schema
+  `t37-f4e-r10-intro05-input-v1`, fixed route and definition `DB814FF9…0A16`.
+- Domain is 192 bytes / `2F7F954D792C5DF5E3B69DE203BB5323F58304895B8DBAFF6EFBC714CD301FE0`, Base64 in DESIGN,
+  for count one / `SQLHTCR` / 8 drops / 4 rows / locks 5..7.
+- Rehash input and R10-empty namespace, then only one literal-HEAD no-write preflight. Nonzero
+  consumes R10; outer/worker/task/Store/proof/product paths remain closed.

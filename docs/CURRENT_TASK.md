@@ -10921,3 +10921,13 @@ independent static reviews are all-zero. Apart from mechanical R9-to-R10 identit
 only R28's two omitted-default rules and exact empty-trigger rule differ; all source/lifecycle
 guards remain. Source is immutable. Only a later contract may open fresh R10 input and no-write
 preflight; execution and product paths remain closed.
+
+### 2026-09-01 F4E-R10 R30 input/preflight pin
+
+Post-review only, create fresh `...t37-f4e-endgame-r10-intro05-input.json`: 1,183 canonical
+UTF-8/no-BOM/LF bytes / `AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`, schema
+`t37-f4e-r10-intro05-input-v1`, fixed primary route/definition `DB814FF9…0A16`. Domain is 192
+bytes / `2F7F954D792C5DF5E3B69DE203BB5323F58304895B8DBAFF6EFBC714CD301FE0` (Base64 in DESIGN) for
+the same count-one `SQLHTCR` 8-drop/4-row/5..7-lock domain. Rehash and inspect empty R10 names,
+then run only one literal-current-HEAD no-write R10 preflight. Nonzero consumes R10; all execution
+and product paths remain closed.

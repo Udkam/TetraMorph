@@ -11169,3 +11169,25 @@ authorized R28 acceptance of absent-or-exact safe RunLevel/AllowStartOnDemand an
 one `<Triggers />`, with all other trigger forms and every remaining source/lifecycle guard fatal.
 The source is immutable. A later four-document checkpoint may open fresh R10 input and one
 no-write preflight; no R10 mode, task, Store/proof, source integration or product action opens.
+
+### F4E-R10 R30 canonical input and no-write preflight contract
+
+After this four-document checkpoint's two all-zero reviews, create only previously absent plain
+no-follow regular `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r10-intro05-input.json`.
+Its canonical UTF-8/no-BOM/LF bytes are 1,183 / SHA-256
+`AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`, recursive keys
+`{candidate,schema}`, schema `t37-f4e-r10-intro05-input-v1`, and exactly the already frozen
+primary route and 682-byte `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`
+definition. It is new R10 bytes, not any retained R7/R8/R9 input.
+
+Domain is 192 canonical bytes / SHA-256
+`2F7F954D792C5DF5E3B69DE203BB5323F58304895B8DBAFF6EFBC714CD301FE0`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTAtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K`.
+It freezes one `t3r-shaft-04`, alphabet `SQLHTCR`, setup 8, target 4 and locks 5..7.
+
+After input/no-follow/hash and empty R10 mutable-namespace inspection, record the current
+checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R10
+`--preflight --root <absolute-root> --input <absolute-input> --domain-json-base64 <above>
+--expect-head <literal-head> --expect-input-sha <above-SHA>`. It is no-write/no-task/no-Store/
+no-proof; nonzero consumes R10. Outer/worker, Task Scheduler, source integration and every product
+path remain closed.
