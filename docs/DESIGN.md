@@ -11236,6 +11236,28 @@ trigger XML checks, task/store/publication and all fail-closed lifecycle guards.
 immutable. A later four-document contract may open only fresh R13 input and one no-write
 preflight; no R13 mode, Task Scheduler, Store/proof or product action is yet authorized.
 
+### F4E-R13 R38 canonical input and no-write preflight contract
+
+After this four-document checkpoint's two all-zero contract reviews, create only previously absent
+plain no-follow regular `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r13-intro05-input.json`.
+Its canonical UTF-8/no-BOM/LF bytes are 1,183 / SHA-256
+`3A1F4E49E4BBD9FC317C1C32F41C7A5F4C88B2B4D83CAFD4F17F2F8BD1552874`, recursive keys
+`{candidate,schema}`, schema `t37-f4e-r13-intro05-input-v1`, and the already frozen primary route
+and 682-byte `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16` definition. It is
+fresh R13 bytes, not a retained R7–R12 input.
+
+Domain is 192 canonical bytes / SHA-256
+`D665FD2D8382E6AD6FF61963795286A51AF19EB9BB10E9B9A5D5040BB97FE229`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTMtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K`.
+It freezes one `t3r-shaft-04`, alphabet `SQLHTCR`, setup 8, target 4 and locks 5..7.
+
+After input/no-follow/hash and empty R13 mutable-namespace inspection, record the current
+checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R13
+`--preflight --root <absolute-root> --input <absolute-input> --domain-json-base64 <above>
+--expect-head <literal-head> --expect-input-sha <above-SHA>`. It is no-write/no-task/no-Store/
+no-proof; nonzero consumes R13. Outer/worker, Task Scheduler, source integration and every product
+path remain closed.
+
 ### F4E-R10 R31 successful no-write preflight receipt
 
 R10's sole preflight ran once at `7364a9fd41b8e271920244a955e4d417df3425df` with literal root,

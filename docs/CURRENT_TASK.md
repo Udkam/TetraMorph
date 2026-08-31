@@ -10996,3 +10996,14 @@ R13 static validator is accepted: 70,756 UTF-8/no-BOM/LF bytes / SHA-256
 integrity/lifecycle reviews are all `0/0/0/0/0`. It is byte-exact R11→R13 isolation with all SID,
 XML, source-pin and fail-closed lifecycle controls retained. Source is immutable; next is only a
 four-document fresh R13 input/preflight contract, not input creation or any execution/product path.
+
+### 2026-09-01 F4E-R13 R38 input/preflight pin
+
+After two all-zero contract reviews only, create fresh absent R13 input at
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r13-intro05-input.json`: 1,183
+UTF-8/no-BOM/LF bytes / `3A1F4E49E4BBD9FC317C1C32F41C7A5F4C88B2B4D83CAFD4F17F2F8BD1552874`, schema
+`t37-f4e-r13-intro05-input-v1`, fixed route and definition `DB814FF9…0A16`. The R13-only domain
+is 192 bytes / `D665FD2D8382E6AD6FF61963795286A51AF19EB9BB10E9B9A5D5040BB97FE229` (Base64 in DESIGN),
+with one `SQLHTCR` candidate, eight drops, four rows and five through seven locks. After no-follow/
+hash and empty namespace checks, run one literal-current-HEAD no-write preflight. Nonzero consumes
+R13; outer/worker/Task Scheduler/Store/proof/product remain closed.

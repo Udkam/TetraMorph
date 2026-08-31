@@ -3925,3 +3925,17 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   pin and lifecycle guards remain intact.
 - Status: immutable static source; R13 input/attempt/candidate/result/terminal/stage/task and
   process are absent. Next action is an independently reviewed input/no-write-preflight contract.
+
+### F4E-R13 R38 input/preflight contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R13-INPUT-001`.
+- Post-review only create absent plain no-follow input at
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r13-intro05-input.json`: 1,183
+  UTF-8/no-BOM/LF bytes / SHA-256 `3A1F4E49E4BBD9FC317C1C32F41C7A5F4C88B2B4D83CAFD4F17F2F8BD1552874`,
+  schema `t37-f4e-r13-intro05-input-v1`, fixed route and definition `DB814FF9…0A16`.
+- Frozen domain: 192 canonical bytes / SHA-256
+  `D665FD2D8382E6AD6FF61963795286A51AF19EB9BB10E9B9A5D5040BB97FE229`; Base64 in DESIGN;
+  count one / `SQLHTCR` / eight drops / four rows / five-to-seven locks.
+- After two independent all-zero reviews only, verify no-follow/hash and empty R13 mutable names,
+  literalize the committed checkpoint HEAD, then invoke one ordered R13 `--preflight`. It is
+  no-write; nonzero consumes R13. Outer/worker/Task Scheduler/Store/proof/product remain closed.

@@ -1523,3 +1523,16 @@ product path is open.
 - Accepted source is byte-exact mechanical R11→R13 identity/schema/namespace isolation with strict
   SID/no-follow/source-pin/XML/default/empty-trigger/lifecycle safeguards preserved. R13 source is
   immutable. Next is an independently reviewed input/preflight contract only.
+
+### F4E-R13 R38 canonical input and preflight command contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R13-INPUT-001`.
+- After two independent all-zero reviews only, create absent no-follow
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r13-intro05-input.json`: 1,183
+  UTF-8/no-BOM/LF bytes / `3A1F4E49E4BBD9FC317C1C32F41C7A5F4C88B2B4D83CAFD4F17F2F8BD1552874`, schema
+  `t37-f4e-r13-intro05-input-v1`, fixed route and definition `DB814FF9…0A16`.
+- Frozen domain: 192 bytes / `D665FD2D8382E6AD6FF61963795286A51AF19EB9BB10E9B9A5D5040BB97FE229`,
+  Base64 in DESIGN, one candidate / `SQLHTCR` / 8 drops / 4 rows / 5..7 locks.
+- After review verify no-follow/hash/empty R13 names, use literal committed lowercase HEAD in one
+  no-write preflight only. Nonzero consumes R13; all outer/worker/Task Scheduler/Store/proof/
+  product paths stay closed.
