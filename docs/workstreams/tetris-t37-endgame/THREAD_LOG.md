@@ -1354,3 +1354,20 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   Store, proof, curriculum/UI, sensory/browser, or player-acceptance action ran.
 - Next action: author and independently review a four-document R9 input/literal-command contract;
   only after acceptance may it create one fresh input and invoke the one no-write preflight.
+
+### F4E-R9 R25 canonical input and preflight command contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R9-INPUT-001`.
+- Base: `4bcef64`.
+- Post-review only create one absent plain no-follow input at
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r9-intro05-input.json`: 1,182
+  UTF-8/no-BOM/LF bytes / SHA-256 `4FF9DA912F0FD89F4F5A5C6A63CB44ABB4F7D06AEC98DD8C647E89E032B90AAA`,
+  schema `t37-f4e-r9-intro05-input-v1`, fixed R17 primary route, and 682-byte definition
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`.
+- Frozen domain is 191 bytes / `BD1D5BED276C7CD5713CD74E0A6C487D17B6784294E9701446A5B2A2E53A1723`, Base64 in DESIGN,
+  for one `t3r-shaft-04` candidate, `SQLHTCR`, eight drops, four rows, and 5..7 locks.
+- Only after two independent all-zero contract reviews: verify fresh input hash/no-follow identity
+  and no R9 mutable residue, record the committed checkpoint's exact lowercase HEAD as a literal,
+  and invoke one ordered R9 `--preflight`. No shell substitution, outer/worker, task, Store,
+  proof, candidate, terminal, stage, source integration, curriculum/UI, sensory/browser, or
+  player-acceptance action is permitted. A nonzero result consumes R9 and permits no retry.

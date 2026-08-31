@@ -11077,3 +11077,32 @@ fail-closed R9-only inventory while deliberately omitting R7's raw worktree/blob
 It is immutable. A later four-document contract may open one new R9 input and one no-write
 preflight; no R9 mode, input, task, Store, proof, curriculum/UI, sensory/browser, or player
 acceptance action is opened by this acceptance.
+
+### F4E-R9 R25 canonical input and no-write preflight contract
+
+After this four-document checkpoint is committed and independently accepted, create only the
+previously absent plain, no-follow regular file
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r9-intro05-input.json`. Its canonical
+UTF-8/no-BOM/LF bytes are exactly 1,182 / SHA-256
+`4FF9DA912F0FD89F4F5A5C6A63CB44ABB4F7D06AEC98DD8C647E89E032B90AAA`, with recursively ordinal
+keys `{candidate,schema}`, schema `t37-f4e-r9-intro05-input-v1`, and candidate keys
+`{commandStream,definitionJsonBase64,definitionSha256}`. It freezes the sole primary route
+`SQLHTTTQLHTTTCLLHTTTRHTTTTTTTTTTTTCRRRRHTTTTTTTTTTTTCRHTTTTTTTTTTTTLLLLHTTTTTTTTTTTT` and
+the 682-byte UTF-8/no-BOM/LF `t3r-shaft-04` definition payload SHA-256
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`: `后手`, difficulty 5,
+gameplay seed 3887, setup seed 37220 with exactly
+`I0@5,T0@2,S0@4,L0@0,J2@7,Z0@2,O0@0,L2@7`, target rows 4, 16 empty rows followed by
+`OOZZ...LLL` / `OOLZZSSL..` / `LLLTSS.JJJ` / `..TTTIIIIJ`, and empty hidden/anchor arrays.
+
+The sole domain argument is 191 canonical UTF-8/no-BOM/LF bytes / SHA-256
+`BD1D5BED276C7CD5713CD74E0A6C487D17B6784294E9701446A5B2A2E53A1723`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yOS1pbnRybzA1LWRvbWFpbi12MSIsInNldHVwRHJvcENvdW50Ijo4LCJ0YXJnZXRSb3dzIjo0fQo=`. It freezes base ID `t3r-shaft-04`, count 1, alphabet `SQLHTCR`, setup 8, target 4, and locks 5..7.
+
+After two independent all-zero R25 reviews, verify the newly created file's no-follow identity,
+bytes and SHA plus empty R9 mutable namespace. Record the resulting checkpoint's exact lowercase
+`git rev-parse HEAD` as a literal (not command substitution) `--expect-head`, then invoke exactly
+one ordered R9 `--preflight --root <absolute-root> --input <absolute-input>
+--domain-json-base64 <above> --expect-head <literal-head> --expect-input-sha <above-SHA>`.
+It is no-write/no-task/no-Store/no-proof; nonzero consumes R9 with no retry. `--outer`, `--worker`,
+Task Scheduler, candidate/terminal/stage, source integration, curriculum/UI, sensory/browser and
+player acceptance remain closed.

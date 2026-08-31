@@ -10867,3 +10867,18 @@ Git-clean-before-load, strict CLI, fail-closed lifecycle, and R9-only residue is
 not restore the EOL-sensitive raw worktree/blob byte-equality check. The runner is immutable.
 Only a later four-document contract can open fresh R9 input and one no-write preflight; every R9
 mode and all task/Store/proof/product actions remain closed.
+
+### 2026-09-01 F4E-R9 R25 input/preflight pin
+
+Following this checkpoint's all-zero review only, create fresh absent
+`...t37-f4e-endgame-r9-intro05-input.json`: 1,182 canonical UTF-8/no-BOM/LF bytes / SHA-256
+`4FF9DA912F0FD89F4F5A5C6A63CB44ABB4F7D06AEC98DD8C647E89E032B90AAA`, schema
+`t37-f4e-r9-intro05-input-v1`, fixed seven-lock primary route, and definition 682 bytes /
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`. Domain is 191 bytes /
+`BD1D5BED276C7CD5713CD74E0A6C487D17B6784294E9701446A5B2A2E53A1723` (Base64 in DESIGN) for
+the same count-one, `SQLHTCR`, eight-drop, four-row, five-to-seven-lock domain.
+
+After rehashing the fresh file and proving empty R9 mutable names, compute this committed
+checkpoint's lowercase HEAD and pass that literal value in the one ordered R9 `--preflight`.
+It is no-write and fail-closed; any nonzero consumes R9. Outer/worker/task/Store/proof/source/
+product paths remain closed.

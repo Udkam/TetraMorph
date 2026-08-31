@@ -3775,3 +3775,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   R7's clean-CRLF false rejection.
 - No R9 mode/input/task/Store/proof/product action has run. A separate four-document contract is
   required before creating a fresh R9 input or invoking its sole no-write preflight.
+
+### F4E-R9 R25 input/preflight contract
+
+- Post-review only, create absent `...t37-f4e-endgame-r9-intro05-input.json`: 1,182 canonical
+  UTF-8/no-BOM/LF bytes / `4FF9DA912F0FD89F4F5A5C6A63CB44ABB4F7D06AEC98DD8C647E89E032B90AAA`, schema
+  `t37-f4e-r9-intro05-input-v1`, primary route/domain and 682-byte definition pin
+  `DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16` as frozen in DESIGN.
+- Domain is 191 canonical bytes / `BD1D5BED276C7CD5713CD74E0A6C487D17B6784294E9701446A5B2A2E53A1723`, Base64 frozen in
+  DESIGN; it is count one, `SQLHTCR`, eight drops, four rows, and five through seven locks.
+- After two all-zero reviews, rehash/inspect the absent-to-created input and R9 mutable inventory,
+  then invoke exactly one ordered no-write preflight with the committed checkpoint's literal
+  lowercase HEAD. Nonzero consumes R9; outer/worker/task/Store/proof/product paths stay closed.
