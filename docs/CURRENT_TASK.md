@@ -1076,6 +1076,14 @@ Only `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
 checkpoint. Published Puzzle definitions, runtime Core, UI, T27/`progress.md`, icon, and Ice
 remain closed.
 
+### 2026-09-01 F4E-R14 R41 static-source acceptance
+
+R14 static source is accepted at 70,745 UTF-8/no-BOM/LF bytes / SHA-256
+`7DEA14F02566C6C67BD275B79EF55DC56F9B8CDCF56AA37E0E3C439E1DA7F633`; parser plus independent
+integrity/lifecycle QA are all `0/0/0/0/0`. It only corrects exported Arguments representation to
+literal action text while registration remains escaped and every other guard stays exact. Source
+immutable; next is fresh R14 input/preflight contract only, not input/execution/product action.
+
 The first writer correctly stopped before creating either path because nested exact keys and
 three scalar literals were underspecified. `docs/DESIGN.md` now freezes every top/nested key,
 artifact/schema version, and claim string; no implementer-selected field name is permitted.

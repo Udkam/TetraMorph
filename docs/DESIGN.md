@@ -11222,6 +11222,17 @@ literal `actionArguments` text emitted by this verified export. Principal/UserId
 trigger/Enabled/Exec/command/working-directory/action-hash, source pin and all lifecycle guards
 remain exact. No R14 input, mode, Task Scheduler, Store/proof or product action opens.
 
+### F4E-R14 R41 static-source acceptance
+
+The sole R14 source at `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r14.mjs`
+is accepted: 70,745 UTF-8/no-BOM/LF bytes / SHA-256
+`7DEA14F02566C6C67BD275B79EF55DC56F9B8CDCF56AA37E0E3C439E1DA7F633`. Parser-only syntax and
+independent integrity/lifecycle reviews each return `P0/P1/P2/P3/GAP = 0/0/0/0/0`. It is R13→R14
+mechanical isolation plus only an exact exported `<Arguments>` comparator using literal
+`actionArguments`; `taskXml` retains entity escaping at registration and all remaining guards are
+byte-equivalent. The source is immutable. A later four-document contract may open only fresh R14
+input and one no-write preflight; no R14 mode, Task Scheduler, Store/proof or product action opens.
+
 ### F4E-R11 R35 malformed input materialization / R12 static successor
 
 R11's authorized materialization created its previously absent input but the patch transport added

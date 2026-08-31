@@ -1560,3 +1560,15 @@ product path is open.
 - R14 opens post-review only for fresh mechanical R13→R14 static source/namespace plus that one
   literal-Arguments comparator correction. All other safeguards and all R14 input/execution/product
   paths remain closed.
+
+### F4E-R14 R41 static-source acceptance
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R14-STATIC-001`.
+- Source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r14.mjs`,
+  70,745 UTF-8/no-BOM/LF bytes / SHA-256
+  `7DEA14F02566C6C67BD275B79EF55DC56F9B8CDCF56AA37E0E3C439E1DA7F633`.
+- Parser-only syntax and independent integrity/lifecycle QA each return `P0/P1/P2/P3/GAP =
+  0/0/0/0/0`, no mode/write/Scheduler/Store/proof/product action occurred.
+- Accepted delta only compares exported `<Arguments>` to literal full action arguments; registration
+  still escapes XML and all remaining SID/XML/source-pin/lifecycle safeguards remain exact. Source
+  immutable; next is input/preflight contract only.

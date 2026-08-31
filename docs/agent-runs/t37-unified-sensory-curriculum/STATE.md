@@ -3964,3 +3964,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   namespace and change only the Arguments exact-fragment comparison to literal `actionArguments`.
   All remaining XML/source/lifecycle guards and all R14 input/mode/task/Store/proof/product closure
   remain unchanged.
+
+### F4E-R14 R41 static-source acceptance
+
+- Source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r14.mjs`,
+  70,745 UTF-8/no-BOM/LF bytes / SHA-256
+  `7DEA14F02566C6C67BD275B79EF55DC56F9B8CDCF56AA37E0E3C439E1DA7F633`; parser-only syntax green.
+- Independent integrity/lifecycle QA each report `P0/P1/P2/P3/GAP = 0/0/0/0/0`; source is R13→R14
+  isolation plus only literal exported Arguments comparison. Registration escaping and all SID/XML/
+  source-pin/lifecycle safeguards remain.
+- R14 source immutable; input/attempt/candidate/result/terminal/stage/task/process absent. Next is
+  a separately reviewed fresh input/no-write-preflight contract only.
