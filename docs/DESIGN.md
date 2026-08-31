@@ -11157,3 +11157,15 @@ attribute/alternate serialization, and any Trigger child. Every other task ident
 token/disabled/Exec/action/working-directory/`IgnoreNew` check stays exact. No R10 mode, input,
 Task operation, Store/proof, source integration, curriculum/UI, sensory/browser or player action
 opens until the resulting static source passes parser and two independent reviews.
+
+### F4E-R10 R29 static-source acceptance
+
+The sole R10 source at `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r10.mjs`
+is accepted: 70,469 UTF-8/no-BOM/LF bytes / SHA-256
+`0CFE2C3185B2AD512ED00606D8B010BC7E1353D5E76ADFBB60ECE4F07FEF7D9C`. Parser-only syntax and
+two independent static reviews each return `P0/P1/P2/P3/GAP = 0/0/0/0/0`. Excluding
+`assertTaskXml`, R10 normalized back to R9 is byte-identical; its only semantic change is the
+authorized R28 acceptance of absent-or-exact safe RunLevel/AllowStartOnDemand and zero or exact
+one `<Triggers />`, with all other trigger forms and every remaining source/lifecycle guard fatal.
+The source is immutable. A later four-document checkpoint may open fresh R10 input and one
+no-write preflight; no R10 mode, task, Store/proof, source integration or product action opens.

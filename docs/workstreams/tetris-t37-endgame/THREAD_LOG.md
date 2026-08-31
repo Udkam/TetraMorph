@@ -1410,3 +1410,16 @@ product path is open.
   other XML/source/lifecycle guard exact.
 - Next: commit and obtain two fresh all-zero R28 reviews before creating R10 source; no execution
   or product path is open.
+
+### F4E-R10 R29 static-source acceptance
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R10-STATIC-001`.
+- Source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r10.mjs`,
+  70,469 UTF-8/no-BOM/LF bytes / SHA-256
+  `0CFE2C3185B2AD512ED00606D8B010BC7E1353D5E76ADFBB60ECE4F07FEF7D9C`.
+- Parser-only syntax and independent integrity/lifecycle QA each report
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0`; neither review invoked a mode or modified file/Scheduler state.
+  Identity-normalized source is byte-identical to accepted R9 outside `assertTaskXml`.
+- Accepted delta is only R28: absent-or-exact-safe defaults plus zero or unique exact `<Triggers />`;
+  all other trigger forms and every other guard remain fatal. Status immutable.
+- Next: author/review a four-document fresh R10 input and one no-write preflight contract.

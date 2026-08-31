@@ -10912,3 +10912,12 @@ exists. Following fresh review only, the source may accept zero containers or ex
 `<Triggers />`; it must reject multiple, nonempty, attributed or alternate trigger forms and every
 Trigger child. The two omitted-safe-default rules and all remaining guards are unchanged; execution
 and product paths stay closed.
+
+### 2026-09-01 F4E-R10 R29 static-source acceptance
+
+R10 static source is accepted at 70,469 UTF-8/no-BOM/LF bytes / SHA-256
+`0CFE2C3185B2AD512ED00606D8B010BC7E1353D5E76ADFBB60ECE4F07FEF7D9C`; parser and both
+independent static reviews are all-zero. Apart from mechanical R9-to-R10 identity/schema names,
+only R28's two omitted-default rules and exact empty-trigger rule differ; all source/lifecycle
+guards remain. Source is immutable. Only a later contract may open fresh R10 input and no-write
+preflight; execution and product paths remain closed.

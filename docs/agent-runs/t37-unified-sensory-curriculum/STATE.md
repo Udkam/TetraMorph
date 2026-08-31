@@ -3818,3 +3818,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - After fresh review only, R10 source may accept zero containers or one exact `<Triggers />`; it
   must reject multiple/nonempty/attributed/alternate containers and every child Trigger. The two
   omission-or-safe-default XML rules and every other guard remain unchanged; execution stays closed.
+
+### F4E-R10 R29 static-source acceptance
+
+- R10 source accepted: 70,469 UTF-8/no-BOM/LF bytes /
+  `0CFE2C3185B2AD512ED00606D8B010BC7E1353D5E76ADFBB60ECE4F07FEF7D9C`; parser and independent
+  integrity/lifecycle static reviews each return `P0/P1/P2/P3/GAP = 0/0/0/0/0`.
+- It is mechanical R9-to-R10 identity/schema isolation plus only R28's absent-or-exact-safe-default
+  fields and zero-or-exact-single-empty-trigger handling. All other source/lifecycle guards remain
+  fail-closed. Source immutable; input/preflight requires a later four-document contract.
