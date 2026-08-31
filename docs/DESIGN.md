@@ -11192,6 +11192,17 @@ checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R1
 no-proof; nonzero consumes R10. Outer/worker, Task Scheduler, source integration and every product
 path remain closed.
 
+### F4E-R13 R39 successful no-write preflight receipt
+
+R13's sole `--preflight` was invoked once at checkpoint
+`2bb44b969d0869f4a2d290af280d388d641c835f` with literal absolute root/input paths, the frozen R13
+domain Base64, literal lowercase HEAD and exact input SHA. It exited 0 without output. Postflight
+rehashes the unchanged 1,183-byte `3A1F4E49E4BBD9FC317C1C32F41C7A5F4C88B2B4D83CAFD4F17F2F8BD1552874`
+input and finds only the R13 source and input, with no R13 task or node process. No Store, proof
+or product action ran. Preflight is consumed and cannot rerun. The only eligible next action is one
+R13 `--outer` with the immutable input/domain and a fresh literal current-HEAD pin; all other modes
+and product paths remain closed pending its audited terminal disposition.
+
 ### F4E-R11 R35 malformed input materialization / R12 static successor
 
 R11's authorized materialization created its previously absent input but the patch transport added

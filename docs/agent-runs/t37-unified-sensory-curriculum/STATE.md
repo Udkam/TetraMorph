@@ -3939,3 +3939,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - After two independent all-zero reviews only, verify no-follow/hash and empty R13 mutable names,
   literalize the committed checkpoint HEAD, then invoke one ordered R13 `--preflight`. It is
   no-write; nonzero consumes R13. Outer/worker/Task Scheduler/Store/proof/product remain closed.
+
+### F4E-R13 R39 successful no-write preflight receipt
+
+- R13 `--preflight` ran once at literal HEAD `2bb44b969d0869f4a2d290af280d388d641c835f` with
+  literal root/input/domain/input-SHA arguments and exited 0 without output.
+- Postflight: immutable input 1,183 bytes / SHA-256
+  `3A1F4E49E4BBD9FC317C1C32F41C7A5F4C88B2B4D83CAFD4F17F2F8BD1552874`; only R13 source/input
+  exist, and R13 task/process/Store/proof/product actions are absent. It was no-write.
+- Preflight is permanently consumed. Next action is one audited R13 outer only, with immutable
+  input/domain and a fresh literal current HEAD; every other path remains closed.

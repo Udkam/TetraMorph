@@ -1536,3 +1536,13 @@ product path is open.
 - After review verify no-follow/hash/empty R13 names, use literal committed lowercase HEAD in one
   no-write preflight only. Nonzero consumes R13; all outer/worker/Task Scheduler/Store/proof/
   product paths stay closed.
+
+### F4E-R13 R39 successful no-write preflight receipt
+
+- R13 preflight executed once at `2bb44b969d0869f4a2d290af280d388d641c835f` with literal
+  absolute root/input, frozen domain Base64, literal HEAD and input SHA; exit 0, no output.
+- Postflight confirms 1,183-byte / `3A1F4E49E4BBD9FC317C1C32F41C7A5F4C88B2B4D83CAFD4F17F2F8BD1552874`
+  input and only R13 source/input files, with no task, runner process, Store, proof or product
+  action. Preflight is consumed and cannot rerun.
+- Next action: one separately audited R13 outer with immutable input/domain and a fresh literal
+  current HEAD; all other modes and product paths remain closed pending terminal disposition.
