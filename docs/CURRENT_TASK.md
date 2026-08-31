@@ -1076,6 +1076,12 @@ Only `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
 checkpoint. Published Puzzle definitions, runtime Core, UI, T27/`progress.md`, icon, and Ice
 remain closed.
 
+### 2026-09-01 F4E-R14 R45 preflight receipt
+
+R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes / `D31C…0EB3`, and
+only R14 source/input exist, with no task/process/Store/proof/product action. It is consumed;
+only one fresh-literal-HEAD audited outer is next.
+
 ### 2026-09-01 F4E-R14 R41 static-source acceptance
 
 R14 static source is accepted at 70,745 UTF-8/no-BOM/LF bytes / SHA-256

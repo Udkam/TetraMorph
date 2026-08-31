@@ -11192,6 +11192,14 @@ checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R1
 no-proof; nonzero consumes R10. Outer/worker, Task Scheduler, source integration and every product
 path remain closed.
 
+### F4E-R14 R45 successful no-write preflight receipt
+
+R14 preflight ran once at literal HEAD `74f8887d8aefe887064a163018ab1d950f420f6d` with the
+corrected 192-byte domain and immutable input, exited 0 without output, and left only R14 source/
+input: 1,183 bytes / `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`.
+No task, process, Store, proof or product action ran. Preflight is consumed; the only next action
+is one audited R14 outer with fresh literal current HEAD and immutable input/domain.
+
 ### F4E-R13 R39 successful no-write preflight receipt
 
 R13's sole `--preflight` was invoked once at checkpoint
