@@ -3844,3 +3844,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Input remains 1,183 bytes / `AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`;
   attempt/candidate/result/terminal/stage/non-self process remain absent. No task/Store/proof/
   product action ran. Preflight is consumed; only one outer with fresh literal HEAD is next.
+
+### F4E-R10 R32 consumed outer / R11 SID boundary
+
+- R10 outer published 2,988-byte `CB77CE5175F4719D1B305B41E73DF308700FFA2E10B46F94A20AF25F833E2BD4`
+  attempt / `r10-8640d169caba21aabb062c4f` and disabled task, then stopped before start/worker:
+  task record username differs from Scheduler-exported current-token SID. Candidate/result/
+  terminal/stage/process are absent; R10 evidence immutable.
+- Post-review only R11 source may bind task record and exact XML UserId to one strict SID obtained
+  from the existing noninteractive PowerShell current token. No username/arbitrary/changed SID
+  acceptance or any R11 execution/product path opens.

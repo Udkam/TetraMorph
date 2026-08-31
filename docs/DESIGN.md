@@ -11201,3 +11201,23 @@ input and zero R10 attempt/candidate/result/terminal/stage/owned-process residue
 proof or product action ran. Preflight is consumed. The sole next eligible operation is one R10
 outer invocation using this input/domain and a fresh literal current-HEAD pin; all other paths
 remain closed pending its audited terminal.
+
+### F4E-R10 R32 consumed outer identity interruption and R11 static contract
+
+R10's sole outer ran once at literal HEAD `50ab6549c2f520d819ae1ccca3e5d8823092d4b1`, published
+immutable 2,988-byte attempt `CB77CE5175F4719D1B305B41E73DF308700FFA2E10B46F94A20AF25F833E2BD4`
+for `r10-8640d169caba21aabb062c4f`, and registered disabled task
+`\\TetraMorph\\F4E-R10-Intro05-r10-8640d169caba21aabb062c4f`. It stopped before enable/start/
+worker/Store/proof at `Task Scheduler XML field round trip differs`; candidate/result/terminal/
+stage/owned processes are absent. R10 evidence and task are immutable; no retry, resume, delete or
+repair is permitted.
+
+The remaining mismatch is precise: immutable task record stores `runAs:"Alex Chen"`, while the
+verified Windows export's `<UserId>` is the current interactive token SID
+`S-1-5-21-3436880540-2256684200-2625073485-1004`. R11 opens fresh static source/namespace only
+after two all-zero reviews. It may mechanically replace R10 identity/schema/namespace and change
+only task run-as construction/verification to derive exactly one current token SID through the
+existing noninteractive PowerShell transport using `[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value`, require `^S-\d+(?:-\d+)+$`, record that SID in the immutable task/action
+hash, and require exact matching `<UserId>` export. It may not accept a username, arbitrary SID,
+or a changed SID. All R10 default/empty-trigger rules and every other guard remain exact. No R11
+mode, input, task, Store/proof or product action opens.

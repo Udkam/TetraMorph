@@ -1444,3 +1444,15 @@ product path is open.
   candidate/result/terminal/stage/non-self process. No task, Store, proof or product action ran.
 - Preflight is consumed. Next is one audited R10 outer only, with fresh literal current HEAD and
   this immutable input/domain.
+
+### F4E-R10 R32 consumed outer identity interruption / R11 contract
+
+- R10 outer at `50ab6549c2f520d819ae1ccca3e5d8823092d4b1` published immutable 2,988-byte
+  `CB77CE5175F4719D1B305B41E73DF308700FFA2E10B46F94A20AF25F833E2BD4` attempt /
+  `r10-8640d169caba21aabb062c4f`, registered a Disabled task, then fail-closed before start/
+  worker/Store/proof on XML field round trip. Candidate/result/terminal/stage/process absent.
+- Cause: action record `runAs` is username while Scheduler exports current interactive token SID.
+  Retain R10 task/input/attempt unchanged; no retry/resume/delete/repair.
+- R11 source after review may only replace identity/schema/namespace plus bind task action/UserId
+  to strict current-token SID read through the existing PowerShell transport. No loose username or
+  SID acceptance; retain all other guards and all execution/product closure.
