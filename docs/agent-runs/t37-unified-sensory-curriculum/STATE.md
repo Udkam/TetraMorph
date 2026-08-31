@@ -3763,3 +3763,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   No mutable R8 object/task/Store/proof/product action ran.
 - Post-review only, create new R9 static runner/fresh r9 namespace by mechanical R8-to-R9 identity
   replacement. No other code/flow change and no R9 mode/input/task/Store/proof/product action.
+
+### F4E-R9 R24 static-source acceptance
+
+- R9 static source accepted: 69,812 UTF-8/no-BOM/LF bytes /
+  `D9176D30DF2955604E8D5A752E50BB0001C0435F25FAFE17ED61AF2D8C805726`; parser-only syntax and
+  independent integrity/lifecycle static reviews each report `P0/P1/P2/P3/GAP = 0/0/0/0/0`.
+- The immutable source is an exact R8-to-R9 identity/schema/namespace transformation. It preserves
+  no-follow, Git blob/hash/closure and clean-source gates, strict CLI/lifecycle guards, and
+  R9-only fail-closed inventory; the intentional absence of raw worktree/blob equality prevents
+  R7's clean-CRLF false rejection.
+- No R9 mode/input/task/Store/proof/product action has run. A separate four-document contract is
+  required before creating a fresh R9 input or invoking its sole no-write preflight.

@@ -11063,3 +11063,17 @@ are `t37-f4e-endgame-canonical-validate-r9.mjs`, `...attempt-r9.json`, `...candi
 source operation is a mechanical R8-to-R9 identity/schema/namespace copy of the accepted R8
 runner. It must not alter no-follow, blob/hash/closure, clean-source, CLI, task, Store, proof, or
 publication behavior; no R9 mode, input, task, Store/proof, or product action is open.
+
+### F4E-R9 R24 static-source acceptance
+
+The sole R9 static source at
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r9.mjs` is
+accepted as 69,812 UTF-8/no-BOM/LF bytes / SHA-256
+`D9176D30DF2955604E8D5A752E50BB0001C0435F25FAFE17ED61AF2D8C805726`. Parser-only syntax and two
+independent static reviews each return `P0/P1/P2/P3/GAP = 0/0/0/0/0`. The source is the mechanical
+R8-to-R9 identity/schema/namespace replacement: it retains no-follow reads, Git blob/hash/closure
+validation, tracked/untracked clean-source gates before Vite loading, strict mode grammar, and
+fail-closed R9-only inventory while deliberately omitting R7's raw worktree/blob equality branch.
+It is immutable. A later four-document contract may open one new R9 input and one no-write
+preflight; no R9 mode, input, task, Store, proof, curriculum/UI, sensory/browser, or player
+acceptance action is opened by this acceptance.

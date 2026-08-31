@@ -10856,3 +10856,14 @@ before `preflight()`; no mutable action ran. R8 and its correct retained input a
 not be reused. After review, only new R9 static source at `...validate-r9.mjs`/fresh r9 namespace
 may be mechanically copied from accepted R8 identity/schema names. No R9 mode/input/task/Store/
 proof/product action opens.
+
+### 2026-09-01 F4E-R9 R24 static-source acceptance
+
+The sole R9 static runner is accepted at 69,812 UTF-8/no-BOM/LF bytes / SHA-256
+`D9176D30DF2955604E8D5A752E50BB0001C0435F25FAFE17ED61AF2D8C805726`. Parser-only syntax and
+independent integrity/lifecycle reviews are each `P0/P1/P2/P3/GAP = 0/0/0/0/0`. It is a mechanical
+R8-to-R9 identity/schema/namespace replacement and preserves no-follow, Git pin/closure,
+Git-clean-before-load, strict CLI, fail-closed lifecycle, and R9-only residue isolation. It does
+not restore the EOL-sensitive raw worktree/blob byte-equality check. The runner is immutable.
+Only a later four-document contract can open fresh R9 input and one no-write preflight; every R9
+mode and all task/Store/proof/product actions remain closed.

@@ -1336,3 +1336,21 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
 - Post-review only create fresh `...validate-r9.mjs` plus r9 namespace through mechanical R8-to-R9
   identity/schema replacement. Preserve all behavior/boundaries; no R9 mode/input/task/Store/
   proof/product action opens.
+
+### F4E-R9 R24 static-source acceptance
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R9-STATIC-001`.
+- Base: `670c214`.
+- Exact external source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r9.mjs`,
+  69,812 UTF-8/no-BOM/LF bytes / SHA-256
+  `D9176D30DF2955604E8D5A752E50BB0001C0435F25FAFE17ED61AF2D8C805726`.
+- Commands actually run: parser-only `E:\\Nodejs\\node.exe --check` and static hash/text
+  inspection; neither QA invoked a validator mode, Task Scheduler, Store, proof, or product path.
+- Independent integrity and lifecycle QA each return `P0/P1/P2/P3/GAP = 0/0/0/0/0`. They verify
+  the exact mechanical R8-to-R9 identity/schema/namespace transform, retained no-follow and Git
+  blob/hash/closure plus Git-clean-before-load guards, strict mode grammar, R9-only inventory,
+  and the intentional absence of the EOL-sensitive raw working-tree/blob equality decision.
+- Status: accepted and immutable. No R9 input, attempt, candidate, result, terminal, stage, task,
+  Store, proof, curriculum/UI, sensory/browser, or player-acceptance action ran.
+- Next action: author and independently review a four-document R9 input/literal-command contract;
+  only after acceptance may it create one fresh input and invoke the one no-write preflight.
