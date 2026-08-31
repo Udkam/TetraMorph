@@ -11191,3 +11191,13 @@ checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R1
 --expect-head <literal-head> --expect-input-sha <above-SHA>`. It is no-write/no-task/no-Store/
 no-proof; nonzero consumes R10. Outer/worker, Task Scheduler, source integration and every product
 path remain closed.
+
+### F4E-R10 R31 successful no-write preflight receipt
+
+R10's sole preflight ran once at `7364a9fd41b8e271920244a955e4d417df3425df` with literal root,
+input, domain, HEAD and input-SHA arguments and exited 0 without output. Postflight confirms the
+unchanged 1,183-byte `AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`
+input and zero R10 attempt/candidate/result/terminal/stage/owned-process residue. No task, Store,
+proof or product action ran. Preflight is consumed. The sole next eligible operation is one R10
+outer invocation using this input/domain and a fresh literal current-HEAD pin; all other paths
+remain closed pending its audited terminal.

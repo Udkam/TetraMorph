@@ -10931,3 +10931,10 @@ bytes / `2F7F954D792C5DF5E3B69DE203BB5323F58304895B8DBAFF6EFBC714CD301FE0` (Base
 the same count-one `SQLHTCR` 8-drop/4-row/5..7-lock domain. Rehash and inspect empty R10 names,
 then run only one literal-current-HEAD no-write R10 preflight. Nonzero consumes R10; all execution
 and product paths remain closed.
+
+### 2026-09-01 F4E-R10 R31 preflight receipt
+
+R10's unique preflight at `7364a9fd41b8e271920244a955e4d417df3425df` exited 0 without output.
+Postflight confirms unchanged 1,183-byte `AB80185F…AA332` input and zero R10 mutable/process
+residue; it performed no task/Store/proof/product action. It is consumed. The only next action is
+one audited R10 outer with a fresh literal HEAD and immutable input/domain pins.

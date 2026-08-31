@@ -3837,3 +3837,10 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   for count one / `SQLHTCR` / 8 drops / 4 rows / locks 5..7.
 - Rehash input and R10-empty namespace, then only one literal-HEAD no-write preflight. Nonzero
   consumes R10; outer/worker/task/Store/proof/product paths remain closed.
+
+### F4E-R10 R31 successful preflight
+
+- R10's sole preflight at `7364a9fd41b8e271920244a955e4d417df3425df` exited 0 without output.
+- Input remains 1,183 bytes / `AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`;
+  attempt/candidate/result/terminal/stage/non-self process remain absent. No task/Store/proof/
+  product action ran. Preflight is consumed; only one outer with fresh literal HEAD is next.

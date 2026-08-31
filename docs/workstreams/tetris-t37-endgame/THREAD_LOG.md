@@ -1434,3 +1434,13 @@ product path is open.
 - After two all-zero reviews, inspect fresh input/no-follow identity/hash and empty R10 mutable
   names, then run one literal-current-HEAD R10 preflight only. Nonzero consumes R10; all outer/
   worker/task/Store/proof/product paths remain closed.
+
+### F4E-R10 R31 successful no-write preflight receipt
+
+- R10 `--preflight` ran once at literal HEAD `7364a9fd41b8e271920244a955e4d417df3425df` with
+  frozen absolute root/input/domain/SHA arguments and exited 0 without output.
+- Postflight: immutable input 1,183 bytes /
+  `AB80185F0710F9FCCD7F41D074A8451DCA15EB6AAEB35697E05A45CD831AA332`; zero R10 attempt/
+  candidate/result/terminal/stage/non-self process. No task, Store, proof or product action ran.
+- Preflight is consumed. Next is one audited R10 outer only, with fresh literal current HEAD and
+  this immutable input/domain.
