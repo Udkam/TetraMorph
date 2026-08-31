@@ -10891,3 +10891,15 @@ using literal root/input/domain/HEAD/input-SHA arguments. Postflight rehash conf
 no task/Store/proof/product action occurred. Preflight is consumed and cannot be rerun. The next
 and only eligible action is one separately audited R9 outer attempt using this immutable input and
 a fresh literal current-HEAD source pin; every other path remains closed.
+
+### 2026-09-01 F4E-R9 R27 consumed outer / R10 successor
+
+R9's sole actual outer at `349ab5e473777105dba19ffe528da854b812d77a` created attempt
+`29612CAC…93B8` / `r9-8041f201c649c194836b8309` and a disabled task, then stopped before
+start/worker/Store/proof because Scheduler export omits explicit default `LeastPrivilege` and
+`AllowStartOnDemand=true` fields. Candidate/result/terminal/stage/process are absent. R9 evidence
+is frozen; do not retry, resume or alter it.
+
+Post-review only, R10 creates fresh static source/new r10 namespace. It may apply mechanical
+R9-to-R10 identity/schema replacement and let only those two XML fields be omitted or equal their
+safe default; every other guard is unchanged. No R10 execution or product path opens.

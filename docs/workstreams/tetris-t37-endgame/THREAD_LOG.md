@@ -1383,3 +1383,18 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   action ran. Preflight is permanently consumed; do not rerun it.
 - Next action: one audited R9 outer attempt only, using a fresh literal current-HEAD pin and this
   immutable input/domain; its terminal decides whether source integration opens.
+
+### F4E-R9 R27 consumed outer interruption / R10 static successor
+
+- After a local wrong HEAD was rejected before Node, the sole R9 outer at
+  `349ab5e473777105dba19ffe528da854b812d77a` failed closed `Task Scheduler XML shape differs`
+  before task start, worker, Store or proof.
+- Immutable attempt: 2,973 bytes / `29612CAC102B4F197AF82A409CA24049E5155E8ED0A1D90DA2843E87661993B8`,
+  run `r9-8041f201c649c194836b8309`; task
+  `\\TetraMorph\\F4E-R9-Intro05-r9-8041f201c649c194836b8309` remains Disabled. Candidate/result/
+  terminal/stage/owned parts/non-self process are absent. Do not retry, resume or alter R9.
+- Scheduler's export omits explicit safe-default RunLevel and AllowStartOnDemand fields. R10 may
+  only accept each as absent or exactly the safe value; any present mismatch stays fatal.
+- Next: two contract reviews, then fresh R10 static source/new r10 namespace through mechanical
+  identity/schema replacement plus that verifier correction. No R10 mode/input/task/Store/proof/
+  product path is open.

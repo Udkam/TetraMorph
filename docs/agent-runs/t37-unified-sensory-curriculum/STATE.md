@@ -3797,3 +3797,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   Store, proof, or product action ran.
 - Preflight is consumed. The sole next eligible action is one audited R9 outer attempt with the
   immutable input/domain and a newly literalized current HEAD; no other action opens.
+
+### F4E-R9 R27 consumed outer / R10 static boundary
+
+- R9 actual outer at `349ab5e473777105dba19ffe528da854b812d77a` published 2,973-byte /
+  `29612CAC102B4F197AF82A409CA24049E5155E8ED0A1D90DA2843E87661993B8` attempt and a disabled
+  task, then failed closed before start or worker because Windows export omits explicit safe
+  default RunLevel/AllowStartOnDemand nodes.
+- Candidate/result/terminal/stage/owned parts/non-self process are absent. R9 attempt/task/input
+  are immutable and cannot rerun, resume, delete or repair.
+- R10 static source/new r10 namespace opens only after review: mechanical R9-to-R10 replacement
+  plus only omission-or-exact-safe-default acceptance for those two XML fields; all other guards
+  and R10 execution/product paths remain closed.

@@ -11119,3 +11119,24 @@ or product action ran. The input is immutable and R9's preflight is consumed; it
 rerun. The only subsequently eligible operation is one R9 `--outer`, with a newly literalized
 current checkpoint HEAD and the same immutable input/domain pins; all other modes and product
 paths remain closed until its audited terminal disposition.
+
+### F4E-R9 R27 consumed outer interruption and R10 static-source contract
+
+R9's only actual `--outer` used literal HEAD `349ab5e473777105dba19ffe528da854b812d77a`; one
+earlier locally mistyped HEAD was rejected before Node and did not invoke the runner. The outer
+published immutable attempt `t37-f4e-endgame-canonical-attempt-r9.json`, 2,973
+UTF-8/no-BOM/LF bytes / `29612CAC102B4F197AF82A409CA24049E5155E8ED0A1D90DA2843E87661993B8`,
+run `r9-8041f201c649c194836b8309`, then registered disabled task
+`\\TetraMorph\\F4E-R9-Intro05-r9-8041f201c649c194836b8309`. It failed closed at
+`Task Scheduler XML shape differs`, before task enable/start, worker, Store or proof. Candidate,
+result, terminal, stage, owned parts and non-self runner processes are absent. Retain the attempt,
+input and disabled task unchanged: R9 is consumed and cannot rerun, resume, delete or repair.
+
+Windows exported the verified user/action/working-directory/disabled/`IgnoreNew` task but omitted
+the explicit safe-default `<RunLevel>LeastPrivilege</RunLevel>` and
+`<AllowStartOnDemand>true</AllowStartOnDemand>` nodes. R10 opens only fresh static source/namespace
+after two all-zero contract reviews. It may mechanically replace R9 identity/schema/namespace and
+change only `assertTaskXml` so each field is either absent (Windows default) or exactly its safe
+value; any present mismatch remains fatal. All other principal, token, disabled, Exec, action,
+working-directory, no-follow, source pin, CLI, task/store/publication and collision guards remain
+unchanged. No R10 mode, input, task, Store/proof or product action is open.
