@@ -3975,3 +3975,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   source-pin/lifecycle safeguards remain.
 - R14 source immutable; input/attempt/candidate/result/terminal/stage/task/process absent. Next is
   a separately reviewed fresh input/no-write-preflight contract only.
+
+### F4E-R14 R42 input/preflight contract
+
+- Post-review only create absent no-follow R14 input: 1,183 UTF-8/no-BOM/LF bytes /
+  `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`, schema
+  `t37-f4e-r14-intro05-input-v1`, fixed route/definition `DB814FF9…0A16`.
+- Domain: 192 bytes / `4CB0007FCCB20355EDD465AC07FB12A221083FA685953BE24586A88DA5E61064`,
+  Base64 in DESIGN; count one / `SQLHTCR` / 8 drops / 4 rows / 5..7 locks.
+- After two all-zero reviews, verify no-follow/hash/empty R14 names and run one literal-HEAD
+  no-write preflight only. Nonzero consumes R14; all execution/product paths remain closed.

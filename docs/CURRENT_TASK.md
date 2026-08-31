@@ -1084,6 +1084,15 @@ integrity/lifecycle QA are all `0/0/0/0/0`. It only corrects exported Arguments 
 literal action text while registration remains escaped and every other guard stays exact. Source
 immutable; next is fresh R14 input/preflight contract only, not input/execution/product action.
 
+### 2026-09-01 F4E-R14 R42 input/preflight pin
+
+After two all-zero reviews only, create absent fresh R14 input `...r14-intro05-input.json`: 1,183
+UTF-8/no-BOM/LF bytes / `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`, schema
+`t37-f4e-r14-intro05-input-v1`, fixed route/definition `DB814FF9…0A16`; domain is 192 bytes /
+`4CB0007FCCB20355EDD465AC07FB12A221083FA685953BE24586A88DA5E61064` (Base64 in DESIGN), one
+`SQLHTCR` candidate, 8 drops, 4 rows, 5..7 locks. Then one literal-current-HEAD no-write preflight;
+nonzero consumes R14, and all outer/worker/Task/Store/proof/product paths remain closed.
+
 The first writer correctly stopped before creating either path because nested exact keys and
 three scalar literals were underspecified. `docs/DESIGN.md` now freezes every top/nested key,
 artifact/schema version, and claim string; no implementer-selected field name is permitted.

@@ -11233,6 +11233,25 @@ mechanical isolation plus only an exact exported `<Arguments>` comparator using 
 byte-equivalent. The source is immutable. A later four-document contract may open only fresh R14
 input and one no-write preflight; no R14 mode, Task Scheduler, Store/proof or product action opens.
 
+### F4E-R14 R42 canonical input and no-write preflight contract
+
+After two all-zero reviews, create only absent no-follow
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r14-intro05-input.json`: 1,183
+UTF-8/no-BOM/LF bytes / SHA-256 `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`,
+schema `t37-f4e-r14-intro05-input-v1`, fixed primary route and 682-byte definition
+`DB814FF9DB1E83A967541A35C91CF749A08E45DE5AF47AAB38FE4DBE2AC80A16`. It is fresh R14 bytes.
+
+Domain is 192 canonical bytes / SHA-256
+`4CB0007FCCB20355EDD465AC07FB12A221083FA685953BE24586A88DA5E61064`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTQtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K`:
+one `t3r-shaft-04`, `SQLHTCR`, eight drops, four rows and five-to-seven locks.
+
+After no-follow/hash and empty R14 namespace checks, use the committed checkpoint's literal
+lowercase HEAD in exactly one ordered R14 `--preflight --root <absolute-root> --input
+<absolute-input> --domain-json-base64 <above> --expect-head <literal-head> --expect-input-sha
+<above-SHA>`. It is no-write; nonzero consumes R14. Outer/worker/Task Scheduler/Store/proof/
+product paths remain closed.
+
 ### F4E-R11 R35 malformed input materialization / R12 static successor
 
 R11's authorized materialization created its previously absent input but the patch transport added
