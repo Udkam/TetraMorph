@@ -3854,3 +3854,19 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Post-review only R11 source may bind task record and exact XML UserId to one strict SID obtained
   from the existing noninteractive PowerShell current token. No username/arbitrary/changed SID
   acceptance or any R11 execution/product path opens.
+
+### F4E-R11 R33 static-source acceptance
+
+- Source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r11.mjs`,
+  70,756 UTF-8/no-BOM/LF bytes / SHA-256
+  `5616C5813D039D35E4CCDD2277B240A5FF75FC2ADE852F0C2FC3BA7E37288537`; parser-only syntax is
+  green.
+- Independent integrity and lifecycle reviews each report `P0/P1/P2/P3/GAP = 0/0/0/0/0` without
+  invoking a mode or touching Scheduler/Store/proof/product state. The exact SID expression is
+  `^S-\d+(?:-\d+)+$`; the SID is derived only through the existing PowerShell transport and is
+  covered by task/action revalidation and exact XML UserId matching.
+- R11 normalized to R10 outside that authorized identity binding is byte-equivalent. Its source is
+  immutable; R11 mutable namespace, task, input, attempt, candidate, result, terminal, stage and
+  processes are absent.
+- Next action: author and independently review a four-document R11 input/no-write-preflight
+  contract. No input creation, validator mode, Task Scheduler, Store/proof or product path opens.

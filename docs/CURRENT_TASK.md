@@ -10947,3 +10947,13 @@ the current interactive token SID. Candidate/result/terminal/stage/process remai
 R10 untouched. R11, post-review only, may use existing PowerShell transport to derive one strict
 current-token SID, place it in task/action hash and require exact XML `<UserId>` match; it may not
 accept a username/arbitrary/changed SID. All other guards and paths remain closed.
+
+### 2026-09-01 F4E-R11 R33 static-source acceptance
+
+R11 static validator is accepted at 70,756 UTF-8/no-BOM/LF bytes / SHA-256
+`5616C5813D039D35E4CCDD2277B240A5FF75FC2ADE852F0C2FC3BA7E37288537`; parser plus independent
+integrity/lifecycle reviews are all `0/0/0/0/0`. Its only R10-normalized semantic change binds the
+task/action/XML UserId to a strict current interactive-token SID; all XML, lifecycle and
+one-attempt guards remain fail-closed. The immutable source has not executed. Next action is a
+four-document fresh R11 input/preflight contract only; creation of input and every R11 execution
+or product action remains closed until that contract is independently reviewed.

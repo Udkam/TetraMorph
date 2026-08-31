@@ -11221,3 +11221,18 @@ existing noninteractive PowerShell transport using `[System.Security.Principal.W
 hash, and require exact matching `<UserId>` export. It may not accept a username, arbitrary SID,
 or a changed SID. All R10 default/empty-trigger rules and every other guard remain exact. No R11
 mode, input, task, Store/proof or product action opens.
+
+### F4E-R11 R33 static-source acceptance
+
+The sole R11 source at `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r11.mjs`
+is accepted: 70,756 UTF-8/no-BOM/LF bytes / SHA-256
+`5616C5813D039D35E4CCDD2277B240A5FF75FC2ADE852F0C2FC3BA7E37288537`.
+Parser-only syntax and independent integrity/lifecycle reviews each return
+`P0/P1/P2/P3/GAP = 0/0/0/0/0`. R11 is mechanically isolated from R10 except that `taskRecord`
+obtains exactly one current interactive-token SID through the pre-existing noninteractive
+PowerShell transport, validates `^S-\d+(?:-\d+)+$`, includes it in the immutable task/action hash,
+and requires an exact exported `<UserId>` match. There is no username, arbitrary-SID, or changed-
+SID fallback. All R10 no-follow, source-pin, strict CLI, XML default/unique empty-trigger,
+task/store/publication and fail-closed lifecycle guards remain byte-equivalent. The source is
+immutable. A later four-document checkpoint may open only fresh R11 input and one no-write
+preflight; no R11 mode, Task Scheduler, Store/proof or product action is yet authorized.

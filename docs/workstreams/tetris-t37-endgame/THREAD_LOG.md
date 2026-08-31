@@ -1456,3 +1456,19 @@ product path is open.
 - R11 source after review may only replace identity/schema/namespace plus bind task action/UserId
   to strict current-token SID read through the existing PowerShell transport. No loose username or
   SID acceptance; retain all other guards and all execution/product closure.
+
+### F4E-R11 R33 static-source acceptance
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R11-STATIC-001`.
+- Source: `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r11.mjs`,
+  70,756 UTF-8/no-BOM/LF bytes / SHA-256
+  `5616C5813D039D35E4CCDD2277B240A5FF75FC2ADE852F0C2FC3BA7E37288537`.
+- Commands actually run: parser-only `E:\\Nodejs\\node.exe --check` and static text/hash checks.
+  Independent integrity and lifecycle QA each report `P0/P1/P2/P3/GAP = 0/0/0/0/0`; neither
+  invoked any mode, wrote a mutable R11 artifact, or touched Scheduler/Store/proof/product state.
+- Acceptance: R11 is an R10-normalized mechanical identity/schema/namespace replacement plus only
+  strict current-token SID task/action/XML UserId binding (`^S-\d+(?:-\d+)+$`). R10 XML default and
+  unique empty-trigger checks and the remaining fail-closed lifecycle are retained unchanged.
+- Status: immutable static source; R11 input, attempt, candidate, result, terminal, stage, task,
+  Store/proof and product action are absent. Next action is a separate reviewed input/preflight
+  contract only.
