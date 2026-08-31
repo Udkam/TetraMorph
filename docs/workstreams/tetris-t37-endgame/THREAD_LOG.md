@@ -1590,4 +1590,11 @@ product path is open.
   named absent R14 input; required bytes/SHA are 1,183 /
   `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`.
 - No R14 mutable artifact or mode ran. All prior fresh/no-follow/literal-head/one-preflight/nonzero
-  closure remains and requires two fresh reviews before materialization.
+ closure remains and requires two fresh reviews before materialization.
+
+### F4E-R14 R44 domain-Base64 correction
+
+- R42 domain Base64 was truncated. DESIGN R44 now holds the sole full domain Base64: decode exactly
+  to 192 bytes / `4CB0007FCCB20355EDD465AC07FB12A221083FA685953BE24586A88DA5E61064`, with
+  `commandAlphabet` and `maximumLocks`; it supersedes all R42 occurrences.
+- No R14 input/mode ran. Repeat both independent reviews before materialize/preflight.

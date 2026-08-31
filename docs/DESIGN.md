@@ -11263,6 +11263,14 @@ The only authorized output is the previously absent R14 input path named in R42,
 exact bytes; every other R42 domain, no-follow, literal-HEAD, one-preflight and nonzero-consumes
 constraint is unchanged.
 
+### F4E-R14 R44 domain-Base64 correction
+
+R42's previously printed domain Base64 was truncated and must never be used. The sole R14 domain
+Base64 is exactly `eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTQtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K`; it decodes to 192 canonical bytes /
+`4CB0007FCCB20355EDD465AC07FB12A221083FA685953BE24586A88DA5E61064` with all exact keys,
+including `commandAlphabet:"SQLHTCR"` and `maximumLocks:7`. It supersedes every earlier R42 domain
+Base64 occurrence; all other R42/R43 constraints remain unchanged. No R14 input or mode ran.
+
 ### F4E-R11 R35 malformed input materialization / R12 static successor
 
 R11's authorized materialization created its previously absent input but the patch transport added

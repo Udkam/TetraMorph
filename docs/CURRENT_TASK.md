@@ -1100,6 +1100,12 @@ Base64 payload in DESIGN R43, decoded once without transformation to the named a
 decoded SHA remains `D31C6680…0EB3`. No file was created and no execution ran. All R42 constraints
 are unchanged; repeat both independent reviews before materialize/preflight.
 
+### 2026-09-01 F4E-R14 R44 domain-Base64 correction
+
+R42 printed a truncated domain Base64; do not use it. The sole domain is the complete Base64 in
+DESIGN R44, decoding to 192 bytes / `4CB0007F…1064` with `SQLHTCR` and maximumLocks 7. It
+supersedes every R42 occurrence. No R14 input/preflight ran; repeat two fresh reviews.
+
 The first writer correctly stopped before creating either path because nested exact keys and
 three scalar literals were underspecified. `docs/DESIGN.md` now freezes every top/nested key,
 artifact/schema version, and claim string; no implementer-selected field name is permitted.
