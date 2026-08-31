@@ -3985,3 +3985,11 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   Base64 in DESIGN; count one / `SQLHTCR` / 8 drops / 4 rows / 5..7 locks.
 - After two all-zero reviews, verify no-follow/hash/empty R14 names and run one literal-HEAD
   no-write preflight only. Nonzero consumes R14; all execution/product paths remain closed.
+
+### F4E-R14 R43 canonical-payload correction
+
+- R42 is corrected before execution: DESIGN R43 now contains the sole complete R14 canonical-input
+  Base64. Decode it once without transformations to the R42 absent path; it must be 1,183 bytes /
+  `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`.
+- No R14 input/mode/task/Store/proof/product action ran. Every R42 guard remains unchanged; this
+  corrected contract needs two fresh independent all-zero reviews before materialization.

@@ -1582,3 +1582,12 @@ product path is open.
   Base64 in DESIGN; one `SQLHTCR` candidate, 8 drops, 4 rows, 5..7 locks.
 - After two all-zero reviews, verify no-follow/hash/empty names then one literal-current-HEAD
   no-write preflight. Nonzero consumes R14; all outer/worker/Task/Store/proof/product paths closed.
+
+### F4E-R14 R43 canonical-payload correction
+
+- R42 review found the input not independently reconstructible. Before any execution, DESIGN R43
+  now pins the full canonical Base64. Decode that exact payload once without transformation to the
+  named absent R14 input; required bytes/SHA are 1,183 /
+  `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`.
+- No R14 mutable artifact or mode ran. All prior fresh/no-follow/literal-head/one-preflight/nonzero
+  closure remains and requires two fresh reviews before materialization.

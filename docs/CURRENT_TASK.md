@@ -1093,6 +1093,13 @@ UTF-8/no-BOM/LF bytes / `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448
 `SQLHTCR` candidate, 8 drops, 4 rows, 5..7 locks. Then one literal-current-HEAD no-write preflight;
 nonzero consumes R14, and all outer/worker/Task/Store/proof/product paths remain closed.
 
+### 2026-09-01 F4E-R14 R43 canonical-payload correction
+
+R42 lacked a self-contained payload and is not executable. The unique R14 input is now the exact
+Base64 payload in DESIGN R43, decoded once without transformation to the named absent path; its
+decoded SHA remains `D31C6680…0EB3`. No file was created and no execution ran. All R42 constraints
+are unchanged; repeat both independent reviews before materialize/preflight.
+
 The first writer correctly stopped before creating either path because nested exact keys and
 three scalar literals were underspecified. `docs/DESIGN.md` now freezes every top/nested key,
 artifact/schema version, and claim string; no implementer-selected field name is permitted.
