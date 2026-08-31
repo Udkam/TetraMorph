@@ -11192,6 +11192,22 @@ checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R1
 no-proof; nonzero consumes R10. Outer/worker, Task Scheduler, source integration and every product
 path remain closed.
 
+### F4E-R11 R35 malformed input materialization / R12 static successor
+
+R11's authorized materialization created its previously absent input but the patch transport added
+one extra terminal LF: the retained regular file is 1,184 UTF-8/no-BOM/LF bytes / SHA-256
+`F7FC29289513F1DB38BC4AA5649F73A18004F7817CD933C2A90BBC1C76865505`, versus the frozen
+1,183-byte `607C0FF51CA5522D66664D693C8607CCE885D9D491BD3D294B8443FF5272A5B2`. A local prelaunch
+hash check stopped before Node, so no R11 validator mode or Scheduler/Store/proof/product action
+ran; the only byte difference is a second final LF. Retain this malformed input unchanged: do not
+trim, replace, delete, reuse or invoke R11 preflight. R11 is closed fail-closed.
+
+R12 opens only fresh static source/namespace after two all-zero reviews. It may mechanically
+replace R11 identity/schema/namespace with R12 while preserving the accepted strict SID binding,
+no-follow, source pin, strict CLI, XML, task/store/publication and fail-closed lifecycle guards.
+No R12 input, mode, Task Scheduler, Store/proof or product action opens until that fresh static
+source is parser-checked and independently accepted.
+
 ### F4E-R10 R31 successful no-write preflight receipt
 
 R10's sole preflight ran once at `7364a9fd41b8e271920244a955e4d417df3425df` with literal root,

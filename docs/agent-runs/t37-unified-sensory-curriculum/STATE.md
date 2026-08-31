@@ -3888,3 +3888,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   identity/hash and empty R11 mutable names, literalize the committed checkpoint's lowercase HEAD,
   then invoke one ordered R11 `--preflight`. It must perform no Task Scheduler/Store/proof/product
   action. Nonzero consumes R11; outer/worker and all product paths stay closed.
+
+### F4E-R11 R35 malformed materialization / R12 static boundary
+
+- The one authorized R11 input materialization produced a retained 1,184-byte UTF-8/no-BOM/LF
+  regular file / SHA-256 `F7FC29289513F1DB38BC4AA5649F73A18004F7817CD933C2A90BBC1C76865505`, not
+  the contract's 1,183-byte `607C0FF51CA5522D66664D693C8607CCE885D9D491BD3D294B8443FF5272A5B2`.
+  Byte comparison finds exactly one extra final LF.
+- The coordinator hash precondition stopped before Node. R11 validator preflight/outer/worker,
+  Task Scheduler, Store, proof, candidate, result, terminal, stage and product paths did not run.
+  The malformed input is immutable and cannot be trimmed, replaced, deleted, reused or retried.
+- Post-review only R12 may author a fresh static R11-to-R12 identity/schema/namespace successor;
+  it retains strict current-token SID, no-follow, source-pin, XML and lifecycle guards. No R12
+  input, mode, task, Store/proof or product action is open.

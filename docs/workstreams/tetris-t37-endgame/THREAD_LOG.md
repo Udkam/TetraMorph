@@ -1487,3 +1487,15 @@ product path is open.
   checkpoint's exact lowercase HEAD in one ordered no-write preflight. No shell substitution,
   outer/worker, Task Scheduler, Store, proof, source integration or product path is allowed;
   nonzero consumes R11.
+
+### F4E-R11 R35 malformed materialization / R12 static successor
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R11-INPUT-001` stopped locally before validator launch.
+  Created R11 input is 1,184 UTF-8/no-BOM/LF bytes / SHA-256
+  `F7FC29289513F1DB38BC4AA5649F73A18004F7817CD933C2A90BBC1C76865505`, with one extra terminal
+  LF over the frozen 1,183-byte `607C0FF51CA5522D66664D693C8607CCE885D9D491BD3D294B8443FF5272A5B2`.
+- Commands actually run: hash/head preconditions only. Hash mismatch stopped before Node; no R11
+  preflight/mode, Task Scheduler, Store, proof, candidate/result/terminal/stage or product action.
+- Status: malformed R11 input retained immutable; do not modify/delete/reuse/retry. R12 opens only
+  after review for a mechanical R11-to-R12 static source/namespace successor preserving all
+  accepted guards. No R12 input or execution/product path is open.

@@ -10970,3 +10970,12 @@ The R11-only domain is 192 bytes / `06E363774089C0369924E523AED4C10D183A06BD8C2B
 seven locks. Rehash/no-follow check this new file and prove the R11 mutable namespace empty, then
 run precisely one literal-current-HEAD no-write preflight. A nonzero consumes R11; outer/worker/
 Task Scheduler/Store/proof/product paths remain closed.
+
+### 2026-09-01 F4E-R11 R35 malformed materialization / R12 successor
+
+R11 input materialization is closed before validator invocation: retained R11 input is 1,184 bytes
+/ `F7FC29289513F1DB38BC4AA5649F73A18004F7817CD933C2A90BBC1C76865505`, one extra terminal LF
+over its frozen 1,183-byte hash. The local hash precondition stopped before Node; no mode/task/
+Store/proof/product action ran. Do not alter, delete, retry or use it. Following fresh review only,
+R12 may author a mechanically identity/schema/namespace-isolated static successor preserving all
+accepted R11 guards; no R12 input or execution path is open.
