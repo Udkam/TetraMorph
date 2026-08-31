@@ -1499,3 +1499,15 @@ product path is open.
 - Status: malformed R11 input retained immutable; do not modify/delete/reuse/retry. R12 opens only
   after review for a mechanical R11-to-R12 static source/namespace successor preserving all
   accepted guards. No R12 input or execution/product path is open.
+
+### F4E-R12 R36 malformed static source / R13 successor
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R12-STATIC-001` stopped before review. Retained R12
+  source is 70,757 UTF-8/no-BOM/LF bytes / SHA-256
+  `B9E4F1FB8C4675AC7470A6457EBA663B9CC91B3159C9926F04264C7D1AF9028A`; exact mechanical transform
+  is 70,756 bytes / `F5D8E283B56C2A9A02CD6555F38CBD95CD5276C62D73C4A70DA5ED2F9F1EC715`.
+- Static byte comparison finds one extra final LF. Parser-only syntax passed; no R12 QA/mode,
+  Task Scheduler, Store/proof or product action occurred. Retain source immutable; do not alter,
+  delete, reuse or review it.
+- R13 opens after review only for fresh mechanical identity/schema/namespace static source with
+  final-LF-safe transport. All R13 input/execution/product paths remain closed.

@@ -10979,3 +10979,12 @@ over its frozen 1,183-byte hash. The local hash precondition stopped before Node
 Store/proof/product action ran. Do not alter, delete, retry or use it. Following fresh review only,
 R12 may author a mechanically identity/schema/namespace-isolated static successor preserving all
 accepted R11 guards; no R12 input or execution path is open.
+
+### 2026-09-01 F4E-R12 R36 malformed static source / R13 successor
+
+R12 source generation is closed before review or execution: retained source is 70,757 bytes /
+`B9E4F1FB8C4675AC7470A6457EBA663B9CC91B3159C9926F04264C7D1AF9028A`, one extra terminal LF over
+the exact 70,756-byte mechanical transform `F5D8E283…EC715`. Parser check passed, but no R12
+review/mode/task/Store/proof/product action ran; retain it unchanged. Following fresh review only,
+R13 may author the same bounded mechanical static successor with a final-LF-safe transport; no R13
+input or execution path is open.

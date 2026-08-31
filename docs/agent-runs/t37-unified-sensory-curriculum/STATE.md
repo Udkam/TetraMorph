@@ -3901,3 +3901,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Post-review only R12 may author a fresh static R11-to-R12 identity/schema/namespace successor;
   it retains strict current-token SID, no-follow, source-pin, XML and lifecycle guards. No R12
   input, mode, task, Store/proof or product action is open.
+
+### F4E-R12 R36 malformed static source / R13 static boundary
+
+- R12 source materialization produced retained 70,757 UTF-8/no-BOM/LF bytes / SHA-256
+  `B9E4F1FB8C4675AC7470A6457EBA663B9CC91B3159C9926F04264C7D1AF9028A`, instead of exact
+  mechanical R11-to-R12 70,756 bytes / `F5D8E283B56C2A9A02CD6555F38CBD95CD5276C62D73C4A70DA5ED2F9F1EC715`.
+  Comparison proves exactly one additional final LF. Parser-only syntax passed.
+- No review, R12 mode, Task Scheduler, Store, proof, candidate/result/terminal/stage or product
+  path ran. Retain malformed R12 source immutable; do not modify/delete/reuse/review it.
+- Post-review only R13 may author a fresh mechanical source/namespace successor, preserving all
+  R11 controls and adding no semantic change. Its transport must avoid a blank terminal add-line;
+  R13 input/mode/task/Store/proof/product paths are closed.

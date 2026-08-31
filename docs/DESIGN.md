@@ -11208,6 +11208,22 @@ no-follow, source pin, strict CLI, XML, task/store/publication and fail-closed l
 No R12 input, mode, Task Scheduler, Store/proof or product action opens until that fresh static
 source is parser-checked and independently accepted.
 
+### F4E-R12 R36 malformed static-source materialization / R13 successor
+
+R12 static-source materialization is closed before review or mode: retained source is 70,757
+UTF-8/no-BOM/LF bytes / SHA-256 `B9E4F1FB8C4675AC7470A6457EBA663B9CC91B3159C9926F04264C7D1AF9028A`,
+whereas byte-exact mechanical R11-to-R12 transformation is 70,756 bytes /
+`F5D8E283B56C2A9A02CD6555F38CBD95CD5276C62D73C4A70DA5ED2F9F1EC715`. Comparison proves the
+sole difference is one second terminal LF. Parser-only syntax passed, but no review, R12 mode,
+Task Scheduler, Store/proof or product action ran. Retain it unchanged: do not trim, replace,
+delete, reuse or review it.
+
+R13 opens only fresh static source/namespace after two all-zero reviews. It may mechanically
+replace R11 identity/schema/namespace with R13, retaining every accepted SID/no-follow/source-pin/
+strict-CLI/XML/task/store/publication/lifecycle guard. The transport must construct its final LF
+without adding a blank added line. No R13 input, mode, Task Scheduler, Store/proof or product
+action opens until static parser and independent acceptance complete.
+
 ### F4E-R10 R31 successful no-write preflight receipt
 
 R10's sole preflight ran once at `7364a9fd41b8e271920244a955e4d417df3425df` with literal root,
