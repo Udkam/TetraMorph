@@ -1371,3 +1371,15 @@ F4E-R6-CONSUMED-V1 {"head":"8776bb8adf9f5042266966a4cebaef63e25ea526","srcTree":
   and invoke one ordered R9 `--preflight`. No shell substitution, outer/worker, task, Store,
   proof, candidate, terminal, stage, source integration, curriculum/UI, sensory/browser, or
   player-acceptance action is permitted. A nonzero result consumes R9 and permits no retry.
+
+### F4E-R9 R26 successful no-write preflight receipt
+
+- Command executed once at `d7d36f9b37e2299f455abe0335789a49e2a2144a`: R9 `--preflight` with
+  literal absolute root/input, frozen domain Base64, literal lowercase HEAD, and input SHA.
+- Result: exit 0 with no output. Postflight confirms input 1,182 bytes /
+  `4FF9DA912F0FD89F4F5A5C6A63CB44ABB4F7D06AEC98DD8C647E89E032B90AAA`, zero R9
+  attempt/candidate/worker-result/terminal/stage residue, and zero non-self R9 runner processes.
+- No task, Store, proof, candidate, terminal, source, curriculum/UI, sensory/browser, or player
+  action ran. Preflight is permanently consumed; do not rerun it.
+- Next action: one audited R9 outer attempt only, using a fresh literal current-HEAD pin and this
+  immutable input/domain; its terminal decides whether source integration opens.

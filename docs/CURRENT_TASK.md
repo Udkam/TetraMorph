@@ -10882,3 +10882,12 @@ After rehashing the fresh file and proving empty R9 mutable names, compute this 
 checkpoint's lowercase HEAD and pass that literal value in the one ordered R9 `--preflight`.
 It is no-write and fail-closed; any nonzero consumes R9. Outer/worker/task/Store/proof/source/
 product paths remain closed.
+
+### 2026-09-01 F4E-R9 R26 preflight receipt
+
+The one R9 preflight at `d7d36f9b37e2299f455abe0335789a49e2a2144a` passed silently with exit 0
+using literal root/input/domain/HEAD/input-SHA arguments. Postflight rehash confirms the unchanged
+1,182-byte `4FF9DA91…B90AAA` input and no R9 mutable object or runner process. It was no-write:
+no task/Store/proof/product action occurred. Preflight is consumed and cannot be rerun. The next
+and only eligible action is one separately audited R9 outer attempt using this immutable input and
+a fresh literal current-HEAD source pin; every other path remains closed.

@@ -11106,3 +11106,16 @@ one ordered R9 `--preflight --root <absolute-root> --input <absolute-input>
 It is no-write/no-task/no-Store/no-proof; nonzero consumes R9 with no retry. `--outer`, `--worker`,
 Task Scheduler, candidate/terminal/stage, source integration, curriculum/UI, sensory/browser and
 player acceptance remain closed.
+
+### F4E-R9 R26 successful no-write preflight receipt
+
+R9's sole `--preflight` was invoked once at checkpoint
+`d7d36f9b37e2299f455abe0335789a49e2a2144a` with literal absolute root/input paths, the frozen R9
+domain Base64, literal lowercase HEAD, and exact input SHA. It exited 0 without output. Its
+postflight audit rehashes the plain input at 1,182 bytes /
+`4FF9DA912F0FD89F4F5A5C6A63CB44ABB4F7D06AEC98DD8C647E89E032B90AAA` and finds no R9 attempt,
+candidate, worker result, terminal, stage, owned parts, or runner process. No task, Store, proof,
+or product action ran. The input is immutable and R9's preflight is consumed; it must never be
+rerun. The only subsequently eligible operation is one R9 `--outer`, with a newly literalized
+current checkpoint HEAD and the same immutable input/domain pins; all other modes and product
+paths remain closed until its audited terminal disposition.

@@ -3787,3 +3787,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - After two all-zero reviews, rehash/inspect the absent-to-created input and R9 mutable inventory,
   then invoke exactly one ordered no-write preflight with the committed checkpoint's literal
   lowercase HEAD. Nonzero consumes R9; outer/worker/task/Store/proof/product paths stay closed.
+
+### F4E-R9 R26 successful preflight
+
+- The sole R9 `--preflight` ran once at `d7d36f9b37e2299f455abe0335789a49e2a2144a` with literal
+  root/input/domain/HEAD/SHA arguments and returned exit 0 without output.
+- Postflight confirms the original 1,182-byte / `4FF9DA912F0FD89F4F5A5C6A63CB44ABB4F7D06AEC98DD8C647E89E032B90AAA`
+  input plus zero R9 attempt/candidate/result/terminal/stage/owned-process residue. No task,
+  Store, proof, or product action ran.
+- Preflight is consumed. The sole next eligible action is one audited R9 outer attempt with the
+  immutable input/domain and a newly literalized current HEAD; no other action opens.
