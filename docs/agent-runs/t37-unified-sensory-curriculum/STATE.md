@@ -4062,3 +4062,10 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   `EB7B72061553272096F9C6B1F105509B2BDAB1D1E1CCE099E419DC65710F636C`, then one literal-HEAD
   no-write preflight against the DESIGN domain. Failure consumes R15; outer/proof/product and
   acceptance remain closed.
+
+### 2026-09-01 F4E-R15 R53 preflight / outer boundary
+
+- Sole R15 preflight at `c1020df…04240` exits 0 with no output and no mutable namespace residue.
+  A prior PowerShell parse error never started Node or wrote anything. Preflight is consumed.
+- One fresh-literal-HEAD audited outer is the next and only action; its resulting artifacts are
+  immutable and no retry/proof/product/acceptance path opens before terminal audit.

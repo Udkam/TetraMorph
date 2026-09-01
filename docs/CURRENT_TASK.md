@@ -1123,6 +1123,14 @@ bounded action is one fresh R15 input only: `...r15-intro05-input.json`, 1,183 c
 After no-follow/hash/empty namespace checks, one literal-current-HEAD no-write preflight opens;
 nonzero consumes R15 and every outer/worker/Task/Store/proof/product/acceptance path remains closed.
 
+### 2026-09-01 F4E-R15 R53 preflight / outer boundary
+
+R15's sole preflight at `c1020df…04240` exits 0 without output, retains the 1,183-byte input hash,
+and leaves no R15 mutable residue. The preceding PowerShell parse error never started Node and made
+no artifact. Preflight is consumed. Next only: one audited outer with fresh literal HEAD and the
+same input/domain; its attempt/task/terminal are immutable whatever the result, and no retry,
+proof/product/acceptance path opens before audit.
+
 ### 2026-09-01 F4E-R14 R45 preflight receipt
 
 R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes / `D31C…0EB3`, and

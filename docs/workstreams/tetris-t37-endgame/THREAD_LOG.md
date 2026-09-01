@@ -1660,3 +1660,11 @@ product path is open.
   canonical bytes / `EB7B72061553272096F9C6B1F105509B2BDAB1D1E1CCE099E419DC65710F636C`, then exactly one
   literal-current-HEAD no-write preflight using DESIGN's R15 domain. Nonzero consumes R15; all
   outer/worker/Task/Store/proof/product/acceptance paths stay closed.
+
+### F4E-R15 R53 preflight / outer boundary
+
+- Sole preflight at `c1020df…04240` exits 0/no output; input hash remains exact and R15 mutable
+  namespace remains absent. The preceding PowerShell parser error never launched Node or wrote an
+  artifact. Preflight is consumed.
+- Sole next action: one audited outer with a fresh literal HEAD. Its artifacts are immutable;
+  candidate/result/stage/proof/product/acceptance stay closed until terminal audit.

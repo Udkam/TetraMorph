@@ -11287,6 +11287,18 @@ current lowercase HEAD and invoke once only:
 It is a no-write/no-task/no-Store/no-proof preflight. Nonzero consumes R15; outer/worker/product
 and player acceptance remain closed pending its audit.
 
+### F4E-R15 R53 successful no-write preflight / outer boundary
+
+The sole R15 preflight ran at literal HEAD `c1020df466ef23f6af3bf59ecd32fcb4a3604240`, exited 0
+without stdout/stderr, and confirmed the 1,183-byte input hash while leaving every R15 mutable
+attempt/candidate/result/terminal/stage path absent. The prior PowerShell parser typo stopped before
+Node process creation and produced no artifact; it is not an invocation. Preflight is now consumed.
+
+The sole next operation is one audited R15 `--outer` invocation with this immutable input/domain and
+a fresh literal current HEAD. It may create only its new R15 attempt, disabled scheduled task and
+terminal audit state. Do not retry, delete, resume or repair any resulting R15 artifact; candidate,
+worker result, stage, product and player acceptance remain closed until its terminal disposition.
+
 ### F4E-R14 R45 successful no-write preflight receipt
 
 R14 preflight ran once at literal HEAD `74f8887d8aefe887064a163018ab1d950f420f6d` with the
