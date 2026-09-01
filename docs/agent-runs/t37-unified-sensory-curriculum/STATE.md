@@ -4053,3 +4053,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   direct Git-blob Core loader, fixed adapter data URL, source-manifest and post-proof pin are
   present. No mode/task/Store/proof/product/browser/acceptance action occurred. Next is semantic
   and lifecycle static review only.
+
+### 2026-09-01 F4E-R15 R51/R52 viability and input/preflight
+
+- A second read-only viability check reproduced 16 Core blobs and manifest `77C5EF4F…5810C`, plus
+  the exact 231,209-byte adapter and fixed four `node:` imports. No R15 mode occurred.
+- Next only: create fresh no-follow R15 input at the fixed Temp path, 1,183 canonical bytes /
+  `EB7B72061553272096F9C6B1F105509B2BDAB1D1E1CCE099E419DC65710F636C`, then one literal-HEAD
+  no-write preflight against the DESIGN domain. Failure consumes R15; outer/proof/product and
+  acceptance remain closed.

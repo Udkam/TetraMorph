@@ -11262,6 +11262,31 @@ post-proof source-pin reconciliation. It has not been invoked in any mode. Stati
 review remains required before an R15 input/preflight contract, and all task/proof/product paths
 remain closed.
 
+### F4E-R15 R51 static viability and R52 input/preflight contract
+
+A second read-only loader-viability review reproduced the current literal HEAD Core tree
+`f92ab32779a7fe2a2b667a877f94bbd8e5dbaa0b`: exactly 16 regular non-test Core TypeScript blobs,
+their in-memory built-in-transform manifest
+`77C5EF4FD77DB73EC3AFA0B5EDD35ED77B90A7013351C45560478A7B5625810C`, and the 231,209-byte
+adapter hash `800677A27C10EA92B25101C5AC8E6E63904B6119BC7C76BFC4C21EAC2476DCE1` with only its four
+fixed `node:` specifiers. Together with R50's syntax/policy pass it closes static authoring review;
+no R15 mode/task/Store/proof/product action occurred.
+
+After this four-document checkpoint, create only the absent plain no-follow regular
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r15-intro05-input.json`: 1,183
+UTF-8/no-BOM/LF canonical bytes / SHA-256
+`EB7B72061553272096F9C6B1F105509B2BDAB1D1E1CCE099E419DC65710F636C`, schema
+`t37-f4e-r15-intro05-input-v1`, same one primary route and 682-byte definition pinned for R14.
+The R15 domain is 192 bytes / `A9A44E6CC45767EA9C42A5CADA6B452BDC4E62EB7DD17DED454BFC500419CD57`, Base64
+`eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTUtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K`; it freezes one `SQLHTCR` candidate, 8 drops, 4 rows and 5..7 locks.
+
+After absent/no-follow/hash checks of this input and R15 mutable namespace, record the exact
+current lowercase HEAD and invoke once only:
+`--preflight --root <absolute-root> --input <absolute-input> --domain-json-base64 <above>
+--expect-head <literal-head> --expect-input-sha EB7B72061553272096F9C6B1F105509B2BDAB1D1E1CCE099E419DC65710F636C`.
+It is a no-write/no-task/no-Store/no-proof preflight. Nonzero consumes R15; outer/worker/product
+and player acceptance remain closed pending its audit.
+
 ### F4E-R14 R45 successful no-write preflight receipt
 
 R14 preflight ran once at literal HEAD `74f8887d8aefe887064a163018ab1d950f420f6d` with the

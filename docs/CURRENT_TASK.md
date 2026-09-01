@@ -1111,6 +1111,18 @@ four adapter `node:` imports, hook teardown order, Core manifest pin and post-pr
 are present. No source mode ran. Semantic/lifecycle review is still required before R15 input or
 preflight; task/proof/product/acceptance remains closed.
 
+### 2026-09-01 F4E-R15 R51/R52 viability and input/preflight
+
+A second read-only viability check reproduces the 16 Core blob built-in-transform manifest
+`77C5EF4F…5810C` at current Core tree `f92ab327…baa0b` and the pinned 231,209-byte adapter with
+only `node:fs`, `node:crypto`, `node:path`, `node:util`; no source mode ran. The accepted next
+bounded action is one fresh R15 input only: `...r15-intro05-input.json`, 1,183 canonical bytes /
+`EB7B72061553272096F9C6B1F105509B2BDAB1D1E1CCE099E419DC65710F636C`, schema
+`t37-f4e-r15-intro05-input-v1`, original fixed route/definition. R15 domain is 192 bytes /
+`A9A44E6CC45767EA9C42A5CADA6B452BDC4E62EB7DD17DED454BFC500419CD57` (Base64 in DESIGN).
+After no-follow/hash/empty namespace checks, one literal-current-HEAD no-write preflight opens;
+nonzero consumes R15 and every outer/worker/Task/Store/proof/product/acceptance path remains closed.
+
 ### 2026-09-01 F4E-R14 R45 preflight receipt
 
 R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes / `D31C…0EB3`, and

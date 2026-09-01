@@ -1651,3 +1651,12 @@ product path is open.
   node_modules/SSR absent; built-in Core transform/no-delegation hooks/data adapter and exact
   adapter imports, source manifest and post-proof pin present. No mode/task/Store/proof/product
   action. Semantic/lifecycle review is the sole next action.
+
+### F4E-R15 R51/R52 viability and input/preflight
+
+- Read-only viability reproduces 16 captured Core blobs, transform manifest `77C5EF4F…5810C` and
+  231,209-byte pinned adapter with exactly four expected `node:` imports. No R15 mode occurred.
+- After this contract, create only absent no-follow input `...r15-intro05-input.json`: 1,183
+  canonical bytes / `EB7B72061553272096F9C6B1F105509B2BDAB1D1E1CCE099E419DC65710F636C`, then exactly one
+  literal-current-HEAD no-write preflight using DESIGN's R15 domain. Nonzero consumes R15; all
+  outer/worker/Task/Store/proof/product/acceptance paths stay closed.
