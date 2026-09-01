@@ -4035,3 +4035,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Post-review only R15 may mechanical-isolate R14→R15, add project `createRequire`, and dynamically
   import the absolute Vite entry resolved from `root/package.json` through existing `pathToFileURL`.
   No CWD reliance or other source/lifecycle change is authorized; all R15 paths stay closed.
+
+### 2026-09-01 F4E-R14 R49 R15 self-contained proof-loader correction
+
+- R48 is retracted before source: absolute Vite resolution still executes ignored, unpinned
+  `node_modules`, the established P1. No R15 artifact or mode was created.
+- After fresh dual all-zero review, R15 static authoring is limited to direct Git-blob Core loading
+  via Node built-in TypeScript transform and private no-delegation hooks, plus an exact pinned
+  adapter blob through a deterministic data URL with only four fixed `node:` imports. No Vite,
+  working-tree/project source, node_modules, execution, product, browser, or acceptance path opens.

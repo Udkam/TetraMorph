@@ -11217,6 +11217,38 @@ and imported through existing `pathToFileURL`. It may not rely on CWD, change AP
 ordering, task XML, inputs, proof/store, publication, error secrecy or lifecycle guards. No R15
 input, mode, Task Scheduler, Store/proof or product action opens.
 
+### F4E-R14 R49 R15 self-contained proof-loader correction
+
+R48's absolute-Vite proposal is retracted before any R15 source exists: it repairs Temp-parent
+resolution but would execute ignored, unpinned `node_modules`, the previously established P1. It
+is not an authorized R15 edit and no R15 input, mode, Task, Store, proof, product, or player-
+acceptance path opens from R48.
+
+After two fresh independent all-zero reviews of this four-document correction, one writer may
+author only an external R15 static validator/worker. It mechanically isolates R14 identity,
+schemas, fixed namespace, paths, task names and diagnostics; retains R14's literal exported
+Arguments comparison and every existing no-follow/source/history/lifecycle/publication guard; and
+replaces `loadPinnedApi` plus Vite/path-to-file-URL imports completely. It introduces no `vite`,
+`createRequire`, `require.resolve`, SSR transform, project dynamic import, working-tree module
+execution, or `node_modules` access.
+
+The only admitted Core source is direct Git blob data at captured HEAD. Before claim it enumerates
+every regular non-test `src/game/core/*.ts` HEAD blob in raw ASCII byte order, fatal-decodes
+UTF-8/no-BOM/LF-only bytes, verifies Git identity and uppercase SHA-256, then transforms only
+those in-memory bytes with pinned Node 24.12.0 `stripTypeScriptTypes` under private canonical
+`t37-f4e-core:<Core-tree>/<Git-path>` URLs. A synchronous no-delegation `registerHooks` pair may
+resolve/load only that frozen map and strict same-directory `./Name` Core imports; it performs no
+I/O, package/built-in/filesystem resolution, delegation or retransform, and deregisters in one
+enclosing `try/finally` before staging creation.
+
+The adapter is separately read from its pinned Git blob, byte/hash checked, and imported only via
+a deterministic `data:text/javascript;base64,` URL constructed from those bytes. Its static
+specifiers must be exactly `node:fs`, `node:crypto`, `node:path`, and `node:util`; relative,
+dynamic, package, query/fragment, or loader-mediated imports fail closed. Core and adapter
+namespaces must expose R14's same four public methods; transformed-Core manifest and raw-adapter
+hash reconcile into `sourcePin` both before and after proof. No project module loader or source
+read may occur after preclaim Git materialization. R15 remains static-review-only after authoring.
+
 ### F4E-R14 R45 successful no-write preflight receipt
 
 R14 preflight ran once at literal HEAD `74f8887d8aefe887064a163018ab1d950f420f6d` with the

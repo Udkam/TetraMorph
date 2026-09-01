@@ -1090,6 +1090,17 @@ only, R15 may mechanically isolate R14→R15 and replace the bare import with a 
 `createRequire` resolved absolute URL; all API/task/proof/lifecycle controls and R15 paths remain
 closed.
 
+### 2026-09-01 F4E-R14 R49 R15 self-contained loader correction
+
+R48 is withdrawn before source creation: an absolute Vite entry still executes ignored, unpinned
+`node_modules`, a known P1. After fresh dual all-zero four-document review only, R15 static source
+may replace Vite completely with the established R4E model: direct captured-HEAD Core blobs,
+Node 24.12.0 `stripTypeScriptTypes`, private no-delegation hooks and no project/module loader.
+The pinned adapter is exact Git bytes imported only through a deterministic data URL after exact
+`node:fs`, `node:crypto`, `node:path`, `node:util` static-import checks. Retain R14's existing
+guards and literal Arguments comparison. No working-tree source, node_modules, Task, mode, Store,
+proof, product, browser, or acceptance step is authorized.
+
 ### 2026-09-01 F4E-R14 R45 preflight receipt
 
 R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes / `D31C…0EB3`, and

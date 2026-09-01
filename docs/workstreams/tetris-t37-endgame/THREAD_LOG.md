@@ -1632,3 +1632,13 @@ product path is open.
 - R15 after review only: mechanical R14→R15 isolation plus `createRequire(root/package.json)` and
   existing `pathToFileURL` to import an absolute Vite entry. No CWD dependence, other code/guard,
   input or execution/product path opens.
+
+### F4E-R14 R49 R15 self-contained proof-loader correction
+
+- R48 is withdrawn before source: absolute Vite resolution still trusts ignored/unpinned
+  `node_modules`, a known P1. No R15 source, input, task, Store, proof, or product action exists.
+- After fresh independent all-zero review, R15 may author static source only: Core executes from
+  captured-HEAD blob bytes transformed with Node built-ins through private no-delegation hooks;
+  adapter executes only its hash-pinned Git bytes through a deterministic data URL and exact
+  `node:fs`, `node:crypto`, `node:path`, `node:util` imports. Retain all R14 guards. Vite,
+  working-tree/project imports, node_modules and every execution/product/acceptance path stay closed.
