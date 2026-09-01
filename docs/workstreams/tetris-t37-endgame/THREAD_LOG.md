@@ -1623,3 +1623,12 @@ product path is open.
   may reference it. Do not author that R15 edit.
 - R15 remains completely closed. Next is dual read-only static trace of the actual R14 worker
   failure before any source/input/mode/task/Store/proof/product authority reopens.
+
+### F4E-R14 R48 R15 project-root Vite-resolution successor
+
+- Independent static trace establishes P0: Temp-resident R14 worker bare-imports `vite`; ESM parent
+  resolution cannot reach project `node_modules`, so `ERR_MODULE_NOT_FOUND` occurs before candidate/
+  worker-result publication. It matches R14 failed/no-result terminal.
+- R15 after review only: mechanical R14→R15 isolation plus `createRequire(root/package.json)` and
+  existing `pathToFileURL` to import an absolute Vite entry. No CWD dependence, other code/guard,
+  input or execution/product path opens.

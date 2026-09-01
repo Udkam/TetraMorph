@@ -1082,6 +1082,14 @@ R46's API scope cause is disproved: `api` is function-scoped before try and vali
 R15 source is authorized. First perform two read-only traces to identify R14's true pre-publication
 worker failure; all R15 input/execution/product paths remain closed.
 
+### 2026-09-01 F4E-R14 R48 R15 project-root Vite successor
+
+True R14 P0 is Temp-resident bare `import('vite')`: ESM resolves upward from Temp, not task CWD, so
+it cannot reach the project Vite package and fails before result publication. After fresh review
+only, R15 may mechanically isolate R14→R15 and replace the bare import with a project-package
+`createRequire` resolved absolute URL; all API/task/proof/lifecycle controls and R15 paths remain
+closed.
+
 ### 2026-09-01 F4E-R14 R45 preflight receipt
 
 R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes / `D31C…0EB3`, and

@@ -11201,6 +11201,22 @@ authorized source delta, input, mode, Task Scheduler, Store/proof or product act
 after two independent read-only traces identify a concrete R14 worker failure before first durable
 publication and define the smallest fail-closed correction.
 
+### F4E-R14 R48 R15 project-root Vite-resolution contract
+
+Independent static trace identifies the concrete pre-publication P0: R14 worker's Temp-resident
+validator calls bare `await import('vite')` in `loadPinnedApi`. ESM package resolution begins at the
+Temp validator path, whose ancestor chain has no `node_modules/vite`; task working directory does
+not change that parent-module resolution. The project-root Vite entry exists, but is unreachable by
+the bare specifier. This deterministically yields `ERR_MODULE_NOT_FOUND` before candidate/result
+publication, matching terminal `failed` with no worker result.
+
+R15 opens only fresh static source/namespace after two all-zero reviews. It may mechanically replace
+R14 identity/schema/namespace, add `createRequire` from `node:module`, and replace that one bare
+Vite import with an absolute module URL resolved from `createRequire(path.join(root,'package.json'))`
+and imported through existing `pathToFileURL`. It may not rely on CWD, change API checks, worker
+ordering, task XML, inputs, proof/store, publication, error secrecy or lifecycle guards. No R15
+input, mode, Task Scheduler, Store/proof or product action opens.
+
 ### F4E-R14 R45 successful no-write preflight receipt
 
 R14 preflight ran once at literal HEAD `74f8887d8aefe887064a163018ab1d950f420f6d` with the

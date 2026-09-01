@@ -4026,3 +4026,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   try and is legal in finally. Do not author the proposed R15 source.
 - R15 has no source/input/mode/task/Store/proof/product authority. Next is two independent
   read-only traces of the true R14 worker failure before first durable publication.
+
+### F4E-R14 R48 R15 project-root Vite-resolution boundary
+
+- Independent static trace proves R14's Temp-resident bare `import('vite')` cannot resolve project
+  Vite: ESM resolution is relative to validator location, not Task CWD, and occurs before candidate/
+  worker-result publication. This explains failed terminal with zero result/candidate/stage.
+- Post-review only R15 may mechanical-isolate R14→R15, add project `createRequire`, and dynamically
+  import the absolute Vite entry resolved from `root/package.json` through existing `pathToFileURL`.
+  No CWD reliance or other source/lifecycle change is authorized; all R15 paths stay closed.
