@@ -11249,6 +11249,19 @@ namespaces must expose R14's same four public methods; transformed-Core manifest
 hash reconcile into `sourcePin` both before and after proof. No project module loader or source
 read may occur after preclaim Git materialization. R15 remains static-review-only after authoring.
 
+### F4E-R15 R50 static-source candidate
+
+The sole R15 external candidate is
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r15.mjs`:
+78,994 UTF-8/no-BOM/LF-only bytes / SHA-256
+`00C51D5A73E052C5AC093E56446C875AC1DCAB0B11CABE01DD78CF5A85B95033`. Parser-only Node syntax
+and the source policy check pass. The policy confirms absent Vite/createRequire/path-to-file-URL/
+node_modules/SSR terms; present built-in transform/private-hook/data-URL path; exact four adapter
+`node:` specifiers; hook deregistration before data-URL import; Core-manifest source pin; and a
+post-proof source-pin reconciliation. It has not been invoked in any mode. Static semantic/lifecycle
+review remains required before an R15 input/preflight contract, and all task/proof/product paths
+remain closed.
+
 ### F4E-R14 R45 successful no-write preflight receipt
 
 R14 preflight ran once at literal HEAD `74f8887d8aefe887064a163018ab1d950f420f6d` with the

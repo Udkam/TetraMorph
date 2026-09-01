@@ -1101,6 +1101,16 @@ The pinned adapter is exact Git bytes imported only through a deterministic data
 guards and literal Arguments comparison. No working-tree source, node_modules, Task, mode, Store,
 proof, product, browser, or acceptance step is authorized.
 
+### 2026-09-01 F4E-R15 R50 static candidate
+
+R15 external static candidate is 78,994 UTF-8/no-BOM/LF-only bytes /
+`00C51D5A73E052C5AC093E56446C875AC1DCAB0B11CABE01DD78CF5A85B95033` at the fixed Temp path.
+Parser-only syntax and a no-execution source-policy check pass: Vite/createRequire/path-to-file-URL/
+node_modules/SSR are absent; built-in Core transform/private hooks/deterministic adapter data URL,
+four adapter `node:` imports, hook teardown order, Core manifest pin and post-proof reconciliation
+are present. No source mode ran. Semantic/lifecycle review is still required before R15 input or
+preflight; task/proof/product/acceptance remains closed.
+
 ### 2026-09-01 F4E-R14 R45 preflight receipt
 
 R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes / `D31C…0EB3`, and

@@ -1642,3 +1642,12 @@ product path is open.
   adapter executes only its hash-pinned Git bytes through a deterministic data URL and exact
   `node:fs`, `node:crypto`, `node:path`, `node:util` imports. Retain all R14 guards. Vite,
   working-tree/project imports, node_modules and every execution/product/acceptance path stay closed.
+
+### F4E-R15 R50 static-source candidate
+
+- Created only `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r15.mjs`:
+  78,994 UTF-8/no-BOM/LF bytes / `00C51D5A73E052C5AC093E56446C875AC1DCAB0B11CABE01DD78CF5A85B95033`.
+- Parser-only syntax plus a no-execution policy scan pass: Vite/createRequire/path-to-file-URL/
+  node_modules/SSR absent; built-in Core transform/no-delegation hooks/data adapter and exact
+  adapter imports, source manifest and post-proof pin present. No mode/task/Store/proof/product
+  action. Semantic/lifecycle review is the sole next action.

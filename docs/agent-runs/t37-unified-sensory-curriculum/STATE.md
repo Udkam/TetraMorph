@@ -4044,3 +4044,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   via Node built-in TypeScript transform and private no-delegation hooks, plus an exact pinned
   adapter blob through a deterministic data URL with only four fixed `node:` imports. No Vite,
   working-tree/project source, node_modules, execution, product, browser, or acceptance path opens.
+
+### 2026-09-01 F4E-R15 R50 static candidate
+
+- Created only external static source `...validate-r15.mjs`: 78,994 UTF-8/no-BOM/LF bytes /
+  `00C51D5A73E052C5AC093E56446C875AC1DCAB0B11CABE01DD78CF5A85B95033`.
+- Parser-only syntax and no-execution policy scan pass; no Vite/node_modules path remains and the
+  direct Git-blob Core loader, fixed adapter data URL, source-manifest and post-proof pin are
+  present. No mode/task/Store/proof/product/browser/acceptance action occurred. Next is semantic
+  and lifecycle static review only.
