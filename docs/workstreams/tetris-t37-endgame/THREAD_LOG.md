@@ -1616,3 +1616,10 @@ product path is open.
   retry; R14 evidence immutable.
 - R15 only after review: mechanical R14→R15 isolation plus `let api = null` before try, assignment
   at load, optional close in finally. All other source/lifecycle guards and R15 paths remain closed.
+
+### F4E-R14 R47 R15 scope-premise retraction
+
+- R46's scope diagnosis is false: `api` is declared before worker try in function scope and finally
+  may reference it. Do not author that R15 edit.
+- R15 remains completely closed. Next is dual read-only static trace of the actual R14 worker
+  failure before any source/input/mode/task/Store/proof/product authority reopens.

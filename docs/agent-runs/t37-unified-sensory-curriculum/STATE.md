@@ -4019,3 +4019,10 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Static control-flow trace: worker's try-scoped `const api` is referenced in finally. Post-review
   R15 may only mechanical-isolate R14→R15 and lift API to `let api = null`, assign it at load, and
   optional-close it. Every other guard and all R15 input/execution/product closure remain unchanged.
+
+### F4E-R14 R47 R15 scope-premise retraction
+
+- Static trace disproves R46's proposed API fix: API is declared in worker function scope before
+  try and is legal in finally. Do not author the proposed R15 source.
+- R15 has no source/input/mode/task/Store/proof/product authority. Next is two independent
+  read-only traces of the true R14 worker failure before first durable publication.

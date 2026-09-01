@@ -11192,6 +11192,15 @@ checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R1
 no-proof; nonzero consumes R10. Outer/worker, Task Scheduler, source integration and every product
 path remain closed.
 
+### F4E-R14 R47 R15 scope-premise retraction
+
+R46's proposed API-lifetime edit is revoked before source authoring. Static line trace proves
+`const api = await loadPinnedApi(...)` already precedes the worker `try` in function scope, and its
+`finally` can legally reference that binding. It is not the cause of R14's failed task. R15 has no
+authorized source delta, input, mode, Task Scheduler, Store/proof or product action. Reopen only
+after two independent read-only traces identify a concrete R14 worker failure before first durable
+publication and define the smallest fail-closed correction.
+
 ### F4E-R14 R45 successful no-write preflight receipt
 
 R14 preflight ran once at literal HEAD `74f8887d8aefe887064a163018ab1d950f420f6d` with the

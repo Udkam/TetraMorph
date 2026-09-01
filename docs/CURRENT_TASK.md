@@ -1076,6 +1076,12 @@ Only `docs/workstreams/tetris-t37-puzzle/puzzle-v3-ten-row-prototype.json` and
 checkpoint. Published Puzzle definitions, runtime Core, UI, T27/`progress.md`, icon, and Ice
 remain closed.
 
+### 2026-09-01 F4E-R14 R47 R15 premise retraction
+
+R46's API scope cause is disproved: `api` is function-scoped before try and valid in finally. No
+R15 source is authorized. First perform two read-only traces to identify R14's true pre-publication
+worker failure; all R15 input/execution/product paths remain closed.
+
 ### 2026-09-01 F4E-R14 R45 preflight receipt
 
 R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes / `D31C…0EB3`, and
