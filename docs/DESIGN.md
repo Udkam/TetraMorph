@@ -11200,6 +11200,23 @@ input: 1,183 bytes / `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080
 No task, process, Store, proof or product action ran. Preflight is consumed; the only next action
 is one audited R14 outer with fresh literal current HEAD and immutable input/domain.
 
+### F4E-R14 R46 consumed outer worker-scope interruption / R15 static contract
+
+R14's sole outer at `3ab84d933470d51cbc8bb9229f615c99a9a82d7a` published immutable 3,024-byte
+attempt `A7235A29B21FF7C961E06F0950539FE805E8E6623C6B7062647D82F5E8E4C00E`, run
+`r14-c423dfa750b11a9cd95fd8a8`, and finished disabled task
+`\\TetraMorph\\F4E-R14-Intro05-r14-c423dfa750b11a9cd95fd8a8` with LastTaskResult 1. Terminal is
+immutable 615 bytes / `34F3BF5EF9B7F7555E6DC54E020FC4FC5D6CA513246451ADDF3F5E78388145FF`, status `failed`;
+candidate/result/stage/process are absent. Do not alter or retry R14.
+
+Static trace identifies a deterministic control-flow defect: `worker()` declares `const api` inside
+its `try` block but unconditionally calls `await api.close()` in `finally`, outside that binding.
+R15 opens after two all-zero reviews only: mechanically replace R14 identity/schema/namespace and
+change only worker lifetime to `let api = null` before `try`, assign `api = await loadPinnedApi(...)`,
+and use `await api?.close()` in `finally`. Store cleanup, all proof logic, publications, XML, input
+and lifecycle guards remain exact. No R15 input, mode, Task Scheduler, Store/proof or product action
+opens until static acceptance.
+
 ### F4E-R13 R39 successful no-write preflight receipt
 
 R13's sole `--preflight` was invoked once at checkpoint

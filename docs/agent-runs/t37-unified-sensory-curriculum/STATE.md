@@ -4008,3 +4008,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   output. Input stays 1,183 bytes / `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`.
 - Only source/input exist; task/process/Store/proof/product actions absent. Preflight is consumed;
   sole next action is audited outer with immutable inputs and fresh literal HEAD.
+
+### F4E-R14 R46 consumed outer / R15 worker-scope boundary
+
+- R14 outer ran once at `3ab84d933470d51cbc8bb9229f615c99a9a82d7a`: 3,024-byte attempt /
+  `A7235A29B21FF7C961E06F0950539FE805E8E6623C6B7062647D82F5E8E4C00E`, run
+  `r14-c423dfa750b11a9cd95fd8a8`, disabled task LastTaskResult 1, and 615-byte failed terminal /
+  `34F3BF5EF9B7F7555E6DC54E020FC4FC5D6CA513246451ADDF3F5E78388145FF`.
+- Candidate/result/stage/process absent; all R14 evidence immutable and no retry/repair permitted.
+- Static control-flow trace: worker's try-scoped `const api` is referenced in finally. Post-review
+  R15 may only mechanical-isolate R14→R15 and lift API to `let api = null`, assign it at load, and
+  optional-close it. Every other guard and all R15 input/execution/product closure remain unchanged.

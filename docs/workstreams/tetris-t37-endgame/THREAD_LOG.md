@@ -1605,3 +1605,14 @@ product path is open.
   input remains 1,183 bytes / `D31C6680A9F9444C5D771C5FA5E25E30799931C44ED8C7EE02AD448080950EB3`.
 - Only R14 source/input exist. No task/process/Store/proof/product action; preflight consumed.
   Next: one audited outer with fresh literal HEAD only.
+
+### F4E-R14 R46 consumed outer / R15 worker-scope successor
+
+- R14 outer at `3ab84d933470d51cbc8bb9229f615c99a9a82d7a` published attempt 3,024 bytes /
+  `A7235A29B21FF7C961E06F0950539FE805E8E6623C6B7062647D82F5E8E4C00E`, run
+  `r14-c423dfa750b11a9cd95fd8a8`; task ended disabled, LastTaskResult 1. Failed terminal is 615
+  bytes / `34F3BF5EF9B7F7555E6DC54E020FC4FC5D6CA513246451ADDF3F5E78388145FF`; no candidate/result/stage/process.
+- Static source defect: `const api` exists only inside worker try but finally always calls it. No
+  retry; R14 evidence immutable.
+- R15 only after review: mechanical R14→R15 isolation plus `let api = null` before try, assignment
+  at load, optional close in finally. All other source/lifecycle guards and R15 paths remain closed.

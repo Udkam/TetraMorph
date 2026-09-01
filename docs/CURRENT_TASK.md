@@ -1082,6 +1082,14 @@ R14's sole preflight at `74f8887d…20f6d` exited 0; input remains 1,183 bytes /
 only R14 source/input exist, with no task/process/Store/proof/product action. It is consumed;
 only one fresh-literal-HEAD audited outer is next.
 
+### 2026-09-01 F4E-R14 R46 consumed outer / R15 worker-scope successor
+
+R14 outer at `3ab84d9…82d7a` produced immutable attempt `A7235A29…4C00E`, disabled task (last result
+1) and failed terminal `34F3BF5E…145FF`; candidate/result/stage/process are absent. Do not retry.
+Static source shows `const api` declared inside worker try but referenced unconditionally in finally,
+creating a deterministic scope failure. R15 post-review may only move it to `let api = null` outside
+try, assign load result and optional-close it; all other guards and R15 paths stay closed.
+
 ### 2026-09-01 F4E-R14 R41 static-source acceptance
 
 R14 static source is accepted at 70,745 UTF-8/no-BOM/LF bytes / SHA-256
