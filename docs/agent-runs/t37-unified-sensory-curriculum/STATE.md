@@ -4217,3 +4217,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next: four-document contract for a possible explicit no-write R15 admission mode. Source,
   admission, outer/worker/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser/
   acceptance remain closed.
+
+### 2026-09-05 F4E-R16 R65 explicit admission-source contract
+
+- Current R16 source contains a sealed but uncalled R15 admission; R64 does not exercise it. After
+  two all-zero R65 reviews, only the external validator may gain exact `--admit-r15` root/head CLI,
+  descriptor entry, and a branch that first source-pins then calls that existing admission once.
+- The branch is no-output/no-write and must neither touch R16 input/receipts/mutable namespace nor
+  reach Store methods after the one R15 `resume` construction, Task/Scheduler, copy, outer/worker/
+  preflight, proof, or product paths. Existing preflight and immutable evidence remain exact.
+- Parser/static policy only follows authoring; then two independent source audits are required.
+  A later separate command/receipt contract is mandatory before admission invocation.

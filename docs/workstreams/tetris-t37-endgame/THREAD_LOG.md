@@ -1839,3 +1839,15 @@ product path is open.
 - Next: a new four-document boundary for an explicit no-write predecessor-admission mode only.
   Source/admission/outer/worker/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser/
   acceptance remain closed.
+
+### F4E-R16 R65 explicit predecessor-admission source contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-ADMISSION-STATIC-001`; base/current head:
+  `a3875a7244b693b7ad5c2224edcdfb57e6cf5055`. After two all-zero reviews, only external R16
+  validator source may change to expose an
+  exact root/head `--admit-r15` CLI which source-pins and invokes the existing sealed admission.
+- It must produce no success output/write, preserve current preflight and immutable R16 evidence,
+  and limit R15 to full before/after snapshot around one pinned resume constructor with no Store
+  member call or cleanup. No mode runs during authoring; parser/static policy only.
+- Next: two independent R65 contract reviews. Input/receipt/admission invocation/task/Store/copy/
+  proof/product/browser/acceptance stay closed.

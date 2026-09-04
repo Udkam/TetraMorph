@@ -11393,3 +11393,25 @@ The only next action is a new four-document contract deciding how an explicit, s
 no-write R15 predecessor-admission mode could be exposed from the R16 static source. No source
 edit, admission invocation, outer/worker, Store/Scheduler, copy, stage, candidate, terminal,
 proof, product, browser, or player-acceptance path is opened by this receipt.
+
+### 2026-09-05 F4E-R16 R65 explicit read-only predecessor-admission source contract
+
+R64 leaves the existing sealed R15 admission function uninvoked and unreachable from the CLI. After
+two independent all-zero reviews of this four-document contract, one writer may edit only
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r16.mjs`. The
+source change may add exactly one new `--admit-r15` mode with exactly `--root <absolute-root>` and
+`--expect-head <lowercase-40-hex>` arguments, update `--describe`, and route that mode only through
+`assertPinnedSource(root, expectHead)` followed by the already sealed
+`await admitSealedR15PredecessorReadOnly(source.root, source.sourcePin)`.
+
+The new mode must emit no stdout/stderr on success and make no R16 input/receipt/mutable-namespace
+read or write. It may only authenticate R15 before/after the single pinned adapter `resume`
+construction at owner `r15-de5d99be53b69f89097ca0ca` / tip 108; no predecessor Store member,
+`dispose`, scheduler, copy/hard-link, outer/worker/preflight, stage/candidate/terminal/proof, or
+product/browser path may be reachable. Existing preflight's exact CLI/behavior and the immutable
+R16 input/intent/result must remain byte-identical.
+
+Only parser/source-policy checks may run after that external source edit. A fresh two-review static
+source audit is mandatory; a later separate contract must define any no-write admission invocation
+and its receipt. No mode, task, Store, copy, proof, product, browser, or player acceptance opens
+under this contract.

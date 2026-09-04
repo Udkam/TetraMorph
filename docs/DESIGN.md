@@ -11862,3 +11862,28 @@ decision is a separately reviewed four-document source-boundary contract for an 
 predecessor-admission mode; current R16 source exposes no such invoked mode. Until then, do not
 edit source or invoke admission, outer/worker, Store/Scheduler, copy/stage/candidate/terminal/proof,
 product/browser/player-acceptance paths.
+
+### F4E-R16 R65 explicit no-write predecessor-admission source contract
+
+R16's current sealed `admitSealedR15PredecessorReadOnly(root, sourcePin)` is deliberately uncalled;
+R64 proves only preflight, not admission. After two independent all-zero R65 reviews, edit only the
+same external validator source. The permitted delta is narrowly mechanical:
+
+- add an exact `--admit-r15 --root <absolute-root> --expect-head <lowercase-40-hex>` parser;
+- add `--admit-r15` to the descriptor CLI; and
+- in `main`, call only `assertPinnedSource(root, expectHead)` then
+  `await admitSealedR15PredecessorReadOnly(source.root, source.sourcePin)` and return.
+
+The new branch must write/output nothing on success and may not accept input/domain/Task/worker
+arguments. Its only R15 operation is the existing full no-follow inventory/owner/tip check before
+and after exactly one pinned adapter `createResumableEndgameDiskFrontierStore({ mode: 'resume',
+ownerId: 'r15-de5d99be53b69f89097ca0ca', expectedTip: generation 108 / manifest
+`82B9D55B916252F92440303177BB82F24B4E0AFBD94F011B03DC1026F13D4AA6` })` construction. It may not
+call any predecessor Store member, including `loadCheckpoint`, `advance`, `suspend`, `dispose`,
+release, or cleanup. It must retain Git-blob/data-URL authority and every existing preflight input,
+source-pin, receipt, R16 namespace, and immutable-evidence behavior byte-for-byte.
+
+After source authoring, only `node --check` and static policy checks are permitted; no mode may
+execute. Two independent all-zero source/behavior audits must then precede a separate admission
+invocation/receipt contract. R15, R16 input/intent/result, scheduler, outer/worker, Store/copy/
+stage/candidate/terminal/proof, product/browser/player-acceptance paths remain closed.
