@@ -4241,3 +4241,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   existing modes stay byte-identical; only stated helper/literals/parser/descriptor/main may vary.
 - Candidate identity must be rehashed before/after authoring; node syntax/static checks only, no
   mode. Two source audits then a separate invocation/receipt contract are still required.
+
+### 2026-09-05 F4E-R16 R67 validator-baseline escrow contract
+
+- R66 is rejected before source/action: second QA finds the external candidate hash cannot prove a
+  restricted diff without reconstructible baseline bytes. Fixed root/Core-tree repair remains
+  valid; no source/R15/R16/Task mutation occurred.
+- After two R67 reviews, only one raw no-replace capture is permitted: verified 82,977-byte /
+  `9EAED7…ED23` external validator to
+  `docs/agent-runs/t37-unified-sensory-curriculum/f4e-r16-admission-validator-baseline-9eaed7.mjs`.
+  Both paths require no-follow/UTF-8 sentinels/hash equality; commit one evidence path and audit it.
+- The capture is non-executable escrow, not source authoring. Next: independent escrow audit, then
+  a new authoring/diff contract; every validator mode and product/proof path stays closed.

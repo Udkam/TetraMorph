@@ -11448,3 +11448,32 @@ Core-tree enforcement, remain mandatory. A further standalone invocation/receipt
 required before `--admit-r15` may execute. R15, R16 input/receipts/mutable namespace, Task,
 Store member, scheduler, copy, outer/worker, stage/candidate/terminal/proof, product/browser, and
 player-acceptance paths remain closed.
+
+### 2026-09-05 F4E-R16 R67 admission-validator baseline escrow contract
+
+R66 is rejected before any validator-source edit or admission action. The second independent R66
+review finds a GAP: an external candidate SHA identifies only the replacement file, while the
+82,977-byte baseline cannot be reconstructed from a digest alone to prove generic pinning and the
+old modes remained byte-identical. The first all-zero R66 review does not override this. No source,
+R15/R16 data, Task, or mode changed.
+
+After two independent all-zero R67 contract reviews, the only permitted non-document mutation is
+one byte-for-byte, no-replace capture of the verified external baseline into exactly
+`docs/agent-runs/t37-unified-sensory-curriculum/f4e-r16-admission-validator-baseline-9eaed7.mjs`.
+Before creation, both the external source and destination must be no-follow regular-file checks:
+the source must be exactly 82,977 bytes / SHA-256
+`9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`, UTF-8 no-BOM/no-CR with one
+trailing LF, and the destination must be absent. Copy raw bytes only, do not transform text, then
+recheck both paths byte-for-byte and commit that one tracked evidence path in its own checkpoint.
+
+This capture is an explicit COMMIT_POLICY evidence exception: it is the sole reproducible baseline
+for a later read-only `git diff --no-index`/Git-blob comparison, not executable product source and
+not permission to edit the external validator. The evidence commit must name its source baseline,
+destination bytes/SHA, Git blob, exact path, and all inherited dirty paths left untouched. An
+independent actual-artifact audit must verify the capture before any new authoring contract.
+
+R67 opens neither external source authoring nor `--admit-r15`: no parser, mode, Node execution,
+Task, Store, copy beyond this single baseline capture, R15 access, R16 namespace access, proof,
+product/browser, or player-acceptance path is permitted. Only after the escrow audit may a fresh
+four-document authoring contract bind the candidate to this committed baseline and exact allowed
+diff hunks.

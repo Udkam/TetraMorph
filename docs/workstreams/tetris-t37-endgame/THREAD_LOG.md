@@ -1866,3 +1866,17 @@ product path is open.
 - Candidate checksum/sentinels and static-only policy are mandatory; no mode runs. Next: two
   independent R66 contract reviews, then source authoring/static audits, then another separate
   invocation/receipt contract. R15/R16 receipts/Task/Store/copy/proof/product remain closed.
+
+### F4E-R16 R67 admission-validator baseline escrow contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-ADMISSION-STATIC-003`; base/current head:
+  `718bff24181c237c1c7e91f7d9e600055631bb90`. R66 is rejected before authoring because
+  adversarial QA finds a reconstructible-baseline/diff GAP; its all-zero companion does not
+  override. No external source/mode/R15 mutation occurred.
+- After two all-zero R67 reviews, sole non-doc action is a no-replace raw-byte evidence copy from
+  verified `82977` / `9EAED7F6…3E148ED23` external validator to exact tracked path
+  `docs/agent-runs/t37-unified-sensory-curriculum/f4e-r16-admission-validator-baseline-9eaed7.mjs`.
+  Verify no-follow identity/sentinels/hash before and after, commit only that evidence path, then
+  obtain independent artifact QA. It is an explicit non-executable baseline escrow exception.
+- Next: R67 contract reviews only. No external validator edit, Node/mode, R15/R16 access, Task,
+  Store, proof/product/browser path is open; authoring requires a later exact-diff contract.

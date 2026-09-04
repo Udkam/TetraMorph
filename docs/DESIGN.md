@@ -11919,3 +11919,26 @@ plain-file bytes/SHA-256/UTF-8 sentinels and limit it to those named source regi
 and static policy checks, including `node --check`, may run after writing; no validator mode is
 allowed. Two independent all-zero source/behavior audits are required before a separate
 invocation/receipt contract can open `--admit-r15`.
+
+### F4E-R16 R67 admission-validator baseline escrow contract
+
+R66 is rejected before source authoring because its candidate SHA/region rule cannot independently
+prove a restricted diff once the external 82,977-byte source is overwritten. The adversarial GAP
+does not question the fixed-root/Core-tree repair; it requires a reconstructible baseline. No
+validator source, mode, R15 stage, R16 receipt, Task, or Store changed while resolving it.
+
+After two all-zero R67 reviews, make exactly one raw-byte, no-replace evidence capture from the
+verified external validator to
+`docs/agent-runs/t37-unified-sensory-curriculum/f4e-r16-admission-validator-baseline-9eaed7.mjs`.
+It is eligible only when the external source is a no-follow ordinary file whose bytes are exactly
+82,977 / `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`, with UTF-8 no BOM, no
+CR, and one final LF, and when the destination does not exist. The capture must copy raw bytes
+without normalization; verify source/destination byte equality, no-reparse file identity, UTF-8
+sentinels, SHA-256, and the committed Git blob identity before accepting it.
+
+The one-file evidence checkpoint is an authorized exception to the normal hand-authored-line
+budget because a digest cannot reconstruct the external baseline. It is documentation evidence,
+never imported or executed. It enables a future static auditor to compare the external candidate
+directly against a committed Git blob and prove the exact permitted diff. Capture does not open
+validator authoring, any mode, source policy Node run, R15/R16 data access, Task/Store, or product
+work. A separate post-capture artifact audit and then a new authoring contract remain mandatory.
