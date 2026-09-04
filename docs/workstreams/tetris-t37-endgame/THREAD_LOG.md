@@ -1733,3 +1733,18 @@ product path is open.
   Store construction is permitted during correction.
 - No R16 input/task/stage/candidate/terminal/proof exists; R15 and inherited protected paths
   remain untouched. Next action: independent read-only review of this four-document contract.
+
+### F4E-R16 R58 corrected external source checkpoint
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-STATIC-004`; base/current head:
+  `5c4526be4f8ac0f05cb8004b90c90196bb342bf6`. The two R57 contract audits are all-zero.
+- Exact external artifact corrected in place:
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r16.mjs`,
+  82,977 UTF-8 no-BOM/LF-only bytes, SHA-256
+  `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`.
+  It removes working-tree Core/adapter and drift access, fences every input read to `INPUT_PATH`,
+  and binds its uncalled predecessor admission to `loadPinnedApi(root, sourcePin)`.
+- Commands run: external static-source patch, parser-only `E:\\Nodejs\\node.exe --check`, and
+  static policy checks. No validator mode/input/task/Store/copy/stage/candidate/terminal/proof/
+  product/browser/acceptance action ran. R15 and protected inherited paths are untouched.
+- Next: two independent read-only static source/behavior reviews; no input/preflight mode opens.

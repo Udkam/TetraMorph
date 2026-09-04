@@ -11633,3 +11633,18 @@ accept an arbitrary `api`, call any predecessor Store member, or invoke the admi
 
 Only parser/source-policy checks may run after that source edit. No R16 input, mode, task, Store,
 copy, proof, product, browser, or acceptance path opens until a later reviewed preflight contract.
+
+### F4E-R16 R58 corrected external static source checkpoint
+
+Following two all-zero R57 contract reviews, the same R16 source is corrected at
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r16.mjs`:
+82,977 UTF-8 no-BOM/LF-only bytes, SHA-256
+`9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`. Git tree/blob reads are now
+the sole Core/adapter authority: live module-closure helpers, root-derived Core/adapter reads,
+and source-drift scans are absent. `INPUT_PATH` locks every preflight/worker/candidate/existing/
+resume input read to the exact R16 Temp name. The uncalled admission is async `(root, sourcePin)`
+and gets the adapter only through `loadPinnedApi`, with no arbitrary adapter or predecessor Store
+member access.
+
+Parser-only `E:\\Nodejs\\node.exe --check` and static policy pass. Two independent all-zero source/
+behavior reviews are required next; no R16 operational path has run or is opened.

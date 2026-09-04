@@ -4124,3 +4124,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   binding admission to `loadPinnedApi(root, sourcePin)`. It must not invoke admission or any mode.
 - Parser/source policy only may then run. No input, task, Store, stage, candidate, terminal,
   proof, product, browser, or acceptance path is authorized.
+
+### 2026-09-05 F4E-R16 R58 corrected static source checkpoint
+
+- The R57 double all-zero gate opened only the same source correction. It is now 82,977 bytes,
+  UTF-8 no BOM/LF only, SHA-256 `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`.
+- Parser-only and static policy pass: no root-derived Core/adapter read or drift scan remains;
+  fixed R16 `INPUT_PATH` fences all five input-read sites; and admission is uncalled async
+  `(root, sourcePin)` via `loadPinnedApi`, without arbitrary `api` or Store member access.
+- No R16 input/mode/task/Store/copy/stage/candidate/terminal/proof/product/browser/acceptance
+  action ran. Next: two independent read-only source/behavior reviews.

@@ -11230,3 +11230,23 @@ adapter working-tree read/traversal or `git diff`/untracked scan remains, all R1
 to `INPUT_PATH`, and the admission has no `api` parameter or `predecessorStore.` access. No R16
 input may be created, and no validator mode, Task Scheduler task, Store admission, copy, stage,
 candidate, terminal, proof, product, browser, or acceptance action is opened.
+
+### 2026-09-05 F4E-R16 R58 corrected static source; static QA next
+
+Both independent R57 contract reviews are all-zero. The same external source is now corrected in
+place, as 82,977 UTF-8 no-BOM/LF-only bytes with SHA-256
+`9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`. It no longer traverses or
+reads a root-derived Core/adapter path, retains no module-closure helper or `src`/`scripts` drift
+scan, and treats Git tree/blob objects as the only Core/adapter source. `INPUT_PATH` is exactly
+`...t37-f4e-endgame-r16-intro05-input.json`; one no-follow fence is used by preflight, worker,
+candidate-bound, existing-attempt, and resume reads. The sealed admission is now an uncalled async
+`(root, sourcePin)` function that obtains the adapter only through `loadPinnedApi`; it has no
+arbitrary `api` parameter and no predecessor Store member call.
+
+Only `E:\\Nodejs\\node.exe --check` and static source-policy checks ran. They confirm the fixed
+input fence, six R16 output paths, no R15 output path, no working-tree Core/adapter traversal or
+drift scan, and no forbidden loader/package form. No R16 input, mode, task, Store admission,
+copy, stage, candidate, terminal, proof, product, browser, or acceptance action ran.
+
+The only next action is two independent read-only static source/behavior reviews. A later
+four-document input/preflight contract remains required before any mode can execute.
