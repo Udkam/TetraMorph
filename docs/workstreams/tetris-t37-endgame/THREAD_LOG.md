@@ -1687,3 +1687,19 @@ product path is open.
   delete, Task Scheduler mutation, Store, proof, product, server, or browser action occurred.
   Next action: independently review a four-document R16 recovery contract; no R16 execution path
   is open.
+
+### F4E-R16 R55 static-successor contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-STATIC-001`; base `f646ce76b99e81a93a078372dbe4653db5fff14a`.
+  This four-document checkpoint permits only future external static source
+  `...t37-f4e-endgame-canonical-validate-r16.mjs` after two all-zero reviews.
+- R15 predecessor pins are the exact attempt/terminal/owner/final-manifest hashes and the full
+  112-file / 9,151,919,032-byte ordered snapshot hash
+  `48710EBDC36C5025E1ABC524D507D94B68C16E7955BD108756E9DBEB06FCA292`. R16 has a wholly fresh
+  namespace and may neither write nor silently adopt R15.
+- The future no-write admission is limited to full before/after snapshot equality around one
+  adapter resume construction using the old R15 owner and tip 108. It cannot call any Store method
+  after construction, including `dispose`; no copy, hard link, Task Scheduler, proof, product,
+  browser, or acceptance path is authorized.
+- Next action: independent read-only contract review. The inherited T27 paths, `progress.md`,
+  untracked handoff and preflight capture remain untouched.

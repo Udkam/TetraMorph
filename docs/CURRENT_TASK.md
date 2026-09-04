@@ -11150,3 +11150,36 @@ or player-acceptance step opens here. The sole next action is a separately revie
 R16 recovery contract that binds a fresh external namespace and explicitly decides whether an
 independently authenticated predecessor stage can be read without mutation; no R16 source, input,
 mode, task, Store, proof, or product action is authorized by this disposition alone.
+
+### 2026-09-05 F4E-R16 R55 static-successor contract
+
+This four-document contract opens one static external source only:
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r16.mjs`.
+It opens no R16 input, validator mode, Task Scheduler task, Store, copy, proof, candidate,
+terminal, curriculum, product, browser, or player-acceptance action. The entire R16 namespace is
+currently absent: future fixed names are `...canonical-attempt-r16.json`,
+`...canonical-candidate-r16.json`, `...canonical-worker-result-r16.json`,
+`...canonical-terminal-r16.json`, `...canonical-frontier-stage-r16`, and
+`...r16-intro05-input.json` under the same Temp root.
+
+R15 remains immutable predecessor evidence, never an R16 output: attempt
+`A613E44A77629BC6167F4368FB87D6486816DA922FD3D24CC7E6E148FB8DB1B9`, terminal
+`8BB1F95F5961CC1F17445AEC6DF73604D3D599BDB6EC112DE5C2D3B1FCE87F6A`, owner
+`7FA224C76FC92F6A8325B43E33D2A4DC78CDDC1D44D683B878AD5365C52D09BD`, and tip manifest
+`g00108` / `82B9D55B916252F92440303177BB82F24B4E0AFBD94F011B03DC1026F13D4AA6`. Its complete
+stage snapshot is exactly 112 regular files / 9,151,919,032 bytes with inventory SHA-256
+`48710EBDC36C5025E1ABC524D507D94B68C16E7955BD108756E9DBEB06FCA292`, computed from ASCII-sorted
+records `name NUL decimal-byte-length NUL uppercase-file-SHA256 LF`.
+
+R16 source must remain an R15-normalized direct Git-blob Core loader and fixed data-URL adapter
+loader: no Vite, project-module import, `node_modules`, working-tree Core/script loading, dynamic
+package import, or delegation. It must use fresh R16 fixed artifact names and a fresh future stage;
+all R15 names are read-only predecessor constants. Its future no-write predecessor admission must
+recompute the complete snapshot before and after one adapter `resume` admission with the frozen R15
+owner ID and tip. It must not call `advance`, `suspend`, `dispose`, `createRun`, copy, hard-link, or
+unlink against R15. A new R16 stage, if later separately authorized, must be a full byte-verified
+copy in a distinct namespace, never a hard link or mutation of R15.
+
+After two independent all-zero contract reviews, one writer may author only that external static
+source and run parser/source-policy checks. No mode may execute while authoring. A later distinct
+contract is required for R16 input and no-write preflight.

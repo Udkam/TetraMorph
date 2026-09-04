@@ -11560,3 +11560,39 @@ namespace, a one-time input, a source-identity domain, and a read-only predecess
 that fails closed unless it can authenticate the full old stage without mutation. This R54 entry
 opens no R16 source, input, mode, Task Scheduler, Store, proof, product, browser, or acceptance
 action.
+
+### F4E-R16 R55 static successor and read-only predecessor-admission contract
+
+R16 begins static only at
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r16.mjs`; its
+future fixed identities are `...canonical-attempt-r16.json`, `...canonical-candidate-r16.json`,
+`...canonical-worker-result-r16.json`, `...canonical-terminal-r16.json`,
+`...canonical-frontier-stage-r16`, and `...r16-intro05-input.json` under the same Temp root; all
+are initially absent. R15 remains sealed. Its attempt, terminal, owner and `g00108` hashes are respectively
+`A613E44A77629BC6167F4368FB87D6486816DA922FD3D24CC7E6E148FB8DB1B9`,
+`8BB1F95F5961CC1F17445AEC6DF73604D3D599BDB6EC112DE5C2D3B1FCE87F6A`,
+`7FA224C76FC92F6A8325B43E33D2A4DC78CDDC1D44D683B878AD5365C52D09BD`, and
+`82B9D55B916252F92440303177BB82F24B4E0AFBD94F011B03DC1026F13D4AA6`. The sealed predecessor
+snapshot is 112 regular files / 9,151,919,032 bytes, with ordered inventory SHA-256
+`48710EBDC36C5025E1ABC524D507D94B68C16E7955BD108756E9DBEB06FCA292`; each ASCII record is
+`basename NUL decimal-byte-length NUL uppercase-content-SHA256 LF` in raw byte-name order.
+
+R16 retains R15's self-identity, strict CLI, no-follow, Git proof, captured non-test Core blob,
+Node built-in transform, private no-delegation hook, and exact four-`node:` data-URL adapter rules.
+It must structurally reject Vite, `createRequire`, path-to-file URL, SSR, `node_modules`, package
+imports, working-tree Core/adapter reads, and any R15 write path. R16's static source may define,
+but may not invoke, its later predecessor admission.
+
+That future no-write admission is limited to re-hashing the full R15 inventory before and after a
+single adapter `createResumableEndgameDiskFrontierStore({ mode: 'resume', ownerId:
+'r15-de5d99be53b69f89097ca0ca', expectedTip: { generation: 108, manifestSha256:
+'82B9D55B916252F92440303177BB82F24B4E0AFBD94F011B03DC1026F13D4AA6' } })` construction against
+the R15 stage. The old adapter's actual owner schema remains `t37-f4e-r7-owner-v1`. No method on
+that predecessor Store may be called afterwards: specifically no `advance`, `suspend`, `dispose`,
+`createRun`, release, copy, hard-link, rename, unlink, or directory removal. Process exit releases
+only memory/descriptors. A later R16 execution contract may create a distinct stage only by a full
+byte-verified copy; it must never hard-link or mutate R15.
+
+After two independent all-zero reviews, author only the R16 external source and run parser/source-
+policy checks. No R16 input, mode, Task Scheduler, Store/proof, product, browser, or acceptance
+action is open until another four-document input/preflight contract.

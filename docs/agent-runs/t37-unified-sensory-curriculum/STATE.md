@@ -4085,3 +4085,17 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next action: independently review a four-document R16 recovery contract only. It must retain
   R15 immutable, bind a new namespace, and leave R16 source/input/mode/task/Store/proof/product
   paths closed until that contract has its own authorization.
+
+### 2026-09-05 F4E-R16 R55 static-successor contract
+
+- R16 is static-only. Its sole future source path is external `...validate-r16.mjs`; every R16
+  input/output/stage/task/mode path is absent and closed.
+- R15's sealed predecessor snapshot is now pinned: attempt, terminal, owner and final manifest
+  hashes are `A613…B1B9`, `8BB1…7F6A`, `7FA2…09BD`, and `82B9…AA6`; 112 files / 9,151,919,032
+  bytes hash to ordered inventory `48710EBDC36C5025E1ABC524D507D94B68C16E7955BD108756E9DBEB06FCA292`.
+- Future R16 no-write admission may only compare that full snapshot before/after an R15-owner
+  adapter resume construction at tip 108. It must not invoke `advance`, `suspend`, `dispose`, or
+  any filesystem mutation. A later new stage must be a byte-verified independent copy, never a
+  hard link or a modification of R15.
+- Next: two independent contract reviews, then one writer may author only the static R16 source
+  and parser/source-policy check it. No executable R16 path is open.
