@@ -4069,3 +4069,19 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   A prior PowerShell parse error never started Node or wrote anything. Preflight is consumed.
 - One fresh-literal-HEAD audited outer is the next and only action; its resulting artifacts are
   immutable and no retry/proof/product/acceptance path opens before terminal audit.
+
+### 2026-09-05 F4E-R15 R54 consumed outer audit
+
+- The R53 outer was already consumed at `e87ccbaf7b9ab6181f1ce6b777fe00757266ce11`. It created
+  3,166-byte attempt `A613E44A77629BC6167F4368FB87D6486816DA922FD3D24CC7E6E148FB8DB1B9`, run
+  `r15-de5d99be53b69f89097ca0ca`, and the disabled R15 task. Scheduler reports
+  `LastTaskResult 0xC000013A`; candidate and worker-result are absent and no worker remains.
+- The immutable 947-byte terminal `8BB1F95F5961CC1F17445AEC6DF73604D3D599BDB6EC112DE5C2D3B1FCE87F6A`
+  is `failed`. The retained stage is 112 files / 9,151,919,032 bytes with matching owner ID and
+  manifests `g00000..g00108`, but it is not a certificate.
+- Static audit explains the terminal's unexpected `pre-owner-stage`: the pinned adapter writes
+  owner schema `t37-f4e-r7-owner-v1`, while R15's interrupted-stage reader admits only
+  `t37-f4e-r15-owner-v1`. No byte is amended, resumed, adopted, deleted, or retried.
+- Next action: independently review a four-document R16 recovery contract only. It must retain
+  R15 immutable, bind a new namespace, and leave R16 source/input/mode/task/Store/proof/product
+  paths closed until that contract has its own authorization.

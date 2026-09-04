@@ -11535,3 +11535,28 @@ checkpoint's exact lowercase HEAD as a literal and invoke exactly one ordered R1
 --expect-head <literal-head> --expect-input-sha <above-SHA>`. It is no-write/no-task/no-Store/
 no-proof; nonzero consumes R11. Outer/worker, Task Scheduler, source integration and every product
 path remain closed.
+
+### F4E-R15 R54 consumed outer audit and R16 recovery boundary
+
+R15's sole outer is consumed at head `e87ccbaf7b9ab6181f1ce6b777fe00757266ce11`. It produced
+immutable attempt `A613E44A77629BC6167F4368FB87D6486816DA922FD3D24CC7E6E148FB8DB1B9` (3,166 bytes),
+run `r15-de5d99be53b69f89097ca0ca`, and disabled task
+`\\TetraMorph\\F4E-R15-Intro05-r15-de5d99be53b69f89097ca0ca`. Scheduler's terminal result is
+`0xC000013A`. The 947-byte terminal
+`8BB1F95F5961CC1F17445AEC6DF73604D3D599BDB6EC112DE5C2D3B1FCE87F6A` is `failed`; its candidate
+and worker-result hashes are null, and no matching process remains.
+
+The sole retained stage has 112 files / 9,151,919,032 bytes, an R15-matching owner ID, and a
+manifest chain `g00000..g00108`, but is not an authenticated certificate. The captured adapter
+creates `{"schema":"t37-f4e-r7-owner-v1","ownerId":...}`. R15's no-result stage audit instead
+requires `t37-f4e-r15-owner-v1`, so its durable terminal correctly retains the directory only as
+unexpected `pre-owner-stage`. No inference about a resumable frontier, proof correctness, or
+candidate optimality follows from its bytes.
+
+R15's validator, input, attempt, task, terminal, stage, candidate/result absence, and task record
+are immutable. A future R16 may not alter, delete, rename, retry, resume, or silently adopt them.
+Before any new external command, a fresh four-document recovery contract must specify a new
+namespace, a one-time input, a source-identity domain, and a read-only predecessor-admission rule
+that fails closed unless it can authenticate the full old stage without mutation. This R54 entry
+opens no R16 source, input, mode, Task Scheduler, Store, proof, product, browser, or acceptance
+action.

@@ -11124,3 +11124,29 @@ are absent; retain it unchanged. The only mismatch is encoded action quotes regi
 but exported as literal quotes. After fresh review only, R14 may mechanically isolate R13→R14 and
 change only that exact Arguments comparison; all other guards and all R14 input/execution paths
 remain closed.
+
+### 2026-09-05 F4E-R15 R54 consumed outer audit and recovery boundary
+
+The R15 outer authorized by R53 was already consumed at current head
+`e87ccbaf7b9ab6181f1ce6b777fe00757266ce11`; it must not be invoked again. Its immutable
+attempt is 3,166 bytes / SHA-256 `A613E44A77629BC6167F4368FB87D6486816DA922FD3D24CC7E6E148FB8DB1B9`,
+run `r15-de5d99be53b69f89097ca0ca`. The disabled task
+`\\TetraMorph\\F4E-R15-Intro05-r15-de5d99be53b69f89097ca0ca` reports
+`LastTaskResult 0xC000013A`; no matching worker remains. Candidate and worker-result are absent.
+The immutable terminal is 947 bytes / SHA-256
+`8BB1F95F5961CC1F17445AEC6DF73604D3D599BDB6EC112DE5C2D3B1FCE87F6A`, status `failed`, with
+no candidate hash and `observedTaskState: failed`.
+
+The retained R15 stage is not a certificate: it contains 112 files / 9,151,919,032 bytes,
+owner `r15-de5d99be53b69f89097ca0ca`, and manifests `g00000` through `g00108`. Static trace
+shows the pinned disk adapter writes owner schema `t37-f4e-r7-owner-v1`, while R15's
+interrupted-stage audit accepts only `t37-f4e-r15-owner-v1`; the terminal therefore reports the
+stage as unexpected `pre-owner-stage`. This observation does not authenticate, repair, resume,
+or repurpose that stage.
+
+Do not edit, delete, rename, retry, resume, or use any R15 input, validator, attempt, task,
+terminal, or stage artifact as product proof. No F5, curriculum, renderer, UI, audio, browser,
+or player-acceptance step opens here. The sole next action is a separately reviewed four-document
+R16 recovery contract that binds a fresh external namespace and explicitly decides whether an
+independently authenticated predecessor stage can be read without mutation; no R16 source, input,
+mode, task, Store, proof, or product action is authorized by this disposition alone.

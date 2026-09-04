@@ -1668,3 +1668,22 @@ product path is open.
   artifact. Preflight is consumed.
 - Sole next action: one audited outer with a fresh literal HEAD. Its artifacts are immutable;
   candidate/result/stage/proof/product/acceptance stay closed until terminal audit.
+
+### F4E-R15 R54 consumed outer audit
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R15-OUTER-001`; base/current head:
+  `e87ccbaf7b9ab6181f1ce6b777fe00757266ce11`.
+- Read-only audit observed attempt `A613E44A77629BC6167F4368FB87D6486816DA922FD3D24CC7E6E148FB8DB1B9`
+  (3,166 bytes), run `r15-de5d99be53b69f89097ca0ca`, disabled task with
+  `LastTaskResult 0xC000013A`, no matching process, no candidate, and no worker-result.
+  Terminal `8BB1F95F5961CC1F17445AEC6DF73604D3D599BDB6EC112DE5C2D3B1FCE87F6A` (947 bytes) is
+  immutable and `failed`.
+- Retained stage evidence is 112 files / 9,151,919,032 bytes, owner ID matches R15, and manifests
+  span `g00000..g00108`. It remains non-authoritative: the adapter owner is
+  `t37-f4e-r7-owner-v1`, whereas R15's no-result audit expects `t37-f4e-r15-owner-v1` and records
+  it as unexpected `pre-owner-stage`.
+- Exact changed paths in this documentation disposition are the four T37 authority/log files.
+  Commands run were metadata/hash/task/process and static source traces only; no R15 mode, retry,
+  delete, Task Scheduler mutation, Store, proof, product, server, or browser action occurred.
+  Next action: independently review a four-document R16 recovery contract; no R16 execution path
+  is open.
