@@ -4228,3 +4228,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   preflight, proof, or product paths. Existing preflight and immutable evidence remain exact.
 - Parser/static policy only follows authoring; then two independent source audits are required.
   A later separate command/receipt contract is mandatory before admission invocation.
+
+### 2026-09-05 F4E-R16 R66 admission-source authority correction
+
+- R65 is rejected before source/action: adversarial QA reports P1 because arbitrary self-consistent
+  root/head could import foreign unpinned Core siblings, plus a baseline/candidate identity GAP.
+  The companion all-zero result does not override this. Current validator remains 82,977 bytes /
+  `9EAED7…ED23`; no R16/R15 artifact changed.
+- R66 permits no source edit until two reviews accept fixed resolved/native project root
+  `E:\\Proj\\reproduction-tetris`, no-follow directory identity, and full Core Git-tree
+  `f92ab32779a7fe2a2b667a877f94bbd8e5dbaa0b` in a dedicated admission helper. Generic pinning and
+  existing modes stay byte-identical; only stated helper/literals/parser/descriptor/main may vary.
+- Candidate identity must be rehashed before/after authoring; node syntax/static checks only, no
+  mode. Two source audits then a separate invocation/receipt contract are still required.

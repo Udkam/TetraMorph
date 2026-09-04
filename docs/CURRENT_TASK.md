@@ -11415,3 +11415,36 @@ Only parser/source-policy checks may run after that external source edit. A fres
 source audit is mandatory; a later separate contract must define any no-write admission invocation
 and its receipt. No mode, task, Store, copy, proof, product, browser, or player acceptance opens
 under this contract.
+
+### 2026-09-05 F4E-R16 R66 admission-source authority correction
+
+R65 is rejected before any validator-source edit or admission action. One independent review is
+all-zero, but the adversarial review finds P1: arbitrary absolute `--root` plus an arbitrary
+self-consistent `--expect-head` can make `loadPinnedApi` import unpinned sibling Core modules from
+another Git root. It also finds a candidate-identity GAP. R65's zero review does not override this;
+the current 82,977-byte validator remains the exact no-BOM/no-CR/LF-terminated
+`9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23` baseline.
+
+After two independent all-zero R66 contract reviews, one writer may modify only
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r16.mjs`, and only
+after rechecking that exact plain no-follow baseline. The permitted mechanical delta is limited to
+an admission-only parser/descriptor/main branch plus a private admission-authority helper and
+literals. That helper must require both resolved path and native realpath to equal the fixed plain
+directory `E:\\Proj\\reproduction-tetris`, then call the unchanged generic `assertPinnedSource` and
+require its captured full `src/game/core` Git-tree identity to equal
+`f92ab32779a7fe2a2b667a877f94bbd8e5dbaa0b` before the sealed admission can load anything. The
+existing generic pinning, preflight/outer/worker paths, R16 input/intent/result behavior, and
+immutable evidence must remain byte-identical.
+
+The exact new CLI remains `--admit-r15 --root <absolute-root> --expect-head
+<lowercase-40-hex>`; it must pass only the fixed-root/full-Core-tree authority object into the
+already sealed admission. No root/head value is itself authority. The candidate must remain a
+plain no-reparse UTF-8 no-BOM/no-CR single-LF source, report its exact bytes/SHA-256, and be
+reviewable as changes only to the stated literals/helper/parser/descriptor/main branch. No
+validator mode may run after authoring: only `node --check` and static policy checks are allowed.
+
+Two independent all-zero source audits, including baseline/candidate identity and fixed-root/full-
+Core-tree enforcement, remain mandatory. A further standalone invocation/receipt contract is
+required before `--admit-r15` may execute. R15, R16 input/receipts/mutable namespace, Task,
+Store member, scheduler, copy, outer/worker, stage/candidate/terminal/proof, product/browser, and
+player-acceptance paths remain closed.

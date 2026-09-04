@@ -1851,3 +1851,18 @@ product path is open.
   member call or cleanup. No mode runs during authoring; parser/static policy only.
 - Next: two independent R65 contract reviews. Input/receipt/admission invocation/task/Store/copy/
   proof/product/browser/acceptance stay closed.
+
+### F4E-R16 R66 admission-source authority correction contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-ADMISSION-STATIC-002`; base/current head:
+  `338167139aae087b6363ac8a5415d9ca48afcd72`. R65 is rejected before authoring: adversarial QA
+  reports P1 arbitrary-root authority and a candidate-identity GAP; companion all-zero does not
+  override it. No source/mode/R15 mutation occurred.
+- After two all-zero R66 reviews, only the external validator may change from verified baseline
+  `82977` bytes / `9EAED7F6…3E148ED23`. Its admission-only helper must bind resolved/native plain
+  root `E:\\Proj\\reproduction-tetris` and fixed full 16-module Core Git tree
+  `f92ab32779a7fe2a2b667a877f94bbd8e5dbaa0b` before sealed admission; generic pinning and existing
+  modes are unchanged. Allowed source regions are literals/helper/dedicated parser/descriptor/main.
+- Candidate checksum/sentinels and static-only policy are mandatory; no mode runs. Next: two
+  independent R66 contract reviews, then source authoring/static audits, then another separate
+  invocation/receipt contract. R15/R16 receipts/Task/Store/copy/proof/product remain closed.

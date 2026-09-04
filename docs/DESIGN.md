@@ -11887,3 +11887,35 @@ After source authoring, only `node --check` and static policy checks are permitt
 execute. Two independent all-zero source/behavior audits must then precede a separate admission
 invocation/receipt contract. R15, R16 input/intent/result, scheduler, outer/worker, Store/copy/
 stage/candidate/terminal/proof, product/browser/player-acceptance paths remain closed.
+
+### F4E-R16 R66 admission-source authority correction
+
+R65 is not an authoring authority: one adversarial review reports P1 because its root/head pair
+could name a self-consistent foreign Git root. `assertPinnedSource` pins the route and adapter
+blobs but `buildCoreBlobBundle` imports every Core sibling from the selected tree, so an unpinned
+root could execute a substituted sibling module during `loadPinnedApi`. That review also reports a
+baseline/candidate-identity GAP. No source, mode, Store, task, or R15 artifact changed under R65;
+the competing all-zero review cannot override P1.
+
+R66 starts from the exact external validator baseline: regular no-follow UTF-8 source, 82,977
+bytes, SHA-256 `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`, no BOM/CR and exactly
+one trailing LF. After two all-zero R66 reviews, the sole permitted source delta must add a private
+admission-authority path that first proves `path.resolve(root)` and `fs.realpathSync.native(root)`
+are both the literal plain directory `E:\\Proj\\reproduction-tetris` (and its no-follow directory
+identity), then invokes the unchanged generic `assertPinnedSource`. It must reject unless that
+returned source pin has Core Git-tree identity exactly
+`f92ab32779a7fe2a2b667a877f94bbd8e5dbaa0b`, the 16-module full `src/game/core` tree at R66.
+
+Only that authority helper/literals, a dedicated exact root/head admission parser, the
+`--admit-r15` descriptor token, and a main branch that invokes the helper then the sealed admission
+may differ. Generic source pinning and all preflight/outer/worker code remains byte-identical.
+The branch still accepts no input/domain/receipt/Task/worker parameters; it produces no successful
+output or write; it may not invoke a predecessor Store member, cleanup/dispose, scheduler, copy,
+or any product/proof route. The `--expect-head` syntax is only an equality check against current
+HEAD; fixed root and Core tree are the code authority.
+
+Before any later audit, the author must rehash the baseline, then report the candidate's exact
+plain-file bytes/SHA-256/UTF-8 sentinels and limit it to those named source regions. Only parser
+and static policy checks, including `node --check`, may run after writing; no validator mode is
+allowed. Two independent all-zero source/behavior audits are required before a separate
+invocation/receipt contract can open `--admit-r15`.
