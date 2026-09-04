@@ -1826,3 +1826,16 @@ product path is open.
 - No external R16 path was created or mode run. The sole next sequence is R62's fresh input,
   fresh intent, one direct preflight, and result-only-if-returned batch; every other R16/R15/
   product/browser/acceptance path remains closed.
+
+### F4E-R16 R64 successful preflight audit
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-PREFLIGHT-005`; batch head:
+  `b45199aeda6d3b2f058a4c79e1a2e5fada31b445`. The sole preflight returns 0 with empty streams;
+  immutable input/intent/result are 1,183 / `BD4A…A9DF7`, 2,014 / `1AE3…3A1F`, and 1,484 /
+  `CEA1…8AB7` bytes/hashes. No R16 mutable output/task/process or R15 change exists after it.
+- Two independent actual-artifact audits are all-zero, independently checking receipt canonicality/
+  binding, source pins, and full sealed R15 snapshot. Preflight is consumed and never retryable;
+  the input/receipts are audit evidence, not certificate proof or R15-resume permission.
+- Next: a new four-document boundary for an explicit no-write predecessor-admission mode only.
+  Source/admission/outer/worker/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser/
+  acceptance remain closed.

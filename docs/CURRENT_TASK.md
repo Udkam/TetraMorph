@@ -11373,3 +11373,23 @@ intent, run exactly the direct `--preflight` argument vector once, and create on
 Node returns. Before and after each step, apply all R62 checks. R15 remains sealed, and no
 outer/worker/admission/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser/player
 acceptance path is open.
+
+### 2026-09-05 F4E-R16 R64 successful no-write preflight receipt
+
+The sole R16 preflight ran once at literal HEAD
+`b45199aeda6d3b2f058a4c79e1a2e5fada31b445`. Its immutable input/intent/result are respectively
+1,183 bytes / `BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7`, 2,014 bytes /
+`1AE3ED05FE1723A394BBCED80D0D78656A3246CFB7A9B7ECFE069405D80B3A1F`, and 1,484 bytes /
+`CEA130B9C8C5D33DFB8660CEA45A8F842E8F9D6E394B26277DED0FF767518AB7`. It exits 0 with empty
+stdout/stderr, preserves the accepted source/input/domain, full sealed R15 snapshot, and empty
+R16 mutable namespace/task/process state.
+
+Two independent actual-artifact audits are all-zero (`P0/P1/P2/P3/GAP = 0/0/0/0/0`): they
+recompute canonical bytes, cross-record bindings, Git source pins, and the 112-file / 9,151,919,032
+byte R15 inventory. The preflight is consumed and cannot be retried. Input/intent/result are now
+immutable audit evidence, not proof or permission to resume R15.
+
+The only next action is a new four-document contract deciding how an explicit, separately audited
+no-write R15 predecessor-admission mode could be exposed from the R16 static source. No source
+edit, admission invocation, outer/worker, Store/Scheduler, copy, stage, candidate, terminal,
+proof, product, browser, or player-acceptance path is opened by this receipt.

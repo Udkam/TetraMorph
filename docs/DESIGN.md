@@ -11844,3 +11844,21 @@ The sole next sequence is exactly R62's bounded batch: fresh input, fresh intent
 `--preflight`, then fresh result only if Node returns, with all prescribed before/after checks.
 Everything else, including R15 admission, outer/worker, Store/Scheduler, copy/stage/proof, product,
 browser, and player acceptance, remains closed.
+
+### F4E-R16 R64 successful no-write preflight receipt
+
+R16's sole `--preflight` executes at literal HEAD
+`b45199aeda6d3b2f058a4c79e1a2e5fada31b445` with the R62 input/intent/result protocol. The
+immutable input is 1,183 bytes / `BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7`;
+intent is 2,014 bytes / `1AE3ED05FE1723A394BBCED80D0D78656A3246CFB7A9B7ECFE069405D80B3A1F`;
+result is 1,484 bytes / `CEA130B9C8C5D33DFB8660CEA45A8F842E8F9D6E394B26277DED0FF767518AB7`.
+Result binds the exact 15-item argv and HEAD, exits 0, and records empty stdout/stderr plus empty
+pre/post R16 mutable namespace/task/process arrays.
+
+Two independent artifact audits are all-zero. Both independently rehash source/input/domain/R15
+facts and the result-to-intent binding; R15 remains the exact 112-file / 9,151,919,032-byte sealed
+snapshot, without an admission, copy, or write. This consumes preflight only. The next permissible
+decision is a separately reviewed four-document source-boundary contract for an explicit no-write
+predecessor-admission mode; current R16 source exposes no such invoked mode. Until then, do not
+edit source or invoke admission, outer/worker, Store/Scheduler, copy/stage/candidate/terminal/proof,
+product/browser/player-acceptance paths.

@@ -4204,3 +4204,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - No R16 input/intent/result/mode/task/Store/copy/stage/candidate/terminal/proof/product/browser/
   acceptance artifact or action has yet occurred; R15 remains sealed. Next is the one bounded
   batch defined by R62, beginning with its exact input and no other path.
+
+### 2026-09-05 F4E-R16 R64 successful no-write preflight receipt
+
+- The sole R16 preflight at `b45199aeda6d3b2f058a4c79e1a2e5fada31b445` succeeds with exit 0 and
+  empty stdout/stderr. Immutable input/intent/result hashes are `BD4A…A9DF7` (1,183),
+  `1AE3…3A1F` (2,014), and `CEA1…8AB7` (1,484). Source/input/domain/R15 and empty R16
+  mutable namespace/task/process post-state all match before-state.
+- Two independent actual-artifact audits are `P0/P1/P2/P3/GAP = 0/0/0/0/0`, including canonical
+  receipt reconstruction, source-pin and full 112-file/9,151,919,032-byte R15 recomputation.
+  Preflight is consumed; the three receipts/input are immutable audit evidence only.
+- Next: four-document contract for a possible explicit no-write R15 admission mode. Source,
+  admission, outer/worker/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser/
+  acceptance remain closed.
