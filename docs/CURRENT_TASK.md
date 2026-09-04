@@ -11328,3 +11328,33 @@ zero R16 mutable paths/tasks/validator processes is a successful consumed prefli
 nonempty output, postflight difference, or missing/invalid result is consumed failure with no
 retry. Outer/worker, sealed R15 admission, Scheduler action, Store, stage copy, proof, product,
 browser, and player acceptance remain closed in every case.
+
+### 2026-09-05 F4E-R16 R62 R61 receipt-schema correction contract
+
+R61 cannot open input or a mode. Its adversarial review finds P2: this file omitted `domain` from
+the result receipt and from the successful-result comparison while DESIGN required both. The same
+review correctly identifies that generic "canonical JSON"/"no-replace" wording is not a mechanical
+receipt format or bounded-write implementation. The companion review is all-zero, but the P2
+prevails. No R16 input, receipt, mode, task, Store, copy, stage, candidate, terminal, proof,
+product, browser, or acceptance artifact/action exists.
+
+After two independent all-zero R62 reviews, only three exact new-file paths may be written: the
+R60 input plus R61's intent and result receipts. No `.part`, sidecar, log,
+wrapper, cache, temporary file, hard link, rename, deletion, or overwrite is permitted in Temp
+during that batch. Before
+each Add-File-only creation, prove the fixed Temp parent is a real directory and the target is
+absent; afterwards prove it is a plain no-follow regular file and rehash it. Any failed creation
+or verification stops before Node. Both receipt byte streams use the validator's canonical JSON
+algorithm (recursive lexicographic object keys, finite safe integers only, UTF-8 no-BOM/no-CR,
+and exactly one trailing LF) and must be checked by a no-write inline verifier before Node for
+intent and after Node for result.
+
+The exact R62 schemas, nested keys/types, receipt binding, R16 matching snapshots, full domain
+round-trip, and accepted-result predicate are in DESIGN and apply verbatim here: intent is
+`t37-f4e-r16-preflight-intent-v1`, result is `t37-f4e-r16-preflight-result-v1`; both bind the
+fixed source/input/domain/R15 facts, result's domain must byte/hash/base64-equal intent's, and
+success requires the result receipt itself to verify. This supersedes every weaker R61 receipt
+description. Intent creation still consumes the one preflight; any missing, malformed, unbound,
+or postcondition-failing result is no-retry failure, and every operational/product path remains
+closed. Only after the result/absence is audited may a separate docs-only disposition record the
+outcome; that record is not a preflight sidecar or retry authority.

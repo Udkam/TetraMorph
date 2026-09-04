@@ -1799,3 +1799,19 @@ product path is open.
   consumed result; every other case is consumed no-retry failure. No outer/worker/admission/Store/
   Scheduler/copy/stage/candidate/terminal/proof/product/browser/acceptance path opens. Next: two
   independent read-only reviews of this correction only; input and validator mode stay closed.
+
+### F4E-R16 R62 R61 receipt-schema and bounded-write correction contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-PREFLIGHT-003`; base/current head:
+  `80a14d8b7f37414a375a758682b358076c38697e`. R61 cannot open input/mode: the adversarial audit
+  reports P2 result-domain/success-predicate drift plus a receipt-schema/write-allowlist GAP; the
+  companion all-zero report does not override it. No R16 artifact/action occurred.
+- R62 changes only these four authority/log documents. After two all-zero reviews it permits only
+  three exact Add-File-only paths (R60 input, R61 intent/result), all no-follow UTF-8 no-BOM/no-CR
+  single-LF, with no sidecars/parts/wrappers/cache/overwrite/rename/delete/hard-link. DESIGN fixes
+  immutable intent/result schemas, canonical-byte semantics, exact field types/values, full
+  domain binding and a no-write receipt verifier with pre/post namespace/task/process evidence.
+- Intent creation consumes the sole preflight; only a schema-valid result bound to it with zero exit,
+  empty digest-verified stdout/stderr and unchanged source/input/domain/R15 plus empty R16 poststate
+  succeeds. Everything else is no-retry failure; outer/worker/admission/Store/Scheduler/copy/proof/
+  product/browser/acceptance paths remain closed. Next: two independent R62 reviews only.

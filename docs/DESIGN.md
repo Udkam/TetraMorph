@@ -11754,3 +11754,79 @@ R15 values, and empty postflight R16 mutable namespace plus zero matching task/p
 outcome is consumed failure. The only validator mode remains `--preflight`; it must not reach
 outer/worker/admission/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser paths.
 No later action is opened without a separate contract and audit.
+
+### F4E-R16 R62 R61 receipt-schema and bounded-write correction
+
+R61 is rejected before input/receipt/mode. Its adversarial review finds P2 because CURRENT_TASK
+does not require `domain` in the result or in the success comparison, conflicting with this
+document, and GAP because generic receipt prose is not independently mechanically verifiable.
+An all-zero companion audit does not override that disposition. R61's weak receipt opening is
+superseded completely; no R16 external artifact has been created.
+
+After two independent all-zero R62 reviews, the only permitted new external files are exactly the
+fixed R60 input, R61 intent, and R61 result paths. Their parent must be a real fixed Temp directory;
+each target must be absent before an Add-File-only creation and a plain no-follow regular file
+afterward. No overwrite, rename, delete, hard link, `.part`, sidecar, wrapper, log, cache, or
+other Temp write is allowed during the input/intent/result/preflight batch. A failed create or
+check forbids Node launch. All three files are UTF-8 no-BOM/no-CR and end in exactly one LF. Input
+bytes/hash remain the R60 literal. Only after that batch's result/absence is audited may a separate
+docs-only disposition record the outcome; it never opens a retry or operational action.
+
+Receipt bytes use exactly the validator's `canonicalBytes` semantics: a recursively
+lexicographically sorted JSON object, arrays in supplied order, only booleans/strings/null/safe
+integers, no cyclic/nonplain values, followed by one LF. A read-only inline verifier must read
+each receipt no-follow, reject BOM/CR/noncanonical reserialization/non-UTF-8/unknown keys or
+wrong primitive type, hash the actual bytes, and rehash the live fixed source/input/domain/R15
+facts plus the matching R16 namespace/task/process snapshots. It creates no file or process other
+than itself and reports no content beyond its verdict/digests.
+
+The intent is canonical exact-key JSON with schema
+`t37-f4e-r16-preflight-intent-v1` and these structures:
+
+```text
+{
+  "argv": [15 exact ASCII strings: nodePath and the 14 R61 direct arguments in order],
+  "before": {"matchingScheduledTasks":[sorted strings],"matchingValidatorProcesses":[sorted strings],"mutableNamespace":[sorted basenames]},
+  "domain": {"base64":<R61 literal>,"bytes":192,"sha256":"0AE5C63D21DAEFFA7B4F3804E01AF12FB3C3D801D37463E65B17AFE4DCE78F15"},
+  "head": <exact lowercase 40-hex capture>,
+  "input": {"bytes":1183,"path":<R61 input literal>,"sha256":"BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7"},
+  "r15Snapshot": {"bytes":9151919032,"files":112,"ownerSha256":"7FA224C76FC92F6A8325B43E33D2A4DC78CDDC1D44D683B878AD5365C52D09BD","sha256":"48710EBDC36C5025E1ABC524D507D94B68C16E7955BD108756E9DBEB06FCA292","tipGeneration":108,"tipSha256":"82B9D55B916252F92440303177BB82F24B4E0AFBD94F011B03DC1026F13D4AA6"},
+  "schema": "t37-f4e-r16-preflight-intent-v1",
+  "source": {"bytes":82977,"path":<R61 validator literal>,"sha256":"9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23"}
+}
+```
+
+`argv` must equal the R61 literal vector exactly, including captured `head` exactly once after
+`--expect-head`; its preflight token is the only legal validator mode. `before` is successful
+only when all three arrays are empty. `mutableNamespace` uses the validator's exact filter:
+basename starts `t37-f4e-endgame-canonical-`, contains `-r16`, and excludes only the fixed
+validator and fixed input names. Task strings match exactly
+`\\TetraMorph\\F4E-R16-Intro05-r16-[0-9a-f]{24}`; process strings identify only `node.exe`
+commands containing the fixed validator path. All nonempty arrays are sorted and make the attempt
+fail closed; the typed strings preserve enough identity for a human audit without storing output.
+
+The result is canonical exact-key JSON with schema `t37-f4e-r16-preflight-result-v1`:
+
+```text
+{
+  "after": <the same exact three-array structure as before>,
+  "domain": <byte/hash/base64 object exactly equal to intent.domain>,
+  "exitCode": <safe integer 0..4294967295>,
+  "input": <object exactly equal to intent.input>,
+  "intentSha256": <uppercase SHA-256 of the complete immutable intent bytes>,
+  "r15Snapshot": <object exactly equal to intent.r15Snapshot>,
+  "schema": "t37-f4e-r16-preflight-result-v1",
+  "source": <object exactly equal to intent.source>,
+  "stderr": {"bytes":<safe integer 0..65536>,"sha256":<uppercase SHA-256>},
+  "stdout": {"bytes":<safe integer 0..65536>,"sha256":<uppercase SHA-256>}
+}
+```
+
+The read-only result verifier rehashes the intent and requires every cross-record equality above,
+the R61 domain Base64 decoding to exactly 192 bytes/SHA/schema, and fresh live post-state equality.
+It also requires `after` arrays empty, zero-byte stdout/stderr each with SHA-256
+`E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855`, and `exitCode: 0` for
+success. Intent creation consumes the one invocation; result failure, absence, schema failure,
+nonzero/overflow output, or any changed fact is a permanently consumed failure. Outer/worker,
+R15 admission, Store, Scheduler, copy, stage/candidate/terminal/proof, product/browser/acceptance
+remain closed under every result.

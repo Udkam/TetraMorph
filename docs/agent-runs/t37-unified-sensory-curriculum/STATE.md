@@ -4179,3 +4179,19 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   namespace/task/process snapshots. Intent itself consumes the preflight; missing/invalid result,
   output, nonzero, or changed post-state means no retry. Outer/worker/admission/Store/copy/proof/
   product/browser/acceptance remain closed. Next: two independent read-only R61 reviews only.
+
+### 2026-09-05 F4E-R16 R62 R61 receipt-schema correction
+
+- R61 is rejected before any external R16 write: adversarial review finds P2 because CURRENT_TASK
+  omits result-domain binding/success comparison and GAP because receipt format/write bounds are
+  not mechanically specified. A companion all-zero review does not override this disposition.
+- R62 supersedes that opening. After two all-zero reviews, exactly three Add-File-only external
+  paths may exist: R60 input and the fixed R61 intent/result receipts; no sidecar/part/wrapper/
+  cache/overwrite/rename/delete/hard link is permitted. Every file must be no-follow regular,
+  UTF-8 no-BOM/no-CR/single-LF after creation and source/input/receipt checks fail closed before
+  Node.
+- DESIGN fixes schema literals, recursive sorted canonical JSON bytes, exact intent/result keys,
+  field types/values, full domain cross-binding, pre/post R16 snapshot matching, and a no-write
+  verifier. Intent consumes the one invocation; only verified zero/empty/unchanged post-state
+  result is success. All other R16 operational/product paths remain closed. Next: independent
+  read-only review of this four-document correction only.
