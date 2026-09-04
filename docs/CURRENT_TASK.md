@@ -11204,3 +11204,29 @@ proof, product, browser, or player-acceptance action ran. R15 remains sealed and
 
 The only next action is two independent read-only static source/behavior reviews. A distinct
 four-document input/preflight contract remains mandatory before any R16 execution path.
+
+### 2026-09-05 F4E-R16 R57 static-source rejection and narrow correction contract
+
+R56 is rejected by two independent read-only source audits and cannot count as all-zero. The
+failed external candidate remains retained at its recorded 84,908-byte SHA-256
+`106F956B6F3B5F3F29FC69666DD0F1B35D2BB59F3AC0F032EC89A9A10704E49F`; it has never run a mode.
+The audits found exactly three structural defects: (1) `assertPinnedBlob` still read live
+working-tree Core/adapter bytes after validating their Git blobs; (2) the R16 CLI accepted an
+arbitrary absolute input instead of the sole fixed `...r16-intro05-input.json` path; and
+(3) the uncalled R15 admission accepted an arbitrary `api` parameter rather than loading the
+verified Git-blob/data-URL adapter itself.
+
+After two independent all-zero reviews of this correction contract, one writer may edit only the
+same external R16 source. The edit must remove the unused working-tree module-closure helpers,
+all live Core/adapter byte/metadata traversal, and the `src`/`scripts` working-tree drift scans;
+history-only Git tree/blob reads remain the sole Core/adapter authority. It must add `INPUT_PATH`
+for the exact fixed R16 input and one no-follow helper used by preflight, worker, candidate-bound
+input, existing-attempt, and resume paths. It must change the uncalled admission to an async
+root/source-pin signature that obtains its adapter only through `loadPinnedApi(root, sourcePin)`;
+it may neither accept an arbitrary adapter nor call any predecessor Store member.
+
+Parser/source-policy checks only may follow that edit. They must prove no root-derived Core or
+adapter working-tree read/traversal or `git diff`/untracked scan remains, all R16 input reads bind
+to `INPUT_PATH`, and the admission has no `api` parameter or `predecessorStore.` access. No R16
+input may be created, and no validator mode, Task Scheduler task, Store admission, copy, stage,
+candidate, terminal, proof, product, browser, or acceptance action is opened.

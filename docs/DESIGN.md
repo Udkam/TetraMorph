@@ -11615,3 +11615,21 @@ validator mode, input, task, Store, copy, proof, product, browser, or acceptance
 
 Two independent all-zero static source/behavior reviews are now required. No input/preflight
 contract or execution is opened by this checkpoint.
+
+### F4E-R16 R57 rejected static source and correction boundary
+
+R56's external source is retained but rejected by independent static audits at its recorded
+84,908-byte / `106F956B6F3B5F3F29FC69666DD0F1B35D2BB59F3AC0F032EC89A9A10704E49F` identity. It
+still performs a reachable but unused `readRegularNoFollow` against live Core and adapter paths;
+it lacks the fixed R16 input-path fence; and its uncalled predecessor admission receives an
+unbound adapter parameter. These violate the R55 direct-Git-blob and fixed-namespace boundary.
+
+After two independent all-zero reviews, only the same external source may be corrected. Delete
+the unused module-closure/live-path helpers and every Core/adapter live read or `src`/`scripts`
+working-tree drift scan. Bind `INPUT_PATH` exactly to the named R16 Temp input and require it at
+every preflight/worker/candidate/resume input read. Make predecessor admission async and bind it
+to `loadPinnedApi(root, sourcePin)`, whose source-pin check proves the data-URL adapter; do not
+accept an arbitrary `api`, call any predecessor Store member, or invoke the admission now.
+
+Only parser/source-policy checks may run after that source edit. No R16 input, mode, task, Store,
+copy, proof, product, browser, or acceptance path opens until a later reviewed preflight contract.

@@ -1720,3 +1720,16 @@ product path is open.
   path ran. R15 stage and all protected inherited paths remain unchanged.
 - Next action: two independent read-only static source/behavior reviews; do not open R16 input or
   execution until a fresh four-document preflight contract is committed and reviewed.
+
+### F4E-R16 R57 rejected static candidate and correction contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-STATIC-003`; base/current head:
+  `2840c6fe77f52d86994d14d5c7565d10722c8b6e`. Independent static audits reject the retained
+  external `106F…E49F` source before any mode: it reads live Core/adapter paths, does not bind
+  input to the fixed R16 Temp name, and accepts an arbitrary admission adapter.
+- After two all-zero reviews, only that same external source may be edited to remove all
+  working-tree Core/adapter traversal and source drift scans, add the no-follow fixed input
+  fence, and obtain admission's adapter through `loadPinnedApi(root, sourcePin)`. No mode or
+  Store construction is permitted during correction.
+- No R16 input/task/stage/candidate/terminal/proof exists; R15 and inherited protected paths
+  remain untouched. Next action: independent read-only review of this four-document contract.

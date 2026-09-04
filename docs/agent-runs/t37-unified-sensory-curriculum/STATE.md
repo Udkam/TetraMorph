@@ -4113,3 +4113,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   product, browser, or acceptance path ran; R15 files and stage remain sealed.
 - Next action: two independent read-only static source/behavior reviews. Input/preflight requires
   a later four-document contract.
+
+### 2026-09-05 F4E-R16 R57 static-source correction contract
+
+- Both independent R56 audits reject the retained `106F…E49F` source without executing it:
+  reachable live Core/adapter reads remain; `INPUT_PATH` is not fixed; and the uncalled R15
+  admission takes an arbitrary adapter parameter. R15 and all R16 output paths remain unchanged.
+- The next static-only source revision, after two all-zero contract reviews, is limited to removing
+  root-derived Core/adapter reads and source drift scans, adding the fixed R16 input fence, and
+  binding admission to `loadPinnedApi(root, sourcePin)`. It must not invoke admission or any mode.
+- Parser/source policy only may then run. No input, task, Store, stage, candidate, terminal,
+  proof, product, browser, or acceptance path is authorized.
