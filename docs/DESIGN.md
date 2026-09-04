@@ -11966,3 +11966,30 @@ have parent `captureParent`, one recursive `A` diff for that path, and tree entr
 `captureCommit:path` must rehash to the fixed source identity. This binds the durable baseline,
 not merely a reported blob. Copier/capture never runs a validator mode or receives R15/R16/Task/
 Store data. Independent artifact audit and later authoring/diff contract remain required.
+
+### F4E-R16 R69 Git-blob escrow replacement contract
+
+R68's path and commit escrow is rejected without execution: a checked parent chain cannot make a
+future `CreateNew` path atomic against reparse replacement, and post-commit validation cannot undo
+a raced `HEAD`/index publication. R69 therefore eliminates all workspace and branch/index writes
+from baseline capture.
+
+After two all-zero reviews, the capture process first holds only the external source bytes and
+requires the fixed 82,977-byte / `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`
+UTF-8 no-BOM/no-CR/single-final-LF identity. It passes those bytes unfiltered through a binary
+stdin channel to `git hash-object -w --stdin`, expects exactly
+`ed03acdfbdeb4f434cb540c81b664f9bcb47596f`, and confirms `git cat-file blob` reconstructs the
+same raw bytes. Until this succeeds, no Git ref, index, `HEAD`, or working-tree path may change.
+
+Each Git subprocess is direct `git -C E:\\Proj\\reproduction-tetris` against its resolved native
+plain `.git` directory, with `GIT_DIR`, `GIT_WORK_TREE`, `GIT_INDEX_FILE`, `GIT_OBJECT_DIRECTORY`,
+`GIT_ALTERNATE_OBJECT_DIRECTORIES`, `GIT_COMMON_DIR`, and `GIT_NAMESPACE` absent and replacement
+objects disabled. Snapshot `HEAD`, `refs/heads/main`, index raw bytes/hash, and staged path list
+before/after; only successful creation of the direct baseline tag may differ.
+
+Publication is one direct-tag compare-and-swap, not a commit: require
+`refs/tags/t37-f4e-r16-validator-baseline-9eaed7` absent, then use `git update-ref --no-deref`
+with the all-zero old 40-hex value to set exactly that verified blob. Reopen the tag and object and
+repeat fixed byte/hash/sentinel checks. Failed CAS/read/hash does not permit retry, source edit, or
+a mode; a dangling immutable Git object has no authority. The tag is the future in-memory diff
+baseline and must pass independent artifact audit before a separately reviewed authoring contract.

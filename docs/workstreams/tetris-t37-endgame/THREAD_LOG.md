@@ -1892,3 +1892,16 @@ product path is open.
   sole `A` diff and cat-file rehash must bind it to `82977` / `9EAED7…ED23`.
 - Next: R68 contract reviews, then capture/independent artifact audit, then a fresh authoring/diff
   contract. Validator source/mode/R15/R16/Task/Store/proof/product remain closed.
+
+### F4E-R16 R69 Git-blob escrow replacement contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-ADMISSION-STATIC-005`; base/current head:
+  `f1b757e83c2dfbb8684b50dc5a9a215dbb4b5f64`. R68 is rejected without capture: adversarial QA
+  finds parent-path TOCTOU and post-commit ref/index race; companion all-zero cannot override.
+- After two all-zero R69 reviews, sole capture is verified raw bytes through binary stdin to
+  `git hash-object -w --stdin` yielding `ed03acdfbdeb4f434cb540c81b664f9bcb47596f`, followed by
+  absent-to-fixed CAS direct tag `refs/tags/t37-f4e-r16-validator-baseline-9eaed7` and re-read.
+  Direct fixed repo/.git Git children disable alternate Git env/replacement objects; no
+  worktree/index/HEAD/branch path may change; no retry after failed hash/CAS.
+- Next: R69 contract reviews, then independent tag/blob audit and a new authoring/diff contract.
+  Validator source/mode/R15/R16/Task/Store/proof/product remain closed.

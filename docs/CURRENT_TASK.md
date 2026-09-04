@@ -11509,3 +11509,40 @@ validator mode closed; do not retry or repair by overwriting a destination.
 The raw copier is not the validator and receives no R15/R16/Task/Store/proof input; it may create
 only this destination and Git's one-file evidence commit. Independent actual-artifact audit of the
 capture tree/blob and a new authoring/diff contract still precede any external validator change.
+
+### 2026-09-05 F4E-R16 R69 Git-blob escrow replacement contract
+
+R68 is rejected before capture. Its adversarial review finds P1 because a path snapshot plus
+`CreateNew` cannot atomically bind the escrow parent chain, and P2 because main-branch evidence
+commit checks occur only after a competing ref/index change could make an irreversible bad commit.
+The companion all-zero review does not override those findings. No escrow file, source change,
+R15/R16 action, Task, or mode occurred.
+
+R69 replaces the working-tree/commit escrow entirely. After two independent all-zero R69 reviews,
+one raw capture process may read the fixed external source only after its bytes pass the exact R67
+82,977-byte / `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23` / UTF-8 sentinel checks.
+It may send only those verified raw bytes through binary standard input to `git hash-object -w
+--stdin`, require returned object ID exactly `ed03acdfbdeb4f434cb540c81b664f9bcb47596f`, and prove
+`git cat-file blob` returns identical raw bytes. It must not create, stage, rename, delete, or
+materialize any workspace path, and it must not alter `HEAD`, index, branch, or tag before this
+object verification succeeds.
+
+Every Git child must be a direct `git -C E:\\Proj\\reproduction-tetris` invocation with the Git
+directory resolved as the plain native `.git` directory and with `GIT_DIR`, `GIT_WORK_TREE`,
+`GIT_INDEX_FILE`, `GIT_OBJECT_DIRECTORY`, `GIT_ALTERNATE_OBJECT_DIRECTORIES`, `GIT_COMMON_DIR`,
+and `GIT_NAMESPACE` absent from its environment; replacement objects are disabled. Capture before/
+after snapshots must show identical `HEAD`, `refs/heads/main`, current index bytes/hash, and staged
+path list; the sole allowed ref difference is the direct baseline tag after successful CAS.
+
+The sole durable publication is exact compare-and-swap creation of the previously absent direct ref
+`refs/tags/t37-f4e-r16-validator-baseline-9eaed7`: `git update-ref --no-deref` must set it to the
+fixed blob only if its old value is the all-zero 40-hex absent value. Immediately reread that exact
+ref and its Git blob, again bind raw bytes/hash/sentinels, and record its object identity. A failed
+read/hash/CAS leaves no workspace or branch/index mutation; an unreferenced Git blob is harmless
+and does not authorize retry, source edit, or mode.
+
+The tag-to-blob binding supersedes the uncreated R67/R68 file/commit path and is the only baseline
+authority for a future in-memory candidate diff. It is non-executable and remains subject to
+independent actual-artifact audit. No validator source edit, validator mode, R15/R16 data, Task,
+Store, proof, product/browser, or player-acceptance path opens until that audit and another exact
+authoring/diff contract are accepted.

@@ -4264,3 +4264,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Capture commit must prove sole `A` path and exact `100644 blob ed03acdfbdeb4f434cb540c81b664f9bcb47596f`,
   verified through `cat-file`. Two R68 reviews precede it; post-capture artifact QA and a separate
   authoring/diff contract still block every validator mode.
+
+### 2026-09-05 F4E-R16 R69 Git-blob escrow replacement contract
+
+- R68 is rejected without capture: QA finds parent-path TOCTOU and post-commit ref/index race.
+  File/commit escrow is abandoned; no workspace/branch/source/R15/R16 action occurred.
+- After two reviews, only verified raw baseline bytes may enter `git hash-object -w --stdin`, must
+  yield `ed03acdfbdeb4f434cb540c81b664f9bcb47596f`, then publish by one absent-to-fixed CAS direct
+  tag `refs/tags/t37-f4e-r16-validator-baseline-9eaed7`. Git runs at fixed native repo/.git with
+  alternate Git env/replacement objects disabled; re-read tag/blob and hash exactly.
+- No worktree/index/HEAD/branch path may change; failed hash/CAS has no retry authority. Next:
+  independent tag/blob artifact audit, then a new in-memory authoring/diff contract.
