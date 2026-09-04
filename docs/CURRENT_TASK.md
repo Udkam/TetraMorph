@@ -11477,3 +11477,35 @@ Task, Store, copy beyond this single baseline capture, R15 access, R16 namespace
 product/browser, or player-acceptance path is permitted. Only after the escrow audit may a fresh
 four-document authoring contract bind the candidate to this committed baseline and exact allowed
 diff hunks.
+
+### 2026-09-05 F4E-R16 R68 escrow creation and Git-tree binding correction
+
+R67 is rejected before capture. Its second independent review finds P2/GAP: an absent destination
+cannot be a regular file before creation, and naming a Git blob does not prove the capture commit
+tree contains that exact blob at the escrow path. The all-zero companion review does not override
+this. No file, validator source, R15/R16 state, Task, or mode changed.
+
+After two independent all-zero R68 contract reviews, the sole non-document operation is one
+fail-closed raw-byte capture through this exact sequence. First, verify every existing component of
+the fixed source path and escrow destination parent chain with no-follow `lstat` as a plain
+directory (source leaf as plain regular file); require source bytes/hash/UTF-8 sentinels exactly as
+R67 and require the destination leaf to fail no-follow lookup with `ENOENT`. Then use one binary
+`CreateNew`/exclusive file handle at the exact destination path to write only the source bytes; it
+must fail if a leaf appears, never truncate/replace/rename/link, and flush before close. If a
+failure occurs after exclusive creation, leave that exact destination unchanged, consume the
+attempt, and never delete, overwrite, or retry it. Recheck the full parent chain and both leaves as no-follow
+ordinary files, then require exact 82,977 bytes / `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`,
+no BOM/CR, one trailing LF, and byte equality.
+
+Immediately before staging, capture literal `captureParent = git rev-parse --verify HEAD`; it must
+not already contain the escrow path. Stage exactly that one path and commit it alone. Let
+`captureCommit` be the new HEAD: require its sole parent equal `captureParent`, its recursive
+name-status diff equal only `A\t` plus the escrow path, and its `git ls-tree` entry at that path
+equal exactly `100644 blob ed03acdfbdeb4f434cb540c81b664f9bcb47596f`. Finally, read that
+`captureCommit:path` blob directly through Git and rehash its raw bytes to the same fixed
+82,977-byte/SHA-256/UTF-8 identity. Any failed precondition leaves source authoring and every
+validator mode closed; do not retry or repair by overwriting a destination.
+
+The raw copier is not the validator and receives no R15/R16/Task/Store/proof input; it may create
+only this destination and Git's one-file evidence commit. Independent actual-artifact audit of the
+capture tree/blob and a new authoring/diff contract still precede any external validator change.

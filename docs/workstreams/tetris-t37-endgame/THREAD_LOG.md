@@ -1880,3 +1880,15 @@ product path is open.
   obtain independent artifact QA. It is an explicit non-executable baseline escrow exception.
 - Next: R67 contract reviews only. No external validator edit, Node/mode, R15/R16 access, Task,
   Store, proof/product/browser path is open; authoring requires a later exact-diff contract.
+
+### F4E-R16 R68 escrow creation and Git-tree-binding correction contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-ADMISSION-STATIC-004`; base/current head:
+  `8605a4a21d8b8d44c9dc785da5e35d3aaeb1727d`. R67 is rejected before capture: adversarial QA
+  reports P2 absent/regular destination contradiction and a capture-tree/blob GAP; no action made.
+- After two all-zero R68 reviews, only source safe-read/parent-chain checks, destination no-follow
+  `ENOENT`, exclusive `CreateNew` raw copy/flush/postcheck, and one-file escrow commit may occur.
+  Expected Git tree entry is exact `100644 blob ed03acdfbdeb4f434cb540c81b664f9bcb47596f`; parent,
+  sole `A` diff and cat-file rehash must bind it to `82977` / `9EAED7…ED23`.
+- Next: R68 contract reviews, then capture/independent artifact audit, then a fresh authoring/diff
+  contract. Validator source/mode/R15/R16/Task/Store/proof/product remain closed.

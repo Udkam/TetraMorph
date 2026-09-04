@@ -4253,3 +4253,14 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   Both paths require no-follow/UTF-8 sentinels/hash equality; commit one evidence path and audit it.
 - The capture is non-executable escrow, not source authoring. Next: independent escrow audit, then
   a new authoring/diff contract; every validator mode and product/proof path stays closed.
+
+### 2026-09-05 F4E-R16 R68 escrow creation/tree-binding correction
+
+- R67 is rejected before capture: QA finds P2 destination absent/regular contradiction and GAP
+  because a named blob lacks capture commit-tree binding. No file/source/R15/R16 action occurred.
+- R68's only prospective operation is source no-follow read + destination-parent no-reparse/ENOENT,
+  atomic exclusive `CreateNew` raw copy, flush, full post-check, then a one-path evidence commit.
+  Both paths must bind exact `82977` / `9EAED7…ED23` sentinels.
+- Capture commit must prove sole `A` path and exact `100644 blob ed03acdfbdeb4f434cb540c81b664f9bcb47596f`,
+  verified through `cat-file`. Two R68 reviews precede it; post-capture artifact QA and a separate
+  authoring/diff contract still block every validator mode.

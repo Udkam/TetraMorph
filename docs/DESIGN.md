@@ -11942,3 +11942,27 @@ never imported or executed. It enables a future static auditor to compare the ex
 directly against a committed Git blob and prove the exact permitted diff. Capture does not open
 validator authoring, any mode, source policy Node run, R15/R16 data access, Task/Store, or product
 work. A separate post-capture artifact audit and then a new authoring contract remain mandatory.
+
+### F4E-R16 R68 escrow creation and Git-tree binding correction
+
+R67 is rejected before capture: the destination cannot simultaneously be absent and a regular
+file, and a reported Git blob is insufficient without proving the capture commit's tree entry.
+This P2/GAP correction opens no source, mode, or R15/R16 action.
+
+After two all-zero R68 reviews, capture uses a single fail-closed binary path only. Precondition:
+no-follow `lstat` each existing component of fixed source and destination-parent chains, source
+leaf plain regular with exact R67 bytes/hash/sentinels, destination leaf `ENOENT` by no-follow
+lookup. Creation: one exclusive `CreateNew` handle at the exact escrow path writes only the source
+bytes, flushes, and cannot truncate, replace, rename, or link. If creation has happened and any
+following condition fails, leave that exact destination unchanged and consume the no-retry attempt;
+do not delete or overwrite it. Postcondition: rerun no-follow parent/leaf checks and bind both raw byte sequences to exactly
+82,977 bytes / `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`, UTF-8 no BOM/CR and one
+trailing LF.
+
+The one-file evidence commit is itself part of the proof. Before staging capture `captureParent`
+and require no prior escrow tree entry; stage only the path. The resulting `captureCommit` must
+have parent `captureParent`, one recursive `A` diff for that path, and tree entry exactly
+`100644 blob ed03acdfbdeb4f434cb540c81b664f9bcb47596f`. Git `cat-file` of
+`captureCommit:path` must rehash to the fixed source identity. This binds the durable baseline,
+not merely a reported blob. Copier/capture never runs a validator mode or receives R15/R16/Task/
+Store data. Independent artifact audit and later authoring/diff contract remain required.
