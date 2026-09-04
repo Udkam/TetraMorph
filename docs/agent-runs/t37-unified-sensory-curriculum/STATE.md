@@ -4163,3 +4163,19 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   full sealed snapshot. A nonzero preflight consumes R16 without retry; a zero only consumes the
   preflight and requires another contract before any operational action. Next: independent review
   of this four-document contract only.
+
+### 2026-09-05 F4E-R16 R61 R60 rejection and receipt-bound correction
+
+- R60 is rejected before input/mode: one independent adversarial review reports P1 because the
+  one-use preflight command retains unresolved value placeholders, and identifies missing
+  postflight task/process evidence plus no durable intent/result record. A companion review is
+  all-zero, but cannot override the P1. Nothing in the R16 external namespace was created.
+- R61 supersedes R60 opening authority. After two all-zero reviews it permits only R60's fresh
+  input, then one direct argument-array preflight with literal Node/validator/root/input/domain/
+  input-SHA values and a single `git rev-parse --verify HEAD` lowercase-40 capture recorded
+  verbatim as `--expect-head`.
+- A no-replace/no-follow pre-invocation intent and post-return result outside the canonical R16
+  mutable namespace bind the literal argv, source/input/domain/R15 hashes and before/after R16
+  namespace/task/process snapshots. Intent itself consumes the preflight; missing/invalid result,
+  output, nonzero, or changed post-state means no retry. Outer/worker/admission/Store/copy/proof/
+  product/browser/acceptance remain closed. Next: two independent read-only R61 reviews only.

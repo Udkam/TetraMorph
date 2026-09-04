@@ -1782,3 +1782,20 @@ product path is open.
   Pre/post audit requires hash and empty-namespace/task/process evidence plus unchanged full R15
   snapshot. Nonzero consumes R16/no retry; zero needs another contract before any operational step.
   Next: two independent read-only reviews of this contract; no input or mode is yet authorized.
+
+### F4E-R16 R61 R60 rejection and receipt-bound correction contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-PREFLIGHT-002`; base/current head:
+  `99adca269c0ccbc99d3782a402295a1121aca014`. R60 cannot authorize input/mode: the adversarial
+  audit finds P1 unresolved command placeholders plus GAPs in postflight task/process evidence and
+  durable outcome capture; the second audit's all-zero result does not override it.
+- R61 changes only these four authority/log documents. After two independent all-zero reviews,
+  the only open sequence is fresh R60 input, then one preflight built from literal Node/validator/
+  root/input/domain/input-SHA values and one immediately captured/validated/recorded lowercase
+  40-hex HEAD. A no-replace/no-follow intent before Node and result after Node, both outside the
+  canonical mutable namespace, bind argv plus source/input/domain/R15 and before/after R16
+  namespace/task/process snapshots; intent means consumed even if no result returns.
+- Zero exit plus zero stdout/stderr and all unchanged/empty postconditions is the sole successful
+  consumed result; every other case is consumed no-retry failure. No outer/worker/admission/Store/
+  Scheduler/copy/stage/candidate/terminal/proof/product/browser/acceptance path opens. Next: two
+  independent read-only reviews of this correction only; input and validator mode stay closed.

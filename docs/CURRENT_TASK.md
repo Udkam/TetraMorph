@@ -11290,3 +11290,41 @@ snapshot, and all R16 attempt/candidate/worker-result/terminal/stage paths uncha
 nonzero result consumes this R16 preflight attempt and forbids retry; either outcome requires a
 fresh audit before a successor action. Even a successful preflight opens no outer/worker,
 predecessor-admission, stage copy, proof, product, browser, or player-acceptance work.
+
+### 2026-09-05 F4E-R16 R61 R60 rejection and receipt-bound preflight correction
+
+R60 cannot open input creation or a mode: its independent adversarial audit finds a P1 because
+the supposedly single-use command retained placeholders for validator, input, domain, and HEAD;
+it also omitted postflight R16 task/process checks and a durable invocation/result record. A
+second audit is all-zero, but the P1 prevails. No R16 input, mode, receipt, task, Store, copy,
+stage, candidate, terminal, proof, product, browser, or player-acceptance action has occurred.
+
+After two independent all-zero reviews of this correction, R60's opening authority is superseded
+by the following sole protocol. The executable/validator/root/input literals are exactly
+`E:\Nodejs\node.exe`,
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-r16.mjs`,
+`E:\Proj\reproduction-tetris`, and
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-r16-intro05-input.json`; the domain is
+the exact R60 Base64 literal and the input SHA is
+`BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7`. The only dynamic argument
+is `head`: immediately before invocation, read `git rev-parse --verify HEAD`, trim only its
+terminal newline, require exactly one lowercase `[0-9a-f]{40}` token, preserve it verbatim, and
+pass it as `--expect-head` in the single direct argument array. No shell placeholder or inferred
+path/value is permitted.
+
+After creating and rehashing the fresh R16 input, but before Node starts, write once-only,
+no-replace/no-follow intent `C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-r16-preflight-intent.json`
+outside the validator's canonical mutable namespace. It records source/input/domain/R15 snapshot,
+the verified literal `head`, the complete argv array, and preflight R16 namespace/task/process
+snapshots. Its successful creation consumes the sole invocation: if a result never appears, stop
+and audit as ambiguous—never launch Node again. On return, write once-only result
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-r16-preflight-result.json`, bound to the
+intent SHA-256, with exit code, stdout/stderr byte counts and hashes, source/input/R15 snapshots,
+and postflight R16 namespace/task/process snapshots. Neither receipt may be overwritten, deleted,
+renamed, or treated as a validator output.
+
+Only a result with exit code zero, empty stdout/stderr, unchanged source/input/R15 hashes, and
+zero R16 mutable paths/tasks/validator processes is a successful consumed preflight. Any nonzero,
+nonempty output, postflight difference, or missing/invalid result is consumed failure with no
+retry. Outer/worker, sealed R15 admission, Scheduler action, Store, stage copy, proof, product,
+browser, and player acceptance remain closed in every case.

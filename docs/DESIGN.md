@@ -11703,3 +11703,54 @@ postflight must rehash source/input, verify R15's full sealed snapshot, and show
 paths still absent. A nonzero result consumes R16 with no retry. A zero result consumes only this
 preflight and still leaves every outer/worker/admission/copy/proof/product path closed pending a
 new contract and audit.
+
+### F4E-R16 R61 R60 rejection and receipt-bound preflight correction
+
+R60 is rejected before input creation or any validator mode. One independent adversarial audit
+reports P1 because its single-use command leaves validator/input/domain/HEAD placeholders instead
+of a fixed invocation protocol; it also identifies absent postflight task/process checks and no
+durable result record. An all-zero companion review does not override that finding. R60's earlier
+opening language is superseded completely by this correction; all R16 operational artifacts remain
+absent, and the accepted validator source remains byte-identical.
+
+After two independent all-zero R61 reviews, create the R60 exact input as stated there, then use
+only this argument construction. The immutable literal values are:
+
+```text
+nodePath=E:\Nodejs\node.exe
+validatorPath=C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-canonical-validate-r16.mjs
+root=E:\Proj\reproduction-tetris
+input=C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-r16-intro05-input.json
+domainJsonBase64=eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTYtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K
+inputSha256=BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7
+```
+
+Read `head` exactly once immediately before the invocation with `git rev-parse --verify HEAD`.
+Strip only its terminal newline; require the remaining value to match `^[0-9a-f]{40}$`; record it
+and never recalculate/substitute it. The exact direct argv array is then `nodePath`, the two fixed
+Node flags `--disable-warning=ExperimentalWarning` and `--max-old-space-size=6144`, `validatorPath`,
+`--preflight`, `--root`, `root`, `--input`, `input`, `--domain-json-base64`,
+`domainJsonBase64`, `--expect-head`, `head`, `--expect-input-sha`, and `inputSha256`, in that
+order. This is a construction rule, not a template: all names above resolve to the displayed
+literals and `head` is the one verified/recorded value. Shell interpolation, aliases, inferred
+paths, substituted domain text, or a second HEAD read fail closed before Node.
+
+Before Node starts, after rechecking the R60 input/source/R15/R16 preconditions, create exactly
+one fresh no-replace/no-follow intent at
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-r16-preflight-intent.json`. It is outside
+the `t37-f4e-endgame-canonical-` mutable namespace and records canonical JSON keys
+`schema`, `head`, `argv`, `source`, `input`, `domain`, `r15Snapshot`, and `before`, where `before`
+contains R16 mutable namespace, matching validator process, and matching scheduled-task snapshots.
+Its exact SHA-256 becomes the sole binding for the fresh no-replace/no-follow result at
+`C:\Users\Alex Chen\AppData\Local\Temp\t37-f4e-endgame-r16-preflight-result.json`, whose canonical
+keys are `schema`, `intentSha256`, `exitCode`, `stdout`, `stderr`, `source`, `input`, `domain`,
+`r15Snapshot`, and `after`. `stdout`/`stderr` each contain only byte count and SHA-256; `after`
+repeats the three R16 namespace/process/task snapshots. Both records are immutable. Intent creation
+means the preflight is consumed even if Node never returns; missing result is ambiguous consumed
+failure, not retry authority.
+
+The only accepted result has `exitCode: 0`, zero-byte stdout/stderr, unchanged source/input/domain/
+R15 values, and empty postflight R16 mutable namespace plus zero matching task/process. Any other
+outcome is consumed failure. The only validator mode remains `--preflight`; it must not reach
+outer/worker/admission/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser paths.
+No later action is opened without a separate contract and audit.
