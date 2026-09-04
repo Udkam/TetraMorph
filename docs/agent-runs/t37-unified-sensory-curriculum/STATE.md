@@ -4275,3 +4275,13 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   alternate Git env/replacement objects disabled; re-read tag/blob and hash exactly.
 - No worktree/index/HEAD/branch path may change; failed hash/CAS has no retry authority. Next:
   independent tag/blob artifact audit, then a new in-memory authoring/diff contract.
+
+### 2026-09-05 F4E-R16 R70 trusted local Git control-plane boundary
+
+- R69 adversarial review identifies only same-privilege hostile OS/Git-control-plane replacement,
+  which can alter every local artifact and is outside product recovery. No capture occurred.
+- R70 explicitly trusts local filesystem/configured Git/.git for one bounded capture while retaining
+  R69 raw-content, sanitized-env, snapshot and CAS protections against ordinary failures/concurrency.
+  Hostile control-plane protection requires a separate isolated-runner/OS task.
+- After two boundary reviews, execute R69 once; then tag/blob artifact QA and all later source/mode
+  gates remain mandatory.

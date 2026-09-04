@@ -11546,3 +11546,24 @@ authority for a future in-memory candidate diff. It is non-executable and remain
 independent actual-artifact audit. No validator source edit, validator mode, R15/R16 data, Task,
 Store, proof, product/browser, or player-acceptance path opens until that audit and another exact
 authoring/diff contract are accepted.
+
+### 2026-09-05 F4E-R16 R70 local Git control-plane boundary
+
+R69's content-level controls are sound, but its adversarial review correctly observes that a
+same-privilege hostile process able to replace `git.exe`, `.git/objects`, refs, or filesystem
+directory chains can defeat any ordinary local Git client after prechecks. That threat can also
+rewrite every local document and tag; it is not a game-recovery defect that another validator
+contract can eliminate. No R69 capture occurred.
+
+R70 fixes the operational boundary: this task assumes the user's local Windows filesystem, configured
+Git executable, and this repository's `.git` control plane are trusted during the one bounded
+capture. It remains fail-closed against accidental wrong content, filters, stale/foreign Git
+environment, existing tag, ordinary ref concurrency, and source-byte drift through R69's exact
+raw SHA-256/Git-blob/cat-file/absent-to-fixed-CAS checks. A same-privilege hostile local compromise
+requires a separately provisioned isolated runner or OS-level controls and is explicitly outside
+this product task.
+
+After two independent all-zero R70 boundary reviews, execute only R69's single tag-capture protocol
+under that stated trust boundary. Do not add a workspace escrow, change `main`, run a validator
+mode, or modify source. The tag still requires independent actual-artifact audit and a later exact
+in-memory authoring/diff contract before any admission path can open.

@@ -11993,3 +11993,22 @@ with the all-zero old 40-hex value to set exactly that verified blob. Reopen the
 repeat fixed byte/hash/sentinel checks. Failed CAS/read/hash does not permit retry, source edit, or
 a mode; a dangling immutable Git object has no authority. The tag is the future in-memory diff
 baseline and must pass independent artifact audit before a separately reviewed authoring contract.
+
+### F4E-R16 R70 local Git control-plane boundary
+
+R69 cannot defend against a hostile process with the user's own filesystem/Git permissions that
+replaces the client binary or arbitrary `.git` directory chain after validation. That actor can
+equally rewrite source, docs, and refs, so attempting to prove around it within application code is
+non-terminating and outside the TetraMorph recovery threat model.
+
+The bounded operational premise is therefore trusted local Windows filesystem, configured Git
+binary, and repository Git control plane for the one capture. Within that premise R69 still requires
+literal raw content identity, binary object insertion, unfiltered `cat-file` reconstruction,
+sanitized Git environment, snapshots, and zero-old-value direct-tag CAS. It handles ordinary
+mistakes and non-hostile concurrent ref updates without broadening product authority. A hostile
+same-privilege control-plane scenario needs a separate isolated runner/OS security task; it is not
+silently accepted as evidence.
+
+After two all-zero boundary reviews, R69's tag capture may proceed once. All post-capture artifact
+audit, in-memory candidate-diff contract, source audit, invocation contract, and product acceptance
+gates remain unchanged.

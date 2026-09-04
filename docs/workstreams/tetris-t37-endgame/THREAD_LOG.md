@@ -1905,3 +1905,14 @@ product path is open.
   worktree/index/HEAD/branch path may change; no retry after failed hash/CAS.
 - Next: R69 contract reviews, then independent tag/blob audit and a new authoring/diff contract.
   Validator source/mode/R15/R16/Task/Store/proof/product remain closed.
+
+### F4E-R16 R70 local Git control-plane boundary
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-ADMISSION-STATIC-006`; base/current head:
+  `0130ce82f6f1d75f3f75b5d07183a2b0e285b375`. R69 receives P1/P2/GAP only for a hostile
+  same-privilege filesystem/Git control plane; no tag/source/mode action occurred.
+- R70 scopes one capture to trusted local Windows filesystem, configured Git and `.git`; R69 still
+  enforces raw bytes, sanitized environment, snapshots and absent-to-fixed tag CAS for ordinary
+  faults/concurrency. Hostile local compromise needs separate OS/isolated-runner authority.
+- Next: two R70 boundary reviews, then sole R69 tag capture and artifact QA. Source/mode/R15/R16/
+  Task/Store/proof/product remain closed.
