@@ -11830,3 +11830,17 @@ success. Intent creation consumes the one invocation; result failure, absence, s
 nonzero/overflow output, or any changed fact is a permanently consumed failure. Outer/worker,
 R15 admission, Store, Scheduler, copy, stage/candidate/terminal/proof, product/browser/acceptance
 remain closed under every result.
+
+### F4E-R16 R63 R62 receipt-contract review disposition
+
+Two independent R62 reviews are all-zero (`P0/P1/P2/P3/GAP = 0/0/0/0/0`). They accept the
+corrected contract's exact result-domain equality, receipt schema/type/canonical-byte rules,
+three-path write allowlist, matching R16 namespace/task/process filters, intent-to-result binding,
+and fail-closed consumption semantics. This is not a preflight result, proof, or product claim;
+source remains the accepted 82,977-byte static artifact and all R16 external paths are still
+absent at this disposition.
+
+The sole next sequence is exactly R62's bounded batch: fresh input, fresh intent, one direct
+`--preflight`, then fresh result only if Node returns, with all prescribed before/after checks.
+Everything else, including R15 admission, outer/worker, Store/Scheduler, copy/stage/proof, product,
+browser, and player acceptance, remains closed.

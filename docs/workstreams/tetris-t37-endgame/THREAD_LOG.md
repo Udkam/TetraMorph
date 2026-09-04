@@ -1815,3 +1815,14 @@ product path is open.
   empty digest-verified stdout/stderr and unchanged source/input/domain/R15 plus empty R16 poststate
   succeeds. Everything else is no-retry failure; outer/worker/admission/Store/Scheduler/copy/proof/
   product/browser/acceptance paths remain closed. Next: two independent R62 reviews only.
+
+### F4E-R16 R63 receipt-contract QA disposition
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-PREFLIGHT-004`; reviewed contract head:
+  `ea09cf833cb689f55119d9f6576b164d24df28f9`. Both independent R62 audits are
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0` and accept only the
+  corrected receipt contract: result-domain equality, canonical schemas, three-path allowlist,
+  exact namespace/task/process snapshots, and consumed no-retry state.
+- No external R16 path was created or mode run. The sole next sequence is R62's fresh input,
+  fresh intent, one direct preflight, and result-only-if-returned batch; every other R16/R15/
+  product/browser/acceptance path remains closed.

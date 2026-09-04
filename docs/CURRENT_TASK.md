@@ -11358,3 +11358,18 @@ description. Intent creation still consumes the one preflight; any missing, malf
 or postcondition-failing result is no-retry failure, and every operational/product path remains
 closed. Only after the result/absence is audited may a separate docs-only disposition record the
 outcome; that record is not a preflight sidecar or retry authority.
+
+### 2026-09-05 F4E-R16 R63 R62 receipt contract accepted
+
+Both independent R62 reviews are all-zero (`P0/P1/P2/P3/GAP = 0/0/0/0/0`). They verify that the
+R62 four-document range is docs-only; the result schema now requires full domain
+base64/bytes/hash equality with intent; the three-path Add-File-only boundary, canonical receipt
+bytes, task/process/namespace snapshots, intent/result binding, and no-retry outcome rules are
+mechanically consistent. This accepts the contract only, not an input, receipt, validator run, or
+certificate.
+
+The one permitted batch may now begin: create/rehash only the exact R60 input, then its exact R61
+intent, run exactly the direct `--preflight` argument vector once, and create only its result if
+Node returns. Before and after each step, apply all R62 checks. R15 remains sealed, and no
+outer/worker/admission/Store/Scheduler/copy/stage/candidate/terminal/proof/product/browser/player
+acceptance path is open.

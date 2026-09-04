@@ -4195,3 +4195,12 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   verifier. Intent consumes the one invocation; only verified zero/empty/unchanged post-state
   result is success. All other R16 operational/product paths remain closed. Next: independent
   read-only review of this four-document correction only.
+
+### 2026-09-05 F4E-R16 R63 R62 receipt-contract review accepted
+
+- Both independent R62 reviews report `P0/P1/P2/P3/GAP = 0/0/0/0/0`. The only accepted claim is
+  the receipt contract: full result-domain binding, schema/canonical-byte validation, three-file
+  allowlist, exact R16 pre/post snapshots, and one-use fail-closed semantics are consistent.
+- No R16 input/intent/result/mode/task/Store/copy/stage/candidate/terminal/proof/product/browser/
+  acceptance artifact or action has yet occurred; R15 remains sealed. Next is the one bounded
+  batch defined by R62, beginning with its exact input and no other path.
