@@ -4134,3 +4134,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   `(root, sourcePin)` via `loadPinnedApi`, without arbitrary `api` or Store member access.
 - No R16 input/mode/task/Store/copy/stage/candidate/terminal/proof/product/browser/acceptance
   action ran. Next: two independent read-only source/behavior reviews.
+
+### 2026-09-05 F4E-R16 R59 corrected static-source review accepted
+
+- Both independent R58 source/behavior audits report `P0/P1/P2/P3/GAP = 0/0/0/0/0`. They
+  recompute the corrected external source identity `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`
+  (82,977 UTF-8 no-BOM/LF-only bytes), confirm parser-only success and the Git-blob-only loader,
+  exact fixed-input paths, and the uncalled adapter-bound predecessor admission.
+- This accepts only the static source as a reviewed basis for a later R16 preflight; it does not
+  create an input or authorize an operational validator mode. R15's sealed stage and all R16
+  operational namespaces remain absent/unchanged.
+- Next: prepare a distinct four-document input/no-write-preflight contract, then obtain its own
+  independent reviews before creating the fixed input or executing the bounded preflight.

@@ -1748,3 +1748,19 @@ product path is open.
   static policy checks. No validator mode/input/task/Store/copy/stage/candidate/terminal/proof/
   product/browser/acceptance action ran. R15 and protected inherited paths are untouched.
 - Next: two independent read-only static source/behavior reviews; no input/preflight mode opens.
+
+### F4E-R16 R59 corrected static-source QA disposition
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-STATIC-005`; reviewed source base/current head:
+  `bab8ffecc1d1e6c6a06fc68efbe03045b122c2cc`. Both independent read-only reviewers report
+  `P0/P1/P2/P3/GAP = 0/0/0/0/0` for the corrected external source.
+- The reviewed artifact is exactly
+  `C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-canonical-validate-r16.mjs`,
+  82,977 UTF-8 no-BOM/LF-only bytes, SHA-256
+  `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`. QA independently confirms
+  the direct Git-blob/data-URL Core/adapter chain, all fixed-input read fences, and an uncalled
+  adapter-bound R15 admission with no predecessor Store member access.
+- Exact changed paths in this coordinator disposition are the four T37 authority/log files.
+  No external source edit or validator mode/input/task/Store/copy/stage/candidate/terminal/proof/
+  product/browser/acceptance action occurred; R15 and inherited protected paths remain untouched.
+  Next: a separately reviewed four-document R16 input/no-write-preflight contract.

@@ -11648,3 +11648,17 @@ member access.
 
 Parser-only `E:\\Nodejs\\node.exe --check` and static policy pass. Two independent all-zero source/
 behavior reviews are required next; no R16 operational path has run or is opened.
+
+### F4E-R16 R59 corrected static-source review disposition
+
+Both independent R58 source/behavior reviews are all-zero (`P0/P1/P2/P3/GAP = 0/0/0/0/0`). They
+confirm the 82,977-byte / `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`
+external source's direct Git-blob/data-URL authority, exact fixed-input fence at every read site,
+and sealed, uncalled adapter-bound R15 admission. The source is accepted solely as static
+preflight-planning input; no semantic claim about an R16 execution, certificate, or product
+behavior follows from this disposition.
+
+The next boundary is a new four-document R16 input/no-write-preflight contract. Until that
+contract is independently reviewed, the fixed input file and every validator mode remain absent
+and closed, as do task scheduling, Store construction/admission, R15 copying, stage/candidate/
+terminal/proof paths, product changes, browser evidence, and player acceptance.

@@ -11250,3 +11250,18 @@ copy, stage, candidate, terminal, proof, product, browser, or acceptance action 
 
 The only next action is two independent read-only static source/behavior reviews. A later
 four-document input/preflight contract remains required before any mode can execute.
+
+### 2026-09-05 F4E-R16 R59 corrected static source accepted for preflight planning
+
+Two independent read-only R58 source/behavior audits are all-zero: each reports
+`P0/P1/P2/P3/GAP = 0/0/0/0/0`. They independently rechecked the external source identity
+(`9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`, 82,977 UTF-8 no-BOM/LF-only
+bytes), parser-only check, Git-blob-only Core/adapter loading, fixed R16 `INPUT_PATH` fencing,
+and the uncalled adapter-bound R15 admission. The corrected static source is therefore accepted
+only as the reviewed basis for later R16 preflight planning; it is not a proof or product result.
+
+No R16 input, mode, Task Scheduler task, Store construction/admission, copy, stage, candidate,
+terminal, proof, product, browser, or player-acceptance action ran. R15 remains sealed. The sole
+next action is a fresh four-document contract for an exact R16 input and a bounded no-write
+preflight; that contract must receive its own independent review before either artifact or mode
+is opened.
