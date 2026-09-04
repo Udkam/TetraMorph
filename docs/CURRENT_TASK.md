@@ -11265,3 +11265,28 @@ terminal, proof, product, browser, or player-acceptance action ran. R15 remains 
 next action is a fresh four-document contract for an exact R16 input and a bounded no-write
 preflight; that contract must receive its own independent review before either artifact or mode
 is opened.
+
+### 2026-09-05 F4E-R16 R60 canonical input and no-write preflight contract
+
+This contract keeps the accepted 82,977-byte external source at SHA-256
+`9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23` unchanged. Only after two
+independent all-zero reviews may one writer create the otherwise absent plain no-follow regular
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r16-intro05-input.json` from the
+R16 literal in DESIGN: exactly 1,183 UTF-8 no-BOM/LF canonical bytes, SHA-256
+`BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7`, schema
+`t37-f4e-r16-intro05-input-v1`. It is a fresh R16 literal; no R15 input may be copied, renamed,
+hard-linked, or modified to create it.
+
+After no-follow/hash checks of the source and input, an empty R16 mutable namespace, no matching
+R16 scheduled task or validator process, and unchanged sealed R15 snapshot, exactly one R16
+`--preflight` may run. It uses only the fixed absolute root/input, the R16 192-byte domain from
+DESIGN (SHA-256 `0AE5C63D21DAEFFA7B4F3804E01AF12FB3C3D801D37463E65B17AFE4DCE78F15`), the exact current
+lowercase Git HEAD read immediately before invocation, and the exact input SHA. The permitted
+mode is no-write/no-task/no-Store/no-proof/no-admission: it must not call `--outer`, `--worker`,
+the sealed R15 admission, a scheduler, a copy/hard-link, or any product/browser path.
+
+The preflight must exit zero with no stdout/stderr and leave source/input hashes, R15's frozen
+snapshot, and all R16 attempt/candidate/worker-result/terminal/stage paths unchanged/absent. A
+nonzero result consumes this R16 preflight attempt and forbids retry; either outcome requires a
+fresh audit before a successor action. Even a successful preflight opens no outer/worker,
+predecessor-admission, stage copy, proof, product, browser, or player-acceptance work.

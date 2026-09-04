@@ -11662,3 +11662,44 @@ The next boundary is a new four-document R16 input/no-write-preflight contract. 
 contract is independently reviewed, the fixed input file and every validator mode remain absent
 and closed, as do task scheduling, Store construction/admission, R15 copying, stage/candidate/
 terminal/proof paths, product changes, browser evidence, and player acceptance.
+
+### F4E-R16 R60 canonical input and bounded no-write preflight contract
+
+The accepted R16 source remains exactly 82,977 UTF-8 no-BOM/LF-only bytes at SHA-256
+`9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`; no source change is
+authorized here. After two independent all-zero reviews of this four-document contract, create
+only the currently absent plain no-follow regular
+`C:\\Users\\Alex Chen\\AppData\\Local\\Temp\\t37-f4e-endgame-r16-intro05-input.json`. It must be
+the following exact R16 literal decoded as UTF-8 no-BOM/LF bytes—1,183 bytes, SHA-256
+`BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7`, schema
+`t37-f4e-r16-intro05-input-v1`—and must be created fresh, never by copying, renaming, hard-linking,
+or changing an R15 file:
+
+```text
+eyJjYW5kaWRhdGUiOnsiY29tbWFuZFN0cmVhbSI6IlNRTEhUVFRRTEhUVFRDTExIVFRUUkhUVFRUVFRUVFRUVFRDUlJSUkhUVFRUVFRUVFRUVFRDUkhUVFRUVFRUVFRUVFRMTExMSFRUVFRUVFRUVFRUVCIsImRlZmluaXRpb25Kc29uQmFzZTY0IjoiZXlKaGJtTm9iM0pEWld4c2N5STZXMTBzSW1KdllYSmtVbTkzY3lJNld5SXVMaTR1TGk0dUxpNHVJaXdpTGk0dUxpNHVMaTR1TGlJc0lpNHVMaTR1TGk0dUxpNGlMQ0l1TGk0dUxpNHVMaTR1SWl3aUxpNHVMaTR1TGk0dUxpSXNJaTR1TGk0dUxpNHVMaTRpTENJdUxpNHVMaTR1TGk0dUlpd2lMaTR1TGk0dUxpNHVMaUlzSWk0dUxpNHVMaTR1TGk0aUxDSXVMaTR1TGk0dUxpNHVJaXdpTGk0dUxpNHVMaTR1TGlJc0lpNHVMaTR1TGk0dUxpNGlMQ0l1TGk0dUxpNHVMaTR1SWl3aUxpNHVMaTR1TGk0dUxpSXNJaTR1TGk0dUxpNHVMaTRpTENJdUxpNHVMaTR1TGk0dUlpd2lUMDlhV2k0dUxreE1UQ0lzSWs5UFRGcGFVMU5NTGk0aUxDSk1URXhVVTFNdVNrcEtJaXdpTGk1VVZGUkpTVWxKU2lKZExDSmthV1ptYVdOMWJIUjVJam8xTENKb2FXUmtaVzVEWld4c2N5STZXMTBzSW1sa0lqb2lkRE55TFhOb1lXWjBMVEEwSWl3aWJtRnRaU0k2SXVXUWp1YUppeUlzSW5ObFpXUWlPak00T0Rjc0luTmxkSFZ3SWpwN0luQnNZV05sYldWdWRITWlPbHQ3SW5KdmRHRjBhVzl1SWpvd0xDSjBlWEJsSWpvaVNTSXNJbmdpT2pWOUxIc2ljbTkwWVhScGIyNGlPakFzSW5SNWNHVWlPaUpVSWl3aWVDSTZNbjBzZXlKeWIzUmhkR2x2YmlJNk1Dd2lkSGx3WlNJNklsTWlMQ0o0SWpvMGZTeDdJbkp2ZEdGMGFXOXVJam93TENKMGVYQmxJam9pVENJc0luZ2lPakI5TEhzaWNtOTBZWFJwYjI0aU9qSXNJblI1Y0dVaU9pSktJaXdpZUNJNk4zMHNleUp5YjNSaGRHbHZiaUk2TUN3aWRIbHdaU0k2SWxvaUxDSjRJam95ZlN4N0luSnZkR0YwYVc5dUlqb3dMQ0owZVhCbElqb2lUeUlzSW5naU9qQjlMSHNpY205MFlYUnBiMjRpT2pJc0luUjVjR1VpT2lKTUlpd2llQ0k2TjMxZExDSnpaV1ZrSWpvek56SXlNSDBzSW5SaGNtZGxkRkp2ZDNNaU9qUjlDZz09IiwiZGVmaW5pdGlvblNoYTI1NiI6IkRCODE0RkY5REIxRTgzQTk2NzU0MUEzNUM5MUNGNzQ5QTA4RTQ1REU1QUY0N0FBQjM4RkU0REJFMkFDODBBMTYifSwic2NoZW1hIjoidDM3LWY0ZS1yMTYtaW50cm8wNS1pbnB1dC12MSJ9Cg==
+```
+
+The sole domain is 192 UTF-8 no-BOM/LF bytes, SHA-256
+`0AE5C63D21DAEFFA7B4F3804E01AF12FB3C3D801D37463E65B17AFE4DCE78F15`, whose exact Base64 CLI
+argument is:
+
+```text
+eyJiYXNlTGV2ZWxJZCI6InQzci1zaGFmdC0wNCIsImNhbmRpZGF0ZUNvdW50TGltaXQiOjEsImNvbW1hbmRBbHBoYWJldCI6IlNRTEhUQ1IiLCJtYXhpbXVtTG9ja3MiOjcsIm1pbmltdW1Mb2NrcyI6NSwic2NoZW1hIjoidDM3LWY0ZS1yMTYtaW50cm8wNS1kb21haW4tdjEiLCJzZXR1cERyb3BDb3VudCI6OCwidGFyZ2V0Um93cyI6NH0K
+```
+
+It freezes one `t3r-shaft-04` candidate (`SQLHTCR` alphabet), eight setup drops, four target
+rows, and five-through-seven locks. Before the sole preflight, prove source and input no-follow
+regularity/hashes, absence of every R16 mutable output/stage path and matching R16 task/process,
+and unchanged sealed R15 snapshot. Then invoke only:
+
+```text
+E:\\Nodejs\\node.exe --disable-warning=ExperimentalWarning --max-old-space-size=6144 <fixed-r16-validator> --preflight --root E:\\Proj\\reproduction-tetris --input <fixed-r16-input> --domain-json-base64 <above> --expect-head <literal-current-lowercase-HEAD> --expect-input-sha BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7
+```
+
+The preflight is exactly one no-write/no-task/no-Store/no-proof/no-admission mode: it may not
+invoke outer/worker, the sealed R15 admission, scheduler APIs, file copy/hard-link, stage or
+candidate publication, or any product/browser action. It must exit zero with empty stdout/stderr;
+postflight must rehash source/input, verify R15's full sealed snapshot, and show all R16 mutable
+paths still absent. A nonzero result consumes R16 with no retry. A zero result consumes only this
+preflight and still leaves every outer/worker/admission/copy/proof/product path closed pending a
+new contract and audit.

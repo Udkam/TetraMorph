@@ -4146,3 +4146,20 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   operational namespaces remain absent/unchanged.
 - Next: prepare a distinct four-document input/no-write-preflight contract, then obtain its own
   independent reviews before creating the fixed input or executing the bounded preflight.
+
+### 2026-09-05 F4E-R16 R60 canonical input / no-write-preflight contract
+
+- R60 freezes the accepted 82,977-byte external source at `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`.
+  After two independent all-zero contract reviews, the only first write may create the absent,
+  plain no-follow regular R16 input from DESIGN's R16 literal: 1,183 UTF-8 no-BOM/LF bytes,
+  `BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7`, with no R15 copy/rename/
+  hard-link/change.
+- One later preflight is fixed to Node v24.12.0 plus the source's two flags, exact root/input,
+  192-byte R16 domain `0AE5C63D21DAEFFA7B4F3804E01AF12FB3C3D801D37463E65B17AFE4DCE78F15`, immediate literal
+  lowercase HEAD, and input hash. It is no-write/no-task/no-Store/no-proof/no-admission; outer,
+  worker, scheduler, R15 admission, copy/stage/candidate/terminal, product/browser/acceptance
+  paths remain closed.
+- Pre/post checks bind source/input hashes, empty R16 mutable namespace/task/process, and R15's
+  full sealed snapshot. A nonzero preflight consumes R16 without retry; a zero only consumes the
+  preflight and requires another contract before any operational action. Next: independent review
+  of this four-document contract only.

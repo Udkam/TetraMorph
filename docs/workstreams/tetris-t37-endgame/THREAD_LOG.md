@@ -1764,3 +1764,21 @@ product path is open.
   No external source edit or validator mode/input/task/Store/copy/stage/candidate/terminal/proof/
   product/browser/acceptance action occurred; R15 and inherited protected paths remain untouched.
   Next: a separately reviewed four-document R16 input/no-write-preflight contract.
+
+### F4E-R16 R60 canonical input and no-write-preflight contract
+
+- Task: `TETRIS-T37-F4E-ENDGAME-INTRO05-R16-PREFLIGHT-001`; base/current head:
+  `d8b212b1f99be1d8fa40aabff13676d37de3ae44`. This contract changes only the four authority/log
+  documents and keeps the external R16 source at 82,977 bytes / SHA-256
+  `9EAED7F6FE7379CA283FDA4FBC1C12A932270A518B3EFA43B5F2FFF3E148ED23`.
+- After two independent all-zero contract reviews, create only the fixed absent R16 input from
+  DESIGN's explicit R16 literal: 1,183 UTF-8 no-BOM/LF bytes / SHA-256
+  `BD4A421388CEAB8640F2E500F2CC598486AE034454B5D71F6BFFE0E6D93A9DF7`; it is never a copied,
+  renamed, hard-linked, or modified R15 input. Then exactly one source `--preflight` may use the
+  fixed root/input, R16 domain hash `0AE5C63D21DAEFFA7B4F3804E01AF12FB3C3D801D37463E65B17AFE4DCE78F15`,
+  immediate literal current HEAD, and input hash.
+- The preflight is no-write/no-task/no-Store/no-proof/no-admission and may not enter outer/worker,
+  scheduler, R15 admission, copy/stage/candidate/terminal/proof/product/browser/acceptance paths.
+  Pre/post audit requires hash and empty-namespace/task/process evidence plus unchanged full R15
+  snapshot. Nonzero consumes R16/no retry; zero needs another contract before any operational step.
+  Next: two independent read-only reviews of this contract; no input or mode is yet authorized.
