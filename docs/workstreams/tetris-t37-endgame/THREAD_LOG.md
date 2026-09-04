@@ -1916,3 +1916,18 @@ product path is open.
   faults/concurrency. Hostile local compromise needs separate OS/isolated-runner authority.
 - Next: two R70 boundary reviews, then sole R69 tag capture and artifact QA. Source/mode/R15/R16/
   Task/Store/proof/product remain closed.
+
+### T37 F5 revision-3 curriculum implementation
+
+- Task: `TETRIS-T37-F5-CURRICULUM-PUBLICATION-001`; base SHA:
+  `a0821f056b148fd45a3afe9c0cbf5c2e6434c554`. Coordinator owns the source slice and excludes the
+  inherited T27 evidence/progress dirt. Exact planned paths are active Endgame types/definitions,
+  lessons/mastery/progress/legacy routing, App/localization/styles as required, and their focused
+  tests.
+- Contract: publish the frozen 5 Intro / 25 Easy / 16 Hard order, retire only 34/40/42/43, use
+  v7/revision 3 with `bestLockedPieceCounts`, retain only 38 behavior-stable records, reset the
+  five Intro plus rebuilt 32/39/46, and make retired deep links visibly archived rather than live.
+  Hard unlocks use the eight frozen Easy-technique mappings at optimum plus five locks.
+- Commands/evidence/blocker: docs contract recorded before code; focused tests, candidate SHA, full
+  gates, browser evidence, and independent QA are pending. R69/R70 and Intro-05 external proof are
+  not touched; the next action is source implementation.

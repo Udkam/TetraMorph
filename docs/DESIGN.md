@@ -12012,3 +12012,24 @@ silently accepted as evidence.
 After two all-zero boundary reviews, R69's tag capture may proceed once. All post-capture artifact
 audit, in-memory candidate-diff contract, source audit, invocation contract, and product acceptance
 gates remain unchanged.
+
+### 2026-09-05 T37 F5 revision-3 Endgame publication slice
+
+The player has resumed the unified T37 objective and explicitly asks that remaining product work be
+implemented before any consolidated human acceptance. This independent source slice realizes the
+already-frozen F5 product contract without invoking R16: publish the exact 46-board order (5 Intro,
+25 Easy, 16 Hard), retire only `tm-endgame-34`, `tm-endgame-40`, `tm-endgame-42`, and
+`tm-endgame-43`, and advance persistence from canonical v6/revision 2 to v7/revision 3.
+
+The atomic source boundary includes `EndgameId`/definition order, lesson and mastery registries,
+Hard-to-Easy prerequisite mapping, localization, route fallback for a retired deep link, progress
+codec/migration, library grouping/layout assumptions, and every active consumer/test. V7 keeps the
+exact fields `version`, `campaignRevision`, `completedLevelIds`, and `bestLockedPieceCounts`; it
+reads v7 before v6, treats a present invalid/failed higher-priority record as terminal, preserves
+only the frozen 38 behavior-stable IDs, clears the five Intro plus rebuilt 32/39/46, and transfers
+nothing from retired IDs. A write is durable only after strict semantic readback.
+
+The source slice must not state whole-stage acceptance: each published prerequisite continues to
+need its exact route certificate, and Intro-05 remains subject to the separately blocked R16 proof
+chain. Focused tests may establish implementation consistency; the final full suite, browser
+evidence, independent QA, and consolidated player review remain later gates.

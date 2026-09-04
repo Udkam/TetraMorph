@@ -4285,3 +4285,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   Hostile control-plane protection requires a separate isolated-runner/OS task.
 - After two boundary reviews, execute R69 once; then tag/blob artifact QA and all later source/mode
   gates remain mandatory.
+
+### 2026-09-05 T37 F5 curriculum publication implementation opened
+
+- Player direction resumes the remaining unified T37 product work and defers all human acceptance
+  to the final consolidated gate. The coordinator opens a single F5 source slice for the frozen
+  46-board 5/25/16 roster, revision-3/v7 progress migration, visible archived-link fallback,
+  mastery mapping, localization, and responsive library consumers.
+- This is independent of and does not weaken R69/R70: no Git tag capture, external validator mode,
+  R15 admission, external proof retry, or player acceptance runs in this slice. Existing T27
+  evidence/progress worktree dirt remains inherited and excluded.
+- Acceptance remains pending all exact certificates (including the separately blocked Intro-05
+  chain), final browser evidence, independent QA, and the final audio/visual player review.

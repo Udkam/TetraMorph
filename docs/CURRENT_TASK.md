@@ -11567,3 +11567,26 @@ After two independent all-zero R70 boundary reviews, execute only R69's single t
 under that stated trust boundary. Do not add a workspace escrow, change `main`, run a validator
 mode, or modify source. The tag still requires independent actual-artifact audit and a later exact
 in-memory authoring/diff contract before any admission path can open.
+
+### 2026-09-05 T37 F5 revision-3 curriculum implementation
+
+- Task: `TETRIS-T37-F5-CURRICULUM-PUBLICATION-001`; base: current `main` after the R70 docs
+  checkpoint. The player explicitly resumes all remaining T37 product work and defers every human
+  acceptance request until the end. This opens one coordinator-owned source slice only; it does not
+  authorize R69 capture, an R16 validator mode, R15 admission, or an external proof retry.
+- Before product code, preserve the inherited T27 evidence/progress dirt and record this exact
+  scope in DESIGN, CURRENT_TASK, STATE, and the Endgame workstream log. Then atomically move active
+  Endgame consumers to the frozen F5 roster: Intro positions 1-5, Easy 6-30, and the listed
+  non-retired Hard IDs at positions 31-46. No five-column/ten-row-band compatibility construct may
+  remain active.
+- Implement v7/revision-3 persistence with v7-first/v6-second tri-state reads. Preserve only the
+  38 frozen behavior-stable IDs and their positive best counts, reset five Intro plus 32/39/46, omit
+  34/40/42/43, order every output by the new roster, and require write/readback semantic equality.
+  The active V7 count field is `bestLockedPieceCounts`; V6 remains an untouched rollback source.
+- Each of the 16 Hard boards must have exactly one F5-mapped Easy prerequisite at its certified
+  optimum plus five locks. A retired URL must return the Endgame library with an explicit archived
+  notice rather than silently select or start another board. Update bilingual copy and keyboard/grid
+  behavior with the source change.
+- Run targeted Core/progress/migration/UI tests while editing. Do not call the final full suite,
+  build, browser evidence, independent QA, commit/push, or player review until the coherent source
+  candidate is ready. R16 and consolidated sensory acceptance remain later, separate gates.
