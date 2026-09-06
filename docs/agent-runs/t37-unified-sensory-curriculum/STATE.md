@@ -4859,3 +4859,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   write one receipt per child; stop immediately on a nonzero child or Core certificate; and receive
   another complete ledger/Store audit after exit. No source change, concurrent proof, successor
   candidate, registry action, final gate, publication, or player review opens during the batch.
+
+### 2026-09-06 F5 Horizon g66–g97 serial batch running
+
+- Fresh preflight at `23051c4` revalidates the exact g65 receipt/manifest tip
+  `0EB2402C...623800DA`, 66 continuous receipts, no part residue, no prior runner, unchanged proof
+  source boundary, and 352.61 GiB free on `E:`.
+- Sole runner `27016` starts at `17:57:02+08:00` with `--max-advances 32`; its owned external
+  stdout/stderr directory is
+  `%LOCALAPPDATA%\\Temp\\t37-f5-horizon-r7-g00066-g00097-20260906-175702-logs`. It owns only
+  g66–g97 under the already-authorized unchanged Horizon stage, receipt directory, candidate route,
+  Core source, and R7 allowance. Do not modify proof source, start another proof, or infer a result
+  while it is live; on exit, audit its markers/stderr, ledger, residue, and exact Store tip first.

@@ -2393,3 +2393,13 @@ product path is open.
   fresh-preflighted `--max-advances 32` g66–g97 runner under the identical source/receipt contract.
   It must stop on failure or certificate and undergo another complete ledger/Store audit after exit;
   concurrent proof, source changes, registry, final gates, and player review remain closed.
+
+### T37 F5 Horizon R7 g66–g97 live serial batch
+
+- Fresh preflight at `23051c4` validates the exact g65 tip, contiguous 0–65 receipt ledger, no
+  `.part` residue or prior runner, unchanged proof source boundary, and 352.61 GiB free space.
+  Sole owner `27016` starts at `17:57:02+08:00` with the permitted `--max-advances 32`; stdout and
+  stderr are retained in the named g66–g97 external log directory.
+- This is a live execution record only. The runner may append authenticated g66–g97 receipts or stop
+  on a failure/Core certificate; no proof source change or concurrent runner is authorized. After it
+  exits, inspect its logs, ledger, residue, and exact Store admission before any successor action.
