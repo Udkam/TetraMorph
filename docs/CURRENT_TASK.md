@@ -11767,12 +11767,17 @@ in-memory authoring/diff contract before any admission path can open.
 
 #### Bounded source-checkpoint typecheck exception
 
-- The sole source checkpoint for this parity repair is exactly
-  `src/game/core/endgameRouteSearch.ts` plus
-  `src/game/core/endgameProofFrontierStore.test.ts`. The normal checkpoint typecheck cannot be
-  green without prematurely editing the still-closed mastery registry: its only diagnostics are
-  the already-recorded `TS2345` retired-ID references at `src/endgameMastery.ts:105,113,122`
-  (`tm-endgame-34`, `tm-endgame-40`, and `tm-endgame-42`).
+- The sole source checkpoint is exactly the compact proof/Core quartet:
+  `src/game/core/endgameRouteSearch.ts`,
+  `src/game/core/endgameRouteSearch.test.ts`,
+  `src/game/core/endgameRouteKeyFrontier.test.ts`, and
+  `src/game/core/endgameProofFrontierStore.test.ts`. The first three are an inherited but
+  uncommitted atomic `p1.` compact-frontier plus conservative-bound slice; the fourth verifies the
+  new R7 parity call. They cannot be split while retaining the current codec, shared bound helper,
+  and direct test contract. The normal checkpoint typecheck cannot be green without prematurely
+  editing the still-closed mastery registry: its only diagnostics are the already-recorded `TS2345`
+  retired-ID references at `src/endgameMastery.ts:105,113,122` (`tm-endgame-34`,
+  `tm-endgame-40`, and `tm-endgame-42`).
 - This is a temporary, narrow exception to `COMMIT_POLICY.md` section 3. It permits a local source
   checkpoint only after the direct R7/core tests pass, `git diff --check` passes, and the command
   output confirms no new typecheck diagnostic. It does not permit a full-gate, QA, evidence,
