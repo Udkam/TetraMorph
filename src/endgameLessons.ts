@@ -11,7 +11,8 @@ export type EndgameTechnique =
   | 'edge-to-centre'
   | 'split-lanes'
   | 'choose-gate'
-  | 'anchor-side-slip';
+  | 'anchor-side-slip'
+  | 'clear-order';
 
 export type EndgameLesson = Readonly<{
   levelId: EndgameId;
@@ -20,8 +21,8 @@ export type EndgameLesson = Readonly<{
 }>;
 
 /**
- * Each Intro level names one transferable decision without exposing a live solver
- * answer. The tenth lesson introduces the only timing-specific anchor manoeuvre.
+ * Intro establishes transferable decisions. Lesson slots remain authored coaching;
+ * only independently verified certificates may later unlock matching Hard boards.
  */
 export const ENDGAME_LESSONS: readonly EndgameLesson[] = Object.freeze([
   Object.freeze({ levelId: 't3r-shaft-01', technique: 'complete-row', stage: 'foundation' }),
@@ -34,6 +35,9 @@ export const ENDGAME_LESSONS: readonly EndgameLesson[] = Object.freeze([
   Object.freeze({ levelId: 't5r-lattice-09', technique: 'split-lanes', stage: 'foundation' }),
   Object.freeze({ levelId: 't5r-rift-10', technique: 'choose-gate', stage: 'foundation' }),
   Object.freeze({ levelId: 't5r-drift-08', technique: 'anchor-side-slip', stage: 'anchor' }),
+  Object.freeze({ levelId: 't5r-horizon-15', technique: 'preserve-well', stage: 'foundation' }),
+  Object.freeze({ levelId: 't6r-terrace-18', technique: 'clear-order', stage: 'foundation' }),
+  Object.freeze({ levelId: 't6r-keystone-20', technique: 'build-support', stage: 'foundation' }),
 ]);
 
 const LESSON_BY_LEVEL = new Map<EndgameId, EndgameLesson>(

@@ -102,7 +102,7 @@ export const ENDGAME_HARD_MASTERY_GROUPS: readonly EndgameHardMasteryGroup[] = O
     prerequisiteId: 't5r-prism-11',
     technique: 'avoid-hole',
     hardLevelIds: endgameIds(
-      'tm-endgame-31', 'tm-endgame-34', 'tm-endgame-35',
+      'tm-endgame-31', 'tm-endgame-35',
       'tm-endgame-39', 'tm-endgame-46', 'tm-endgame-47',
     ),
   }),
@@ -110,8 +110,8 @@ export const ENDGAME_HARD_MASTERY_GROUPS: readonly EndgameHardMasteryGroup[] = O
     prerequisiteId: 't5r-current-12',
     technique: 'retain-opening',
     hardLevelIds: endgameIds(
-      'tm-endgame-32', 'tm-endgame-33', 'tm-endgame-40', 'tm-endgame-41',
-      'tm-endgame-43', 'tm-endgame-45', 'tm-endgame-48', 'tm-endgame-50',
+      'tm-endgame-32', 'tm-endgame-33', 'tm-endgame-41', 'tm-endgame-45',
+      'tm-endgame-48', 'tm-endgame-50',
     ),
   }),
   Object.freeze({
@@ -119,7 +119,7 @@ export const ENDGAME_HARD_MASTERY_GROUPS: readonly EndgameHardMasteryGroup[] = O
     technique: 'build-support',
     hardLevelIds: endgameIds(
       'tm-endgame-36', 'tm-endgame-37', 'tm-endgame-38',
-      'tm-endgame-42', 'tm-endgame-44', 'tm-endgame-49',
+      'tm-endgame-44', 'tm-endgame-49',
     ),
   }),
 ]);
@@ -139,7 +139,7 @@ for (const group of ENDGAME_HARD_MASTERY_GROUPS) {
     HARD_GROUP_BY_LEVEL.set(levelId, group);
   }
 }
-if (HARD_GROUP_BY_LEVEL.size !== 20) throw new Error('Every Hard Endgame must belong to exactly one mastery group.');
+if (HARD_GROUP_BY_LEVEL.size !== 16) throw new Error('Every current Hard Endgame must belong to exactly one mastery group.');
 
 export function endgameOptimalCertificate(levelId: EndgameId): EndgameOptimalCertificate | null {
   return CERTIFICATE_BY_LEVEL.get(levelId) ?? null;

@@ -30,7 +30,7 @@ for (const file of [hard36File, hard38File, hard47File, hard46To50File] as unkno
 }
 
 describe('Endgame mastery certificate registry', () => {
-  it('freezes three completed public-command witnesses at optimum plus five', () => {
+  it('keeps only verified public-command witnesses at optimum plus five', () => {
     expect(ENDGAME_OPTIMAL_CERTIFICATES).toHaveLength(3);
     for (const certificate of ENDGAME_OPTIMAL_CERTIFICATES) {
       const replay = replayEndgameRoute(certificate.levelId, certificate.route);
@@ -80,6 +80,12 @@ describe('Endgame mastery certificate registry', () => {
     }
   });
 
+  it('does not fabricate certificates for deferred lesson targets', () => {
+    expect(endgameOptimalCertificate('t5r-horizon-15')).toBeNull();
+    expect(endgameOptimalCertificate('t6r-terrace-18')).toBeNull();
+    expect(endgameOptimalCertificate('t6r-keystone-20')).toBeNull();
+  });
+
   it('assigns every Hard level to exactly one related Easy mastery group', () => {
     const easyIds = new Set(ENDGAME_CATEGORIES.find(({ id }) => id === 'easy')!.levels.map(({ id }) => id));
     const hardIds = ENDGAME_CATEGORIES.find(({ id }) => id === 'hard')!.levels.map(({ id }) => id);
@@ -91,7 +97,7 @@ describe('Endgame mastery certificate registry', () => {
       expect(endgameOptimalCertificate(group.prerequisiteId)?.technique).toBe(group.technique);
       for (const levelId of group.hardLevelIds) expect(endgameHardMasteryGroup(levelId)).toBe(group);
     }
-    expect(CAMPAIGN_LEVELS).toHaveLength(50);
+    expect(CAMPAIGN_LEVELS).toHaveLength(46);
   });
 
   it('replays every Hard witness through its Easy technique contraction contract', () => {
