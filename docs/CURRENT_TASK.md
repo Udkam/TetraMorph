@@ -11899,3 +11899,14 @@ and build; final Browser evidence from the candidate for Bomb, route transition,
 and responsive controls; independent read-only QA; changelog, bounded commits, and coordinator
 push. Only then request the player's consolidated experience/listening acceptance. Preserve the
 inherited T27 evidence paths and `progress.md` outside every T37 commit.
+
+#### Bounded integration UI source-checkpoint exception
+
+The one React-facing checkpoint is exactly `src/App.tsx`, `src/App.test.ts`,
+`src/styles/endgame-library.css`, `src/styles/endgame-library.test.ts`,
+`src/styles/settings.css`, `src/styles/result.css`, and `src/ui/localization.ts`. It exceeds the
+normal hand-authored addition budget by four lines because the same composed App surface must keep
+the fixed Classic selector, five/25/16 Endgame view, archived-route notice, D2B transitions, and
+their responsive/accessibility contracts consistent in one render tree. Its focused gate is
+`src/App.test.ts` plus `src/styles/endgame-library.test.ts`; it remains separate from browser
+evidence and QA.
