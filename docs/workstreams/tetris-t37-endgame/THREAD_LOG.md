@@ -2355,3 +2355,16 @@ product path is open.
   runner for g26–g33 (`--max-advances 8`): each child must append its own receipt and halt the
   parent on a failure or certificate. No source changes or concurrent proof are permitted during
   the batch; it must receive a full ledger and Store audit after exit before further authorization.
+
+### T37 F5 Horizon R7 g26–g33 serial batch audit
+
+- Sole owner `26392` completes all eight permitted children normally. Its eight markers and
+  receipts cover g26–g33 at depth-five offsets 327680 through 786432, retain route
+  `458DD677...E348C663`, have empty stderr and no part residue, and finish at exact tip
+  `A817E7A0...4D1AF526`. Ledger/manifest hash and process absence checks all pass.
+- Direct g33 Store re-admission is advanceable and cleanly suspended: 13,967,878 parents,
+  7,279,743 transitions, zero current bound prunes, and offset 786432. The layer still has
+  13,181,446 parents / 202 fixed units remaining. Coordinator authorizes one sole,
+  fresh-preflighted `--max-advances 32` g34–g65 runner with unchanged source/receipt protocol and
+  stop-on-failure behavior. It requires another full ledger/Store audit after exit; no other proof,
+  source change, registry action, final gate, or player review opens.

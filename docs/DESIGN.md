@@ -12229,3 +12229,11 @@ Core-owned certificate; it may not start a second proof, change source between c
 or infer a successor batch. A clean exact-tip Store re-admission after the runner ends remains
 mandatory before authorizing any later slice. This is operational batching only and preserves the
 exact landing domain, conservative bounds, receipt protocol, and certificate semantics.
+
+The first serial-slice audit validates that rule: g26–g33 produce eight contiguous authenticated
+checkpoints at fixed 65,536-parent offsets with no stderr or residue, and g33 reopens cleanly at
+offset 786432. The same layer still has 13,181,446 parents remaining (202 bounded units), so a
+second fixed 32-unit slice may be authorized without crossing a depth boundary. It retains exactly
+the same Core source and receipt protocol, stops at a failed child or certificate, and must receive
+another independent exact-tip Store admission after the runner exits. No semantic conclusion is
+drawn from the observed zero bound prunes.

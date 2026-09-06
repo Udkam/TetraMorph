@@ -4811,3 +4811,19 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   per child and stops on a failed child or a certificate; a direct ledger/Store audit is mandatory
   after it exits. No other proof, source edit, registry activation, final gate, or player review
   opens during the batch.
+
+### 2026-09-06 F5 Horizon g26–g33 serial batch audited
+
+- Sole serial owner `26392` starts at `10:06:03+08:00` with `--max-advances 8`; stdout/stderr are
+  retained in `%LOCALAPPDATA%\\Temp\\t37-f5-horizon-r7-g00026-g00033-20260906-100603-logs`.
+  It emits exactly eight normal checkpoint markers for g26–g33, appends one receipt per marker,
+  exits normally with empty stderr, and leaves no relevant Node process or `.part` residue.
+- Ledger readback is contiguous through `tip-g00033.json`. The g26–g33 offsets are 327680,
+  393216, 458752, 524288, 589824, 655360, 720896, and 786432; every marker retains route
+  SHA-256 `458DD677...E348C663`. The final exact tip is `A817E7A0...4D1AF526`, matching its
+  receipt and `manifest-g00033.json`; the retained stage is about 3.317 GiB.
+- Independent g33 Store admission is advanceable and cleanly suspends: depth 5 / offset 786432,
+  13,967,878 frontier parents, 7,279,743 current-layer transitions, zero current bound prunes.
+  This is progress only. With 13,181,446 depth-five parents remaining (202 fixed units), next
+  action is a fresh-preflighted sole g34–g65 serial `--max-advances 32` run. It may not overlap
+  another proof or source edit, and must receive another full ledger/Store audit after exit.

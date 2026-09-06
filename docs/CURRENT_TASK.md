@@ -11847,3 +11847,20 @@ in-memory authoring/diff contract before any admission path can open.
   change. After it exits, independently audit the full ledger and exact Store tip before deciding
   any successor batch. Registry action, successor levels, final gates, publication, and player
   review remain closed.
+
+### 2026-09-06 T37 F5 Horizon g26–g33 audit and g34–g65 boundary
+
+- The sole eight-unit runner completes normally: it emits exactly eight `F5_CHECKPOINT` markers
+  for g26–g33, each retaining route binding `458DD677...E348C663`, depth 5, and offsets 327680
+  through 786432. It appends every matching receipt, produces no stderr, and leaves no `.part`
+  residue or live proof process. Exact g33 tip `A817E7A0...4D1AF526` matches both receipt and
+  sealed manifest; the ledger is contiguous through 33.
+- Independent exact-tip Store re-admission is advanceable and cleanly suspended. It confirms the
+  unchanged 13,967,878-parent depth-five frontier at offset 786432, 7,279,743 transitions, and
+  zero current bound prunes. This is an intermediate checkpoint, not an optimality certificate.
+- The layer boundary remains 202 fixed units away from the g33 offset. Authorize one sole fresh-
+  preflighted serial `--max-advances 32` runner for g34–g65 only. It must retain the same source,
+  receipt-per-child protocol, 30-minute per-child R7 allowance, single proof ownership, and
+  immediate stop on a failed child or Core certificate. Do not modify source during the batch.
+  After exit, independently audit ledger and Store before any later slice; successor levels,
+  registry, final gates, publication, and player review remain closed.
