@@ -12253,3 +12253,25 @@ prunes remains a measurement, not permission to weaken or replace the bound. A l
 chosen only after g66–g97 exits and the coordinator independently validates its ledger and exact-tip
 Store suspension; no registry, product, browser, QA, publication, or player-acceptance work opens
 before a terminal certificate chain exists.
+
+### 2026-09-06 T37 player-directed certificate deferral and integration boundary
+
+The player has explicitly removed the long-running exact-certificate proof from the present
+delivery boundary and asked for the remaining implemented T37 work to be integrated, pushed, and
+presented for acceptance. Horizon, Terrace, and Keystone optimality searches are therefore
+**deferred**, not passed, inferred, or replaced by a weaker claim. The stopped Horizon R7 process
+and all external stage, receipt, and log material remain retained as non-product proof residue; no
+resume, deletion, mutation, or certificate extraction is part of this release.
+
+The release still contains the designed 46-level `5 / 25 / 16` Endgame curriculum, its normal
+progression/migration, lesson copy, and playable interaction. A level may display a mastery or
+optimality badge only when a real verified certificate already exists. The eight new target lesson
+slots remain curriculum guidance without fabricated certificate payloads, and the active registry
+and tests must not require uncomputed Horizon, Terrace, or Keystone results merely to make the
+release green.
+
+This scope change opens the ordinary integration sequence for the remaining owned source: targeted
+repairs, final typecheck, full test suite, production build, regenerated Browser evidence for the
+Bomb/route/Endgame surfaces, independent read-only QA, changelog, bounded commits, and coordinator
+push. The consolidated player review remains last; it must explicitly distinguish the deliverable
+experience from the deferred exact-proof work.

@@ -2403,3 +2403,15 @@ product path is open.
 - This is a live execution record only. The runner may append authenticated g66–g97 receipts or stop
   on a failure/Core certificate; no proof source change or concurrent runner is authorized. After it
   exits, inspect its logs, ledger, residue, and exact Store admission before any successor action.
+
+## T37 player-directed certificate deferral and integration
+
+- Player instruction: do not continue or wait on the Horizon/Terrace/Keystone certificate proof;
+  integrate and push the remaining product work for acceptance.
+- Coordinator verified and stopped sole Horizon runner PID `27016`. Existing external stage,
+  receipt, and log files are retained untouched and supply no certificate or release claim.
+- The 46-level Endgame curriculum remains a playable `5 / 25 / 16` delivery. New mastery lesson
+  slots may not present fabricated optimality results; the active registry and its tests are being
+  corrected to require only real verified certificates.
+- Next action: source/test integration, concentrated final validation and Browser evidence, then
+  independent QA, changelog, bounded commits, coordinator push, and consolidated player review.

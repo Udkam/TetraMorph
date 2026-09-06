@@ -11880,3 +11880,22 @@ in-memory authoring/diff contract before any admission path can open.
   batch. After exit, independently audit stdout/stderr, ledger, residue, and exact Store tip before
   deciding any later slice; successor levels, registry, final gates, publication, and player review
   remain closed.
+
+### 2026-09-06 T37 player-directed integration override
+
+The player directed the coordinator to stop considering the Horizon/Terrace/Keystone exact-proof
+chain and to integrate, push, and present the remaining T37 work for acceptance. PID `27016` was
+verified as the sole Horizon `g66–g97` runner and then stopped. Its external checkpoint material is
+retained and is not a certificate input, a deletion target, or a release artifact.
+
+This integration slice owns the existing T37 sensory, Classic, Endgame-curriculum, route-handoff,
+and presentation changes plus only the small registry/test correction needed to stop claiming or
+requiring certificates that do not exist. It does **not** authorize a substitute proof, guessed
+certificate, certificate badge, or renewed background proof. The 46-level `5 / 25 / 16` course is
+delivered as playable curriculum; deferred optimality claims remain absent.
+
+Required final gates are now: targeted tests while integrating; one final typecheck, full suite,
+and build; final Browser evidence from the candidate for Bomb, route transition, Endgame library,
+and responsive controls; independent read-only QA; changelog, bounded commits, and coordinator
+push. Only then request the player's consolidated experience/listening acceptance. Preserve the
+inherited T27 evidence paths and `progress.md` outside every T37 commit.

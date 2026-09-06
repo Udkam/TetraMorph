@@ -4871,3 +4871,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   g66–g97 under the already-authorized unchanged Horizon stage, receipt directory, candidate route,
   Core source, and R7 allowance. Do not modify proof source, start another proof, or infer a result
   while it is live; on exit, audit its markers/stderr, ledger, residue, and exact Store tip first.
+
+### 2026-09-06 — player-directed certificate deferral
+
+- The player directed the coordinator to stop considering the exact-proof chain and prepare the
+  remaining T37 implementation for integration, push, and acceptance. The verified sole runner
+  PID `27016` was stopped after the previously observed g66 receipt; no deletion or continuation
+  followed.
+- The external Horizon stage, receipt ledger, and logs are retained untouched as non-release,
+  non-certificate residue. Do not resume, remove, parse as a certificate, or mix them into the
+  product candidate.
+- Next action: integrate only the playable sensory/Classic/46-level Endgame/route/presentation
+  work, ensure the active mastery registry contains no unverified claims, then run the consolidated
+  validation, Browser evidence, QA, commits, and push before player review.
