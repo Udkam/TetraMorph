@@ -168,7 +168,7 @@ describe('Endgame v3 non-published Intro-04 authoring entry', () => {
   it('appends one deeply frozen draft while preserving the live and prior draft baselines', () => {
     const liveBytes = JSON.stringify(getEndgameDefinition('t3r-cascade-06'));
     const serialized = JSON.stringify(draft);
-    expect(ENDGAME_DEFINITIONS).toHaveLength(50);
+    expect(ENDGAME_DEFINITIONS).toHaveLength(46);
     expect(ENDGAME_V3_INTRO_DRAFTS).toHaveLength(4);
     expect(ENDGAME_V3_INTRO_DRAFTS.filter(({ id }) => id === draft!.id)).toEqual([draft]);
     expect(ENDGAME_DEFINITIONS).not.toContain(draft);
@@ -200,7 +200,7 @@ describe('Endgame v3 non-published Intro-04 authoring entry', () => {
       .toEqual([5, 2, 3, 2]);
     expect(openingColumns(replayEndgameRouteForDefinition(draft!, 'S').state)).toEqual([OPENING_X]);
     const prior = [...ENDGAME_DEFINITIONS, intro01!, intro02!, intro03!];
-    expect(prior).toHaveLength(53);
+    expect(prior).toHaveLength(49);
     expect(prior.every(({ seed }) => seed !== draft!.seed)).toBe(true);
     for (const other of prior) {
       expect(compareEndgameTopologies(other, draft!), other.id).toMatchObject({

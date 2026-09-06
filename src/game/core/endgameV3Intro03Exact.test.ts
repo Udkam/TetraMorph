@@ -150,7 +150,7 @@ function routeEvidence(route: string) {
 describe('Endgame v3 non-published Intro-03 authoring entry', () => {
   it('appends one deeply frozen draft while preserving every accepted baseline', () => {
     const liveBytes = JSON.stringify(getEndgameDefinition('t3r-shaft-03'));
-    expect(ENDGAME_DEFINITIONS).toHaveLength(50);
+    expect(ENDGAME_DEFINITIONS).toHaveLength(46);
     expect(ENDGAME_V3_INTRO_DRAFTS.filter(({ id }) => id === draft.id)).toEqual([draft]);
     expect(ENDGAME_DEFINITIONS).not.toContain(draft);
     expect(new TextEncoder().encode(liveBytes)).toHaveLength(LIVE_BYTES);

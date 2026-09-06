@@ -11,7 +11,7 @@ function settle(state: GameState): GameState {
   return next;
 }
 
-describe('Phase-7 transitional all-open Endgame campaign behavior', () => {
+describe('F5 46-board Endgame campaign behavior', () => {
   it('orders the stable IDs as a teaching-first curriculum before the later authored batches', () => {
     expect(ENDGAME_DEFINITIONS.map((definition) => definition.id)).toEqual([
       't3r-shaft-01', 't3r-shaft-02', 't3r-shaft-03', 't3r-cascade-06', 't3r-shaft-04',
@@ -20,13 +20,12 @@ describe('Phase-7 transitional all-open Endgame campaign behavior', () => {
       't6r-cairn-17', 't6r-terrace-18', 't6r-keystone-20', 't6r-bastion-19', 't6r-veil-16',
       'tm-endgame-21', 'tm-endgame-22', 'tm-endgame-23', 'tm-endgame-24', 'tm-endgame-25',
       'tm-endgame-26', 'tm-endgame-27', 'tm-endgame-28', 'tm-endgame-29', 'tm-endgame-30',
-      'tm-endgame-31', 'tm-endgame-32', 'tm-endgame-33', 'tm-endgame-34', 'tm-endgame-35',
-      'tm-endgame-36', 'tm-endgame-37', 'tm-endgame-38', 'tm-endgame-39', 'tm-endgame-40',
-      'tm-endgame-41', 'tm-endgame-42', 'tm-endgame-43', 'tm-endgame-44', 'tm-endgame-45',
-      'tm-endgame-46', 'tm-endgame-47', 'tm-endgame-48', 'tm-endgame-49', 'tm-endgame-50',
+      'tm-endgame-31', 'tm-endgame-32', 'tm-endgame-33', 'tm-endgame-35', 'tm-endgame-36',
+      'tm-endgame-37', 'tm-endgame-38', 'tm-endgame-39', 'tm-endgame-41', 'tm-endgame-44',
+      'tm-endgame-45', 'tm-endgame-46', 'tm-endgame-47', 'tm-endgame-48', 'tm-endgame-49', 'tm-endgame-50',
     ] satisfies EndgameId[]);
     expect(ENDGAME_DEFINITIONS.every((definition) => !('solverPieceBudget' in definition))).toBe(true);
-    expect(ENDGAME_DEFINITIONS.map((definition) => definition.difficulty)).toEqual(Array.from({ length: 50 }, (_, index) => index + 1));
+    expect(ENDGAME_DEFINITIONS.map((definition) => definition.difficulty)).toEqual(Array.from({ length: 46 }, (_, index) => index + 1));
     expect(ENDGAME_DEFINITIONS.some((definition) => definition.anchorCells.length > 0)).toBe(true);
     expect(ENDGAME_DEFINITIONS.every((definition) => definition.anchorCells.length <= 2)).toBe(true);
   });

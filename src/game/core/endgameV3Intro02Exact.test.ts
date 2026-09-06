@@ -149,7 +149,7 @@ describe('Endgame v3 non-published Intro-02 authoring entry', () => {
     const live = getEndgameDefinition('t3r-shaft-02');
     const liveBytes = JSON.stringify(live);
     const intro01Bytes = JSON.stringify(intro01);
-    expect(ENDGAME_DEFINITIONS).toHaveLength(50);
+    expect(ENDGAME_DEFINITIONS).toHaveLength(46);
     expect(ENDGAME_V3_INTRO_DRAFTS.filter(({ id }) => id === draft.id)).toEqual([draft]);
     expect(ENDGAME_DEFINITIONS).not.toContain(draft);
     expect(new TextEncoder().encode(liveBytes)).toHaveLength(LIVE_BYTES);

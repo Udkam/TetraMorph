@@ -110,26 +110,25 @@ describe('T13 legal endgame workshop definitions', () => {
       't6r-cairn-17', 't6r-terrace-18', 't6r-keystone-20', 't6r-bastion-19', 't6r-veil-16',
       'tm-endgame-21', 'tm-endgame-22', 'tm-endgame-23', 'tm-endgame-24', 'tm-endgame-25',
       'tm-endgame-26', 'tm-endgame-27', 'tm-endgame-28', 'tm-endgame-29', 'tm-endgame-30',
-      'tm-endgame-31', 'tm-endgame-32', 'tm-endgame-33', 'tm-endgame-34', 'tm-endgame-35',
-      'tm-endgame-36', 'tm-endgame-37', 'tm-endgame-38', 'tm-endgame-39', 'tm-endgame-40',
-      'tm-endgame-41', 'tm-endgame-42', 'tm-endgame-43', 'tm-endgame-44', 'tm-endgame-45',
-      'tm-endgame-46', 'tm-endgame-47', 'tm-endgame-48', 'tm-endgame-49', 'tm-endgame-50',
+      'tm-endgame-31', 'tm-endgame-32', 'tm-endgame-33', 'tm-endgame-35', 'tm-endgame-36',
+      'tm-endgame-37', 'tm-endgame-38', 'tm-endgame-39', 'tm-endgame-41', 'tm-endgame-44',
+      'tm-endgame-45', 'tm-endgame-46', 'tm-endgame-47', 'tm-endgame-48', 'tm-endgame-49', 'tm-endgame-50',
     ] satisfies EndgameId[]);
-    expect(ENDGAME_DEFINITIONS.map(({ difficulty }) => difficulty)).toEqual(Array.from({ length: 50 }, (_, index) => index + 1));
-    expect(new Set(ENDGAME_DEFINITIONS.map(({ id }) => id)).size).toBe(50);
-    expect(new Set(ENDGAME_DEFINITIONS.map(({ name }) => name)).size).toBe(50);
+    expect(ENDGAME_DEFINITIONS.map(({ difficulty }) => difficulty)).toEqual(Array.from({ length: 46 }, (_, index) => index + 1));
+    expect(new Set(ENDGAME_DEFINITIONS.map(({ id }) => id)).size).toBe(46);
+    expect(new Set(ENDGAME_DEFINITIONS.map(({ name }) => name)).size).toBe(46);
     expect(ENDGAME_DEFINITIONS.map(({ name }) => name)).toEqual([
       '补行', '留井', '托台', '留口', '后手', '避坑', '归心', '分流', '择门', '侧隙',
       '平台', '塔基', '留槽', '侧门', '双井', '回填', '侧台', '横桥', '窄门', '交汇',
       '门柱', '回廊', '中柱', '斜坡', '夹井', '错台', '缓坡', '侧桥', '双层', '断台',
-      '曲井', '左闸', '错桥', '阶井', '悬台', '斜阶', '双廊', '层塔', '边塔', '折桥',
-      '横沟', '中阶', '分廊', '双塔', '斜廊', '边井', '悬廊', '断槽', '叠井', '岔口',
+      '曲井', '左闸', '错桥', '悬台', '斜阶', '双廊', '层塔', '边塔', '横沟', '双塔',
+      '斜廊', '边井', '悬廊', '断槽', '叠井', '岔口',
     ]);
-    expect(new Set(ENDGAME_DEFINITIONS.map(({ seed }) => seed)).size).toBe(50);
+    expect(new Set(ENDGAME_DEFINITIONS.map(({ seed }) => seed)).size).toBe(46);
     expect(new Set(ENDGAME_DEFINITIONS.map(({ boardRows, anchorCells }) => JSON.stringify({
       boardRows,
       anchorCells,
-    }))).size).toBe(50);
+    }))).size).toBe(46);
     expect(ENDGAME_DEFINITIONS.filter((definition) => definition.anchorCells.length > 0).map(({ id }) => id)).toEqual([
       't5r-drift-08', 't5r-pulse-14', 't6r-cairn-17',
       'tm-endgame-22', 'tm-endgame-26', 'tm-endgame-27',
@@ -141,8 +140,7 @@ describe('T13 legal endgame workshop definitions', () => {
     expect(ENDGAME_DEFINITIONS.map(({ targetRows }) => targetRows)).toEqual([
       3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
       5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-      6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-      7, 7, 7, 7, 7, 6, 7, 6, 6, 6,
+      6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 6, 7, 6, 6, 6,
     ]);
 
     for (const definition of ENDGAME_DEFINITIONS) {

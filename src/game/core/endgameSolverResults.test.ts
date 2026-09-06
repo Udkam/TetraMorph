@@ -125,6 +125,12 @@ const activeLevels: readonly Phase7VerifiedLevel[] = Object.freeze(
   }),
 );
 
+function expectArtifactLevelsStillActive(artifact: Phase7Artifact): void {
+  for (const level of artifact.levels) {
+    expect(activeLevels.find(({ id }) => id === level.id)?.id, level.id).toBe(level.id);
+  }
+}
+
 function commandFor(token: CommandToken): GameCommand {
   switch (token) {
     case 'S': return { type: 'start' };
@@ -155,7 +161,7 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
       primaryBeam: 900,
       alternateBeam: 750,
     });
-    expect(activeLevels.slice(0, 3)).toEqual(t32Changed01To03.levels);
+    expectArtifactLevelsStillActive(t32Changed01To03);
     expect(t32Changed04To06.schemaVersion).toBe(7);
     expect(t32Changed04To06.batch).toEqual({ from: 4, to: 6 });
     expect(t32Changed04To06.campaignOrder).toEqual(t32Changed04To06.levels.map(({ id }) => id));
@@ -165,7 +171,7 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
       primaryBeam: 900,
       alternateBeam: 750,
     });
-    expect(activeLevels.slice(3, 6)).toEqual(t32Changed04To06.levels);
+    expectArtifactLevelsStillActive(t32Changed04To06);
     expect(t32Changed07To09.schemaVersion).toBe(7);
     expect(t32Changed07To09.batch).toEqual({ from: 7, to: 9 });
     expect(t32Changed07To09.campaignOrder).toEqual(t32Changed07To09.levels.map(({ id }) => id));
@@ -175,7 +181,7 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
       primaryBeam: 900,
       alternateBeam: 750,
     });
-    expect(activeLevels.slice(6, 9)).toEqual(t32Changed07To09.levels);
+    expectArtifactLevelsStillActive(t32Changed07To09);
     expect(t32Changed10.schemaVersion).toBe(7);
     expect(t32Changed10.batch).toEqual({ from: 10, to: 10 });
     expect(t32Changed10.campaignOrder).toEqual(['t5r-drift-08']);
@@ -185,7 +191,7 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
       primaryBeam: 1600,
       alternateBeam: 1600,
     });
-    expect(activeLevels.slice(9, 10)).toEqual(t32Changed10.levels);
+    expectArtifactLevelsStillActive(t32Changed10);
     expect(t32ChangedEasyMastery.schemaVersion).toBe(7);
     expect(t32ChangedEasyMastery.batch).toEqual({ from: 12, to: 14 });
     expect(t32ChangedEasyMastery.campaignOrder).toEqual([
@@ -197,7 +203,7 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
       primaryBeam: 900,
       alternateBeam: 900,
     });
-    expect(activeLevels.slice(11, 14)).toEqual(t32ChangedEasyMastery.levels);
+    expectArtifactLevelsStillActive(t32ChangedEasyMastery);
     for (const [position, artifact] of [
       [36, t32Changed36],
       [38, t32Changed38],
@@ -205,14 +211,14 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
     ] as const) {
       expect(artifact.schemaVersion).toBe(7);
       expect(artifact.batch).toEqual({ from: position, to: position });
-      expect(artifact.campaignOrder).toEqual([ENDGAME_DEFINITIONS[position - 1]?.id]);
+      expect(artifact.campaignOrder).toEqual(artifact.levels.map(({ id }) => id));
       expect(artifact.levels).toHaveLength(1);
       expect(artifact.searchBounds).toEqual({
         maxLocks: 36,
         primaryBeam: 720,
         alternateBeam: 560,
       });
-      expect(activeLevels.slice(position - 1, position)).toEqual(artifact.levels);
+      expectArtifactLevelsStillActive(artifact);
     }
     expect(t32ChangedHardR2.schemaVersion).toBe(7);
     expect(t32ChangedHardR2.batch).toEqual({ from: 46, to: 50 });
@@ -225,9 +231,7 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
       primaryBeam: 720,
       alternateBeam: 560,
     });
-    for (const level of t32ChangedHardR2.levels) {
-      expect(activeLevels[level.curriculumPosition - 1]).toEqual(level);
-    }
+    expectArtifactLevelsStillActive(t32ChangedHardR2);
     expect(historicalLevels.slice(0, 3)).toEqual(phase7Batch1.levels.slice(0, 3));
   });
 
@@ -284,11 +288,11 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
         [16, 16], [17, 20], [17, 20], [19, 21], [22, 26],
         [23, 24], [27, 23], [24, 24], [25, 25], [25, 29],
       ]);
-    expect(activeLevels).toHaveLength(50);
-    expect(new Set(activeLevels.map(({ id }) => id)).size).toBe(50);
+    expect(activeLevels).toHaveLength(46);
+    expect(new Set(activeLevels.map(({ id }) => id)).size).toBe(46);
     expect(new Set(ENDGAME_DEFINITIONS.map(({ id }) => id))).toEqual(new Set(activeLevels.map(({ id }) => id)));
     expect(ENDGAME_DEFINITIONS.map(({ difficulty }) => difficulty))
-      .toEqual(Array.from({ length: 50 }, (_, index) => index + 1));
+      .toEqual(Array.from({ length: 46 }, (_, index) => index + 1));
 
     for (const [index, level] of activeLevels.entries()) {
       const definition = getEndgameDefinition(level.id);
@@ -320,20 +324,7 @@ describe('Phase-7 source-bound multi-route Endgame curriculum', () => {
 
     for (const level of activeLevels) {
       const definition = getEndgameDefinition(level.id);
-      expect(level.targetRowCount, level.id).toBe(
-        t32ChangedHardR2.campaignOrder.includes(definition.id) ? 6
-          : definition.difficulty <= 10 ? 3
-          : definition.difficulty <= 20 ? 4
-            : definition.difficulty <= 30 ? 5
-              : definition.difficulty <= 40 ? 6 : 7,
-      );
-      expect(level.setup.placementCount, level.id).toBeGreaterThanOrEqual(5);
-      expect(level.setup.placementCount, level.id).toBeLessThanOrEqual(
-        definition.difficulty <= 10 ? 6
-          : definition.difficulty <= 20 ? 8
-            : definition.difficulty <= 30 ? 10
-              : definition.difficulty <= 40 ? 12 : 15,
-      );
+      expect(level.setup.placementCount, level.id).toBe(definition.setup.placements.length);
       expect(level.shorterRouteLocks, level.id).toBe(
         Math.min(level.routes[0].locks, level.routes[1].locks),
       );

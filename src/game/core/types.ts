@@ -68,16 +68,12 @@ export type EndgameId =
   | 'tm-endgame-31'
   | 'tm-endgame-32'
   | 'tm-endgame-33'
-  | 'tm-endgame-34'
   | 'tm-endgame-35'
   | 'tm-endgame-36'
   | 'tm-endgame-37'
   | 'tm-endgame-38'
   | 'tm-endgame-39'
-  | 'tm-endgame-40'
   | 'tm-endgame-41'
-  | 'tm-endgame-42'
-  | 'tm-endgame-43'
   | 'tm-endgame-44'
   | 'tm-endgame-45'
   | 'tm-endgame-46'
@@ -85,6 +81,16 @@ export type EndgameId =
   | 'tm-endgame-48'
   | 'tm-endgame-49'
   | 'tm-endgame-50';
+
+/** IDs deliberately retired when the revision-3 46-level Endgame curriculum published. */
+export const RETIRED_ENDGAME_IDS = [
+  'tm-endgame-34',
+  'tm-endgame-40',
+  'tm-endgame-42',
+  'tm-endgame-43',
+] as const;
+
+export type RetiredEndgameId = (typeof RETIRED_ENDGAME_IDS)[number];
 
 export type EndgameGoal = 'original-targets-cleared';
 export type EndgameCompletion =

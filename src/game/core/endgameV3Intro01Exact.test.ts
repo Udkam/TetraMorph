@@ -159,7 +159,7 @@ describe('Endgame v3 non-published Intro-01 authoring entry', () => {
     const base = getEndgameDefinition('t3r-shaft-01');
     const baseBytes = JSON.stringify(base);
     expect(Object.keys(introModule)).toEqual(['ENDGAME_V3_INTRO_DRAFTS']);
-    expect(ENDGAME_DEFINITIONS).toHaveLength(50);
+    expect(ENDGAME_DEFINITIONS).toHaveLength(46);
     expect(introModule.ENDGAME_V3_INTRO_DRAFTS.filter(({ id }) => id === draft.id)).toEqual([draft]);
     const draftBytes = JSON.stringify(draft);
     expect(new TextEncoder().encode(draftBytes)).toHaveLength(DRAFT_BYTES);
