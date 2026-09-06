@@ -3,15 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 // @ts-expect-error Vitest runs this byte fixture audit in Node while product types omit Node.
 import { readFileSync } from 'node:fs';
-import { T37_AUDIO_ASSETS, type T37AudioAssetId } from './audioAssetCatalog';
+import { REJECTED_BOMB_STEM_ARCHIVE, T37_AUDIO_ASSETS, type T37AudioAssetId } from './audioAssetCatalog';
 
 const ASSET_IDS = [
   'studioProgress',
   'studioStart',
   'freezeIce',
-  'bombFamiliarA',
-  'bombFamiliarB',
-  'bombFamiliarC',
 ] satisfies T37AudioAssetId[];
 
 const EXTERNAL_CC0_ASSET_IDS = [
@@ -44,7 +41,7 @@ function inspectPcm16Wav(candidate: 'A' | 'B' | 'C') {
 }
 
 describe('T37 audio asset catalog', () => {
-  it('exposes the three external samples and three provisional project-generated Bomb stems', () => {
+  it('exposes only the three runtime samples', () => {
     expect(Object.keys(T37_AUDIO_ASSETS)).toEqual(ASSET_IDS);
 
     for (const id of EXTERNAL_CC0_ASSET_IDS) {
@@ -58,28 +55,31 @@ describe('T37 audio asset catalog', () => {
     }
   });
 
-  it('binds byte-exact R5A PCM16 stems without claiming human acceptance', () => {
+  it('retains byte-exact R5A PCM16 stems as rejected audit-only files', () => {
     const expected = {
-      bombFamiliarA: ['A', 'be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254'],
-      bombFamiliarB: ['B', 'b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc'],
-      bombFamiliarC: ['C', 'ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6'],
+      A: 'be2b68b51e29ac0a040491b9f7e4b5f1633907cd6075cfe421a8e722380ea254',
+      B: 'b9ffeee9ec38007e5d3e8aa86997b62da939af968cec3f5bd83892337641f3fc',
+      C: 'ed866e4e50e39a2292d99c175c3be04881d6fe7720f32508afd4c7ebf7c5bcc6',
     } as const;
 
-    for (const [id, [candidate, sha256]] of Object.entries(expected)) {
-      const asset = T37_AUDIO_ASSETS[id as keyof typeof expected];
-      expect(asset.url, id).toMatch(/\.wav(?:\?|$)/);
-      expect(asset.sha256, id).toBe(sha256);
-      expect(asset.format, id).toEqual({
+    for (const [candidate, sha256] of Object.entries(expected) as Array<[
+      keyof typeof expected,
+      (typeof expected)[keyof typeof expected],
+    ]>) {
+      const archive = REJECTED_BOMB_STEM_ARCHIVE[candidate];
+      expect(archive.relativePath).toBe(`src/assets/audio/t37/bomb-familiar-${candidate.toLowerCase()}.wav`);
+      expect(archive.sha256).toBe(sha256);
+      expect(archive.format).toEqual({
         encoding: 'PCM16 WAV', sampleRate: 48_000, channels: 1, frames: 8_640,
       });
-      expect(asset.source, id).toMatchObject({
+      expect(archive.source).toMatchObject({
         kind: 'project-generated',
         candidate,
         evidenceCommit: '99b47be36835c9ed1b9c72f2a0caf653cd2739a3',
         evidencePath: `docs/evidence/t37/bomb-familiar-language-audition-r5a/assets/${candidate}.wav`,
         humanAccepted: false,
       });
-      expect(asset.status, id).toBe('provisional');
+      expect(archive.status).toBe('human-rejected');
       expect(inspectPcm16Wav(candidate)).toEqual({
         sha256,
         riff: 'RIFF',

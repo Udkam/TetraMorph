@@ -10,7 +10,7 @@ import {
 import { audioCue, type CandidateAudioCueId } from './audioPalette';
 import { scheduleRecoveredNoisePuff } from './candidatePlayback';
 import { T37_AUDIO_ASSETS, type T37AudioAssetId } from './audioAssetCatalog';
-import { composeBombEventSamples, scheduleBombEventBuffer } from './bombStemPlayback';
+import { composeBombBlockEventSamples, scheduleBombBlockEventBuffer } from './bombBlockPlayback';
 import {
   ACCEPTED_OUTPUT_GAIN,
   ACTION_A_CONTRACT,
@@ -28,13 +28,6 @@ import {
 
 type MutationActivation = Extract<GameEvent, { type: 'mutation-activated' }>;
 export type AcceptedAudioAssetLoader = (url: string) => Promise<ArrayBuffer>;
-export type BombStemVariant = 'A' | 'B' | 'C';
-export const PRODUCT_BOMB_STEM_VARIANT: BombStemVariant = 'A';
-
-export interface AudioEngineOptions {
-  /** Constructor-only audition seam. Product code always uses PRODUCT_BOMB_STEM_VARIANT. */
-  readonly forceBombStemVariantForTest?: BombStemVariant;
-}
 
 const MOVE_CUE_MIN_INTERVAL_MS = 60;
 const SOFT_DROP_CUE_MIN_INTERVAL_MS = 52;
@@ -54,12 +47,6 @@ const AUDIO_BUS_GAINS: Readonly<Record<AudioBus, number>> = Object.freeze({
   ambient: 0.14,
   ui: 0.7,
 });
-const BOMB_STEM_ASSET: Readonly<Record<BombStemVariant, T37AudioAssetId>> = Object.freeze({
-  A: 'bombFamiliarA',
-  B: 'bombFamiliarB',
-  C: 'bombFamiliarC',
-});
-
 function configureCompressor(
   compressor: DynamicsCompressorNode,
   contract: Readonly<{
@@ -104,12 +91,7 @@ export class AudioEngine {
   constructor(
     private readonly platform: BrowserPlatform = browserPlatform,
     private readonly assetLoader: AcceptedAudioAssetLoader = fetchAcceptedAudioAsset,
-    options: AudioEngineOptions = {},
-  ) {
-    this.bombStemVariant = options.forceBombStemVariantForTest ?? PRODUCT_BOMB_STEM_VARIANT;
-  }
-
-  private readonly bombStemVariant: BombStemVariant;
+  ) {}
 
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
@@ -515,24 +497,19 @@ export class AudioEngine {
     startAt: number,
   ): void {
     const context = this.context;
-    const destination = this.enabledGate;
-    const buffer = this.acceptedBuffers.get(BOMB_STEM_ASSET[this.bombStemVariant]);
+    const destination = this.buses.mutation;
     if (
-      !context || !destination || !buffer || !this.enabled || this.destroyed
+      !context || !destination || !this.enabled || this.destroyed
       || this.activeVoices.size >= MAX_EFFECT_VOICES
     ) return;
     try {
-      const samples = composeBombEventSamples({
-        samples: buffer.getChannelData(0),
-        sampleRate: buffer.sampleRate,
-        channels: buffer.numberOfChannels,
-      }, { beatStartsMs, reducedMotion: this.reducedMotion });
-      scheduleBombEventBuffer(context, destination, samples, {
+      const samples = composeBombBlockEventSamples({ beatStartsMs, reducedMotion: this.reducedMotion });
+      scheduleBombBlockEventBuffer(context, destination, samples, {
         startAt,
         ...this.voiceHooks(true),
       });
     } catch {
-      // A malformed or undecodable provisional stem fails closed to silence.
+      // A malformed visual beat plan fails closed to silence.
     }
   }
 

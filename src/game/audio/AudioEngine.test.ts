@@ -115,9 +115,6 @@ class FakeAudioContext {
   state: AudioContextState = 'running';
   readonly sampleRate = 48_000;
   readonly destination = {} as AudioDestinationNode;
-  private localDecodeCalls = 0;
-
-  constructor(private readonly validBombStems = true) {}
 
   createGain(): GainNode {
     const node = new FakeGain();
@@ -156,10 +153,6 @@ class FakeAudioContext {
   }
   async decodeAudioData(): Promise<AudioBuffer> {
     decodeCalls += 1;
-    this.localDecodeCalls += 1;
-    if (this.validBombStems && this.localDecodeCalls >= 4) {
-      return new FakeAudioBuffer(8_640, 48_000, 1, (this.localDecodeCalls - 3) / 10) as unknown as AudioBuffer;
-    }
     return new FakeAudioBuffer(96_000, 48_000, 2, 0.5) as unknown as AudioBuffer;
   }
   async resume(): Promise<void> { this.state = 'running'; }
@@ -236,8 +229,8 @@ describe('AudioEngine accepted production contract', () => {
     const audio = audioFor();
     await audio.prime();
 
-    expect(loadAsset).toHaveBeenCalledTimes(6);
-    expect(decodeCalls).toBe(6);
+    expect(loadAsset).toHaveBeenCalledTimes(3);
+    expect(decodeCalls).toBe(3);
     expect(compressors).toHaveLength(3);
     expect(compressors.map((node) => ({
       threshold: node.threshold.value,
@@ -438,7 +431,7 @@ describe('AudioEngine accepted production contract', () => {
     });
   });
 
-  it('routes a normal Bomb as one direct stem source with its audible body at 220 ms', async () => {
+  it('routes a normal Bomb as one quiet block-break source at the 220 ms impact', async () => {
     const audio = audioFor();
     await audio.prime();
     audio.play([mutation('bomb')]);
@@ -447,15 +440,17 @@ describe('AudioEngine accepted production contract', () => {
     expect(filters).toHaveLength(0);
     expect(bufferSources).toHaveLength(1);
     expect(bufferSources[0]?.starts[0]).toEqual({ time: 0, offset: undefined, duration: undefined });
-    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.4);
-    expect(bufferSources[0]?.connections[0]).toBe(gains[1]);
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.352);
+    expect(bufferSources[0]?.connections[0]).toBe(gains[7]);
     expect(createdBuffers).toHaveLength(1);
-    expect(createdBuffers[0]?.length).toBe(19_200);
-    expect(createdBuffers[0]?.getChannelData(0)[10_559]).toBe(0);
-    expect(createdBuffers[0]?.getChannelData(0)[10_570]).toBeCloseTo(0.1);
+    expect(createdBuffers[0]?.length).toBe(16_896);
+    const samples = createdBuffers[0]?.getChannelData(0) ?? new Float32Array();
+    expect(samples.slice(0, 220 * 48).every((sample) => sample === 0)).toBe(true);
+    expect(Math.max(...samples.slice(220 * 48).map(Math.abs))).toBeGreaterThan(0.05);
+    expect(Math.max(...samples.map(Math.abs))).toBeLessThan(0.11);
   });
 
-  it('composes the full row-39 chain into one 1368 ms source and preserves its 1504 ms tail', async () => {
+  it('composes the full row-39 chain into one causal block-break source and preserves its visual tail', async () => {
     const audio = audioFor();
     await audio.prime();
     audio.play([chainClearMutation(), mutation('freeze')]);
@@ -464,36 +459,29 @@ describe('AudioEngine accepted production contract', () => {
     expect(filters).toHaveLength(0);
     expect(bufferSources).toHaveLength(2);
     expect(bufferSources[0]?.starts[0]?.time).toBe(0);
-    expect(bufferSources[0]?.stops[0]).toBeCloseTo(1.368);
-    expect(createdBuffers[0]?.length).toBe(65_664);
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(1.416);
+    expect(createdBuffers[0]?.length).toBe(67_968);
     expect(bufferSources[1]?.starts[0]).toEqual({ time: 1.504, offset: 0.19375, duration: 0.44 });
   });
 
-  it('uses the reduced 466 ms chain source while keeping the shared 520 ms tail', async () => {
+  it('uses the reduced block-break tail while keeping the shared 520 ms visual tail', async () => {
     const audio = audioFor();
     await audio.prime();
     audio.setReducedMotion(true);
     audio.play([chainClearMutation(), mutation('freeze')]);
 
-    expect(createdBuffers[0]?.length).toBe(22_368);
-    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.466);
+    expect(createdBuffers[0]?.length).toBe(24_960);
+    expect(bufferSources[0]?.stops[0]).toBeCloseTo(0.52);
     const ice = bufferSources.find((source) => source.starts[0]?.offset === 0.19375);
     expect(ice?.starts[0]).toEqual({ time: 0.52, offset: 0.19375, duration: 0.44 });
   });
 
-  it('keeps A as product default and exposes B/C only through the constructor test seam', async () => {
-    const peaks: number[] = [];
-    for (const variant of ['A', 'B', 'C'] as const) {
-      const context = new FakeAudioContext();
-      const audio = new AudioEngine(platformFor(context), loadAsset, {
-        forceBombStemVariantForTest: variant,
-      });
-      await audio.prime();
-      audio.play([mutation('bomb')]);
-      peaks.push(createdBuffers.at(-1)?.getChannelData(0)[10_570] ?? 0);
-      audio.destroy();
-    }
-    expect(peaks.map((peak) => Number(peak.toFixed(3)))).toEqual([0.1, 0.2, 0.3]);
+  it('loads no rejected Bomb stem while priming the runtime asset set', async () => {
+    const audio = audioFor();
+    await audio.prime();
+    const urls = loadAsset.mock.calls.map(([url]) => url);
+    expect(urls).toHaveLength(3);
+    expect(urls.some((url) => url.includes('bomb-familiar'))).toBe(false);
   });
 
   it('pins every layer of one clear or Bomb event to one moving AudioContext clock read', async () => {
@@ -520,16 +508,9 @@ describe('AudioEngine accepted production contract', () => {
     audio.play([mutation('bomb')]);
     const bombSource = bufferSources.at(-1)!;
     expect(bombSource.starts[0]?.time).toBeCloseTo(4.011);
-    expect(createdBuffers.at(-1)?.getChannelData(0)[10_570]).toBeCloseTo(0.1);
-  });
-
-  it('fails closed to silence when the decoded Bomb asset violates its stem contract', async () => {
-    const audio = audioFor(new FakeAudioContext(false));
-    await audio.prime();
-    audio.play([mutation('bomb')]);
-    expect(bufferSources).toHaveLength(0);
-    expect(oscillators).toHaveLength(0);
-    expect(filters).toHaveLength(0);
+    const samples = createdBuffers.at(-1)?.getChannelData(0) ?? new Float32Array();
+    expect(samples.slice(0, 220 * 48).every((sample) => sample === 0)).toBe(true);
+    expect(Math.max(...samples.map(Math.abs))).toBeLessThan(0.11);
   });
 
   it('lets Ice own a resolution frame without stacking hard-drop, lock, or clear sounds', async () => {
@@ -572,8 +553,8 @@ describe('AudioEngine accepted production contract', () => {
     const audio = audioFor();
     audio.setAmbientTheme('deep-tide');
     await Promise.all([audio.prime(), audio.prime(), audio.prime()]);
-    expect(loadAsset).toHaveBeenCalledTimes(6);
-    expect(decodeCalls).toBe(6);
+    expect(loadAsset).toHaveBeenCalledTimes(3);
+    expect(decodeCalls).toBe(3);
     expect(sourceCount()).toBe(0);
     audio.setAmbientTheme('mineral-mist');
     expect(sourceCount()).toBe(0);
