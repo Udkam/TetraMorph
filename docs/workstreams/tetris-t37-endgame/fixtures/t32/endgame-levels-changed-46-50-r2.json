@@ -49,7 +49,7 @@
   "levels": [
     {
       "id": "tm-endgame-46",
-      "curriculumPosition": 46,
+      "curriculumPosition": 42,
       "targetRowCount": 6,
       "setup": {
         "seed": 4101001,
@@ -146,7 +146,7 @@
     },
     {
       "id": "tm-endgame-48",
-      "curriculumPosition": 48,
+      "curriculumPosition": 44,
       "targetRowCount": 6,
       "setup": {
         "seed": 4101024,
@@ -254,7 +254,7 @@
     },
     {
       "id": "tm-endgame-49",
-      "curriculumPosition": 49,
+      "curriculumPosition": 45,
       "targetRowCount": 6,
       "setup": {
         "seed": 4101019,
@@ -357,7 +357,7 @@
     },
     {
       "id": "tm-endgame-50",
-      "curriculumPosition": 50,
+      "curriculumPosition": 46,
       "targetRowCount": 6,
       "setup": {
         "seed": 4101002,
