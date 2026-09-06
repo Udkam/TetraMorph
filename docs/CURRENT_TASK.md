@@ -11783,3 +11783,17 @@ in-memory authoring/diff contract before any admission path can open.
   output confirms no new typecheck diagnostic. It does not permit a full-gate, QA, evidence,
   integration, or acceptance claim. The registry flip must remove all three diagnostics before the
   unified final typecheck/suite/build/browser/QA sequence.
+
+#### Bounded resumable-driver source-checkpoint exception
+
+- The matching driver checkpoint is exactly
+  `src/game/core/endgameF5CertificateDiscovery.test.ts`,
+  `scripts/run-endgame-f5-resumable-proof.mjs`, and
+  `src/authoring/runEndgameF5ResumableProof.test.mjs` (860 hand-authored lines). The adapter's
+  explicit R7 environment pins, the runner's receipt/recovery protocol, and the short-Cascade
+  sealing-without-receipt integration test form one protocol boundary; splitting them would leave
+  a nonrunnable or untested recovery surface.
+- This is the same temporary `COMMIT_POLICY.md` section 3 exception: require the direct
+  R7/core/runner suite, Node syntax check, cached diff check, and the same three-only global
+  typecheck output before the local checkpoint. It authorizes neither a terminal Horizon claim nor
+  any final-gate, QA, evidence, registry, or publication step.
