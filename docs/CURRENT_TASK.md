@@ -2,6 +2,46 @@
 
 Status: **COMPLETION-FIRST IMPLEMENTATION ACTIVE / ALL NEW CHOICES PROVISIONAL / ONE CONSOLIDATED HUMAN REVIEW LAST**
 
+## 2026-09-05 Bomb direct-feedback correction — R5C block-break source
+
+The player's direct listening result supersedes the R5B product-source choice: normal Bomb
+and chain-clear Bomb are both **HUMAN REJECTED**. The reason is specific: the current stem
+sounds too much like a real, loud, startling explosive. R5A/R5B source, hashes, audition
+outputs, and reports remain immutable historical evidence; their A/B/C WAVs must not be
+loaded or played by the current product, and no selector, storage value, or migration is
+introduced for them.
+
+R5C is one provisional original **block-break** event, not another explosion comparison.
+It renders one deterministic mono buffer/source per Bomb event through the existing mutation
+mix path. At every shared `mutationChainPresentationPlan` beat it combines a rounded
+`174.61 -> 138.59 Hz` body with a quiet `349.23 -> 293.66 Hz` block-contact partial. Normal
+Bomb has its only onset at the existing `220 ms` impact; chain-clear uses the same distinct
+beat starts, including reduced-motion starts. There is no pre-impact warning, external or
+archived WAV, sub-bass, real-world explosion/noise/reverb, piercing crack, pressure build,
+or tail beyond `132 ms` full motion / `90 ms` reduced motion after its final beat. The
+composed source must be finite, dry, bounded at raw peak `0.18`, and quieter than the
+accepted hard-drop body at the shared output reference.
+
+This changes audio source identity only: Core, Renderer, Bomb visual/timeline, score,
+mutation ordering, one-Canvas ownership, and D1/D2B work remain frozen. Automated tests may
+prove timing, bounded samples, asset non-use, lifecycle, and chain causality, but R5C remains
+provisional until the one final consolidated player review.
+
+### R5C product audition technical surface
+
+Before the consolidated review, add only
+`docs/evidence/t37/bomb-block-r5c-product-audition/**` as a source-only technical audition
+surface. It must drive current production `AudioEngine` and `TetrisRenderer` from real Core
+normal and row-39 chain fixtures; it may not reintroduce, fetch, decode, select, or compare
+the rejected R5B A/B/C WAVs. Full-motion controls are normal then chain; reduced motion is
+technical-only. No autoplay, stored selector/verdict, or acceptance control is allowed.
+
+The page must expose concise `render_game_to_text` and `advanceTime(ms)` hooks, retain one
+Canvas, and instrument one 48 kHz mono BufferSource per event, exact causal beat starts,
+finite/raw-cap-bounded samples, active-catalog-only requests, and lifecycle cleanup. Its
+authored source remains separate from later generated screenshots/reports and does not change
+product source, Core, Renderer, timing, score, or accepted D1/D2B behavior.
+
 ## 2026-08-16 authoritative completion-first task
 
 This block supersedes every older status, pause, gate, and next action in this append-only
@@ -11590,3 +11630,151 @@ in-memory authoring/diff contract before any admission path can open.
 - Run targeted Core/progress/migration/UI tests while editing. Do not call the final full suite,
   build, browser evidence, independent QA, commit/push, or player review until the coherent source
   candidate is ready. R16 and consolidated sensory acceptance remain later, separate gates.
+
+### 2026-09-05 T37 Classic fixed-pace implementation
+
+- Replace the inherited arbitrary Classic gravity rails and three-grade leaderboard presentation
+  with exactly five fixed presets: Calm `60/18`, Relaxed `48/12`, Standard `36/4.8`, Swift
+  `24/4.8`, and Expert `12/4.8` ticks. Preserve next-run-only application, renderer independence,
+  and keyboard/touch-safe Settings navigation.
+- Read old range preferences and v9 Classic records only as migration input; emit canonical
+  `classic-pace:v2` preferences and v10 records with the exact matching fixed pair. Five distinct
+  leaderboard domains replace legacy grade buckets. Reject malformed or noncanonical v10 pairs
+  instead of silently assigning a different ranking domain.
+- This fixed-preset slice is now source-implemented and covered by focused migration, leaderboard,
+  Settings, and CSS contract tests. It remains provisional pending the final F5 registry flip,
+  unified typecheck/suite/build/browser evidence, independent QA, and consolidated player review.
+
+### 2026-09-05 T37 F5 compact proof-frontier codec correction
+
+- The current sparse Horizon proof proves the need for a representation-only correction: its final
+  depth-five run is 9,075,581,565 bytes at 649 UTF-8 characters per frontier key, while a sampled
+  adaptive packed envelope projects to 167 Base64URL characters (3.89x smaller). Preserve the
+  current stage/logs as non-proof residue; stop its verified parent/worker before changing source.
+- Replace only the private proof-frontier key codec. Preserve general `endgameRouteStateKey`, exact
+  equivalence, all candidate routes, and all current conservative bounds. The versioned compact
+  key must encode every future-legal state field, derive template anchors and spawn count safely,
+  reject malformed/trailing/noncanonical forms, and pass exact decode/re-encode plus route-search
+  regression tests.
+- After a green focused source checkpoint, run one fresh absent-stage Horizon proof under the compact
+  codec. It is the sole exact process; old stages are never resumed/reused/deleted, and Terrace or
+  Keystone may not start until Horizon reaches a terminal result.
+- Implementation checkpoint: `endgameRouteSearch.ts` now uses the private `p1.` canonical
+  Base64URL codec with adaptive sparse/bitmap coordinate lists, template-derived anchors and spawn
+  count, strict decode/re-encode identity, and no change to the general route key or bounds.
+  Focused proof codec/frontier tests pass; the only current typecheck failures remain the intended
+  retired-ID mastery registry references pending all eight certificates.
+
+### 2026-09-06 T37 F5 checkpointed Horizon proof recovery
+
+- The prior compact Horizon process is terminal only as non-proof residue: Windows Event Log
+  records a user-initiated restart at `2026-09-05T20:35+08:00`; stdout contains neither
+  `F5_CERTIFICATE` nor a Vitest terminal result, stderr is empty, and the retained stage ends at
+  `d0006-p0000-g0120.run`. Do not resume, delete, repurpose, or claim any value from it.
+- Open one coordinator-owned authoring/test slice only. Exact production boundary remains frozen:
+  `src/game/core/endgameRouteSearch.ts`, all product Endgame/UI/audio paths, registry flip,
+  Terrace/Keystone, final suite/build/browser/QA/push/player review are closed. Allowed new source
+  paths are `src/game/core/endgameF5CertificateDiscovery.test.ts` and
+  `scripts/run-endgame-f5-resumable-proof.mjs`, plus their direct tests and T37 docs/logs.
+- The test adapter must invoke existing `advanceOptimalEndgameRouteProof` with the existing
+  `createResumableEndgameDiskFrontierStore` only when explicit F5 resumable environment pins are
+  supplied. A runner must create a fresh externally located R7 stage and append-only receipt
+  ledger, resume only against the exact last receipt tip, run one bounded advancement at a time,
+  require clean `suspend()`, and emit complete certificates only after the Core reports `complete`.
+  It must reject malformed/noncontiguous receipts, route/level/owner/stage mismatches, stale
+  expected tips, ambiguous residue, and any attempt to share a stage with the old compact run.
+- Before the fresh Horizon start, run direct adapter/receipt checks and an existing short-level
+  resumable lifecycle proof. The first production Horizon R7 stage and receipt directory must be
+  absent at preflight. After its terminal certificate, keep Terrace and Keystone as fresh serial
+  successors; no registry flip or final validation opens early.
+
+### 2026-09-06 T37 F5 clean-unreceipted checkpoint recovery
+
+- The sole Horizon R7 runner reached a sealed `manifest-g00009.json` after receipt generation 8,
+  but its parent was no longer live before it appended `tip-g00009.json`. The external stage has
+  no `.part` entries and no remaining relevant Node process. This is not a certificate, not an
+  authorization to start another search, and not permission to edit or discard any stage file.
+- Permit one explicit runner-only recovery mode for this narrow case. It must require the exact
+  next generation and uppercase manifest SHA-256 on the command line; accept neither inference,
+  rollback, a receipt gap, a complete checkpoint, a dirty stage, nor a stage that the R7 Store
+  cannot reopen with that exact tip. It must load a `searching` checkpoint, check the stored
+  binding's level and candidate command-stream SHA-256 against the prior receipt, and require a
+  clean `suspend()` before writing the single missing immutable receipt. It then exits without
+  advancing the proof.
+- Cover the recovery path with a fresh short Cascade integration fixture that intentionally seals
+  one unit without a receipt, proves wrong tip/continuity rejection, then admits and receipts the
+  exact clean checkpoint. Only after that focused test is green may the observed Horizon generation
+  9 checkpoint be recovered. The next proof advancement remains a separate one-unit invocation.
+
+### 2026-09-06 T37 F5 R7 unit-timeout correction
+
+- The background generation-10 child seals a checkpoint and prints its marker after `642,287 ms`,
+  but the discovery test's inherited `600,000 ms` limit then makes Vitest return nonzero. The
+  runner correctly refuses to parse a marker from a failed child and leaves no receipt. Treat the
+  sealed generation 10 state as another clean-unreceipted checkpoint only after the same Store
+  admission/recovery checks; do not use the failed test status as proof output.
+- Change only the opt-in R7 discovery-test timeout to a pinned 30-minute per-unit allowance. The
+  default non-resumable discovery test remains 10 minutes; no search algorithm, product code,
+  candidate, bound, or store contract may change. Run the short R7 lifecycle fixture after the
+  correction before recovering generation 10, then continue each long unit through the recorded
+  background runner.
+
+### 2026-09-06 T37 F5 Horizon depth-four closure and g21 boundary
+
+- The sole g14–g20 serial runner completed normally: receipts are contiguous through
+  `tip-g00020.json`, its route binding remains `458DD677...E348C663`, no `.part` residue remains,
+  and its stderr log is empty. The authenticated generation-20 tip is
+  `58FB88E8...D23F5A65`; it is still a `searching` checkpoint, not a certificate.
+- An independent R7 Store resume at that exact tip is clean and advanceable. It confirms that
+  depth four has exhausted all 737,671 parents (13,977,409 transitions), with twelve sealed
+  depth-five runs totaling 13,973,398 states. Never infer a later batch size from the completed
+  depth-four count.
+- Permit only one fresh-preflighted g21 advancement (`--max-advances 1`) from receipt 20. It must
+  either append one normal exact receipt or emit the Core-owned terminal certificate; on either
+  result it stops. Terrace, Keystone, registry activation, final validation, publication, and
+  player review remain closed until the terminal Horizon certificate is independently read back.
+
+### 2026-09-06 T37 F5 Horizon g21 layer transition and g22 boundary
+
+- g21 completes normally with empty stderr and no residue. It atomically compacts the twelve
+  depth-five input runs into an authenticated `searching` checkpoint at generation 21, exact tip
+  `7D3FDCE9...B8556C69`, depth 5 / offset 0. Its temporary layer-transition material is released
+  after publication; the retained stage is about 2.19 GiB.
+- Independent Store admission at that exact tip is clean and advanceable. It reports 13,967,878
+  deduplicated depth-five parent states, no already-produced next runs, and zero current-layer
+  transitions. This remains an intermediate proof state.
+- Permit only one fresh-preflighted g22 advancement (`--max-advances 1`) from receipt 21. It must
+  stop after one authenticated result (normal receipt or Core certificate); do not extrapolate a
+  multi-unit batch from the prior depth. All successor work remains closed.
+
+### 2026-09-06 T37 F5 R7 conservative long-proof bound parity
+
+- g22 completes normally at depth 5 / offset 65536 with tip `129558BA...98D5BEDE`, no residue,
+  and no terminal certificate. The measured 13,967,878-parent layer shows the resumable path is
+  using only `endgameRouteLockLowerBound`, while the synchronous exact proof already applies the
+  stronger conservative future-piece interval/column-mask capacity bound for candidates of nine
+  locks or more.
+- Open one narrow Core/test slice: `src/game/core/endgameRouteSearch.ts` and its direct tests only.
+  The resumable advancing unit must reuse the existing `proofDeficitBoundPrecludesCandidate` with
+  the same long-proof threshold and per-advance caches as the synchronous certificate path. It may
+  prune only states mathematically unable to finish inside the candidate's remaining lock budget;
+  it must not change level definitions, candidate routes, store/receipt schema, UI, or certificate
+  acceptance criteria.
+- R7 generations 0–22 remain a conservative exhaustive-prefix superset, never a terminal claim.
+  After focused parity tests and a source checkpoint, a fresh exact-tip readback may resume g23
+  under the stronger conservative bound, with the mixed-policy history recorded. No alternate
+  stage, deletion, registry activation, successor proof, or final validation opens.
+
+#### Bounded source-checkpoint typecheck exception
+
+- The sole source checkpoint for this parity repair is exactly
+  `src/game/core/endgameRouteSearch.ts` plus
+  `src/game/core/endgameProofFrontierStore.test.ts`. The normal checkpoint typecheck cannot be
+  green without prematurely editing the still-closed mastery registry: its only diagnostics are
+  the already-recorded `TS2345` retired-ID references at `src/endgameMastery.ts:105,113,122`
+  (`tm-endgame-34`, `tm-endgame-40`, and `tm-endgame-42`).
+- This is a temporary, narrow exception to `COMMIT_POLICY.md` section 3. It permits a local source
+  checkpoint only after the direct R7/core tests pass, `git diff --check` passes, and the command
+  output confirms no new typecheck diagnostic. It does not permit a full-gate, QA, evidence,
+  integration, or acceptance claim. The registry flip must remove all three diagnostics before the
+  unified final typecheck/suite/build/browser/QA sequence.

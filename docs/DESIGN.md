@@ -41,6 +41,45 @@ There is no clamp, normalization, compression, preview transcode, old `bomb` /
 `bomb-chain` recipe, noise layer, or fixed pulse. Renderer ownership, the presentation
 timeline, and Core stay frozen. Default A remains provisional rather than human accepted.
 
+### 2026-09-05 R5C — direct-feedback block-break replacement
+
+The player has now rejected R5B normal and chain playback in full: its stem identity is too
+realistic, loud, and startling. That verdict supersedes the preceding R5B **runtime** contract
+without erasing its committed source/evidence provenance. The three byte-pinned WAVs and their
+audition results remain rejected history only; current product code must neither fetch nor play
+them and exposes no variant choice.
+
+R5C is one original, dry, low-volume block-break grammar shared by normal and chain Bombs. A
+single deterministic mono event buffer/source contains a rounded `174.61 -> 138.59 Hz` body
+and a quiet `349.23 -> 293.66 Hz` contact partial for each causal impact. Normal starts only at
+the existing `220 ms` visual impact. Chain uses the same frozen distinct presentation-plan beat
+starts; reduced motion shortens only the post-impact tail to `90 ms` (full is at most `132 ms`).
+It has no external sample, pre-impact warning, sub-bass, explosive pressure, broad noise,
+reverb, piercing crack, or separate chain timbre. Raw output is finite and capped at `0.18`
+before the existing candidate/mutation mix, so it remains beneath the accepted hard-drop body.
+
+This is a source correction prompted by direct feedback, not a subjective acceptance claim.
+All source and browser checks are technical eligibility; R5C joins the final consolidated
+player review together with the remaining T37 work.
+
+### R5C product-backed technical audition surface
+
+The current source receives one new, non-product evidence surface at
+`docs/evidence/t37/bomb-block-r5c-product-audition/**`. It is not an A/B/C comparison and
+must never load, fetch, decode, or mention the rejected archived Bomb WAVs as playable
+choices. Its only full-motion controls are the current production normal Bomb and the real
+row-39 chain-clear; reduced motion is technical-only. Both fixtures must be emitted by Core,
+rendered by the current `TetrisRenderer`, and dispatched through the current `AudioEngine`.
+
+The surface has no autoplay, URL/storage selector, persisted verdict, or human-acceptance
+control. It must expose a concise `render_game_to_text` state and deterministic
+`advanceTime(ms)` hook for browser proof. Technical instrumentation must demonstrate one
+48 kHz mono event buffer/source, the frozen normal/chain beat starts, finite samples at or
+below the raw `0.18` cap, active-catalog-only asset requests, and complete stop/restart/
+disable/pagehide/HMR cleanup without Canvas, listener, ticker, or AudioContext multiplication.
+Its source checkpoint is limited to its own authored page files; generated screenshots and
+reports remain a later final-candidate evidence checkpoint.
+
 R5B evidence hashes committed text from Git blob bytes, not checkout-dependent working-tree
 bytes. Every authored/generated text file is UTF-8 without BOM and LF-only; generation
 fails before commit on CRLF, BOM, or invalid UTF-8, while PNG is raw binary. Reusable stop,
@@ -12033,3 +12072,144 @@ The source slice must not state whole-stage acceptance: each published prerequis
 need its exact route certificate, and Intro-05 remains subject to the separately blocked R16 proof
 chain. Focused tests may establish implementation consistency; the final full suite, browser
 evidence, independent QA, and consolidated player review remain later gates.
+
+### 2026-09-05 T37 Classic fixed-pace preset completion
+
+Classic no longer exposes a free two-rail gravity range or the old three-grade midpoint model.
+It offers exactly five named, keyboard- and touch-selectable pace presets: **Calm** `60/18`,
+**Relaxed** `48/12`, **Standard** `36/4.8`, **Swift** `24/4.8`, and **Expert** `12/4.8`
+(all values are 60 Hz ticks per cell). The setting persists only the canonical preset identity as
+`tetramorph:classic-pace:v2`; a legacy free range is read once, rounded by deterministic nearest
+pair selection, and then rewritten canonically. Choosing a pace affects the next Classic runtime,
+not an in-progress run.
+
+The leaderboard advances to v10 and exposes five independent Classic ranking domains keyed by the
+same canonical preset IDs. A valid new record must carry the exact pair belonging to its preset;
+v9's former three-grade/free-range records migrate through the same nearest-preset rule. The five
+cards use one 44 px-or-larger keyboard/touch target grammar, arrow navigation selects the focused
+radio, and the visual speed shorthand remains paired with a full unit-bearing accessible label.
+This is implementation-complete but remains part of the final consolidated browser and player
+review rather than a standalone acceptance claim.
+
+### 2026-09-05 T37 F5 compact proof-frontier representation recovery
+
+The live Horizon sparse-column proof has established that its semantic frontier key is an
+unnecessarily expensive transport representation: the completed depth-five run is
+`9,075,581,565` bytes and a deterministic 1,000-record sample is exactly 649 UTF-8 characters
+per record. The same decision domain now projects to 167 canonical Base64URL characters per
+record (3.89x smaller) through an adaptive sorted-coordinate/bitmap encoding of ordinary,
+target, and supported occupancy; anchoring remains template-derived, and active piece, queue,
+seven-bag, seed, and piece count are retained exactly. This is not a relaxation, heuristic, or
+new lower bound.
+
+The next Core slice replaces only the private proof-frontier transport codec. It must retain
+`endgameRouteStateKey` for normal callers, retain the exact state-equivalence relation, use a
+versioned canonical compact envelope, reject malformed/trailing/noncanonical input, and prove
+byte-for-byte `encode(decode(key)) === key` before a decoded state is admitted. The codec must
+reconstruct ordinary material as `I`, reconstruct immutable anchors from the proof template, and
+derive the canonical Endgame spawn count from the encoded piece count only after validating the
+existing decision-domain invariants.
+
+The running sparse-stage is stopped only after its process identity is rechecked; its files and
+logs remain immutable non-proof residue and are neither resumed, reused, nor deleted. After
+focused codec and route-search tests are green, exactly one replacement Horizon proof may start
+from an absent compact-codec stage. Terrace and Keystone remain serial successors only after its
+terminal certificate. This representation correction supersedes the earlier no-more-strategy-edit
+sentence, but does not authorize a new pruning policy or concurrent certificate search.
+
+### 2026-09-06 T37 F5 checkpointed exact-proof recovery
+
+The compact Horizon process did not produce a proof failure: Windows records a user-initiated
+restart at `2026-09-05T20:35+08:00`, after the process had sealed depth-six chunks through
+`g0120` but before it emitted a certificate. That old simple-run stage is immutable non-proof
+residue. It is never resumed, read as a certificate, deleted, or mixed with successor output.
+
+The recovery may use the existing Core `advanceOptimalEndgameRouteProof` and the existing R7
+resumable disk Store, but only through a test/authoring driver. It preserves the same candidate
+route, complete public-control landing domain, compact `p1.` key codec, conservative bounds, and
+certificate fields; it adds no product dependency, search heuristic, relaxed bound, or concurrent
+proof. One invocation advances exactly one authenticated unit/layer and calls `suspend()` before
+returning. A `F5_CERTIFICATE` is emitted only after an authenticated `complete` result and clean
+suspension; intermediate results are explicitly `F5_CHECKPOINT` records.
+
+The fresh external namespace is
+`%LOCALAPPDATA%\Temp\t37-f5-horizon-r7-resumable-stage`, with an adjacent initially absent
+receipt directory `%LOCALAPPDATA%\Temp\t37-f5-horizon-r7-resumable-receipts` and printable-ASCII
+owner `t37-f5-horizon-r7-resumable-v1`. The driver creates the stage only when the receipt
+directory is empty; every clean result appends one immutable UTF-8/LF receipt named by its
+generation. A receipt binds schema, level, candidate-route SHA-256, normalized stage path, owner,
+and exact manifest tip. Resume accepts only the newest contiguous receipt and passes that exact
+tip to Store admission; missing, malformed, conflicting, or stale state fails closed rather than
+guessing a recovery point. This reduces restart loss to at most the currently executing unit while
+keeping normal unit boundaries independently replayable.
+
+The source boundary is limited to the F5 certificate discovery test's opt-in resumable adapter,
+one Node authoring runner, and their direct tests/docs. The old compact Horizon stage, all product
+Core semantics, Endgame registry, user-facing UI/audio, Terrace/Keystone stages, and final gates
+remain closed until Horizon reaches a terminal certificate.
+
+### 2026-09-06 T37 F5 authenticated clean-checkpoint receipt recovery
+
+R7's stage manifest is the authenticated persistent checkpoint; the adjacent runner receipt is
+the independent ledger binding that checkpoint to the requested candidate and invocation history.
+If a process is terminated after the Store has atomically sealed a manifest and cleanly released
+its handles but before the runner has appended its receipt, the two records may temporarily differ
+by exactly one generation. Treat this as recoverable only through an explicit, no-advance authoring
+operation, never as a normal resume or a certificate.
+
+The recovery request supplies the exact next generation and uppercase SHA-256 of the sealed
+manifest. The runner verifies the prior ledger is contiguous/searching, requires that requested
+generation to be precisely prior-plus-one, rejects every `.part` residue, resumes the R7 Store at
+that exact tip, and requires a live `searching` checkpoint with matching generation/tip and
+`advanceAllowed`. It then hashes the Store-validated checkpoint binding's candidate command stream
+and checks it and `levelId` against the prior receipt. A clean `suspend()` is mandatory both on the
+successful inspection and on failure cleanup. Only then may the runner append a canonical
+`searching` receipt; it performs no `advanceOptimalEndgameRouteProof` call in recovery mode.
+
+Completed-but-unreceipted stages remain deliberately unrecoverable by this mechanism because a
+receipt alone would not reconstruct the terminal certificate payload. Any malformed, dirty,
+ambiguous, stale, or externally changed stage remains fail-closed. This preserves the old compact
+Horizon stage as immutable non-proof residue and does not alter Core proof semantics or the
+serialized product state.
+
+### 2026-09-06 T37 F5 R7 bounded unit-duration allowance
+
+The original certificate-discovery test applies a 10-minute timeout suitable for its ordinary
+one-shot use. A single R7 unit may legally take longer while still being bounded, checkpointed,
+and below the Store's resource limits; generation 10 demonstrates this by sealing an authenticated
+checkpoint after roughly 10.7 minutes. For the explicit R7 resumable configuration only, the test
+uses a pinned 30-minute unit timeout. Ordinary discovery and disk-stage modes retain the 10-minute
+timeout. The runner remains fail-closed on every nonzero child status, so this timing correction
+does not make a failed child recoverable or weaken receipt authentication.
+
+### 2026-09-06 T37 F5 depth-boundary batch discipline
+
+An R7 generation count is a bounded amount of parent work, not a prediction of the next proof
+layer's size. After a checkpoint exhausts a depth, the coordinator must reopen the Store at the
+exact authenticated receipt, close it cleanly, and inspect the new frontier before authorizing the
+next batch. Horizon generation 20 is the reference boundary: its 737,671 depth-four parents
+produce twelve sealed depth-five runs totaling 13,973,398 states. The next operation is therefore
+one independent unit rather than an inherited multi-generation batch. This is operational
+governance only: it changes neither Core search semantics nor the receipt/store protocol.
+
+Horizon generation 21 validates the second half of that rule: the authenticated layer transition
+deduplicates those runs to 13,967,878 depth-five parents at offset zero, removes the temporary
+transition material after publication, and leaves no depth-six output. The first actual depth-five
+parent unit is therefore isolated as g22. Its output size and completion status must be observed
+before any later batch is selected.
+
+### 2026-09-06 T37 F5 resumable conservative-bound parity
+
+Both exact proof engines must apply the same admissible deficit test. For a long candidate
+(`optimalLocks >= 9`), that test first compares the ordinary cell-deficit lower bound and then the
+existing future-piece interval/column-mask supply bound. R7 previously used only the first half,
+which is still exhaustive but can retain a much larger safe superset. The resumable advancing unit
+now receives the same per-advance bound configuration and caches as the synchronous engine.
+
+The change is correctness-preserving: it only omits a parent or landing when the established bound
+proves that its remaining deterministic piece supply cannot finish within the candidate's residual
+lock budget. Existing R7 checkpoints may be resumed after exact-tip admission because their old
+frontiers contain extra states, never states omitted by an unsound bound. The final record must
+state that pre-g23 work used the weaker conservative subset and post-g23 work used the shared
+stronger conservative subset; neither policy changes player-facing rules or the meaning of an
+optimal certificate.

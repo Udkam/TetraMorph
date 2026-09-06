@@ -1931,3 +1931,389 @@ product path is open.
 - Commands/evidence/blocker: docs contract recorded before code; focused tests, candidate SHA, full
   gates, browser evidence, and independent QA are pending. R69/R70 and Intro-05 external proof are
   not touched; the next action is source implementation.
+
+### T37 F5 certificate-authoring checkpoint
+
+- Task: `TETRIS-T37-F5-CURRICULUM-PUBLICATION-001`; source base remains
+  `a0821f056b148fd45a3afe9c0cbf5c2e6434c554` and the pre-source contract checkpoint is
+  `afa4b03`. The active worktree carries only the bounded F5 product/test paths plus inherited
+  T27 evidence/progress dirt, which remains excluded from this task.
+- Five non-live Easy prerequisite certificates are complete and replayable through the current
+  Core: `t3r-cascade-05` (5), `t5r-delta-07` (5), `t5r-lattice-09` (4), `t5r-rift-10` (4), and
+  `t5r-drift-08` (4). Their frozen routes, initial-state hashes, exact shorter-depth telemetry,
+  and technique signatures are awaiting one registry update together with Horizon, Terrace, and
+  Keystone; no live mastery threshold has been published from a partial set.
+- One exact, proof-quotiented Horizon verification is currently running alone from
+  `2026-09-05T06:44:59+08:00`: parent Node PID `27548`, worker PID `4520`, project root
+  `E:\Proj\reproduction-tetris`, command
+  `E:\Nodejs\node.exe E:\Proj\reproduction-tetris\node_modules\vitest\vitest.mjs run src/game/core/endgameF5CertificateDiscovery.test.ts --maxWorkers=1 --disableConsoleIntercept`,
+  with `ENDGAME_F5_CERTIFICATE_DISCOVERY=t5r-horizon-15` and
+  `NODE_OPTIONS=--max-old-space-size=8192`. Its isolated UTF-8 logs are
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-certificate.stdout.log` and
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-certificate.stderr.log`. Do not start Terrace or Keystone
+  proof until this process exits; it has no partial certificate output.
+- Focused green evidence so far: `endgameLessons.test.ts` (2), `endgame-library.css` contract
+  test (6), campaign/core roster tests (21), and `endgameSolverResults.test.ts` (3). The interim
+  typecheck reaches only the deliberately stale old F5 mastery registry IDs; replace that registry
+  after all eight certificate outputs, then rerun focused migration/progress/App/mastery tests.
+- Blocker/next action: wait for the sole Horizon certificate to complete, extract its exact output,
+  run Terrace then Keystone serially, and make the one coherent mastery-registry/publication flip.
+
+### T37 F5 Horizon proof recovery checkpoint
+
+- Task: `TETRIS-T37-F5-CURRICULUM-PUBLICATION-001`; source base remains
+  `a0821f056b148fd45a3afe9c0cbf5c2e6434c554`. The original in-memory Horizon proof exited at
+  `2026-09-05T08:38:52+08:00` after 6,832.52 seconds with Node's `Ineffective mark-compacts near
+  heap limit` error under its 8 GiB old-space ceiling. It produced no certificate, registry change,
+  or product mutation; its UTF-8 stdout/stderr remain isolated at
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-certificate.*.log` for evidence only.
+- After verifying both original PIDs had exited and that the new stage namespace was absent, one
+  replacement proof began at `2026-09-05T08:55:08+08:00`: parent PID `15076`, worker PID `5380`,
+  command `E:\Nodejs\node.exe node_modules\vitest\vitest.mjs run
+  src\game\core\endgameF5CertificateDiscovery.test.ts --maxWorkers=1 --disableConsoleIntercept`,
+  `ENDGAME_F5_CERTIFICATE_DISCOVERY=t5r-horizon-15`,
+  `ENDGAME_F5_CERTIFICATE_DISK_STAGE=%LOCALAPPDATA%\Temp\t37-f5-horizon-disk-frontier`, and
+  `NODE_OPTIONS=--max-old-space-size=4096`. Its stdout/stderr are separately redirected to
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-disk.*.log`.
+- This uses the existing immutable disk-frontier adapter only; no Terrace/Keystone or other exact
+  certificate search overlaps it. Next action: monitor only this proof, extract a complete
+  `F5_CERTIFICATE` record on success, then continue remaining certificate work serially.
+- A separate non-certificate route probe finished at `2026-09-05T09:01:33+08:00` with
+  `ENDGAME_AUTHOR_LEVEL_ID=t5r-horizon-15`, `ENDGAME_AUTHOR_MAX_LOCKS=10`, and the existing
+  `endgameMasteryAuthoring.test.ts` beam width of 900. It found no route in that bounded heuristic
+  pass after 6.84 seconds. This is neither an optimum proof nor a no-solution claim; it only leaves
+  the 11-lock candidate and the one disk-frontier proof unchanged. Its isolated logs are
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-route-probe.*.log`.
+- Independent non-certificate authoring beams for `t6r-terrace-18` and `t6r-keystone-20` ran
+  once in parallel with only the Horizon **exact** proof, each capped at 11 locks and 900 beam
+  entries. They finished at `2026-09-05T09:07:30+08:00` after `7.69 s` and `7.31 s` without a
+  bounded route. Those are not no-solution certificates and do not open their exact proof work;
+  they simply leave each 12-lock candidate unchanged. Logs remain isolated as
+  `%LOCALAPPDATA%\Temp\t37-f5-{terrace,keystone}-route-probe.*.log`.
+- The first disk-frontier run was deliberately stopped at `2026-09-05T09:16:03+08:00` after its
+  parent/worker `15076/5380` were verified as task-owned and both exited. It had reached its
+  fifth frontier and left an intact `1.42 GiB` stage at
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-disk-frontier`; do not reuse, mutate, or treat that stage
+  as proof. The stop is necessary because its already-loaded verifier lacked the later conservative
+  interval-supply bound and would produce incompatible telemetry.
+- The current sole exact Horizon process began at `2026-09-05T09:16:03+08:00`: parent `30184`,
+  worker `19780`, same one-worker command and 4 GiB old-space ceiling, with the new empty stage
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-interval-disk-frontier` and logs
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-interval-disk.*.log`. Its source adds a conservative
+  future-piece contiguous-column capacity bound only for candidates of nine or more locks; short
+  completed F5 certificates keep their prior telemetry. Focused bound tests pass `2/2`.
+- That interval-only successor was stopped cleanly at `2026-09-05T09:29:38+08:00` after its
+  verified `30184/19780` parent/worker exited. It leaves a separate intact `1.23 GiB` non-proof
+  stage at `%LOCALAPPDATA%\Temp\t37-f5-horizon-interval-disk-frontier`; it is retained but never
+  resumed, reused, or deleted in this slice. A sparse-column subset extension passed the same
+  focused bound test and is the final proof-policy revision for this task.
+- The sole current Horizon proof began at `2026-09-05T09:29:38+08:00`: parent `30576`, worker
+  `29920`, same command/heap, newly absent
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-sparse-disk-frontier`, and isolated
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-sparse-disk.*.log`. The completed Core route-search suite
+  now passes `10/10`; no further proof-strategy source edit is permitted before this process
+  produces a terminal result.
+
+### T37 Classic fixed-pace checkpoint
+
+- Task: `TETRIS-T37-F5-CURRICULUM-PUBLICATION-001`; base SHA remains
+  `a0821f056b148fd45a3afe9c0cbf5c2e6434c554`. The coordinator replaced the old arbitrary
+  Classic gravity range / three-grade display with five canonical paces and their separate v10
+  leaderboard domains. Exact paths: `src/classicPace.ts`, `src/classicPace.test.ts`,
+  `src/leaderboard.ts`, `src/leaderboard.test.ts`, `src/App.tsx`, `src/App.test.ts`,
+  `src/ui/localization.ts`, `src/styles/settings.css`, and `src/styles/result.css`.
+- Green focused evidence: `classicPace.test.ts` + `leaderboard.test.ts` (`14/14`), targeted
+  App migration/accessibility checks (`3/3`), and Settings/result/library stylesheet checks
+  (`14/14`). A full App pass reaches the expected incomplete F5 mastery-registry assertion only;
+  current typecheck likewise reaches only the three obsolete retired-ID registry entries.
+- No acceptance claim: full suite/build/browser evidence, independent QA, and the consolidated
+  player review wait for the complete F5 certificate registry flip.
+
+### T37 F5 targeted regression checkpoint
+
+- While the sole Horizon proof remains active, the coordinator ran
+  `npm.cmd exec vitest -- run src/endgameProgress.test.ts src/legacyEndgameMigration.test.ts
+  src/endgameLessons.test.ts src/game/core/endgames.test.ts src/game/core/endgameCampaign.test.ts
+  --maxWorkers=1` at `2026-09-05T09:51:24+08:00`. It produced `40/42` passing checks.
+- The only two failures are expected from the intentionally stale 20-level mastery registry:
+  Hard unlock count remains `50` instead of the revision-3 `46`, and v6 migration blocks before
+  it can project the new roster. Course metadata, campaign roster, and all unrelated migration
+  checks pass. No product source was changed by this regression checkpoint.
+- Blocker/next action: retain the non-live registry until all eight exact certificates are
+  complete; then replace the registry and rerun this exact focused command before the final suite.
+
+### T37 F5 compact proof-frontier codec decision
+
+- At `2026-09-05T12:01:17+08:00`, the verified live sparse Horizon parent/worker were
+  `30576`/`29920`; its current stage had reached depth-six raw chunks without a terminal result.
+  The converged depth-five file is 9,075,581,565 bytes. A deterministic 1,000-key sample measured
+  exactly 649 UTF-8 characters per key; a field-complete adaptive Base64URL design measures 167
+  characters per sample (3.89x reduction).
+- This opens a representation-only Core correction, not a new solver, heuristic, or bound. Preserve
+  the current stage/logs as immutable non-proof residue, verify and stop the owner pair, then change
+  only the private proof-frontier codec with strict reversible/canonical validation. A fresh absent
+  compact-codec Horizon stage is the next sole exact process after focused tests; Terrace/Keystone
+  remain closed until its terminal result.
+
+### T37 F5 compact proof-frontier codec checkpoint
+
+- The verified `29920` worker then `30576` parent were stopped at `2026-09-05T12:06+08:00`; postcheck
+  finds neither process and retains 13 stage files / 9,423.1 MiB. The outer Vitest error is the
+  expected worker-exit interruption, so this stage has no certificate status and remains untouched.
+- Changed Core/test paths: `src/game/core/endgameRouteSearch.ts`,
+  `src/game/core/endgameRouteSearch.test.ts`, and
+  `src/game/core/endgameRouteKeyFrontier.test.ts`. The private proof key is now `p1.` Base64URL with
+  canonical adaptive sparse-or-bitmap coordinate representations. It serializes every future-legal
+  state value, derives anchor/spawn invariants from the template/piece count, and rejects malformed,
+  noncanonical, trailing, and lossy forms. General route keys and proof bounds are unchanged.
+- Commands actually run: the focused codec/frontier/store/exact suite passes `47/47` with six expected
+  skips; an end-to-end `t3r-cascade-05` certificate returns the unchanged frozen optimum/telemetry
+  (`5`, `13920abc`, `1/34/313/8750`, `9098`, `326946`, `2188`). `npm.cmd run typecheck` reaches only
+  the known stale `tm-endgame-34/40/42` registry IDs. Next: source diff review then one absent-stage
+  compact-codec Horizon proof; no concurrent proof or live registry flip is authorized.
+
+### T37 F5 compact Horizon live run
+
+- Fresh path preflight was green (CPU 1%, 19.52 GiB free RAM, 186.85 GiB free C:) and found no other
+  discovery worker. The sole new run began at `2026-09-05T12:19+08:00`: parent `9812`, child `20092`,
+  4 GiB old-space, `t5r-horizon-15`, and absent
+  `%LOCALAPPDATA%\Temp\t37-f5-horizon-compact-codec-disk-frontier` with isolated compact-codec logs.
+- At `12:24:42+08:00`, its depth-four global run is 119.6 MiB versus the old 457.9 MiB same-depth
+  representation; depth-five raw output has started and worker RSS is 423.1 MiB. This confirms the
+  expected representation reduction but is not a partial certificate. Next: monitor this sole run
+  to terminal before any Terrace/Keystone action.
+
+### T37 R5C Bomb direct-feedback scope
+
+- Player feedback rejects both R5B normal and chain playback as too realistic, loud, and startling.
+  The former A/B/C stem product route is historical/rejected only. A bounded audio-only correction
+  now replaces it with a single deterministic, low-volume procedural block-break source at the
+  existing causal impact beat(s), retaining all visual/Core/timeline boundaries and deferring the
+  next human listening result to the final consolidated review.
+
+### T37 R5C source checkpoint
+
+- Task: `TETRIS-T37-F5-CURRICULUM-PUBLICATION-001`; base/current committed SHA
+  `afa4b038b89ed1caacf213a9480338abc16205ff`. Writer: coordinator. Changed paths are
+  `src/game/audio/AudioEngine.ts`, `src/game/audio/AudioEngine.test.ts`,
+  `src/game/audio/audioAssetCatalog.ts`, `src/game/audio/audioAssetCatalog.test.ts`, and new
+  `src/game/audio/bombBlockPlayback.ts` / `.test.ts`; the unrelated compact-codec fixture typing
+  correction is limited to `src/game/core/endgameRouteSearch.test.ts`.
+- Commands: focused R5C audio tests pass `33/33`; focused R5C plus compact route search passes
+  `43/43`; `npm.cmd run typecheck` has no R5C error and stops only on the deliberately stale
+  `tm-endgame-34/40/42` registry literals. No full suite, build, browser pass, acceptance claim,
+  commit, or push is made while the certificate registry remains incomplete.
+- Evidence/decision: the current runtime primes only Studio Progress, Studio Start, and Ice; the
+  rejected A/B/C WAVs retain hash/provenance as audit-only files and are not static bundle imports
+  or playback targets. Normal and chain both render one source from the same block-break grammar.
+  Blocker: Horizon exact proof remains live. Next action: monitor only that proof to terminal,
+  then run Terrace and Keystone serially before atomic mastery registration.
+
+### T37 R5C product-audition technical surface
+
+- Coordinator extends the R5C docs contract before evidence-page source. New source-only path:
+  `docs/evidence/t37/bomb-block-r5c-product-audition/**` (README, HTML/CSS, Core fixture,
+  production Renderer/AudioEngine wrappers, page controller, browser smoke, and client actions).
+  It is explicitly not a comparison or acceptance UI and cannot fetch/decode/select R5B A/B/C.
+- Real browser evidence from the current worktree passes. Normal, full row-39 chain, and reduced
+  chain each produce one 48 kHz mono current-product BufferSource with exact compositor equality;
+  frames/peaks are respectively `16896/.0754463449`, `67968/.0287683047`, and
+  `24960/.0142307030`, all finite and <= `.18`. Desktop and 390x844 full-page screenshots were
+  inspected; browser errors, page errors, request errors, overflow, and DOM board cells are zero.
+  The prescribed web-game Playwright client independently captures a nonblank canvas and state
+  with one Canvas/context/source and an exact normal buffer. All generated files live only in
+  `%LOCALAPPDATA%\Temp`; server `127.0.0.1:4193` / PID `22080` was released after the run.
+- This is provisional technical eligibility, not player acceptance. Current F5 Horizon remains the
+  sole exact proof; do not start Terrace/Keystone, flip the registry, run final gates, or ask for
+  human audio feedback until the Horizon terminal result permits the serial successor.
+
+### T37 F5 Horizon continuation monitor
+
+- At `2026-09-05T13:24:12+08:00`, coordinator verification finds the sole authorized compact-codec
+  Horizon parent/worker `9812`/`20092` alive and the isolated stage advancing through
+  `d0005-p0000-g0050.run` (`52` files / `1,190.4 MiB`; worker RSS `494.1 MiB`). The terminal
+  stdout marker and stderr are still absent. The task heartbeat remains active at 15 minutes.
+- No source, stage, historical residue, registry, or player-review state changed. Next action is
+  terminal-only handling: verify Horizon certificate, record it, then preflight and run Terrace
+  as the single serial successor.
+
+### T37 F5 Horizon continuation audit
+
+- `2026-09-05T13:37:41+08:00`: the authorized Horizon compact-codec process remains the exact
+  `9812`/`20092` pair. It now owns `65` stage runs / `1,463.3 MiB`; newest
+  `d0005-p0000-g0063.run` is current, stdout has no certificate/terminal marker, and stderr is
+  empty. This is live progress only.
+- Coordinator separately reviewed D2B, fixed Classic pace, long-clear reward, and Falling Fold
+  static contracts without running final gates or changing source. The unique next action stays
+  terminal Horizon handling, then serial Terrace preflight/run.
+- A completed immutable compact run `d0005-p0000-g0000.run` is read-only sampled at `22,015,710`
+  bytes / `131,046` records: every key is canonical `p1.`, ordering is strictly byte-increasing,
+  and terminal LF is present. This does not replace the certifier's merge/readback proof. At
+  `13:41:34+08:00`, live stage progress is `68` runs / `1,526.3 MiB`, no terminal marker/stderr.
+- Focused non-proof technical regression command passes `52/52` in seven files covering R5C
+  block-break/catalog/AudioEngine, Classic pace, long-clear tail, Falling Fold icon, and D2B
+  stylesheet contract. It does not claim the deferred final suite/build/browser/QA gate. At
+  `13:48:47+08:00`, Horizon continues at `75` runs / `1,673.3 MiB`, no terminal marker/stderr.
+- Static runtime import review finds current `AudioEngine` depends only on `bombBlockPlayback`.
+  The rejected WAV/stem names occur solely in archive metadata and test-only history; no active
+  product import reintroduces them. Final human listening remains deferred.
+
+### T37 F5 Horizon continuous monitor
+
+- Through `2026-09-05T13:58:45+08:00`, the sole `9812`/`20092` Horizon process continues from
+  `79` to `84` compact runs / `1,862.2 MiB`, newest `d0005-p0000-g0082.run`; CPU is active,
+  stdout has no certificate/terminal marker, and stderr is empty. One malformed monitor command
+  was rejected at PowerShell parse time before executing any file operation; the corrected next
+  check is clean.
+- No proof source, stage, registry, product, or acceptance transition. Next remains Horizon
+  terminal verification followed only by fresh Terrace serial preflight/run.
+
+### T37 F5 Horizon depth-six live checkpoint
+
+- At `2026-09-05T16:17:51+08:00`, coordinator confirms the same sole compact-codec Horizon
+  parent/worker `9812`/`20092` remains CPU-active. The depth-five merged predecessor is retained;
+  depth-six `p0000` has `44` sealed chunks through `d0006-p0000-g0043.run`. Stdout contains no
+  certificate or Vitest terminal marker, stderr is empty, and depth seven has not started.
+- This read-only checkpoint changes no proof/product source, stage artifact, registry, evidence,
+  index, commit, push, or player-review state. Next action remains verified Horizon terminal
+  handling followed only by a fresh absent-stage Terrace preflight and serial run.
+
+### T37 F5 Horizon restart recovery
+
+- At `2026-09-06T05:28+08:00`, coordinator verifies the previous compact Horizon process has no
+  terminal certificate: stage ends at `d0006-p0000-g0120.run`, stdout/stderr contain no terminal
+  result, and no relevant Node process remains. Windows Event `1074` records user-initiated
+  restart at `2026-09-05T20:35:02+08:00`; available C: space is `180.84 GiB`.
+- The old stage is immutable non-proof residue. Coordinator opens only an opt-in test/authoring
+  adapter to the already-existing resumable Core proof Store: fresh stage, exact manifest-tip
+  receipt chain, one cleanly suspended advancement per invocation, and no Core/product/registry
+  semantic change. Base remains `afa4b038b89ed1caacf213a9480338abc16205ff`; no source, stage,
+  index, commit, push, or player-review action has occurred yet. Next action: direct adapter
+  implementation and focused lifecycle proof, then a fresh serial Horizon run.
+
+### T37 F5 checkpointed proof adapter candidate
+
+- Changed paths: `src/game/core/endgameF5CertificateDiscovery.test.ts`,
+  `scripts/run-endgame-f5-resumable-proof.mjs`, and
+  `src/authoring/runEndgameF5ResumableProof.test.mjs`. The opt-in test route makes one existing
+  R7 `advanceOptimalEndgameRouteProof` call, requires a clean Store `suspend`, and emits either an
+  intermediate bound checkpoint or a complete certificate. The authoring runner restarts Vitest
+  per advancement and appends an immutable receipt bound to level, candidate route SHA-256, stage,
+  owner, generation, and manifest hash.
+- Commands actually green: `node --check scripts/run-endgame-f5-resumable-proof.mjs`; direct
+  receipt test `2/2`; `endgameProofFrontierStore`, `endgameDiskFrontier`, and receipt regression
+  `225 passed / 2 skipped`; isolated Cascade R7 lifecycle through receipt generations `0..8`; and
+  a final Store resume producing the known exact five-lock Cascade certificate. `npm.cmd run
+  typecheck` reports only the known pre-flip `tm-endgame-34/40/42` registry references.
+- No Horizon successor stage has started. The old compact stage remains untouched. Next action is
+  one fresh Horizon R7 stage/receipt preflight, then exactly one cleanly checkpointed advancement
+  at a time; Terrace/Keystone, registry flip, final gates, commit, push, and player review remain
+  closed.
+
+### T37 F5 Horizon R7 sealed-checkpoint receipt gap
+
+- The active R7 batch safely seals generation 9 (`manifest-g00009.json`) but terminates before
+  its runner appends receipt 9. Diagnostics find no relevant Node process, no `.part` file, and a
+  contiguous receipt chain only through generation 8. A direct read-only R7 resume pins the
+  generation-9 manifest tip `6FCE2437...AED6BA1`, loads `searching` depth 4 / parent offset 65536,
+  and reports a clean suspension.
+- This is an authenticated checkpoint recovery question, not a proof result. Coordinator has
+  documented a runner-only no-advance mode: explicit next tip; Store admission; checkpoint-binding
+  level/route-hash check against receipt 8; no dirty/complete/gapped state; canonical receipt only
+  after clean suspend. Next action is implementation plus a short real R7 integration test before
+  the one permitted Horizon receipt recovery. No stage artifact is manually written or changed.
+
+### T37 F5 Horizon R7 receipt 9 recovery verified
+
+- Implemented only the authoring runner and direct receipt test. The runner accepts recovery only
+  with paired explicit generation/SHA flags, next-generation continuity, no `.part` residue,
+  exact R7 Store admission, a searching checkpoint, candidate-binding level/route hash equality,
+  and clean suspension; it then exits after appending the receipt. A complete or ambiguous state
+  remains fail-closed. Focused R7 regression is green: `226 passed / 2 skipped`.
+- Fresh preflight and the one permitted recovery append `tip-g00009.json` for Horizon tip
+  `6FCE2437...AED6BA1`. Independent ledger plus Store readback confirms generations `0..9`,
+  route `458DD677...E348C663`, searching depth 4 / parent offset 65536, zero part files, and a
+  clean suspension. No proof unit was advanced during recovery. Next: one recorded background
+  generation-10 advancement only; all serial successors and product/publication gates remain
+  closed.
+
+### T37 F5 Horizon R7 generation 10 timing correction
+
+- Recorded background runner `27776` completes its Store work and the child emits generation-10
+  checkpoint tip `09FC51A8...D5A87FB`, depth 4 / parent offset 131072. It exceeds the discovery
+  test's inherited 600-second timeout at 642.287 seconds, so Vitest exits nonzero and the runner
+  properly refuses to append receipt 10. Logs are retained in the named external run directory;
+  no source/stage/receipt was manually changed.
+- Next source slice is test-only: set a pinned 30-minute timeout only when explicit R7 resumable
+  configuration is active, leaving ordinary discovery at 10 minutes. Re-run direct R7 tests,
+  Store-admit generation 10, then recover its one missing receipt with the already-tested explicit
+  no-advance mechanism. No alternate proof, Terrace/Keystone, or registry operation opens.
+
+### T37 F5 Horizon R7 receipt 10 recovered
+
+- The R7-only `1,800,000 ms` test allowance is source-limited to explicit resumable configuration;
+  direct short lifecycle tests pass (`3/3`) and normal discovery remains skipped. It does not alter
+  the runner's nonzero-child rejection rule.
+- Fresh preflight then admits the sealed generation-10 tip `09FC51A8...D5A87FB` with no process or
+  `.part` residue. One explicit no-advance invocation appends `tip-g00010.json`, binding the same
+  Horizon route and searching checkpoint at depth 4 / parent offset 131072. No other stage or
+  proof unit changed. Next: one background generation-11 unit only, using the corrected R7 timeout.
+
+### T37 F5 Horizon R7 generation 11 normal publication
+
+- Recorded owner `7204` / Vitest `30400` / worker `4044` completes with zero stderr. Its sole
+  runner marker and canonical receipt agree on generation 11, tip `92F52AAD...E3153A1`, route
+  `458DD677...E348C663`, searching depth 4 / parent offset 196608. The R7 30-minute allowance
+  permits the long unit to finish normally rather than reclassifying it as a failed child.
+- Independent ledger readback confirms receipts `0..11` and no `.part` residue. This is progress
+  only; next is fresh preflight plus one background generation-12 unit. Terrace/Keystone, registry,
+  final verification, publication, and player review stay closed.
+
+### T37 F5 Horizon R7 generation 12 normal publication
+
+- Generation 12 closes normally with zero stderr and receipt `tip-g00012.json`: route
+  `458DD677...E348C663`, tip `DC45BFD1...B863C8FA`, searching depth 4 / parent offset 262144.
+  Ledger readback sees receipts `0..12` and zero part files. No product or successor proof path
+  changed. Next remains one preflighted background generation-13 unit only.
+
+### T37 F5 Horizon R7 generation 13 and serial depth-four batch
+
+- Generation 13 publishes normally with receipt `tip-g00013.json`, tip
+  `F521C7A5...44351361`, route `458DD677...E348C663`, depth 4 / parent offset 327680, and no
+  stderr/part residue. Read-only Store admission reports 737,671 depth-four frontier parents, so
+  409,991 remain at this offset.
+- Coordinator authorizes one bounded single-owner **serial** `--max-advances 7` run for g14–g20:
+  every child remains one 65,536-parent R7 unit, writes its own authenticated receipt before the
+  next starts, uses the 30-minute R7-only timeout, and runs no other proof concurrently. A failure
+  stops the batch; Terrace/Keystone, registry, final gates, and player review remain closed.
+
+### T37 F5 Horizon R7 depth-four closure
+
+- The sole owner `11260` publishes normal receipts for g14–g20 with empty stderr and no part-file
+  residue. The ledger ends at g20 / `58FB88E8...D23F5A65`; its candidate binding remains
+  `458DD677...E348C663`. This is an authenticated `searching` checkpoint, not a terminal claim.
+- Direct Store readback at that exact tip is advanceable and cleanly suspended: depth four is
+  exhausted at 737,671 parents / 13,977,409 transitions, and the next depth consists of twelve
+  sealed runs totaling 13,973,398 states. Coordinator authorizes one fresh g21 advancement only,
+  then an independent readback. No successor level, registry, product, final-gate, or player-review
+  work is opened.
+
+### T37 F5 Horizon R7 g21 layer transition
+
+- Owner `29768` completes g21 normally and releases its temporary layer material after atomic
+  publication. Receipt g21 / `7D3FDCE9...B8556C69` remains `searching`; stderr and part residue
+  are empty, and the candidate binding is unchanged. Direct Store re-admission reports depth 5,
+  offset 0, 13,967,878 deduplicated parents, and no next runs.
+- This is only a verified layer boundary. Coordinator permits one g22 parent-work unit after a
+  fresh exact-tip preflight, then another independent receipt/Store audit. No broader batch or
+  successor work is authorized.
+
+### T37 F5 Horizon R7 g22 and conservative-bound parity
+
+- Owner `8568` publishes g22 normally: `129558BA...98D5BEDE`, depth 5 / offset 65536, unchanged
+  candidate binding, empty stderr, and no part residue. It is intermediate proof progress only.
+- Coordinator's source audit identifies that R7's advancing unit omits the existing synchronous
+  long-proof interval/column-mask capacity bound. Open a bounded Core/test parity repair that
+  reuses this already-conservative test with per-advance caches. The g0–g22 prefix overexplores
+  rather than underexplores, so an exact-tip continuation remains mathematically safe after direct
+  tests; document the policy boundary and do not start any other workstream.
