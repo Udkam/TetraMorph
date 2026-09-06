@@ -4884,3 +4884,31 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
 - Next action: integrate only the playable sensory/Classic/46-level Endgame/route/presentation
   work, ensure the active mastery registry contains no unverified claims, then run the consolidated
   validation, Browser evidence, QA, commits, and push before player review.
+
+### 2026-09-06 — final integration candidate
+
+- Task: `T37/unified-sensory-curriculum`; immutable adopted base
+  `745edb0e863ace5034131526ba7aee51cb71c07a`; release-review base `8034e66`; product source
+  candidate `92ec0fc`; evidence candidate `9692ee2`. Exact candidate paths are the 74 paths
+  printed by `git diff --name-only 8034e66..9692ee2`; that reviewed range contains no inherited
+  `docs/evidence/t27/**`, `docs/evidence/t27-r1-followup/**`, or `progress.md` path.
+- Product checkpoints: `20c1b76`, `540cd60`, `2e61f6b`, `9478876`, `5d7784d`, `0b01306`,
+  `98622c3`, `16f1aba`, `7670025`, `92ec0fc`; final route/Bomb evidence checkpoint `9692ee2`.
+  They deliver only the deferred-proof-safe registry, quiet block-break audio, five Classic paces,
+  46-level course/migration, UI and route/category transitions, and bounded evidence artifacts.
+- Commands actually run after the last product change: `npm.cmd run typecheck`; `npm.cmd run test`
+  (`775 passed / 17 skipped`); `npm.cmd run build`; the prescribed web-game Playwright client;
+  `node docs/evidence/t37/route-handoff-d1/capture-route-handoff.mjs`; the real Bomb
+  `browser-smoke.mjs`; and a real `/endgames` 5/25/16 tab-motion smoke. The D1 audit has zero
+  failures/browser errors and its manifest pins 23 generated files to `92ec0fc`.
+- Read-only integration QA: `git diff --check 8034e66..9692ee2` is clean; static review confirms
+  the fixed Classic pairs, bounded no-sample Bomb contract, long-clear reward-tail implementation,
+  and the three-certificates-only lookup. Horizon/Terrace/Keystone return no fabricated certificate.
+  The Survival optimization proposal remains marked `AUDIT ONLY / NOT IMPLEMENTED`.
+- Evidence server ownership: project `E:\Proj\reproduction-tetris`; command
+  `node ...\\vite.js --host 127.0.0.1 --port 4192 --strictPort`; listener PID `27620`, parent
+  `29700`, started `2026-09-06T18:36:18.52441+08:00`, purpose final T37 browser evidence. It was
+  explicitly stopped after capture; `4192` had no remaining listener.
+- Blocker/next action: automated delivery is ready for bounded changelog/documentation commit and
+  coordinator push. Player visual/listening acceptance is still required, especially for normal
+  Bomb and chained clearing; exact optimality proof is intentionally outside this release.

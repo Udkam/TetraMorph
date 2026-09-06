@@ -2415,3 +2415,23 @@ product path is open.
   corrected to require only real verified certificates.
 - Next action: source/test integration, concentrated final validation and Browser evidence, then
   independent QA, changelog, bounded commits, coordinator push, and consolidated player review.
+
+### T37 2026-09-06 final browser and integration candidate
+
+- Release-review range: `8034e66..9692ee2`; product source candidate `92ec0fc`. The exact 74
+  changed paths are reproducibly pinned by `git diff --name-only 8034e66..9692ee2`; scope audit
+  finds zero T27/progress paths. The product is the real 46-level `5 / 25 / 16` course, migration,
+  fixed Classic paces, quiet procedural Bomb block-break playback, D1/D2B interaction, and the
+  existing long-clear reward presentation. Exactly three pre-existing verified certificates stay
+  active; Horizon, Terrace, and Keystone return `null` and remain deferred.
+- Actual final commands: focused integration tests; `npm.cmd run typecheck`; `npm.cmd run test`
+  (`775 passed / 17 skipped`); `npm.cmd run build`; route capture; real product-Bomb smoke; and
+  real Endgame tab smoke. D1 audit/manifest bind to `92ec0fc` with zero failures/errors; Bomb
+  normal/chain/reduced smoke passes one Canvas/source and lifecycle cleanup; Endgame shows
+  5/25/16, animated category/detail changes, and zero horizontal overflow/errors.
+- Read-only integration audit reports `git diff --check` clean, no stale fake certificate lookup,
+  fixed paces `60/18`, `48/12`, `36/4.8`, `24/4.8`, `12/4.8`, and retains Survival as an audit-only
+  proposal. Owned local Vite listener `27620` on 4192 (parent `29700`) was stopped after capture;
+  port is clear.
+- Next action: coordinator documentation/changelog commit and push; then obtain one consolidated
+  player verdict. No exact-proof action is authorized by this integration record.

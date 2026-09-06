@@ -11905,8 +11905,29 @@ inherited T27 evidence paths and `progress.md` outside every T37 commit.
 The one React-facing checkpoint is exactly `src/App.tsx`, `src/App.test.ts`,
 `src/styles/endgame-library.css`, `src/styles/endgame-library.test.ts`,
 `src/styles/settings.css`, `src/styles/result.css`, and `src/ui/localization.ts`. It exceeds the
-normal hand-authored addition budget by four lines because the same composed App surface must keep
+normal hand-authored addition budget by three lines because the same composed App surface must keep
 the fixed Classic selector, five/25/16 Endgame view, archived-route notice, D2B transitions, and
 their responsive/accessibility contracts consistent in one render tree. Its focused gate is
 `src/App.test.ts` plus `src/styles/endgame-library.test.ts`; it remains separate from browser
 evidence and QA.
+
+### 2026-09-06 T37 final integration candidate and player-review boundary
+
+- Product candidate `92ec0fcca276462ac81757f5e7d0c8ad2e80c944` and final evidence candidate
+  `9692ee2` complete the player-authorized non-proof release: a restrained procedural Bomb
+  block-break cue, five fixed Classic paces, the playable 46-level `5 / 25 / 16` Endgame course,
+  migration/archived-route handling, D1 route handoff, D2B category/detail motion, and existing
+  count-only long-clear reward tails/icons. The Survival document remains an audit-only proposal.
+- Typecheck, the full suite (`775 passed / 17 skipped` across `62 passed / 3 skipped` files), and
+  the production build passed. The build retains only Vite's non-failing 624 kB chunk-size warning.
+- Final browser evidence binds D1 audit/manifest to product candidate `92ec0fc` with zero failures
+  and browser errors. The real Bomb page passes normal, 20-beat chain, and reduced paths with one
+  Canvas/source and teardown cleanup; the actual Endgame page verifies 5 Intro, 25 Easy, and 16
+  Hard cards, tab motion, no horizontal overflow, and zero browser errors.
+- Read-only integration audit of `8034e66..9692ee2` reports a clean whitespace diff, 74 in-scope
+  paths, and no inherited T27 path. The registry retains only three existing verified certificates;
+  Horizon, Terrace, and Keystone remain explicitly deferred and absent from certificate lookup.
+- The owned Vite evidence server (`node vite --host 127.0.0.1 --port 4192 --strictPort`, listener
+  PID `27620`, parent `29700`, started 18:36:18+08:00 for T37 final browser evidence) was stopped
+  after capture; port 4192 has no listener. No code or automated gate remains before the bounded
+  documentation commit/push and the player's consolidated visual/listening acceptance.

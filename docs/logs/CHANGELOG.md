@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-06 — T37 unified sensory curriculum integrated; player review open
+
+- Player-directed scope excludes the unfinished Horizon, Terrace, and Keystone exact proofs. They
+  are retained as deferred non-release residue, not implied by the product; the mastery registry
+  exposes only its three genuine existing certificates while the 46-level `5 / 25 / 16` course
+  remains fully playable.
+- Product range `8034e66..92ec0fc` adds the quiet procedural Bomb block-break cue, fixed five
+  Classic pace presets, Endgame migration/course/UI, D1 route recapture, D2B category/detail
+  motion, and the verified long-clear reward presentation. The Survival optimization output stays
+  explicitly audit-only rather than changing Survival rules.
+- Final typecheck, full suite (`775 passed / 17 skipped`), and build pass. Vite reports only its
+  non-failing 624 kB chunk-size warning. Read-only integration review of
+  `8034e66..9692ee2` finds no whitespace defect, no inherited T27 path, and no fabricated deferred
+  certificate.
+- Final Chromium evidence binds D1 to source `92ec0fc` with zero failures/errors, confirms
+  normal/chain/reduced product Bomb behavior with lifecycle cleanup, and verifies real Endgame
+  5/25/16 category motion without horizontal overflow. The final evidence commit is `9692ee2`.
+- Player acceptance remains the last gate: judge normal Bomb and chained clear timbre/loudness,
+  Classic pace feel, Endgame playability, and page/category transitions. Exact optimality proof is
+  deliberately not part of this review.
+
 ## 2026-08-16 — T37 R5B provisional product audio implemented
 
 - Added byte-exact R5A A/B/C stems as provisional product assets, a strict single-buffer
