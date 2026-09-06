@@ -31,6 +31,7 @@ import App, {
   RunResultSummary,
   RunStats,
   REDUCED_MOTION_STORAGE_KEY,
+  CLASSIC_PACE_STORAGE_KEY,
   CLASSIC_GRAVITY_RANGE_STORAGE_KEY,
   SettingsRecord,
   scoreRecordRank,
@@ -701,13 +702,13 @@ describe('DEV QA state snapshot isolation', () => {
 });
 
 describe('Endgame progress boot persistence', () => {
-  it('loads an existing canonical v6 record without rewriting it', () => {
+  it('loads an existing canonical v7 record without rewriting it', () => {
     const currentId = CAMPAIGN_LEVELS[1]!.id;
     const current = JSON.stringify({
-      version: 6,
+      version: 7,
       campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: [currentId],
-      bestPieceCounts: { [currentId]: 7 },
+      bestLockedPieceCounts: { [currentId]: 7 },
     });
     localStorage.setItem(ENDGAME_PROGRESS_KEY, current);
 
@@ -852,10 +853,10 @@ describe('Endgame completion ceremony', () => {
     first.view.unmount();
 
     const priorBest: EndgameProgress = {
-      version: 6,
+      version: 7,
       campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: [endgameId],
-      bestPieceCounts: { [endgameId]: 12 },
+      bestLockedPieceCounts: { [endgameId]: 12 },
     };
     const record = await renderCompletion(priorBest, 9);
     expect(record.view.container.querySelector<HTMLElement>('[data-testid="endgame-celebration"]')?.dataset.outcome).toBe('record');
@@ -865,10 +866,10 @@ describe('Endgame completion ceremony', () => {
     record.view.unmount();
 
     const replayBest: EndgameProgress = {
-      version: 6,
+      version: 7,
       campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: [endgameId],
-      bestPieceCounts: { [endgameId]: 9 },
+      bestLockedPieceCounts: { [endgameId]: 9 },
     };
     const replay = await renderCompletion(replayBest, 9);
     expect(replay.view.container.querySelector<HTMLElement>('[data-testid="endgame-celebration"]')?.dataset.outcome).toBe('replay');
@@ -909,7 +910,7 @@ describe('Endgame completion ceremony', () => {
 
     expect(JSON.parse(localStorage.getItem(ENDGAME_PROGRESS_KEY) ?? 'null')).toMatchObject({
       completedLevelIds: [level.id],
-      bestPieceCounts: { [level.id]: 13 },
+      bestLockedPieceCounts: { [level.id]: 13 },
     });
     const resultButtons = [...view.container.querySelectorAll<HTMLButtonElement>('.action-sheet button')];
     expect(resultButtons.map((button) => button.textContent)).toContain('返回关卡库');
@@ -1674,9 +1675,9 @@ describe('T6 frontend mode binding', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     const leaderboard = {
-      version: 9 as const,
+      version: 10 as const,
       marathon: [{
-        version: 9 as const,
+        version: 10 as const,
         mode: 'marathon' as const,
         outcome: 'top-out' as const,
         score: 3_210,
@@ -1687,7 +1688,7 @@ describe('T6 frontend mode binding', () => {
         completedAt: '2026-07-24T00:00:00.000Z',
         classicStartingGravityTicks: 36,
         classicGravityFloorTicks: 4.8,
-        classicGrade: 'challenge' as const,
+        classicGrade: 'standard' as const,
       }],
       race: [],
       sprint: [],
@@ -1788,8 +1789,9 @@ describe('T6 frontend mode binding', () => {
     expect(onLanguageChange).toHaveBeenCalledExactlyOnceWith('en');
     const restart = view.container.querySelector<HTMLButtonElement>('[data-testid="settings-restart"]')!;
     const resume = [...sheet.querySelectorAll<HTMLButtonElement>('button')].find((button) => button.textContent === '继续游戏')!;
-    const startingSpeed = view.container.querySelector<HTMLInputElement>('[data-testid="classic-starting-speed"]')!;
-    const fastestSpeed = view.container.querySelector<HTMLInputElement>('[data-testid="classic-fastest-speed"]')!;
+    const calmPace = view.container.querySelector<HTMLButtonElement>('[data-testid="classic-pace-calm"]')!;
+    const relaxedPace = view.container.querySelector<HTMLButtonElement>('[data-testid="classic-pace-relaxed"]')!;
+    const standardPace = view.container.querySelector<HTMLButtonElement>('[data-testid="classic-pace-standard"]')!;
     const mineralMist = view.container.querySelector<HTMLButtonElement>('[data-testid="theme-mineral-mist"]')!;
     const deepTide = view.container.querySelector<HTMLButtonElement>('[data-testid="theme-deep-tide"]')!;
     const sunstone = view.container.querySelector<HTMLButtonElement>('[data-testid="theme-sunstone"]')!;
@@ -1809,14 +1811,14 @@ describe('T6 frontend mode binding', () => {
       [english, 'ArrowDown', deepTide],
       [motion, 'ArrowDown', sunstone],
       [toggle, 'ArrowUp', chinese],
-      [toggle, 'ArrowDown', startingSpeed],
+      [toggle, 'ArrowDown', calmPace],
       [mineralMist, 'ArrowRight', deepTide],
       [deepTide, 'ArrowRight', sunstone],
-      [deepTide, 'ArrowDown', startingSpeed],
-      [sunstone, 'ArrowDown', fastestSpeed],
+      [deepTide, 'ArrowDown', relaxedPace],
+      [sunstone, 'ArrowDown', standardPace],
       [restart, 'ArrowRight', resume],
       [resume, 'ArrowLeft', restart],
-      [resume, 'ArrowUp', startingSpeed],
+      [resume, 'ArrowUp', relaxedPace],
     ];
     for (const [from, key, to] of routes) assertArrowRoute(from, key, to);
 
@@ -1848,17 +1850,17 @@ describe('T6 frontend mode binding', () => {
     const completed = {
       ...defaultEndgameProgress(),
       completedLevelIds: [level.id],
-      bestPieceCounts: { [level.id]: 7 },
+      bestLockedPieceCounts: { [level.id]: 7 },
     };
     const completedView = render(createElement(SettingsRecord, {
-      mode: 'endgame', endgameId: level.id, leaderboard: { version: 9, marathon: [], race: [], sprint: [] }, progress: completed,
+      mode: 'endgame', endgameId: level.id, leaderboard: { version: 10, marathon: [], race: [], sprint: [] }, progress: completed,
     }));
     expect(completedView.container.textContent).toBe('当前关纪录最少 7 步');
     expect(completedView.container.textContent).not.toMatch(/消行|分|连锁|最长/);
     completedView.unmount();
 
     const freshView = render(createElement(SettingsRecord, {
-      mode: 'endgame', endgameId: level.id, leaderboard: { version: 9, marathon: [], race: [], sprint: [] }, progress: defaultEndgameProgress(),
+      mode: 'endgame', endgameId: level.id, leaderboard: { version: 10, marathon: [], race: [], sprint: [] }, progress: defaultEndgameProgress(),
     }));
     expect(freshView.container.textContent).toBe('当前关纪录尚未通关');
     freshView.unmount();
@@ -2296,7 +2298,7 @@ describe('T6 frontend mode binding', () => {
     expect(sourceStyles).not.toMatch(/\.mode-gates--workbench \.mode-gate__action svg \{[^}]*transform:/s);
     expect(sourceStyles).toContain('transform: translateX(-.38em)');
     expect(sourceStyles).toContain('stroke: #ffffff');
-    expect(endgameLibraryStyles).toMatch(/data-endgame-category="easy"[^}]*repeat\(6,/s);
+    expect(endgameLibraryStyles).toMatch(/data-endgame-category="easy"[^}]*repeat\(5,/s);
     expect(endgameLibraryStyles).toMatch(/\[lang="en"\] \.endgame-gallery__page\s*\{[^}]*font-family:\s*var\(--font-ui\)/s);
     const iconDocument = new DOMParser().parseFromString(sourceIndex, 'text/html');
     expect(iconDocument.querySelector('link[rel="icon"][type="image/svg+xml"][sizes="any"][href="/favicon.svg"]')).not.toBeNull();
@@ -2457,89 +2459,63 @@ describe('T6 frontend mode binding', () => {
     view.unmount();
   });
 
-  it('persists a bounded Classic pace interval and applies it to the next runtime only', async () => {
+  it('migrates arbitrary Classic ranges into five fixed presets and applies them to the next runtime only', async () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => { callback(0); return 1; }));
     localStorage.setItem('tetramorph:language:v1', 'zh-CN');
     localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['marathon']));
 
     expect(parseClassicGravityRange(null)).toEqual({ startingTicks: 36, floorTicks: 4.8 });
-    expect(parseClassicGravityRange('31')).toEqual({ startingTicks: 30, floorTicks: 4.8 });
+    expect(parseClassicGravityRange('31')).toEqual({ startingTicks: 36, floorTicks: 4.8 });
     expect(parseClassicGravityRange('{"startingTicks":31,"floorTicks":17}')).toEqual({
-      startingTicks: 30,
-      floorTicks: 18,
+      startingTicks: 48,
+      floorTicks: 12,
     });
+    expect(parseClassicGravityRange('{"version":2,"paceId":"expert"}')).toEqual({ startingTicks: 12, floorTicks: 4.8 });
+    localStorage.setItem(CLASSIC_GRAVITY_RANGE_STORAGE_KEY, '{"startingTicks":31,"floorTicks":17}');
 
     const view = render(createElement(App));
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
     await act(async () => Promise.resolve());
     const runtime = runtimeHarness.instances.at(-1)!;
-    expect(runtime.options.classicStartingGravityTicks).toBe(36);
-    expect(runtime.options.classicGravityFloorTicks).toBe(4.8);
-    expect(runtime.getState().classicStartingGravityTicks).toBe(36);
-    expect(runtime.getState().classicGravityFloorTicks).toBe(4.8);
+    expect(runtime.options.classicStartingGravityTicks).toBe(48);
+    expect(runtime.options.classicGravityFloorTicks).toBe(12);
+    expect(runtime.getState().classicStartingGravityTicks).toBe(48);
+    expect(runtime.getState().classicGravityFloorTicks).toBe(12);
 
     act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="open-settings"]')?.click());
-    const startingRange = view.container.querySelector<HTMLInputElement>('[data-testid="classic-starting-speed"]')!;
-    const floorRange = view.container.querySelector<HTMLInputElement>('[data-testid="classic-fastest-speed"]')!;
-    const setRangeValue = (input: HTMLInputElement, value: string) => {
-      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, value);
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    };
-    expect(startingRange.value).toBe('4');
-    expect(floorRange.value).toBe('13');
+    const presetButtons = [...view.container.querySelectorAll<HTMLButtonElement>('button[data-testid^="classic-pace-"]')];
+    expect(presetButtons).toHaveLength(5);
+    expect(presetButtons.map((button) => button.dataset.classicPace)).toEqual(['calm', 'relaxed', 'standard', 'swift', 'expert']);
+    expect(view.container.querySelector('[data-testid="classic-pace-relaxed"]')?.getAttribute('aria-checked')).toBe('true');
+    const standardPace = view.container.querySelector<HTMLButtonElement>('[data-testid="classic-pace-standard"]')!;
+    act(() => standardPace.click());
+    expect(localStorage.getItem(CLASSIC_PACE_STORAGE_KEY)).toBe('{"version":2,"paceId":"standard"}');
+    expect(runtime.setClassicGravityRange).toHaveBeenLastCalledWith(36, 4.8);
+    expect(view.container.querySelector('[data-testid="classic-pace-summary"]')?.textContent).toBe('开局速度 0.6 → 最快速度 0.08 秒/格');
+    const activeStandardPace = view.container.querySelector<HTMLButtonElement>('[data-testid="classic-pace-standard"]')!;
     act(() => {
-      setRangeValue(floorRange, '4');
+      activeStandardPace.focus();
+      activeStandardPace.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
     });
-    const speedRail = view.container.querySelector<HTMLDivElement>('.classic-speed-control__rail')!;
-    vi.spyOn(speedRail, 'getBoundingClientRect').mockReturnValue({
-      left: 0,
-      right: 140,
-      top: 0,
-      bottom: 28,
-      width: 140,
-      height: 28,
-      x: 0,
-      y: 0,
-      toJSON: () => ({}),
-    });
-    act(() => {
-      speedRail.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: 140 }));
-    });
-    expect(localStorage.getItem(CLASSIC_GRAVITY_RANGE_STORAGE_KEY)).toBe('{"startingTicks":36,"floorTicks":4.8}');
-    expect(document.activeElement).toBe(floorRange);
-    act(() => {
-      setRangeValue(startingRange, '9');
-    });
-    act(() => {
-      setRangeValue(floorRange, '12');
-    });
-
-    expect(localStorage.getItem(CLASSIC_GRAVITY_RANGE_STORAGE_KEY)).toBe('{"startingTicks":9,"floorTicks":5.4}');
-    expect(runtime.setClassicGravityRange).toHaveBeenLastCalledWith(9, 5.4);
-    const selectedValues = [...view.container.querySelectorAll<HTMLOutputElement>('.classic-speed-control__value')]
-      .map((output) => output.textContent);
-    expect(selectedValues).toEqual(['开局速度0.15', '最快速度0.09']);
-    expect(startingRange.getAttribute('aria-valuetext')).toBe('0.15 秒/格');
-    expect(floorRange.getAttribute('aria-valuetext')).toBe('0.09 秒/格');
-    expect(runtime.getState().classicStartingGravityTicks).toBe(36);
-    expect(runtime.getState().classicGravityFloorTicks).toBe(4.8);
-    expect(view.container.querySelectorAll('.classic-speed-control__rail')).toHaveLength(1);
-    expect(view.container.querySelectorAll('.classic-speed-control__input')).toHaveLength(2);
+    expect(localStorage.getItem(CLASSIC_PACE_STORAGE_KEY)).toBe('{"version":2,"paceId":"swift"}');
+    expect(runtime.setClassicGravityRange).toHaveBeenLastCalledWith(24, 4.8);
+    expect(view.container.querySelector('[data-testid="classic-pace-swift"]')?.getAttribute('aria-checked')).toBe('true');
+    expect(runtime.getState().classicStartingGravityTicks).toBe(48);
+    expect(runtime.getState().classicGravityFloorTicks).toBe(12);
     expect(view.container.querySelector('.classic-speed-control__heading em')?.textContent).toBe('秒/格');
-    expect(view.container.querySelector('[data-testid="classic-difficulty-grade"]')?.textContent).toBe('难度 · 挑战');
-    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__track i\s*\{[^}]*left:\s*var\(--classic-speed-start\)[^}]*width:\s*calc\(var\(--classic-speed-floor\) - var\(--classic-speed-start\)\)/s);
-    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__input\s*\{[^}]*appearance:\s*none[^}]*direction:\s*ltr[^}]*pointer-events:\s*none/s);
-    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__input::-(?:webkit-slider-thumb|moz-range-thumb)\s*\{[^}]*pointer-events:\s*auto[^}]*border:\s*4px solid var\(--settings-accent\)/s);
-    expect(sourceSettingsStyles).toMatch(/\.settings-console \.classic-speed-control__input\[data-arrow-nav\]\[data-arrow-selected="true"\]\s*\{[^}]*outline:\s*0/s);
-    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__input:focus-visible::-(?:webkit-slider-thumb|moz-range-thumb)\s*\{[^}]*box-shadow:[^}]*var\(--focus\)/s);
+    expect(view.container.querySelector('[data-testid="classic-difficulty-grade"]')?.textContent).toBe('节奏预设 · 迅捷');
+    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__presets\s*\{[^}]*repeat\(5,\s*minmax\(44px,\s*1fr\)\)/s);
+    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__preset\s*\{[^}]*min-height:\s*52px/s);
+    expect(sourceSettingsStyles).toMatch(/\.classic-speed-control__preset\[aria-checked="true"\]\s*\{[^}]*background:/s);
+    expect(sourceSettingsStyles).not.toContain('.classic-speed-control__input');
     view.unmount();
 
     const resumed = render(createElement(App));
     act(() => resumed.container.querySelector<HTMLButtonElement>('[data-testid="enter-marathon"]')?.click());
     await act(async () => Promise.resolve());
-    expect(runtimeHarness.instances.at(-1)?.options.classicStartingGravityTicks).toBe(9);
-    expect(runtimeHarness.instances.at(-1)?.options.classicGravityFloorTicks).toBe(5.4);
+    expect(runtimeHarness.instances.at(-1)?.options.classicStartingGravityTicks).toBe(24);
+    expect(runtimeHarness.instances.at(-1)?.options.classicGravityFloorTicks).toBe(4.8);
     resumed.unmount();
   });
 
@@ -2579,7 +2555,7 @@ describe('T6 frontend mode binding', () => {
 
   it('labels Classic by lines and pieces, Survival by time and lines, and 异变 by score and lines', () => {
     const base: ScoreRecord = {
-      version: 9,
+      version: 10,
       score: 3200,
       lines: 18,
       pieces: 62,
@@ -2588,8 +2564,8 @@ describe('T6 frontend mode binding', () => {
       mode: 'marathon',
       outcome: 'top-out',
       completedAt: '2026-07-18T12:00:00.000Z',
-      classicStartingGravityTicks: 48,
-      classicGravityFloorTicks: 6,
+      classicStartingGravityTicks: 36,
+      classicGravityFloorTicks: 4.8,
       classicGrade: 'standard',
     };
     const classic = render(createElement(LeaderboardPanel, { mode: 'marathon', records: [base], highlightRecord: base }));
@@ -2605,37 +2581,37 @@ describe('T6 frontend mode binding', () => {
     expect(classic.container.querySelector<HTMLElement>('.result-leaderboard')?.dataset.empty).toBeUndefined();
     expect(classic.container.querySelector<HTMLElement>('.result-leaderboard')?.dataset.classicGrade).toBe('standard');
     expect([...classic.container.querySelectorAll('[data-testid="classic-leaderboard-grades"] button')].map((button) => button.textContent))
-      .toEqual(['休闲', '标准', '挑战']);
+      .toEqual(['平缓', '轻松', '标准', '迅捷', '专家']);
     expect(classic.container.querySelector('[data-grade="standard"]')?.getAttribute('aria-pressed')).toBe('true');
     expect(scoreRecordRank([base], base)).toBe(1);
     expect(scoreRecordRank([base], { ...base, completedAt: '2026-07-19T12:00:00.000Z' })).toBeNull();
     classic.unmount();
 
-    const relaxed: ScoreRecord = {
+    const calm: ScoreRecord = {
       ...base,
       lines: 22,
       completedAt: '2026-07-17T12:00:00.000Z',
       classicStartingGravityTicks: 60,
       classicGravityFloorTicks: 18,
-      classicGrade: 'relaxed',
+      classicGrade: 'calm',
     };
-    const challenge: ScoreRecord = {
+    const expert: ScoreRecord = {
       ...base,
       lines: 26,
       completedAt: '2026-07-16T12:00:00.000Z',
-      classicStartingGravityTicks: 30,
-      classicGravityFloorTicks: 6,
-      classicGrade: 'challenge',
+      classicStartingGravityTicks: 12,
+      classicGravityFloorTicks: 4.8,
+      classicGrade: 'expert',
     };
     const filteredClassic = render(createElement(LeaderboardPanel, {
       mode: 'marathon',
-      records: [relaxed, base, challenge],
-      initialClassicGrade: 'challenge',
+      records: [calm, base, expert],
+      initialClassicGrade: 'expert',
     }));
     expect(filteredClassic.container.querySelector('[data-record-field="lines"]')?.textContent).toBe('26 行');
-    act(() => filteredClassic.container.querySelector<HTMLButtonElement>('[data-grade="relaxed"]')?.click());
+    act(() => filteredClassic.container.querySelector<HTMLButtonElement>('[data-grade="calm"]')?.click());
     expect(filteredClassic.container.querySelector('[data-record-field="lines"]')?.textContent).toBe('22 行');
-    expect(filteredClassic.container.querySelector<HTMLElement>('.result-leaderboard')?.dataset.classicGrade).toBe('relaxed');
+    expect(filteredClassic.container.querySelector<HTMLElement>('.result-leaderboard')?.dataset.classicGrade).toBe('calm');
     filteredClassic.unmount();
 
     const emptySettings = render(createElement(LeaderboardPanel, { mode: 'marathon', records: [], variant: 'settings' }));
@@ -2644,7 +2620,7 @@ describe('T6 frontend mode binding', () => {
     emptySettings.unmount();
 
     const survivalRecord: ScoreRecord = {
-      version: 9,
+      version: 10,
       mode: 'race',
       outcome: 'top-out',
       lines: 27,
@@ -2675,7 +2651,7 @@ describe('T6 frontend mode binding', () => {
 
     const ended = { ...createInitialState(1, 'race'), status: 'game-over' as const, score: 900, lines: 27, pieceCount: 62, elapsedTicks: 4200 };
     expect(scoreRecordForState(ended, base.completedAt)).toEqual({
-      version: 9,
+      version: 10,
       mode: 'race',
       outcome: 'top-out',
       lines: 27,
@@ -2689,7 +2665,7 @@ describe('T6 frontend mode binding', () => {
       mode: 'marathon',
       classicStartingGravityTicks: 36,
       classicGravityFloorTicks: 4.8,
-      classicGrade: 'challenge',
+      classicGrade: 'standard',
     });
     expect(scoreRecordForState(createInitialState(1, 'endgame', CAMPAIGN_LEVELS[0]!.id), base.completedAt)).toBeNull();
   });
@@ -2705,7 +2681,7 @@ describe('T6 frontend mode binding', () => {
       const records: ScoreRecord[] = Array.from({ length: 7 }, (_, index) => {
         const completedAt = `2026-07-${String(index + 1).padStart(2, '0')}T12:00:00.000Z`;
         if (mode === 'race') return {
-          version: 9 as const,
+          version: 10 as const,
           mode: 'race' as const,
           outcome: 'top-out' as const,
           lines: 30 - index,
@@ -2713,7 +2689,7 @@ describe('T6 frontend mode binding', () => {
           completedAt,
         };
         const scoredRecord = {
-          version: 9 as const,
+          version: 10 as const,
           outcome: 'top-out' as const,
           score: 7000 - index * 100,
           lines: 30 - index,
@@ -2726,8 +2702,8 @@ describe('T6 frontend mode binding', () => {
           ...scoredRecord,
           mode,
           ...{
-            classicStartingGravityTicks: 48,
-            classicGravityFloorTicks: 6,
+            classicStartingGravityTicks: 36,
+            classicGravityFloorTicks: 4.8,
             classicGrade: 'standard' as const,
           },
         };
@@ -3019,10 +2995,10 @@ describe('T6 frontend mode binding', () => {
     expect(sourceHudStyles).toMatch(/\.run-stats\s+strong\s*\{[^}]*display:\s*inline-flex[^}]*min-height:\s*1\.08em[^}]*align-items:\s*baseline/s);
   });
 
-  it('uses a three-stage Endgame curriculum with lessons and mastery-gated Hard endgames', () => {
-    expect(CAMPAIGN_LEVELS).toHaveLength(50);
+  it('uses a 5/25/16 Endgame curriculum with lessons and mastery-gated Hard endgames', () => {
+    expect(CAMPAIGN_LEVELS).toHaveLength(46);
     expect(ENDGAME_CATEGORIES.map(({ id, levels }) => [id, levels.length])).toEqual([
-      ['intro', 10], ['easy', 20], ['hard', 20],
+      ['intro', 5], ['easy', 25], ['hard', 16],
     ]);
     const onSelect = vi.fn();
     const onStart = vi.fn();
@@ -3037,10 +3013,10 @@ describe('T6 frontend mode binding', () => {
     const view = render(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[0]!.id)));
 
     let rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
-    expect(rows).toHaveLength(10);
-    expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(0, 10).map((level) => level.id));
+    expect(rows).toHaveLength(5);
+    expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(0, 5).map((level) => level.id));
     expect(rows.every((row) => row.dataset.unlocked === 'true')).toBe(true);
-    expect(view.container.querySelector('[data-testid="level-list"]')?.getAttribute('aria-label')).toBe('共 50 个残局');
+    expect(view.container.querySelector('[data-testid="level-list"]')?.getAttribute('aria-label')).toBe('共 46 个残局');
     expect(view.container.querySelector('[data-testid="campaign-availability"], [data-testid="campaign-rules"]')).toBeNull();
     expect(view.container.querySelectorAll('.console-band, .console-bands, .console-nodes')).toHaveLength(0);
     expect(view.container.querySelector('[data-testid="endgame-lesson"]')?.textContent).toContain('先完成一行');
@@ -3049,18 +3025,18 @@ describe('T6 frontend mode binding', () => {
     expect(pageTabs).toHaveLength(3);
     expect(pageTabs.map((tab) => tab.textContent)).toEqual(['入门', '简单', '困难']);
     expect(pageTabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false']);
-    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('入门，10 关');
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('入门，5 关');
     act(() => {
       pageTabs[0]!.focus();
       pageTabs[0]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
     });
     expect(document.activeElement).toBe(pageTabs[1]);
     expect(pageTabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['false', 'true', 'false']);
-    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[10]!.id);
-    view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[10]!.id)));
+    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[5]!.id);
+    view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[5]!.id)));
     rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
-    expect(rows).toHaveLength(20);
-    expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(10, 30).map((level) => level.id));
+    expect(rows).toHaveLength(25);
+    expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(5, 30).map((level) => level.id));
     expect(rows.every((row) => row.dataset.unlocked === 'true')).toBe(true);
     expect(rows.every((row) => row.getAttribute('aria-disabled') === null)).toBe(true);
     expect(rows[0]?.getAttribute('aria-label')).toContain('可进入');
@@ -3070,7 +3046,7 @@ describe('T6 frontend mode binding', () => {
     });
     expect(document.activeElement).toBe(pageTabs[0]);
     expect(pageTabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false']);
-    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('入门，10 关');
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('入门，5 关');
     rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
     expect(rows[0]?.textContent).toContain('01');
     expect(view.container.querySelectorAll('.endgame-gallery__catalog .endgame-silhouette')).toHaveLength(0);
@@ -3088,14 +3064,14 @@ describe('T6 frontend mode binding', () => {
       [certificate.levelId, certificate.masteryOperations]
     ))) as Partial<Record<EndgameId, number>>;
     const mastered: EndgameProgress = {
-      version: 6,
+      version: 7,
       campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: CAMPAIGN_LEVELS.slice(0, 30).map((level) => level.id),
-      bestPieceCounts: masteredBests,
+      bestLockedPieceCounts: masteredBests,
     };
     view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[0]!.id, {
       ...mastered,
-      bestPieceCounts: { ...masteredBests, [CAMPAIGN_LEVELS[0]!.id]: 7 },
+      bestLockedPieceCounts: { ...masteredBests, [CAMPAIGN_LEVELS[0]!.id]: 7 },
     })));
     const selectedBest = view.container.querySelector<HTMLElement>('[data-testid="selected-endgame-start-best"]');
     const startSelected = view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]');
@@ -3103,7 +3079,7 @@ describe('T6 frontend mode binding', () => {
     expect(selectedBest?.closest('.endgame-gallery__title-row')?.querySelector('.endgame-gallery__title')).not.toBeNull();
     expect(startSelected?.closest('.endgame-gallery__meta')?.contains(selectedBest ?? null)).toBe(true);
     expect(view.container.querySelector<HTMLButtonElement>('[data-level-id="t3r-shaft-01"]')?.dataset.bestPieces).toBe('7');
-    expect(view.container.querySelectorAll('.endgame-gallery__completion-tick')).toHaveLength(10);
+    expect(view.container.querySelectorAll('.endgame-gallery__completion-tick')).toHaveLength(5);
     expect(view.container.querySelectorAll('.endgame-gallery__node--complete .endgame-gallery__index')).toHaveLength(0);
     expect(view.container.querySelector<HTMLButtonElement>('[data-level-id="t3r-shaft-01"]')?.textContent).toBe('');
     expect(view.container.textContent).not.toContain('√');
@@ -3111,10 +3087,10 @@ describe('T6 frontend mode binding', () => {
 
     act(() => pageTabs[2]!.click());
     rows = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
-    expect(rows).toHaveLength(20);
+    expect(rows).toHaveLength(16);
     expect(rows.map((row) => row.dataset.levelId)).toEqual(CAMPAIGN_LEVELS.slice(30).map((level) => level.id));
     expect(rows.every((row) => row.dataset.unlocked === 'true')).toBe(true);
-    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('困难，20 关');
+    expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('aria-label')).toBe('困难，16 关');
     expect(view.container.querySelectorAll('.endgame-gallery__mastery span')).toHaveLength(3);
     expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[30]!.id);
     view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[30]!.id, mastered)));
@@ -3148,7 +3124,7 @@ describe('T6 frontend mode binding', () => {
     )!.masteryOperations;
     const blocked: EndgameProgress = {
       ...mastered,
-      bestPieceCounts: { ...masteredBests, [gatedGroup.prerequisiteId]: gatedThreshold + 1 },
+      bestLockedPieceCounts: { ...masteredBests, [gatedGroup.prerequisiteId]: gatedThreshold + 1 },
     };
     view.rerender(createElement(EndgameLibrary, props(gatedGroup.hardLevelIds[0]!, blocked)));
     expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')?.disabled).toBe(true);
@@ -3156,10 +3132,10 @@ describe('T6 frontend mode binding', () => {
     expect(view.container.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.getAttribute('aria-label')).toContain(`${gatedThreshold} 步内`);
 
     const historicHard: EndgameProgress = {
-      version: 6,
+      version: 7,
       campaignRevision: ENDGAME_CAMPAIGN_REVISION,
       completedLevelIds: [gatedGroup.hardLevelIds[0]!],
-      bestPieceCounts: { [gatedGroup.hardLevelIds[0]!]: 12 },
+      bestLockedPieceCounts: { [gatedGroup.hardLevelIds[0]!]: 12 },
     };
     view.rerender(createElement(EndgameLibrary, props(gatedGroup.hardLevelIds[0]!, historicHard)));
     expect(view.container.querySelector<HTMLButtonElement>('[data-testid="start-selected-endgame"]')?.disabled).toBe(false);
@@ -3191,23 +3167,23 @@ describe('T6 frontend mode binding', () => {
     expect(levels.filter((button) => button.tabIndex === 0)).toEqual([levels[0]]);
     act(() => levels[0]!.focus());
     press(levels[0]!, 'ArrowDown');
-    expect(document.activeElement).toBe(levels[3]);
-    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[3]!.id);
+    expect(document.activeElement).toBe(levels[4]);
+    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[4]!.id);
 
     const tabs = [...view.container.querySelectorAll<HTMLButtonElement>('.endgame-gallery__pages [role="tab"]')];
     act(() => tabs[1]!.click());
     levels = [...view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')];
-    expect(levels).toHaveLength(20);
+    expect(levels).toHaveLength(25);
     act(() => levels[0]!.focus());
     press(levels[0]!, 'ArrowDown');
-    expect(document.activeElement).toBe(levels[6]);
-    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[16]!.id);
-    press(levels[6]!, 'Home');
+    expect(document.activeElement).toBe(levels[5]);
+    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[10]!.id);
+    press(levels[5]!, 'Home');
     expect(document.activeElement).toBe(levels[0]);
     press(levels[0]!, 'End');
-    expect(document.activeElement).toBe(levels[19]);
-    press(levels[19]!, 'ArrowRight');
-    expect(document.activeElement).toBe(levels[19]);
+    expect(document.activeElement).toBe(levels[24]);
+    press(levels[24]!, 'ArrowRight');
+    expect(document.activeElement).toBe(levels[24]);
     expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('data-endgame-category')).toBe('easy');
 
     act(() => tabs[1]!.focus());
@@ -3215,6 +3191,45 @@ describe('T6 frontend mode binding', () => {
     expect(document.activeElement).toBe(tabs[2]);
     expect(view.container.querySelector('.endgame-gallery__grid')?.getAttribute('data-endgame-category')).toBe('hard');
     expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[30]!.id);
+    view.unmount();
+  });
+
+  it('marks D2B category and detail transitions without changing the roving grid contract', () => {
+    const onSelect = vi.fn();
+    const props = (selectedId: EndgameId, reducedMotion = false) => ({
+      progress: defaultEndgameProgress(),
+      selectedId,
+      onSelect,
+      onStart: vi.fn(),
+      onBack: vi.fn(),
+      reducedMotion,
+    });
+    const view = render(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[0]!.id)));
+
+    let grid = view.container.querySelector<HTMLOListElement>('.endgame-gallery__grid')!;
+    let hero = view.container.querySelector<HTMLElement>('.endgame-gallery__hero')!;
+    expect(grid.dataset.endgameCategoryMotion).toBe('full');
+    expect(grid.dataset.endgameCategoryEpoch).toBe('0');
+    expect(hero.dataset.endgameDetailMotion).toBe('full');
+    expect(hero.dataset.endgameDetailEpoch).toBe('0');
+
+    act(() => view.container.querySelectorAll<HTMLButtonElement>('.endgame-gallery__pages [role="tab"]')[1]?.click());
+    grid = view.container.querySelector<HTMLOListElement>('.endgame-gallery__grid')!;
+    hero = view.container.querySelector<HTMLElement>('.endgame-gallery__hero')!;
+    expect(grid.dataset.endgameCategory).toBe('easy');
+    expect(grid.dataset.endgameCategoryEpoch).toBe('1');
+    expect(grid.classList.contains('endgame-gallery__grid--motion')).toBe(true);
+    expect(hero.dataset.endgameDetailEpoch).toBe('1');
+    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[5]!.id);
+
+    view.rerender(createElement(EndgameLibrary, props(CAMPAIGN_LEVELS[5]!.id, true)));
+    const nextLevel = view.container.querySelectorAll<HTMLButtonElement>('[data-testid="level-row"]')[1]!;
+    act(() => nextLevel.click());
+    hero = view.container.querySelector<HTMLElement>('.endgame-gallery__hero')!;
+    expect(hero.dataset.endgameDetailMotion).toBe('reduced');
+    expect(hero.dataset.endgameDetailEpoch).toBe('2');
+    expect(hero.classList.contains('endgame-gallery__hero--motion')).toBe(true);
+    expect(onSelect).toHaveBeenLastCalledWith(CAMPAIGN_LEVELS[6]!.id);
     view.unmount();
   });
 

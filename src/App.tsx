@@ -6,14 +6,12 @@ import {
   useReducer,
   useRef,
   useState,
-  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { flushSync } from 'react-dom';
 import {
   ANCHOR_CELL,
-  CLASSIC_GRAVITY_CHOICES_TICKS,
   CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS,
   CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS,
   MUTATION_EFFECT_TICKS,
@@ -28,12 +26,11 @@ import {
   type MutationItem,
   type PieceType,
   type EndgameId,
+  type RetiredEndgameId,
   createInitialState,
   getEndgameDefinition,
   gravityForMode,
   nextMutationPreviewItem,
-  normalizeClassicGravityFloorTicks,
-  normalizeClassicStartingGravityTicks,
   survivalIntervalSeconds,
   survivalIntervalTicks,
 } from './game/core';
@@ -109,6 +106,14 @@ import {
   type RunMode,
   type ScoreRecord,
 } from './leaderboard';
+import {
+  CLASSIC_PACES,
+  classicPaceForGravityRange,
+  classicPaceForId,
+  defaultClassicPace,
+  isClassicPaceId,
+  type ClassicPaceId,
+} from './classicPace';
 
 type ExitDestination = 'home' | 'endgame-library';
 type EntryCountdownDigit = 3 | 2 | 1;
@@ -156,6 +161,7 @@ const NOOP = () => undefined;
 type AppRouteResolution = Readonly<{
   navigation: AppNavigationState;
   replacement: Readonly<{ path: string; state: unknown }> | null;
+  archivedEndgameId: RetiredEndgameId | null;
 }>;
 
 function resolveAppNavigation(pathname: string, historyState: unknown): AppRouteResolution {
@@ -164,25 +170,29 @@ function resolveAppNavigation(pathname: string, historyState: unknown): AppRoute
     return {
       navigation: { ...legacy.navigation },
       replacement: { path: legacy.path, state: legacy.historyState },
+      archivedEndgameId: legacy.archivedEndgameId,
     };
   }
   const canonical = appNavigationFromHistory(pathname, historyState);
-  if (canonical) return { navigation: canonical, replacement: null };
+  if (canonical) return { navigation: canonical, replacement: null, archivedEndgameId: null };
   return {
     navigation: DEFAULT_APP_NAVIGATION,
     replacement: {
       path: appPathFor(DEFAULT_APP_NAVIGATION),
       state: appHistoryStateFor(DEFAULT_APP_NAVIGATION),
     },
+    archivedEndgameId: null,
   };
 }
 
-function readAppNavigation(): AppNavigationState {
+function readAppRoute(): AppRouteResolution {
   const target = browserPlatform.windowTarget();
-  return resolveAppNavigation(target?.location.pathname ?? '/', target?.history.state).navigation;
+  return resolveAppNavigation(target?.location.pathname ?? '/', target?.history.state);
 }
 const MODE_RULE_INTROS_KEY = 'tetramorph:mode-rule-intros:v2';
 export const REDUCED_MOTION_STORAGE_KEY = 'tetramorph:reduced-motion:v1';
+export const CLASSIC_PACE_STORAGE_KEY = 'tetramorph:classic-pace:v2';
+/** Legacy arbitrary-range preference source. New writes use the fixed-preset v2 key. */
 export const CLASSIC_GRAVITY_RANGE_STORAGE_KEY = 'tetramorph:classic-gravity-range:v1';
 const LEGACY_CLASSIC_STARTING_GRAVITY_STORAGE_KEY = 'tetramorph:classic-start-gravity:v1';
 
@@ -243,25 +253,50 @@ function writeVisualTheme(theme: VisualThemeId): void {
 }
 
 function normalizeClassicGravityRange(range: ClassicGravityRange): ClassicGravityRange {
-  const startingTicks = normalizeClassicStartingGravityTicks(range.startingTicks);
+  const pace = classicPaceForGravityRange(range.startingTicks, range.floorTicks);
   return {
-    startingTicks,
-    floorTicks: normalizeClassicGravityFloorTicks(range.floorTicks, startingTicks),
+    startingTicks: pace.startingTicks,
+    floorTicks: pace.floorTicks,
   };
+}
+
+function rangeForClassicPace(id: ClassicPaceId): ClassicGravityRange {
+  const pace = classicPaceForId(id);
+  return { startingTicks: pace.startingTicks, floorTicks: pace.floorTicks };
+}
+
+function parseClassicPacePreference(value: string | null): ClassicGravityRange | null {
+  if (!value?.trim()) return null;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+    const record = parsed as Record<string, unknown>;
+    if (
+      record.version !== 2
+      || !isClassicPaceId(record.paceId)
+      || Object.keys(record).length !== 2
+      || !('version' in record)
+      || !('paceId' in record)
+    ) return null;
+    return rangeForClassicPace(record.paceId);
+  } catch {
+    return null;
+  }
 }
 
 export function parseClassicGravityRange(
   value: string | null,
   legacyStartingValue: string | null = null,
 ): ClassicGravityRange {
-  const fallback = {
-    startingTicks: CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS,
-    floorTicks: CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS,
-  };
+  const fallback = rangeForClassicPace(defaultClassicPace().id);
   const source = value?.trim();
   if (source) {
     try {
       const parsed: unknown = JSON.parse(source);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        const record = parsed as Record<string, unknown>;
+        if (record.version === 2 && isClassicPaceId(record.paceId)) return rangeForClassicPace(record.paceId);
+      }
       if (typeof parsed === 'number') {
         return normalizeClassicGravityRange({ startingTicks: parsed, floorTicks: fallback.floorTicks });
       }
@@ -292,23 +327,23 @@ export function parseClassicGravityRange(
 
 function readClassicGravityRange(): ClassicGravityRange {
   try {
+    const current = parseClassicPacePreference(browserPlatform.readStorage(CLASSIC_PACE_STORAGE_KEY));
+    if (current) return current;
     return parseClassicGravityRange(
       browserPlatform.readStorage(CLASSIC_GRAVITY_RANGE_STORAGE_KEY),
       browserPlatform.readStorage(LEGACY_CLASSIC_STARTING_GRAVITY_STORAGE_KEY),
     );
   } catch {
-    return {
-      startingTicks: CLASSIC_STARTING_GRAVITY_DEFAULT_TICKS,
-      floorTicks: CLASSIC_GRAVITY_FLOOR_DEFAULT_TICKS,
-    };
+    return rangeForClassicPace(defaultClassicPace().id);
   }
 }
 
 function writeClassicGravityRange(range: ClassicGravityRange): void {
   try {
+    const pace = classicPaceForGravityRange(range.startingTicks, range.floorTicks);
     browserPlatform.writeStorage(
-      CLASSIC_GRAVITY_RANGE_STORAGE_KEY,
-      JSON.stringify(normalizeClassicGravityRange(range)),
+      CLASSIC_PACE_STORAGE_KEY,
+      JSON.stringify({ version: 2, paceId: pace.id }),
     );
   } catch {
     // Storage is optional: the next run in this session still uses the chosen pace.
@@ -336,7 +371,7 @@ function readEndgameProgress(): PersistedBootstrap<EndgameProgress> {
         version: result.data.version,
         campaignRevision: result.data.campaignRevision,
         completedLevelIds: [...result.data.completedLevelIds],
-        bestPieceCounts: { ...result.data.bestPieceCounts },
+        bestLockedPieceCounts: { ...result.data.bestLockedPieceCounts },
       },
       canPersist: result.persistence === 'verified',
     };
@@ -531,7 +566,7 @@ export function scoreRecordForState(state: GameState, completedAt: string): Scor
   const mode: RunMode = state.mode === 'sprint' ? 'sprint' : state.mode === 'race' ? 'race' : 'marathon';
   if (mode === 'race') {
     return {
-      version: 9,
+      version: 10,
       lines: state.lines,
       elapsedTicks: state.elapsedTicks,
       mode,
@@ -540,7 +575,7 @@ export function scoreRecordForState(state: GameState, completedAt: string): Scor
     };
   }
   const scoredRecord = {
-    version: 9 as const,
+    version: 10 as const,
     score: state.score,
     lines: state.lines,
     pieces: state.pieceCount,
@@ -551,15 +586,16 @@ export function scoreRecordForState(state: GameState, completedAt: string): Scor
     completedAt,
   };
   if (mode === 'marathon') {
+    const pace = classicPaceForGravityRange(
+      state.classicStartingGravityTicks,
+      state.classicGravityFloorTicks,
+    );
     return {
       ...scoredRecord,
       mode,
-      classicStartingGravityTicks: state.classicStartingGravityTicks,
-      classicGravityFloorTicks: state.classicGravityFloorTicks,
-      classicGrade: classicDifficultyGrade(
-        state.classicStartingGravityTicks,
-        state.classicGravityFloorTicks,
-      ),
+      classicStartingGravityTicks: pace.startingTicks,
+      classicGravityFloorTicks: pace.floorTicks,
+      classicGrade: pace.id,
     };
   }
   return { ...scoredRecord, mode: 'sprint' };
@@ -593,6 +629,17 @@ export function scoreRecordRank(records: readonly ScoreRecord[], record: ScoreRe
     : records;
   const index = comparableRecords.findIndex((candidate) => scoreRecordKey(candidate) === scoreRecordKey(record));
   return index >= 0 ? index + 1 : null;
+}
+
+function classicPaceLabel(language: AppLanguage, pace: ClassicDifficultyGrade): string {
+  const labels = appCopy(language).labels;
+  return {
+    calm: labels.classicCalm,
+    relaxed: labels.classicRelaxed,
+    standard: labels.classicStandard,
+    swift: labels.classicSwift,
+    expert: labels.classicExpert,
+  }[pace];
 }
 
 function Brand({ compact = false }: { compact?: boolean }) {
@@ -835,6 +882,12 @@ function CompletionTick() {
 
 const ENDGAME_CATEGORY_IDS: readonly EndgameCategoryId[] = Object.freeze(['intro', 'easy', 'hard']);
 
+function archivedEndgameNotice(language: AppLanguage): string {
+  return language === 'zh-CN'
+    ? '该残局已归档，已返回当前关卡库。'
+    : 'This endgame has been archived. You are back in the current library.';
+}
+
 function endgameCategoryForLevel(levelId: EndgameId): EndgameCategoryId {
   return ENDGAME_CATEGORIES.find((category) => category.levels.some((level) => level.id === levelId))?.id ?? 'intro';
 }
@@ -846,6 +899,8 @@ export function EndgameLibrary({
   onStart,
   onBack,
   language = DEFAULT_LANGUAGE,
+  archivedEndgameId = null,
+  reducedMotion = false,
 }: {
   progress: EndgameProgress;
   selectedId: EndgameId;
@@ -853,6 +908,8 @@ export function EndgameLibrary({
   onStart: () => void;
   onBack: () => void;
   language?: AppLanguage;
+  archivedEndgameId?: RetiredEndgameId | null;
+  reducedMotion?: boolean;
 }) {
   const selected = campaignLevel(selectedId);
   const selectedName = endgameDisplayName(language, selected.id, selected.name);
@@ -872,9 +929,13 @@ export function EndgameLibrary({
     : null;
   const selectedCategory = endgameCategoryForLevel(selected.id);
   const [categoryId, setCategoryId] = useState<EndgameCategoryId>(selectedCategory);
+  const [categoryMotionEpoch, setCategoryMotionEpoch] = useState(0);
+  const [detailMotionEpoch, setDetailMotionEpoch] = useState(0);
   const levelButtonRefs = useRef(new Map<EndgameId, HTMLButtonElement>());
   const pageTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const pendingFocusRef = useRef<EndgameId | null>(null);
+  const categoryMotionIdRef = useRef<EndgameCategoryId>(selectedCategory);
+  const detailMotionIdRef = useRef<EndgameId>(selected.id);
   const pageLastSelectedRef = useRef<Record<EndgameCategoryId, EndgameId>>({
     intro: ENDGAME_CATEGORIES[0]!.levels[0]!.id,
     easy: ENDGAME_CATEGORIES[1]!.levels[0]!.id,
@@ -887,9 +948,31 @@ export function EndgameLibrary({
     ? selected.id
     : pageLastSelectedRef.current[categoryId];
 
+  const requestCategoryTransition = (nextCategory: EndgameCategoryId) => {
+    if (categoryMotionIdRef.current === nextCategory) return;
+    categoryMotionIdRef.current = nextCategory;
+    setCategoryId(nextCategory);
+    setCategoryMotionEpoch((epoch) => epoch + 1);
+  };
+
+  const requestDetailTransition = (nextId: EndgameId) => {
+    if (detailMotionIdRef.current === nextId) return;
+    detailMotionIdRef.current = nextId;
+    setDetailMotionEpoch((epoch) => epoch + 1);
+  };
+
+  const selectLevel = (nextId: EndgameId) => {
+    requestDetailTransition(nextId);
+    onSelect(nextId);
+  };
+
   useEffect(() => {
-    setCategoryId(selectedCategory);
+    requestCategoryTransition(selectedCategory);
   }, [selectedCategory]);
+
+  useEffect(() => {
+    requestDetailTransition(selected.id);
+  }, [selected.id]);
 
   useEffect(() => {
     const pending = pendingFocusRef.current;
@@ -910,8 +993,8 @@ export function EndgameLibrary({
     const nextCategory = endgameCategoryForLevel(next.id);
     pageLastSelectedRef.current[nextCategory] = next.id;
     if (focus && nextCategory !== categoryId) pendingFocusRef.current = next.id;
-    setCategoryId(nextCategory);
-    onSelect(next.id);
+    requestCategoryTransition(nextCategory);
+    selectLevel(next.id);
     if (focus && nextCategory === categoryId) {
       const target = levelButtonRefs.current.get(next.id);
       try {
@@ -925,8 +1008,8 @@ export function EndgameLibrary({
   const switchPage = (nextCategory: EndgameCategoryId, focusTab = false) => {
     const targetId = pageLastSelectedRef.current[nextCategory];
     const targetIndex = CAMPAIGN_LEVELS.findIndex((level) => level.id === targetId);
-    setCategoryId(nextCategory);
-    if (targetIndex >= 0) onSelect(targetId);
+    requestCategoryTransition(nextCategory);
+    if (targetIndex >= 0) selectLevel(targetId);
     if (focusTab) {
       const target = pageTabRefs.current[ENDGAME_CATEGORY_IDS.indexOf(nextCategory)];
       try {
@@ -953,7 +1036,7 @@ export function EndgameLibrary({
     const renderedColumns = grid
       ? window.getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).filter(Boolean).length
       : 0;
-    const fallbackColumns = categoryId === 'intro' ? 3 : categoryId === 'easy' ? 6 : 5;
+    const fallbackColumns = 5;
     const columns = renderedColumns > 1 ? renderedColumns : fallbackColumns;
     let nextLocalIndex = localIndex;
     if (event.key === 'ArrowLeft') nextLocalIndex = Math.max(0, localIndex - 1);
@@ -976,8 +1059,17 @@ export function EndgameLibrary({
         <Brand compact />
       </header>
       <section className="endgame-gallery" aria-labelledby="library-title">
-        <aside className="endgame-gallery__hero" aria-live="polite" aria-label={copy.phrasing.selectedEndgame(selectedName)}>
-          <div className="endgame-gallery__stage" key={selected.id}>
+        <aside
+          className={`endgame-gallery__hero${detailMotionEpoch > 0 ? ' endgame-gallery__hero--motion' : ''}`}
+          aria-live="polite"
+          aria-label={copy.phrasing.selectedEndgame(selectedName)}
+          data-endgame-detail-motion={reducedMotion ? 'reduced' : 'full'}
+          data-endgame-detail-epoch={detailMotionEpoch}
+          key={`${selected.id}:${detailMotionEpoch}`}
+        >
+          <div
+            className="endgame-gallery__stage"
+          >
             <div className="endgame-gallery__board">
               <EndgameSilhouette id={selected.id} label={copy.phrasing.endgameBoard(selectedName)} />
             </div>
@@ -1046,6 +1138,16 @@ export function EndgameLibrary({
                 );
               })}
             </div>
+            {archivedEndgameId && (
+              <p
+                className="endgame-gallery__archived-notice"
+                data-testid="endgame-archived-notice"
+                data-archived-endgame-id={archivedEndgameId}
+                role="status"
+              >
+                {archivedEndgameNotice(language)}
+              </p>
+            )}
           </header>
           {categoryId === 'hard' && (
             <section className="endgame-gallery__mastery" aria-label={copy.labels.mastery}>
@@ -1074,7 +1176,6 @@ export function EndgameLibrary({
           )}
           <ol
             id={`endgame-page-panel-${categoryId}`}
-            className="endgame-gallery__grid"
             role="tabpanel"
             aria-labelledby={`endgame-page-tab-${categoryId}`}
             aria-label={copy.phrasing.endgameCategory(
@@ -1082,7 +1183,10 @@ export function EndgameLibrary({
               pageLevels.length,
             )}
             data-endgame-category={categoryId}
-            key={categoryId}
+            data-endgame-category-motion={reducedMotion ? 'reduced' : 'full'}
+            data-endgame-category-epoch={categoryMotionEpoch}
+            className={`endgame-gallery__grid${categoryMotionEpoch > 0 ? ' endgame-gallery__grid--motion' : ''}`}
+            key={`${categoryId}:${categoryMotionEpoch}`}
           >
             {pageLevels.map((level, localIndex) => {
               const complete = progress.completedLevelIds.includes(level.id);
@@ -1109,7 +1213,7 @@ export function EndgameLibrary({
                     }}
                     aria-label={`${copy.phrasing.levelNode(String(level.index).padStart(2, '0'), levelName, getEndgameDefinition(level.id).targetRows, complete, unlocked, bestPieces)}${gate && !gate.unlocked ? ` — ${copy.phrasing.masteryThreshold(copy.phrasing.endgameLesson(gate.group.technique).title, endgameDisplayName(language, campaignLevel(gate.group.prerequisiteId).id, campaignLevel(gate.group.prerequisiteId).name), gate.requiredOperations, gate.bestOperations)}` : ''}`}
                     onKeyDown={(event) => moveLevelFocus(event, localIndex)}
-                    onClick={() => onSelect(level.id)}
+                    onClick={() => selectLevel(level.id)}
                   >
                     {complete
                       ? <CompletionTick />
@@ -1150,11 +1254,6 @@ export function LeaderboardPanel({
     setSelectedClassicGrade(preferredClassicGrade);
   }, [preferredClassicGrade]);
   const highlightKey = highlightRecord ? scoreRecordKey(highlightRecord) : null;
-  const classicGradeLabels: Record<ClassicDifficultyGrade, string> = {
-    relaxed: copy.labels.classicRelaxed,
-    standard: copy.labels.classicStandard,
-    challenge: copy.labels.classicChallenge,
-  };
   const filteredRecords = mode === 'marathon'
     ? records.filter((record) => record.mode === 'marathon' && record.classicGrade === selectedClassicGrade)
     : records;
@@ -1200,7 +1299,7 @@ export function LeaderboardPanel({
               aria-pressed={selectedClassicGrade === grade}
               onClick={() => setSelectedClassicGrade(grade)}
             >
-              {classicGradeLabels[grade]}
+              {classicPaceLabel(language, grade)}
             </button>
           ))}
         </div>
@@ -1466,102 +1565,64 @@ function ClassicGravityRangeControl({
     const seconds = ticks / TICKS_PER_SECOND;
     return seconds.toFixed(seconds < 0.2 ? 2 : 1);
   };
-  const startingSeconds = displaySeconds(range.startingTicks);
-  const floorSeconds = displaySeconds(range.floorTicks);
   const unit = language === 'en' ? 's/cell' : '秒/格';
   const difficultyGrade = classicDifficultyGrade(range.startingTicks, range.floorTicks);
-  const difficultyLabel = {
-    relaxed: copy.labels.classicRelaxed,
-    standard: copy.labels.classicStandard,
-    challenge: copy.labels.classicChallenge,
-  }[difficultyGrade];
-  const choiceTicks: readonly number[] = CLASSIC_GRAVITY_CHOICES_TICKS;
-  const choiceIndex = (ticks: number) => choiceTicks.indexOf(normalizeClassicStartingGravityTicks(ticks));
-  const percentForTicks = (ticks: number) => (choiceIndex(ticks) / (choiceTicks.length - 1)) * 100;
-  const controlStyle = {
-    '--classic-speed-start': `${percentForTicks(range.startingTicks)}%`,
-    '--classic-speed-floor': `${percentForTicks(range.floorTicks)}%`,
-  } as CSSProperties;
-  const updateBoundFromRail = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if ((event.target as HTMLElement).closest('input')) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    if (rect.width <= 0) return;
-    const position = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-    const targetIndex = Math.round(position * (choiceTicks.length - 1));
-    const ticks = choiceTicks[targetIndex]!;
-    const startingIndex = choiceIndex(range.startingTicks);
-    const floorIndex = choiceIndex(range.floorTicks);
-    const selectStarting = startingIndex === floorIndex
-      ? targetIndex <= startingIndex
-      : Math.abs(targetIndex - startingIndex) <= Math.abs(targetIndex - floorIndex);
-    const testId = selectStarting ? 'classic-starting-speed' : 'classic-fastest-speed';
-    event.currentTarget.querySelector<HTMLInputElement>(`[data-testid="${testId}"]`)?.focus();
-    onChange(normalizeClassicGravityRange(selectStarting
-      ? { startingTicks: Math.max(ticks, range.floorTicks), floorTicks: range.floorTicks }
-      : { startingTicks: range.startingTicks, floorTicks: Math.min(ticks, range.startingTicks) }));
+  const selectPace = (paceId: ClassicPaceId) => onChange(rangeForClassicPace(paceId));
+  const movePaceFocus = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const selectedIndex = CLASSIC_DIFFICULTY_GRADES.indexOf(difficultyGrade);
+    let nextIndex = selectedIndex;
+    if (event.key === 'ArrowLeft') nextIndex = Math.max(0, selectedIndex - 1);
+    else if (event.key === 'ArrowRight') nextIndex = Math.min(CLASSIC_DIFFICULTY_GRADES.length - 1, selectedIndex + 1);
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = CLASSIC_DIFFICULTY_GRADES.length - 1;
+    else return;
+    event.preventDefault();
+    event.stopPropagation();
+    const nextId = CLASSIC_DIFFICULTY_GRADES[nextIndex]!;
+    selectPace(nextId);
+    event.currentTarget.querySelector<HTMLButtonElement>(`[data-classic-pace="${nextId}"]`)?.focus();
   };
   return (
-    <div className="classic-speed-control" role="group" aria-label={copy.labels.classicSpeedRange} style={controlStyle}>
+    <div className="classic-speed-control" role="group" aria-label={copy.labels.classicSpeedRange}>
       <div className="classic-speed-control__heading">
         <span><b>{copy.labels.classicSpeedRange}</b><small>{copy.labels.appliesNextRun}</small></span>
         <span className="classic-speed-control__meta">
           <strong className="classic-speed-control__grade" data-grade={difficultyGrade} data-testid="classic-difficulty-grade">
-            {copy.labels.classicDifficulty} · {difficultyLabel}
+            {copy.labels.classicDifficulty} · {classicPaceLabel(language, difficultyGrade)}
           </strong>
           <em>{unit}</em>
         </span>
       </div>
-      <div className="classic-speed-control__values">
-        <output className="classic-speed-control__value" htmlFor="classic-starting-speed" aria-live="polite">
-          <span>{copy.labels.startingFallSpeed}</span><strong>{startingSeconds}</strong>
-        </output>
-        <span className="classic-speed-control__direction" aria-hidden="true">→</span>
-        <output className="classic-speed-control__value" htmlFor="classic-fastest-speed" aria-live="polite">
-          <span>{copy.labels.fastestFallSpeed}</span><strong>{floorSeconds}</strong>
-        </output>
+      <div className="classic-speed-control__presets" role="radiogroup" aria-label={copy.labels.classicDifficulty} onKeyDown={movePaceFocus}>
+        {CLASSIC_PACES.map((pace, index) => {
+          const selected = pace.id === difficultyGrade;
+          const paceRange = `${displaySeconds(pace.startingTicks)}→${displaySeconds(pace.floorTicks)}`;
+          return (
+            <button
+              key={pace.id}
+              className="classic-speed-control__preset"
+              type="button"
+              role="radio"
+              data-testid={`classic-pace-${pace.id}`}
+              data-classic-pace={pace.id}
+              data-arrow-nav
+              data-arrow-activate-on-focus="true"
+              data-arrow-row="3"
+              data-arrow-col={index}
+              aria-label={`${classicPaceLabel(language, pace.id)} · ${displaySeconds(pace.startingTicks)} → ${displaySeconds(pace.floorTicks)} ${unit}`}
+              aria-checked={selected}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => selectPace(pace.id)}
+            >
+              <strong>{classicPaceLabel(language, pace.id)}</strong>
+              <span>{paceRange}</span>
+            </button>
+          );
+        })}
       </div>
-      <div className="classic-speed-control__rail" onPointerDown={updateBoundFromRail}>
-        <span className="classic-speed-control__track" aria-hidden="true"><i /></span>
-        <input
-          id="classic-starting-speed"
-          className="classic-speed-control__input classic-speed-control__input--start"
-          type="range"
-          data-testid="classic-starting-speed"
-          data-arrow-nav
-          data-arrow-row="3"
-          data-arrow-col="1"
-          min="0"
-          max={choiceTicks.length - 1}
-          step="1"
-          value={choiceIndex(range.startingTicks)}
-          aria-label={copy.labels.startingFallSpeed}
-          aria-valuetext={`${startingSeconds} ${unit}`}
-          onChange={(event) => onChange(normalizeClassicGravityRange({
-            startingTicks: Math.max(choiceTicks[Number(event.currentTarget.value)]!, range.floorTicks),
-            floorTicks: range.floorTicks,
-          }))}
-        />
-        <input
-          id="classic-fastest-speed"
-          className="classic-speed-control__input classic-speed-control__input--floor"
-          type="range"
-          data-testid="classic-fastest-speed"
-          data-arrow-nav
-          data-arrow-row="3"
-          data-arrow-col="2"
-          min="0"
-          max={choiceTicks.length - 1}
-          step="1"
-          value={choiceIndex(range.floorTicks)}
-          aria-label={copy.labels.fastestFallSpeed}
-          aria-valuetext={`${floorSeconds} ${unit}`}
-          onChange={(event) => onChange(normalizeClassicGravityRange({
-            startingTicks: range.startingTicks,
-            floorTicks: Math.min(choiceTicks[Number(event.currentTarget.value)]!, range.startingTicks),
-          }))}
-        />
-      </div>
-      <div className="classic-speed-control__limits" aria-hidden="true"><span>1.0</span><span>0.08</span></div>
+      <output className="classic-speed-control__summary" data-testid="classic-pace-summary" aria-live="polite">
+        {copy.labels.startingFallSpeed} {displaySeconds(range.startingTicks)} → {copy.labels.fastestFallSpeed} {displaySeconds(range.floorTicks)} {unit}
+      </output>
     </div>
   );
 }
@@ -2916,7 +2977,10 @@ function skipAppViewTransition(transition: AppViewTransition | null | undefined)
 }
 
 export default function App() {
-  const [navigation, setNavigation] = useState<AppNavigationState>(readAppNavigation);
+  const initialRouteRef = useRef<AppRouteResolution | null>(null);
+  const initialRoute = initialRouteRef.current ?? (initialRouteRef.current = readAppRoute());
+  const [navigation, setNavigation] = useState<AppNavigationState>(initialRoute.navigation);
+  const [archivedEndgameId, setArchivedEndgameId] = useState<RetiredEndgameId | null>(initialRoute.archivedEndgameId);
   const progressBootstrapRef = useRef<PersistedBootstrap<EndgameProgress> | null>(null);
   if (progressBootstrapRef.current === null) progressBootstrapRef.current = readEndgameProgress();
   const introBootstrapRef = useRef<PersistedBootstrap<readonly GameMode[]> | null>(null);
@@ -3023,6 +3087,7 @@ export default function App() {
     nextNavigation: AppNavigationState,
     action: 'push' | 'replace' | 'pop' = 'push',
     hasUaVisualTransition = false,
+    nextArchivedEndgameId: RetiredEndgameId | null = null,
   ) => {
     const windowTarget = browserPlatform.windowTarget();
     const previousNavigation = navigationRef.current;
@@ -3051,6 +3116,7 @@ export default function App() {
       setRouteCommitEpoch(epoch);
       setRouteDirection(transitionMode === 'idle' ? 'neutral' : direction);
       setRouteTransitionMode(transitionMode);
+      setArchivedEndgameId(nextArchivedEndgameId);
       setNavigation(nextNavigation);
       return true;
     };
@@ -3143,6 +3209,7 @@ export default function App() {
     if (!initialRouteReplacedRef.current) {
       initialRouteReplacedRef.current = true;
       const initialRoute = resolveAppNavigation(windowTarget.location.pathname, windowTarget.history.state);
+      setArchivedEndgameId(initialRoute.archivedEndgameId);
       if (initialRoute.replacement) {
         windowTarget.history.replaceState(
           initialRoute.replacement.state,
@@ -3169,7 +3236,7 @@ export default function App() {
           nextRoute.replacement.path,
         );
       }
-      navigate(nextRoute.navigation, 'pop', popEvent.hasUAVisualTransition === true);
+      navigate(nextRoute.navigation, 'pop', popEvent.hasUAVisualTransition === true, nextRoute.archivedEndgameId);
     });
   }, [navigate]);
 
@@ -3276,6 +3343,8 @@ export default function App() {
             onStart={startEndgame}
             onBack={() => navigate(DEFAULT_APP_NAVIGATION)}
             language={language}
+            archivedEndgameId={archivedEndgameId}
+            reducedMotion={reducedMotion}
           />
         )}
         {screen === 'game' && (

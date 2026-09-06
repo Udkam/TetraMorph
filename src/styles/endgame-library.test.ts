@@ -22,6 +22,8 @@ describe('Phase 12 Endgame curriculum authority', () => {
     expect(app).toContain('role="tablist"');
     expect(app).toContain('role="tabpanel"');
     expect(app).toContain('data-endgame-category={categoryId}');
+    expect(app).toContain('data-endgame-category-motion={reducedMotion ? \'reduced\' : \'full\'}');
+    expect(app).toContain('data-endgame-detail-motion={reducedMotion ? \'reduced\' : \'full\'}');
     expect(app).toContain('endgame-gallery__hero');
     expect(app).toContain('endgame-gallery__board');
     expect(app).toContain('endgame-gallery__title');
@@ -40,8 +42,8 @@ describe('Phase 12 Endgame curriculum authority', () => {
     expect(gallery).toMatch(/@media \(min-width:\s*720px\) and \(max-height:\s*520px\)[\s\S]*\.library-shell--gallery\s*\{[^}]*calc\(100dvh - 62px\)[^}]*gap:\s*12px;/s);
     expect(gallery).toMatch(/\.endgame-gallery__grid\s*\{[\s\S]*grid-template-columns:\s*repeat\(5,\s*minmax\(44px,\s*1fr\)\)/);
     expect(gallery).toMatch(/\.endgame-gallery__grid\s*\{[\s\S]*align-content:\s*center;[\s\S]*justify-self:\s*center;[\s\S]*width:\s*min\(100%,\s*560px\)/);
-    expect(gallery).toMatch(/\.endgame-gallery__grid\[data-endgame-category="intro"\]\s*\{[^}]*repeat\(3,/s);
-    expect(gallery).toMatch(/\.endgame-gallery__grid\[data-endgame-category="easy"\]\s*\{[^}]*repeat\(6,/s);
+    expect(gallery).toMatch(/\.endgame-gallery__grid\[data-endgame-category="intro"\]\s*\{[^}]*repeat\(5,/s);
+    expect(gallery).toMatch(/\.endgame-gallery__grid\[data-endgame-category="easy"\]\s*\{[^}]*repeat\(5,/s);
     expect(gallery).toMatch(/\.endgame-gallery__node\s*\{[\s\S]*aspect-ratio:\s*1;/);
     expect(gallery).toMatch(/\.endgame-gallery__node > button\s*\{[\s\S]*min-width:\s*44px;[\s\S]*min-height:\s*44px;/);
     expect(gallery).not.toMatch(/overflow-(?:x|y):\s*(?:auto|scroll)/);
@@ -49,15 +51,17 @@ describe('Phase 12 Endgame curriculum authority', () => {
     expect(gallery).not.toContain('.endgame-gallery__node--selected > button::before');
   });
 
-  it('keeps lessons and mastery compact without a second route-mount reveal', () => {
+  it('keeps lessons and mastery compact while animating only D2B category and detail swaps', () => {
     expect(gallery).toMatch(/\.endgame-gallery__lesson\s*\{[^}]*grid-template-columns:\s*max-content minmax\(0,\s*1fr\)/s);
     expect(gallery).toMatch(/\.endgame-gallery__mastery > div\s*\{[^}]*repeat\(3,/s);
     expect(gallery).toMatch(/\.endgame-gallery__node--locked > button\s*\{[^}]*border-style:\s*dashed;/s);
     expect(gallery).toMatch(/@media \(max-width:\s*719px\),\s*\(orientation:\s*portrait\)[\s\S]*\.endgame-gallery\s*\{[\s\S]*grid-template-rows:/);
     expect(gallery).toMatch(/@media \(min-width:\s*720px\) and \(max-height:\s*520px\)[\s\S]*\.endgame-gallery__grid\s*\{[\s\S]*grid-template-columns:\s*repeat\(5,/);
-    expect(gallery).not.toContain('endgame-gallery-reveal');
-    expect(gallery).not.toContain('endgame-gallery-page-in');
-    expect(gallery).not.toMatch(/\.endgame-gallery__(?:stage|grid)\s*\{[^}]*animation:/s);
+    expect(gallery).toMatch(/\.endgame-gallery__grid--motion\[data-endgame-category-motion="full"\]\s*\{[^}]*120ms[^}]*180ms[^}]*120ms/s);
+    expect(gallery).toMatch(/\.endgame-gallery__hero--motion\[data-endgame-detail-motion="full"\]\s*\{[^}]*120ms/s);
+    expect(gallery).toMatch(/\.endgame-gallery__grid--motion\[data-endgame-category-motion="reduced"\][\s\S]*32ms[\s\S]*transform:\s*none !important/s);
+    expect(gallery).toMatch(/@keyframes endgame-gallery-category-release\s*\{[\s\S]*translateY\(4px\)/s);
+    expect(gallery).toMatch(/@keyframes endgame-gallery-detail-settle\s*\{[\s\S]*translateY\(3px\)/s);
   });
 
   it('keeps localized Endgame titles inside a complete glyph box', () => {

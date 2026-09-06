@@ -307,7 +307,7 @@
 
 .classic-speed-control__heading small {
   color: var(--muted);
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .classic-speed-control__heading em {
@@ -332,155 +332,83 @@
   border: 1px solid color-mix(in srgb, var(--settings-accent) 28%, var(--line));
   border-radius: 999px;
   font-family: var(--font-ui);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
 }
 
-.classic-speed-control__values {
+.classic-speed-control__presets {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
+  gap: 5px;
   min-width: 0;
 }
 
-.classic-speed-control__value {
-  display: flex;
-  min-width: 0;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
+.classic-speed-control__preset {
+  display: grid;
+  min-width: 44px;
+  min-height: 52px;
+  padding: 6px 4px;
+  place-items: center;
+  gap: 3px;
   color: var(--muted);
-  font-size: 11px;
-}
-
-.classic-speed-control__value strong {
-  color: var(--ink);
-  font-family: var(--font-data);
-  font-size: 14px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.classic-speed-control__direction {
-  color: color-mix(in srgb, var(--settings-accent) 66%, var(--muted));
-  font-family: var(--font-data);
-  font-size: 13px;
-}
-
-.classic-speed-control__rail {
-  position: relative;
-  height: 28px;
-  margin-inline: 3px;
-  touch-action: none;
-}
-
-.classic-speed-control__track {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  left: 8px;
-  height: 6px;
-  overflow: hidden;
   background:
-    repeating-linear-gradient(90deg, transparent 0 calc(7.6923% - 1px), color-mix(in srgb, var(--surface) 72%, transparent) calc(7.6923% - 1px) 7.6923%),
-    color-mix(in srgb, var(--settings-accent) 24%, var(--raised));
-  border: 1px solid color-mix(in srgb, var(--settings-accent) 25%, var(--line));
-  border-radius: 999px;
-  transform: translateY(-50%);
-}
-
-.classic-speed-control__track i {
-  position: absolute;
-  top: -1px;
-  bottom: -1px;
-  left: var(--classic-speed-start);
-  width: calc(var(--classic-speed-floor) - var(--classic-speed-start));
-  background: linear-gradient(90deg, color-mix(in srgb, var(--settings-accent) 72%, white), var(--settings-accent));
-  border-radius: inherit;
-}
-
-.classic-speed-control__input {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 28px;
-  margin: 0;
-  appearance: none;
-  direction: ltr;
-  pointer-events: none;
-  background: transparent;
-  border: 0;
+    linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, white), var(--raised));
+  border: 1px solid color-mix(in srgb, var(--settings-accent) 20%, var(--line));
+  border-radius: 9px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .58);
   cursor: pointer;
 }
 
-.classic-speed-control__input--floor { z-index: 3; }
-.classic-speed-control__input:focus { z-index: 4; }
-
-.classic-speed-control__input::-webkit-slider-runnable-track {
-  height: 6px;
-  background: transparent;
-  border: 0;
+.classic-speed-control__preset strong {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
 }
 
-.classic-speed-control__input::-webkit-slider-thumb {
-  width: 18px;
-  height: 18px;
-  margin-top: -6px;
-  appearance: none;
-  pointer-events: auto;
-  background: var(--surface);
-  border: 4px solid var(--settings-accent);
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--settings-accent) 42%, var(--ink)), 0 3px 7px rgba(20, 57, 87, .18);
+.classic-speed-control__preset span {
+  color: color-mix(in srgb, var(--muted) 88%, var(--ink));
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.classic-speed-control__input::-moz-range-track {
-  height: 6px;
-  background: transparent;
-  border: 0;
+.classic-speed-control__preset:hover,
+.classic-speed-control__preset:focus-visible {
+  color: color-mix(in srgb, var(--settings-accent) 80%, var(--ink));
+  border-color: color-mix(in srgb, var(--settings-accent) 62%, var(--line));
 }
 
-.classic-speed-control__input::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  pointer-events: auto;
-  background: var(--surface);
-  border: 4px solid var(--settings-accent);
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--settings-accent) 42%, var(--ink)), 0 3px 7px rgba(20, 57, 87, .18);
+.classic-speed-control__preset:focus-visible {
+  z-index: 1;
+  outline: 3px solid color-mix(in srgb, var(--focus) 70%, white);
+  outline-offset: 1px;
 }
 
-.classic-speed-control__input:focus-visible {
-  outline: 0;
+.classic-speed-control__preset[aria-checked="true"] {
+  color: var(--action-ink);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--settings-accent) 78%, white), var(--settings-accent));
+  border-color: var(--settings-accent);
+  box-shadow: 0 5px 12px color-mix(in srgb, var(--settings-accent) 24%, transparent);
 }
 
-.settings-console .classic-speed-control__input[data-arrow-nav][data-arrow-selected="true"] {
-  outline: 0;
-  outline-offset: 0;
+.classic-speed-control__preset[aria-checked="true"] span {
+  color: color-mix(in srgb, var(--action-ink) 86%, transparent);
 }
 
-.classic-speed-control__input:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--focus), 0 3px 7px rgba(20, 57, 87, .18);
-}
-
-.classic-speed-control__input:focus-visible::-moz-range-thumb {
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--focus), 0 3px 7px rgba(20, 57, 87, .18);
-}
-
-.classic-speed-control__limits {
-  display: flex;
-  justify-content: space-between;
-  margin-top: -5px;
-  padding-inline: 3px;
+.classic-speed-control__summary {
+  display: block;
+  min-height: 16px;
   color: var(--muted);
   font-family: var(--font-data);
-  font-size: 12px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .settings-console__actions {
@@ -793,14 +721,13 @@
 
   .classic-speed-control__heading small { display: none; }
 
-  .classic-speed-control__values { gap: 6px; }
-
-  .classic-speed-control__value {
-    display: grid;
-    gap: 2px;
+  .classic-speed-control__preset {
+    min-height: 48px;
+    padding-inline: 2px;
   }
 
-  .classic-speed-control__value:last-child { text-align: right; }
+  .classic-speed-control__preset strong,
+  .classic-speed-control__preset span { font-size: 11px; }
 }
 
 @media (max-height: 520px) and (min-width: 700px) {

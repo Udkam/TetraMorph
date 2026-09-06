@@ -1,6 +1,6 @@
 /* Phase 12 Endgame curriculum authority.
    One large canonical board and three named square-card pages replace the dense
-   50-node worksheet. The gallery owns no scroll container at any supported viewport. */
+   46-board worksheet. The gallery owns no scroll container at any supported viewport. */
 
 .library-shell--gallery {
   display: grid;
@@ -255,6 +255,17 @@
   line-height: 1;
 }
 
+.endgame-gallery__archived-notice {
+  grid-column: 1 / -1;
+  margin: -3px 0 0;
+  padding: 7px 9px;
+  color: #68537e;
+  font-size: 11px;
+  line-height: 1.35;
+  background: rgba(232, 239, 244, .76);
+  border-left: 3px solid #8a63b3;
+}
+
 .endgame-gallery__pages {
   display: grid;
   grid-template-columns: repeat(3, minmax(68px, 1fr));
@@ -362,12 +373,76 @@
 }
 
 .endgame-gallery__grid[data-endgame-category="intro"] {
-  grid-template-columns: repeat(3, minmax(64px, 1fr));
-  width: min(76%, 340px);
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
+  width: min(100%, 560px);
 }
 
 .endgame-gallery__grid[data-endgame-category="easy"] {
-  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
+}
+
+@keyframes endgame-gallery-category-release {
+  from {
+    opacity: .7;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: .86;
+    transform: translateY(2px);
+  }
+}
+
+@keyframes endgame-gallery-category-settle {
+  from {
+    opacity: .86;
+    transform: translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes endgame-gallery-detail-settle {
+  from {
+    opacity: .78;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes endgame-gallery-reduced-reveal {
+  from {
+    opacity: .78;
+    transform: none;
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.endgame-gallery__grid--motion[data-endgame-category-motion="full"] {
+  animation:
+    endgame-gallery-category-release 120ms ease-out both,
+    endgame-gallery-category-settle 180ms 120ms cubic-bezier(.18, .75, .28, 1) forwards;
+}
+
+.endgame-gallery__hero--motion[data-endgame-detail-motion="full"] {
+  animation: endgame-gallery-detail-settle 120ms cubic-bezier(.18, .75, .28, 1) both;
+}
+
+.endgame-gallery__grid--motion[data-endgame-category-motion="reduced"],
+.endgame-gallery__hero--motion[data-endgame-detail-motion="reduced"] {
+  animation: endgame-gallery-reduced-reveal 32ms linear both;
+  transform: none !important;
 }
 
 .endgame-gallery__node {
@@ -571,7 +646,7 @@
   }
 
   .endgame-gallery__grid[data-endgame-category="easy"] {
-    grid-template-columns: repeat(6, minmax(44px, 1fr));
+    grid-template-columns: repeat(5, minmax(44px, 1fr));
   }
 
   .endgame-gallery__mastery {
@@ -674,6 +749,9 @@
   }
 }
 
-.app[data-reduced-motion="true"] .endgame-gallery__node > button {
+.app[data-reduced-motion="true"] .endgame-gallery__node > button,
+.app[data-reduced-motion="true"] .endgame-gallery__grid--motion,
+.app[data-reduced-motion="true"] .endgame-gallery__hero--motion {
   transition: none !important;
+  transform: none !important;
 }
