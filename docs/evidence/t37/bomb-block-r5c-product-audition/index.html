@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>TetraMorph · R5C 方块爆破试听</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body data-ready="false">
+    <main>
+      <header>
+        <div>
+          <p class="kicker">T37 · R5C · PRODUCT AUDIO</p>
+          <h1>方块 <span>崩</span> 开，而非真实爆炸</h1>
+          <p>此页只调度真实 Core Bomb 事件、当前生产 Renderer 与当前生产 AudioEngine。请在完整 <b>1×</b> 下依次试听正常 Bomb 与连锁清屏。</p>
+        </div>
+        <aside><b>技术证据，不是提前验收</b><br>无自动播放、无持久化选择、无隐藏的 A/B/C 素材。</aside>
+      </header>
+      <section class="stage">
+        <div class="visual">
+          <div class="row"><h2 id="scene-title">真实 Core · 正常 Bomb</h2><output id="time">0 ms</output></div>
+          <div id="canvas-host" aria-label="TetraMorph Bomb 生产动画棋盘"></div>
+          <p id="status">正在准备生产 Renderer…</p>
+        </div>
+        <div class="controls">
+          <h2>完整 1× 试听</h2>
+          <button class="primary" id="sequence"><b>正常 Bomb → 连锁清屏</b><span>顺序试听当前 R5C 方块爆破</span></button>
+          <div class="direct">
+            <button id="normal">只播放正常 Bomb</button>
+            <button id="chain">只播放连锁清屏</button>
+          </div>
+          <div class="utilities">
+            <button id="stop">停止</button>
+            <button id="restart">重新播放顺序</button>
+            <button id="disable">禁用声音</button>
+            <button id="reduced">reduced 技术核验</button>
+          </div>
+          <p class="note">正常 onset 固定在视觉 220 ms；连锁使用同一因果节拍。reduced 仅验证短尾与静态端点，不用于人耳结论。</p>
+        </div>
+      </section>
+      <footer>
+        <span>当前生产路径 · 单声道 · 无外部 Bomb 样本</span>
+        <span id="technical">Instance 0 · Canvas 0 · Audio cold</span>
+      </footer>
+    </main>
+    <script type="module" src="./audition.ts"></script>
+  </body>
+</html>
