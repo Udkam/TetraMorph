@@ -12237,3 +12237,19 @@ second fixed 32-unit slice may be authorized without crossing a depth boundary. 
 the same Core source and receipt protocol, stops at a failed child or certificate, and must receive
 another independent exact-tip Store admission after the runner exits. No semantic conclusion is
 drawn from the observed zero bound prunes.
+
+### 2026-09-06 T37 F5 depth-five serial continuity after g65
+
+The second fixed batch validates the same operational contract at a larger offset: g34–g65 append
+32 contiguous authenticated checkpoints with no stderr, residue, binding drift, or Store-admission
+failure. At g65 the verified state remains depth 5 / offset 2,883,584 of the known 13,967,878-parent
+frontier, so a further 32 fixed units (g66–g97) end at offset 4,980,736 and cannot cross this layer
+boundary. The next batch therefore remains a bounded continuation rather than an inferred
+successor-layer operation.
+
+This authorization changes neither the p1 codec, public-control landing domain, candidate route,
+conservative deficit rule, receipt protocol, nor certificate semantics. The observed zero bound
+prunes remains a measurement, not permission to weaken or replace the bound. A later batch may be
+chosen only after g66–g97 exits and the coordinator independently validates its ledger and exact-tip
+Store suspension; no registry, product, browser, QA, publication, or player-acceptance work opens
+before a terminal certificate chain exists.

@@ -4839,3 +4839,23 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   `%LOCALAPPDATA%\\Temp\\t37-f5-horizon-r7-g00034-g00065-20260906-114423-logs`. Do not edit proof
   source, launch another proof, or infer a result while it is live. On exit, first read its
   stderr/markers and audit the contiguous ledger plus exact Store tip before any next action.
+
+### 2026-09-06 F5 Horizon g34–g65 serial batch audited
+
+- Sole owner `25532` exits normally after exactly 32 `F5_CHECKPOINT` markers (g34 through g65).
+  The last marker is still `searching`, retains Horizon route SHA-256
+  `458DD677...E348C663`, and binds generation 65 / depth 5 / parent offset 2,883,584 to exact
+  tip `0EB2402C...623800DA`. There is no `F5_CERTIFICATE`, stderr is empty, no related Node
+  process remains, and no `.part` residue exists.
+- Independent ledger validation finds every receipt and manifest continuous from g0 through g65;
+  every receipt shape, route hash, owner, generation, manifest SHA-256, predecessor link, and the
+  single proof-binding hash validates. Exact-tip Store re-admission reports `advanceAllowed=true`,
+  the same 13,967,878-parent depth-five frontier, 26,755,798 current-layer transitions, zero
+  current bound prunes, and a clean suspension with no active runs or cleanup errors. This is an
+  authenticated intermediate checkpoint, not an optimality certificate.
+- At the observed offset, 11,084,294 parents remain before this depth boundary (170 fixed units).
+  Authorize one sole fresh-preflighted serial `--max-advances 32` runner for g66–g97 only. It must
+  use the unchanged source, stage, receipt protocol, candidate route, and 30-minute R7 allowance;
+  write one receipt per child; stop immediately on a nonzero child or Core certificate; and receive
+  another complete ledger/Store audit after exit. No source change, concurrent proof, successor
+  candidate, registry action, final gate, publication, or player review opens during the batch.

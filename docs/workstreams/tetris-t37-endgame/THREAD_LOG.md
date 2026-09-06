@@ -2378,3 +2378,18 @@ product path is open.
 - This is a live execution record, not a certificate or result. On exit, read the markers/stderr,
   validate receipt contiguity and the exact final manifest tip, then re-admit and cleanly suspend
   the Store before any successor authorization.
+
+### T37 F5 Horizon R7 g34–g65 serial batch audit
+
+- Sole owner `25532` exits normally after its permitted 32 children. Stdout has exactly the g34–g65
+  checkpoint markers and no certificate marker; stderr is empty. Receipt g65 remains `searching`
+  at depth 5 / offset 2,883,584 and binds route `458DD677...E348C663` to exact tip
+  `0EB2402C...623800DA`; no related Node or part residue remains.
+- Coordinator validates the full g0–g65 receipt/manifest chain: contiguous generations, stable
+  binding, matching receipt SHA-256 tips, and valid predecessor links. Direct exact-tip Store
+  admission is advanceable and cleanly suspended at 13,967,878 parents / 26,755,798 transitions /
+  zero current bound prunes. This is a durable checkpoint only, not a Horizon certificate.
+- With 11,084,294 depth-five parents (170 units) still outstanding, coordinator authorizes one sole
+  fresh-preflighted `--max-advances 32` g66–g97 runner under the identical source/receipt contract.
+  It must stop on failure or certificate and undergo another complete ledger/Store audit after exit;
+  concurrent proof, source changes, registry, final gates, and player review remain closed.

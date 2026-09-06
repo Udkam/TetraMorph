@@ -11864,3 +11864,19 @@ in-memory authoring/diff contract before any admission path can open.
   immediate stop on a failed child or Core certificate. Do not modify source during the batch.
   After exit, independently audit ledger and Store before any later slice; successor levels,
   registry, final gates, publication, and player review remain closed.
+
+### 2026-09-06 T37 F5 Horizon g34–g65 audit and g66–g97 boundary
+
+- The sole 32-unit runner exits normally. Its g34–g65 markers, receipts, manifests, and one
+  stable candidate binding validate end-to-end; g65 is `searching` at depth 5 / offset 2,883,584,
+  exact tip `0EB2402C...623800DA`, empty stderr, and zero part residue. It is not a certificate.
+- Direct Store admission at that exact tip is advanceable and cleanly suspended: the depth-five
+  frontier remains 13,967,878 parents, current transitions are 26,755,798, and current bound
+  prunes are zero. The 11,084,294 parents still remaining are 170 fixed units, so this authorization
+  stays entirely inside the observed depth-five layer.
+- Permit one sole fresh-preflighted serial `--max-advances 32` runner for g66–g97 only. It must
+  retain the exact source, stage, route, receipt-per-child protocol, 30-minute R7 allowance, and
+  stop-on-failure-or-certificate behavior. Do not modify source or start another proof during the
+  batch. After exit, independently audit stdout/stderr, ledger, residue, and exact Store tip before
+  deciding any later slice; successor levels, registry, final gates, publication, and player review
+  remain closed.
