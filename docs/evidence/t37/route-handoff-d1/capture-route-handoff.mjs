@@ -34,7 +34,7 @@ const addKnownPreferences = async (context, {
     localStorage.setItem('tetramorph:reduced-motion:v1', reduced ? 'on' : 'off');
     localStorage.setItem(
       'tetramorph:mode-rule-intros:v1',
-      JSON.stringify(['marathon', 'race', 'sprint', 'puzzle']),
+      JSON.stringify(['marathon', 'race', 'sprint', 'endgame']),
     );
   }, { reduced: reducedMotion, selectedLanguage: language, selectedTheme: theme });
 };
@@ -255,8 +255,8 @@ try {
   await screenshot(nativePage, 'native-home-final.png');
 
   await armRouteAnimationPause(nativePage, 't37-route-settle');
-  await nativePage.evaluate(() => document.querySelector('[data-testid="enter-puzzle"]')?.click());
-  await nativePage.getByTestId('puzzle-library').waitFor();
+  await nativePage.evaluate(() => document.querySelector('[data-testid="enter-endgame"]')?.click());
+  await nativePage.getByTestId('endgame-library').waitFor();
   const forwardAnimations = await pauseRouteAnimations(nativePage, 't37-route-settle');
   const forwardFrames = [];
   for (const timeMs of [0, 60, 120, 200]) {
@@ -267,7 +267,7 @@ try {
   }
   const forwardDuring = forwardFrames[1];
   validateTopology('native-forward', forwardDuring, { expectedCanvas: 0 });
-  requireEvidence(forwardDuring.path === '/puzzles', `native-forward: wrong path ${forwardDuring.path}`);
+  requireEvidence(forwardDuring.path === '/endgames', `native-forward: wrong path ${forwardDuring.path}`);
   requireEvidence(forwardDuring.transitionMode === 'native', `native-forward: wrong mode ${forwardDuring.transitionMode}`);
   requireEvidence(forwardDuring.appDirection === 'forward' && forwardDuring.rootDirection === 'forward', 'native-forward: forward direction was not exposed on app and root');
   requireEvidence(forwardAnimations.some((animation) => animation.name === 't37-route-release' && animation.duration === 120), 'native-forward: missing 120 ms release animation');
@@ -335,7 +335,7 @@ try {
 
   // Two same-stack intents: only the latest route may commit or own history.
   await nativePage.evaluate(() => {
-    document.querySelector('[data-testid="enter-puzzle"]')?.click();
+    document.querySelector('[data-testid="enter-endgame"]')?.click();
     document.querySelector('[data-testid="enter-marathon"]')?.click();
   });
   await nativePage.getByTestId('game-screen').waitFor();
@@ -378,8 +378,8 @@ try {
   observePage(fallbackPage, 'fallback');
   await fallbackPage.goto(origin, { waitUntil: 'networkidle' });
   await armRouteAnimationPause(fallbackPage, 't37-route-settle');
-  await fallbackPage.evaluate(() => document.querySelector('[data-testid="enter-puzzle"]')?.click());
-  await fallbackPage.getByTestId('puzzle-library').waitFor();
+  await fallbackPage.evaluate(() => document.querySelector('[data-testid="enter-endgame"]')?.click());
+  await fallbackPage.getByTestId('endgame-library').waitFor();
   const fallbackAnimations = await pauseRouteAnimations(fallbackPage, 't37-route-settle');
   await seekRouteAnimations(fallbackPage, 80);
   const fallbackDuring = await routeSnapshot(fallbackPage);
@@ -405,7 +405,7 @@ try {
   const reducedSamples = await reducedPage.evaluate(async () => {
     const samples = [];
     const startedAt = performance.now();
-    document.querySelector('[data-testid="enter-puzzle"]')?.click();
+    document.querySelector('[data-testid="enter-endgame"]')?.click();
     for (let frame = 0; frame < 12; frame += 1) {
       const app = document.querySelector('.app');
       const viewport = document.querySelector('[data-testid="route-viewport"]');
@@ -432,7 +432,7 @@ try {
     }
     return samples;
   });
-  await reducedPage.getByTestId('puzzle-library').waitFor();
+  await reducedPage.getByTestId('endgame-library').waitFor();
   const reducedActive = reducedSamples.filter((sample) => sample.mode === 'reduced');
   requireEvidence(reducedActive.length > 0, `reduced: no active sample ${JSON.stringify(reducedSamples)}`);
   requireEvidence(reducedActive.every((sample) => sample.transform === 'none'), `reduced: translation appeared ${JSON.stringify(reducedActive)}`);
@@ -456,8 +456,8 @@ try {
   const mobilePage = await mobileContext.newPage();
   observePage(mobilePage, 'mobile');
   await mobilePage.goto(origin, { waitUntil: 'networkidle' });
-  await mobilePage.getByTestId('enter-puzzle').click();
-  await mobilePage.getByTestId('puzzle-library').waitFor();
+  await mobilePage.getByTestId('enter-endgame').click();
+  await mobilePage.getByTestId('endgame-library').waitFor();
   await waitForIdle(mobilePage);
   const mobileFinal = await routeSnapshot(mobilePage);
   const mobileGeometry = await mobilePage.evaluate(() => ({
@@ -467,7 +467,7 @@ try {
     documentScrollHeight: document.documentElement.scrollHeight,
     routeControlHeights: [
       document.querySelector('.library-back'),
-      document.querySelector('[data-testid="start-selected-puzzle"]'),
+      document.querySelector('[data-testid="start-selected-endgame"]'),
       ...document.querySelectorAll('[data-testid="level-row"]'),
     ].filter(Boolean).map((control) => ({
       testId: control.getAttribute('data-testid'),
@@ -480,7 +480,7 @@ try {
   requireEvidence(mobileGeometry.documentScrollWidth === mobileGeometry.innerWidth, `mobile-final: horizontal overflow ${JSON.stringify(mobileGeometry)}`);
   requireEvidence(mobileGeometry.documentScrollHeight === mobileGeometry.innerHeight, `mobile-final: vertical overflow ${JSON.stringify(mobileGeometry)}`);
   requireEvidence(mobileGeometry.routeControlHeights.every((control) => control.height >= 44), `mobile-final: route control below 44 px ${JSON.stringify(mobileGeometry.routeControlHeights)}`);
-  await screenshot(mobilePage, 'mobile-puzzle-final.png');
+  await screenshot(mobilePage, 'mobile-endgame-final.png');
   evidence.mobile = { final: mobileFinal, geometry: mobileGeometry };
   await mobileContext.close();
 
@@ -495,12 +495,12 @@ try {
       const matrixPage = await matrixContext.newPage();
       observePage(matrixPage, `matrix-${label}`);
       await matrixPage.goto(origin, { waitUntil: 'networkidle' });
-      await matrixPage.getByTestId('enter-puzzle').click();
-      await matrixPage.getByTestId('puzzle-library').waitFor();
+      await matrixPage.getByTestId('enter-endgame').click();
+      await matrixPage.getByTestId('endgame-library').waitFor();
       await waitForIdle(matrixPage);
       const final = await routeSnapshot(matrixPage);
       validateTopology(`matrix-${label}`, final, { expectedCanvas: 0 });
-      requireEvidence(final.path === '/puzzles', `matrix-${label}: wrong path ${final.path}`);
+      requireEvidence(final.path === '/endgames', `matrix-${label}: wrong path ${final.path}`);
       requireEvidence(final.language === language, `matrix-${label}: wrong language ${final.language}`);
       requireEvidence(final.theme === theme, `matrix-${label}: wrong theme ${final.theme}`);
       requireEvidence(final.otherAnimations.length === 0, `matrix-${label}: residual child animation ${JSON.stringify(final.otherAnimations)}`);

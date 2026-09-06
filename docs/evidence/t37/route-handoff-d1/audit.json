@@ -1,6 +1,6 @@
 {
-  "sourceSha": "532935362392d00eafb80b8f198a929586437eda",
-  "capturedAt": "2026-08-10T00:02:46.604Z",
+  "sourceSha": "92ec0fcca276462ac81757f5e7d0c8ad2e80c944",
+  "capturedAt": "2026-09-06T10:40:25.461Z",
   "origin": "http://127.0.0.1:4192",
   "browser": "149.0.7827.55",
   "evidence": {
@@ -25,16 +25,16 @@
       "forwardFrames": [
         {
           "timeMs": 0,
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "zh-CN",
           "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -47,7 +47,7 @@
           "domCellCount": 0,
           "activeTestId": "level-row",
           "activeAriaLabel": "01 补行，3 行残局，可进入",
-          "surfaceTestId": "puzzle-library",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -80,16 +80,16 @@
         },
         {
           "timeMs": 60,
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "zh-CN",
           "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -102,7 +102,7 @@
           "domCellCount": 0,
           "activeTestId": "level-row",
           "activeAriaLabel": "01 补行，3 行残局，可进入",
-          "surfaceTestId": "puzzle-library",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -135,16 +135,16 @@
         },
         {
           "timeMs": 120,
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "zh-CN",
           "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -157,7 +157,7 @@
           "domCellCount": 0,
           "activeTestId": "level-row",
           "activeAriaLabel": "01 补行，3 行残局，可进入",
-          "surfaceTestId": "puzzle-library",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -190,16 +190,16 @@
         },
         {
           "timeMs": 200,
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "zh-CN",
           "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -212,7 +212,7 @@
           "domCellCount": 0,
           "activeTestId": "level-row",
           "activeAriaLabel": "01 补行，3 行残局，可进入",
-          "surfaceTestId": "puzzle-library",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -245,16 +245,16 @@
         }
       ],
       "forwardFinal": {
-        "path": "/puzzles",
+        "path": "/endgames",
         "language": "zh-CN",
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
-              "screen": "puzzle-library",
-              "mode": "puzzle",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "screen": "endgame-library",
+              "mode": "endgame",
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -267,7 +267,7 @@
         "domCellCount": 0,
         "activeTestId": "level-row",
         "activeAriaLabel": "01 补行，3 行残局，可进入",
-        "surfaceTestId": "puzzle-library",
+        "surfaceTestId": "endgame-library",
         "surfaceViewTransitionName": "none",
         "viewportViewTransitionName": "app-route",
         "viewportOpacity": "1",
@@ -306,11 +306,11 @@
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
               "screen": "home",
               "mode": "marathon",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -360,11 +360,11 @@
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
               "screen": "home",
               "mode": "marathon",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -399,11 +399,11 @@
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
               "screen": "game",
               "mode": "marathon",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -482,11 +482,11 @@
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
               "screen": "game",
               "mode": "marathon",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -558,11 +558,11 @@
             "pseudoElement": null
           },
           {
-            "name": "sheet-backdrop-in",
+            "name": "d2a-backdrop-in",
             "pseudoElement": null
           },
           {
-            "name": "sheet-in",
+            "name": "d2a-sheet-in",
             "pseudoElement": null
           }
         ]
@@ -574,11 +574,11 @@
         "status": "ready",
         "countdown": 3,
         "phase": "active",
-        "puzzleId": null,
-        "puzzleCompletion": null,
-        "puzzleTargetsRemaining": 0,
-        "puzzleTargetsInitial": 0,
-        "puzzleUndoDepth": 0,
+        "endgameId": null,
+        "endgameCompletion": null,
+        "endgameTargetsRemaining": 0,
+        "endgameTargetsInitial": 0,
+        "endgameUndoDepth": 0,
         "mutation": null,
         "score": 0,
         "lines": 0,
@@ -590,10 +590,10 @@
         "stoneIntervalPieces": null,
         "stoneNextPieces": null,
         "fallingStones": [],
-        "fallTicks": 48,
+        "fallTicks": 36,
         "placedPieces": 0,
         "active": {
-          "type": "Z",
+          "type": "S",
           "x": 3,
           "y": 19,
           "rotation": 0
@@ -631,11 +631,11 @@
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
               "screen": "home",
               "mode": "marathon",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -670,11 +670,11 @@
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
               "screen": "game",
               "mode": "marathon",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -739,11 +739,11 @@
         "status": "ready",
         "countdown": 3,
         "phase": "active",
-        "puzzleId": null,
-        "puzzleCompletion": null,
-        "puzzleTargetsRemaining": 0,
-        "puzzleTargetsInitial": 0,
-        "puzzleUndoDepth": 0,
+        "endgameId": null,
+        "endgameCompletion": null,
+        "endgameTargetsRemaining": 0,
+        "endgameTargetsInitial": 0,
+        "endgameUndoDepth": 0,
         "mutation": null,
         "score": 0,
         "lines": 0,
@@ -755,17 +755,17 @@
         "stoneIntervalPieces": null,
         "stoneNextPieces": null,
         "fallingStones": [],
-        "fallTicks": 48,
+        "fallTicks": 36,
         "placedPieces": 0,
         "active": {
-          "type": "O",
-          "x": 4,
+          "type": "I",
+          "x": 3,
           "y": 19,
           "rotation": 0
         },
-        "next": "I",
+        "next": "T",
         "nextPreviews": [
-          "I"
+          "T"
         ],
         "visibleBoard": [
           "..........",
@@ -800,16 +800,16 @@
         }
       ],
       "during": {
-        "path": "/puzzles",
+        "path": "/endgames",
         "language": "zh-CN",
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
-              "screen": "puzzle-library",
-              "mode": "puzzle",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "screen": "endgame-library",
+              "mode": "endgame",
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -822,7 +822,7 @@
         "domCellCount": 0,
         "activeTestId": "level-row",
         "activeAriaLabel": "01 补行，3 行残局，可进入",
-        "surfaceTestId": "puzzle-library",
+        "surfaceTestId": "endgame-library",
         "surfaceViewTransitionName": "none",
         "viewportViewTransitionName": "app-route",
         "viewportOpacity": "0.999577",
@@ -847,16 +847,16 @@
         "otherAnimations": []
       },
       "final": {
-        "path": "/puzzles",
+        "path": "/endgames",
         "language": "zh-CN",
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
-              "screen": "puzzle-library",
-              "mode": "puzzle",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "screen": "endgame-library",
+              "mode": "endgame",
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -869,7 +869,7 @@
         "domCellCount": 0,
         "activeTestId": "level-row",
         "activeAriaLabel": "01 补行，3 行残局，可进入",
-        "surfaceTestId": "puzzle-library",
+        "surfaceTestId": "endgame-library",
         "surfaceViewTransitionName": "none",
         "viewportViewTransitionName": "app-route",
         "viewportOpacity": "1",
@@ -889,10 +889,10 @@
     "reduced": {
       "samples": [
         {
-          "elapsedMs": 36.19999998807907,
+          "elapsedMs": 21.299999997019768,
           "mode": "reduced",
           "direction": "forward",
-          "path": "/puzzles",
+          "path": "/endgames",
           "opacity": "0.995",
           "transform": "none",
           "animations": [
@@ -905,10 +905,10 @@
           ]
         },
         {
-          "elapsedMs": 90.5,
+          "elapsedMs": 53.599999994039536,
           "mode": "reduced",
           "direction": "forward",
-          "path": "/puzzles",
+          "path": "/endgames",
           "opacity": "0.995",
           "transform": "none",
           "animations": [
@@ -921,10 +921,10 @@
           ]
         },
         {
-          "elapsedMs": 92.69999998807907,
+          "elapsedMs": 57.599999994039536,
           "mode": "reduced",
           "direction": "forward",
-          "path": "/puzzles",
+          "path": "/endgames",
           "opacity": "0.995",
           "transform": "none",
           "animations": [
@@ -937,26 +937,26 @@
           ]
         },
         {
-          "elapsedMs": 111.59999999403954,
+          "elapsedMs": 74.8999999910593,
           "mode": "idle",
           "direction": "neutral",
-          "path": "/puzzles",
+          "path": "/endgames",
           "opacity": "1",
           "transform": "none",
           "animations": []
         }
       ],
       "final": {
-        "path": "/puzzles",
+        "path": "/endgames",
         "language": "zh-CN",
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
-              "screen": "puzzle-library",
-              "mode": "puzzle",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "screen": "endgame-library",
+              "mode": "endgame",
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -969,7 +969,7 @@
         "domCellCount": 0,
         "activeTestId": "level-row",
         "activeAriaLabel": "01 补行，3 行残局，可进入",
-        "surfaceTestId": "puzzle-library",
+        "surfaceTestId": "endgame-library",
         "surfaceViewTransitionName": "none",
         "viewportViewTransitionName": "app-route",
         "viewportOpacity": "1",
@@ -988,16 +988,16 @@
     },
     "mobile": {
       "final": {
-        "path": "/puzzles",
+        "path": "/endgames",
         "language": "zh-CN",
         "theme": "mineral-mist",
         "historyState": {
           "tetramorphRoute": {
-            "version": 1,
+            "version": 2,
             "navigation": {
-              "screen": "puzzle-library",
-              "mode": "puzzle",
-              "selectedPuzzleId": "t3r-shaft-01"
+              "screen": "endgame-library",
+              "mode": "endgame",
+              "selectedEndgameId": "t3r-shaft-01"
             }
           }
         },
@@ -1010,7 +1010,7 @@
         "domCellCount": 0,
         "activeTestId": "level-row",
         "activeAriaLabel": "01 补行，3 行残局，可进入",
-        "surfaceTestId": "puzzle-library",
+        "surfaceTestId": "endgame-library",
         "surfaceViewTransitionName": "none",
         "viewportViewTransitionName": "app-route",
         "viewportOpacity": "1",
@@ -1038,59 +1038,34 @@
             "height": 44
           },
           {
-            "testId": "start-selected-puzzle",
-            "className": "primary-action puzzle-gallery__start",
+            "testId": "start-selected-endgame",
+            "className": "primary-action endgame-gallery__start",
             "height": 44
           },
           {
             "testId": "level-row",
             "className": "",
-            "height": 84.84375
+            "height": 64.796875
           },
           {
             "testId": "level-row",
             "className": "",
-            "height": 84.84375
+            "height": 64.796875
           },
           {
             "testId": "level-row",
             "className": "",
-            "height": 84.859375
+            "height": 64.796875
           },
           {
             "testId": "level-row",
             "className": "",
-            "height": 84.84375
+            "height": 64.796875
           },
           {
             "testId": "level-row",
             "className": "",
-            "height": 84.84375
-          },
-          {
-            "testId": "level-row",
-            "className": "",
-            "height": 84.859375
-          },
-          {
-            "testId": "level-row",
-            "className": "",
-            "height": 84.84375
-          },
-          {
-            "testId": "level-row",
-            "className": "",
-            "height": 84.84375
-          },
-          {
-            "testId": "level-row",
-            "className": "",
-            "height": 84.859375
-          },
-          {
-            "testId": "level-row",
-            "className": "",
-            "height": 84.84375
+            "height": 64.8125
           }
         ]
       }
@@ -1100,16 +1075,16 @@
         "language": "zh-CN",
         "theme": "mineral-mist",
         "final": {
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "zh-CN",
           "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -1122,7 +1097,7 @@
           "domCellCount": 0,
           "activeTestId": "level-row",
           "activeAriaLabel": "01 补行，3 行残局，可进入",
-          "surfaceTestId": "puzzle-library",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -1143,16 +1118,16 @@
         "language": "zh-CN",
         "theme": "deep-tide",
         "final": {
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "zh-CN",
           "theme": "deep-tide",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -1165,7 +1140,7 @@
           "domCellCount": 0,
           "activeTestId": "level-row",
           "activeAriaLabel": "01 补行，3 行残局，可进入",
-          "surfaceTestId": "puzzle-library",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -1186,16 +1161,16 @@
         "language": "zh-CN",
         "theme": "sunstone",
         "final": {
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "zh-CN",
           "theme": "sunstone",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -1208,7 +1183,7 @@
           "domCellCount": 0,
           "activeTestId": "level-row",
           "activeAriaLabel": "01 补行，3 行残局，可进入",
-          "surfaceTestId": "puzzle-library",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -1229,16 +1204,16 @@
         "language": "en",
         "theme": "mineral-mist",
         "final": {
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "en",
           "theme": "mineral-mist",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -1250,8 +1225,8 @@
           "canvasCount": 0,
           "domCellCount": 0,
           "activeTestId": "level-row",
-          "activeAriaLabel": "01 Gap, 3-row puzzle, ready",
-          "surfaceTestId": "puzzle-library",
+          "activeAriaLabel": "01 Gap, 3-row endgame, ready",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -1272,16 +1247,16 @@
         "language": "en",
         "theme": "deep-tide",
         "final": {
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "en",
           "theme": "deep-tide",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -1293,8 +1268,8 @@
           "canvasCount": 0,
           "domCellCount": 0,
           "activeTestId": "level-row",
-          "activeAriaLabel": "01 Gap, 3-row puzzle, ready",
-          "surfaceTestId": "puzzle-library",
+          "activeAriaLabel": "01 Gap, 3-row endgame, ready",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
@@ -1315,16 +1290,16 @@
         "language": "en",
         "theme": "sunstone",
         "final": {
-          "path": "/puzzles",
+          "path": "/endgames",
           "language": "en",
           "theme": "sunstone",
           "historyState": {
             "tetramorphRoute": {
-              "version": 1,
+              "version": 2,
               "navigation": {
-                "screen": "puzzle-library",
-                "mode": "puzzle",
-                "selectedPuzzleId": "t3r-shaft-01"
+                "screen": "endgame-library",
+                "mode": "endgame",
+                "selectedEndgameId": "t3r-shaft-01"
               }
             }
           },
@@ -1336,8 +1311,8 @@
           "canvasCount": 0,
           "domCellCount": 0,
           "activeTestId": "level-row",
-          "activeAriaLabel": "01 Gap, 3-row puzzle, ready",
-          "surfaceTestId": "puzzle-library",
+          "activeAriaLabel": "01 Gap, 3-row endgame, ready",
+          "surfaceTestId": "endgame-library",
           "surfaceViewTransitionName": "none",
           "viewportViewTransitionName": "app-route",
           "viewportOpacity": "1",
