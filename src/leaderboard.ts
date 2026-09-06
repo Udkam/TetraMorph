@@ -4,18 +4,26 @@ import {
   normalizeClassicGravityFloorTicks,
   normalizeClassicStartingGravityTicks,
 } from './game/core/constants';
+import {
+  CLASSIC_PACE_IDS,
+  classicPaceForGravityRange,
+  classicPaceForId,
+  isClassicPaceId,
+  type ClassicPaceId,
+} from './classicPace';
 
 const LEGACY_CLASSIC_STARTING_GRAVITY_TICKS = 48;
 const LEGACY_CLASSIC_GRAVITY_FLOOR_TICKS = 6;
 
 export type RunMode = 'marathon' | 'race' | 'sprint';
 export type RunOutcome = 'top-out';
-export type ClassicDifficultyGrade = 'relaxed' | 'standard' | 'challenge';
+/** Historical name retained for callers; the value is now one fixed Classic pace. */
+export type ClassicDifficultyGrade = ClassicPaceId;
 
-export const CLASSIC_DIFFICULTY_GRADES = ['relaxed', 'standard', 'challenge'] as const;
+export const CLASSIC_DIFFICULTY_GRADES = CLASSIC_PACE_IDS;
 
 interface ScoreRecordBase {
-  version: 9;
+  version: 10;
   lines: number;
   elapsedTicks: number;
   outcome: RunOutcome;
@@ -49,14 +57,14 @@ export interface SurvivalScoreRecord extends ScoreRecordBase {
 export type ScoreRecord = StandardScoreRecord | SurvivalScoreRecord;
 
 export interface Leaderboard {
-  version: 9;
+  version: 10;
   marathon: ClassicScoreRecord[];
   race: SurvivalScoreRecord[];
   sprint: MutationScoreRecord[];
 }
 
-export const LEADERBOARD_KEY = 'tetramorph:leaderboard:v9';
-export const LEGACY_LEADERBOARD_KEYS = ['tetramorph:leaderboard:v8', 'tetris:leaderboard:v8', 'tetris:leaderboard:v7', 'tetris:leaderboard:v6', 'tetris:leaderboard:v5', 'tetris:leaderboard:v4', 'tetris:leaderboard:v3', 'stack-order:leaderboard:v2', 'stack-order:leaderboard:v1'] as const;
+export const LEADERBOARD_KEY = 'tetramorph:leaderboard:v10';
+export const LEGACY_LEADERBOARD_KEYS = ['tetramorph:leaderboard:v9', 'tetramorph:leaderboard:v8', 'tetris:leaderboard:v8', 'tetris:leaderboard:v7', 'tetris:leaderboard:v6', 'tetris:leaderboard:v5', 'tetris:leaderboard:v4', 'tetris:leaderboard:v3', 'stack-order:leaderboard:v2', 'stack-order:leaderboard:v1'] as const;
 export const LEADERBOARD_LIMIT = 5;
 export const MUTATION_LEADERBOARD_LIMIT = LEADERBOARD_LIMIT;
 
@@ -65,19 +73,14 @@ export function leaderboardLimit(mode: RunMode): number {
 }
 
 export function emptyLeaderboard(): Leaderboard {
-  return { version: 9, marathon: [], race: [], sprint: [] };
+  return { version: 10, marathon: [], race: [], sprint: [] };
 }
 
 export function classicDifficultyGrade(
   startingTicks: number,
   floorTicks: number,
 ): ClassicDifficultyGrade {
-  const normalizedStartingTicks = normalizeClassicStartingGravityTicks(startingTicks);
-  const normalizedFloorTicks = normalizeClassicGravityFloorTicks(floorTicks, normalizedStartingTicks);
-  const midpointSeconds = (normalizedStartingTicks + normalizedFloorTicks) / (2 * TICKS_PER_SECOND);
-  if (midpointSeconds >= 0.65) return 'relaxed';
-  if (midpointSeconds >= 0.35) return 'standard';
-  return 'challenge';
+  return classicPaceForGravityRange(startingTicks, floorTicks).id;
 }
 
 function isNonNegativeInteger(value: unknown): value is number {
@@ -105,14 +108,14 @@ function isClassicGravityTicks(value: unknown): value is number {
 }
 
 function isClassicDifficultyGrade(value: unknown): value is ClassicDifficultyGrade {
-  return CLASSIC_DIFFICULTY_GRADES.includes(value as ClassicDifficultyGrade);
+  return isClassicPaceId(value);
 }
 
 export function isScoreRecord(value: unknown): value is ScoreRecord {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
   if (
-    record.version !== 9
+    record.version !== 10
     || !isNonNegativeInteger(record.lines)
     || !isNonNegativeInteger(record.elapsedTicks)
     || (record.mode !== 'marathon' && record.mode !== 'race' && record.mode !== 'sprint')
@@ -131,10 +134,8 @@ export function isScoreRecord(value: unknown): value is ScoreRecord {
       && isClassicGravityTicks(record.classicGravityFloorTicks)
       && record.classicGravityFloorTicks <= record.classicStartingGravityTicks
       && isClassicDifficultyGrade(record.classicGrade)
-      && record.classicGrade === classicDifficultyGrade(
-        record.classicStartingGravityTicks,
-        record.classicGravityFloorTicks,
-      )
+      && record.classicStartingGravityTicks === classicPaceForId(record.classicGrade).startingTicks
+      && record.classicGravityFloorTicks === classicPaceForId(record.classicGrade).floorTicks
       && hasOnlyKeys(record, [
         'version',
         'mode',
@@ -203,7 +204,7 @@ function limitClassicRecords(records: readonly ClassicScoreRecord[]): ClassicSco
 function isLeaderboard(value: unknown): value is Leaderboard {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const board = value as Partial<Leaderboard>;
-  return board.version === 9
+  return board.version === 10
     && recordsAreValid('marathon', board.marathon)
     && recordsAreValid('race', board.race)
     && recordsAreValid('sprint', board.sprint);
@@ -217,7 +218,7 @@ export function parseLeaderboard(raw: string | null): Leaderboard {
       return migrateLegacyLeaderboard(raw);
     }
     return {
-      version: 9,
+      version: 10,
       marathon: limitClassicRecords(value.marathon),
       race: sortRecords('race', value.race).slice(0, leaderboardLimit('race')) as SurvivalScoreRecord[],
       sprint: sortRecords('sprint', value.sprint).slice(0, leaderboardLimit('sprint')) as MutationScoreRecord[],
@@ -233,6 +234,41 @@ interface LegacyRecordFields {
   pieces: number;
   elapsedTicks: number;
   completedAt: string;
+}
+
+type LegacyV9ClassicDifficultyGrade = 'relaxed' | 'standard' | 'challenge';
+
+interface LegacyV9ClassicScoreRecord extends LegacyRecordFields {
+  version: 9;
+  chain: number;
+  mode: 'marathon';
+  outcome: 'top-out';
+  classicStartingGravityTicks: number;
+  classicGravityFloorTicks: number;
+  classicGrade: LegacyV9ClassicDifficultyGrade;
+}
+
+interface LegacyV9MutationScoreRecord extends LegacyRecordFields {
+  version: 9;
+  chain: number;
+  mode: 'sprint';
+  outcome: 'top-out';
+}
+
+interface LegacyV9SurvivalScoreRecord {
+  version: 9;
+  lines: number;
+  elapsedTicks: number;
+  mode: 'race';
+  outcome: 'top-out';
+  completedAt: string;
+}
+
+interface LegacyV9Leaderboard {
+  version: 9;
+  marathon: LegacyV9ClassicScoreRecord[];
+  race: LegacyV9SurvivalScoreRecord[];
+  sprint: LegacyV9MutationScoreRecord[];
 }
 
 interface LegacyV8StandardScoreRecord extends LegacyRecordFields {
@@ -333,6 +369,97 @@ function hasLegacyFields(record: Partial<LegacyRecordFields>): boolean {
     && isNonNegativeInteger(record.pieces)
     && isNonNegativeInteger(record.elapsedTicks)
     && isIsoDate(record.completedAt);
+}
+
+function legacyV9ClassicDifficultyGrade(
+  startingTicks: number,
+  floorTicks: number,
+): LegacyV9ClassicDifficultyGrade {
+  const normalizedStartingTicks = normalizeClassicStartingGravityTicks(startingTicks);
+  const normalizedFloorTicks = normalizeClassicGravityFloorTicks(floorTicks, normalizedStartingTicks);
+  const midpointSeconds = (normalizedStartingTicks + normalizedFloorTicks) / (2 * TICKS_PER_SECOND);
+  if (midpointSeconds >= 0.65) return 'relaxed';
+  if (midpointSeconds >= 0.35) return 'standard';
+  return 'challenge';
+}
+
+function isLegacyV9ClassicDifficultyGrade(value: unknown): value is LegacyV9ClassicDifficultyGrade {
+  return value === 'relaxed' || value === 'standard' || value === 'challenge';
+}
+
+function isLegacyV9ClassicRecord(value: unknown): value is LegacyV9ClassicScoreRecord {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return record.version === 9
+    && record.mode === 'marathon'
+    && record.outcome === 'top-out'
+    && isNonNegativeInteger(record.score)
+    && isNonNegativeInteger(record.lines)
+    && isNonNegativeInteger(record.pieces)
+    && record.chain === 0
+    && isNonNegativeInteger(record.elapsedTicks)
+    && isIsoDate(record.completedAt)
+    && isClassicGravityTicks(record.classicStartingGravityTicks)
+    && isClassicGravityTicks(record.classicGravityFloorTicks)
+    && record.classicGravityFloorTicks <= record.classicStartingGravityTicks
+    && isLegacyV9ClassicDifficultyGrade(record.classicGrade)
+    && record.classicGrade === legacyV9ClassicDifficultyGrade(
+      record.classicStartingGravityTicks,
+      record.classicGravityFloorTicks,
+    )
+    && hasOnlyKeys(record, [
+      'version',
+      'mode',
+      'outcome',
+      'score',
+      'lines',
+      'pieces',
+      'elapsedTicks',
+      'chain',
+      'completedAt',
+      'classicStartingGravityTicks',
+      'classicGravityFloorTicks',
+      'classicGrade',
+    ]);
+}
+
+function isLegacyV9MutationRecord(value: unknown): value is LegacyV9MutationScoreRecord {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return record.version === 9
+    && record.mode === 'sprint'
+    && record.outcome === 'top-out'
+    && isNonNegativeInteger(record.score)
+    && isNonNegativeInteger(record.lines)
+    && isNonNegativeInteger(record.pieces)
+    && record.chain === 0
+    && isNonNegativeInteger(record.elapsedTicks)
+    && isIsoDate(record.completedAt)
+    && hasOnlyKeys(record, ['version', 'mode', 'outcome', 'score', 'lines', 'pieces', 'elapsedTicks', 'chain', 'completedAt']);
+}
+
+function isLegacyV9SurvivalRecord(value: unknown): value is LegacyV9SurvivalScoreRecord {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return record.version === 9
+    && record.mode === 'race'
+    && record.outcome === 'top-out'
+    && isNonNegativeInteger(record.lines)
+    && isNonNegativeInteger(record.elapsedTicks)
+    && isIsoDate(record.completedAt)
+    && hasOnlyKeys(record, ['version', 'mode', 'outcome', 'lines', 'elapsedTicks', 'completedAt']);
+}
+
+function isLegacyV9Leaderboard(value: unknown): value is LegacyV9Leaderboard {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const board = value as Partial<LegacyV9Leaderboard>;
+  return board.version === 9
+    && Array.isArray(board.marathon)
+    && board.marathon.every(isLegacyV9ClassicRecord)
+    && Array.isArray(board.race)
+    && board.race.every(isLegacyV9SurvivalRecord)
+    && Array.isArray(board.sprint)
+    && board.sprint.every(isLegacyV9MutationRecord);
 }
 
 function isLegacyV5Record(value: unknown): value is LegacyV5ScoreRecord {
@@ -483,13 +610,37 @@ function isLegacyV3Leaderboard(value: unknown): value is LegacyV3Leaderboard {
     && board.race.every((record) => isLegacyV3Record(record) && record.mode === 'race');
 }
 
+function migrateV9ClassicRecords(records: readonly LegacyV9ClassicScoreRecord[]): ClassicScoreRecord[] {
+  return limitClassicRecords(records.map((record): ClassicScoreRecord => {
+    const pace = classicPaceForGravityRange(record.classicStartingGravityTicks, record.classicGravityFloorTicks);
+    return {
+      version: 10,
+      score: record.score,
+      lines: record.lines,
+      pieces: record.pieces,
+      elapsedTicks: record.elapsedTicks,
+      chain: 0,
+      mode: 'marathon',
+      outcome: 'top-out',
+      completedAt: record.completedAt,
+      classicStartingGravityTicks: pace.startingTicks,
+      classicGravityFloorTicks: pace.floorTicks,
+      classicGrade: pace.id,
+    };
+  }));
+}
+
 function migrateStandardRecords(
   records: readonly LegacyRecordFields[],
   mode: 'marathon' | 'sprint',
 ): StandardScoreRecord[] {
   if (mode === 'marathon') {
+    const pace = classicPaceForGravityRange(
+      LEGACY_CLASSIC_STARTING_GRAVITY_TICKS,
+      LEGACY_CLASSIC_GRAVITY_FLOOR_TICKS,
+    );
     return limitClassicRecords(records.map((record): ClassicScoreRecord => ({
-      version: 9,
+      version: 10,
       score: record.score,
       lines: record.lines,
       pieces: record.pieces,
@@ -498,13 +649,13 @@ function migrateStandardRecords(
       mode,
       outcome: 'top-out',
       completedAt: record.completedAt,
-      classicStartingGravityTicks: LEGACY_CLASSIC_STARTING_GRAVITY_TICKS,
-      classicGravityFloorTicks: LEGACY_CLASSIC_GRAVITY_FLOOR_TICKS,
-      classicGrade: 'standard',
+      classicStartingGravityTicks: pace.startingTicks,
+      classicGravityFloorTicks: pace.floorTicks,
+      classicGrade: pace.id,
     })));
   }
   return sortRecords(mode, records.map((record): MutationScoreRecord => ({
-    version: 9,
+    version: 10,
     score: record.score,
     lines: record.lines,
     pieces: record.pieces,
@@ -520,7 +671,7 @@ function migrateSurvivalRecords(
   records: readonly Pick<LegacyRecordFields, 'lines' | 'elapsedTicks' | 'completedAt'>[],
 ): SurvivalScoreRecord[] {
   return sortRecords('race', records.map((record) => ({
-    version: 9 as const,
+    version: 10 as const,
     lines: record.lines,
     elapsedTicks: record.elapsedTicks,
     mode: 'race' as const,
@@ -534,9 +685,17 @@ export function migrateLegacyLeaderboard(raw: string | null): Leaderboard {
   if (raw === null) return emptyLeaderboard();
   try {
     const value: unknown = JSON.parse(raw);
+    if (isLegacyV9Leaderboard(value)) {
+      return {
+        version: 10,
+        marathon: migrateV9ClassicRecords(value.marathon),
+        race: migrateSurvivalRecords(value.race),
+        sprint: migrateStandardRecords(value.sprint, 'sprint') as MutationScoreRecord[],
+      };
+    }
     if (isLegacyV8Leaderboard(value)) {
       return {
-        version: 9,
+        version: 10,
         marathon: migrateStandardRecords(value.marathon, 'marathon') as ClassicScoreRecord[],
         race: migrateSurvivalRecords(value.race),
         sprint: migrateStandardRecords(value.sprint, 'sprint') as MutationScoreRecord[],
@@ -544,7 +703,7 @@ export function migrateLegacyLeaderboard(raw: string | null): Leaderboard {
     }
     if (isLegacyV7Leaderboard(value)) {
       return {
-        version: 9,
+        version: 10,
         marathon: migrateStandardRecords(value.marathon, 'marathon') as ClassicScoreRecord[],
         race: migrateSurvivalRecords(value.race),
         sprint: migrateStandardRecords(value.sprint, 'sprint') as MutationScoreRecord[],
@@ -552,7 +711,7 @@ export function migrateLegacyLeaderboard(raw: string | null): Leaderboard {
     }
     if (isLegacyV6Leaderboard(value) || isLegacyV5Leaderboard(value) || isLegacyV4Leaderboard(value)) {
       return {
-        version: 9,
+        version: 10,
         marathon: migrateStandardRecords(value.marathon, 'marathon') as ClassicScoreRecord[],
         race: migrateSurvivalRecords(value.race),
         // All prior fourth-mode rows predate the item rule and cannot be compared.
@@ -561,7 +720,7 @@ export function migrateLegacyLeaderboard(raw: string | null): Leaderboard {
     }
     if (!isLegacyV3Leaderboard(value)) return emptyLeaderboard();
     return {
-      version: 9,
+      version: 10,
       marathon: migrateStandardRecords(value.marathon, 'marathon') as ClassicScoreRecord[],
       race: migrateSurvivalRecords(value.race),
       sprint: [],
