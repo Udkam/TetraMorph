@@ -143,12 +143,6 @@ function observation(state: GameState) {
   };
 }
 
-function replaceSegment(key: string, index: number, value: string): string {
-  const segments = key.split('~');
-  segments[index] = value;
-  return segments.join('~');
-}
-
 function differentValue(value: unknown): unknown {
   if (Array.isArray(value)) return [...value];
   if (value === null) return Object.freeze({ proofMutation: true });
@@ -305,7 +299,6 @@ describe('Endgame exact key-frontier proof codec', () => {
   it('keeps every encoded field mutation-sensitive in the general key and proof domain', () => {
     const base = started(draft);
     const key = ENDGAME_PROOF_FRONTIER_TESTING.encode(base, base);
-    const segments = key.split('~');
     const board = base.board.map((row) => [...row]);
     const empty = board.flatMap((row, y) => row.flatMap((cell, x) => (
       cell === null && !cellsForPiece(base.active!).some((candidate) => candidate.x === x && candidate.y === y)
@@ -323,12 +316,13 @@ describe('Endgame exact key-frontier proof codec', () => {
     for (const [field, variant] of encodedVariants) {
       expect(ENDGAME_PROOF_FRONTIER_TESTING.encode(variant, base), field).not.toBe(key);
     }
-    for (const [field, index, value] of [
-      ['status', 10, 'paused'],
-      ['phase', 9, 'entry'],
+    for (const [field, value] of [
+      ['status', 'paused'],
+      ['phase', 'entry'],
     ] as const) {
-      expect(endgameRouteStateKey({ ...base, [field]: value }), field).not.toBe(key);
-      expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(replaceSegment(key, index, value), base), field).toThrow();
+      expect(endgameRouteStateKey({ ...base, [field]: value }), field)
+        .not.toBe(endgameRouteStateKey(base));
+      expect(() => ENDGAME_PROOF_FRONTIER_TESTING.encode({ ...base, [field]: value }, base), field).toThrow();
     }
     for (const field of ['pieceCount', 'endgameSpawnCount'] as const) {
       const variant = { ...base, [field]: base[field] + 1 };
@@ -345,7 +339,7 @@ describe('Endgame exact key-frontier proof codec', () => {
     expect(new Set(encodedVariants.map(([field]) => field)).size + 5).toBe(
       Object.values(FIELD_EXPECTATIONS).filter((storage) => storage === 'encoded').length,
     );
-    expect(segments).toHaveLength(11);
+    expect(key).toMatch(/^p1\.[A-Za-z0-9_-]+$/);
   });
 
   it('canonicalizes ordinary colours while preserving locks, commands, successors, and wins', () => {
@@ -386,44 +380,14 @@ describe('Endgame exact key-frontier proof codec', () => {
   it('rejects malformed grammar, noncanonical decisions, and cross-domain materials', () => {
     const base = started(draft);
     const key = ENDGAME_PROOF_FRONTIER_TESTING.encode(base, base);
-    const segments = key.split('~');
-    const rows = segments[0]!.split('/');
-    const target = segments[1]!.split('|')[0]!;
     const malformed = [
       `${key}~extra`,
-      replaceSegment(key, 0, rows.slice(1).join('/')),
-      replaceSegment(key, 0, [...rows, rows[0]!].join('/')),
-      replaceSegment(key, 0, [rows[0]!.slice(1), ...rows.slice(1)].join('/')),
-      replaceSegment(key, 0, [`${rows[0]}.`, ...rows.slice(1)].join('/')),
-      replaceSegment(key, 0, [rows[0]!.replace('.', 'X'), ...rows.slice(1)].join('/')),
-      replaceSegment(key, 0, [rows[0]!.replace('.', 'B'), ...rows.slice(1)].join('/')),
-      replaceSegment(key, 0, [rows[0]!.replace('.', 'R'), ...rows.slice(1)].join('/')),
-      replaceSegment(key, 1, `${target}|${target}`),
-      replaceSegment(key, 1, segments[1]!.split('|').reverse().join('|')),
-      replaceSegment(key, 1, '10,0'),
-      replaceSegment(key, 1, ''),
-      replaceSegment(key, 2, `${target}|${target}`),
-      replaceSegment(key, 3, 'X:0:3:19'),
-      replaceSegment(key, 3, 'I:4:3:19'),
-      replaceSegment(key, 3, 'I:0:03:19'),
-      replaceSegment(key, 3, 'I:0:-0:19'),
-      replaceSegment(key, 3, 'I:0:0:39'),
-      replaceSegment(key, 4, segments[4]!.slice(1)),
-      replaceSegment(key, 4, `${segments[4]}I`),
-      replaceSegment(key, 4, `${segments[4]!.slice(0, 4)}X`),
-      replaceSegment(key, 5, '0'),
-      replaceSegment(key, 5, '01'),
-      replaceSegment(key, 5, '4294967296'),
-      replaceSegment(key, 6, 'II'),
-      replaceSegment(key, 6, 'IOTSZJL'),
-      replaceSegment(key, 6, 'X'),
-      replaceSegment(key, 7, '-1'),
-      replaceSegment(key, 7, '01'),
-      replaceSegment(key, 7, '9007199254740992'),
-      replaceSegment(key, 7, String(Number(segments[7]) + 1)),
-      replaceSegment(key, 8, String(Number(segments[8]) + 1)),
-      replaceSegment(key, 9, 'entry'),
-      replaceSegment(key, 10, 'paused'),
+      key.replace(/^p1\./, 'p2.'),
+      'p1.',
+      `${key}=`,
+      key.slice(0, -1),
+      key.slice(0, -2),
+      `${key}A`,
     ];
     for (const candidate of malformed) {
       expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(candidate, base), candidate).toThrow();

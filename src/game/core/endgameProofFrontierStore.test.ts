@@ -3,9 +3,12 @@ import intro01 from '../../../docs/workstreams/tetris-t37-endgame/fixtures/t37/e
 import intro02 from '../../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-02.json';
 import intro03 from '../../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-03.json';
 import intro04 from '../../../docs/workstreams/tetris-t37-endgame/fixtures/t37/endgame-v3-intro-04.json';
+import { createInitialState, dispatch } from './engine';
 import { ENDGAME_V3_INTRO_DRAFTS } from './endgameV3IntroDefinitions';
-import type { EndgameDefinition } from './endgames';
+import { getEndgameDefinition, type EndgameDefinition } from './endgames';
 import {
+  ENDGAME_PROOF_FRONTIER_TESTING,
+  ENDGAME_PROOF_INTERVAL_BOUND_TESTING,
   ENDGAME_PROOF_FRONTIER_STORE_TESTING,
   advanceOptimalEndgameRouteProof,
   advanceOptimalEndgameRouteProofForDefinition,
@@ -22,6 +25,7 @@ import {
   type EndgameProofRunWriter,
   type EndgameProofTip,
 } from './endgameRouteSearch';
+import type { GameState } from './types';
 
 type RunTransform = (id: string, values: readonly string[], read: number) => readonly string[];
 type CompletedMemoryRun = Readonly<{ id: string; records: number; recordBytes: number }>;
@@ -560,6 +564,87 @@ describe('Endgame proof frontier Core-owned runs', () => {
     if (finalUnit.transition !== 'unit') throw new Error('expected final-depth unit publication');
     expect(finalUnit.nextRun).toBeNull();
     expect(finalUnitStore.createRunCount).toBe(0);
+  });
+
+  it('applies the conservative long-proof interval capacity bound inside a resumable unit', () => {
+    const definition = getEndgameDefinition('t5r-horizon-15');
+    const route = 'SRHTTTCCLLHTTTCLLLLHTTTCCCRRRRRHTTTTTTTTTTTTCRHTTTLHTTTCRRRHTTTTTTTTTTTTCRRRRHTTTCLLLHTTTTTTTTTTTTCLLLLHTTTTTTTTTTTTCCCRRRHTTTTTTTTTTTT';
+    const diagnostics = Object.freeze({
+      activeRuns: Object.freeze([]), residue: Object.freeze([]), residueTruncated: false,
+      cleanupErrors: Object.freeze([]), cleanupErrorsTruncated: false,
+    });
+    const seedStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: null, tip: null, diagnostics, advanceAllowed: true,
+    }));
+    advanceOptimalEndgameRouteProofForDefinition(definition, route, seedStore);
+    const seed = seedStore.publications[0]!;
+    if (seed.transition !== 'seed') throw new Error('expected Horizon seed publication');
+
+    const horizonStarted = dispatch(createInitialState(0x51a1f00d, 'endgame', definition.id), { type: 'start' }).state;
+    const horizonTemplate: GameState = {
+      ...horizonStarted,
+      endgameUndoHistory: Object.freeze([]),
+      endgameActiveSpawnCheckpoint: null,
+    };
+    const constrainedBoard = horizonTemplate.board.map((row) => row.map(() => null as null | 'T'));
+    const constrainedTargets: { x: number; y: number }[] = [];
+    for (let y = 36; y < 40; y += 1) {
+      for (let x = 1; x < 10; x += 1) {
+        constrainedBoard[y]![x] = 'T';
+        constrainedTargets.push({ x, y });
+      }
+    }
+    const constrained: GameState = {
+      ...horizonTemplate,
+      board: constrainedBoard,
+      active: { type: 'O', rotation: 0, x: 4, y: 19 },
+      queue: ['O', 'O', 'O', 'O', 'O'],
+      endgameTargetCells: Object.freeze(constrainedTargets),
+      endgameAnchorSupportedCells: Object.freeze([]),
+    };
+    expect(ENDGAME_PROOF_INTERVAL_BOUND_TESTING.cannotFinishWithin(constrained, 1)).toBe(true);
+
+    const depth = seed.binding.optimalLocks - 2;
+    const historicalGeneration = depth * 2;
+    const frontier = new MemoryRun(
+      `r7-f-d${String(depth).padStart(5, '0')}-g${String(historicalGeneration).padStart(5, '0')}`,
+      Object.freeze([ENDGAME_PROOF_FRONTIER_TESTING.encode(constrained, horizonTemplate)]),
+      1,
+      (_id, values) => values,
+      () => {},
+    );
+    const unitStore = new MemoryCheckpointRunStore(Object.freeze({
+      checkpoint: Object.freeze({
+        kind: 'searching' as const,
+        generation: historicalGeneration,
+        binding: seed.binding,
+        depth,
+        parentOffset: 0,
+        lastProcessedParentKey: null,
+        frontier,
+        nextRuns: Object.freeze({
+          count: 0,
+          open(): readonly EndgameProofRun[] { throw new Error('fresh unit must not open prior runs'); },
+        }),
+        transitions: 0,
+        boundPrunes: 0,
+        exhaustedDepths: Object.freeze(Array.from(
+          { length: depth },
+          (_, lockedPieces) => Object.freeze({ lockedPieces, frontierStates: 1, transitions: 0, boundPrunes: 0 }),
+        )),
+      }),
+      tip: Object.freeze({ generation: historicalGeneration, manifestSha256: 'A'.repeat(64) }),
+      diagnostics,
+      advanceAllowed: true,
+    }));
+
+    const result = advanceOptimalEndgameRouteProofForDefinition(definition, route, unitStore);
+    expect(result).toMatchObject({ status: 'searching', generation: historicalGeneration + 1, depth, parentOffset: 1 });
+    const unit = unitStore.publications[0]!;
+    expect(unit.transition).toBe('unit');
+    if (unit.transition !== 'unit') throw new Error('expected Horizon interval-bound unit publication');
+    expect(unit).toMatchObject({ transitionsDelta: 0, boundPrunesDelta: 1, nextRun: null });
+    expect(unitStore.createRunCount).toBe(0);
   });
 
   it('validates searching shape before returning a blocked residue result', () => {

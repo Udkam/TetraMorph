@@ -6,6 +6,7 @@ import t32Changed46To50File from '../../../docs/workstreams/tetris-t37-endgame/f
 import { createInitialState, dispatch, stateHash } from './engine';
 import { getEndgameDefinition, type EndgameDefinition } from './endgames';
 import {
+  ENDGAME_PROOF_INTERVAL_BOUND_TESTING,
   ENDGAME_PROOF_FRONTIER_TESTING,
   decodeEndgameRoute,
   encodeEndgameRoute,
@@ -19,7 +20,14 @@ import {
   replayEndgameRoute,
   replayEndgameRouteForDefinition,
 } from './endgameRouteSearch';
-import { BEDROCK_CELL, SURVIVAL_STONE_CELL, type GameCommand, type GameState, type EndgameId } from './types';
+import {
+  BEDROCK_CELL,
+  SURVIVAL_STONE_CELL,
+  type Board,
+  type GameCommand,
+  type GameState,
+  type EndgameId,
+} from './types';
 
 type RecordedRoute = {
   id: 'primary' | 'alternate';
@@ -201,6 +209,50 @@ describe('Phase-7 Endgame route search', () => {
     expect(endgameRouteLockLowerBound(supported)).toBe(0);
   });
 
+  it('uses future-piece interval capacity only as a conservative long-proof deficit bound', () => {
+    const ordinary = startedEndgame('t5r-arc-13');
+    const board = ordinary.board.map((row) => row.map(() => null as null | 'T'));
+    const targets: { x: number; y: number }[] = [];
+    for (let y = 36; y < 40; y += 1) {
+      for (let x = 1; x < 10; x += 1) {
+        board[y]![x] = 'T';
+        targets.push({ x, y });
+      }
+    }
+    const constrained: GameState = {
+      ...ordinary,
+      board,
+      active: { type: 'O', rotation: 0, x: 4, y: 19 },
+      queue: ['O', 'O', 'O', 'O', 'O'],
+      endgameTargetCells: Object.freeze(targets),
+      endgameAnchorSupportedCells: Object.freeze([]),
+    };
+
+    expect(endgameRouteLockLowerBound(constrained)).toBe(1);
+    expect(ENDGAME_PROOF_INTERVAL_BOUND_TESTING.cannotFinishWithin(constrained, 1)).toBe(true);
+    expect(ENDGAME_PROOF_INTERVAL_BOUND_TESTING.cannotFinishWithin({
+      ...constrained,
+      active: { type: 'I', rotation: 0, x: 3, y: 19 },
+    }, 1)).toBe(false);
+
+    const sparseBoard = ordinary.board.map((row) => row.map(() => null as null | 'T'));
+    const sparseTargets: { x: number; y: number }[] = [];
+    for (let y = 36; y < 40; y += 1) {
+      for (let x = 0; x < 10; x += 1) {
+        if ((x === 0 && y < 38) || (x === 9 && y >= 38)) continue;
+        sparseBoard[y]![x] = 'T';
+        sparseTargets.push({ x, y });
+      }
+    }
+    const sparse: GameState = {
+      ...constrained,
+      board: sparseBoard,
+      endgameTargetCells: Object.freeze(sparseTargets),
+    };
+    expect(endgameRouteLockLowerBound(sparse)).toBe(1);
+    expect(ENDGAME_PROOF_INTERVAL_BOUND_TESTING.cannotFinishWithin(sparse, 1)).toBe(true);
+  });
+
   it('round-trips only canonical proof decisions and rejects lossy board materials', () => {
     const raw = startedEndgame('t5r-arc-13');
     const started = {
@@ -210,9 +262,50 @@ describe('Phase-7 Endgame route search', () => {
     };
     const key = ENDGAME_PROOF_FRONTIER_TESTING.encode(started, started);
     const decoded = ENDGAME_PROOF_FRONTIER_TESTING.decode(key, started);
+    expect(key).toMatch(/^p1\.[A-Za-z0-9_-]+$/);
+    expect(key.length).toBeLessThan(endgameRouteStateKey(started).length);
+    expect(Math.max(...started.endgameTargetCells.map((cell) => cell.y * 10 + cell.x))).toBeGreaterThan(0xff);
     expect(ENDGAME_PROOF_FRONTIER_TESTING.encode(decoded, started)).toBe(key);
     expect(Object.keys(ENDGAME_PROOF_FRONTIER_TESTING.fieldPolicy).sort())
       .toEqual(Object.keys(started).sort());
+
+    const recoloredBoard = started.board.map((row) => [...row]);
+    const recolored = started.endgameTargetCells[0]!;
+    recoloredBoard[recolored.y]![recolored.x] = 'Z';
+    expect(ENDGAME_PROOF_FRONTIER_TESTING.encode({
+      ...started,
+      board: recoloredBoard,
+      endgameTargetCells: Object.freeze([...started.endgameTargetCells].reverse()),
+      endgameAnchorSupportedCells: Object.freeze([...started.endgameAnchorSupportedCells].reverse()),
+    }, started)).toBe(key);
+
+    const multiBytePieceCount = { ...started, pieceCount: 130, endgameSpawnCount: 131 };
+    const multiByteKey = ENDGAME_PROOF_FRONTIER_TESTING.encode(multiBytePieceCount, started);
+    expect(ENDGAME_PROOF_FRONTIER_TESTING.decode(multiByteKey, started)).toMatchObject({
+      pieceCount: 130,
+      endgameSpawnCount: 131,
+    });
+
+    const bitmapBoard: Board = started.board.map((row) => row.map((cell) => (cell === 'A' ? cell : null)));
+    const bitmapTargets: { x: number; y: number }[] = [];
+    for (let y = bitmapBoard.length - 4; y < bitmapBoard.length; y += 1) {
+      for (let x = 0; x < 8; x += 1) {
+        if (bitmapBoard[y]![x] !== null) continue;
+        bitmapBoard[y]![x] = 'T';
+        bitmapTargets.push({ x, y });
+      }
+    }
+    expect(bitmapTargets).toHaveLength(32);
+    const bitmapState = {
+      ...started,
+      board: bitmapBoard,
+      endgameTargetCells: Object.freeze(bitmapTargets),
+      endgameAnchorSupportedCells: Object.freeze([]),
+    };
+    const bitmapKey = ENDGAME_PROOF_FRONTIER_TESTING.encode(bitmapState, started);
+    const bitmapDecoded = ENDGAME_PROOF_FRONTIER_TESTING.decode(bitmapKey, started);
+    expect(bitmapKey.length).toBeLessThan(200);
+    expect(bitmapDecoded.endgameTargetCells).toEqual(bitmapTargets);
 
     const occupied = started.endgameTargetCells[0]!;
     for (const material of [BEDROCK_CELL, SURVIVAL_STONE_CELL]) {
@@ -222,9 +315,10 @@ describe('Phase-7 Endgame route search', () => {
         .toThrow('Bedrock, Survival stone, or unknown material');
     }
     expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(`${key}~extra`, started))
-      .toThrow('exactly 11 segments');
-    expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(key.replace(/~playing$/, '~paused'), started))
-      .toThrow('active-playing decision');
+      .toThrow('non-Base64URL character');
+    expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(key.replace(/^p1\./, 'p2.'), started))
+      .toThrow('unknown compact codec prefix');
+    expect(() => ENDGAME_PROOF_FRONTIER_TESTING.decode(key.slice(0, -1), started)).toThrow();
   });
 
   it('replays one- and two-anchor definitions through the same six-lock public route', () => {

@@ -2,6 +2,8 @@ import { canPlace } from './board';
 import { BOARD_HEIGHT, BOARD_WIDTH, NEXT_QUEUE_SIZE } from './constants';
 import { createInitialState, dispatch, stateHash } from './engine';
 import { getEndgameDefinition, type EndgameDefinition } from './endgames';
+import { PIECE_SHAPES } from './pieces';
+import { drawPiece } from './random';
 import {
   ANCHOR_CELL,
   PIECE_TYPES,
@@ -31,6 +33,67 @@ const EXHAUSTIVE_PLANNER_COMMANDS: readonly GameCommand[] = Object.freeze([
 ]);
 
 const MAX_SETTLEMENT_TICKS = 32;
+/** Long F5 certificates use an additional conservative supply bound; short frozen certificates retain their telemetry. */
+const LONG_PROOF_INTERVAL_BOUND_MINIMUM_LOCKS = 9;
+
+type ColumnInterval = Readonly<{ left: number; right: number }>;
+const COLUMN_MASK_COUNT = 1 << BOARD_WIDTH;
+
+const COLUMN_INTERVALS: readonly ColumnInterval[] = Object.freeze(
+  Array.from({ length: BOARD_WIDTH }, (_, left) => (
+    Array.from({ length: BOARD_WIDTH - left }, (_, offset) => Object.freeze({ left, right: left + offset }))
+  )).flat(),
+);
+
+function maximumPieceCellsInInterval(piece: PieceType, interval: ColumnInterval): number {
+  let maximum = 0;
+  for (const rotation of [0, 1, 2, 3] as const) {
+    for (let originX = -3; originX < BOARD_WIDTH; originX += 1) {
+      const cells = PIECE_SHAPES[piece][rotation];
+      if (cells.some((cell) => cell.x + originX < 0 || cell.x + originX >= BOARD_WIDTH)) continue;
+      let covered = 0;
+      for (const cell of cells) {
+        const x = cell.x + originX;
+        if (x >= interval.left && x <= interval.right) covered += 1;
+      }
+      maximum = Math.max(maximum, covered);
+    }
+  }
+  return maximum;
+}
+
+const PIECE_INTERVAL_CAPACITY: Readonly<Record<PieceType, readonly number[]>> = Object.freeze(
+  Object.fromEntries(PIECE_TYPES.map((piece) => [
+    piece,
+    Object.freeze(COLUMN_INTERVALS.map((interval) => maximumPieceCellsInInterval(piece, interval))),
+  ])) as Record<PieceType, readonly number[]>,
+);
+
+function maximumPieceCellsInColumnMask(piece: PieceType, mask: number): number {
+  let maximum = 0;
+  for (const rotation of [0, 1, 2, 3] as const) {
+    for (let originX = -3; originX < BOARD_WIDTH; originX += 1) {
+      const cells = PIECE_SHAPES[piece][rotation];
+      if (cells.some((cell) => cell.x + originX < 0 || cell.x + originX >= BOARD_WIDTH)) continue;
+      let covered = 0;
+      for (const cell of cells) {
+        const x = cell.x + originX;
+        if ((mask & (1 << x)) !== 0) covered += 1;
+      }
+      maximum = Math.max(maximum, covered);
+    }
+  }
+  return maximum;
+}
+
+const PIECE_COLUMN_MASK_CAPACITY: Readonly<Record<PieceType, readonly number[]>> = Object.freeze(
+  Object.fromEntries(PIECE_TYPES.map((piece) => [
+    piece,
+    Object.freeze(Array.from({ length: COLUMN_MASK_COUNT }, (_, mask) => (
+      mask === 0 ? 0 : maximumPieceCellsInColumnMask(piece, mask)
+    ))),
+  ])) as Record<PieceType, readonly number[]>,
+);
 
 export interface EndgameRouteMetrics {
   commandCount: number;
@@ -545,6 +608,13 @@ const ENDGAME_PROOF_FIELD_POLICY = Object.freeze({
 
 type EndgameProofFrontierContext = Readonly<{ template: GameState }>;
 const PIECE_TYPE_SET = new Set<string>(PIECE_TYPES);
+const PROOF_FRONTIER_KEY_PREFIX = 'p1.';
+const PROOF_FRONTIER_BASE64URL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+const PROOF_FRONTIER_COORDINATE_COUNT = BOARD_WIDTH * BOARD_HEIGHT;
+const PROOF_FRONTIER_COORDINATE_BITMAP_BYTES = Math.ceil(PROOF_FRONTIER_COORDINATE_COUNT / 8);
+const PROOF_FRONTIER_COORDINATE_SPARSE = 0;
+const PROOF_FRONTIER_COORDINATE_BITMAP = 1;
+const PROOF_FRONTIER_ACTIVE_AXIS_BIAS = 128;
 
 function proofKeyError(message: string): never {
   throw new Error(`Invalid Endgame proof-frontier state: ${message}.`);
@@ -654,75 +724,283 @@ function proofFrontierStateKey(state: GameState, context: EndgameProofFrontierCo
       proofKeyError('immutable anchor coordinates changed');
     }
   }
-  return endgameRouteStateKey(state);
+  const active = state.active;
+  if (active === null) proofKeyError('active piece is missing');
+
+  const ordinaryCoordinates: number[] = [];
+  for (let y = 0; y < BOARD_HEIGHT; y += 1) for (let x = 0; x < BOARD_WIDTH; x += 1) {
+    const cell = state.board[y]![x]!;
+    if (cell !== null && cell !== ANCHOR_CELL) ordinaryCoordinates.push(y * BOARD_WIDTH + x);
+  }
+  const bytes: number[] = [];
+  writeProofCoordinateList(bytes, ordinaryCoordinates, 'ordinary occupancy');
+  writeProofCoordinateList(bytes, canonicalProofCoordinates(state.endgameTargetCells), 'target cells');
+  writeProofCoordinateList(bytes, canonicalProofCoordinates(state.endgameAnchorSupportedCells), 'supported cells');
+  writeProofPiece(bytes, active.type, 'active piece');
+  if (![0, 1, 2, 3].includes(active.rotation)) proofKeyError('active rotation is outside its domain');
+  bytes.push(active.rotation, encodeProofActiveAxis(active.x, 'active x'), encodeProofActiveAxis(active.y, 'active y'));
+  for (const piece of state.queue) writeProofPiece(bytes, piece, 'queue');
+  writeProofUint32(bytes, state.randomizer.seed, 'randomizer seed');
+  if (state.randomizer.bag.length > PIECE_TYPES.length - 1) proofKeyError('randomizer bag is too long');
+  bytes.push(state.randomizer.bag.length);
+  for (const piece of state.randomizer.bag) writeProofPiece(bytes, piece, 'randomizer bag');
+  writeProofVarUint(bytes, state.pieceCount, 'piece count');
+  return `${PROOF_FRONTIER_KEY_PREFIX}${encodeProofBase64Url(bytes)}`;
 }
 
-function parseCanonicalUint(text: string, label: string, maximum = Number.MAX_SAFE_INTEGER): number {
-  if (!/^(0|[1-9]\d*)$/.test(text)) proofKeyError(`${label} is not a canonical unsigned integer`);
-  const value = Number(text);
-  if (!isUint(value, maximum)) proofKeyError(`${label} is outside its domain`);
+function canonicalProofCoordinates(cells: readonly Cell[]): number[] {
+  return cells.map((cell) => cell.y * BOARD_WIDTH + cell.x).sort((left, right) => left - right);
+}
+
+function writeProofCoordinateList(bytes: number[], coordinates: readonly number[], label: string): void {
+  assertProofCompactCoordinates(coordinates, label);
+  const useBitmap = proofCoordinateListUsesBitmap(coordinates.length);
+  bytes.push(useBitmap ? PROOF_FRONTIER_COORDINATE_BITMAP : PROOF_FRONTIER_COORDINATE_SPARSE);
+  if (useBitmap) {
+    const bitmap = Array.from({ length: PROOF_FRONTIER_COORDINATE_BITMAP_BYTES }, () => 0);
+    for (const coordinate of coordinates) bitmap[Math.floor(coordinate / 8)]! |= 1 << (coordinate % 8);
+    bytes.push(...bitmap);
+    return;
+  }
+  writeProofUint16(bytes, coordinates.length, `${label} count`);
+  for (const coordinate of coordinates) writeProofUint16(bytes, coordinate, `${label} coordinate`);
+}
+
+function assertProofCompactCoordinates(coordinates: readonly number[], label: string): void {
+  if (coordinates.length > PROOF_FRONTIER_COORDINATE_COUNT) proofKeyError(`${label} exceeds compact capacity`);
+  let previous = -1;
+  for (const coordinate of coordinates) {
+    if (!isUint(coordinate, PROOF_FRONTIER_COORDINATE_COUNT - 1) || coordinate <= previous) {
+      proofKeyError(`${label} are not strictly ordered compact coordinates`);
+    }
+    previous = coordinate;
+  }
+}
+
+function proofCoordinateListUsesBitmap(count: number): boolean {
+  return 2 + count * 2 >= PROOF_FRONTIER_COORDINATE_BITMAP_BYTES;
+}
+
+function writeProofPiece(bytes: number[], piece: PieceType, label: string): void {
+  const code = PIECE_TYPES.indexOf(piece);
+  if (code < 0) proofKeyError(`${label} contains an unknown piece`);
+  bytes.push(code);
+}
+
+function encodeProofActiveAxis(value: number, label: string): number {
+  if (!Number.isInteger(value) || value < -PROOF_FRONTIER_ACTIVE_AXIS_BIAS
+    || value >= PROOF_FRONTIER_ACTIVE_AXIS_BIAS) {
+    proofKeyError(`${label} is outside compact active-axis bounds`);
+  }
+  return value + PROOF_FRONTIER_ACTIVE_AXIS_BIAS;
+}
+
+function writeProofUint32(bytes: number[], value: number, label: string): void {
+  if (!isUint(value, 0xffff_ffff)) proofKeyError(`${label} is outside compact uint32 bounds`);
+  bytes.push(
+    Math.floor(value / 0x1000000) & 0xff,
+    Math.floor(value / 0x10000) & 0xff,
+    Math.floor(value / 0x100) & 0xff,
+    value & 0xff,
+  );
+}
+
+function writeProofUint16(bytes: number[], value: number, label: string): void {
+  if (!isUint(value, 0xffff)) proofKeyError(`${label} is outside compact uint16 bounds`);
+  bytes.push(Math.floor(value / 0x100) & 0xff, value & 0xff);
+}
+
+function writeProofVarUint(bytes: number[], value: number, label: string): void {
+  if (!isUint(value)) proofKeyError(`${label} is outside compact unsigned bounds`);
+  let remaining = value;
+  do {
+    let encoded = remaining % 0x80;
+    remaining = Math.floor(remaining / 0x80);
+    if (remaining > 0) encoded |= 0x80;
+    bytes.push(encoded);
+  } while (remaining > 0);
+}
+
+function encodeProofBase64Url(bytes: readonly number[]): string {
+  let encoded = '';
+  for (let index = 0; index < bytes.length; index += 3) {
+    const first = bytes[index]!;
+    const second = bytes[index + 1];
+    const third = bytes[index + 2];
+    encoded += PROOF_FRONTIER_BASE64URL_ALPHABET[first >> 2]!;
+    encoded += PROOF_FRONTIER_BASE64URL_ALPHABET[((first & 0x03) << 4) | ((second ?? 0) >> 4)]!;
+    if (second !== undefined) {
+      encoded += PROOF_FRONTIER_BASE64URL_ALPHABET[((second & 0x0f) << 2) | ((third ?? 0) >> 6)]!;
+    }
+    if (third !== undefined) encoded += PROOF_FRONTIER_BASE64URL_ALPHABET[third & 0x3f]!;
+  }
+  return encoded;
+}
+
+function proofBase64UrlValue(character: string): number {
+  const value = PROOF_FRONTIER_BASE64URL_ALPHABET.indexOf(character);
+  if (value < 0) proofKeyError('compact key contains a non-Base64URL character');
   return value;
 }
 
-function parseCanonicalInt(text: string, label: string): number {
-  if (!/^-?(0|[1-9]\d*)$/.test(text)) proofKeyError(`${label} is not a canonical integer`);
-  const value = Number(text);
-  if (!Number.isSafeInteger(value) || String(value) !== text) proofKeyError(`${label} is outside its domain`);
+function decodeProofBase64Url(text: string): number[] {
+  if (text.length === 0 || text.length % 4 === 1) proofKeyError('compact key has an invalid Base64URL length');
+  const bytes: number[] = [];
+  for (let index = 0; index < text.length; index += 4) {
+    const remaining = Math.min(4, text.length - index);
+    const first = proofBase64UrlValue(text[index]!);
+    const second = proofBase64UrlValue(text[index + 1]!);
+    if (remaining === 2 && (second & 0x0f) !== 0) proofKeyError('compact key has noncanonical Base64URL padding bits');
+    bytes.push((first << 2) | (second >> 4));
+    if (remaining >= 3) {
+      const third = proofBase64UrlValue(text[index + 2]!);
+      if (remaining === 3 && (third & 0x03) !== 0) {
+        proofKeyError('compact key has noncanonical Base64URL padding bits');
+      }
+      bytes.push(((second & 0x0f) << 4) | (third >> 2));
+      if (remaining === 4) {
+        const fourth = proofBase64UrlValue(text[index + 3]!);
+        bytes.push(((third & 0x03) << 6) | fourth);
+      }
+    }
+  }
+  return bytes;
+}
+
+type ProofByteCursor = { offset: number };
+
+function readProofByte(bytes: readonly number[], cursor: ProofByteCursor, label: string): number {
+  const value = bytes[cursor.offset];
+  if (value === undefined) proofKeyError(`compact key ended while reading ${label}`);
+  cursor.offset += 1;
   return value;
 }
 
-function parseCellsKey(text: string, label: string): readonly Cell[] {
-  if (text === '') return Object.freeze([]);
-  const cells = text.split('|').map((token) => {
-    const match = /^(0|[1-9]\d*),(0|[1-9]\d*)$/.exec(token);
-    if (!match) proofKeyError(`${label} has malformed coordinates`);
-    return Object.freeze({
-      x: parseCanonicalUint(match[1]!, `${label} x`, BOARD_WIDTH - 1),
-      y: parseCanonicalUint(match[2]!, `${label} y`, BOARD_HEIGHT - 1),
-    });
-  });
-  assertCells(cells, label);
-  if (orderedCellsKey(cells) !== text) proofKeyError(`${label} is not canonically sorted`);
-  return Object.freeze(cells);
+function readProofCoordinateList(
+  bytes: readonly number[],
+  cursor: ProofByteCursor,
+  label: string,
+): readonly number[] {
+  const representation = readProofByte(bytes, cursor, `${label} representation`);
+  const coordinates: number[] = [];
+  if (representation === PROOF_FRONTIER_COORDINATE_SPARSE) {
+    const count = readProofUint16(bytes, cursor, `${label} count`);
+    if (count > PROOF_FRONTIER_COORDINATE_COUNT) proofKeyError(`${label} exceeds compact capacity`);
+    for (let index = 0; index < count; index += 1) {
+      coordinates.push(readProofUint16(bytes, cursor, `${label} coordinate`));
+    }
+  } else if (representation === PROOF_FRONTIER_COORDINATE_BITMAP) {
+    for (let byteIndex = 0; byteIndex < PROOF_FRONTIER_COORDINATE_BITMAP_BYTES; byteIndex += 1) {
+      const byte = readProofByte(bytes, cursor, `${label} bitmap`);
+      for (let bit = 0; bit < 8; bit += 1) if ((byte & (1 << bit)) !== 0) {
+        coordinates.push(byteIndex * 8 + bit);
+      }
+    }
+  } else {
+    proofKeyError(`${label} has an unknown compact representation`);
+  }
+  assertProofCompactCoordinates(coordinates, label);
+  if (proofCoordinateListUsesBitmap(coordinates.length)
+    !== (representation === PROOF_FRONTIER_COORDINATE_BITMAP)) {
+    proofKeyError(`${label} is not canonically represented`);
+  }
+  return Object.freeze(coordinates);
 }
 
-function parsePieceList(text: string, label: string, expectedLength?: number): PieceType[] {
-  const pieces = [...text];
-  if (pieces.some((piece) => !PIECE_TYPE_SET.has(piece))) proofKeyError(`${label} contains an unknown piece`);
-  const typed = pieces as PieceType[];
-  assertPieceList(typed, label, expectedLength);
-  return typed;
+function readProofPiece(bytes: readonly number[], cursor: ProofByteCursor, label: string): PieceType {
+  const code = readProofByte(bytes, cursor, label);
+  const piece = PIECE_TYPES[code];
+  if (piece === undefined) proofKeyError(`${label} contains an unknown piece`);
+  return piece;
+}
+
+function readProofActiveAxis(bytes: readonly number[], cursor: ProofByteCursor, label: string): number {
+  return readProofByte(bytes, cursor, label) - PROOF_FRONTIER_ACTIVE_AXIS_BIAS;
+}
+
+function readProofUint32(bytes: readonly number[], cursor: ProofByteCursor, label: string): number {
+  return (
+    readProofByte(bytes, cursor, `${label} byte 0`) * 0x1000000
+    + readProofByte(bytes, cursor, `${label} byte 1`) * 0x10000
+    + readProofByte(bytes, cursor, `${label} byte 2`) * 0x100
+    + readProofByte(bytes, cursor, `${label} byte 3`)
+  );
+}
+
+function readProofUint16(bytes: readonly number[], cursor: ProofByteCursor, label: string): number {
+  return (
+    readProofByte(bytes, cursor, `${label} byte 0`) * 0x100
+    + readProofByte(bytes, cursor, `${label} byte 1`)
+  );
+}
+
+function readProofVarUint(bytes: readonly number[], cursor: ProofByteCursor, label: string): number {
+  let value = 0;
+  let multiplier = 1;
+  for (let index = 0; index < 8; index += 1) {
+    const encoded = readProofByte(bytes, cursor, label);
+    const payload = encoded & 0x7f;
+    value += payload * multiplier;
+    if (!Number.isSafeInteger(value)) proofKeyError(`${label} exceeds the safe integer domain`);
+    if ((encoded & 0x80) === 0) {
+      if (index > 0 && payload === 0) proofKeyError(`${label} is not canonically encoded`);
+      return value;
+    }
+    multiplier *= 0x80;
+  }
+  proofKeyError(`${label} exceeds compact unsigned bounds`);
+}
+
+function cellsFromProofCoordinates(coordinates: readonly number[]): readonly Cell[] {
+  return Object.freeze(coordinates.map((coordinate) => Object.freeze({
+    x: coordinate % BOARD_WIDTH,
+    y: Math.floor(coordinate / BOARD_WIDTH),
+  })));
+}
+
+function boardFromProofCoordinates(
+  coordinates: readonly number[],
+  context: EndgameProofFrontierContext,
+): Board {
+  const board: Board = context.template.board.map((row) => row.map((cell) => (
+    cell === ANCHOR_CELL ? ANCHOR_CELL : null
+  )));
+  for (const coordinate of coordinates) {
+    const x = coordinate % BOARD_WIDTH;
+    const y = Math.floor(coordinate / BOARD_WIDTH);
+    if (board[y]![x] === ANCHOR_CELL) proofKeyError('ordinary occupancy overlaps an immutable anchor');
+    board[y]![x] = 'I';
+  }
+  return board;
 }
 
 function decodeProofFrontierStateKey(key: string, context: EndgameProofFrontierContext): GameState {
-  const segments = key.split('~');
-  if (segments.length !== 11) proofKeyError('key must contain exactly 11 segments');
-  const rows = segments[0]!.split('/');
-  if (rows.length !== BOARD_HEIGHT || rows.some((row) => row.length !== BOARD_WIDTH || !/^[.#A]+$/.test(row))) {
-    proofKeyError('board segment is malformed');
-  }
-  const board: Board = rows.map((row) => [...row].map((cell) => (
-    cell === '.' ? null : cell === 'A' ? ANCHOR_CELL : 'I'
-  )));
-  const activeMatch = /^([IOTSZJL]):([0-3]):(-?(?:0|[1-9]\d*)):(-?(?:0|[1-9]\d*))$/.exec(segments[3]!);
-  if (!activeMatch) proofKeyError('active-piece segment is malformed');
+  if (!key.startsWith(PROOF_FRONTIER_KEY_PREFIX)) proofKeyError('key has an unknown compact codec prefix');
+  const bytes = decodeProofBase64Url(key.slice(PROOF_FRONTIER_KEY_PREFIX.length));
+  const cursor: ProofByteCursor = { offset: 0 };
+  const ordinaryCoordinates = readProofCoordinateList(bytes, cursor, 'ordinary occupancy');
+  const targetCoordinates = readProofCoordinateList(bytes, cursor, 'target cells');
+  const supportedCoordinates = readProofCoordinateList(bytes, cursor, 'supported cells');
   const active: ActivePiece = {
-    type: activeMatch[1] as PieceType,
-    rotation: Number(activeMatch[2]) as Rotation,
-    x: parseCanonicalInt(activeMatch[3]!, 'active x'),
-    y: parseCanonicalInt(activeMatch[4]!, 'active y'),
+    type: readProofPiece(bytes, cursor, 'active piece'),
+    rotation: readProofByte(bytes, cursor, 'active rotation') as Rotation,
+    x: readProofActiveAxis(bytes, cursor, 'active x'),
+    y: readProofActiveAxis(bytes, cursor, 'active y'),
   };
-  const queue = parsePieceList(segments[4]!, 'queue', NEXT_QUEUE_SIZE);
-  const bag = parsePieceList(segments[6]!, 'randomizer bag');
-  if (bag.length > PIECE_TYPES.length - 1 || new Set(bag).size !== bag.length) {
-    proofKeyError('randomizer bag is not a valid remaining seven-bag');
-  }
-  if (segments[9] !== 'active' || segments[10] !== 'playing') {
-    proofKeyError('key is not an active-playing decision');
-  }
+  if (![0, 1, 2, 3].includes(active.rotation)) proofKeyError('active rotation is outside its domain');
+  const queue = Array.from({ length: NEXT_QUEUE_SIZE }, () => readProofPiece(bytes, cursor, 'queue'));
+  const randomizerSeed = readProofUint32(bytes, cursor, 'randomizer seed');
+  const bagLength = readProofByte(bytes, cursor, 'randomizer bag count');
+  if (bagLength > PIECE_TYPES.length - 1) proofKeyError('randomizer bag is too long');
+  const bag = Array.from({ length: bagLength }, () => readProofPiece(bytes, cursor, 'randomizer bag'));
+  if (new Set(bag).size !== bag.length) proofKeyError('randomizer bag is not a valid remaining seven-bag');
+  const pieceCount = readProofVarUint(bytes, cursor, 'piece count');
+  if (cursor.offset !== bytes.length) proofKeyError('compact key contains trailing bytes');
+  const endgameSpawnCount = pieceCount + 1;
+  if (!isUint(endgameSpawnCount)) proofKeyError('derived Endgame spawn count is outside its domain');
   const decoded: GameState = {
     ...context.template,
-    board,
+    board: boardFromProofCoordinates(ordinaryCoordinates, context),
     active,
     queue,
     score: 0,
@@ -730,16 +1008,16 @@ function decodeProofFrontierStateKey(key: string, context: EndgameProofFrontierC
     combo: 0,
     level: 0,
     endgameTargetLines: null,
-    endgameTargetCells: parseCellsKey(segments[1]!, 'target cells'),
-    endgameAnchorSupportedCells: parseCellsKey(segments[2]!, 'supported cells'),
+    endgameTargetCells: cellsFromProofCoordinates(targetCoordinates),
+    endgameAnchorSupportedCells: cellsFromProofCoordinates(supportedCoordinates),
     endgameQueue: Object.freeze([...queue]),
     endgameQueueIndex: 0,
-    endgameSpawnCount: parseCanonicalUint(segments[8]!, 'Endgame spawn count'),
+    endgameSpawnCount,
     endgameUndoHistory: Object.freeze([]),
     endgameActiveSpawnCheckpoint: null,
     completedLevelId: null,
     nextUnlockedLevelId: null,
-    pieceCount: parseCanonicalUint(segments[7]!, 'piece count'),
+    pieceCount,
     status: 'playing',
     phase: 'active',
     phaseTicks: 0,
@@ -750,7 +1028,7 @@ function decodeProofFrontierStateKey(key: string, context: EndgameProofFrontierC
     lockResets: 0,
     elapsedTicks: 0,
     randomizer: {
-      seed: parseCanonicalUint(segments[5]!, 'randomizer seed', 0xffff_ffff),
+      seed: randomizerSeed,
       bag,
     },
   };
@@ -793,6 +1071,145 @@ export function endgameRouteLockLowerBound(state: GameState): number {
   }
   return Math.ceil(deficit / 4);
 }
+
+type ProofIntervalCapacityCache = Map<string, readonly number[]>;
+type ProofColumnMaskCapacityCache = Map<string, readonly number[]>;
+
+function proofFutureIntervalCapacity(
+  state: GameState,
+  locks: number,
+  cache: ProofIntervalCapacityCache,
+): readonly number[] {
+  const active = state.active;
+  if (active === null || locks <= 0) return Object.freeze(Array.from({ length: COLUMN_INTERVALS.length }, () => 0));
+  const key = `${active.type}:${state.queue.join('')}:${state.randomizer.seed}:${state.randomizer.bag.join('')}:${locks}`;
+  const cached = cache.get(key);
+  if (cached) return cached;
+
+  const pieces: PieceType[] = [active.type, ...state.queue];
+  let randomizer = state.randomizer;
+  while (pieces.length < locks) {
+    const draw = drawPiece(randomizer);
+    pieces.push(draw.piece);
+    randomizer = draw.randomizer;
+  }
+  const capacity = Array.from({ length: COLUMN_INTERVALS.length }, () => 0);
+  for (const piece of pieces.slice(0, locks)) {
+    const contribution = PIECE_INTERVAL_CAPACITY[piece];
+    for (let index = 0; index < capacity.length; index += 1) capacity[index]! += contribution[index]!;
+  }
+  const frozen = Object.freeze(capacity);
+  cache.set(key, frozen);
+  return frozen;
+}
+
+function proofFutureColumnMaskCapacity(
+  state: GameState,
+  locks: number,
+  cache: ProofColumnMaskCapacityCache,
+): readonly number[] {
+  const active = state.active;
+  if (active === null || locks <= 0) return Object.freeze(Array.from({ length: COLUMN_MASK_COUNT }, () => 0));
+  const key = `${active.type}:${state.queue.join('')}:${state.randomizer.seed}:${state.randomizer.bag.join('')}:${locks}`;
+  const cached = cache.get(key);
+  if (cached) return cached;
+
+  const pieces: PieceType[] = [active.type, ...state.queue];
+  let randomizer = state.randomizer;
+  while (pieces.length < locks) {
+    const draw = drawPiece(randomizer);
+    pieces.push(draw.piece);
+    randomizer = draw.randomizer;
+  }
+  const capacity = Array.from({ length: COLUMN_MASK_COUNT }, () => 0);
+  for (const piece of pieces.slice(0, locks)) {
+    const contribution = PIECE_COLUMN_MASK_CAPACITY[piece];
+    for (let mask = 1; mask < capacity.length; mask += 1) capacity[mask]! += contribution[mask]!;
+  }
+  const frozen = Object.freeze(capacity);
+  cache.set(key, frozen);
+  return frozen;
+}
+
+/**
+ * A relaxation of the physical board: each future piece may independently choose the placement
+ * that covers the most cells in a contiguous set of columns. If even that generous supply cannot
+ * fill every surviving target row in an interval, the real public-control game cannot finish in
+ * the proposed number of locks. Anchors deliberately retain the established zero-bound policy.
+ */
+function intervalSupplyCannotFinishWithin(
+  state: GameState,
+  futureLocks: number,
+  cache: ProofIntervalCapacityCache,
+  columnMaskCache: ProofColumnMaskCapacityCache,
+): boolean {
+  if (
+    futureLocks < 0
+    || state.endgameAnchorSupportedCells.length > 0
+    || state.board.some((row) => row.some((cell) => cell === ANCHOR_CELL))
+  ) return false;
+  const targetRows = new Set(state.endgameTargetCells.map((cell) => cell.y)).size;
+  if (targetRows === 0) return false;
+  const capacity = proofFutureIntervalCapacity(state, futureLocks, cache);
+  const occupiedByColumn = Array.from({ length: BOARD_WIDTH }, () => 0);
+  for (const row of state.board) {
+    for (let x = 0; x < BOARD_WIDTH; x += 1) {
+      if (row[x] !== null) occupiedByColumn[x]! += 1;
+    }
+  }
+
+  let intervalIndex = 0;
+  for (let left = 0; left < BOARD_WIDTH; left += 1) {
+    let available = 0;
+    for (let right = left; right < BOARD_WIDTH; right += 1) {
+      available += occupiedByColumn[right]!;
+      const required = targetRows * (right - left + 1);
+      if (required - available > capacity[intervalIndex]!) return true;
+      intervalIndex += 1;
+    }
+  }
+
+  const deficits = occupiedByColumn.map((available) => Math.max(0, targetRows - available));
+  let positiveMask = 0;
+  let positiveColumnCount = 0;
+  for (let x = 0; x < deficits.length; x += 1) {
+    if (deficits[x]! > 0) {
+      positiveMask |= 1 << x;
+      positiveColumnCount += 1;
+    }
+  }
+  // Sparse deficits are where independent per-column maxima lose the most information. Keep
+  // this bounded to six columns so the exact frontier retains a small, fixed per-state cost.
+  if (futureLocks <= 5 && positiveMask !== 0 && positiveColumnCount <= 6) {
+    const maskCapacity = proofFutureColumnMaskCapacity(state, futureLocks, columnMaskCache);
+    for (let mask = positiveMask; mask > 0; mask = (mask - 1) & positiveMask) {
+      let required = 0;
+      for (let x = 0; x < BOARD_WIDTH; x += 1) {
+        if ((mask & (1 << x)) !== 0) required += deficits[x]!;
+      }
+      if (required > maskCapacity[mask]!) return true;
+    }
+  }
+  return false;
+}
+
+function proofDeficitBoundPrecludesCandidate(
+  state: GameState,
+  futureLocks: number,
+  useIntervalBound: boolean,
+  cache: ProofIntervalCapacityCache,
+  columnMaskCache: ProofColumnMaskCapacityCache,
+): boolean {
+  if (endgameRouteLockLowerBound(state) > futureLocks) return true;
+  return useIntervalBound && intervalSupplyCannotFinishWithin(state, futureLocks, cache, columnMaskCache);
+}
+
+/** @internal Focused tests exercise the conservative long-proof interval relaxation. */
+export const ENDGAME_PROOF_INTERVAL_BOUND_TESTING = Object.freeze({
+  cannotFinishWithin(state: GameState, futureLocks: number): boolean {
+    return intervalSupplyCannotFinishWithin(state, futureLocks, new Map(), new Map());
+  },
+});
 
 type EndgameProofRunLimits = Readonly<{
   recordMaxBytes: number;
@@ -1413,6 +1830,9 @@ type PreparedResumableEndgameProof = Readonly<{
   levelId: EndgameId;
   replay: EndgameRouteReplay;
   optimalLocks: number;
+  useIntervalBound: boolean;
+  intervalCapacityCache: ProofIntervalCapacityCache;
+  columnMaskCapacityCache: ProofColumnMaskCapacityCache;
   initialStateHash: string;
   started: GameState;
   proofContext: EndgameProofFrontierContext;
@@ -1448,6 +1868,9 @@ function prepareResumableEndgameProof(
   if (!Number.isSafeInteger(optimalLocks) || optimalLocks <= 0 || optimalLocks > 32_768) {
     throw proofRunError('optimal lock count must be 1..32768');
   }
+  const useIntervalBound = optimalLocks >= LONG_PROOF_INTERVAL_BOUND_MINIMUM_LOCKS;
+  const intervalCapacityCache: ProofIntervalCapacityCache = new Map();
+  const columnMaskCapacityCache: ProofColumnMaskCapacityCache = new Map();
   const canonicalStart = dispatch(createEndgameInitialState(definition), { type: 'start' }).state;
   if (!isActive(canonicalStart)) return null;
   const initialStateHash = stateHash(canonicalStart);
@@ -1462,7 +1885,18 @@ function prepareResumableEndgameProof(
     initialStateHash,
     initialFrontierKey,
   });
-  return Object.freeze({ levelId, replay, optimalLocks, initialStateHash, started, proofContext, binding });
+  return Object.freeze({
+    levelId,
+    replay,
+    optimalLocks,
+    useIntervalBound,
+    intervalCapacityCache,
+    columnMaskCapacityCache,
+    initialStateHash,
+    started,
+    proofContext,
+    binding,
+  });
 }
 
 function assertResumableBinding(
@@ -1934,7 +2368,13 @@ function advanceSearchingProofUnit(
         checkpoint.lastProcessedParentKey,
         (parentKey) => {
           const parent = decodeProofFrontierStateKey(parentKey, prepared.proofContext);
-          if (checkpoint.depth + endgameRouteLockLowerBound(parent) >= prepared.optimalLocks) {
+          if (proofDeficitBoundPrecludesCandidate(
+            parent,
+            prepared.optimalLocks - checkpoint.depth - 1,
+            prepared.useIntervalBound,
+            prepared.intervalCapacityCache,
+            prepared.columnMaskCapacityCache,
+          )) {
             boundPrunesDelta += 1;
             addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
             return;
@@ -1949,7 +2389,13 @@ function advanceSearchingProofUnit(
             }
             if (!isActive(landing.state) || finalDecisionDepth) continue;
             const nextDepth = checkpoint.depth + 1;
-            if (nextDepth + endgameRouteLockLowerBound(landing.state) >= prepared.optimalLocks) {
+            if (proofDeficitBoundPrecludesCandidate(
+              landing.state,
+              prepared.optimalLocks - nextDepth - 1,
+              prepared.useIntervalBound,
+              prepared.intervalCapacityCache,
+              prepared.columnMaskCapacityCache,
+            )) {
               boundPrunesDelta += 1;
               addSafeProofCounter(checkpoint.boundPrunes, boundPrunesDelta, 'bound-prune');
               continue;
@@ -2372,6 +2818,9 @@ function certifyOptimalEndgameRouteWithRunStore(
       throw new Error(`Optimal Endgame candidate must be a completed public-command replay: ${levelId}.`);
     }
     const optimalLocks = replay.locks.length;
+    const useIntervalBound = optimalLocks >= LONG_PROOF_INTERVAL_BOUND_MINIMUM_LOCKS;
+    const intervalCapacityCache: ProofIntervalCapacityCache = new Map();
+    const columnMaskCapacityCache: ProofColumnMaskCapacityCache = new Map();
     const canonicalStart = dispatch(createEndgameInitialState(definition), { type: 'start' }).state;
     if (!isActive(canonicalStart)) return null;
     const initialStateHash = stateHash(canonicalStart);
@@ -2390,7 +2839,9 @@ function certifyOptimalEndgameRouteWithRunStore(
       const nextFrontier = createProofLayerBuilder(owner, depth + 1);
       for (const parentKey of verifiedProofRunValues(frontier, owner.limits)) {
         const parent = decodeProofFrontierStateKey(parentKey, proofContext);
-        if (depth + endgameRouteLockLowerBound(parent) >= optimalLocks) {
+        if (proofDeficitBoundPrecludesCandidate(
+          parent, optimalLocks - depth - 1, useIntervalBound, intervalCapacityCache, columnMaskCapacityCache,
+        )) {
           boundPrunes += 1;
           continue;
         }
@@ -2402,7 +2853,9 @@ function certifyOptimalEndgameRouteWithRunStore(
           if (!isActive(landing.state)) continue;
           const nextDepth = depth + 1;
           if (nextDepth >= optimalLocks - 1) continue;
-          if (nextDepth + endgameRouteLockLowerBound(landing.state) >= optimalLocks) {
+          if (proofDeficitBoundPrecludesCandidate(
+            landing.state, optimalLocks - nextDepth - 1, useIntervalBound, intervalCapacityCache, columnMaskCapacityCache,
+          )) {
             boundPrunes += 1;
             continue;
           }
@@ -2450,9 +2903,9 @@ function certifyOptimalEndgameRouteWithRunStore(
 
 /**
  * Certifies a supplied winning route as optimal. All public-control landing states that
- * could finish with fewer locks are traversed; the only pruning rule is the proved
- * target-deficit lower bound above. There is no beam, heuristic score, state-count
- * cutoff, or product-time execution.
+ * could finish with fewer locks are traversed; pruning uses only proved target-deficit
+ * lower bounds, including the long-route interval-supply relaxation. There is no beam,
+ * heuristic score, state-count cutoff, or product-time execution.
  */
 export function certifyOptimalEndgameRoute(
   levelId: EndgameId,
@@ -2476,6 +2929,9 @@ export function certifyOptimalEndgameRouteForDefinition(
     throw new Error(`Optimal Endgame candidate must be a completed public-command replay: ${levelId}.`);
   }
   const optimalLocks = replay.locks.length;
+  const useIntervalBound = optimalLocks >= LONG_PROOF_INTERVAL_BOUND_MINIMUM_LOCKS;
+  const intervalCapacityCache: ProofIntervalCapacityCache = new Map();
+  const columnMaskCapacityCache: ProofColumnMaskCapacityCache = new Map();
   const canonicalStart = dispatch(createEndgameInitialState(definition), { type: 'start' }).state;
   if (!isActive(canonicalStart)) return null;
   const initialStateHash = stateHash(canonicalStart);
@@ -2491,7 +2947,9 @@ export function certifyOptimalEndgameRouteForDefinition(
     const nextFrontier = new Set<string>();
     for (const parentKey of frontier) {
       const parent = decodeProofFrontierStateKey(parentKey, proofContext);
-      if (depth + endgameRouteLockLowerBound(parent) >= optimalLocks) {
+      if (proofDeficitBoundPrecludesCandidate(
+        parent, optimalLocks - depth - 1, useIntervalBound, intervalCapacityCache, columnMaskCapacityCache,
+      )) {
         boundPrunes += 1;
         continue;
       }
@@ -2503,7 +2961,9 @@ export function certifyOptimalEndgameRouteForDefinition(
         if (!isActive(landing.state)) continue;
         const nextDepth = depth + 1;
         if (nextDepth >= optimalLocks - 1) continue;
-        if (nextDepth + endgameRouteLockLowerBound(landing.state) >= optimalLocks) {
+        if (proofDeficitBoundPrecludesCandidate(
+          landing.state, optimalLocks - nextDepth - 1, useIntervalBound, intervalCapacityCache, columnMaskCapacityCache,
+        )) {
           boundPrunes += 1;
           continue;
         }
@@ -2544,6 +3004,45 @@ export function certifyOptimalEndgameRouteForDefinition(
     initialStateHash,
     replay,
   });
+}
+
+/**
+ * Test-only authoring aid: reconstructs one route from the same proof-quotiented,
+ * exhaustive public-control frontier used by optimality certification. It never
+ * participates in product state or unlock decisions.
+ */
+export function discoverExactEndgameRoute(
+  levelId: EndgameId,
+  maxLocks: number,
+): EndgameRouteReplay | null {
+  const definition = getEndgameDefinition(levelId);
+  const canonicalStart = dispatch(createEndgameInitialState(definition), { type: 'start' }).state;
+  if (!isActive(canonicalStart) || !Number.isSafeInteger(maxLocks) || maxLocks <= 0) return null;
+  const started = withoutUndoHistory(canonicalStart);
+  const proofContext = createProofFrontierContext(started);
+  let frontier = new Map<string, readonly GameCommand[]>([
+    [proofFrontierStateKey(started, proofContext), Object.freeze([{ type: 'start' }])],
+  ]);
+
+  for (let depth = 0; depth < maxLocks && frontier.size > 0; depth += 1) {
+    const next = new Map<string, readonly GameCommand[]>();
+    for (const [parentKey, parentCommands] of frontier) {
+      const parent = decodeProofFrontierStateKey(parentKey, proofContext);
+      if (depth + endgameRouteLockLowerBound(parent) > maxLocks) continue;
+      for (const landing of exhaustiveEndgameLandings(parent)) {
+        const commands = Object.freeze([...parentCommands, ...landing.commands]);
+        if (landing.state.status === 'finished' && landing.state.endgameCompletion === 'finished') {
+          return replayEndgameRouteForDefinition(definition, encodeEndgameRoute(commands));
+        }
+        if (!isActive(landing.state) || depth + 1 >= maxLocks) continue;
+        if (depth + 1 + endgameRouteLockLowerBound(landing.state) > maxLocks) continue;
+        const key = proofFrontierStateKey(landing.state, proofContext);
+        if (!next.has(key)) next.set(key, commands);
+      }
+    }
+    frontier = next;
+  }
+  return null;
 }
 
 function countHoles(state: GameState): number {
