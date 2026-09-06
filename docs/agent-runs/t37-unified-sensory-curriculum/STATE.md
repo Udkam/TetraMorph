@@ -4766,3 +4766,18 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   repair plus direct tests. The old g0–g22 state is a safe unpruned superset; after tests it may
   resume at exact tip g22 with the stronger *conservative* bound, recording the policy boundary.
   No route/level/schema/player behavior changes and no other proof begins.
+
+### 2026-09-06 F5 Horizon g23 normal post-parity checkpoint
+
+- Sole runner `29824` starts at `09:18:21+08:00` (Vitest `2208`, worker `4920`) from the exact
+  authenticated g22 tip after fresh ledger/stage/process preflight. Its external stdout/stderr are
+  retained in `%LOCALAPPDATA%\\Temp\\t37-f5-horizon-r7-g00023-20260906-091821-logs`.
+- It exits normally with one `F5_CHECKPOINT` marker, no stderr, and no `.part` residue. Receipt
+  `tip-g00023.json` extends the contiguous ledger through `0..23`; it binds the unchanged Horizon
+  route SHA-256 `458DD677...E348C663` to exact tip `43E90C85...1B586FA7`, `searching` at depth 5 /
+  parent offset 131072. The sealed stage is about 2.393 GiB. This is not a terminal certificate.
+- Independent exact-tip Store admission is advanceable and cleanly suspends. It reports the
+  13,967,878-parent depth-five frontier, 1,332,613 current-layer transitions, and zero current
+  bound prunes. The strengthened conservative interval/column-mask rule remains active; this unit
+  simply had no state it could legally prune. Next action: one fresh-preflighted g24 unit only,
+  followed by ledger and Store readback before any additional proof work.

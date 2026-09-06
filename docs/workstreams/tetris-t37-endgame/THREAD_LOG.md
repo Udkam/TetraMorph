@@ -2317,3 +2317,16 @@ product path is open.
   reuses this already-conservative test with per-advance caches. The g0–g22 prefix overexplores
   rather than underexplores, so an exact-tip continuation remains mathematically safe after direct
   tests; document the policy boundary and do not start any other workstream.
+
+### T37 F5 Horizon R7 g23 normal post-parity publication
+
+- Sole owner `29824` (Vitest `2208`, worker `4920`) finishes g23 normally after fresh exact-tip
+  preflight. Receipt `tip-g00023.json` is a contiguous `searching` checkpoint at depth 5 / offset
+  131072, binding the unchanged route `458DD677...E348C663` to
+  `43E90C85...1B586FA7`; stdout has its single marker, stderr is empty, and no part residue
+  remains. This is progress only, not a Horizon certificate.
+- Direct Store re-admission at that exact tip is advanceable and cleanly suspended. It sees the
+  13,967,878-parent frontier with 1,332,613 current-layer transitions and zero current bound
+  prunes; the newly parity-aligned conservative capacity rule is active even though this unit has
+  no state to reject. Authorize only one independently preflighted g24 unit, then another exact
+  receipt/Store audit. Registry, successors, final gates, and player review remain closed.

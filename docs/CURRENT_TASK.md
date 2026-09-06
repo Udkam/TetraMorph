@@ -11797,3 +11797,19 @@ in-memory authoring/diff contract before any admission path can open.
   R7/core/runner suite, Node syntax check, cached diff check, and the same three-only global
   typecheck output before the local checkpoint. It authorizes neither a terminal Horizon claim nor
   any final-gate, QA, evidence, registry, or publication step.
+
+### 2026-09-06 T37 F5 Horizon g23 post-parity checkpoint and g24 boundary
+
+- From the committed conservative-bound parity checkpoint, the sole fresh-preflighted g23 runner
+  completes normally. It appends `tip-g00023.json` with exact tip
+  `43E90C85...1B586FA7`, unchanged route binding `458DD677...E348C663`, `searching` depth 5 /
+  parent offset 131072, empty stderr, and zero `.part` residue. The ledger is contiguous through
+  23; this is not a certificate.
+- An independent exact-tip Store re-admission is advanceable and cleanly suspended. It reports
+  the same depth-five frontier (13,967,878 parents), 1,332,613 current-layer transitions, and zero
+  current-unit bound prunes. Zero prunes is an observed legal result of the strengthened
+  conservative rule, not a relaxation or a completion claim.
+- Permit only one fresh-preflighted g24 advancement (`--max-advances 1`) from receipt 23. It must
+  stop after one authenticated normal receipt or a Core-owned certificate, then undergo the same
+  ledger/Store readback. No wider batch, alternate stage, successor proof, registry operation,
+  final validation, publication, or player review opens.
