@@ -4781,3 +4781,16 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   bound prunes. The strengthened conservative interval/column-mask rule remains active; this unit
   simply had no state it could legally prune. Next action: one fresh-preflighted g24 unit only,
   followed by ledger and Store readback before any additional proof work.
+
+### 2026-09-06 F5 Horizon g24 normal post-parity checkpoint
+
+- Sole runner `26300` starts at `09:34:01+08:00` and its worker `26824` completes normally. The
+  external logs are retained in `%LOCALAPPDATA%\\Temp\\t37-f5-horizon-r7-g00024-20260906-093401-logs`.
+  It writes one `F5_CHECKPOINT` marker, no stderr, and leaves zero `.part` residue.
+- Receipt `tip-g00024.json` extends the contiguous ledger through `0..24`; it binds the unchanged
+  route SHA-256 `458DD677...E348C663` to tip `9D5E05C0...34B4B534`, `searching` at depth 5 /
+  parent offset 196608. The stage is about 2.485 GiB. This is not a terminal certificate.
+- Independent exact-tip Store admission is advanceable and cleanly suspends. It reports the same
+  13,967,878-parent depth-five frontier, 1,928,208 current-layer transitions, and zero current
+  bound prunes. Next action: one fresh-preflighted g25 unit only, followed by ledger and Store
+  readback before any successor proof, registry action, final validation, or player review.

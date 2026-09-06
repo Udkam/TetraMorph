@@ -2330,3 +2330,15 @@ product path is open.
   prunes; the newly parity-aligned conservative capacity rule is active even though this unit has
   no state to reject. Authorize only one independently preflighted g24 unit, then another exact
   receipt/Store audit. Registry, successors, final gates, and player review remain closed.
+
+### T37 F5 Horizon R7 g24 normal post-parity publication
+
+- Sole owner `26300` / worker `26824` finishes g24 normally. Receipt `tip-g00024.json` is a
+  contiguous `searching` checkpoint at depth 5 / offset 196608, binding the unchanged route
+  `458DD677...E348C663` to `9D5E05C0...34B4B534`; one marker, empty stderr, and zero part residue
+  are retained with the external run logs. This is intermediate proof progress only.
+- Direct exact-tip Store admission is advanceable and cleanly suspended. It retains the
+  13,967,878-parent frontier with 1,928,208 current-layer transitions and zero current bound
+  prunes under the active conservative rule. Coordinator permits only one fresh-preflighted g25
+  unit, then another exact receipt/Store audit; all registry, successors, final gates, and player
+  review remain closed.

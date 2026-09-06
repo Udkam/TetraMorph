@@ -11813,3 +11813,18 @@ in-memory authoring/diff contract before any admission path can open.
   stop after one authenticated normal receipt or a Core-owned certificate, then undergo the same
   ledger/Store readback. No wider batch, alternate stage, successor proof, registry operation,
   final validation, publication, or player review opens.
+
+### 2026-09-06 T37 F5 Horizon g24 post-parity checkpoint and g25 boundary
+
+- The sole g24 runner also completes normally. It appends `tip-g00024.json` with exact tip
+  `9D5E05C0...34B4B534`, unchanged route binding `458DD677...E348C663`, `searching` depth 5 /
+  parent offset 196608, empty stderr, and zero `.part` residue. The ledger is contiguous through
+  24; this remains an intermediate state rather than a certificate.
+- Independent exact-tip Store re-admission is advanceable and cleanly suspended. It confirms the
+  13,967,878-parent depth-five frontier, 1,928,208 current-layer transitions, and zero current
+  bound prunes. The parity-aligned conservative capacity bound is still active; no behavior or
+  proof contract changed while it found no impossible state in this unit.
+- Permit only one fresh-preflighted g25 advancement (`--max-advances 1`) from receipt 24. It must
+  stop after one authenticated normal receipt or a Core-owned certificate, followed by the same
+  ledger/Store audit. No broader batch, alternate stage, successor proof, registry action, final
+  gate, publication, or player review opens.
