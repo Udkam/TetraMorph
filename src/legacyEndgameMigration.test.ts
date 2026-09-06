@@ -4,10 +4,12 @@ import { act, createElement, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
-import { ENDGAME_CAMPAIGN_REVISION, ENDGAME_PROGRESS_KEY } from './endgameProgress';
+import { ENDGAME_CAMPAIGN_REVISION, ENDGAME_PROGRESS_KEY, ENDGAME_PROGRESS_V6_KEY } from './endgameProgress';
 import { appHistoryStateFor } from './navigation/appRoute';
 import type { PlatformStorageRead } from './platform/browserPlatform';
 import {
+  ENDGAME_V7_BEHAVIOR_STABLE_IDS,
+  ENDGAME_V7_REBUILT_IDS,
   migrateEndgameProgressStorage,
   migrateEndgameRuleIntrosStorage,
   normalizeEndgameRoute,
@@ -74,155 +76,149 @@ function memory(initial: Record<string, string>, options: MemoryOptions = {}) {
   };
 }
 
-describe('isolated Endgame progress migration', () => {
-  it('maps generic IDs exactly, preserves neutral IDs, orders and verifies canonical v6', () => {
+function v6(
+  completedLevelIds: readonly string[],
+  bestPieceCounts: Record<string, number> = {},
+): string {
+  return JSON.stringify({ version: 6, campaignRevision: 2, completedLevelIds, bestPieceCounts });
+}
+
+function v7(
+  completedLevelIds: readonly string[],
+  bestLockedPieceCounts: Record<string, number> = {},
+): string {
+  return JSON.stringify({ version: 7, campaignRevision: 3, completedLevelIds, bestLockedPieceCounts });
+}
+
+describe('isolated revision-3 Endgame progress migration', () => {
+  it('publishes 46 active IDs with exactly 38 behavior-stable migrations and eight resets', () => {
+    expect(ENDGAME_V7_BEHAVIOR_STABLE_IDS).toHaveLength(38);
+    expect(ENDGAME_V7_REBUILT_IDS).toEqual([
+      't3r-shaft-01', 't3r-shaft-02', 't3r-shaft-03', 't3r-cascade-06', 't3r-shaft-04',
+      'tm-endgame-32', 'tm-endgame-39', 'tm-endgame-46',
+    ]);
+    expect(new Set([...ENDGAME_V7_BEHAVIOR_STABLE_IDS, ...ENDGAME_V7_REBUILT_IDS]).size).toBe(46);
+  });
+
+  it('accepts canonical v7 first, does not rewrite it, and retains v6 as rollback data', () => {
+    const canonical = v7(['t3r-cascade-05'], { 't3r-cascade-05': 5 });
+    const store = memory({
+      [ENDGAME_PROGRESS_KEY]: canonical,
+      [ENDGAME_PROGRESS_V6_KEY]: v6(['t3r-cascade-05'], { 't3r-cascade-05': 5 }),
+    });
+    const result = migrateEndgameProgressStorage(store.port);
+    expect(result).toMatchObject({
+      status: 'available', sourceRank: 0, persistence: 'verified',
+      data: {
+        version: 7, campaignRevision: ENDGAME_CAMPAIGN_REVISION,
+        completedLevelIds: ['t3r-cascade-05'], bestLockedPieceCounts: { 't3r-cascade-05': 5 },
+      },
+      cleanup: { removedSourceRanks: [], retainedSourceRanks: [1] },
+    });
+    expect(store.values.get(ENDGAME_PROGRESS_KEY)).toBe(canonical);
+    expect(store.values.has(ENDGAME_PROGRESS_V6_KEY)).toBe(true);
+  });
+
+  it('projects v6 through the frozen stable set, clears rebuilt records, and transfers nothing from retired IDs', () => {
+    const store = memory({
+      [ENDGAME_PROGRESS_V6_KEY]: v6([
+        't3r-shaft-01', 't3r-shaft-02', 't3r-cascade-05', 't3r-cascade-06', 't5r-delta-07',
+        'tm-endgame-32', 'tm-endgame-34', 'tm-endgame-39', 'tm-endgame-46', 'tm-endgame-50',
+      ], {
+        't3r-shaft-01': 3, 't3r-shaft-02': 4, 't3r-cascade-06': 5, 't3r-cascade-05': 6,
+        't5r-delta-07': 7, 'tm-endgame-32': 8, 'tm-endgame-34': 9, 'tm-endgame-39': 10,
+        'tm-endgame-46': 11, 'tm-endgame-50': 12,
+      }),
+    });
+    const result = migrateEndgameProgressStorage(store.port);
+    expect(result).toMatchObject({
+      status: 'available', sourceRank: 1, persistence: 'verified',
+      data: {
+        version: 7, campaignRevision: 3,
+        completedLevelIds: ['t3r-cascade-05', 't5r-delta-07', 'tm-endgame-50'],
+        bestLockedPieceCounts: { 't3r-cascade-05': 6, 't5r-delta-07': 7, 'tm-endgame-50': 12 },
+      },
+      cleanup: { removedSourceRanks: [], retainedSourceRanks: [1] },
+    });
+    expect(JSON.parse(store.values.get(ENDGAME_PROGRESS_KEY) ?? 'null')).toEqual(
+      (result as Extract<typeof result, { status: 'available' }>).data,
+    );
+    expect(store.values.has(ENDGAME_PROGRESS_V6_KEY)).toBe(true);
+  });
+
+  it('maps older generic IDs before projecting them into v7', () => {
     const source = 'tetramorph:puzzle-completion:v5';
     const store = memory({
       [source]: JSON.stringify({
         version: 5,
         campaignRevision: 2,
-        completedLevelIds: ['tm-puzzle-50', 't3r-shaft-01', 'tm-puzzle-21', 'tm-puzzle-21'],
-        bestPieceCounts: { 'tm-puzzle-50': 9, 't3r-shaft-01': 3, 'tm-puzzle-21': 5 },
+        completedLevelIds: ['tm-puzzle-34', 'tm-puzzle-50', 't3r-cascade-05', 'tm-puzzle-21'],
+        bestPieceCounts: { 'tm-puzzle-34': 7, 'tm-puzzle-50': 8, 't3r-cascade-05': 5, 'tm-puzzle-21': 6 },
       }),
     });
-    const result = migrateEndgameProgressStorage(store.port);
-    expect(result).toMatchObject({
-      status: 'available', persistence: 'verified', sourceRank: 1,
+    expect(migrateEndgameProgressStorage(store.port)).toMatchObject({
+      status: 'available', sourceRank: 2, persistence: 'verified',
       data: {
-        version: 6, campaignRevision: 2,
-        completedLevelIds: ['t3r-shaft-01', 'tm-endgame-21', 'tm-endgame-50'],
-        bestPieceCounts: { 't3r-shaft-01': 3, 'tm-endgame-21': 5, 'tm-endgame-50': 9 },
+        completedLevelIds: ['t3r-cascade-05', 'tm-endgame-21', 'tm-endgame-50'],
+        bestLockedPieceCounts: { 't3r-cascade-05': 5, 'tm-endgame-21': 6, 'tm-endgame-50': 8 },
       },
+      cleanup: { removedSourceRanks: [2], retainedSourceRanks: [] },
     });
-    expect(store.values.has(source)).toBe(false);
-    expect(JSON.parse(store.values.get('tetramorph:endgame-completion:v6')!)).toEqual(
-      (result as Extract<typeof result, { status: 'available' }>).data,
-    );
   });
 
-  it.each(['tm-puzzle-20', 'tm-puzzle-51', 'tm-puzzle-2x', 'unknown'])('rejects invalid id %s', (id) => {
-    const store = memory({
-      'tetramorph:puzzle-completion:v5': JSON.stringify({
-        version: 5, campaignRevision: 2, completedLevelIds: [id], bestPieceCounts: {},
-      }),
-    });
-    expect(migrateEndgameProgressStorage(store.port)).toEqual({ status: 'blocked', reason: 'invalid', sourceRank: 1 });
-    expect(store.values.has('tetramorph:endgame-completion:v6')).toBe(false);
-  });
-
-  it('replays revision-2 invalidation for v4, v3, v2, and v1 without promoting v4 bests', () => {
-    const cases = [
-      ['qingliu:puzzle-completion:v4', { version: 4, completedLevelIds: ['t3r-shaft-01', 't5r-prism-11'], bestPieceCounts: { 't3r-shaft-01': 7, 't5r-prism-11': 9 } }, ['t5r-prism-11'], {}],
-      ['qingliu:puzzle-completion:v3', { version: 3, completedLevelIds: ['t3r-shaft-01', 't5r-prism-11'] }, ['t5r-prism-11'], {}],
-      ['qingliu:puzzle-completion:v2', { version: 2, completedLevelIds: ['t3r-shaft-01', 't5r-prism-11'] }, ['t5r-prism-11'], {}],
-      ['tetris:puzzle-progress:v1', { version: 1, nextUnlockedLevelId: 't6r-veil-16' }, ['t5r-prism-11', 't5r-horizon-15'], {}],
-    ] as const;
-    for (const [key, payload, completedLevelIds, bestPieceCounts] of cases) {
-      const result = migrateEndgameProgressStorage(memory({ [key]: JSON.stringify(payload) }).port);
-      expect(result).toMatchObject({ status: 'available', persistence: 'verified', data: { completedLevelIds, bestPieceCounts } });
-    }
-  });
-
-  it('preserves revision-2 v5 data while filtering revision-1 changed completions and bests', () => {
-    const payload = (campaignRevision: number) => JSON.stringify({
-      version: 5,
-      campaignRevision,
-      completedLevelIds: ['t3r-shaft-01', 't5r-prism-11', 't5r-pulse-14', 'tm-puzzle-36', 'tm-puzzle-37'],
-      bestPieceCounts: { 't3r-shaft-01': 3, 't5r-prism-11': 4, 't5r-pulse-14': 5, 'tm-puzzle-36': 6, 'tm-puzzle-37': 7 },
-    });
-    const revisionOne = migrateEndgameProgressStorage(memory({ 'tetramorph:puzzle-completion:v5': payload(1) }).port);
-    expect(revisionOne).toMatchObject({ data: {
-      completedLevelIds: ['t5r-prism-11', 'tm-endgame-37'],
-      bestPieceCounts: { 't5r-prism-11': 4, 'tm-endgame-37': 7 },
-    } });
-    const revisionTwo = migrateEndgameProgressStorage(memory({ 'tetramorph:puzzle-completion:v5': payload(2) }).port);
-    expect(revisionTwo).toMatchObject({ data: {
-      completedLevelIds: ['t3r-shaft-01', 't5r-prism-11', 't5r-pulse-14', 'tm-endgame-36', 'tm-endgame-37'],
-      bestPieceCounts: { 't3r-shaft-01': 3, 't5r-prism-11': 4, 't5r-pulse-14': 5, 'tm-endgame-36': 6, 'tm-endgame-37': 7 },
-    } });
-  });
-
-  it('uses the live 1-through-50 order rather than the later 5/25/16 roster order', () => {
-    const result = migrateEndgameProgressStorage(memory({
-      'tetramorph:puzzle-completion:v5': JSON.stringify({
-        version: 5,
-        campaignRevision: 2,
-        completedLevelIds: ['t3r-cascade-06', 't3r-shaft-04', 't3r-cascade-05', 't6r-keystone-20', 't6r-veil-16'],
-        bestPieceCounts: {},
-      }),
-    }).port);
-    expect(result).toMatchObject({ data: { completedLevelIds: [
-      't3r-shaft-04', 't3r-cascade-05', 't3r-cascade-06', 't6r-veil-16', 't6r-keystone-20',
-    ] } });
-  });
-
-  it('lets canonical or first-present failure/invalidity block every older fallback', () => {
-    const canonicalKey = 'tetramorph:endgame-completion:v6';
-    const old = JSON.stringify({ version: 2, completedLevelIds: ['t3r-shaft-01'] });
-    const failed = memory({ 'qingliu:puzzle-completion:v2': old }, { failedReads: new Set([canonicalKey]) });
+  it('treats a present unreadable or malformed higher-priority source as terminal', () => {
+    const validV6 = v6(['t3r-cascade-05'], { 't3r-cascade-05': 5 });
+    const failed = memory({ [ENDGAME_PROGRESS_V6_KEY]: validV6 }, { failedReads: new Set([ENDGAME_PROGRESS_KEY]) });
     expect(migrateEndgameProgressStorage(failed.port)).toEqual({ status: 'blocked', reason: 'read-failed', sourceRank: 0 });
 
-    const invalid = memory({
-      'tetramorph:puzzle-completion:v5': '{bad',
-      'qingliu:puzzle-completion:v2': old,
+    const invalidV7 = memory({
+      [ENDGAME_PROGRESS_KEY]: v7(['t3r-cascade-05'], { 't3r-cascade-05': 0 }),
+      [ENDGAME_PROGRESS_V6_KEY]: validV6,
     });
-    expect(migrateEndgameProgressStorage(invalid.port)).toEqual({ status: 'blocked', reason: 'invalid', sourceRank: 1 });
-    expect(invalid.values.has(canonicalKey)).toBe(false);
+    expect(migrateEndgameProgressStorage(invalidV7.port)).toEqual({ status: 'blocked', reason: 'invalid', sourceRank: 0 });
+
+    const invalidV6 = memory({
+      [ENDGAME_PROGRESS_V6_KEY]: '{bad',
+      'tetramorph:puzzle-completion:v5': JSON.stringify({ version: 5, campaignRevision: 2, completedLevelIds: [], bestPieceCounts: {} }),
+    });
+    expect(migrateEndgameProgressStorage(invalidV6.port)).toEqual({ status: 'blocked', reason: 'invalid', sourceRank: 1 });
   });
 
   it.each([
-    ['write-failed', { failedWrites: new Set(['tetramorph:endgame-completion:v6']) }],
+    ['write-failed', { failedWrites: new Set([ENDGAME_PROGRESS_KEY]) }],
     ['readback-missing', { readback: () => ({ status: 'missing' } as const) }],
     ['readback-failed', { readback: () => ({ status: 'failed' } as const) }],
     ['readback-invalid', { readback: () => ({ status: 'value', value: '{}' } as const) }],
-    ['readback-mismatch', { readback: () => ({ status: 'value', value: JSON.stringify({ version: 6, campaignRevision: 2, completedLevelIds: [], bestPieceCounts: {} }) } as const) }],
-  ] as const)('keeps live converted data but suppresses cleanup on %s', (persistence, options) => {
-    const key = 'qingliu:puzzle-completion:v2';
-    const store = memory({ [key]: JSON.stringify({ version: 2, completedLevelIds: ['t5r-prism-11'] }) }, options);
+    ['readback-mismatch', { readback: () => ({ status: 'value', value: v7([], {}) } as const) }],
+  ] as const)('suppresses cleanup when v6-to-v7 persistence is %s', (persistence, options) => {
+    const store = memory({ [ENDGAME_PROGRESS_V6_KEY]: v6(['t3r-cascade-05'], { 't3r-cascade-05': 5 }) }, options);
     const result = migrateEndgameProgressStorage(store.port);
-    expect(result).toMatchObject({ status: 'available', persistence, data: { completedLevelIds: ['t5r-prism-11'] } });
-    expect(store.values.has(key)).toBe(true);
+    expect(result).toMatchObject({ status: 'available', sourceRank: 1, persistence });
+    expect(store.values.has(ENDGAME_PROGRESS_V6_KEY)).toBe(true);
+  });
+});
+
+describe('isolated Endgame routes and the archived deep-link fallback', () => {
+  it.each([
+    ['/play/endgame/tm-endgame-34', 'tm-endgame-34'],
+    ['/play/endgame/tm-endgame-40', 'tm-endgame-40'],
+    ['/play/puzzle/tm-puzzle-43', 'tm-endgame-43'],
+  ] as const)('returns retired deep link %s to the active library', (path, retiredEndgameId) => {
+    expect(normalizeEndgameRoute(path, null)).toMatchObject({
+      status: 'normalized', needsReplace: true, historyAccepted: false,
+      path: '/endgames', archivedEndgameId: retiredEndgameId,
+      navigation: { screen: 'endgame-library', mode: 'endgame', selectedEndgameId: 't3r-shaft-01' },
+    });
   });
 
-  it('does not rewrite valid canonical v6 and only attempts cleanup for present sources', () => {
-    let writes = 0;
-    const canonical = JSON.stringify({
-      version: 6, campaignRevision: 2,
-      completedLevelIds: ['t3r-shaft-01', 't3r-shaft-04', 'tm-endgame-21'],
-      bestPieceCounts: { 't3r-shaft-04': 4 },
-    });
-    const store = memory({
-      'tetramorph:endgame-completion:v6': canonical,
-      'qingliu:puzzle-completion:v2': JSON.stringify({ version: 2, completedLevelIds: [] }),
-    });
-    const port = {
-      ...store.port,
-      writeStorage(key: string, value: string) { writes += 1; return store.port.writeStorage(key, value); },
-    };
-    const result = migrateEndgameProgressStorage(port);
-    expect(result).toMatchObject({ status: 'available', sourceRank: 0, persistence: 'verified', cleanup: {
-      removedSourceRanks: [5], retainedSourceRanks: [],
-    } });
-    expect(writes).toBe(0);
-  });
-
-  it('cleans every source independently and reports partial removal for retry', () => {
-    const blocked = 'qingliu:puzzle-completion:v3';
-    const store = memory({
-      'qingliu:puzzle-completion:v2': JSON.stringify({ version: 2, completedLevelIds: [] }),
-      [blocked]: JSON.stringify({ version: 3, completedLevelIds: [] }),
-    }, { failedRemovals: new Set([blocked]) });
-    const result = migrateEndgameProgressStorage(store.port);
-    expect(result).toMatchObject({
-      status: 'available', persistence: 'verified',
-      cleanup: { removedSourceRanks: [5], retainedSourceRanks: [4] },
-    });
-    expect(store.values.has(blocked)).toBe(true);
+  it('continues to leave a valid active canonical path for the canonical router', () => {
+    expect(normalizeEndgameRoute('/play/endgame/tm-endgame-31', null))
+      .toEqual({ status: 'unhandled', needsReplace: false });
   });
 });
 
 describe('isolated mode-introduction migration', () => {
-  it('maps, deduplicates, filters, and emits product order', () => {
+  it('maps, filters, deduplicates, and emits product order', () => {
     const store = memory({
       'tetramorph:mode-rule-intros:v1': JSON.stringify(['puzzle', 'race', 'bogus', 'marathon', 'puzzle', 4]),
     });
@@ -230,167 +226,24 @@ describe('isolated mode-introduction migration', () => {
       status: 'available', persistence: 'verified', data: ['marathon', 'race', 'endgame'],
     });
   });
-
-  it('blocks fallback when the first present intro value cannot be read or parsed', () => {
-    const store = memory({
-      'tetramorph:mode-rule-intros:v1': 'not-json',
-      'tetris:mode-rule-intros:v1': JSON.stringify(['marathon']),
-    });
-    expect(migrateEndgameRuleIntrosStorage(store.port)).toEqual({ status: 'blocked', reason: 'invalid', sourceRank: 1 });
-  });
 });
 
-describe('isolated Endgame URL and history normalization', () => {
-  const history = (screen: string, selectedPuzzleId: string, mode = 'puzzle') => ({
-    tetramorphRoute: { version: 1, navigation: { screen, mode, selectedPuzzleId } },
-  });
-
-  it('lets a valid library history preserve selection and returns one replace payload', () => {
-    expect(normalizeEndgameRoute('/puzzles/', history('puzzle-library', 'tm-puzzle-22'))).toEqual({
-      status: 'normalized', needsReplace: true, historyAccepted: true, path: '/endgames',
-      navigation: { screen: 'endgame-library', mode: 'endgame', selectedEndgameId: 'tm-endgame-22' },
-      historyState: { tetramorphRoute: { version: 2, navigation: {
-        screen: 'endgame-library', mode: 'endgame', selectedEndgameId: 'tm-endgame-22',
-      } } },
-    });
-  });
-
-  it('makes a play path authoritative over disagreeing or malformed history', () => {
-    const result = normalizeEndgameRoute('/play/puzzle/tm-puzzle-23', history('game', 'tm-puzzle-22'));
-    expect(result).toMatchObject({
-      status: 'normalized', needsReplace: true, historyAccepted: false,
-      path: '/play/endgame/tm-endgame-23',
-      navigation: { screen: 'game', mode: 'endgame', selectedEndgameId: 'tm-endgame-23' },
-    });
-  });
-
-  it.each(['/play/puzzle/%E0%A4%A', '/play/puzzle/tm-puzzle-20', '/play/puzzle/unknown'])
-  ('falls back invalid legacy play path %s to the canonical library', (path) => {
-    expect(normalizeEndgameRoute(path, null)).toMatchObject({
-      status: 'normalized', needsReplace: true, historyAccepted: false, path: '/endgames',
-      navigation: { screen: 'endgame-library', mode: 'endgame', selectedEndgameId: 't3r-shaft-01' },
-    });
-  });
-
-  it('does not claim canonical or unrelated paths and rejects mixed history fields', () => {
-    expect(normalizeEndgameRoute('/endgames', history('puzzle-library', 'tm-puzzle-22'))).toMatchObject({
-      status: 'normalized', path: '/endgames', historyAccepted: true,
-      navigation: { selectedEndgameId: 'tm-endgame-22' },
-    });
-    expect(normalizeEndgameRoute('/elsewhere', null)).toEqual({ status: 'unhandled', needsReplace: false });
-    const mixed = history('puzzle-library', 'tm-puzzle-22') as Record<string, unknown>;
-    (mixed.tetramorphRoute as { navigation: Record<string, unknown> }).navigation.selectedEndgameId = 'tm-endgame-22';
-    expect(normalizeEndgameRoute('/puzzles', mixed)).toMatchObject({ historyAccepted: false });
-  });
-
-  it.each([
-    ['/', history('home', 'tm-puzzle-22', 'marathon'), 'home', 'marathon'],
-    ['/play/classic', history('game', 'tm-puzzle-22', 'marathon'), 'game', 'marathon'],
-    ['/play/survival', history('game', 'tm-puzzle-22', 'race'), 'game', 'race'],
-    ['/play/mutation', history('game', 'tm-puzzle-22', 'sprint'), 'game', 'sprint'],
-  ] as const)('upgrades matching v1 history on unchanged path %s', (path, state, screen, mode) => {
-    expect(normalizeEndgameRoute(path, state)).toMatchObject({
-      status: 'normalized', needsReplace: true, historyAccepted: true, path,
-      navigation: { screen, mode, selectedEndgameId: 'tm-endgame-22' },
-    });
-  });
-
-  it('upgrades matching v1 history on a canonical Endgame play path while path ID wins', () => {
-    expect(normalizeEndgameRoute('/play/endgame/tm-endgame-23', history('game', 'tm-puzzle-22'))).toMatchObject({
-      status: 'normalized', needsReplace: true, historyAccepted: false,
-      path: '/play/endgame/tm-endgame-23',
-      navigation: { screen: 'game', mode: 'endgame', selectedEndgameId: 'tm-endgame-23' },
-    });
-  });
-
-  it('leaves valid canonical paths to the canonical router when v1 history is malformed or mismatched', () => {
-    expect(normalizeEndgameRoute('/play/classic', history('game', 'tm-puzzle-22', 'race')))
-      .toEqual({ status: 'unhandled', needsReplace: false });
-    expect(normalizeEndgameRoute('/endgames', { malformed: true }))
-      .toEqual({ status: 'unhandled', needsReplace: false });
-    expect(normalizeEndgameRoute('/play/endgame/tm-endgame-23', null))
-      .toEqual({ status: 'unhandled', needsReplace: false });
-  });
-
-  it('rejects mismatched screens, modes, versions, and extra navigation fields as history input', () => {
-    const cases: unknown[] = [
-      history('game', 'tm-puzzle-22'),
-      history('puzzle-library', 'tm-puzzle-22', 'marathon'),
-      { tetramorphRoute: { version: 2, navigation: {
-        screen: 'endgame-library', mode: 'endgame', selectedPuzzleId: 'tm-puzzle-22',
-      } } },
-      { tetramorphRoute: { version: 1, navigation: {
-        screen: 'puzzle-library', mode: 'puzzle', selectedPuzzleId: 'tm-puzzle-22', extra: true,
-      } } },
-    ];
-    for (const value of cases) {
-      expect(normalizeEndgameRoute('/puzzles', value)).toMatchObject({
-        status: 'normalized', historyAccepted: false,
-        navigation: { selectedEndgameId: 't3r-shaft-01' },
-      });
-    }
-  });
-});
-
-describe('isolated migration consumed by real App boot', () => {
-  it('normalizes the retired library URL and selected level through one history replacement', () => {
-    const retiredHistory = {
-      tetramorphRoute: {
-        version: 1,
-        navigation: {
-          screen: 'puzzle-library',
-          mode: 'puzzle',
-          selectedPuzzleId: 'tm-puzzle-22',
-        },
-      },
-    };
-    window.history.replaceState(retiredHistory, '', '/puzzles');
+describe('revision-3 route consumption in the real App', () => {
+  it('replaces a retired deep link once and exposes an archived-level notice', () => {
+    window.history.replaceState({}, '', '/play/endgame/tm-endgame-34');
     localStorage.setItem('tetramorph:mode-rule-intros:v2', JSON.stringify(['endgame']));
     const replaceState = vi.spyOn(window.history, 'replaceState');
-
     const view = renderApp();
 
-    expect(replaceState).toHaveBeenCalledTimes(1);
     expect(window.location.pathname).toBe('/endgames');
     expect(window.history.state).toEqual(appHistoryStateFor({
-      screen: 'endgame-library',
-      mode: 'endgame',
-      selectedEndgameId: 'tm-endgame-22',
+      screen: 'endgame-library', mode: 'endgame', selectedEndgameId: 't3r-shaft-01',
     }));
     expect(view.container.querySelector('[data-testid="endgame-library"]')).not.toBeNull();
-    expect(view.container.querySelector('[data-level-id="tm-endgame-22"]')?.getAttribute('aria-pressed')).toBe('true');
+    expect(view.container.querySelector('[data-testid="endgame-archived-notice"]')?.getAttribute('data-archived-endgame-id'))
+      .toBe('tm-endgame-34');
+    expect(replaceState).toHaveBeenCalledTimes(1);
     view.unmount();
     replaceState.mockRestore();
-  });
-
-  it('migrates retired progress and introductions before the first interactive route', () => {
-    const retiredProgressKey = 'tetramorph:puzzle-completion:v5';
-    const retiredIntroKey = 'tetramorph:mode-rule-intros:v1';
-    localStorage.setItem(retiredProgressKey, JSON.stringify({
-      version: 5,
-      campaignRevision: 2,
-      completedLevelIds: ['t3r-shaft-01', 'tm-puzzle-21'],
-      bestPieceCounts: { 't3r-shaft-01': 3, 'tm-puzzle-21': 7 },
-    }));
-    localStorage.setItem(retiredIntroKey, JSON.stringify(['puzzle', 'marathon']));
-
-    const view = renderApp();
-
-    expect(JSON.parse(localStorage.getItem(ENDGAME_PROGRESS_KEY) ?? 'null')).toEqual({
-      version: 6,
-      campaignRevision: ENDGAME_CAMPAIGN_REVISION,
-      completedLevelIds: ['t3r-shaft-01', 'tm-endgame-21'],
-      bestPieceCounts: { 't3r-shaft-01': 3, 'tm-endgame-21': 7 },
-    });
-    expect(JSON.parse(localStorage.getItem('tetramorph:mode-rule-intros:v2') ?? 'null'))
-      .toEqual(['marathon', 'endgame']);
-    expect(localStorage.getItem(retiredProgressKey)).toBeNull();
-    expect(localStorage.getItem(retiredIntroKey)).toBeNull();
-
-    act(() => view.container.querySelector<HTMLButtonElement>('[data-testid="enter-endgame"]')?.click());
-    expect(view.container.querySelector('[data-testid="entry-mode-rules"]')).toBeNull();
-    expect(view.container.querySelector('[data-testid="endgame-library"]')).not.toBeNull();
-    expect(view.container.querySelector('[data-level-id="t3r-shaft-01"]')?.getAttribute('data-best-pieces')).toBe('3');
-    view.unmount();
   });
 });
