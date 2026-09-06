@@ -2368,3 +2368,13 @@ product path is open.
   fresh-preflighted `--max-advances 32` g34–g65 runner with unchanged source/receipt protocol and
   stop-on-failure behavior. It requires another full ledger/Store audit after exit; no other proof,
   source change, registry action, final gate, or player review opens.
+
+### T37 F5 Horizon R7 g34–g65 live serial batch
+
+- After exact g33 preflight (contiguous g0–g33, matching `A817E7A0...4D1AF526`, no part residue or
+  related Node), sole owner `25532` starts the authorized `--max-advances 32` batch at
+  `11:44:23+08:00`. Logs are in the retained R7 g34–g65 directory. It owns no source edit and no
+  concurrent proof is authorized.
+- This is a live execution record, not a certificate or result. On exit, read the markers/stderr,
+  validate receipt contiguity and the exact final manifest tip, then re-admit and cleanly suspend
+  the Store before any successor authorization.

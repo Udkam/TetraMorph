@@ -4827,3 +4827,15 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   This is progress only. With 13,181,446 depth-five parents remaining (202 fixed units), next
   action is a fresh-preflighted sole g34–g65 serial `--max-advances 32` run. It may not overlap
   another proof or source edit, and must receive another full ledger/Store audit after exit.
+
+### 2026-09-06 F5 Horizon g34–g65 serial batch running
+
+- Fresh exact-tip preflight at `6bd80ae` finds the g0–g33 ledger contiguous, g33 tip
+  `A817E7A0...4D1AF526` matching `manifest-g00033.json`, zero `.part` residue, no related Node,
+  and 352.66 GiB free on `E:`. Sole runner `25532` starts at `11:44:23+08:00` with
+  `--max-advances 32`; it is the only authorized proof process.
+- The runner owns only g34–g65 under the unchanged Horizon stage, receipt directory, candidate
+  route, Core source, and 30-minute R7 per-child allowance. Its external logs are retained at
+  `%LOCALAPPDATA%\\Temp\\t37-f5-horizon-r7-g00034-g00065-20260906-114423-logs`. Do not edit proof
+  source, launch another proof, or infer a result while it is live. On exit, first read its
+  stderr/markers and audit the contiguous ledger plus exact Store tip before any next action.
