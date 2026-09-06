@@ -2342,3 +2342,16 @@ product path is open.
   prunes under the active conservative rule. Coordinator permits only one fresh-preflighted g25
   unit, then another exact receipt/Store audit; all registry, successors, final gates, and player
   review remain closed.
+
+### T37 F5 Horizon R7 g25 and bounded serial continuation
+
+- Sole owner `24488` / worker `30128` completes g25 normally. Receipt `tip-g00025.json` remains
+  contiguous at depth 5 / offset 262144 and binds `458DD677...E348C663` to
+  `E8BC8F58...F5C380AA`; the marker is singular, stderr empty, and part residue absent. Direct
+  Store re-admission is advanceable and cleanly suspended at 13,967,878 parents, 2,522,604
+  current-layer transitions, and zero current bound prunes.
+- From that observed fixed unit boundary, 13,705,734 parents / 210 units remain before any
+  depth-five closure. Coordinator authorizes a single exact-source, fresh-preflighted serial
+  runner for g26–g33 (`--max-advances 8`): each child must append its own receipt and halt the
+  parent on a failure or certificate. No source changes or concurrent proof are permitted during
+  the batch; it must receive a full ledger and Store audit after exit before further authorization.

@@ -4794,3 +4794,20 @@ plus one mandatory omitted-count sentinel; truncation is fatal. No implementatio
   13,967,878-parent depth-five frontier, 1,928,208 current-layer transitions, and zero current
   bound prunes. Next action: one fresh-preflighted g25 unit only, followed by ledger and Store
   readback before any successor proof, registry action, final validation, or player review.
+
+### 2026-09-06 F5 Horizon g25 normal checkpoint and bounded serial continuation
+
+- Sole runner `24488` starts at `09:49:05+08:00`; worker `30128` completes normally with one
+  `F5_CHECKPOINT` marker, no stderr, and zero `.part` residue. External logs are retained in
+  `%LOCALAPPDATA%\\Temp\\t37-f5-horizon-r7-g00025-20260906-094905-logs`.
+- Receipt `tip-g00025.json` extends the contiguous ledger through `0..25`; it binds the unchanged
+  route SHA-256 `458DD677...E348C663` to tip `E8BC8F58...F5C380AA`, `searching` at depth 5 /
+  parent offset 262144. The stage is about 2.577 GiB, and this is not a terminal certificate.
+- Independent exact-tip Store admission is advanceable and cleanly suspends. It reports the
+  13,967,878-parent frontier, 2,522,604 current-layer transitions, and zero current bound prunes.
+  Since the three post-parity units g23–g25 have the same authenticated behavior, 13,705,734
+  parents remain and exactly 210 fixed units are needed to exhaust depth five. Next action is one
+  sole fresh-preflighted serial `--max-advances 8` runner for g26–g33 only. It retains one receipt
+  per child and stops on a failed child or a certificate; a direct ledger/Store audit is mandatory
+  after it exits. No other proof, source edit, registry activation, final gate, or player review
+  opens during the batch.

@@ -11828,3 +11828,22 @@ in-memory authoring/diff contract before any admission path can open.
   stop after one authenticated normal receipt or a Core-owned certificate, followed by the same
   ledger/Store audit. No broader batch, alternate stage, successor proof, registry action, final
   gate, publication, or player review opens.
+
+### 2026-09-06 T37 F5 Horizon g25 and bounded depth-five serial batch
+
+- g25 completes normally with exact tip `E8BC8F58...F5C380AA`, unchanged route binding
+  `458DD677...E348C663`, `searching` depth 5 / parent offset 262144, empty stderr, no `.part`
+  residue, and a contiguous ledger through 25. Exact-tip Store re-admission is advanceable and
+  cleanly suspended; it reports the 13,967,878-parent frontier, 2,522,604 transitions, and zero
+  current bound prunes. It is still not a certificate.
+- The three independently read back post-parity parent units g23–g25 all preserve the same
+  frontier, fixed 65,536-parent unit discipline, receipt authentication, clean Store suspension,
+  and zero failure/residue. From offset 262144, 13,705,734 parents remain, requiring 210 bounded
+  units to exhaust this depth. This now permits a small serial batch without extrapolating across
+  a layer boundary.
+- Authorize one sole fresh-preflighted runner with `--max-advances 8`, covering only g26–g33.
+  It must append and bind one exact receipt after each child, use the same committed Core semantics,
+  stop immediately on a nonzero child or Core certificate, and run no concurrent proof or source
+  change. After it exits, independently audit the full ledger and exact Store tip before deciding
+  any successor batch. Registry action, successor levels, final gates, publication, and player
+  review remain closed.

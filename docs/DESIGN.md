@@ -12213,3 +12213,19 @@ frontiers contain extra states, never states omitted by an unsound bound. The fi
 state that pre-g23 work used the weaker conservative subset and post-g23 work used the shared
 stronger conservative subset; neither policy changes player-facing rules or the meaning of an
 optimal certificate.
+
+### 2026-09-06 T37 F5 depth-five bounded serial continuation
+
+The isolated post-parity units g23–g25 establish a same-source, same-frontier operational sample:
+each resumes only the exact receipt tip, appends one immutable receipt after a clean Store
+suspension, and leaves no part residue. At g25, the authenticated depth-five frontier remains
+13,967,878 parents with offset 262144, so 13,705,734 parents remain. Fixed 65,536-parent units
+therefore leave 210 units before this depth can be exhausted; this count is not a statement about
+the next layer.
+
+One sole runner may take a bounded eight-unit slice (g26–g33) while retaining the existing
+per-child 30-minute R7 timeout and one receipt per unit. It must stop on the first nonzero child or
+Core-owned certificate; it may not start a second proof, change source between child invocations,
+or infer a successor batch. A clean exact-tip Store re-admission after the runner ends remains
+mandatory before authorizing any later slice. This is operational batching only and preserves the
+exact landing domain, conservative bounds, receipt protocol, and certificate semantics.
