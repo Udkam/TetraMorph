@@ -2,6 +2,10 @@
 
 ## 2026-09-22 T39 — Active publication slice
 
+Publication complete at https://tetramorph.vercel.app/ (product `a292a11a`).
+GitHub is Udkam/TetraMorph; cube icons verified against live bytes. Local root rename
+is pending Windows open-process lock release. Do not claim the local path changed.
+
 Owner: coordinator. Base: 91ad49f0. User authorizes cube icon replacement, GitHub/local
 rename to TetraMorph, and Vercel production deployment matching personal-web's Git flow.
 Bounded checkpoints: contract; icon generator/assets/direct tests; hosting config;

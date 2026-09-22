@@ -1,5 +1,10 @@
 # TetraMorph
 
+Play: **https://tetramorph.vercel.app/**
+
+Source: https://github.com/Udkam/TetraMorph . Production is deployed by Vercel
+from `main`, using `vercel.json`; only the static `dist/` output is published.
+
 A modern mutation-driven falling-block game built for precise play,
 readable pressure, and deterministic replay.
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-22 — T39 publication
+
+- Replaced the site icon with a three-face tilted cube balanced on one corner.
+- Renamed GitHub repository to Udkam/TetraMorph and updated local origin.
+- Published https://tetramorph.vercel.app/ through the existing Vercel account's
+  Git integration; personal-web untouched. First install exposed a missing optional
+  wasm peer lock entry; corrected it without bypassing npm ci.
+- Typecheck/build PASS; 788 tests PASS / 17 optional skipped; 12 production browser
+  scenes PASS, zero errors; independent initial and lock-delta QA PASS.
+- Local directory rename was attempted but Windows reports an open-process lock.
+  Original directory and all inherited dirty paths remain intact; no forced termination.
+
 ## 2026-09-22 — T38 tactile Mutation and release candidate hardening
 
 - Implemented coherent frost/ceramic/gold/amethyst item materials, local causal
