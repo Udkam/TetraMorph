@@ -1,0 +1,89 @@
+{
+  "scenes": [
+    {
+      "name": "desktop",
+      "mode": "classic",
+      "canvas": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "name": "desktop",
+      "mode": "survival",
+      "canvas": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "name": "desktop",
+      "mode": "mutation",
+      "canvas": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "name": "desktop",
+      "mode": "endgame/t3r-shaft-01",
+      "canvas": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "name": "mobile",
+      "mode": "classic",
+      "canvas": 1,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile",
+      "mode": "survival",
+      "canvas": 1,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile",
+      "mode": "mutation",
+      "canvas": 1,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile",
+      "mode": "endgame/t3r-shaft-01",
+      "canvas": 1,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "landscape",
+      "mode": "classic",
+      "canvas": 1,
+      "width": 844,
+      "scroll": 844
+    },
+    {
+      "name": "landscape",
+      "mode": "survival",
+      "canvas": 1,
+      "width": 844,
+      "scroll": 844
+    },
+    {
+      "name": "landscape",
+      "mode": "mutation",
+      "canvas": 1,
+      "width": 844,
+      "scroll": 844
+    },
+    {
+      "name": "landscape",
+      "mode": "endgame/t3r-shaft-01",
+      "canvas": 1,
+      "width": 844,
+      "scroll": 844
+    }
+  ],
+  "errors": []
+}

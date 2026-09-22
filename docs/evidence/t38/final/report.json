@@ -1,0 +1,1017 @@
+{
+  "source": "d5b46903debad9568a1ae37be2fa3cab8eb4f22c",
+  "scenes": [
+    {
+      "item": "freeze",
+      "stage": "active",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":\"freeze\",\"lockedCarriers\":0,\"freezeTicks\":0,\"collapsePiecesRemaining\":0,\"multiplierTicks\":0,\"lastItem\":null},\"score\":77,\"lines\":0,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":2,\"active\":{\"type\":\"T\",\"x\":7,\"y\":20,\"rotation\":0},\"next\":\"J\",\"nextPreviews\":[\"J\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"......L...\",\"IIIILLL...\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "J",
+        "previewPieces": [
+          "J"
+        ],
+        "previewMutationItem": null,
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 37
+          },
+          {
+            "x": 3,
+            "y": 38
+          },
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 5,
+            "y": 38
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "2:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 8,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      }
+    },
+    {
+      "item": "freeze",
+      "stage": "effect",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":null,\"lockedCarriers\":0,\"freezeTicks\":600,\"collapsePiecesRemaining\":0,\"multiplierTicks\":0,\"lastItem\":\"freeze\"},\"score\":153,\"lines\":1,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":3,\"active\":{\"type\":\"J\",\"x\":3,\"y\":19,\"rotation\":0},\"next\":\"O\",\"nextPreviews\":[\"O\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"......L.T.\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "O",
+        "previewPieces": [
+          "O"
+        ],
+        "previewMutationItem": null,
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 3,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 3,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          },
+          {
+            "x": 5,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "3:J",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 2,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 93,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "rewardSuppressed": true,
+            "rewardTailActive": false,
+            "rewardTailProgress": 0,
+            "rewardTailIntensity": 0,
+            "rewardLayerCount": 0,
+            "visibleCellCount": 10
+          }
+        ],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "freeze",
+          "elapsedMs": 93,
+          "durationMs": 320,
+          "phases": [
+            {
+              "id": "frost-bind",
+              "active": true,
+              "complete": false,
+              "progress": 0.290625,
+              "value": 0.6430333557128907
+            },
+            {
+              "id": "shard-release",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            7,
+            8,
+            9
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      }
+    },
+    {
+      "item": "collapse",
+      "stage": "active",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":\"collapse\",\"lockedCarriers\":0,\"freezeTicks\":0,\"collapsePiecesRemaining\":0,\"multiplierTicks\":0,\"lastItem\":null},\"score\":77,\"lines\":0,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":2,\"active\":{\"type\":\"T\",\"x\":7,\"y\":20,\"rotation\":0},\"next\":\"S\",\"nextPreviews\":[\"S\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"......L...\",\"IIIILLL...\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "S",
+        "previewPieces": [
+          "S"
+        ],
+        "previewMutationItem": "bomb",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 37
+          },
+          {
+            "x": 3,
+            "y": 38
+          },
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 5,
+            "y": 38
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "2:T",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 8,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      }
+    },
+    {
+      "item": "collapse",
+      "stage": "effect",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":\"bomb\",\"lockedCarriers\":0,\"freezeTicks\":0,\"collapsePiecesRemaining\":4,\"multiplierTicks\":0,\"lastItem\":\"collapse\"},\"score\":153,\"lines\":1,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":3,\"active\":{\"type\":\"S\",\"x\":3,\"y\":19,\"rotation\":0},\"next\":\"Z\",\"nextPreviews\":[\"Z\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"......L.T.\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "Z",
+        "previewPieces": [
+          "Z"
+        ],
+        "previewMutationItem": null,
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 5,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 5,
+            "y": 39
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "3:S",
+          "pending": true,
+          "visibleCellCount": 2,
+          "hiddenCellCount": 2
+        },
+        "visibleLockedCells": 2,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 94,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "rewardSuppressed": true,
+            "rewardTailActive": false,
+            "rewardTailProgress": 0,
+            "rewardTailIntensity": 0,
+            "rewardLayerCount": 0,
+            "visibleCellCount": 10
+          }
+        ],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "collapse",
+          "elapsedMs": 94,
+          "durationMs": 220,
+          "phases": [
+            {
+              "id": "pressure-bind",
+              "active": true,
+              "complete": false,
+              "progress": 0.7833333333333333,
+              "value": 0.9898287037037037
+            },
+            {
+              "id": "column-release",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            7,
+            8,
+            9
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      }
+    },
+    {
+      "item": "bomb",
+      "stage": "active",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":\"bomb\",\"lockedCarriers\":0,\"freezeTicks\":0,\"collapsePiecesRemaining\":0,\"multiplierTicks\":0,\"lastItem\":null},\"score\":77,\"lines\":0,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":2,\"active\":{\"type\":\"I\",\"x\":6,\"y\":20,\"rotation\":0},\"next\":\"S\",\"nextPreviews\":[\"S\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\".T.J......\",\"TTTJJJ....\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "S",
+        "previewPieces": [
+          "S"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          },
+          {
+            "x": 6,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 3,
+            "y": 37
+          },
+          {
+            "x": 4,
+            "y": 37
+          },
+          {
+            "x": 5,
+            "y": 37
+          },
+          {
+            "x": 6,
+            "y": 37
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "2:I",
+          "pending": false,
+          "visibleCellCount": 4,
+          "hiddenCellCount": 0
+        },
+        "visibleLockedCells": 8,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      }
+    },
+    {
+      "item": "bomb",
+      "stage": "effect",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":\"collapse\",\"lockedCarriers\":0,\"freezeTicks\":0,\"collapsePiecesRemaining\":0,\"multiplierTicks\":0,\"lastItem\":\"bomb\"},\"score\":453,\"lines\":2,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":3,\"active\":{\"type\":\"S\",\"x\":3,\"y\":19,\"rotation\":0},\"next\":\"L\",\"nextPreviews\":[\"L\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "L",
+        "previewPieces": [
+          "L"
+        ],
+        "previewMutationItem": null,
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 5,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 5,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "3:S",
+          "pending": true,
+          "visibleCellCount": 2,
+          "hiddenCellCount": 2
+        },
+        "visibleLockedCells": 0,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 235,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "rewardSuppressed": true,
+            "rewardTailActive": false,
+            "rewardTailProgress": 0,
+            "rewardTailIntensity": 0,
+            "rewardLayerCount": 0,
+            "visibleCellCount": 4
+          }
+        ],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "bomb",
+          "elapsedMs": 235,
+          "durationMs": 620,
+          "phases": [
+            {
+              "id": "warning",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "pulse",
+              "active": false,
+              "complete": true,
+              "progress": 1,
+              "value": 1
+            },
+            {
+              "id": "impact",
+              "active": true,
+              "complete": false,
+              "progress": 0.10714285714285714,
+              "value": 0.0012299562682215742
+            },
+            {
+              "id": "shockwave",
+              "active": false,
+              "complete": false,
+              "progress": 0,
+              "value": 0
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 72,
+        "mutationCollapseTrail": null
+      }
+    },
+    {
+      "item": "multiplier",
+      "stage": "active",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":\"multiplier\",\"lockedCarriers\":0,\"freezeTicks\":0,\"collapsePiecesRemaining\":0,\"multiplierTicks\":0,\"lastItem\":null},\"score\":75,\"lines\":0,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":2,\"active\":{\"type\":\"L\",\"x\":7,\"y\":20,\"rotation\":0},\"next\":\"S\",\"nextPreviews\":[\"S\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\".....T....\",\"IIIITTT...\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "S",
+        "previewPieces": [
+          "S"
+        ],
+        "previewMutationItem": "collapse",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 5,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          },
+          {
+            "x": 5,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 5,
+            "y": 36
+          },
+          {
+            "x": 3,
+            "y": 37
+          },
+          {
+            "x": 4,
+            "y": 37
+          },
+          {
+            "x": 5,
+            "y": 37
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "2:L",
+          "pending": true,
+          "visibleCellCount": 3,
+          "hiddenCellCount": 1
+        },
+        "visibleLockedCells": 8,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": null,
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 0,
+        "mutationCollapseTrail": null
+      }
+    },
+    {
+      "item": "multiplier",
+      "stage": "effect",
+      "state": "{\"coordinateSystem\":\"board origin is top-left; x increases right; y increases down; visible board is 10 columns by 20 rows\",\"screen\":\"game\",\"mode\":\"sprint\",\"status\":\"playing\",\"countdown\":null,\"phase\":\"active\",\"endgameId\":null,\"endgameCompletion\":null,\"endgameTargetsRemaining\":0,\"endgameTargetsInitial\":0,\"endgameUndoDepth\":0,\"mutation\":{\"activeCarrier\":\"collapse\",\"lockedCarriers\":0,\"freezeTicks\":0,\"collapsePiecesRemaining\":0,\"multiplierTicks\":600,\"lastItem\":\"multiplier\"},\"score\":151,\"lines\":1,\"combo\":0,\"bedrockRows\":0,\"bedrockIntervalSeconds\":null,\"bedrockNextSeconds\":null,\"bedrockPending\":false,\"stoneIntervalPieces\":null,\"stoneNextPieces\":null,\"fallingStones\":[],\"fallTicks\":36,\"placedPieces\":3,\"active\":{\"type\":\"S\",\"x\":3,\"y\":19,\"rotation\":0},\"next\":\"O\",\"nextPreviews\":[\"O\"],\"visibleBoard\":[\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\"..........\",\".....T...L\"]}",
+      "renderer": {
+        "canvas": {
+          "width": 1320,
+          "height": 812,
+          "resolution": 1
+        },
+        "board": {
+          "x": 464,
+          "y": 14,
+          "width": 392,
+          "height": 784,
+          "cell": 39.2
+        },
+        "preview": {
+          "x": 196.8125,
+          "y": 69,
+          "width": 224,
+          "height": 112
+        },
+        "previewLayerVisible": true,
+        "previewPiece": "O",
+        "previewPieces": [
+          "O"
+        ],
+        "previewMutationItem": "bomb",
+        "previewClearBounds": null,
+        "previewClearPiece": null,
+        "scrim": null,
+        "activeCells": [
+          {
+            "x": 4,
+            "y": 19
+          },
+          {
+            "x": 5,
+            "y": 19
+          },
+          {
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 4,
+            "y": 20
+          }
+        ],
+        "ghostCells": [
+          {
+            "x": 4,
+            "y": 38
+          },
+          {
+            "x": 5,
+            "y": 38
+          },
+          {
+            "x": 3,
+            "y": 39
+          },
+          {
+            "x": 4,
+            "y": 39
+          }
+        ],
+        "activeSpawnEntry": {
+          "generationKey": "3:S",
+          "pending": true,
+          "visibleCellCount": 2,
+          "hiddenCellCount": 2
+        },
+        "visibleLockedCells": 2,
+        "ordinaryLineClear": null,
+        "ordinaryMultiLineClearCues": [
+          {
+            "count": 1,
+            "orderedRows": [
+              39
+            ],
+            "elapsedMs": 91,
+            "durationMs": 300,
+            "committed": true,
+            "restrained": false,
+            "rewardSuppressed": true,
+            "rewardTailActive": false,
+            "rewardTailProgress": 0,
+            "rewardTailIntensity": 0,
+            "rewardLayerCount": 0,
+            "visibleCellCount": 10
+          }
+        ],
+        "presentation": {
+          "x": 3,
+          "y": 19,
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "boardShiftOffsetY": 0,
+        "mutationFilters": {
+          "freeze": false,
+          "collapse": false,
+          "activeCount": 0
+        },
+        "survivalDebris": [],
+        "survivalDebrisWarningColumns": [],
+        "survivalDebrisWarningHeight": null,
+        "survivalStoneCueCount": 0,
+        "survivalBedrockCue": null,
+        "survivalEntryBedrockRows": null,
+        "survivalEntryBedrockRise": null,
+        "classicFeedback": [],
+        "mutationActivation": {
+          "item": "multiplier",
+          "elapsedMs": 91,
+          "durationMs": 320,
+          "phases": [
+            {
+              "id": "score-pop",
+              "active": true,
+              "complete": false,
+              "progress": 0.5055555555555555,
+              "value": 1.0894287690980795
+            },
+            {
+              "id": "spark-tail",
+              "active": true,
+              "complete": false,
+              "progress": 0.15185185185185185,
+              "value": 0.3898801503835798
+            }
+          ],
+          "particlesEmitted": true,
+          "triggerColumns": [
+            7,
+            8,
+            9
+          ]
+        },
+        "mutationActivationQueueItems": [],
+        "mutationActiveParticleCount": 28,
+        "mutationCollapseTrail": null
+      }
+    }
+  ],
+  "errors": []
+}

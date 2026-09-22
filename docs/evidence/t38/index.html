@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TetraMorph · T38 集中验收</title>
+<style>
+  :root{color-scheme:dark;font-family:system-ui,sans-serif;background:#0b1822;color:#e0ecec}
+  body{max-width:1100px;margin:auto;padding:32px 20px}h1{font-size:clamp(28px,5vw,48px);margin-bottom:12px}
+  p{line-height:1.8;color:#adc5ca}a{color:#e8ca8b}button{padding:12px 18px;min-height:44px;margin:4px;background:#233d4b;color:#eef5f4;border:1px solid #6b939d;border-radius:7px;font:inherit;cursor:pointer}
+  button:focus-visible,a:focus-visible{outline:3px solid #ecc77e;outline-offset:3px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}figure{margin:0}img{width:100%;border-radius:8px}figcaption{margin:8px 0;color:#b9cdd0}section{margin:36px 0;border-top:1px solid #304652;padding-top:20px}@media(max-width:650px){.grid{grid-template-columns:1fr}}
+</style>
+<h1>TetraMorph · 集中验收</h1>
+<p>本轮候选：陶块裂纹、磨砂冷晶、哑光金与重力刻槽。这里没有自动播放；音效按钮调用当前产品的 AudioEngine，不使用另制试听素材。画面为真实游戏截图。听感和材质喜好仍由你验收。</p>
+<p><a href="/">进入完整游戏 →</a>　·　<a href="../t37/bomb-block-r5c-product-audition/">Bomb 完整 1× 动画＋声音 →</a>（复用旧试听界面，加载的是当前产品代码）</p>
+<section><h2>01 / 听声音</h2><p>先听硬降作为参照，再比较正常 Bomb 和连锁。请从舒适的设备音量开始。</p>
+<label>试听音量 <input id="volume" type="range" min="0" max="1" step=".05" value=".65"></label>
+<label><input id="reduced" type="checkbox"> 减弱动态对应节奏</label><br>
+<button data-cue="drop">硬降参照</button><button data-cue="bomb">正常 Bomb</button><button data-cue="chain">连锁清屏</button><button data-cue="freeze">冰冻</button><button data-cue="collapse">重力</button><button data-cue="multiplier">倍率 ×2</button><button data-cue="four">倍率 ×4</button><button id="stop">停止</button>
+<p id="status" role="status">等待手动播放</p></section>
+<section><h2>02 / 看材质</h2><div class="grid">
+<figure><img src="final/freeze-active.png" alt="冰冻冷晶在真实棋盘上的材质"><figcaption>冰冻：冷晶面与细裂纹</figcaption></figure>
+<figure><img src="final/collapse-active.png" alt="重力方块刻槽"><figcaption>重力：向下刻槽与紫晶厚度</figcaption></figure>
+<figure><img src="final/bomb-active.png" alt="Bomb陶块裂纹"><figcaption>Bomb：暖色陶块裂纹</figcaption></figure>
+<figure><img src="final/multiplier-active.png" alt="倍率哑光金方块"><figcaption>倍率：哑光金与少量闪点</figcaption></figure>
+</div></section>
+<section><h2>03 / 玩完整模式</h2><p><a href="/play/classic">经典</a> · <a href="/play/survival">生存</a> · <a href="/play/mutation">异变</a> · <a href="/endgames">46 关残局</a></p><p>生存已修复“上升＋奖励”同拍丢方块的问题；存档不可用会提示，渲染无法启动可返回首页。未恢复此前明确搁置的残局精确证明搜索。</p></section>
+<script type="module">
+import { AudioEngine } from '/src/game/audio/AudioEngine.ts';
+let engine = new AudioEngine();
+let epoch = 0;
+const status = document.querySelector('#status');
+const base = {type:'mutation-activated',durationTicks:600,score:0,rowsRemoved:0};
+const cues = {
+ drop:{type:'hard-dropped',piece:'I',distance:14},
+ freeze:{...base,item:'freeze'}, collapse:{...base,item:'collapse'},
+ multiplier:{...base,item:'multiplier',multiplierFactor:2}, four:{...base,item:'multiplier',multiplierFactor:4},
+ bomb:{...base,item:'bomb',durationTicks:0,score:300,rowsRemoved:3,bombOutcome:'blast',blastRows:[37,38,39],participatingBombCount:1},
+ chain:{...base,item:'bomb',durationTicks:0,score:600,rowsRemoved:4,bombOutcome:'chain-clear',blastRows:[38,39],participatingBombCount:2,chainOriginCarrierId:1,chainOriginCells:[{x:4,y:39}],chainTriggerRows:[39]},
+};
+function stop(){epoch++;engine.destroy();engine=new AudioEngine();status.textContent='已停止';}
+document.querySelector('#stop').onclick=stop;
+for(const button of document.querySelectorAll('[data-cue]'))button.onclick=async()=>{
+ stop();const turn=epoch;
+ engine.setVolume(Number(document.querySelector('#volume').value));
+ engine.setReducedMotion(document.querySelector('#reduced').checked);
+ try{await engine.prime();if(turn!==epoch)return;engine.play([cues[button.dataset.cue]]);status.textContent=`正在播放：${button.textContent}`;}
+ catch{status.textContent='音频设备无法启用，请检查浏览器权限。';}
+};
+addEventListener('pagehide',()=>engine.destroy());
+</script>
+</html>
