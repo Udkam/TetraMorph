@@ -3638,6 +3638,15 @@ export class TetrisRenderer {
         .filter((cell, index, ordered) => index === 0 || cell.x !== ordered[index - 1]!.x || cell.y !== ordered[index - 1]!.y);
       if (sourceCells.length === 0) return;
       const phaseProgress = bind.active ? bind.progress * .42 : .42 + release.progress * .58;
+      if (bind.active) {
+        for (const cell of sourceCells) {
+          const x = layout.x + (cell.x + .15) * layout.cell;
+          const y = layout.y + (cell.y + .18) * layout.cell;
+          graphics.moveTo(x, y + layout.cell * .5).lineTo(x, y)
+            .lineTo(x + layout.cell * .55 * bind.value, y)
+            .stroke({ color: token.palette.highlight, alpha: .48 * Math.sin(bind.progress * Math.PI), width: Math.max(1, layout.cell * .035) });
+        }
+      }
       const sourceOffsets = [[-.22, -.04], [.18, .06], [-.08, .17], [.24, -.15]] as const;
       const drift = [[-.1, -.34], [.08, -.45], [.04, -.29], [-.06, -.4]] as const;
       const radii = [.12, .1, .11, .09] as const;
@@ -3673,6 +3682,15 @@ export class TetrisRenderer {
       const sources = [...bottomByColumn.entries()].sort(([left], [right]) => left - right);
       if (sources.length === 0) return;
       const phaseProgress = pressure.active ? pressure.progress * .4 : .4 + release.progress * .6;
+      if (release.active) {
+        for (const [column, bottom] of sources) {
+          const x = layout.x + (column + .5) * layout.cell;
+          const y = layout.y + bottom * layout.cell;
+          const end = Math.min(layout.y + layout.height - layout.cell * .1, y + layout.cell * 1.8 * release.value);
+          graphics.moveTo(x, y).lineTo(x, end)
+            .stroke({ color: token.palette.facet, alpha: .3 * (1 - release.progress), width: Math.max(1, layout.cell * .04) });
+        }
+      }
       const lateralDrift = [-.24, -.12, 0, .14, .25] as const;
       const verticalTravel = [.38, .52, .62, .46, .56] as const;
       for (let index = 0; index < 5; index += 1) {
@@ -3710,16 +3728,17 @@ export class TetrisRenderer {
       const floorField = (run: { first: number; last: number }, alpha: number, lift: number, color: number): void => {
         const y = layout.y + (run.first - VISIBLE_START_ROW) * layout.cell;
         const fieldBottom = layout.y + (run.last - VISIBLE_START_ROW + 1) * layout.cell;
-        const points: number[] = [layout.x, fieldBottom, layout.x, y + layout.cell * .82];
-        const ridge = [.72, .3, .58, .18, .5, .26, .68, .16, .44, .34, .7] as const;
-        for (let index = 0; index < ridge.length; index += 1) {
-          points.push(
-            layout.x + layout.width * index / (ridge.length - 1),
-            y + layout.cell * (ridge[index]! - lift),
-          );
+        // Pressure travels through cell-sized ceramic planes, not a flame wash.
+        for (let column = 0; column < BOARD_WIDTH; column += 1) {
+          const x = layout.x + column * layout.cell;
+          graphics.rect(x + layout.cell * .12, y + layout.cell * .18,
+            layout.cell * .76, Math.max(1, fieldBottom - y - layout.cell * .36))
+            .fill({ color, alpha: alpha * .65 });
+          graphics.moveTo(x + layout.cell * .17, fieldBottom - layout.cell * .23)
+            .lineTo(x + layout.cell * .48, fieldBottom - layout.cell * (.48 + lift))
+            .lineTo(x + layout.cell * .81, fieldBottom - layout.cell * .3)
+            .stroke({ color, alpha, width: Math.max(1, layout.cell * .035) });
         }
-        points.push(layout.x + layout.width, fieldBottom);
-        graphics.poly(points).fill({ color, alpha });
       };
       if (warning.active) {
         const alpha = .55 + Math.sin(warning.progress * Math.PI * 3) * .28;
@@ -3744,9 +3763,9 @@ export class TetrisRenderer {
         const radius = Math.max(layout.cell * 1.1, layout.width * (.06 + pulse.value * .12));
         graphics
           .circle(anchorX, anchorY, radius)
-          .fill({ color: token.palette.primary, alpha: .24 * alpha })
+          .fill({ color: token.palette.primary, alpha: .09 * alpha })
           .circle(anchorX, anchorY, radius * 1.35)
-          .stroke({ color: token.palette.highlight, alpha: .9 * alpha, width: strokeWidth });
+          .stroke({ color: token.palette.highlight, alpha: .55 * alpha, width: strokeWidth });
       }
       if (impact.active) {
         const alpha = 1 - impact.progress;
@@ -3757,10 +3776,10 @@ export class TetrisRenderer {
       }
       if (shockwave.active) {
         const alpha = 1 - shockwave.progress;
-        const radius = Math.max(layout.cell * 1.4, layout.width * (.12 + shockwave.value * .42));
+        const radius = layout.cell * (1.1 + shockwave.value * 1.7);
         graphics
           .circle(anchorX, anchorY, radius)
-          .stroke({ color: token.palette.highlight, alpha: .96 * alpha, width: Math.max(strokeWidth, layout.cell * .09) })
+          .stroke({ color: token.palette.highlight, alpha: .65 * alpha, width: Math.max(1, layout.cell * .04) })
           .circle(anchorX, anchorY, radius * .68)
           .stroke({ color: token.palette.primary, alpha: .5 * alpha, width: strokeWidth });
       }
@@ -3773,13 +3792,14 @@ export class TetrisRenderer {
     const alpha = Math.max(scorePop.active ? 1 - scorePop.progress * .2 : 0, sparkTail.active ? 1 - sparkTail.progress : 0);
     const intensity = flash.multiplierFactor === 4 ? 1.32 : 1;
     const starRadius = Math.max(layout.cell * .74, layout.width * .048) * intensity;
-    graphics.circle(anchorX, anchorY, starRadius * (2.1 + scorePop.value * .7)).fill({ color: token.palette.primary, alpha: 0.16 * alpha });
-    this.drawMutationStar(graphics, anchorX, anchorY, starRadius * 1.72, starRadius * .46, token.palette.highlight, 0.96 * alpha);
-    this.drawMutationStar(graphics, anchorX, anchorY, starRadius, starRadius * .28, token.palette.primary, alpha);
-    this.strokeSegments(graphics, [
-      [anchorX - starRadius * 2.55, anchorY, anchorX + starRadius * 2.55, anchorY],
-      [anchorX, anchorY - starRadius * 2.55, anchorX, anchorY + starRadius * 2.55],
-    ], token.palette.highlight, 0.76 * alpha, Math.max(1, layout.cell * .055));
+    // Sparse gold facets leave the multiplier value unobstructed.
+    for (let index = 0; index < 3; index += 1) {
+      const angle = index * Math.PI * 2 / 3 - Math.PI / 2 + scorePop.value * .35;
+      const radius = starRadius * (1.1 + scorePop.value * .5);
+      this.drawMutationDiamond(graphics, anchorX + Math.cos(angle) * radius,
+        anchorY + Math.sin(angle) * radius, starRadius * .13, starRadius * .24,
+        token.palette.highlight, .72 * alpha);
+    }
     this.drawMutationMultiplierValue(
       graphics,
       anchorX,
@@ -4290,7 +4310,7 @@ export class TetrisRenderer {
       this.setWorldOffset(0, 0);
       return;
     }
-    const amplitude = Math.min(8, Math.max(2, layout.cell * .2)) * envelope;
+    const amplitude = Math.min(3, Math.max(1, layout.cell * .07)) * envelope;
     const phase = this.mutationClockMs / 29;
     this.setWorldOffset(Math.sin(phase * 1.7) * amplitude, Math.cos(phase * 2.3) * amplitude * .55);
   }

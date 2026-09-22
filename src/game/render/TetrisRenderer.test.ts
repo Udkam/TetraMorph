@@ -1837,7 +1837,7 @@ describe('Endgame undo presentation reset', () => {
     }
   });
 
-  it('shows the Bomb range as an irregular floor field instead of a 3-by-10 box', () => {
+  it('shows the Bomb range as separated ceramic planes instead of a flame wash', () => {
     const renderer = new TetrisRendererClass();
     const internals = renderer as unknown as RendererInternals;
     const layout = { x: 0, y: 0, width: 200, height: 400, cell: 20, compact: false };
@@ -1845,16 +1845,15 @@ describe('Endgame undo presentation reset', () => {
 
     const warning = createGraphicsRecorder();
     internals.drawMutationActivationEffect(warning.graphics, internals.mutationFlash!, layout);
-    const warningFields = warning.operations.filter((operation) => operation.kind === 'poly');
-    expect(warningFields).toHaveLength(1);
+    const warningFields = warning.operations.filter((operation) => operation.kind === 'rect');
+    expect(warningFields).toHaveLength(10);
     expect(warning.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(0);
-    const warningDepths = new Set(warningFields[0]!.values.filter((_value, index) => index % 2 === 1));
-    expect(warningDepths.size).toBeGreaterThan(5);
+    expect(warningFields.every((field) => field.values[2]! < layout.cell)).toBe(true);
 
     internals.advanceEffects(220);
     const impact = createGraphicsRecorder();
     internals.drawMutationActivationEffect(impact.graphics, internals.mutationFlash!, layout);
-    expect(impact.operations.filter((operation) => operation.kind === 'poly').length).toBeGreaterThanOrEqual(2);
+    expect(impact.operations.filter((operation) => operation.kind === 'rect')).toHaveLength(20);
     expect(impact.operations.filter((operation) => operation.kind === 'roundRect')).toHaveLength(0);
   });
 
@@ -1866,7 +1865,7 @@ describe('Endgame undo presentation reset', () => {
     internals.consumeEvents([{ ...disjoint, blastRows: [29, 30, 31, 38, 39] }]);
     const visible = createGraphicsRecorder();
     internals.drawMutationActivationEffect(visible.graphics, internals.mutationFlash!, layout);
-    expect(visible.operations.filter((operation) => operation.kind === 'poly')).toHaveLength(2);
+    expect(visible.operations.filter((operation) => operation.kind === 'rect')).toHaveLength(20);
 
     const hiddenRenderer = new TetrisRendererClass();
     const hidden = hiddenRenderer as unknown as RendererInternals;
