@@ -158,7 +158,7 @@ describe('timed Survival pressure and three-line reward', () => {
     expect(transition.events).toContainEqual({ type: 'bedrock-raised', count: 1, height: INITIAL_SURVIVAL_BEDROCK_ROWS + 1 });
   });
 
-  it('orders ordinary clear, pending rise, and one three-line bedrock removal', () => {
+  it('settles a pending rise and earned relief atomically without phantom motion', () => {
     const setup = singleClearBoard(1);
     const transition = resolveClear({
       ...start(0x5005, 'race'),
@@ -177,9 +177,44 @@ describe('timed Survival pressure and three-line reward', () => {
     expect(transition.state.board.at(-1)).toEqual(Array(10).fill(BEDROCK_CELL));
     expect(transition.events.map((event) => event.type)).toEqual([
       'lines-cleared',
-      'bedrock-raised',
-      'bedrock-lowered',
     ]);
+  });
+
+  it('preserves top cells when Aftershock plus relief produces only one net rise', () => {
+    const setup = singleClearBoard(1);
+    const transition = resolveClear({
+      ...start(0x5039, 'race'),
+      ...setup,
+      board: setCell(setup.board, 0, 0, 'T'),
+      lines: 2,
+      survivalBedrockRows: 1,
+      survivalRiseCount: 3,
+      survivalRisePending: true,
+    });
+    // The ordinary clear moves the sentinel to row 1; net rise returns it to 0.
+    expect(transition.state.board[0]![0]).toBe('T');
+    expect(transition.state.status).toBe('playing');
+    expect(transition.state.survivalBedrockRows).toBe(2);
+    expect(transition.state.survivalRiseCount).toBe(4);
+    expect(transition.events).toContainEqual({ type: 'bedrock-raised', count: 1, height: 2 });
+    expect(transition.events.some((event) => event.type === 'bedrock-lowered')).toBe(false);
+  });
+
+  it('does not waive final mover overflow merely because relief was earned', () => {
+    const setup = singleClearBoard(1);
+    let state: GameState = {
+      ...start(0x5041, 'race'), ...setup,
+      phase: 'line-clear', phaseTicks: LINE_CLEAR_DELAY_TICKS - 1,
+      pendingClearRows: [BOARD_HEIGHT - 2],
+      active: { type: 'O', rotation: 0, x: 4, y: -1 },
+      lines: 2, survivalBedrockRows: 1, survivalRiseCount: 3,
+      survivalRisePending: true,
+    };
+    // A stone can trigger a clear while the player piece is still entering.
+    state = { ...state, board: setCell(setCell(state.board, 8, BOARD_HEIGHT - 2, 'J'), 9, BOARD_HEIGHT - 2, 'J') };
+    const transition = dispatch(state, { type: 'tick' });
+    expect(transition.state.status).toBe('game-over');
+    expect(transition.events).toContainEqual({ type: 'game-over', reason: 'bedrock-overflow' });
   });
 
   it('resets under the shorter interval at three lines even when no bedrock exists', () => {

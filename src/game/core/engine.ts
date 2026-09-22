@@ -816,22 +816,6 @@ function shiftSurvivalMovers(state: GameState, deltaY: number): {
   return { active, survivalDebris, overflow: activeOverflow || debrisOverflow };
 }
 
-function lowerSurvivalBedrock(state: GameState, count: number): { state: GameState; removed: number } {
-  const lowered = lowerBedrock(state.board, count);
-  if (lowered.removed === 0) return { state, removed: 0 };
-  const movers = shiftSurvivalMovers(state, lowered.removed);
-  return {
-    state: {
-      ...state,
-      board: lowered.board,
-      active: movers.active,
-      survivalDebris: movers.survivalDebris,
-      survivalBedrockRows: Math.max(0, state.survivalBedrockRows - lowered.removed),
-    },
-    removed: lowered.removed,
-  };
-}
-
 /** Restores and respawns the latest locked Endgame piece from its normal top entry. */
 function undoEndgame(state: GameState): GameTransition {
   if (state.mode !== 'endgame' || state.status === 'finished') return { state, events: [] };
@@ -877,27 +861,36 @@ interface SurvivalRiseResolution extends GameTransition {
   overflow: boolean;
 }
 
-function resolvePendingSurvivalRise(state: GameState, deferOverflow = false): SurvivalRiseResolution {
-  if (state.mode !== 'race' || !state.survivalRisePending) return { state, events: [], overflow: false };
-  const survivalRiseCount = state.survivalRiseCount + 1;
-  const riseRows = survivalRiseCount % SURVIVAL_RISES_PER_AFTERSHOCK === 0 ? 2 : 1;
-  const raised = raiseBedrock(state.board, riseRows);
-  const movers = shiftSurvivalMovers(state, -raised.added);
+function resolvePendingSurvivalRise(state: GameState, reliefRows = 0): SurvivalRiseResolution {
+  if (state.mode !== 'race' || (!state.survivalRisePending && reliefRows === 0)) {
+    return { state, events: [], overflow: false };
+  }
+  const survivalRiseCount = state.survivalRiseCount + (state.survivalRisePending ? 1 : 0);
+  const riseRows = state.survivalRisePending
+    ? (survivalRiseCount % SURVIVAL_RISES_PER_AFTERSHOCK === 0 ? 2 : 1)
+    : 0;
+  // Plan first: a cancelled rise must never discard top cells or move entrants.
+  const netRise = riseRows - reliefRows;
+  const raised = netRise > 0 ? raiseBedrock(state.board, netRise) : null;
+  const lowered = netRise < 0 ? lowerBedrock(state.board, -netRise) : null;
+  const delta = (raised?.added ?? 0) - (lowered?.removed ?? 0);
+  const movers = shiftSurvivalMovers(state, -delta);
   const next: GameState = {
     ...state,
-    board: raised.board,
+    board: raised?.board ?? lowered?.board ?? state.board,
     active: movers.active,
     survivalDebris: movers.survivalDebris,
-    survivalBedrockRows: state.survivalBedrockRows + raised.added,
+    survivalBedrockRows: state.survivalBedrockRows + delta,
     survivalPressureTicks: 0,
     survivalRisePending: false,
     survivalRiseCount,
   };
-  const events: GameEvent[] = raised.added > 0
-    ? [{ type: 'bedrock-raised', count: raised.added, height: next.survivalBedrockRows }]
-    : [];
-  const overflow = raised.overflow || movers.overflow;
-  if (!overflow || deferOverflow) return { state: next, events, overflow };
+  const events: GameEvent[] = delta === 0 ? [] : [{
+    type: delta > 0 ? 'bedrock-raised' : 'bedrock-lowered',
+    count: Math.abs(delta), height: next.survivalBedrockRows,
+  }];
+  const overflow = (raised?.overflow ?? false) || (delta !== 0 && movers.overflow);
+  if (!overflow) return { state: next, events, overflow };
   return {
     state: { ...next, active: null, status: 'game-over', phase: 'active' },
     events: [...events, { type: 'game-over', reason: 'bedrock-overflow' }],
@@ -1412,29 +1405,12 @@ function finishLineClear(state: GameState): GameTransition {
     return { state: spawned.state, events: [...events, ...activated.events, ...spawned.events] };
   }
   if (cleared.mode === 'race') {
-    const risen = resolvePendingSurvivalRise(cleared, true);
-    cleared = risen.state;
-    events.push(...risen.events);
-
     const crossedRewardThresholds = Math.floor(lines / SURVIVAL_LINES_PER_BEDROCK)
       - Math.floor(state.lines / SURVIVAL_LINES_PER_BEDROCK);
-    if (crossedRewardThresholds > 0) {
-      const lowered = lowerSurvivalBedrock(cleared, crossedRewardThresholds);
-      cleared = {
-        ...lowered.state,
-        survivalPressureTicks: 0,
-        survivalRisePending: false,
-      };
-      if (lowered.removed > 0) {
-        events.push({ type: 'bedrock-lowered', count: lowered.removed, height: cleared.survivalBedrockRows });
-      }
-    }
-    if (risen.overflow && crossedRewardThresholds === 0) {
-      return {
-        state: { ...cleared, active: null, status: 'game-over', phase: 'active' },
-        events: [...events, { type: 'game-over', reason: 'bedrock-overflow' }],
-      };
-    }
+    const settled = resolvePendingSurvivalRise(cleared, crossedRewardThresholds);
+    cleared = settled.state;
+    events.push(...settled.events);
+    if (settled.overflow) return { state: cleared, events };
     if (cleared.active !== null) {
       return {
         state: {
