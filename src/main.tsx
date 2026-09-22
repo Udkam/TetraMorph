@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { AppErrorBoundary } from './ui/AppRecovery';
 import './styles/fonts.css';
 import './styles.css';
 import './styles/tokens.css';
@@ -18,7 +19,7 @@ if (!root) throw new Error('TetraMorph root element is missing.');
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <AppErrorBoundary><App /></AppErrorBoundary>
   </StrictMode>,
 );
 

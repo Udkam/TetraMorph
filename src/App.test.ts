@@ -702,6 +702,22 @@ describe('DEV QA state snapshot isolation', () => {
 });
 
 describe('Endgame progress boot persistence', () => {
+  it('shows recovery when the graphics runtime cannot mount', async () => {
+    runtimeHarness.mountError = new Error('GPU unavailable');
+    const onExit = vi.fn();
+    const view = render(createElement(GameSession, {
+      mode: 'marathon', endgameId: CAMPAIGN_LEVELS[0]!.id,
+      onExit, onCanonicalCompletion: vi.fn(),
+    }));
+    await act(async () => Promise.resolve());
+    expect(document.querySelector('.recovery-screen')).not.toBeNull();
+    expect(document.querySelectorAll('canvas')).toHaveLength(0);
+    const home = [...document.querySelectorAll('button')].find((button) => button.textContent?.includes('Home'))!;
+    act(() => home.click());
+    expect(onExit).toHaveBeenCalledWith('home');
+    view.unmount();
+    runtimeHarness.mountError = null;
+  });
   it('discloses session-only records and preserves unreadable leaderboard data', () => {
     localStorage.setItem(LEADERBOARD_KEY, '{"version":999}');
     const view = render(createElement(App));

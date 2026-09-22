@@ -37,6 +37,7 @@ import {
 import { GameRuntime, randomRunSeed } from './game/runtime/GameRuntime';
 import { browserPlatform, type PlatformFrame, type PlatformTimeout } from './platform/browserPlatform';
 import { readLeaderboardStorage } from './leaderboardStorage';
+import { AppRecovery } from './ui/AppRecovery';
 import {
   DEFAULT_APP_NAVIGATION,
   appHistoryStateFor,
@@ -1916,6 +1917,7 @@ export function GameSession({
   const endgameProgressRef = useRef(endgameProgress);
   const [runSeed] = useState(() => mode === 'endgame' ? APP_SEED : randomRunSeed());
   const [runtime, setRuntime] = useState<GameRuntime | null>(null);
+  const [runtimeFailed, setRuntimeFailed] = useState(false);
   const [state, setState] = useState<GameState>(() => createInitialState(
     runSeed,
     mode,
@@ -2088,6 +2090,7 @@ export function GameSession({
       if (disposed) return;
       nextRuntime.destroy();
       if (runtimeRef.current === nextRuntime) runtimeRef.current = null;
+      setRuntimeFailed(true);
       onRouteReady(routeEpoch, false);
     });
 
@@ -2595,6 +2598,8 @@ export function GameSession({
   const secondPreviewLabel = previewPieces[1]
     ? `${copy.labels.followingPiece}: ${previewPieces[1]}`
     : copy.labels.followingPiece;
+
+  if (runtimeFailed) return <AppRecovery onHome={() => onExit('home')} />;
 
   return (
     <main

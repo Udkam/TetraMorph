@@ -1,0 +1,24 @@
+.recovery-screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: #0b1822;
+  color: #e8f0ed;
+  font-family: system-ui, sans-serif;
+}
+.recovery-screen > div { max-width: 36rem; }
+.recovery-screen p { line-height: 1.7; }
+.recovery-brand { color: #9fcbd0; letter-spacing: .12em; }
+.recovery-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+.recovery-actions button {
+  min-height: 44px;
+  padding: .75rem 1rem;
+  color: #10242c;
+  background: #accfd8;
+  border: 1px solid #bce2e8;
+  border-radius: .6rem;
+  font: inherit;
+  cursor: pointer;
+}
+.recovery-actions button:focus-visible { outline: 3px solid #ffe0a3; outline-offset: 4px; }
