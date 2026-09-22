@@ -1,6 +1,25 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
+## User-approved finalization
+
+User selected the exact current ice-blue isometric cube on 2026-09-22. Publish it,
+then organize docs/local artifacts and retry root rename. Do not alter domains.
+Documentation checkpoint exception: archive this accumulated file and DESIGN.md
+intact, repair their relative Markdown links, and replace fixed entrypoints with
+concise current contracts. Moving historical lines is mechanical, not new scope.
+Add docs index and archive index; preserve fixture/evidence paths and inherited dirt.
+
 ## T39 R2 — Active icon refinement
+
+Latest user rejects the hand-drawn box geometry and requests later repository/file
+organization. Publication is withheld. Local geometry draft now uses an exact
+18-degree-tilted isometric cube; icon tests 8/8 PASS. WIP_UNCOMMITTED paths:
+docs/DESIGN.md, docs/CURRENT_TASK.md, tools/generate-falling-fold-icons.mjs,
+src/design/siteIcon.test.mjs, public/favicon.svg, public/favicon-16x16.png,
+public/favicon-32x32.png, public/favicon-64x64.png, public/apple-touch-icon.png.
+R2 local commits through 982d4d5c have NOT been pushed; live remains 04e26c6d.
+Next: review actual geometry preview, then final gates/publication. Afterwards inventory
+documentation and reference dependencies before bounded organization; no bulk deletion.
 
 User authorizes icon redesign and publication, not domain purchase/DNS edits.
 Scope: existing icon generator, five generated assets, direct tests. Use ice-blue

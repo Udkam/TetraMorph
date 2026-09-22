@@ -2,6 +2,10 @@
 
 ## T39 R2 — Ice-blue crystal identity
 
+Geometry correction: hand-drawn quads were rejected. Use an exact isometric cube
+projection rotated 18 degrees in screen space; nine projected edges have equal
+length, three face pairs stay parallel, and only one hull vertex is lowest.
+
 User rejects the low-contrast navy/orange cube. Keep its single-point balanced
 silhouette, but use three strongly separated ice/cyan/cobalt gradient faces and
 fine cold-white Y-shaped ridges. Apple icon uses a deep navy ground. No orange,
