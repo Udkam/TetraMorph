@@ -5,6 +5,9 @@ Play: **https://tetramorph.vercel.app/**
 Source: https://github.com/Udkam/TetraMorph . Production is deployed by Vercel
 from `main`, using `vercel.json`; only the static `dist/` output is published.
 
+Documentation: [single entrypoint](docs/README.md) · [current status](docs/CURRENT_TASK.md) ·
+[deployment](docs/release/README.md) · [file map](docs/PROJECT_STRUCTURE.md).
+
 A modern mutation-driven falling-block game built for precise play,
 readable pressure, and deterministic replay.
 
@@ -71,7 +74,7 @@ The deterministic game rules live in `src/game/core`; React owns page compositio
 lifecycle, while PixiJS owns the single board canvas. Project contracts and release
 evidence are maintained under `docs/`.
 
-Current delivery and hosting instructions: [`docs/release/T38-RELEASE.md`](docs/release/T38-RELEASE.md).
+Current delivery and hosting instructions: [`docs/release/README.md`](docs/release/README.md).
 The older rc.1 notes and screenshots below are historical. T38 visual/audio acceptance
 is available locally at `/docs/evidence/t38/` under `npm run dev`; developer review
 pages are not included in the production build. The project is a static browser app,

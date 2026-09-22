@@ -1,5 +1,8 @@
 # Project file map
 
+Start with [the documentation index](README.md). Current contracts are short;
+superseded accumulated records live under `docs/archive/2026-09-22/`.
+
 This repository separates product code, durable records, reusable tooling, and local
 generated material. New files should follow this map instead of accumulating at the
 repository root.
@@ -14,7 +17,7 @@ repository root.
 | `scripts/` | Reusable evidence-capture and QA automation. | Yes |
 | `tools/` | Standalone authoring and solver utilities. | Yes |
 | `Solutions/` | Local Puzzle walkthrough Markdown and per-lock images; regenerated from current routes. | No |
-| `output/` | Local browser-client capture output. | No |
+| `.local/browser/` | New local browser-client capture output. | No |
 | `.local/` | Local QA workspaces, archived audits, scratch harnesses, and logs. | No |
 | `dist/`, `coverage/`, `.vite/`, `.playwright-mcp/`, `node_modules/` | Build, test, and dependency products. | No |
 
@@ -29,10 +32,13 @@ scripts at the root.
 
 - Put ad hoc screenshots and captured browser states in `.local/audits/<topic>/`.
 - Put local diagnostic logs in `.local/logs/`.
-- Keep browser-client output below `output/web-game/<run-name>/`.
+- Route new browser-client output to `.local/browser/<run-name>/` explicitly.
+- Old root `output/`, `.playwright-mcp/` and disabled `.serena/` material is retained
+  under `.local/archive/` when not in use; do not reactivate old tooling.
 - Keep the player-readable Puzzle routes below `Solutions/Solution-<n>.md` and their
   adjacent image directory. These files stay ignored and must never be staged.
-- Put durable, source-bound QA records only in `docs/qa/` and `docs/screenshots/`.
+- Put new durable evidence in `docs/evidence/<task>/` and its QA disposition in
+  `docs/agent-runs/<task>/QA.md`. Old `docs/qa/` and `docs/screenshots/` stay compatible.
 
 The historical root captures are retained under `.local/audits/legacy-root/` so they
 remain available without obscuring the project entry points.
