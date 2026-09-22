@@ -15,27 +15,42 @@ const COLORS = Object.freeze({
   seam: '#E6FCFF',
 });
 
-const OUTLINE = Object.freeze([
-  [7, 16], [30, 6], [49, 22], [53, 48], [30, 58], [11, 42],
-]);
+// Orthographic isometric projection of a unit cube, then an 18-degree screen tilt.
+// Every projected edge has the same length; opposite edges remain parallel.
+const project = (x, y) => {
+  const angle = Math.PI / 10;
+  return [
+    32 + 0.92 * (x * Math.cos(angle) - y * Math.sin(angle)),
+    32 + 0.92 * (x * Math.sin(angle) + y * Math.cos(angle)),
+  ].map((value) => Number(value.toFixed(4)));
+};
+const HALF_WIDTH = 14 * Math.sqrt(3);
+const TOP = project(0, -28);
+const UPPER_RIGHT = project(HALF_WIDTH, -14);
+const LOWER_RIGHT = project(HALF_WIDTH, 14);
+const BOTTOM = project(0, 28);
+const LOWER_LEFT = project(-HALF_WIDTH, 14);
+const UPPER_LEFT = project(-HALF_WIDTH, -14);
+const CENTER = project(0, 0);
+const OUTLINE = Object.freeze([TOP, UPPER_RIGHT, LOWER_RIGHT, BOTTOM, LOWER_LEFT, UPPER_LEFT]);
 
 const FACETS = Object.freeze([
   Object.freeze({
     from: '#DDFEFF', to: '#62DEFA',
-    points: Object.freeze([[7, 16], [30, 6], [49, 22], [26, 32]]),
+    points: Object.freeze([TOP, UPPER_RIGHT, CENTER, UPPER_LEFT]),
   }),
   Object.freeze({
     from: '#35BBF0', to: '#165BD0',
-    points: Object.freeze([[26, 32], [49, 22], [53, 48], [30, 58]]),
+    points: Object.freeze([CENTER, UPPER_RIGHT, LOWER_RIGHT, BOTTOM]),
   }),
   Object.freeze({
     from: '#2479BC', to: '#112D65',
-    points: Object.freeze([[7, 16], [26, 32], [30, 58], [11, 42]]),
+    points: Object.freeze([UPPER_LEFT, CENTER, BOTTOM, LOWER_LEFT]),
   }),
 ]);
 
 const RIDGES = Object.freeze([
-  [[7, 16], [26, 32]], [[26, 32], [49, 22]], [[26, 32], [30, 58]],
+  [UPPER_LEFT, CENTER], [CENTER, UPPER_RIGHT], [CENTER, BOTTOM],
 ]);
 const SEAM_WIDTH = 1.15;
 

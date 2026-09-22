@@ -108,7 +108,16 @@ describe('Balanced cube site icon', () => {
         expect(svg.match(/data-role="seam"/g)).toHaveLength(1);
         expect(svg).not.toContain('#E39A58');
         expect(svg.match(/<linearGradient /g)).toHaveLength(3);
-        expect(svg).toContain('id="cube-body" d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z"');
+        const facePaths = [...svg.matchAll(/data-role="facet" d="([^"]+)"/g)];
+        const lengths = facePaths.flatMap(([, path]) => {
+            const points = [...path.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map(([, x, y]) => [Number(x), Number(y)]);
+            expect(points).toHaveLength(4);
+            return points.map((point, i) => Math.hypot(point[0] - points[(i + 1) % 4][0], point[1] - points[(i + 1) % 4][1]));
+        });
+        expect(Math.max(...lengths) - Math.min(...lengths)).toBeLessThan(0.001);
+        const outline = svg.match(/id="cube-body" d="([^"]+)"/)[1];
+        const ys = [...outline.matchAll(/[ML][\d.]+ ([\d.]+)/g)].map(([, y]) => Number(y));
+        expect(ys.filter((y) => y === Math.max(...ys))).toHaveLength(1);
         expect(svg).toMatch(/id="crystal-ridges"[^>]*stroke="#E6FCFF"[^>]*stroke-width="1.15"/);
         expect(svg).not.toMatch(/<(?:rect|text)\b/i);
         expect(svg).not.toMatch(/#(?:3f9f96|6687d5|c98243|9875be)/i);
@@ -160,7 +169,7 @@ describe('Balanced cube site icon', () => {
         };
         expect(brightness(30, 18)).toBeGreaterThan(brightness(40, 40) + 70);
         expect(brightness(40, 40)).toBeGreaterThan(brightness(18, 38) + 30);
-        expect(brightness(28, 48)).toBeGreaterThan(brightness(18, 38) + 70);
+        expect(brightness(27, 46)).toBeGreaterThan(brightness(18, 38) + 70);
         expect(brightness(40, 34)).toBeGreaterThan(brightness(40, 44));
     });
     it('keeps the 64 px silhouette materially asymmetric', () => {

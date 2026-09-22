@@ -3,13 +3,13 @@
     <linearGradient id="face-0" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="58" color-interpolation="sRGB"><stop stop-color="#DDFEFF"/><stop offset="1" stop-color="#62DEFA"/></linearGradient>
     <linearGradient id="face-1" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="58" color-interpolation="sRGB"><stop stop-color="#35BBF0"/><stop offset="1" stop-color="#165BD0"/></linearGradient>
     <linearGradient id="face-2" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="58" color-interpolation="sRGB"><stop stop-color="#2479BC"/><stop offset="1" stop-color="#112D65"/></linearGradient>
-    <clipPath id="fold-clip"><path d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z" /></clipPath>
+    <clipPath id="fold-clip"><path d="M39.9603 7.5008 L57.1971 26.6442 L49.2368 51.1434 L24.0397 56.4992 L6.8029 37.3558 L14.7632 12.8566 Z" /></clipPath>
   </defs>
-  <path id="cube-body" d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z" fill="#163C78" />
+  <path id="cube-body" d="M39.9603 7.5008 L57.1971 26.6442 L49.2368 51.1434 L24.0397 56.4992 L6.8029 37.3558 L14.7632 12.8566 Z" fill="#163C78" />
   <g clip-path="url(#fold-clip)">
-    <path data-role="facet" d="M7 16 L30 6 L49 22 L26 32 Z" fill="url(#face-0)" />
-    <path data-role="facet" d="M26 32 L49 22 L53 48 L30 58 Z" fill="url(#face-1)" />
-    <path data-role="facet" d="M7 16 L26 32 L30 58 L11 42 Z" fill="url(#face-2)" />
-  <path id="crystal-ridges" data-role="seam" d="M7 16 L26 32 M26 32 L49 22 M26 32 L30 58" stroke="#E6FCFF" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" />
+    <path data-role="facet" d="M39.9603 7.5008 L57.1971 26.6442 L32 32 L14.7632 12.8566 Z" fill="url(#face-0)" />
+    <path data-role="facet" d="M32 32 L57.1971 26.6442 L49.2368 51.1434 L24.0397 56.4992 Z" fill="url(#face-1)" />
+    <path data-role="facet" d="M14.7632 12.8566 L32 32 L24.0397 56.4992 L6.8029 37.3558 Z" fill="url(#face-2)" />
+  <path id="crystal-ridges" data-role="seam" d="M14.7632 12.8566 L32 32 M32 32 L57.1971 26.6442 M32 32 L24.0397 56.4992" stroke="#E6FCFF" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" />
   </g>
 </svg>
