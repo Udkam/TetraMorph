@@ -10,14 +10,9 @@ const VIEWBOX = 64;
 const SUPERSAMPLE = 4;
 
 const COLORS = Object.freeze({
-  background: '#E7EEF4',
-  base: '#0A2B49',
-  upperLeft: '#123D61',
-  upperRight: '#1A5677',
-  middleLeft: '#0E3556',
-  lowerRight: '#16496A',
-  lowerLeft: '#0B2945',
-  seam: '#E39A58',
+  background: '#071729',
+  base: '#163C78',
+  seam: '#E6FCFF',
 });
 
 const OUTLINE = Object.freeze([
@@ -26,21 +21,23 @@ const OUTLINE = Object.freeze([
 
 const FACETS = Object.freeze([
   Object.freeze({
-    color: COLORS.upperLeft,
+    from: '#DDFEFF', to: '#62DEFA',
     points: Object.freeze([[7, 16], [30, 6], [49, 22], [26, 32]]),
   }),
   Object.freeze({
-    color: COLORS.upperRight,
+    from: '#35BBF0', to: '#165BD0',
     points: Object.freeze([[26, 32], [49, 22], [53, 48], [30, 58]]),
   }),
   Object.freeze({
-    color: COLORS.middleLeft,
+    from: '#2479BC', to: '#112D65',
     points: Object.freeze([[7, 16], [26, 32], [30, 58], [11, 42]]),
   }),
 ]);
 
-const SEAM = Object.freeze([[8, 17], [26, 32], [30, 57]]);
-const SEAM_WIDTH = 2;
+const RIDGES = Object.freeze([
+  [[7, 16], [26, 32]], [[26, 32], [49, 22]], [[26, 32], [30, 58]],
+]);
+const SEAM_WIDTH = 1.15;
 
 const rgba = (hex) => {
   const value = Number.parseInt(hex.slice(1), 16);
@@ -58,20 +55,24 @@ function pathData(points, close = true) {
 
 function svgBytes() {
   const outline = pathData(OUTLINE);
-  const facets = FACETS.map(({ color, points }) => (
-    `    <path data-role="facet" d="${pathData(points)}" fill="${color}" />`
+  const gradients = FACETS.map(({ from, to }, index) => (
+    `    <linearGradient id="face-${index}" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="58" color-interpolation="sRGB"><stop stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient>`
   )).join('\n');
-  const seam = pathData(SEAM, false);
+  const facets = FACETS.map(({ points }, index) => (
+    `    <path data-role="facet" d="${pathData(points)}" fill="url(#face-${index})" />`
+  )).join('\n');
+  const seam = RIDGES.map((points) => pathData(points, false)).join(' ');
   const source = [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">',
     '  <defs>',
+    gradients,
     `    <clipPath id="fold-clip"><path d="${outline}" /></clipPath>`,
     '  </defs>',
     `  <path id="cube-body" d="${outline}" fill="${COLORS.base}" />`,
     '  <g clip-path="url(#fold-clip)">',
     facets,
+    `  <path id="crystal-ridges" data-role="seam" d="${seam}" stroke="${COLORS.seam}" stroke-width="${SEAM_WIDTH}" stroke-linecap="round" stroke-linejoin="round" />`,
     '  </g>',
-    `  <path id="warm-seam" data-role="seam" d="${seam}" stroke="${COLORS.seam}" stroke-width="${SEAM_WIDTH}" stroke-linecap="round" stroke-linejoin="round" />`,
     '</svg>',
     '',
   ].join('\n');
@@ -103,8 +104,8 @@ function distanceToSegment(x, y, start, end) {
 }
 
 function isOnSeam(x, y) {
-  for (let index = 1; index < SEAM.length; index += 1) {
-    if (distanceToSegment(x, y, SEAM[index - 1], SEAM[index]) <= SEAM_WIDTH / 2) return true;
+  for (const [start, end] of RIDGES) {
+    if (distanceToSegment(x, y, start, end) <= SEAM_WIDTH / 2) return true;
   }
   return false;
 }
@@ -115,7 +116,12 @@ function sampleView(x, y, opaqueBackground) {
   }
   let color = PALETTE.base;
   for (const facet of FACETS) {
-    if (pointInsidePolygon(x, y, facet.points)) color = rgba(facet.color);
+    if (pointInsidePolygon(x, y, facet.points)) {
+      const start = rgba(facet.from);
+      const end = rgba(facet.to);
+      const progress = Math.max(0, Math.min(1, (y - 6) / 52));
+      color = start.map((value, channel) => Math.round(value + (end[channel] - value) * progress));
+    }
   }
   if (isOnSeam(x, y)) color = PALETTE.seam;
   return color;

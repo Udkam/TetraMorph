@@ -1,12 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
+    <linearGradient id="face-0" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="58" color-interpolation="sRGB"><stop stop-color="#DDFEFF"/><stop offset="1" stop-color="#62DEFA"/></linearGradient>
+    <linearGradient id="face-1" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="58" color-interpolation="sRGB"><stop stop-color="#35BBF0"/><stop offset="1" stop-color="#165BD0"/></linearGradient>
+    <linearGradient id="face-2" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="58" color-interpolation="sRGB"><stop stop-color="#2479BC"/><stop offset="1" stop-color="#112D65"/></linearGradient>
     <clipPath id="fold-clip"><path d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z" /></clipPath>
   </defs>
-  <path id="cube-body" d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z" fill="#0A2B49" />
+  <path id="cube-body" d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z" fill="#163C78" />
   <g clip-path="url(#fold-clip)">
-    <path data-role="facet" d="M7 16 L30 6 L49 22 L26 32 Z" fill="#123D61" />
-    <path data-role="facet" d="M26 32 L49 22 L53 48 L30 58 Z" fill="#1A5677" />
-    <path data-role="facet" d="M7 16 L26 32 L30 58 L11 42 Z" fill="#0E3556" />
+    <path data-role="facet" d="M7 16 L30 6 L49 22 L26 32 Z" fill="url(#face-0)" />
+    <path data-role="facet" d="M26 32 L49 22 L53 48 L30 58 Z" fill="url(#face-1)" />
+    <path data-role="facet" d="M7 16 L26 32 L30 58 L11 42 Z" fill="url(#face-2)" />
+  <path id="crystal-ridges" data-role="seam" d="M7 16 L26 32 M26 32 L49 22 M26 32 L30 58" stroke="#E6FCFF" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" />
   </g>
-  <path id="warm-seam" data-role="seam" d="M8 17 L26 32 L30 57" stroke="#E39A58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

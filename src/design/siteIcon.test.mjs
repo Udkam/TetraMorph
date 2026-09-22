@@ -104,11 +104,12 @@ describe('Balanced cube site icon', () => {
         expect(svg).toContain('viewBox="0 0 64 64"');
         expect(svg.match(/id="cube-body"/g)).toHaveLength(1);
         expect(svg.match(/data-role="facet"/g)).toHaveLength(3);
-        expect(svg.match(/id="warm-seam"/g)).toHaveLength(1);
+        expect(svg.match(/id="crystal-ridges"/g)).toHaveLength(1);
         expect(svg.match(/data-role="seam"/g)).toHaveLength(1);
-        expect(svg.match(/#E39A58/g)).toHaveLength(1);
+        expect(svg).not.toContain('#E39A58');
+        expect(svg.match(/<linearGradient /g)).toHaveLength(3);
         expect(svg).toContain('id="cube-body" d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z"');
-        expect(svg).toMatch(/id="warm-seam"[^>]*stroke="#E39A58"[^>]*stroke-width="2"/);
+        expect(svg).toMatch(/id="crystal-ridges"[^>]*stroke="#E6FCFF"[^>]*stroke-width="1.15"/);
         expect(svg).not.toMatch(/<(?:rect|text)\b/i);
         expect(svg).not.toMatch(/#(?:3f9f96|6687d5|c98243|9875be)/i);
         expect(svg).not.toMatch(/>[A-Za-z]</);
@@ -124,7 +125,7 @@ describe('Balanced cube site icon', () => {
         let opaque = 0;
         let partial = 0;
         let deepBlue = 0;
-        let warm = 0;
+        let ice = 0;
         for (let offset = 0; offset < image.pixels.length; offset += 4) {
             const red = image.pixels[offset];
             const green = image.pixels[offset + 1];
@@ -134,21 +135,33 @@ describe('Balanced cube site icon', () => {
                 opaque += 1;
             if (alpha > 0 && alpha < 255)
                 partial += 1;
-            if (alpha >= 240 && red <= 35 && green <= 100 && blue <= 145)
+            if (alpha >= 240 && red <= 50 && green <= 120 && blue <= 180)
                 deepBlue += 1;
-            if (alpha >= 200 && red >= 120 && green >= 100 && red >= blue + 20)
-                warm += 1;
+            if (alpha >= 200 && green >= 180 && blue >= 220 && blue > red)
+                ice += 1;
         }
         expect(opaque).toBeGreaterThan(size * size * 0.2);
         expect(opaque).toBeLessThan(size * size * 0.65);
         expect(partial).toBeGreaterThan(0);
-        expect(deepBlue).toBeGreaterThan(size);
-        expect(warm).toBeGreaterThan(0);
+        // Even at 16 px, reserve at least 4% of the full icon for the dark face.
+        expect(deepBlue).toBeGreaterThan(size * size * 0.04);
+        expect(ice).toBeGreaterThan(size);
         const bounds = contentBounds(image, (_r, _g, _b, alpha) => alpha >= 128);
         expect(bounds.left).toBeGreaterThanOrEqual(Math.floor(size * 0.10));
         expect(bounds.right).toBeLessThanOrEqual(Math.ceil(size * 0.88));
         expect(bounds.top).toBeGreaterThanOrEqual(Math.floor(size * 0.05));
         expect(bounds.bottom).toBeLessThanOrEqual(Math.ceil(size * 0.95));
+    });
+    it('separates the three faces in luminance and keeps the bright contact ridge', () => {
+        const image = decodePng('public/favicon-64x64.png');
+        const brightness = (x, y) => {
+            const [r, g, b] = pixelAt(image, x, y);
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        expect(brightness(30, 18)).toBeGreaterThan(brightness(40, 40) + 70);
+        expect(brightness(40, 40)).toBeGreaterThan(brightness(18, 38) + 30);
+        expect(brightness(28, 48)).toBeGreaterThan(brightness(18, 38) + 70);
+        expect(brightness(40, 34)).toBeGreaterThan(brightness(40, 44));
     });
     it('keeps the 64 px silhouette materially asymmetric', () => {
         const image = decodePng('public/favicon-64x64.png');
@@ -169,7 +182,7 @@ describe('Balanced cube site icon', () => {
     it('renders the Apple icon on one opaque background inside the safe area', () => {
         const image = decodePng('public/apple-touch-icon.png');
         expect(image).toMatchObject({ width: 180, height: 180 });
-        const background = [231, 238, 244, 255];
+        const background = [7, 23, 41, 255];
         expect(pixelAt(image, 0, 0)).toEqual(background);
         expect(pixelAt(image, 179, 0)).toEqual(background);
         expect(pixelAt(image, 0, 179)).toEqual(background);
