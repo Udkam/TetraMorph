@@ -50,6 +50,7 @@ try {
       await page.getByTestId('open-settings').click();
       await page.keyboard.press('Escape');
       await page.getByRole('dialog').waitFor({ state: 'hidden' });
+      await page.getByTestId('action-sheet-backdrop').waitFor({ state: 'detached' });
       const dimensions = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth }));
       assert(dimensions.scroll <= dimensions.width + 1, `${name}/${mode}: horizontal overflow`);
       const slug = `${name}-${mode.replaceAll('/', '-')}`;
