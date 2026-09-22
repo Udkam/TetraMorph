@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
+import { stripVTControlCharacters } from 'node:util';
 
 const port = Number(process.env.T38_PREVIEW_PORT ?? 4195);
 const origin = `http://127.0.0.1:${port}`;
@@ -16,7 +17,7 @@ let browser;
 try {
   for (let attempt = 0; ; attempt += 1) {
     assert(server.exitCode === null && attempt < 100, `Preview did not start: ${serverLog}`);
-    if (serverLog.includes(origin)) break;
+    if (stripVTControlCharacters(serverLog).includes(origin)) break;
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   browser = await chromium.launch({ headless: true });

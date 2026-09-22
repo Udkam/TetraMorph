@@ -92,3 +92,7 @@ tag. No external deployment target has been supplied.
   failures (785 passed / 2 failed / 17 skipped). No product-source failure. CI platform
   contract corrected explicitly: Windows full suite, Linux excludes only that legacy
   proof-tool file, both retain build/browser/audit. No proof-tool source modified.
+- Remote matrix 35735741888 exposed checkout/runner differences: Windows autocrlf
+  changed five byte-checked JSON fixtures; Linux FORCE_COLOR broke a plain substring
+  readiness check. Added exact fixture-directory LF attributes and ANSI-neutral log
+  parsing. Original test assertions remain unchanged. Product sources are unchanged.

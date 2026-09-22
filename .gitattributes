@@ -10,3 +10,5 @@ docs/qa/evidence/t15-phase6/*.log text eol=lf
 docs/qa/evidence/t15-phase6/*.png -text
 *.ogg -text
 *.wav -text
+# Canonical proof fixtures are byte-checked; checkout must not introduce CRLF.
+docs/workstreams/tetris-t37-endgame/fixtures/t37/*.json text eol=lf
