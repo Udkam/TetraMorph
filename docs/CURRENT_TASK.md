@@ -8,8 +8,9 @@ and old BLOCKED/ACTIVE labels do not authorize restarting work.
 - Website: https://tetramorph.vercel.app/ . Vercel builds `main` via Git integration.
 - Repository: https://github.com/Udkam/TetraMorph . Local origin already updated.
 - User accepted the ice-blue, 18-degree tilted isometric cube icon. Geometry
-  source `993b9942`; final validation/publication is the current bounded task.
-- Documentation is being organized; historical content is retained, not deleted.
+  source `993b9942`; typecheck/build, 789 tests, 12 browser scenes and independent QA pass.
+- Documentation is organized; historical content is retained, not deleted. Old local
+  output, Playwright logs and inactive Serena files are under `.local/archive/`.
 - Local directory rename to `E:\Proj\TetraMorph` remains pending an open-process lock.
 - No custom-domain purchase or DNS change is authorized by the current request.
 
@@ -30,5 +31,6 @@ and old BLOCKED/ACTIVE labels do not authorize restarting work.
 - [Independent QA](agent-runs/t39-publication/QA.md)
 - [Previous accumulated task record](archive/2026-09-22/CURRENT_TASK.md)
 
-Next: publish verified selected icon, finish local organization and report any rename
-blocker without forcibly terminating unrelated processes.
+Only local directory rename remains blocked after another verified retry. Release
+processes using the old root, rename from its parent, then reopen the saved project.
+Do not force-terminate unrelated processes or recreate the old path as a workaround.

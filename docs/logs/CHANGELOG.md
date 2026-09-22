@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-22 — Selected crystal icon and file organization
+
+- User accepted the exact isometric cube: 18-degree tilt, ice-blue gradient faces,
+  thin white ridges, one lowest vertex. Apple PNG SHA256 starts `9CE5FAB339C0`.
+- Source `993b9942`: typecheck/build PASS, 789 tests PASS / 17 optional skipped,
+  12 production browser scenes with zero errors, independent icon QA PASS.
+- Replaced two 12,000-line accumulated entrypoints with concise current docs; full
+  originals retained in `docs/archive/2026-09-22/`. Added docs/release/archive indexes.
+  Independent comparison verifies lossless archive and valid entrypoint links.
+- Moved 155 ignored local files (~13.8 MiB) from root output, old Playwright logs and
+  inactive Serena data into `.local/archive/`; all content hashes identical. No deletion.
+- GitHub already named TetraMorph; local root rename retried and still blocked by
+  Windows file-in-use lock. Inherited T27/progress work remains intact and unstaged.
+
 ## 2026-09-22 — T39 publication
 
 - Replaced the site icon with a three-face tilted cube balanced on one corner.
