@@ -1,5 +1,14 @@
 # TetraMorph — Product Design Contract
 
+## 2026-09-22 T38 — Release candidate supersession
+
+The user authorizes autonomous design and implementation toward release readiness.
+Current direction and acceptance gates: [T38 release contract](agent-runs/t38-release/STATE.md).
+Mutation materials become tactile mineral/ceramic, with restrained causal effects and
+non-realistic, comfortable block-impact audio. Historical acceptance is not approval
+of this new candidate. Previously deferred exact Endgame certificates remain deferred.
+
+
 > The current page-facing identity is the plain-text `TetraMorph`. Older `Tetra` and
 > `Tetris` headings below are retained only as historical contract provenance.
 

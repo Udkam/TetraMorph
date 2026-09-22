@@ -1,5 +1,14 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
+## 2026-09-22 supersession — T38 release candidate
+
+Active authority is now [T38](agent-runs/t38-release/STATE.md). The user asks the
+coordinator to design and implement release readiness, particularly Mutation VFX,
+audio and item materials. Earlier T37 active/blocking statuses below are historical.
+Owner: coordinator; independent QA is read-only after the candidate SHA. Checkpoints
+remain within COMMIT_POLICY; inherited T27 evidence and progress.md are excluded.
+
+
 Status: **COMPLETION-FIRST IMPLEMENTATION ACTIVE / ALL NEW CHOICES PROVISIONAL / ONE CONSOLIDATED HUMAN REVIEW LAST**
 
 ## 2026-09-05 Bomb direct-feedback correction — R5C block-break source
