@@ -53,8 +53,8 @@ const gesture = (
 const BRIGHT_PARTIAL_RATIO = 2.01;
 
 const marimbaStrike = (frequency: number, gain: number, delay: number): readonly AcceptedActionTone[] => [
-  tone(frequency, 0.145, gain, { delay, waveform: 'triangle' }),
-  tone(frequency * BRIGHT_PARTIAL_RATIO, 0.096, gain * 0.22, { delay }),
+  tone(frequency, 0.125, gain, { delay, waveform: 'triangle', attack: .01 }),
+  tone(frequency * BRIGHT_PARTIAL_RATIO, 0.065, gain * 0.12, { delay, attack: .008 }),
 ];
 
 const PALETTE: Readonly<Record<CandidateAudioCueId, CandidateAudioCue>> = {
@@ -104,8 +104,9 @@ const PALETTE: Readonly<Record<CandidateAudioCueId, CandidateAudioCue>> = {
     tone(523.25, 0.06, 0.035, { delay: 0.018, attack: 0.005 }),
   ]),
   supergravity: gesture('mutation', [
-    tone(148, 0.09, 0.25, { attack: 0.008 }),
-    tone(93, 0.12, 0.17, { delay: 0.018, attack: 0.009 }),
+    tone(196, 0.1, 0.17, { endFrequency: 164.81, attack: 0.009 }),
+    tone(130.81, 0.12, 0.14, { delay: 0.035, attack: 0.009 }),
+    tone(392, 0.045, 0.035, { delay: 0.004, attack: 0.006 }),
   ], { mutationOwned: true }),
   'multiplier-2': gesture('mutation', [
     ...marimbaStrike(523.25, 0.165, 0),
@@ -114,7 +115,7 @@ const PALETTE: Readonly<Record<CandidateAudioCueId, CandidateAudioCue>> = {
   'multiplier-4': gesture('mutation', [
     ...marimbaStrike(523.25, 0.165, 0),
     ...marimbaStrike(659.25, 0.145, 0.052),
-    ...marimbaStrike(1_046.5, 0.12, 0.104),
+    ...marimbaStrike(783.99, 0.11, 0.104),
   ], { mutationOwned: true }),
 };
 

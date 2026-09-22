@@ -39,10 +39,10 @@ describe('R5C Bomb block-break compositor', () => {
       fullTailMs: 132,
       reducedTailMs: 90,
       rawPeakCeiling: 0.18,
-      bodyStartHz: 174.61,
-      bodyEndHz: 138.59,
-      contactStartHz: 349.23,
-      contactEndHz: 293.66,
+      bodyStartHz: 196,
+      bodyEndHz: 174.61,
+      contactStartHz: 523.25,
+      contactEndHz: 493.88,
     });
   });
 
@@ -72,6 +72,19 @@ describe('R5C Bomb block-break compositor', () => {
       expect(energy(samples.slice(frame, frame + 48_000 * 0.03))).toBeGreaterThan(0.00001);
     }
     expect(peak(samples)).toBeLessThanOrEqual(BOMB_BLOCK_PLAYBACK_CONTRACT.rawPeakCeiling);
+    const single = composeBombBlockEventSamples({ beatStartsMs: [220], reducedMotion: false });
+    expect(energy(samples.slice(220 * 48, 250 * 48))).toBeGreaterThanOrEqual(
+      energy(single.slice(220 * 48, 250 * 48)) * .8,
+    );
+  });
+
+  it('is deterministic and bounds dense chains without a discontinuous onset', () => {
+    const options = { beatStartsMs: Array.from({ length: 30 }, (_, i) => 50 + i * 2), reducedMotion: true };
+    const samples = composeBombBlockEventSamples(options);
+    expect(samples).toEqual(composeBombBlockEventSamples(options));
+    expect(peak(samples)).toBeLessThanOrEqual(.160001);
+    expect(samples[50 * 48]).toBe(0);
+    expect(samples.at(-1)).toBe(0);
   });
 
   it('uses the same beat grammar in reduced motion with its shorter causal tail', () => {

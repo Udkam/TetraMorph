@@ -77,7 +77,7 @@ describe('T37 recovered soft support palette', () => {
   });
 
   it('gives every remaining Mutation a distinct material-bound one-shot', () => {
-    expect(audioCue('supergravity').tones.map((layer) => layer.frequency)).toEqual([148, 93]);
+    expect(audioCue('supergravity').tones.map((layer) => layer.frequency)).toEqual([196, 130.81, 392]);
     expect(audioCue('multiplier-2').tones).toHaveLength(4);
     expect(audioCue('multiplier-4').tones).toHaveLength(6);
     expect(audioCue('multiplier-2').tones.map((layer) => layer.waveform)).toEqual([

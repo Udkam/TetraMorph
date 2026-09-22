@@ -609,7 +609,7 @@ describe('AudioEngine accepted production contract', () => {
   });
 
   it('keeps recovered-candidate voice accounting consistent with the engine', () => {
-    expect(audioCue('supergravity').tones).toHaveLength(2);
+    expect(audioCue('supergravity').tones).toHaveLength(3);
     expect(audioCue('multiplier-4').tones).toHaveLength(6);
   });
 });

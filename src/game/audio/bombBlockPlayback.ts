@@ -8,10 +8,10 @@ export const BOMB_BLOCK_PLAYBACK_CONTRACT = Object.freeze({
   fullTailMs: 132,
   reducedTailMs: 90,
   rawPeakCeiling: 0.18,
-  bodyStartHz: 174.61,
-  bodyEndHz: 138.59,
-  contactStartHz: 349.23,
-  contactEndHz: 293.66,
+  bodyStartHz: 196,
+  bodyEndHz: 174.61,
+  contactStartHz: 523.25,
+  contactEndHz: 493.88,
 } as const);
 
 export interface ComposeBombBlockEventOptions {
@@ -33,19 +33,6 @@ function frameStarts(beatStartsMs: readonly number[]): number[] {
     starts.push(frame);
   }
   return starts;
-}
-
-function maximumOverlaps(starts: readonly number[], tailFrames: number): number {
-  let maximum = 1;
-  for (let index = 0; index < starts.length; index += 1) {
-    const end = starts[index]! + tailFrames;
-    let count = 0;
-    for (const candidate of starts) {
-      if (candidate >= starts[index]! && candidate < end) count += 1;
-    }
-    maximum = Math.max(maximum, count);
-  }
-  return maximum;
 }
 
 function logarithmicPhase(startHz: number, endHz: number, progress: number, durationSeconds: number): number {
@@ -71,9 +58,8 @@ export function composeBombBlockEventSamples(
   const attackFrames = Math.round(0.006 * BOMB_BLOCK_SAMPLE_RATE);
   const contactAttackFrames = Math.round(0.004 * BOMB_BLOCK_SAMPLE_RATE);
   const output = new Float32Array(starts.at(-1)! + tailFrames);
-  const overlapScale = 1 / maximumOverlaps(starts, tailFrames);
-  const bodyPeak = 0.078 * overlapScale;
-  const contactPeak = 0.024 * overlapScale;
+  const bodyPeak = 0.078;
+  const contactPeak = 0.028;
   const tailSeconds = tailFrames / BOMB_BLOCK_SAMPLE_RATE;
   const contactSeconds = contactFrames / BOMB_BLOCK_SAMPLE_RATE;
 
@@ -89,6 +75,13 @@ export function composeBombBlockEventSamples(
         tailSeconds,
       );
       let sample = Math.sin(Math.PI * 2 * bodyPhase) * bodyPeak * bodyEnvelope;
+      // Damped inharmonic ceramic modes add a short physical crack, without
+      // broadband blast noise, sub-bass or a sustained metallic ring.
+      const seconds = offset / BOMB_BLOCK_SAMPLE_RATE;
+      sample += attack * (1 - progress) ** 6 * (
+        Math.sin(Math.PI * 2 * 807 * seconds) * .012
+        + Math.sin(Math.PI * 2 * 1_231 * seconds) * .006
+      );
 
       if (offset < contactFrames) {
         const contactProgress = offset / Math.max(1, contactFrames - 1);
@@ -106,6 +99,11 @@ export function composeBombBlockEventSamples(
     }
   }
 
+  // Retain the first impact's presence in a chain. Attenuate the whole event only
+  // if its actual summed peak needs headroom, not simply because tails overlap.
+  const peak = output.reduce((maximum, sample) => Math.max(maximum, Math.abs(sample)), 0);
+  const scale = Math.min(1, .16 / Math.max(.16, peak));
+  for (let index = 0; index < output.length; index += 1) output[index]! *= scale;
   for (const sample of output) {
     if (!Number.isFinite(sample) || Math.abs(sample) > BOMB_BLOCK_PLAYBACK_CONTRACT.rawPeakCeiling) {
       throw new Error('Bomb block-break mix exceeded its finite quiet range.');
