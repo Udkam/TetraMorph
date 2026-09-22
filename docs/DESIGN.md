@@ -1,5 +1,12 @@
 # TetraMorph — Product Design Contract
 
+## T39 R2 — Ice-blue crystal identity
+
+User rejects the low-contrast navy/orange cube. Keep its single-point balanced
+silhouette, but use three strongly separated ice/cyan/cobalt gradient faces and
+fine cold-white Y-shaped ridges. Apple icon uses a deep navy ground. No orange,
+extra particles, text or fake bloom. SVG and raster samples share gradients/geometry.
+
 ## 2026-09-22 T39 — Publication and balanced cube icon
 
 User directs publication without further sensory iteration. Replace Falling Fold with

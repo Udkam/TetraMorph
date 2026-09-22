@@ -1,5 +1,12 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
+## T39 R2 — Active icon refinement
+
+User authorizes icon redesign and publication, not domain purchase/DNS edits.
+Scope: existing icon generator, five generated assets, direct tests. Use ice-blue
+gradient faces and thin cold ridges; inspect actual 16/32/64/180 output, run gates,
+independent QA and verify deployed hashes. Preserve inherited dirty paths.
+
 ## 2026-09-22 T39 — Active publication slice
 
 Publication complete at https://tetramorph.vercel.app/ (product `a292a11a`).
