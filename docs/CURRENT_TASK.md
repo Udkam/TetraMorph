@@ -8,6 +8,11 @@ audio and item materials. Earlier T37 active/blocking statuses below are histori
 Owner: coordinator; independent QA is read-only after the candidate SHA. Checkpoints
 remain within COMMIT_POLICY; inherited T27 evidence and progress.md are excluded.
 
+T38 engineering candidate is implemented and independently reviewed (PASS); 787
+tests passed / 17 optional tests skipped, production build and 12-scene browser
+smoke passed. See T38 STATE/QA and `docs/release/T38-RELEASE.md`. Human material/audio
+acceptance and external deployment are not yet claimed. No proof search was resumed.
+
 
 Status: **COMPLETION-FIRST IMPLEMENTATION ACTIVE / ALL NEW CHOICES PROVISIONAL / ONE CONSOLIDATED HUMAN REVIEW LAST**
 

@@ -8,9 +8,9 @@ readable pressure, and deterministic replay.
 - **Classic Mode** — clear lines, build combos, and manage steadily rising gravity.
 - **Survival Mode** — play above rising bedrock while clearable falling stones reshape
   the board.
-- **Mutation Mode** — trigger visible item carriers and adapt to five temporary or
+- **Mutation Mode** — trigger visible item carriers and adapt to four temporary or
   immediate rule mutations.
-- **Endgame Campaign** — solve 50 authored boards with fixed queues, undo support, and
+- **Endgame Campaign** — solve 46 authored boards (5 introductory, 25 easy, 16 hard) with fixed queues, undo support, and
   a staged learning curve.
 
 ## Technical Highlights
@@ -45,7 +45,7 @@ also supports Chinese and English, reduced-motion preferences, and adjustable SF
 
 ## Development
 
-Requirements: a current Node.js release compatible with Vite 8 and npm.
+Requirements: Node.js 24.12.x (the tested CI baseline) and npm; install from the lockfile.
 
 ```bash
 npm ci
@@ -58,15 +58,19 @@ Release gates:
 npm run typecheck
 npm run test
 npm run build
+npx playwright install chromium
+npm run test:release
 ```
 
 The deterministic game rules live in `src/game/core`; React owns page composition and
 lifecycle, while PixiJS owns the single board canvas. Project contracts and release
 evidence are maintained under `docs/`.
 
-The current release-candidate notes and portfolio capture plan are available in
-[`docs/release/RELEASE_NOTES-v1.0-rc.md`](docs/release/RELEASE_NOTES-v1.0-rc.md) and
-[`docs/release/SHOWCASE.md`](docs/release/SHOWCASE.md).
+Current delivery and hosting instructions: [`docs/release/T38-RELEASE.md`](docs/release/T38-RELEASE.md).
+The older rc.1 notes and screenshots below are historical. T38 visual/audio acceptance
+is available locally at `/docs/evidence/t38/` under `npm run dev`; developer review
+pages are not included in the production build. The project is a static browser app,
+not an npm library. `private: true` does not prevent web hosting.
 
 ## Screenshots
 

@@ -55,4 +55,35 @@ tag. No external deployment target has been supplied.
   Reviewed existing material renderer, Mutation audio, Survival settlement and
   persistence entrypoints. No helpers launched yet. Historical screenshot confirms
   repeated cell facets and small overlaid motifs; final evidence must be current.
-- Next: regress atomic Survival rise/relief, implement final-state overflow.
+- Contract committed `e1795ca7`; Survival `cd77b665` (engine/race tests), persistence
+  `b40f4d9b` (App, styles, leaderboard and bootstrap/tests), materials `e83792ec`
+  (renderer/theme/tests), causal VFX `1a0db27f` (renderer/tests), audio `6e80d1ad`
+  (Bomb playback/palette/engine tests), dependencies `ad060988` (package/lock),
+  recovery `a2f18457` (App/main/recovery/tests), CI `d5b46903` (workflow/package/runner),
+  smoke coverage `f3f2cbe0` and `e0062984`. Exact path ownership is recorded in each
+  bounded commit; inherited dirty paths never staged.
+- Targeted tests/typecheck green at each source checkpoint. Survival first reproduced
+  three failures (phantom rise/lower, lost top sentinel, waived overflow), then 32/32.
+  Renderer 74/74; audio 35/35; persistence 92/92 plus new notice test; recovery 77/77.
+- Final actual commands after last product edit: `npm ci --registry=https://registry.npmjs.org`,
+  `npm run typecheck`, `npm run test`, `npm run build`. Results: 787 passed / 17 skipped,
+  build 780 modules, main 639.27 KB / gzip 191.99 KB; known chunk-size advisory only.
+  `npm audit --registry=https://registry.npmjs.org`: zero vulnerabilities including dev.
+- Production `npm run test:release`: 12/12 viewports/modes, actual touch-capable taps,
+  same-document SPA exits, zero console/page errors, storage-denied disclosure. Final
+  correction waited for the physically retired backdrop before screenshots.
+- `node docs/evidence/t38/capture.mjs`: eight source-bound material/effect frames,
+  no failures. `node docs/evidence/t38/check-review.mjs`: seven cues and two product
+  Bomb scenes functional, no errors. Skill client final run recorded real playing
+  state and a placed piece; early intro-only run is not claimed as gameplay proof.
+- Evidence `9961a341`; independent read-only QA `f534dab5`: 211 targeted tests passed,
+  candidate PASS and smoke-only increment PASS. See QA.md for non-claims.
+- Owned dev preview: node PID 24868, parent 29196, started 2026-09-22 21:34:10 local,
+  command `node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4194 --strictPort`,
+  root this repository, purpose current user review. Retained for the review handoff.
+  Earlier owned dev server and all production smoke servers/browsers stopped.
+- Intermediate captures moved within the repository to ignored `.local/t38-intermediate`;
+  no user archives or inherited files deleted. Final evidence about 1 MB, not proof-search output.
+- Engineering implementation and independent review complete. Next: consolidate docs,
+  push the reviewed candidate, report remote CI honestly, user listening/material review.
+  Do not tag a subjectively accepted release or deploy to an unspecified host.

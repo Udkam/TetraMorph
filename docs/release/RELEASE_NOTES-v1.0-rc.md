@@ -1,5 +1,8 @@
 # TetraMorph 1.0.0-rc.1 Release Candidate
 
+> Historical 2026-08-03 snapshot, superseded by [T38 release delivery](T38-RELEASE.md).
+> The current campaign has 46 levels and Mutation has four items, not the counts below.
+
 Date: 2026-08-03
 
 TetraMorph 1.0.0-rc.1 freezes the current four-mode game as a coherent, testable portfolio

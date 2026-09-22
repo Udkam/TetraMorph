@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-22 — T38 tactile Mutation and release candidate hardening
+
+- Implemented coherent frost/ceramic/gold/amethyst item materials, local causal
+  activation cues, quieter Bomb camera movement and unobstructed multiplier reward.
+  Bomb uses a damped synthetic block fracture; chain overlap no longer needlessly
+  attenuates the whole event. Gravity/multiplier percussion matches that palette.
+- Survival now settles pending pressure and earned relief atomically, preserving
+  top cells and checking final mover overflow. Added regressions that failed before
+  the correction. Unknown/corrupt leaderboard data is protected and unavailable
+  saving is disclosed; rendering failures provide non-destructive recovery.
+- Updated targeted dependencies; npm audit reports zero advisories. Added clean-lock
+  CI gates, production browser smoke and static hosting/rollback instructions.
+- Full verification: typecheck, 787 tests passed / 17 optional skipped, build passed;
+  12 production Chromium scenes plus eight real Mutation frames and current product
+  audio review work. Independent QA: PASS, 211 additional targeted tests passed.
+  No claim of physical-device/Safari certification or subjective listening approval.
+- Source `d5b46903`; smoke corrections through `e0062984`; evidence `9961a341`;
+  independent QA `f534dab5`. Inherited T27/progress changes remain excluded.
+- Consolidated player review: `/docs/evidence/t38/` on the local dev server.
+  Deferred exact certificates remain outside scope. No formal accepted release tag
+  or external deployment is created by this candidate.
+
 ## 2026-09-06 — T37 unified sensory curriculum integrated; player review open
 
 - Player-directed scope excludes the unfinished Horizon, Terrace, and Keystone exact proofs. They
