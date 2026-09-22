@@ -26,3 +26,8 @@ Final selected geometry `982d4d5c..993b9942`: independent read-only PASS, icon
 tests 8/8 PASS, range whitespace PASS. Exact isometric projection, 18-degree rotation,
 parallel opposite edges and unique lowest vertex verified. Coordinator confirmed
 selected Apple PNG SHA256 `9CE5FAB339C09229F4966A5A1FF45C7B33B99B043367E175A942AED498181E63`.
+
+Documentation range `993b9942..2e7478ff`: independent PASS. Archived bodies equal
+original blobs after newline/link normalization; all local Markdown links in seven
+entrypoints exist. Product boundaries retained; only nine documentation paths changed.
+Ignored-directory hash migration was checked by coordinator, not independently claimed.
