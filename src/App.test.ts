@@ -702,6 +702,13 @@ describe('DEV QA state snapshot isolation', () => {
 });
 
 describe('Endgame progress boot persistence', () => {
+  it('discloses session-only records and preserves unreadable leaderboard data', () => {
+    localStorage.setItem(LEADERBOARD_KEY, '{"version":999}');
+    const view = render(createElement(App));
+    expect(document.querySelector('.storage-notice')?.textContent).toMatch(/本地存档不可用|Local saving unavailable/);
+    expect(localStorage.getItem(LEADERBOARD_KEY)).toBe('{"version":999}');
+    view.unmount();
+  });
   it('loads an existing canonical v7 record without rewriting it', () => {
     const currentId = CAMPAIGN_LEVELS[1]!.id;
     const current = JSON.stringify({

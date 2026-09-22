@@ -36,6 +36,7 @@ import {
 } from './game/core';
 import { GameRuntime, randomRunSeed } from './game/runtime/GameRuntime';
 import { browserPlatform, type PlatformFrame, type PlatformTimeout } from './platform/browserPlatform';
+import { readLeaderboardStorage } from './leaderboardStorage';
 import {
   DEFAULT_APP_NAVIGATION,
   appHistoryStateFor,
@@ -95,11 +96,9 @@ import {
 import {
   CLASSIC_DIFFICULTY_GRADES,
   LEADERBOARD_KEY,
-  LEGACY_LEADERBOARD_KEYS,
   classicDifficultyGrade,
   emptyLeaderboard,
   insertScoreRecord,
-  parseLeaderboard,
   recordsForMode,
   type Leaderboard,
   type ClassicDifficultyGrade,
@@ -358,9 +357,8 @@ function writeModeRuleIntros(modes: readonly GameMode[], canPersist = true): voi
   );
 }
 
-function writeEndgameProgress(progress: EndgameProgress, canPersist = true): void {
-  if (!canPersist) return;
-  browserPlatform.writeStorage(ENDGAME_PROGRESS_KEY, JSON.stringify(progress));
+function writeEndgameProgress(progress: EndgameProgress, canPersist = true): boolean {
+  return canPersist && browserPlatform.writeStorage(ENDGAME_PROGRESS_KEY, JSON.stringify(progress));
 }
 
 function readEndgameProgress(): PersistedBootstrap<EndgameProgress> {
@@ -377,24 +375,6 @@ function readEndgameProgress(): PersistedBootstrap<EndgameProgress> {
     };
   }
   return { value: defaultEndgameProgress(), canPersist: result.status === 'missing' };
-}
-
-function readLeaderboard(): Leaderboard {
-  try {
-    const current = browserPlatform.readStorage(LEADERBOARD_KEY);
-    if (current !== null) return parseLeaderboard(current);
-    for (const key of LEGACY_LEADERBOARD_KEYS) {
-      const legacy = browserPlatform.readStorage(key);
-      if (legacy !== null) {
-        const migrated = parseLeaderboard(legacy);
-        browserPlatform.writeStorage(LEADERBOARD_KEY, JSON.stringify(migrated));
-        return migrated;
-      }
-    }
-  } catch {
-    return emptyLeaderboard();
-  }
-  return emptyLeaderboard();
 }
 
 function formatScore(value: number, language: AppLanguage = DEFAULT_LANGUAGE): string {
@@ -2983,6 +2963,11 @@ export default function App() {
   const [archivedEndgameId, setArchivedEndgameId] = useState<RetiredEndgameId | null>(initialRoute.archivedEndgameId);
   const progressBootstrapRef = useRef<PersistedBootstrap<EndgameProgress> | null>(null);
   if (progressBootstrapRef.current === null) progressBootstrapRef.current = readEndgameProgress();
+  const leaderboardBootstrapRef = useRef<PersistedBootstrap<Leaderboard> | null>(null);
+  if (leaderboardBootstrapRef.current === null) leaderboardBootstrapRef.current = readLeaderboardStorage(browserPlatform);
+  const [sessionOnly, setSessionOnly] = useState(
+    !progressBootstrapRef.current.canPersist || !leaderboardBootstrapRef.current.canPersist,
+  );
   const introBootstrapRef = useRef<PersistedBootstrap<readonly GameMode[]> | null>(null);
   if (introBootstrapRef.current === null) introBootstrapRef.current = readModeRuleIntros();
   const navigationRef = useRef(navigation);
@@ -3001,7 +2986,8 @@ export default function App() {
   const { screen, mode, selectedEndgameId } = navigation;
   const [progress, setProgress] = useState<EndgameProgress>(progressBootstrapRef.current.value);
   const progressRef = useRef(progress);
-  const [leaderboard, setLeaderboard] = useState<Leaderboard>(readLeaderboard);
+  const [leaderboard, setLeaderboard] = useState<Leaderboard>(leaderboardBootstrapRef.current.value);
+  const leaderboardRef = useRef(leaderboard);
   const [introducedModes, setIntroducedModes] = useState<readonly GameMode[]>(introBootstrapRef.current.value);
   const [ruleIntroMode, setRuleIntroMode] = useState<GameMode | null>(null);
   const [reducedMotionOverride, setReducedMotionOverride] = useState<ReducedMotionOverride>(readReducedMotionOverride);
@@ -3300,17 +3286,17 @@ export default function App() {
     if (updated === current) return;
     // Storage is the first side effect so an immediate modal dismissal or unmount
     // cannot discard a success before React commits the visual update.
-    writeEndgameProgress(updated, progressBootstrapRef.current?.canPersist ?? false);
+    if (!writeEndgameProgress(updated, progressBootstrapRef.current?.canPersist ?? false)) setSessionOnly(true);
     progressRef.current = updated;
     setProgress(updated);
   }, [selectedEndgameId]);
 
   const recordRun = useCallback((record: ScoreRecord) => {
-    setLeaderboard((current) => {
-      const updated = insertScoreRecord(current, record);
-      browserPlatform.writeStorage(LEADERBOARD_KEY, JSON.stringify(updated));
-      return updated;
-    });
+    const updated = insertScoreRecord(leaderboardRef.current, record);
+    if (!leaderboardBootstrapRef.current?.canPersist
+      || !browserPlatform.writeStorage(LEADERBOARD_KEY, JSON.stringify(updated))) setSessionOnly(true);
+    leaderboardRef.current = updated;
+    setLeaderboard(updated);
   }, []);
 
   const exitGame = useCallback((destination: ExitDestination) => {
@@ -3333,6 +3319,11 @@ export default function App() {
       data-route-direction={routeDirection}
     >
       <ActionSheetFamily>
+      {sessionOnly && <aside className="storage-notice" role="status">
+        {language === 'en'
+          ? 'Local saving unavailable. New records may last only this session; existing stored data is preserved.'
+          : '本地存档不可用，新纪录可能仅在本次会话保留；已有存档不会被覆盖。'}
+      </aside>}
       <div className="app-route-viewport" data-testid="route-viewport" key={appPathFor(navigation)}>
         {screen === 'home' && <ModeHome onEnter={enterMode} language={language} />}
         {screen === 'endgame-library' && (

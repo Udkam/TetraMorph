@@ -9543,3 +9543,20 @@ kbd,
 }
 
 .app[data-reduced-motion="true"] .entry-countdown__digit--start { animation: none !important; }
+/* T38: persistent, non-modal disclosure; does not steal game input focus. */
+.storage-notice {
+  position: fixed;
+  z-index: 100;
+  inset: auto 1rem max(1rem, env(safe-area-inset-bottom));
+  width: fit-content;
+  max-width: min(38rem, calc(100vw - 2rem));
+  margin-inline: auto;
+  padding: .65rem 1rem;
+  border: 1px solid #ad8953;
+  border-radius: .7rem;
+  background: #20222bf2;
+  color: #ffe4b4;
+  font-size: .75rem;
+  line-height: 1.5;
+  pointer-events: none;
+}

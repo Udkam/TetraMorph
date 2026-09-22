@@ -228,6 +228,20 @@ export function parseLeaderboard(raw: string | null): Leaderboard {
   }
 }
 
+/** Persistence callers must distinguish invalid data from an empty valid board. */
+export function parsePersistedLeaderboard(raw: string, legacy = false): Leaderboard | null {
+  try {
+    const value: unknown = JSON.parse(raw);
+    if (isLeaderboard(value)) return parseLeaderboard(raw);
+    if (legacy && [isLegacyV9Leaderboard, isLegacyV8Leaderboard, isLegacyV7Leaderboard,
+      isLegacyV6Leaderboard, isLegacyV5Leaderboard, isLegacyV4Leaderboard,
+      isLegacyV3Leaderboard].some((validate) => validate(value))) {
+      return migrateLegacyLeaderboard(raw);
+    }
+  } catch { /* Leave malformed storage untouched. */ }
+  return null;
+}
+
 interface LegacyRecordFields {
   score: number;
   lines: number;
