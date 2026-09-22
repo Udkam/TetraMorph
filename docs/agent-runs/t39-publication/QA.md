@@ -16,3 +16,8 @@ Inherited T27/progress paths excluded. Next action: verify production deployment
 Incremental review through `a292a11a`: PASS. Added missing optional root peer
 @emnapi/runtime 1.11.3; independent official-registry metadata comparison and
 `npm ci --ignore-scripts --dry-run` pass; nested 1.11.1 unchanged.
+
+R2 range `04e26c6d..b8ea4e91`: independent read-only PASS. Actual 64/180 PNGs
+retain the unique lowest corner; SVG and raster share y=6..58 sRGB gradients and
+clipped cold-white ridges. Eight targeted icon tests and range whitespace check PASS.
+No files/services changed by reviewer; live output remains coordinator verification.
