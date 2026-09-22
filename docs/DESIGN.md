@@ -1,5 +1,14 @@
 # TetraMorph — Product Design Contract
 
+## 2026-09-22 T39 — Publication and balanced cube icon
+
+User directs publication without further sensory iteration. Replace Falling Fold with
+one original three-face cube, tilted and balanced on its single lowest vertex.
+Keep ink-blue faces and a restrained warm edge; transparent favicons and opaque Apple
+icon share the same geometry. Deploy via the existing Vercel account/Git workflow,
+as a separate project. Rename the GitHub repository and local directory to TetraMorph.
+This publication decision does not retroactively claim subjective audio approval.
+
 ## 2026-09-22 T38 — Release candidate supersession
 
 The user authorizes autonomous design and implementation toward release readiness.

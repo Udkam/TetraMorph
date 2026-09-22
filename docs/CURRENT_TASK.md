@@ -1,5 +1,14 @@
 # Current Task — T37 Unified Material Feedback and Endgame Curriculum
 
+## 2026-09-22 T39 — Active publication slice
+
+Owner: coordinator. Base: 91ad49f0. User authorizes cube icon replacement, GitHub/local
+rename to TetraMorph, and Vercel production deployment matching personal-web's Git flow.
+Bounded checkpoints: contract; icon generator/assets/direct tests; hosting config;
+independent read-only QA; release record. Preserve inherited T27/progress changes.
+Verify typecheck, full tests, build, browser/icon review, and live route/asset responses.
+Move local root last, after stopping only verified project-owned helpers. No proof search.
+
 ## 2026-09-22 supersession — T38 release candidate
 
 Active authority is now [T38](agent-runs/t38-release/STATE.md). The user asks the
