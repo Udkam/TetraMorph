@@ -44,7 +44,13 @@ npm run test:release
 1440×900、390×844 reduced-motion、844×390 三种视口 × 四模式、真实输入、设置关闭、
 SPA 退出、残局地址刷新、存档禁用。视口模拟不等于实体手机性能或 Safari 实机认证。
 音频监听器和重启清理还由现有 runtime/audio 单元测试覆盖，浏览器脚本不单独证明
-所有资源无泄漏。远端 CI 尚须在推送后查看实际运行结果。
+所有资源无泄漏。
+
+首次远端 Ubuntu 检查：785 passed / 2 failed / 17 skipped；两项失败均来自历史
+`src/authoring/endgameDiskFrontier.test.mjs` 的文件身份复用假设，并非游戏代码。
+不将该失败称为通过，也不在本轮重启证明工具改造。CI 已明确为 Windows 全量测试，
+Linux 仅排除这一个磁盘证明工具文件；两端都执行审计、类型、构建与浏览器冒烟。
+最终远端运行结果见 GitHub Actions，不以本地通过代替。
 
 构建仍有主 chunk 639 KB（gzip 192 KB）提示；中文字体约 4.6 MB。属于首载预算，
 不是构建失败；应开启压缩和长缓存，不能宣称已经验证弱网首屏性能。

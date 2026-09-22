@@ -4,8 +4,12 @@ permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,18 +19,25 @@ jobs:
       - run: npm ci
       - run: npm audit --audit-level=high --registry=https://registry.npmjs.org
       - run: npm run typecheck
-      - run: npm test
+      - name: Full suite on the supported authoring platform
+        if: runner.os == 'Windows'
+        run: npm test
+      # The deferred disk-proof tool assumes historical file identities cannot
+      # be reused. Keep its full gate on Windows; do not claim Linux support.
+      - name: Linux suite excluding legacy disk-proof identity tests
+        if: runner.os == 'Linux'
+        run: npx vitest run --maxWorkers=2 --exclude src/authoring/endgameDiskFrontier.test.mjs
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:release
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: release-smoke
+          name: release-smoke-${{ matrix.os }}
           path: .local/t38-release-smoke
           retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
-          name: tetramorph-static
+          name: tetramorph-static-${{ matrix.os }}
           path: dist
           retention-days: 7

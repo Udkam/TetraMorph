@@ -13,6 +13,12 @@ tests passed / 17 optional tests skipped, production build and 12-scene browser
 smoke passed. See T38 STATE/QA and `docs/release/T38-RELEASE.md`. Human material/audio
 acceptance and external deployment are not yet claimed. No proof search was resumed.
 
+Remote-CI correction: initial Ubuntu run exposes two historical disk-frontier
+authoring tests that assume non-reused filesystem identities. Do not alter/revive
+the deferred proof tool in this release. CI uses full Windows tests and Linux tests
+excluding only `src/authoring/endgameDiskFrontier.test.mjs`; both platforms retain
+typecheck, production build, audit and browser smoke. This limitation is explicit.
+
 
 Status: **COMPLETION-FIRST IMPLEMENTATION ACTIVE / ALL NEW CHOICES PROVISIONAL / ONE CONSOLIDATED HUMAN REVIEW LAST**
 

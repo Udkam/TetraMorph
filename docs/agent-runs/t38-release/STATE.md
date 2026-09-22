@@ -85,5 +85,10 @@ tag. No external deployment target has been supplied.
 - Intermediate captures moved within the repository to ignored `.local/t38-intermediate`;
   no user archives or inherited files deleted. Final evidence about 1 MB, not proof-search output.
 - Engineering implementation and independent review complete. Next: consolidate docs,
-  push the reviewed candidate, report remote CI honestly, user listening/material review.
+  user listening/material review after remote CI is checked.
   Do not tag a subjectively accepted release or deploy to an unspecified host.
+- Pushed `1a86fd34` to origin/main. Initial remote run 35735465708 passed install,
+  audit/typecheck, but Ubuntu full tests found two historical disk-frontier identity
+  failures (785 passed / 2 failed / 17 skipped). No product-source failure. CI platform
+  contract corrected explicitly: Windows full suite, Linux excludes only that legacy
+  proof-tool file, both retain build/browser/audit. No proof-tool source modified.
