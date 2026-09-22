@@ -99,32 +99,32 @@ export const PIECE_MATERIALS: Record<PieceType, PieceMaterial> = {
 /** Complete tetromino materials. No ordinary seven-bag body is rendered underneath. */
 export const MUTATION_MATERIALS: Record<MutationItem, MutationMaterial> = {
   freeze: {
-    fillStart: 0x9beeff,
-    fillEnd: 0x58b8d2,
+    fillStart: 0xaccfd8,
+    fillEnd: 0x629aaa,
     edge: 0x206d8a,
     innerEdge: 0xe2fbff,
     facet: 0x70d4e8,
     glow: 0xbaf2ff,
   },
   collapse: {
-    fillStart: 0xaa7aff,
-    fillEnd: 0x7043bd,
+    fillStart: 0x9c83be,
+    fillEnd: 0x69517f,
     edge: 0x321354,
     innerEdge: 0xe2c6ff,
     facet: 0x8659d4,
     glow: 0xc396ff,
   },
   bomb: {
-    fillStart: 0xb95332,
-    fillEnd: 0x5c272d,
+    fillStart: 0xa77762,
+    fillEnd: 0x60463f,
     edge: 0x251116,
     innerEdge: 0xffa24c,
     facet: 0xd85b2d,
     glow: 0xffb347,
   },
   multiplier: {
-    fillStart: 0xffd46f,
-    fillEnd: 0xc89936,
+    fillStart: 0xe4c686,
+    fillEnd: 0xb09152,
     edge: 0x76500f,
     innerEdge: 0xfff3bd,
     facet: 0xdfb24e,
@@ -134,10 +134,10 @@ export const MUTATION_MATERIALS: Record<MutationItem, MutationMaterial> = {
 
 /** State-aware signal strength; all roles reuse the same body and motif grammar. */
 export const MUTATION_MATERIAL_STRENGTH: Record<MutationMaterialRole, MutationMaterialStrength> = {
-  active: { facet: 0.34, motif: 0.94, rim: 0.62 },
-  next: { facet: 0.3, motif: 0.86, rim: 0.56 },
+  active: { facet: 0.34, motif: 0.94, rim: 0.46 },
+  next: { facet: 0.3, motif: 0.86, rim: 0.4 },
   ghost: { facet: 0, motif: 0.22, rim: 0.34 },
-  settled: { facet: 0.2, motif: 0.62, rim: 0.38 },
+  settled: { facet: 0.2, motif: 0.62, rim: 0.28 },
   clear: { facet: 0.26, motif: 0.74, rim: 0.46 },
 };
 

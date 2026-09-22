@@ -1520,7 +1520,7 @@ export class TetrisRenderer {
     this.drawMutationMaterialDetails(graphics, cells, item, alpha, role, options);
   }
 
-  /** Triangular facets and sparse motifs describe material, never a trigger location. */
+  /** Broad mineral planes and incised marks, never an overlaid item badge. */
   private drawMutationMaterialDetails(
     graphics: Graphics,
     cells: readonly Cell[],
@@ -1562,84 +1562,79 @@ export class TetrisRenderer {
           const top = entry.y + inset;
           const right = entry.x + entry.size - inset;
           const bottom = entry.y + entry.size - inset;
-          const nodeX = entry.x + entry.size * .54;
-          const nodeY = entry.y + entry.size * .46;
+          const shoulder = top + (bottom - top) * .32;
+          const heel = top + (bottom - top) * .68;
           graphics
             .moveTo(left, top)
             .lineTo(right, top)
-            .lineTo(nodeX, nodeY)
+            .lineTo(right, shoulder)
+            .lineTo(left, heel)
             .lineTo(left, top)
-            .fill({ color: material.innerEdge, alpha: alpha * strength.facet * .46 * pulse })
+            .fill({ color: material.innerEdge, alpha: alpha * strength.facet * .6 * pulse })
             .moveTo(right, bottom)
             .lineTo(left, bottom)
-            .lineTo(nodeX, nodeY)
+            .lineTo(left, heel)
+            .lineTo(right, shoulder)
             .lineTo(right, bottom)
-            .fill({ color: material.edge, alpha: alpha * strength.facet * .36 });
-          this.strokeSegments(graphics, [
-            [left, top, nodeX, nodeY],
-            [nodeX, nodeY, right, bottom],
-          ], material.facet, alpha * strength.facet * .78, Math.max(.8, entry.size * .026));
+            .fill({ color: material.edge, alpha: alpha * strength.facet * .28 });
+          // Satin striations run in one direction, without a four-triangle jewel X.
+          if (item === 'multiplier' || item === 'freeze') {
+            this.strokeSegments(graphics, [
+              [left, heel, right, shoulder],
+              [left, heel + entry.size * .045, right, shoulder + entry.size * .045],
+            ], material.innerEdge, alpha * strength.facet * .32, Math.max(.65, entry.size * .018));
+          }
         }
       }
 
-      const motifEntries = entries.length <= 2
-        ? entries
-        : [entries[0]!, entries[Math.floor((entries.length - 1) / 2)]!, entries.at(-1)!]
-          .filter((entry, index, list) => list.indexOf(entry) === index);
+      const motifEntries = role === 'ghost' ? [entries[0]!] : entries;
       const motifAlpha = alpha * strength.motif * pulse;
-      const motifStroke = Math.max(1, options.unit * scale * .042);
+      const motifStroke = Math.max(.8, options.unit * scale * .032);
       if (item === 'freeze') {
-        for (const entry of motifEntries.slice(0, role === 'ghost' ? 1 : 3)) {
-          const reach = entry.size * .27;
+        for (const entry of motifEntries.slice(0, role === 'ghost' ? 1 : 2)) {
+          const reach = entry.size * .34;
           this.strokeSegments(graphics, [
             [entry.centerX - reach, entry.centerY - reach * .72, entry.centerX + reach * .12, entry.centerY + reach * .05],
             [entry.centerX + reach * .12, entry.centerY + reach * .05, entry.centerX + reach, entry.centerY + reach * .62],
             [entry.centerX + reach * .08, entry.centerY, entry.centerX + reach * .54, entry.centerY - reach * .52],
-          ], material.glow, motifAlpha * .72, motifStroke);
+          ], material.glow, motifAlpha * .56, motifStroke);
         }
       } else if (item === 'bomb') {
-        for (const entry of motifEntries.slice(0, role === 'ghost' ? 1 : 3)) {
-          const reach = entry.size * .3;
-          this.strokeSegments(graphics, [
-            [entry.centerX - reach, entry.centerY - reach * .7, entry.centerX - reach * .04, entry.centerY],
-            [entry.centerX - reach * .04, entry.centerY, entry.centerX + reach, entry.centerY + reach * .64],
-            [entry.centerX - reach * .04, entry.centerY, entry.centerX + reach * .5, entry.centerY - reach * .66],
-          ], material.glow, motifAlpha * .88, motifStroke * 1.08);
+        for (const entry of motifEntries) {
+          const reach = entry.size * .37;
+          const bend = (entry.cell.x + entry.cell.y) % 2 === 0 ? .22 : -.22;
+          const seam: Array<readonly [number, number, number, number]> = [
+            [entry.centerX - reach, entry.centerY - reach * .6, entry.centerX + reach * bend, entry.centerY],
+            [entry.centerX + reach * bend, entry.centerY, entry.centerX + reach, entry.centerY + reach * .45],
+          ];
+          this.strokeSegments(graphics, seam, material.edge, motifAlpha, motifStroke * 3);
+          this.strokeSegments(graphics, seam, material.glow, motifAlpha * .82, motifStroke);
         }
       } else if (item === 'multiplier') {
-        const [primary, secondary] = motifEntries;
+        const [primary] = motifEntries;
         if (primary) {
           this.drawMutationStar(
             graphics,
             primary.centerX,
             primary.centerY,
-            primary.size * .16,
-            primary.size * .055,
+            primary.size * .12,
+            primary.size * .025,
             material.glow,
             motifAlpha * .9,
           );
         }
-        if (secondary && secondary !== primary && role !== 'ghost') {
-          this.drawMutationStar(
-            graphics,
-            secondary.centerX + secondary.size * .08,
-            secondary.centerY - secondary.size * .1,
-            secondary.size * .09,
-            secondary.size * .028,
-            material.innerEdge,
-            motifAlpha * .72,
-          );
-        }
       } else {
-        for (const entry of motifEntries.slice(0, 2)) {
-          const radius = Math.max(1.4, entry.size * (role === 'ghost' ? .1 : .13));
-          graphics
-            .circle(entry.centerX, entry.centerY, radius)
-            .fill({ color: material.edge, alpha: motifAlpha * .74 })
-            .circle(entry.centerX, entry.centerY, radius * .48)
-            .fill({ color: material.fillEnd, alpha: motifAlpha * .84 })
-            .circle(entry.centerX - radius * .18, entry.centerY - radius * .22, radius * .16)
-            .fill({ color: material.glow, alpha: motifAlpha * .56 });
+        for (const entry of motifEntries) {
+          const reach = entry.size * .22;
+          for (const dy of [-.11, .11]) {
+            const y = entry.centerY + entry.size * dy;
+            const groove: Array<readonly [number, number, number, number]> = [
+              [entry.centerX - reach, y - reach * .3, entry.centerX, y + reach * .3],
+              [entry.centerX, y + reach * .3, entry.centerX + reach, y - reach * .3],
+            ];
+            this.strokeSegments(graphics, groove, material.edge, motifAlpha * .9, motifStroke * 2.4);
+            this.strokeSegments(graphics, groove, material.facet, motifAlpha * .65, motifStroke);
+          }
         }
       }
 
@@ -1698,7 +1693,7 @@ export class TetrisRenderer {
     item: MutationItem,
     options: GroupDrawOptions,
     alpha = 1,
-    width = Math.max(1, options.unit * 0.056),
+    width = Math.max(.8, options.unit * 0.032),
   ): void {
     if (cells.length === 0 || alpha <= 0) return;
     const scale = options.scale ?? 1;
@@ -1965,7 +1960,7 @@ export class TetrisRenderer {
       );
       // One quiet facet language keeps ordinary and Mutation bodies related without
       // turning the seven-colour baseline into another effects layer.
-      for (const entry of geometry) {
+      for (const entry of ('facet' in material ? [] : geometry)) {
         const inset = Math.max(1, size * .14);
         const left = entry.x + inset;
         const top = entry.y + inset;

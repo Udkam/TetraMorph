@@ -1529,12 +1529,8 @@ describe('Endgame undo presentation reset', () => {
       );
       signatures.add(geometrySignature(recorder.operations));
       expect(recorder.operations.some((operation) => operation.kind === 'roundRect'), item).toBe(false);
-      if (item !== 'collapse') {
-        expect(recorder.operations.some((operation) => operation.kind === 'circle'), item).toBe(false);
-      } else {
-        // At most two distributed wells, each made from three nested circles.
-        expect(recorder.operations.filter((operation) => operation.kind === 'circle')).toHaveLength(6);
-      }
+      // Gravity is incised directional grooves, not circular badge-like wells.
+      expect(recorder.operations.some((operation) => operation.kind === 'circle'), item).toBe(false);
     }
     expect(signatures.size).toBe(4);
   });
