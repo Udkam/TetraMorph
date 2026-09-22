@@ -98,17 +98,17 @@ function contentBounds(image, included) {
     }
     return { left, top, right, bottom };
 }
-describe('Falling Fold site icon', () => {
-    it('ships one original connected asymmetric vector silhouette and one warm seam', () => {
+describe('Balanced cube site icon', () => {
+    it('ships a tilted three-face cube with a single lowest contact vertex', () => {
         const svg = readFileSync(projectPath('public/favicon.svg'), 'utf8');
         expect(svg).toContain('viewBox="0 0 64 64"');
-        expect(svg.match(/id="fold-body"/g)).toHaveLength(1);
-        expect(svg.match(/data-role="facet"/g)).toHaveLength(5);
+        expect(svg.match(/id="cube-body"/g)).toHaveLength(1);
+        expect(svg.match(/data-role="facet"/g)).toHaveLength(3);
         expect(svg.match(/id="warm-seam"/g)).toHaveLength(1);
         expect(svg.match(/data-role="seam"/g)).toHaveLength(1);
         expect(svg.match(/#E39A58/g)).toHaveLength(1);
-        expect(svg).toMatch(/id="fold-body"[^>]*d="M19 5 [^"]+ Z"/);
-        expect(svg).toMatch(/id="warm-seam"[^>]*stroke="#E39A58"[^>]*stroke-width="3"/);
+        expect(svg).toContain('id="cube-body" d="M7 16 L30 6 L49 22 L53 48 L30 58 L11 42 Z"');
+        expect(svg).toMatch(/id="warm-seam"[^>]*stroke="#E39A58"[^>]*stroke-width="2"/);
         expect(svg).not.toMatch(/<(?:rect|text)\b/i);
         expect(svg).not.toMatch(/#(?:3f9f96|6687d5|c98243|9875be)/i);
         expect(svg).not.toMatch(/>[A-Za-z]</);
@@ -145,7 +145,7 @@ describe('Falling Fold site icon', () => {
         expect(deepBlue).toBeGreaterThan(size);
         expect(warm).toBeGreaterThan(0);
         const bounds = contentBounds(image, (_r, _g, _b, alpha) => alpha >= 128);
-        expect(bounds.left).toBeGreaterThanOrEqual(Math.floor(size * 0.12));
+        expect(bounds.left).toBeGreaterThanOrEqual(Math.floor(size * 0.10));
         expect(bounds.right).toBeLessThanOrEqual(Math.ceil(size * 0.88));
         expect(bounds.top).toBeGreaterThanOrEqual(Math.floor(size * 0.05));
         expect(bounds.bottom).toBeLessThanOrEqual(Math.ceil(size * 0.95));

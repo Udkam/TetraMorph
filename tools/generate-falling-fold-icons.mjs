@@ -21,35 +21,26 @@ const COLORS = Object.freeze({
 });
 
 const OUTLINE = Object.freeze([
-  [19, 5], [43, 10], [53, 23], [42, 31], [50, 45],
-  [34, 59], [17, 51], [11, 35], [21, 26], [13, 16],
+  [7, 16], [30, 6], [49, 22], [53, 48], [30, 58], [11, 42],
 ]);
 
 const FACETS = Object.freeze([
   Object.freeze({
     color: COLORS.upperLeft,
-    points: Object.freeze([[19, 5], [43, 10], [37, 24], [21, 26], [13, 16]]),
+    points: Object.freeze([[7, 16], [30, 6], [49, 22], [26, 32]]),
   }),
   Object.freeze({
     color: COLORS.upperRight,
-    points: Object.freeze([[43, 10], [53, 23], [42, 31], [37, 24]]),
+    points: Object.freeze([[26, 32], [49, 22], [53, 48], [30, 58]]),
   }),
   Object.freeze({
     color: COLORS.middleLeft,
-    points: Object.freeze([[13, 16], [21, 26], [37, 24], [31, 38], [17, 51], [11, 35]]),
-  }),
-  Object.freeze({
-    color: COLORS.lowerRight,
-    points: Object.freeze([[37, 24], [42, 31], [50, 45], [34, 59], [31, 38]]),
-  }),
-  Object.freeze({
-    color: COLORS.lowerLeft,
-    points: Object.freeze([[31, 38], [34, 59], [17, 51]]),
+    points: Object.freeze([[7, 16], [26, 32], [30, 58], [11, 42]]),
   }),
 ]);
 
-const SEAM = Object.freeze([[22, 10], [37, 24], [31, 38], [39, 48]]);
-const SEAM_WIDTH = 3;
+const SEAM = Object.freeze([[8, 17], [26, 32], [30, 57]]);
+const SEAM_WIDTH = 2;
 
 const rgba = (hex) => {
   const value = Number.parseInt(hex.slice(1), 16);
@@ -76,7 +67,7 @@ function svgBytes() {
     '  <defs>',
     `    <clipPath id="fold-clip"><path d="${outline}" /></clipPath>`,
     '  </defs>',
-    `  <path id="fold-body" d="${outline}" fill="${COLORS.base}" />`,
+    `  <path id="cube-body" d="${outline}" fill="${COLORS.base}" />`,
     '  <g clip-path="url(#fold-clip)">',
     facets,
     '  </g>',
